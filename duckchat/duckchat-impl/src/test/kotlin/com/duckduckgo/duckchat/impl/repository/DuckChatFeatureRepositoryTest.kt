@@ -301,4 +301,27 @@ class DuckChatFeatureRepositoryTest {
 
         assertTrue(testee.isContextualOnboardingCompleted())
     }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting then set in data store`() = runTest {
+        testee.setChatSuggestionsUserSetting(true)
+
+        verify(mockDataStore).setChatSuggestionsUserSetting(true)
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting false then set in data store`() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+
+        verify(mockDataStore).setChatSuggestionsUserSetting(false)
+    }
+
+    @Test
+    fun `when observeChatSuggestionsUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeChatSuggestionsUserSettingEnabled().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
 }

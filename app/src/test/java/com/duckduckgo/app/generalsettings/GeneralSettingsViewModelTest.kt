@@ -32,6 +32,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
@@ -41,6 +42,7 @@ import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -93,6 +95,9 @@ internal class GeneralSettingsViewModelTest {
 
     private val mockMaliciousSiteProtection: MaliciousSiteProtection = mock()
 
+    @Mock
+    private lateinit var mockDuckChat: DuckChat
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -105,6 +110,11 @@ internal class GeneralSettingsViewModelTest {
 
             fakeShowOnAppLaunchOptionDataStore = FakeShowOnAppLaunchOptionDataStore()
             fakeShowOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+            whenever(mockDuckChat.isEnabled()).thenReturn(false)
+            whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(false)
+            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(mockDuckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
         }
     }
 
@@ -112,7 +122,7 @@ internal class GeneralSettingsViewModelTest {
     fun after() {
         // Clean up the state after each test if necessary
         fakeAppSettingsDataStore = FakeSettingsDataStore()
-        reset(mockPixel, mockHistory)
+        reset(mockPixel, mockHistory, mockDuckChat)
     }
 
     @Test
@@ -387,6 +397,105 @@ internal class GeneralSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenDuckChatEnabledAndInputScreenEnabledAndFeatureAvailableThenChatSuggestionsToggleIsVisible() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state!!.showChatSuggestionsToggle)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatDisabledThenChatSuggestionsToggleIsHidden() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state!!.showChatSuggestionsToggle)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInputScreenDisabledThenChatSuggestionsToggleIsHidden() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state!!.showChatSuggestionsToggle)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenChatSuggestionsFeatureNotAvailableThenChatSuggestionsToggleIsHidden() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(false)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state!!.showChatSuggestionsToggle)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenChatSuggestionsUserSettingDisabledThenToggleIsOff() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isChatSuggestionsFeatureAvailable()).thenReturn(true)
+        whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        whenever(mockDuckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state!!.showChatSuggestionsToggle)
+            assertFalse(state.chatSuggestionsEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenChatSuggestionsSwitchedOnThenPixelFired() = runTest {
+        initTestee()
+
+        testee.onChatSuggestionsSettingChanged(true)
+
+        verify(mockDuckChat).setChatSuggestionsUserSetting(true)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun whenChatSuggestionsSwitchedOffThenPixelFired() = runTest {
+        initTestee()
+
+        testee.onChatSuggestionsSettingChanged(false)
+
+        verify(mockDuckChat).setChatSuggestionsUserSetting(false)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT)
+        verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY, type = Pixel.PixelType.Daily())
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
@@ -412,6 +521,7 @@ internal class GeneralSettingsViewModelTest {
             fakeShowOnAppLaunchOptionDataStore,
             fakeBrowserConfigFeature,
             mockMaliciousSiteProtection,
+            mockDuckChat,
         )
     }
 }

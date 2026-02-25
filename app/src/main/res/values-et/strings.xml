@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
+    <string name="privateSearchChatSuggestionsToggle">Vestluse soovitused</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Kuva otsinguribale tippimise ajal soovitusi oma ajaloost, järjehoidjatest ja (valikuliselt) Duck.ai vestlusajaloo põhjal. Kõik otsingud on privaatsed.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Üldine</string>
@@ -206,6 +208,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokeerib Google\'i sisselogimise hüpikaknad saitidel, mida Google ei oma.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Üleilmne privaatsuskontroll (Global Privacy Control)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Väljendab sinu nimel loobumisõigusi, käskides saitidel mitte müüa ega jagada sinu isiklikke andmeid.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
+    <string name="getDesktopBrowserTitle">Kaitse oma isikuandmeid nii Macis kui ka Windowsis!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo allalaadimiseks Macile või Windowsile külasta:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Jaga allalaadimise linki</string>
+    <string name="getDesktopBrowserNoThanks">Ei, aitäh</string>
+    <string name="getDesktopBrowserHideItem">Peida</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>

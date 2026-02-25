@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">A chamada para o consultor não foi útil</string>
     <string name="feedbackSubCategoryItrOther">Outros</string>
 
-    <string name="feedbackSubCategorySubsOtp">Palavra-passe de utilização única</string>
-    <string name="feedbackSubCategorySubsOther">Outros</string>
+    <string name="feedbackSubCategorySubsOtp">Problema com a palavra-passe de utilização única</string>
+    <string name="feedbackSubCategorySubsOther">Outra coisa</string>
 
     <string name="feedbackSubmitVpnHeader">Encontraste um problema que não é abordado no nosso <annotation type="faqs_link">centro de ajuda</annotation> ? Queremos perceber do que se trata.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Diz-nos o que se passa…</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">A mudança aumenta o preço mensal de %1$s/mês para %2$s/mês.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Manter plano anual</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Mudar para mensal (%1$s/mês)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Não é possível aceder às funcionalidades dos níveis Plus ou Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Atualizar para o Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Desbloqueia IA mais poderosa</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gerir Subscrição</string>
+    <string name="subscriptionSettingViewAllPlans">Ver todos os planos</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gerir pagamento ou Cancelar</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">O teu plano será atualizado para %1$s a %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Será feito o downgrade do teu plano para %1$s a %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Mensal</string>
+    <string name="planNamePlusYearly">Plus Anual</string>
+    <string name="planNameProMonthly">Pro Mensal</string>
+    <string name="planNameProYearly">Pro Anual</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

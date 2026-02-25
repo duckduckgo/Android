@@ -178,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
     <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
     <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
+    <string name="privateSearchChatSuggestionsToggle">Pokalbių pasiūlymai</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Rodyti pasiūlymus iš jūsų istorijos, žymių ir (pasirinktinai) „Duck.ai“ pokalbių istorijos, kai rašai paieškos juostoje. Visos paieškos yra privačios.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Bendrieji</string>
@@ -208,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuoja „Google“ prisijungimo iššokančiuosius langus svetainėse, kurios nepriklauso „Google“.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Visuotinė privatumo kontrolė</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Išreiškia atsisakymo teises jūsų vardu, liepdamas svetainėms nepardavinėti jūsų asmens informacijos ir jos nebendrinti.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
+    <string name="getDesktopBrowserTitle">Apsaugok asmeninę informaciją ir „Mac“ bei „Windows“ kompiuteriuose!</string>
+    <string name="getDesktopBrowserBody">Kad atsisiųstum „DuckDuckGo“ į „Mac“ arba „Windows“, apsilankyk:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Bendrinti atsisiuntimo nuorodą</string>
+    <string name="getDesktopBrowserNoThanks">Ne, dėkoju</string>
+    <string name="getDesktopBrowserHideItem">Slėpti</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Nuoroda nukopijuota</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>

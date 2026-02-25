@@ -44,7 +44,7 @@ data class HistoryEntryEntity(
  */
 @Entity(
     tableName = "visits_list",
-    primaryKeys = ["timestamp", "historyEntryId"],
+    primaryKeys = ["timestamp", "historyEntryId", "tabId"],
     foreignKeys = [
         ForeignKey(
             entity = HistoryEntryEntity::class,
@@ -57,6 +57,7 @@ data class HistoryEntryEntity(
 data class VisitEntity(
     val historyEntryId: Long,
     val timestamp: String,
+    val tabId: String = "",
 )
 
 /**

@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority
@@ -48,9 +49,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var getDesktopBrowserViewModelFactory: GetDesktopBrowserViewModel.Factory
-
-    @Inject
-    lateinit var shareEventHandler: GetDesktopBrowserShareEventHandler
 
     private val binding: ActivityGetDesktopBrowserBinding by viewBinding()
 
@@ -80,18 +78,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
-
-        // Observe share events and close activity when link is shared
-        shareEventHandler.linkShared
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { shared ->
-                if (shared) {
-                    shareEventHandler.consumeEvent()
-                    setResult(RESULT_DISMISSED_OR_SHARED)
-                    finish()
-                }
-            }
-            .launchIn(lifecycleScope)
     }
 
     private fun render(viewState: GetDesktopBrowserViewModel.ViewState) {
@@ -105,12 +91,15 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
             }
 
             is GetDesktopBrowserViewModel.Command.Dismissed -> {
-                setResult(RESULT_DISMISSED_OR_SHARED)
                 finish()
             }
 
             is GetDesktopBrowserViewModel.Command.ShareDownloadLink -> {
                 launchShareSheet(command.url)
+            }
+
+            GetDesktopBrowserViewModel.Command.ShowCopiedNotification -> {
+                showCopiedNotification()
             }
         }
     }
@@ -149,12 +138,19 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
         binding.noThanksButton.setOnClickListener {
             viewModel.onNoThanksClicked()
         }
+        binding.browserUrl.setOnClickListener {
+            viewModel.onLinkClicked()
+        }
     }
 
     private fun setupBackNavigationHandler() {
         onBackPressedDispatcher.addCallback(this) {
             viewModel.onBackPressed()
         }
+    }
+
+    private fun showCopiedNotification() {
+        Snackbar.make(binding.root, R.string.getDesktopBrowserUrlLinkCopied, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun getDesktopBrowserViewModel(params: GetDesktopBrowserActivityParams): GetDesktopBrowserViewModel = ViewModelProvider.create(
@@ -165,10 +161,6 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
         },
         extras = this.defaultViewModelCreationExtras,
     )[GetDesktopBrowserViewModel::class.java]
-
-    companion object {
-        const val RESULT_DISMISSED_OR_SHARED = 100
-    }
 }
 
 data class GetDesktopBrowserActivityParams(

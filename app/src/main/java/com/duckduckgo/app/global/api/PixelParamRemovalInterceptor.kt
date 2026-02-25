@@ -123,6 +123,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.PREONBOARDING_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_RESUME_ONBOARDING_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_AICHAT_SELECTED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.PREONBOARDING_SEARCH_ONLY_SELECTED.pixelName to PixelParameter.removeAtb(),
@@ -180,6 +181,15 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_UNENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_CLICKED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

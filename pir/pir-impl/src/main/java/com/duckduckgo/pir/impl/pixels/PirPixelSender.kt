@@ -50,6 +50,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_LOW_MEMORY
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_STARTED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
@@ -553,6 +554,8 @@ interface PirPixelSender {
     )
 
     fun reportDashboardOpened()
+
+    fun reportInitialScanIncomplete()
 
     fun reportInitialScanDuration(
         durationMs: Long,
@@ -1311,6 +1314,10 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportDashboardOpened() {
         fire(PIR_DASHBOARD_OPENED)
+    }
+
+    override fun reportInitialScanIncomplete() {
+        fire(PIR_INITIAL_SCAN_INCOMPLETE)
     }
 
     override fun reportInitialScanDuration(

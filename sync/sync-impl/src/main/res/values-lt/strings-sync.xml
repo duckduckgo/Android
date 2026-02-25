@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sinchronizuoti žymes skirtinguose įrenginiuose</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Slėpti</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Gaukite kompiuterio naršyklę</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">„DuckDuckGo“, skirta „Mac“ ir „Windows“</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

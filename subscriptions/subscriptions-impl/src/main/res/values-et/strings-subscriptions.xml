@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Nõustajale helistamine ei aita</string>
     <string name="feedbackSubCategoryItrOther">Muu</string>
 
-    <string name="feedbackSubCategorySubsOtp">Ühekordne parool</string>
-    <string name="feedbackSubCategorySubsOther">Muu</string>
+    <string name="feedbackSubCategorySubsOtp">Probleem ühekordse parooliga</string>
+    <string name="feedbackSubCategorySubsOther">Midagi muud</string>
 
     <string name="feedbackSubmitVpnHeader">Kas leidsid probleemi, mida meie <annotation type="faqs_link">abikeskuses</annotation> ei käsitleta? Me tahame sellest kindlasti teada saada.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Ütle meile, mis toimub...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Üleminek suurendab sinu igakuist hinda hinnalt %1$s/kuus hinnale %2$s/kuus.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Jätka aastaplaaniga</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Mine üle igakuisele plaanile (%1$s/kuu)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ei saa Plus või Pro taseme funktsioonidele ligi pääseda</string>
+    <string name="subscriptionsProUpgradeTitle">Mine üle Pro-le</string>
+    <string name="subscriptionsProUpgradeMessage">Vabasta võimsam tehisintellekt</string>
+    <string name="subscriptionSettingSectionManageSubscription">Tellimuse haldamine</string>
+    <string name="subscriptionSettingViewAllPlans">Vaata kõiki plaane</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Makse haldamine või tühistamine</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sinu plaan uuendatakse plaanile %1$s kuupäeval %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sinu pakett alandatakse plaanile %1$s kuupäeval %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Monthly</string>
+    <string name="planNamePlusYearly">Plus Yearly</string>
+    <string name="planNameProMonthly">Pro Monthly</string>
+    <string name="planNameProYearly">Pro Yearly</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

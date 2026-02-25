@@ -178,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického dopĺňania teraz zahŕňajú vaše nedávno navštívené stránky. Vypnite ich v nastaveniach alebo ich kedykoľvek zrušte pomocou tlačidla 🔥Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Rovnaké súkromie.\nLepšie návrhy vyhľadávania!</string>
     <string name="openAutoCompleteSettings">Otvoriť nastavenia</string>
+    <string name="privateSearchChatSuggestionsToggle">Návrhy četu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Pri písaní do vyhľadávacieho panela zobrazuj návrhy z histórie, záložiek a (voliteľne) z histórie chatu Duck.ai. Všetky vyhľadávania sú súkromné.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Všeobecné</string>
@@ -208,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuje vyskakovacie okná pre prihlásenie pomocou Google na stránkach, ktoré spoločnosť Google nevlastní.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globálna kontrola súkromia</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Vyjadruje právo na explicitný nesúhlas vo vašom mene tým, že webovým lokalitám hovorí, aby nepredávali ani nezdieľali vaše osobné údaje.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Získajte prehliadač pre desktop PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pre Mac a Windows</string>
+    <string name="getDesktopBrowserTitle">Chráň si svoje osobné údaje na Macu aj vo Windows!</string>
+    <string name="getDesktopBrowserBody">Ak si chceš stiahnuť aplikáciu DuckDuckGo v systéme Mac alebo Windows, navštív túto stránku:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Zdieľať odkaz na stiahnutie</string>
+    <string name="getDesktopBrowserNoThanks">Nie, ďakujem</string>
+    <string name="getDesktopBrowserHideItem">Skryť</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz bol skopírovaný</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>

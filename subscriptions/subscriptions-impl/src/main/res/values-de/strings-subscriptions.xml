@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefonat mit Berater nicht hilfreich</string>
     <string name="feedbackSubCategoryItrOther">Sonstiges</string>
 
-    <string name="feedbackSubCategorySubsOtp">Einmal-Passwort</string>
-    <string name="feedbackSubCategorySubsOther">Sonstiges</string>
+    <string name="feedbackSubCategorySubsOtp">Problem mit dem Einmal-Passwort</string>
+    <string name="feedbackSubCategorySubsOther">Etwas anderes</string>
 
     <string name="feedbackSubmitVpnHeader">Hast du ein Problem, das in unserem <annotation type="faqs_link">Hilfecenter</annotation> nicht behandelt wird? Wir wollen auf jeden Fall davon erfahren.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Sag uns, worum es geht …</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Durch den Wechsel erhöht sich dein monatlicher Preis von %1$s/Monat auf %2$s/Monat.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Jahrestarif behalten</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Zum Monatsabo wechseln (%1$s/Monat)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Kein Zugriff auf Plus- oder Pro-Funktionen möglich</string>
+    <string name="subscriptionsProUpgradeTitle">Upgrade auf Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Nutze leistungsfähigere KI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Abonnement verwalten</string>
+    <string name="subscriptionSettingViewAllPlans">Alle Tarife anzeigen</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Zahlung verwalten oder stornieren</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s hochgestuft.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s herabgestuft.</string>
+    <string name="planNamePlusMonthly">Plus monatlich</string>
+    <string name="planNamePlusYearly">Plus jährlich</string>
+    <string name="planNameProMonthly">Pro Monat</string>
+    <string name="planNameProYearly">Pro Jahr</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

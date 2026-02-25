@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Poziv savjetniku nije bio od pomoći</string>
     <string name="feedbackSubCategoryItrOther">Ostalo</string>
 
-    <string name="feedbackSubCategorySubsOtp">Jednokratna lozinka</string>
-    <string name="feedbackSubCategorySubsOther">Ostalo</string>
+    <string name="feedbackSubCategorySubsOtp">Problem s jednokratnom lozinkom</string>
+    <string name="feedbackSubCategorySubsOther">Nešto drugo</string>
 
     <string name="feedbackSubmitVpnHeader">Pronašao si problem koji nije pokriven u našem <annotation type="faqs_link">centru za pomoć</annotation> ? Definitivno želimo znati više o tome.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Reci nam što se događa...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Prebacivanje će povećati tvoju mjesečnu cijenu s %1$s/mjesečno na %2$s/mjesečno.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Zadrži godišnji plan</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Prebaci se na mjesečnu pretplatu (%1$s/mjesečno)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ne možeš pristupiti značajkama Plus ili Pro razine</string>
+    <string name="subscriptionsProUpgradeTitle">Nadogradi na Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Otključaj moćniju umjetnu inteligenciju</string>
+    <string name="subscriptionSettingSectionManageSubscription">Upravljaj pretplatom</string>
+    <string name="subscriptionSettingViewAllPlans">Pogledaj sve planove</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Upravljanje plaćanjem ili otkazivanje</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj će se plan nadograditi na %1$s dana %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvoj će se plan smanjiti na %1$s dana %2$s.</string>
+    <string name="planNamePlusMonthly">mjesečni Plus</string>
+    <string name="planNamePlusYearly">godišnji Plus</string>
+    <string name="planNameProMonthly">mjesečni Pro</string>
+    <string name="planNameProYearly">godišnji Pro</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

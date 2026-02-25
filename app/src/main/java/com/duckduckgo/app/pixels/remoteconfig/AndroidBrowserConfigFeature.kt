@@ -321,4 +321,13 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun reduceBrowserTabBundleSize(): Toggle
+
+    /**
+     * Controls whether page load wide events are sent.
+     * @return `true` when the remote config has the global "sendPageLoadWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPageLoadWideEvent(): Toggle
 }

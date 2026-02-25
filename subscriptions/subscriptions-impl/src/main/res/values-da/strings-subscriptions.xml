@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Opkald til rådgiver var ikke hjælpsomt</string>
     <string name="feedbackSubCategoryItrOther">Andet</string>
 
-    <string name="feedbackSubCategorySubsOtp">Engangsadgangskode</string>
-    <string name="feedbackSubCategorySubsOther">Andet</string>
+    <string name="feedbackSubCategorySubsOtp">Problem med engangskode</string>
+    <string name="feedbackSubCategorySubsOther">Noget andet</string>
 
     <string name="feedbackSubmitVpnHeader">Har du fundet et problem, der ikke er dækket i vores <annotation type="faqs_link">hjælpecenter</annotation>? Vi vil helt sikkert gerne vide det.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Fortæl os, hvad der foregår...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Hvis du skifter, vil din månedlige pris stige fra %1$s/md. til %2$s/md.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årligt abonnement</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Skift til månedligt (%1$s/måned)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Kan ikke få adgang til Plus- eller Pro-funktioner</string>
+    <string name="subscriptionsProUpgradeTitle">Opgrader til Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Lås op for mere kraftfuld AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Administrer abonnement</string>
+    <string name="subscriptionSettingViewAllPlans">Se alle abonnementer</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Administrer betaling eller annullér</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dit abonnement opgraderes til %1$s den %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dit abonnement nedgraderes til %1$s den %2$s.</string>
+    <string name="planNamePlusMonthly">Plus månedligt</string>
+    <string name="planNamePlusYearly">Plus årligt</string>
+    <string name="planNameProMonthly">Pro månedligt</string>
+    <string name="planNameProYearly">Pro årligt</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

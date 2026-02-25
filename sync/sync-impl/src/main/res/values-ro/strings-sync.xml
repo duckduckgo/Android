@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Sincronizează marcajele pe mai multe dispozitive</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Ascunde</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

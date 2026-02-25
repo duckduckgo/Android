@@ -63,14 +63,15 @@ class HistoryTest {
         }
     }
 
+    @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true), eq("tabId"))
         }
     }
 
@@ -79,9 +80,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false), eq("tabId"))
         }
     }
 
@@ -99,9 +100,9 @@ class HistoryTest {
         whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any(), any())
         }
     }
 
@@ -110,9 +111,9 @@ class HistoryTest {
         runTest {
             whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
 
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any(), any())
         }
     }
 
@@ -132,5 +133,25 @@ class HistoryTest {
         testee.removeHistoryEntryByQuery(query)
 
         verify(mockHistoryRepository).removeHistoryEntryByQuery(eq(query))
+    }
+
+    @Test
+    fun whenRemoveHistoryForTabThenRemoveHistoryForTabCalled() = runTest {
+        val tabId = "tab1"
+
+        testee.removeHistoryForTab(tabId)
+
+        verify(mockHistoryRepository).removeHistoryForTab(eq(tabId))
+    }
+
+    @Test
+    fun whenSaveToHistoryWithTabIdThenTabIdIsPassedToRepository() {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title", "tab1")
+
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false), eq("tab1"))
+        }
     }
 }

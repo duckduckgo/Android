@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
     <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
+    <string name="privateSearchChatSuggestionsToggle">Csevegési javaslatok</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Az előzményekből, a könyvjelzőkből és (opcionálisan) a Duck.ai csevegési előzményekből származó javaslatok megjelenítése a keresősávba való gépeléskor. Minden keresés privát.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Általános</string>
@@ -206,6 +208,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokkolja az előugró Google bejelentkezési ablakokat a nem a Google tulajdonában lévő webhelyeken.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Leiratkozási jogokat gyakorol a nevedben azáltal, hogy jelzi a webhelyeknek, hogy ne adják el vagy osszák meg a személyes adataidat.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
+    <string name="getDesktopBrowserTitle">Védd a személyes adataidat Mac és Windows rendszeren is!</string>
+    <string name="getDesktopBrowserBody">A DuckDuckGo Mac vagy Windows rendszerre történő letöltéséhez látogass el ide:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Letöltési link megosztása</string>
+    <string name="getDesktopBrowserNoThanks">Nem, köszönöm</string>
+    <string name="getDesktopBrowserHideItem">Elrejtés</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>

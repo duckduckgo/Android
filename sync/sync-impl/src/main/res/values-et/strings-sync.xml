@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Järjehoidjate sünkroonimine seadmete vahel</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Peida</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

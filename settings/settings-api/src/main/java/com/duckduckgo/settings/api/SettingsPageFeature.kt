@@ -35,5 +35,6 @@ interface SettingsPageFeature {
     fun whatsNewEnabled(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun newDesktopBrowserSettingEnabled(): Toggle
 }

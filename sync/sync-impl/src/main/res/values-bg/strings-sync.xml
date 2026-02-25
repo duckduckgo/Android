@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Синхронизирай отметките между устройства</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Скрий</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

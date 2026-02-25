@@ -36,14 +36,11 @@ class GetDesktopBrowserShareBroadcastReceiver : BroadcastReceiver() {
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
-    lateinit var sharedEvent: GetDesktopBrowserShareEventHandler
+    @AppCoroutineScope
+    lateinit var coroutineScope: CoroutineScope
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
-
-    @Inject
-    @AppCoroutineScope
-    lateinit var coroutineScope: CoroutineScope
 
     override fun onReceive(
         context: Context,
@@ -52,9 +49,9 @@ class GetDesktopBrowserShareBroadcastReceiver : BroadcastReceiver() {
         AndroidInjection.inject(this, context)
 
         val pendingResult = goAsync()
+
         coroutineScope.launch(dispatcherProvider.io()) {
             settingsDataStore.getDesktopBrowserSettingDismissed = true
-            sharedEvent.onLinkShared()
             pendingResult.finish()
         }
     }

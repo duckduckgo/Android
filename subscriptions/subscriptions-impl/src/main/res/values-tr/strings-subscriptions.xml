@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Danışmanı aramak yardımcı olmuyor</string>
     <string name="feedbackSubCategoryItrOther">Diğer</string>
 
-    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre</string>
-    <string name="feedbackSubCategorySubsOther">Diğer</string>
+    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre ile ilgili sorun</string>
+    <string name="feedbackSubCategorySubsOther">Başka bir şey</string>
 
     <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Geçiş yapmak, aylık fiyatı %1$s/ay\'dan %2$s/ay\'a çıkaracaktır.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Yıllık Planı Sürdür</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Aylık Plana Geç (%1$s/ay)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus veya Pro seviye özelliklere erişilemiyor</string>
+    <string name="subscriptionsProUpgradeTitle">Pro\'ya Yükseltin</string>
+    <string name="subscriptionsProUpgradeMessage">Daha güçlü yapay zekanın kilidini açın</string>
+    <string name="subscriptionSettingSectionManageSubscription">Aboneliği Yönet</string>
+    <string name="subscriptionSettingViewAllPlans">Bütün Planları Görüntüle</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Ödemeyi Yönetin veya İptal Edin</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planın %2$s tarihinde %1$s planına yükseltilecek.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planınız %2$s tarihinde %1$s planına düşürülecek.</string>
+    <string name="planNamePlusMonthly">Plus Aylık</string>
+    <string name="planNamePlusYearly">Plus Yıllık</string>
+    <string name="planNameProMonthly">Pro Aylık</string>
+    <string name="planNameProYearly">Pro Yıllık</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

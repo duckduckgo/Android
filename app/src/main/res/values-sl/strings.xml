@@ -178,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Predlogi za samodejno dokončanje zdaj vključujejo vaša nedavno obiskana spletna mesta. Izklopite v nastavitvah ali pa seznam kadar koli počistite z gumbom Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Enaka raven zasebnosti.\nBoljši predlogi iskanja!</string>
     <string name="openAutoCompleteSettings">Odpri nastavitve</string>
+    <string name="privateSearchChatSuggestionsToggle">Predlogi za klepet</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Med vnašanjem v iskalno vrstico so prikazani predlogi iz vaše zgodovine, zaznamkov in (po želji) zgodovine klepetov Duck.ai. Vsa iskanja so zasebna.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Splošno</string>
@@ -208,6 +210,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokira pojavna okna za prijavo v Google na spletnih mestih, ki niso v Googlovi lasti.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globalni nadzor zasebnosti</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">V vašem imenu izraža pravice do zavrnitve tako, da spletnim mestom naroči, naj ne prodajajo ali delijo vaših osebnih podatkov.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Namesti namizni brskalnik</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za računalnike Mac in Windows</string>
+    <string name="getDesktopBrowserTitle">Zaščitite svoje osebne podatke tudi v računalnikih Mac in Windows!</string>
+    <string name="getDesktopBrowserBody">Če želite prenesti DuckDuckGo v računalniku Mac ali Windows, obiščite:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Deli povezavo za prenos</string>
+    <string name="getDesktopBrowserNoThanks">Ne, hvala</string>
+    <string name="getDesktopBrowserHideItem">Skrij se</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Povezava je kopirana</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>

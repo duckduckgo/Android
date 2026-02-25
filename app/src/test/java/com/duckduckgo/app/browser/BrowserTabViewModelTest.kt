@@ -123,6 +123,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -162,6 +163,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -346,6 +348,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -489,6 +492,8 @@ class BrowserTabViewModelTest {
     private val mockPagesSettingPlugin: PluginPoint<DuckPlayerPageSettingsPlugin> = mock()
 
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
+
+    private val mockPageLoadWideEvent: PageLoadWideEvent = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -634,6 +639,7 @@ class BrowserTabViewModelTest {
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val favouriteLogoFlow = MutableStateFlow<String?>(null)
     private val setFavouriteEnabledFlow = MutableStateFlow(false)
 
@@ -909,6 +915,8 @@ class BrowserTabViewModelTest {
                 pageContextJSHelper = mockPageContextJSHelper,
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
+                tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+                pageLoadWideEvent = mockPageLoadWideEvent,
             )
 
         testee.loadData("abc", null, false, false)
@@ -8439,6 +8447,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenPixelFiredWithPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribed.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedNoPillStateThenPixelFiredWithNoPillStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribedNoPill,
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.NotSubscribedNoPill.pixelParam),
+        )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithSubscribedStateThenPixelFiredWithSubscribedStatus() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
+        )
+
+        testee.onVpnMenuClicked()
+
+        verify(mockPixel).fire(
+            AppPixelName.MENU_ACTION_VPN_PRESSED,
+            mapOf(PixelParameter.STATUS to VpnMenuState.Subscribed(isVpnEnabled = true).pixelParam),
+        )
+    }
+
+    @Test
     fun whenDuckChatNativeNewChatRequested() = runTest {
         val expectedEvent = SubscriptionEventData(
             featureName = "event1",
@@ -8808,6 +8858,37 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCollectPageContextThenPageContextSubscriptionEventSent() = runTest {
+        val expectedEvent = SubscriptionEventData(
+            featureName = PAGE_CONTEXT_FEATURE_NAME,
+            subscriptionName = "collect",
+            params = JSONObject(),
+        )
+        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
+
+        testee.collectPageContext()
+
+        testee.subscriptionEventDataFlow.test {
+            val emittedEvent = awaitItem()
+            assertEquals(PAGE_CONTEXT_FEATURE_NAME, emittedEvent.featureName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingNotCompletedThenNoPageContextSubscriptionEventSent() = runTest {
+        mockDuckAiContextualModeFlow.emit(true)
+        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSubscriptionChangesWhileOnDuckAiThenAuthUpdateEventSent() = runTest {
         val duckAiUrl = "https://duck.ai/chat"
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
@@ -8905,5 +8986,131 @@ class BrowserTabViewModelTest {
         testee.loadData(tabId = "test-tab", initialUrl = initialUrl, skipHome = false, isExternal = true)
 
         assertNull(testee.previousUrl)
+    }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureEnabledThenDomainRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockTabVisitedSitesRepository).recordVisitedSite("abc", "example.com")
+    }
+
+    @Test
+    fun whenOnSiteVisitedAndFeatureDisabledThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = false))
+
+        testee.onSiteVisited("https://sub.example.com/path", null)
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteVisitedWithNoHostThenNothingRecorded() = runTest {
+        fakeAndroidConfigBrowserFeature.singleTabFireDialog().setRawStoredState(State(enable = true))
+
+        testee.onSiteVisited("about:blank", null)
+
+        verify(mockTabVisitedSitesRepository, never()).recordVisitedSite(any(), any())
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressFirstTimeThenManagerOnProgressChangedCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        val tabIdCaptor = argumentCaptor<String>()
+        val urlCaptor = argumentCaptor<String>()
+
+        verify(mockPageLoadWideEvent).onProgressChanged(
+            tabIdCaptor.capture(),
+            urlCaptor.capture(),
+        )
+
+        assertNotNull(tabIdCaptor.firstValue)
+        assertEquals(testUrl, urlCaptor.firstValue)
+    }
+
+    @Test
+    fun whenProgressExceedsFixedProgressAgainThenManagerNotCalledAgain() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        // First time - should trigger call
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+
+        // Reset mock to verify second call doesn't happen
+        reset(mockPageLoadWideEvent)
+
+        // Second time - should NOT trigger call
+        testee.progressChanged(75, WebViewNavigationState(mockStack, 75))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
+    }
+
+    @Test
+    fun whenProgressBelowFixedProgressThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        // Progress below FIXED_PROGRESS (50) - should NOT call manager
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
+    }
+
+    @Test
+    fun whenNewPageLoadedThenProgressTrackerResetsAndCallsManagerAgain() {
+        val firstUrl = "https://example.com"
+        val secondUrl = "https://another.com"
+        val mockWebHistoryItem1: WebHistoryItem = mock()
+        val mockWebHistoryItem2: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem1.url).thenReturn(firstUrl)
+        whenever(mockWebHistoryItem2.url).thenReturn(secondUrl)
+        setBrowserShowing(true)
+
+        // First page load
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem1)
+        loadUrl(firstUrl)
+        testee.progressChanged(60, WebViewNavigationState(mockStack, 60))
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(firstUrl))
+
+        // New page load - resets hasExitedFixedProgress flag
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem2)
+        loadUrl(secondUrl)
+        testee.progressChanged(70, WebViewNavigationState(mockStack, 70))
+
+        // Verify second call with new URL
+        verify(mockPageLoadWideEvent).onProgressChanged(any(), eq(secondUrl))
+    }
+
+    @Test
+    fun whenProgressReachesExactlyFixedProgressThenManagerNotCalled() {
+        val testUrl = "https://example.com"
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(testUrl)
+        whenever(mockStack.currentItem).thenReturn(mockWebHistoryItem)
+        setBrowserShowing(true)
+        loadUrl(testUrl)
+
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+
+        // Manager is NOT called at exactly FIXED_PROGRESS (50) - only when progress > 50
+        verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
 }

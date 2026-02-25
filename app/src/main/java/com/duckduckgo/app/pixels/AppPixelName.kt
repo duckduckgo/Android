@@ -42,6 +42,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
     PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE("m_preonboarding_intro_reinstall_user_shown_unique"),
     PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
+    PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE("m_preonboarding_default_browser_page_shown_unique"),
     PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
     PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE("m_preonboarding_address_bar_position_dialog_shown_unique"),
     PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE("m_preonboarding_bottom_address_bar_selected_unique"),
@@ -245,6 +246,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_RESULT_DELETED("m_autocomplete_result_deleted"),
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_COUNT("m_aichat_settings_chat_suggestions_turned_on_count"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_ON_DAILY("m_aichat_settings_chat_suggestions_turned_on_daily"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_COUNT("m_aichat_settings_chat_suggestions_turned_off_count"),
+    CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY("m_aichat_settings_chat_suggestions_turned_off_daily"),
+
     SERP_REQUERY("rq_%s"),
 
     CHANGE_APP_ICON_OPENED("m_ic"),
@@ -271,6 +277,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
     MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
+    MENU_ACTION_VPN_PRESSED("m_nav_vpn_menu_item_pressed"),
 
     EXPERIMENTAL_MENU_USED("m_experimental-browsing-menu_used"),
     EXPERIMENTAL_MENU_USED_UNIQUE("m_experimental-browsing-menu_used_unique"),
@@ -502,4 +509,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     TIMEOUT_WAITING_FOR_APP_REFERRER("timeout_waiting_for_referrer"),
 
     DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED("m_automatic_data_clearing_options_updated"),
+
+    GET_DESKTOP_BROWSER_COMPLETE_SETUP_IMPRESSION("m_get_desktop_browser_complete_setup_impression"),
+    GET_DESKTOP_BROWSER_CLICKED("m_get_desktop_browser_clicked"),
+    GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
+    GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK("m_get_desktop_browser_share_download_link_click"),
+    GET_DESKTOP_BROWSER_LINK_CLICK("m_get_desktop_browser_link_click"),
 }

@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
@@ -59,6 +60,10 @@ class DefaultBrowserPageViewModel @Inject constructor(
 
     init {
         viewState.value = newViewState()
+    }
+
+    fun onPageShown() {
+        pixel.fire(pixel = AppPixelName.PREONBOARDING_DEFAULT_BROWSER_PAGE_SHOWN_UNIQUE, type = Unique())
     }
 
     fun loadUI() {

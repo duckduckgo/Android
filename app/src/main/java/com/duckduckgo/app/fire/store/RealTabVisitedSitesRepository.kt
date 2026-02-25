@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.desktopbrowser
+package com.duckduckgo.app.fire.store
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-interface GetDesktopBrowserShareEventHandler {
-    val linkShared: StateFlow<Boolean>
-    suspend fun onLinkShared()
-    fun consumeEvent()
-}
-
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class GetDesktopBrowserShareEventHandlerImpl @Inject constructor() : GetDesktopBrowserShareEventHandler {
-    private val _linkShared = MutableStateFlow(false)
-    override val linkShared: StateFlow<Boolean> = _linkShared.asStateFlow()
+@SingleInstanceIn(AppScope::class)
+class RealTabVisitedSitesRepository @Inject constructor(
+    private val dao: TabVisitedSitesDao,
+) : TabVisitedSitesRepository {
 
-    override suspend fun onLinkShared() {
-        _linkShared.emit(true)
+    override suspend fun recordVisitedSite(tabId: String, domain: String) {
+        dao.insert(TabVisitedSiteEntity(tabId = tabId, domain = domain))
     }
 
-    override fun consumeEvent() {
-        _linkShared.value = false
+    override suspend fun getVisitedSites(tabId: String): Set<String> {
+        return dao.getVisitedSites(tabId).toSet()
+    }
+
+    override suspend fun clearTab(tabId: String) {
+        dao.clearTab(tabId)
+    }
+
+    override suspend fun clearAll() {
+        dao.clearAll()
     }
 }

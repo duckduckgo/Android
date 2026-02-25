@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Разговорът с консултанта не беше полезен</string>
     <string name="feedbackSubCategoryItrOther">Други</string>
 
-    <string name="feedbackSubCategorySubsOtp">Еднократна парола</string>
-    <string name="feedbackSubCategorySubsOther">Други</string>
+    <string name="feedbackSubCategorySubsOtp">Проблем с еднократна парола</string>
+    <string name="feedbackSubCategorySubsOther">Нещо друго</string>
 
     <string name="feedbackSubmitVpnHeader">Попаднахте на проблем, който не е разгледан в нашия <annotation type="faqs_link">помощен център</annotation>? Определено искаме да научим за него.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Кажете ни какъв е проблемът...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Превключването ще увеличи месечната ти цена от %1$s/месец на %2$s/месец.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Запази годишния план</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Превключи на месечен план (%1$s/месец)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Няма достъп до функциите от ниво Plus или Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Надгради до Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Отключване на по-мощен AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Управление на абонамент</string>
+    <string name="subscriptionSettingViewAllPlans">Виж всички планове</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Управлявай плащането или отмени</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Планът ще бъде надграден до %1$s на %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Планът ще бъде намален до %1$s на %2$s.</string>
+    <string name="planNamePlusMonthly">Месечен план Plus</string>
+    <string name="planNamePlusYearly">Годишен план Plus</string>
+    <string name="planNameProMonthly">Месечен план Pro</string>
+    <string name="planNameProYearly">Годишен план Pro</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

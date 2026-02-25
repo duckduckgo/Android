@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -79,7 +80,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -120,8 +120,8 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
+    private val pageLoadWideEvent: PageLoadWideEvent,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
-    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
@@ -440,6 +440,9 @@ class BrowserWebViewClient @Inject constructor(
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.onPageCommitVisible(WebViewNavigationState(navigationList), url)
+            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                pageLoadWideEvent.onPageVisible(tabId, url, webView.progress)
+            }
         }
     }
 
@@ -476,9 +479,13 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageStarted(tabId, it)
+                }
                 incrementAndTrackLoad() // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
+
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -540,40 +547,41 @@ class BrowserWebViewClient @Inject constructor(
             flushCookies()
             printInjector.injectPrint(webView)
 
-            url?.let {
-                val uri = url.toUri()
-                if (url != ABOUT_BLANK) {
-                    start?.let { safeStart ->
-                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(
-                            url = it,
-                            title = navigationList.currentItem?.title,
-                            start = safeStart,
-                            end = currentTimeProvider.elapsedRealtime(),
+            if (url != null && url != ABOUT_BLANK) {
+                start?.let { safeStart ->
+                    val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                    webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                        pageLoadWideEvent.onPageLoadFinished(
+                            tabId = tabId,
+                            url = url,
+                            errorDescription = null,
                             isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
                             activeRequestsOnLoadStart = parallelRequestsOnStart,
-                            concurrentRequestsOnFinish = decrementLoadCountAndGet(),
+                            concurrentRequestsOnFinish = concurrentRequestsOnFinish,
                         )
-                        shouldSendPagePaintedPixel(webView = webView, url = it)
-                        appCoroutineScope.launch(dispatcherProvider.io()) {
-                            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
-                                duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(url.toUri())?.let {
-                                    navigationHistory.saveToHistory(
-                                        it,
-                                        navigationList.currentItem?.title,
-                                    )
-                                }
-                            } else {
-                                if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(uri)) {
-                                    duckPlayer.duckPlayerNavigatedToYoutube()
-                                }
-                                navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
-                            }
-                        }
-                        uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
-
-                        start = null
                     }
+
+                    // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                    pageLoadedHandler.onPageLoaded(
+                        url = url,
+                        title = navigationList.currentItem?.title,
+                        start = safeStart,
+                        end = currentTimeProvider.elapsedRealtime(),
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                    shouldSendPagePaintedPixel(webView = webView, url = url)
+                    appCoroutineScope.launch(dispatcherProvider.io()) {
+                        if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isYoutubeWatchUrl(url.toUri())) {
+                            duckPlayer.duckPlayerNavigatedToYoutube()
+                        }
+                    }
+                    uriLoadedManager.sendUriLoadedPixels(duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url))
+
+                    webViewClientListener?.onSiteVisited(url, navigationList.currentItem?.title)
+
+                    start = null
                 }
             }
         }
@@ -609,14 +617,27 @@ class BrowserWebViewClient @Inject constructor(
         detail: RenderProcessGoneDetail?,
     ): Boolean {
         logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
-        if (detail?.didCrash() == true) {
+        val didCrash = detail?.didCrash() == true
+        if (didCrash) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
 
         if (this.start != null) {
-            decrementLoadCountAndGet()
+            val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+            view?.url?.let { url ->
+                webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                    pageLoadWideEvent.onPageLoadFinished(
+                        tabId = tabId,
+                        url = url,
+                        errorDescription = if (didCrash) "ERROR_RENDERER_CRASHED" else "ERROR_RENDERER_KILLED",
+                        isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                        activeRequestsOnLoadStart = parallelRequestsOnStart,
+                        concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                    )
+                }
+            }
             this.start = null
         }
 
@@ -723,7 +744,20 @@ class BrowserWebViewClient @Inject constructor(
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {
                     if (this.start != null) {
-                        decrementLoadCountAndGet()
+                        // Trigger Wide Event failure for main frame errors
+                        val concurrentRequestsOnFinish = decrementLoadCountAndGet()
+                        request.url?.toString()?.let { url ->
+                            webViewClientListener?.getCurrentTabId()?.let { tabId ->
+                                pageLoadWideEvent.onPageLoadFinished(
+                                    tabId = tabId,
+                                    url = url,
+                                    errorDescription = webResourceError.errorCode.asStringErrorCode(),
+                                    isTabInForegroundOnFinish = webViewClientListener?.isTabInForeground() ?: true,
+                                    activeRequestsOnLoadStart = parallelRequestsOnStart,
+                                    concurrentRequestsOnFinish = concurrentRequestsOnFinish,
+                                )
+                            }
+                        }
                         this.start = null
                     }
                     webViewClientListener?.onReceivedError(parsedError, request.url.toString())

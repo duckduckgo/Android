@@ -17,4 +17,5 @@
 <resources>
     <dimen name="autofillBottomSheetBottomPadding">30dp</dimen>
     <dimen name="autofillBottomSheetContentMaxWidth">480dp</dimen>
+    <dimen name="getDesktopAppMaxItemWidth">600dp</dimen>
 </resources>

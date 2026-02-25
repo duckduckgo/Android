@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Мало толку от звонка консультанту</string>
     <string name="feedbackSubCategoryItrOther">Дополнительные настройки</string>
 
-    <string name="feedbackSubCategorySubsOtp">Одноразовый пароль</string>
-    <string name="feedbackSubCategorySubsOther">Дополнительные настройки</string>
+    <string name="feedbackSubCategorySubsOtp">Проблема с одноразовым паролем</string>
+    <string name="feedbackSubCategorySubsOther">Что-то другое</string>
 
     <string name="feedbackSubmitVpnHeader">Столкнулись с проблемой, которая не затронута в нашем <annotation type="faqs_link">справочном центре</annotation>? Мы просто обязаны о ней знать.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Сообщите нам, что происходит...</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Со сменой тарифа ваша ежемесячная плата увеличится с %1$s до %2$s.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Перейти на месячный план (%1$s/мес.)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Нет доступа к функциям уровня Plus или Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Перейти на Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Повышение тарифа открывает больше возможностей ИИ</string>
+    <string name="subscriptionSettingSectionManageSubscription">Управление подпиской</string>
+    <string name="subscriptionSettingViewAllPlans">Посмотреть все тарифы</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Управление оплатой или Отмена</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s ваш план будет повышен до %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s ваш план будет понижен до %1$s.</string>
+    <string name="planNamePlusMonthly">Plus с оплатой раз в месяц</string>
+    <string name="planNamePlusYearly">Plus с оплатой раз в год</string>
+    <string name="planNameProMonthly">Pro с оплатой раз в месяц</string>
+    <string name="planNameProYearly">Pro с оплатой раз в год</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

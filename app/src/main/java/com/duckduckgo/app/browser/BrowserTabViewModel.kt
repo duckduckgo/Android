@@ -198,6 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -236,6 +237,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -307,6 +309,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -499,6 +502,8 @@ class BrowserTabViewModel @Inject constructor(
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val pageLoadWideEvent: PageLoadWideEvent,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -606,6 +611,7 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var hasExitedFixedProgress = false
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
@@ -961,6 +967,28 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun getCurrentTabId(): String = tabId
+
+    override fun onSiteVisited(url: String, title: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            val uri = url.toUri()
+
+            if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
+                val duckPlayerUrl = duckPlayer.createDuckPlayerUriFromYoutubeNoCookie(uri)
+                if (duckPlayerUrl != null) {
+                    history.saveToHistory(duckPlayerUrl, title, tabId)
+                }
+            } else {
+                history.saveToHistory(url, title, tabId)
+            }
+
+            if (androidBrowserConfig.singleTabFireDialog().isEnabled()) {
+                val domain = uri.host?.toTldPlusOne() ?: uri.host
+                if (domain != null) {
+                    tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+                }
+            }
+        }
+    }
 
     fun onMessageProcessed() {
         showBrowser()
@@ -1839,6 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+        hasExitedFixedProgress = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2080,12 +2109,20 @@ class BrowserTabViewModel @Inject constructor(
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
+
         val visualProgress =
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
                 FIXED_PROGRESS
             } else {
                 newProgress
             }
+
+        // Track the first time we escape from fixed progress for Wide Events
+        val currentUrl = webViewNavigationState.currentUrl
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
+            hasExitedFixedProgress = true
+            pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
+        }
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
 
@@ -4655,6 +4692,13 @@ class BrowserTabViewModel @Inject constructor(
         duckChat.openDuckChat()
     }
 
+    fun collectPageContext() {
+        viewModelScope.launch {
+            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+            _subscriptionEventDataChannel.send(subscriptionEvent)
+        }
+    }
+
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
         hasFocus: Boolean,
@@ -4674,10 +4718,6 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (duckChat.isContextualOnboardingCompleted()) {
                         command.value = Command.ShowDuckAIContextualMode(tabId)
-                        viewModelScope.launch {
-                            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
-                            _subscriptionEventDataChannel.send(subscriptionEvent)
-                        }
                     } else {
                         command.value = Command.ShowDuckAIContextualOnboarding
                     }
@@ -4704,15 +4744,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onVpnMenuClicked() {
-        when (currentBrowserViewState().vpnMenuState) {
-            is VpnMenuState.Subscribed -> {
-                command.value = LaunchVpnManagement
-            }
-
-            VpnMenuState.Hidden -> {} // Should not happen as menu item should not be visible
-            else -> {
+        val state = currentBrowserViewState().vpnMenuState
+        when (state) {
+            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
                 command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
-            }
+            is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
+            VpnMenuState.Hidden -> {} // Menu item not visible
+        }
+        if (state != VpnMenuState.Hidden) {
+            pixel.fire(AppPixelName.MENU_ACTION_VPN_PRESSED, mapOf(PixelParameter.STATUS to state.pixelParam))
         }
     }
 

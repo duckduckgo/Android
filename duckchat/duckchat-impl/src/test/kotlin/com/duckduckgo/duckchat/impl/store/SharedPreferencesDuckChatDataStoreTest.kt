@@ -335,4 +335,34 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.setContextualOnboardingCompleted(false)
         assertFalse(testee.isContextualOnboardingCompleted())
     }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting then observe receives updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeChatSuggestionsUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setChatSuggestionsUserSetting(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting to true then observe emits true`() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeChatSuggestionsUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setChatSuggestionsUserSetting(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
 }

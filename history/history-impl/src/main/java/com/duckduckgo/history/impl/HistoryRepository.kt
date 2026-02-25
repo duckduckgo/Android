@@ -20,7 +20,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -36,7 +35,10 @@ interface HistoryRepository {
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     )
+
+    suspend fun removeHistoryForTab(tabId: String)
 
     suspend fun clearHistory()
 
@@ -56,7 +58,6 @@ interface HistoryRepository {
 class RealHistoryRepository(
     private val historyDao: HistoryDao,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
     private val historyDataStore: HistoryDataStore,
 ) : HistoryRepository {
 
@@ -73,6 +74,7 @@ class RealHistoryRepository(
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     ) {
         withContext(dispatcherProvider.io()) {
             historyDao.updateOrInsertVisit(
@@ -81,7 +83,16 @@ class RealHistoryRepository(
                 query,
                 isSerp,
                 LocalDateTime.now(),
+                tabId,
             )
+            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun removeHistoryForTab(tabId: String) {
+        withContext(dispatcherProvider.io()) {
+            cachedHistoryEntries = null
+            historyDao.deleteHistoryForTab(tabId)
             fetchAndCacheHistoryEntries()
         }
     }

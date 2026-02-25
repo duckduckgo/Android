@@ -215,4 +215,9 @@
     <!-- Sync promo in bookmark added confirmation dialog -->
     <string name="addBookmarkDialogSyncPromoText">Synkroniser bokmerker mellom enheter</string>
     <string name="addBookmarkDialogHideSyncSuggestion">Skjul</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Skaff deg nettleseren for datamaskin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac og Windows</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
 </resources>

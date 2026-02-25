@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Autovervollständigungsvorschläge enthalten jetzt deine kürzlich besuchten Seiten. Du kannst sie in den Einstellungen deaktivieren oder jederzeit mit dem 🔥 Fire Button löschen.</string>
     <string name="improvedAutoCompleteIAMTitle">Gleiche Privatsphäre.\nBessere Suchvorschläge!</string>
     <string name="openAutoCompleteSettings">Einstellungen öffnen</string>
+    <string name="privateSearchChatSuggestionsToggle">Chat-Vorschläge</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Zeige Vorschläge aus deinem Verlauf, deinen Lesezeichen und (optional) deinem Duck.ai-Chatverlauf, während du in die Suchleiste tippst. Alle Suchanfragen sind privat.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Allgemeines</string>
@@ -206,6 +208,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blockiert Google-Anmelde-Pop-ups auf Websites, die nicht Google gehören.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Drückt dein Widerspruchsrecht aus und teilt Websites mit, dass sie deine persönlichen Daten nicht verkaufen oder weitergeben dürfen.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Desktop-Browser herunterladen</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo für Mac und Windows</string>
+    <string name="getDesktopBrowserTitle">Schütze deine persönlichen Daten auch auf Mac und Windows!</string>
+    <string name="getDesktopBrowserBody">Um DuckDuckGo auf Mac oder Windows herunterzuladen, besuche:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Download-Link teilen</string>
+    <string name="getDesktopBrowserNoThanks">Nein, danke</string>
+    <string name="getDesktopBrowserHideItem">Ausblenden</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopiert</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie-Pop-up-Schutz</string>

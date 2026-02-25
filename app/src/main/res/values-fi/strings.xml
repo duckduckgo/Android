@@ -176,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Automaattisen täydennyksen ehdotukset sisältävät nyt äskettäin vieraillut sivustot. Voit poistaa tämän käytöstä asetusten kautta tai tyhjentää milloin tahansa 🔥 Fire Buttonilla.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama tietoja,\nparempia hakuehdotuksia!</string>
     <string name="openAutoCompleteSettings">Avaa asetukset</string>
+    <string name="privateSearchChatSuggestionsToggle">Chat-ehdotukset</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Näytä ehdotuksia historiastasi, kirjanmerkeistäsi ja (valinnaisesti) Duck.ai-keskusteluhistoriastasi, kun kirjoitat hakukenttään. Kaikki haut ovat yksityisiä.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Yleistä</string>
@@ -206,6 +208,17 @@
     <string name="webTrackingProtectionGoogleSigninPopupsDescription">Estää Googlen kirjautumisponnahdusikkunat sivustoissa, joita Google ei omista.</string>
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Ilmaisee kieltäytymisoikeudet puolestasi kertomalla sivustoille, etteivät ne saa myydä tai jakaa henkilötietojasi.</string>
+
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hanki pöytäkoneselain</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac- ja Windows-laitteeseen</string>
+    <string name="getDesktopBrowserTitle">Suojaa henkilökohtaiset tietosi myös Mac- ja Windows-laitteessa!</string>
+    <string name="getDesktopBrowserBody">Lataa DuckDuckGo Mac- ja Windows-laitteeseen osoitteesta:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Jaa latauslinkki</string>
+    <string name="getDesktopBrowserNoThanks">Ei kiitos</string>
+    <string name="getDesktopBrowserHideItem">Piilota</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Linkki kopioitu</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>

@@ -152,7 +152,7 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Appel au conseiller inutile</string>
     <string name="feedbackSubCategoryItrOther">Autre</string>
 
-    <string name="feedbackSubCategorySubsOtp">Mot de passe à usage unique</string>
+    <string name="feedbackSubCategorySubsOtp">Problème lié au mot de passe à usage unique</string>
     <string name="feedbackSubCategorySubsOther">Autre</string>
 
     <string name="feedbackSubmitVpnHeader">Vous avez rencontré un problème qui n\'est pas traité dans notre <annotation type="faqs_link">centre d\'aide</annotation> ? Nous tenons vraiment à savoir de quoi il s\'agit.</string>
@@ -194,5 +194,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Ce changement augmentera vos mensualités, qui passeront de %1$s/mois à %2$s/mois.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Conserver le forfait annuel</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Passer à un forfait mensuel (%1$s/mois)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Impossible d\'accéder aux fonctionnalités des niveaux Plus ou Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Passer à Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Débloquez une IA plus puissante</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gérer l\'abonnement</string>
+    <string name="subscriptionSettingViewAllPlans">Afficher tous les forfaits</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gérer le paiement ou annuler</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Le %2$s, vous passerez à un forfait supérieur : %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Le %2$s, vous passerez à un forfait inférieur : %1$s.</string>
+    <string name="planNamePlusMonthly">Plus Mensuel</string>
+    <string name="planNamePlusYearly">Plus Annuel</string>
+    <string name="planNameProMonthly">Pro Mensuel</string>
+    <string name="planNameProYearly">Pro Annuel</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>
