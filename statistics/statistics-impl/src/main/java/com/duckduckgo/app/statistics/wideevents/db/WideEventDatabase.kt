@@ -24,7 +24,7 @@ import java.time.Instant
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
         WideEventEntity::class,
     ],
