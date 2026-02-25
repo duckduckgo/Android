@@ -500,6 +500,63 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when page context received in webview mode with auto attachment then page context event emitted`() =
+        runTest {
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+                val pageContext = event.params.getJSONObject("pageContext")
+                assertEquals("Ctx Title", pageContext.getString("title"))
+                assertEquals("https://ctx.com", pageContext.getString("url"))
+                assertEquals("content", pageContext.getString("content"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when page context received in webview mode with auto attachment disabled then event not emitted`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when page context received after user removed context then auto-attached pixel not fired`() =
         runTest {
             val serializedPageData =

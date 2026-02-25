@@ -305,6 +305,37 @@ class DuckChatContextualViewModel @Inject constructor(
         )
     }
 
+    private fun generatePageContextEventData(): SubscriptionEventData {
+        val pageContext = if (duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+            if (isContextValid(updatedPageContext)) {
+                updatedPageContext
+                    .takeIf { it.isNotBlank() }
+                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                    ?: run {
+                        logcat { "Duck.ai: no pageContext available" }
+                        null
+                    }
+            } else {
+                logcat { "Duck.ai: pageContext is not valid" }
+                null
+            }
+        } else {
+            logcat { "Duck.ai: no support for multiple attachments" }
+            null
+        }
+
+        val params =
+            JSONObject().apply {
+                put("pageContext", pageContext)
+            }
+
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatPageContext",
+            params = params,
+        )
+    }
+
     fun onContextualClose() {
         viewModelScope.launch(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
@@ -369,7 +400,10 @@ class DuckChatContextualViewModel @Inject constructor(
         return title != null && content != null
     }
 
-    fun replacePrompt(input: String, prompt: String) {
+    fun replacePrompt(
+        input: String,
+        prompt: String,
+    ) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
         duckChatPixels.reportContextualSummarizePromptSelected()
         viewModelScope.launch {
@@ -434,9 +468,8 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
-        logcat { "Duck.ai: onPageContextReceived $pageContext" }
+        logcat { "Duck.ai: onPageContextReceived" }
         if (isContextValid(pageContext)) {
-            logcat { "Duck.ai: onPageContextReceived is valid" }
             updatedPageContext = pageContext
 
             val json = JSONObject(updatedPageContext)
@@ -472,6 +505,11 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
+                }
+                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+                    val pageContext = generatePageContextEventData()
+                    logcat { "Duck.ai: onPageContextReceived attaching new context $pageContext" }
+                    _subscriptionEventDataChannel.trySend(pageContext)
                 }
             }
         } else {
