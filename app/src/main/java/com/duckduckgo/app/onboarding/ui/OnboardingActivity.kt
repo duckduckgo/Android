@@ -19,8 +19,6 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.reportWhenComplete
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -29,7 +27,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
-import com.duckduckgo.app.startup_metrics.api.StartupMetricsReporter
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -38,13 +35,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var startupMetricsReporter: StartupMetricsReporter
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -64,12 +57,6 @@ class OnboardingActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(CREATED) {
                 configurePager()
-                reportFullyDrawn()
-            }
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                fullyDrawnReporter.reportWhenComplete {
-                    startupMetricsReporter.reportStartupComplete()
-                }
             }
         }
     }

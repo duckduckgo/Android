@@ -33,7 +33,6 @@ import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.reportWhenComplete
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -94,7 +93,6 @@ import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.startup_metrics.api.StartupMetricsReporter
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -217,9 +215,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
-
-    @Inject
-    lateinit var startupMetricsReporter: StartupMetricsReporter
 
     private val lastActiveTabs = TabList()
 
@@ -369,10 +364,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-            .onEach {
-                renderer.renderBrowserViewState(it)
-                reportFullyDrawn()
-            }
+            .onEach { renderer.renderBrowserViewState(it) }
             .launchIn(lifecycleScope)
 
         observeDuckChatSharedCommands()
@@ -386,15 +378,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        appCoroutineScope.launch {
-            fullyDrawnReporter.reportWhenComplete {
-                startupMetricsReporter.reportStartupComplete()
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
