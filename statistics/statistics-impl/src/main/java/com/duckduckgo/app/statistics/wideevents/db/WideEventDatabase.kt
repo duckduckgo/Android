@@ -20,11 +20,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import java.time.Instant
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         WideEventEntity::class,
     ],
@@ -35,6 +37,14 @@ import java.time.Instant
 )
 abstract class WideEventDatabase : RoomDatabase() {
     abstract fun wideEventDao(): WideEventDao
+
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE wide_events ADD COLUMN sampling_probability REAL NOT NULL DEFAULT 1.0")
+            }
+        }
+    }
 }
 
 class InstantTypeConverter {
