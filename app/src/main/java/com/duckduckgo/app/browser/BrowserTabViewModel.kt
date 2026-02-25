@@ -331,9 +331,9 @@ import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.eventhub.impl.EVENT_HUB_FEATURE_NAME
-import com.duckduckgo.eventhub.impl.EventHubPixelManager
-import com.duckduckgo.eventhub.impl.WebEventContext
+import com.duckduckgo.eventhub.api.EVENT_HUB_FEATURE_NAME
+import com.duckduckgo.eventhub.api.EventHubPixelManager
+import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData

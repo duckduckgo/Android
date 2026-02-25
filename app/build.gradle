@@ -398,6 +398,7 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':event-hub-api')
     implementation project(':event-hub-impl')
     implementation project(':event-hub-store')
 

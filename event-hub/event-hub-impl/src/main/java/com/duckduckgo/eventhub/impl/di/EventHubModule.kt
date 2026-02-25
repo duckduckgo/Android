@@ -23,7 +23,7 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.EventHubPixelManager
+import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.impl.RealEventHubPixelManager
 import com.duckduckgo.eventhub.impl.RealTimeProvider
 import com.duckduckgo.eventhub.impl.TimeProvider
