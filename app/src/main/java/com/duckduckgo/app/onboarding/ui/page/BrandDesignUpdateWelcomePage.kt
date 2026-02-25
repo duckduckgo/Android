@@ -46,6 +46,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -63,6 +64,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var deviceInfo: DeviceInfo
 
     private val binding: ContentOnboardingWelcomePageUpdateBinding by viewBinding()
     private val viewModel by lazy {
@@ -85,10 +89,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().apply {
             enableEdgeToEdge()
+        }
+
+        if (deviceInfo.formFactor() == DeviceInfo.FormFactor.PHONE) {
+            requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         }
     }
 
