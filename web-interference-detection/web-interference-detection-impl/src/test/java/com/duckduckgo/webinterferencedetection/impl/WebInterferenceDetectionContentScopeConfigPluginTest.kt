@@ -16,8 +16,6 @@
 
 package com.duckduckgo.webinterferencedetection.impl
 
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionEntity
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
@@ -29,18 +27,16 @@ class WebInterferenceDetectionContentScopeConfigPluginTest {
 
     lateinit var testee: WebInterferenceDetectionContentScopeConfigPlugin
 
-    private val mockRepository: WebInterferenceDetectionRepository = mock()
+    private val mockDataStore: WebInterferenceDetectionDataStore = mock()
 
     @Before
     fun before() {
-        testee = WebInterferenceDetectionContentScopeConfigPlugin(mockRepository)
+        testee = WebInterferenceDetectionContentScopeConfigPlugin(mockDataStore)
     }
 
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJson() {
-        whenever(mockRepository.getWebInterferenceDetectionEntity()).thenReturn(
-            WebInterferenceDetectionEntity(json = CONFIG),
-        )
+        whenever(mockDataStore.getRemoteConfigJson()).thenReturn(CONFIG)
         assertEquals("\"webInterferenceDetection\":$CONFIG", testee.config())
     }
 

@@ -17,43 +17,24 @@
 package com.duckduckgo.webdetection.impl.di
 
 import android.content.Context
-import androidx.room.Room
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.common.utils.DispatcherProvider
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webdetection.store.ALL_MIGRATIONS
-import com.duckduckgo.webdetection.store.RealWebDetectionRepository
-import com.duckduckgo.webdetection.store.WebDetectionDatabase
-import com.duckduckgo.webdetection.store.WebDetectionRepository
+import com.duckduckgo.webdetection.impl.WebDetection
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object WebDetectionModule {
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideWebDetectionDatabase(context: Context): WebDetectionDatabase {
-        return Room.databaseBuilder(context, WebDetectionDatabase::class.java, "web_detection.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
-    }
+    private val Context.webDetectionDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "web_detection",
+    )
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebDetectionRepository(
-        database: WebDetectionDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): WebDetectionRepository {
-        return RealWebDetectionRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
-    }
+    @WebDetection
+    fun provideWebDetectionDataStore(context: Context): DataStore<Preferences> = context.webDetectionDataStore
 }

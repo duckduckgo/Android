@@ -16,8 +16,6 @@
 
 package com.duckduckgo.webdetection.impl
 
-import com.duckduckgo.webdetection.store.WebDetectionEntity
-import com.duckduckgo.webdetection.store.WebDetectionRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
@@ -29,18 +27,16 @@ class WebDetectionContentScopeConfigPluginTest {
 
     lateinit var testee: WebDetectionContentScopeConfigPlugin
 
-    private val mockRepository: WebDetectionRepository = mock()
+    private val mockDataStore: WebDetectionDataStore = mock()
 
     @Before
     fun before() {
-        testee = WebDetectionContentScopeConfigPlugin(mockRepository)
+        testee = WebDetectionContentScopeConfigPlugin(mockDataStore)
     }
 
     @Test
     fun whenGetConfigThenReturnCorrectlyFormattedJson() {
-        whenever(mockRepository.getWebDetectionEntity()).thenReturn(
-            WebDetectionEntity(json = CONFIG),
-        )
+        whenever(mockDataStore.getRemoteConfigJson()).thenReturn(CONFIG)
         assertEquals("\"webDetection\":$CONFIG", testee.config())
     }
 

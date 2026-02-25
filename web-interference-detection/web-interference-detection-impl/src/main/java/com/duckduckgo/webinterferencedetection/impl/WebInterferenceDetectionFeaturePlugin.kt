@@ -18,20 +18,18 @@ package com.duckduckgo.webinterferencedetection.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionEntity
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebInterferenceDetectionFeaturePlugin @Inject constructor(
-    private val repository: WebInterferenceDetectionRepository,
+    private val dataStore: WebInterferenceDetectionDataStore,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         val feature = webInterferenceDetectionFeatureValueOf(featureName) ?: return false
         if (feature.value == this.featureName) {
-            repository.updateAll(WebInterferenceDetectionEntity(json = jsonString))
+            dataStore.setRemoteConfigJson(jsonString)
             return true
         }
         return false

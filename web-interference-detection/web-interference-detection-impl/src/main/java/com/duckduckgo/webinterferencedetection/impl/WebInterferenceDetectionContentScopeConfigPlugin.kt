@@ -18,18 +18,17 @@ package com.duckduckgo.webinterferencedetection.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebInterferenceDetectionContentScopeConfigPlugin @Inject constructor(
-    private val repository: WebInterferenceDetectionRepository,
+    private val dataStore: WebInterferenceDetectionDataStore,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
         val featureName = WebInterferenceDetectionFeatureName.WebInterferenceDetection.value
-        val config = repository.getWebInterferenceDetectionEntity().json
+        val config = dataStore.getRemoteConfigJson()
         return "\"$featureName\":$config"
     }
 

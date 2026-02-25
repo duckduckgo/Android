@@ -17,43 +17,25 @@
 package com.duckduckgo.webinterferencedetection.impl.di
 
 import android.content.Context
-import androidx.room.Room
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.di.IsMainProcess
-import com.duckduckgo.common.utils.DispatcherProvider
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webinterferencedetection.store.ALL_MIGRATIONS
-import com.duckduckgo.webinterferencedetection.store.RealWebInterferenceDetectionRepository
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionDatabase
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionRepository
+import com.duckduckgo.webinterferencedetection.impl.WebInterferenceDetection
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 object WebInterferenceDetectionModule {
 
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideWebInterferenceDetectionDatabase(context: Context): WebInterferenceDetectionDatabase {
-        return Room.databaseBuilder(context, WebInterferenceDetectionDatabase::class.java, "web_interference_detection.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
-    }
+    private val Context.webInterferenceDetectionDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "web_interference_detection",
+    )
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideWebInterferenceDetectionRepository(
-        database: WebInterferenceDetectionDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): WebInterferenceDetectionRepository {
-        return RealWebInterferenceDetectionRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
-    }
+    @WebInterferenceDetection
+    fun provideWebInterferenceDetectionDataStore(context: Context): DataStore<Preferences> =
+        context.webInterferenceDetectionDataStore
 }

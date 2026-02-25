@@ -36,24 +36,17 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':content-scope-scripts-api')
-    implementation project(path: ':web-interference-detection-store')
 
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
+    api AndroidX.dataStore.preferences
 
-    // Dagger
     implementation Google.dagger
 
     implementation KotlinX.coroutines.core
 
     testImplementation(KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
 }

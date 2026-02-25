@@ -18,18 +18,17 @@ package com.duckduckgo.webdetection.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.webdetection.store.WebDetectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebDetectionContentScopeConfigPlugin @Inject constructor(
-    private val repository: WebDetectionRepository,
+    private val dataStore: WebDetectionDataStore,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
         val featureName = WebDetectionFeatureName.WebDetection.value
-        val config = repository.getWebDetectionEntity().json
+        val config = dataStore.getRemoteConfigJson()
         return "\"$featureName\":$config"
     }
 

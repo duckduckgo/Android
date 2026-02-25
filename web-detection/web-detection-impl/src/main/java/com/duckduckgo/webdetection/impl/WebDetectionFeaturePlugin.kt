@@ -18,20 +18,18 @@ package com.duckduckgo.webdetection.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.webdetection.store.WebDetectionEntity
-import com.duckduckgo.webdetection.store.WebDetectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebDetectionFeaturePlugin @Inject constructor(
-    private val repository: WebDetectionRepository,
+    private val dataStore: WebDetectionDataStore,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         val feature = webDetectionFeatureValueOf(featureName) ?: return false
         if (feature.value == this.featureName) {
-            repository.updateAll(WebDetectionEntity(json = jsonString))
+            dataStore.setRemoteConfigJson(jsonString)
             return true
         }
         return false

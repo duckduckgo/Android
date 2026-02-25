@@ -16,12 +16,9 @@
 
 package com.duckduckgo.webdetection.impl
 
-import com.duckduckgo.webdetection.store.WebDetectionEntity
-import com.duckduckgo.webdetection.store.WebDetectionRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -29,11 +26,11 @@ class WebDetectionFeaturePluginTest {
 
     lateinit var testee: WebDetectionFeaturePlugin
 
-    private val mockRepository: WebDetectionRepository = mock()
+    private val mockDataStore: WebDetectionDataStore = mock()
 
     @Before
     fun before() {
-        testee = WebDetectionFeaturePlugin(mockRepository)
+        testee = WebDetectionFeaturePlugin(mockDataStore)
     }
 
     @Test
@@ -49,11 +46,9 @@ class WebDetectionFeaturePluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesThenUpdateAll() {
+    fun whenFeatureNameMatchesThenStoreJson() {
         testee.store(FEATURE_NAME_VALUE, JSON_STRING)
-        val captor = argumentCaptor<WebDetectionEntity>()
-        verify(mockRepository).updateAll(captor.capture())
-        assertEquals(JSON_STRING, captor.firstValue.json)
+        verify(mockDataStore).setRemoteConfigJson(JSON_STRING)
     }
 
     companion object {

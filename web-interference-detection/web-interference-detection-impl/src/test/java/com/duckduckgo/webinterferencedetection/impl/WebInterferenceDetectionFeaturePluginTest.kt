@@ -16,12 +16,9 @@
 
 package com.duckduckgo.webinterferencedetection.impl
 
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionEntity
-import com.duckduckgo.webinterferencedetection.store.WebInterferenceDetectionRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -29,11 +26,11 @@ class WebInterferenceDetectionFeaturePluginTest {
 
     lateinit var testee: WebInterferenceDetectionFeaturePlugin
 
-    private val mockRepository: WebInterferenceDetectionRepository = mock()
+    private val mockDataStore: WebInterferenceDetectionDataStore = mock()
 
     @Before
     fun before() {
-        testee = WebInterferenceDetectionFeaturePlugin(mockRepository)
+        testee = WebInterferenceDetectionFeaturePlugin(mockDataStore)
     }
 
     @Test
@@ -49,11 +46,9 @@ class WebInterferenceDetectionFeaturePluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesThenUpdateAll() {
+    fun whenFeatureNameMatchesThenStoreJson() {
         testee.store(FEATURE_NAME_VALUE, JSON_STRING)
-        val captor = argumentCaptor<WebInterferenceDetectionEntity>()
-        verify(mockRepository).updateAll(captor.capture())
-        assertEquals(JSON_STRING, captor.firstValue.json)
+        verify(mockDataStore).setRemoteConfigJson(JSON_STRING)
     }
 
     companion object {
