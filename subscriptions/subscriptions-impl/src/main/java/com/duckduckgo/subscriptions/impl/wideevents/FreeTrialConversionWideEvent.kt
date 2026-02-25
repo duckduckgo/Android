@@ -109,7 +109,12 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     override suspend fun onDuckAiPaidPromptSubmitted() {
         val (subscription, activationDay) = getSubscriptionWithActivationDay() ?: return
 
-        pixelSender.reportFreeTrialDuckAiPaidUsed(activationDay, subscription.platform)
+        val duckAiActivationDay = when (activationDay) {
+            STEP_VPN_ACTIVATED_D1 -> "d1"
+            STEP_VPN_ACTIVATED_D2_TO_D7 -> "d2_to_d7"
+            else -> "unknown"
+        }
+        pixelSender.reportFreeTrialDuckAiPaidUsed(duckAiActivationDay, subscription.platform)
 
         recordStepIfNotAlreadyRecorded(
             stepName = STEP_DUCK_AI_PAID_USED,

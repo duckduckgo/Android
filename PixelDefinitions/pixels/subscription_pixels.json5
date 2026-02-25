@@ -38,7 +38,7 @@
                 "key": "activation_day",
                 "description": "Indicates when prompt was submitted relative to free trial start",
                 "type": "string",
-                "enum": ["vpn_activated_d1", "vpn_activated_d2_to_d7"]
+                "enum": ["d1", "d2_to_d7"]
             },
             {
                 "key": "activation_platform",
