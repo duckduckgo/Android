@@ -160,6 +160,15 @@ class GetDesktopBrowserViewModelTest {
     }
 
     @Test
+    fun whenOnLinkClickedThenSettingIsDismissed() = runTest {
+        whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
+
+        testee.onLinkClicked()
+
+        verify(settingsDataStoreMock).getDesktopBrowserSettingDismissed = true
+    }
+
+    @Test
     fun whenOnLinkClickedThenPixelIsFired() = runTest {
         whenever(clipboardInteractorMock.copyToClipboard(any(), any())).thenReturn(true)
 
