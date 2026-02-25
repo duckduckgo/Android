@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -33,7 +34,8 @@ import javax.inject.Inject
  *
  * Bridges these events into subscription wide events and analytics (e.g. [FreeTrialConversionWideEvent]).
  */
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(VpnScope::class, boundType = VpnServiceCallbacks::class)
+@ContributesMultibinding(AppScope::class, boundType = AtbLifecyclePlugin::class)
 class SubscriptionFeatureCallbacks @Inject constructor(
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

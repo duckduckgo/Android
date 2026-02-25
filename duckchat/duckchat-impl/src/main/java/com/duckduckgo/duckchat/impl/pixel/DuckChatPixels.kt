@@ -172,7 +172,7 @@ class RealDuckChatPixels @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 pixel.fire(pixelName, parameters = params)
                 if (refreshAtb) {
-                    statisticsUpdater.refreshDuckAiRetentionAtb(mapOf("modelTier" to modelTier?.name))
+                    statisticsUpdater.refreshDuckAiRetentionAtb(mapOf("modelTier" to modelTier?.model))
                     duckAiMetricCollector.onMessageSent()
                 }
             }
