@@ -17,24 +17,33 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : EventHubPixelManager {
 
-    private val dedupState = java.util.concurrent.ConcurrentHashMap<String, String>()
+    private val dedupState = ConcurrentHashMap<String, String>()
+    private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
     override fun handleWebEvent(eventType: String, context: WebEventContext) {
         val config = getParsedConfig()
@@ -47,7 +56,6 @@ class RealEventHubPixelManager @Inject constructor(
         for (state in repository.getAllPixelStates()) {
             val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
-            if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) continue
             if (nowMillis > state.periodEndMillis) continue
 
             val params = parseParamsJson(state.paramsJson)
@@ -101,6 +109,11 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
+    /**
+     * Check all pixel states and fire any whose period has elapsed.
+     * After firing, starts a new period and schedules the next fire.
+     * Called on app foreground to catch pixels that elapsed while backgrounded.
+     */
     fun checkPixels() {
         val config = getParsedConfig()
         if (!config.featureEnabled) return
@@ -110,8 +123,10 @@ class RealEventHubPixelManager @Inject constructor(
         for (state in repository.getAllPixelStates()) {
             val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
-            if (nowMillis >= state.periodEndMillis && state.periodEndMillis > 0) {
+            if (nowMillis >= state.periodEndMillis) {
                 fireTelemetry(storedConfig, state)
+            } else {
+                scheduleFireTelemetry(state.pixelName, state.periodEndMillis - nowMillis)
             }
         }
     }
@@ -120,6 +135,7 @@ class RealEventHubPixelManager @Inject constructor(
         val config = getParsedConfig()
         if (!config.featureEnabled) {
             logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
+            cancelAllTimers()
             repository.deleteAllPixelStates()
             return
         }
@@ -133,8 +149,48 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
+    fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
+        if (scheduledTimers.containsKey(pixelName)) {
+            logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
+            return
+        }
+
+        logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
+        val job = appCoroutineScope.launch(dispatcherProvider.io()) {
+            delay(delayMillis)
+            scheduledTimers.remove(pixelName)
+
+            val config = getParsedConfig()
+            if (!config.featureEnabled) return@launch
+
+            val state = repository.getPixelState(pixelName) ?: return@launch
+            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: return@launch
+
+            fireTelemetry(storedConfig, state)
+        }
+        scheduledTimers[pixelName] = job
+    }
+
+    fun hasScheduledTimer(pixelName: String): Boolean = scheduledTimers.containsKey(pixelName)
+
+    fun cancelScheduledFire(pixelName: String) {
+        scheduledTimers.remove(pixelName)?.let { job ->
+            job.cancel()
+            logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
+        }
+    }
+
+    private fun cancelAllTimers() {
+        scheduledTimers.forEach { (name, job) ->
+            job.cancel()
+            logcat(VERBOSE) { "EventHub: cancelled timer for $name" }
+        }
+        scheduledTimers.clear()
+    }
+
     private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: EventHubPixelStateEntity) {
-        if (state.periodStartMillis == 0L || state.periodEndMillis == 0L) return
+
+        cancelScheduledFire(pixelConfig.name)
 
         val pixelData = buildPixel(pixelConfig, state)
 
@@ -155,7 +211,6 @@ class RealEventHubPixelManager @Inject constructor(
             logcat(VERBOSE) { "EventHub: skipping pixel ${pixelConfig.name}, no params" }
         }
 
-        // Deregister and re-register: resets state and picks up any config changes
         repository.deletePixelState(pixelConfig.name)
 
         val latestConfig = getParsedConfig()
@@ -181,6 +236,8 @@ class RealEventHubPixelManager @Inject constructor(
                 configJson = EventHubConfigParser.serializePixelConfig(pixelConfig),
             ),
         )
+
+        scheduleFireTelemetry(pixelConfig.name, periodMillis)
     }
 
     private fun buildPixel(

@@ -30,7 +30,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * On app foreground, check if any pixel periods have elapsed and fire them.
+ * On app foreground: fire any elapsed pixels, then reschedule timers for remaining ones.
  */
 @ContributesMultibinding(
     scope = AppScope::class,
