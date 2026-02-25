@@ -751,14 +751,14 @@ class TabSwitcherActivity :
     }
 
     private fun onTabDroppedOnGroup(tabPosition: Int, groupPosition: Int) {
-        val tabItem = tabsAdapter.getTabSwitcherItem(tabPosition) as? Tab ?: return
+        val tabItem = tabsAdapter.getTabSwitcherItem(tabPosition) as? TabSwitcherItem.Tab ?: return
         val groupItem = tabsAdapter.getTabSwitcherItem(groupPosition) as? TabSwitcherItem.TabGroup ?: return
         viewModel.onTabDroppedOnGroup(tabItem.id, groupItem.id)
     }
 
     private fun onTabDroppedOnTab(draggedTabPosition: Int, targetTabPosition: Int) {
-        val draggedTab = tabsAdapter.getTabSwitcherItem(draggedTabPosition) as? Tab ?: return
-        val targetTab = tabsAdapter.getTabSwitcherItem(targetTabPosition) as? Tab ?: return
+        val draggedTab = tabsAdapter.getTabSwitcherItem(draggedTabPosition) as? TabSwitcherItem.Tab ?: return
+        val targetTab = tabsAdapter.getTabSwitcherItem(targetTabPosition) as? TabSwitcherItem.Tab ?: return
         viewModel.onTabsDroppedToCreateGroup(draggedTab.id, targetTab.id)
     }
 
