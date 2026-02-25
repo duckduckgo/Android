@@ -1501,7 +1501,8 @@
       "pageContext",
       "print",
       "pageObserver",
-      "hover"
+      "hover",
+      "browserUiLock"
     ]
   );
   var platformSupport = {
@@ -1530,9 +1531,11 @@
       "breakageReporting",
       "duckPlayer",
       "messageBridge",
-      "pageContext"
+      "pageContext",
+      "browserUiLock"
     ],
     "android-broker-protection": ["brokerProtection"],
+    "android-ai-history": ["duckAiChatHistory"],
     "android-autofill-import": ["autofillImport"],
     "android-adsjs": [
       "apiManipulation",
@@ -1546,7 +1549,6 @@
       "webDetection",
       "breakageReporting"
     ],
-    "android-ai-history": ["duckAiChatHistory"],
     windows: [
       "cookie",
       ...baseFeatures,
@@ -12141,6 +12143,158 @@ ${iframeContent}
   _delayedRecheckTimer = new WeakMap();
   _activeCapture = new WeakMap();
 
+  // src/features/browser-ui-lock.js
+  init_define_import_meta_trackerLookup();
+  var BrowserUiLock = class extends ContentFeature {
+    constructor() {
+      super(...arguments);
+      /** @type {boolean} */
+      __publicField(this, "_currentLockState", false);
+      /** @type {MutationObserver | null} */
+      __publicField(this, "_mutationObserver", null);
+      /** @type {ResizeObserver | null} */
+      __publicField(this, "_resizeObserver", null);
+      /** @type {number | null} */
+      __publicField(this, "_rafId", null);
+      /**
+       * Enable URL change listening to reset and re-evaluate on SPA navigations
+       */
+      __publicField(this, "listenForUrlChanges", true);
+    }
+    init() {
+      if (window.self !== window.top) {
+        return;
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this._startObserving(), { once: true });
+      } else {
+        this._startObserving();
+      }
+    }
+    /**
+     * Called when URL changes (SPA navigation).
+     */
+    urlChanged() {
+      this._scheduleEvaluation();
+    }
+    /**
+     * Start observing for changes that could affect scrollbar visibility.
+     */
+    _startObserving() {
+      this._scheduleEvaluation();
+      this._setupMutationObserver();
+      this._setupResizeObserver();
+    }
+    /**
+     * Set up MutationObserver to watch for style/class attribute changes on html and body.
+     */
+    _setupMutationObserver() {
+      if (this._mutationObserver) {
+        this._mutationObserver.disconnect();
+      }
+      this._mutationObserver = new MutationObserver(() => {
+        this._scheduleEvaluation();
+      });
+      if (document.documentElement) {
+        this._mutationObserver.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
+      if (document.body) {
+        this._mutationObserver.observe(document.body, {
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
+    }
+    /**
+     * Set up ResizeObserver to detect content size changes (images loading, dynamic content).
+     */
+    _setupResizeObserver() {
+      if (this._resizeObserver) {
+        this._resizeObserver.disconnect();
+      }
+      this._resizeObserver = new ResizeObserver(() => {
+        this._scheduleEvaluation();
+      });
+      if (document.documentElement) {
+        this._resizeObserver.observe(document.documentElement);
+      }
+      if (document.body) {
+        this._resizeObserver.observe(document.body);
+      }
+    }
+    /**
+     * Schedule evaluation using requestAnimationFrame to debounce
+     */
+    _scheduleEvaluation() {
+      if (this._rafId !== null) {
+        return;
+      }
+      this._rafId = requestAnimationFrame(() => {
+        this._rafId = null;
+        this._evaluateLockState();
+      });
+    }
+    /**
+     * Evaluate scrollbar visibility and determine lock state
+     */
+    _evaluateLockState() {
+      const shouldLock = this._detectShouldLock();
+      this._notifyIfChanged(shouldLock);
+    }
+    /**
+     * Determine if UI should be locked based on scrollbar visibility.
+     * Lock if there's no visible vertical scrollbar on the page.
+     * @returns {boolean}
+     */
+    _detectShouldLock() {
+      try {
+        const html2 = document.documentElement;
+        const body = document.body;
+        if (html2 && this._hasVisibleScrollbar(html2)) {
+          return false;
+        }
+        if (body && this._hasVisibleScrollbar(body)) {
+          return false;
+        }
+        return true;
+      } catch (e) {
+        this.log.warn("Failed to detect scroll state:", e);
+        return false;
+      }
+    }
+    /**
+     * Check if an element has a visible vertical scrollbar.
+     * A scrollbar is visible when content overflows AND overflow isn't hidden/clip.
+     * @param {Element} el
+     * @returns {boolean}
+     */
+    _hasVisibleScrollbar(el) {
+      const style = getComputedStyle(el);
+      const overflowY = style.overflowY;
+      return el.scrollHeight > el.clientHeight && overflowY !== "hidden" && overflowY !== "clip";
+    }
+    /**
+     * Notify native if lock state changed
+     * @param {boolean} locked
+     */
+    _notifyIfChanged(locked) {
+      if (locked === this._currentLockState) {
+        return;
+      }
+      this._currentLockState = locked;
+      if (locked) {
+        this.addDebugFlag();
+      }
+      this.messaging.notify("uiLockChanged", { locked });
+      if (this.shouldLog) {
+        this.log.info("UI lock state changed:", locked);
+      }
+    }
+  };
+
   // ddg:platformFeatures:ddg:platformFeatures
   var ddg_platformFeatures_default = {
     ddg_feature_fingerprintingAudio: FingerprintingAudio,
@@ -12162,7 +12316,8 @@ ${iframeContent}
     ddg_feature_breakageReporting: BreakageReporting,
     ddg_feature_duckPlayer: DuckPlayerFeature,
     ddg_feature_messageBridge: message_bridge_default,
-    ddg_feature_pageContext: PageContext
+    ddg_feature_pageContext: PageContext,
+    ddg_feature_browserUiLock: BrowserUiLock
   };
 
   // src/url-change.js
