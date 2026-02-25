@@ -72,8 +72,10 @@ object EventHubModule {
         repository: EventHubRepository,
         pixel: Pixel,
         timeProvider: TimeProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): RealEventHubPixelManager {
-        return RealEventHubPixelManager(repository, pixel, timeProvider)
+        return RealEventHubPixelManager(repository, pixel, timeProvider, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides

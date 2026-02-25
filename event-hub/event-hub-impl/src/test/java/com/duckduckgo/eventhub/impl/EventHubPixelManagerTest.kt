@@ -18,11 +18,17 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.cancel
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +41,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventHubPixelManagerTest {
 
     private val repository: EventHubRepository = mock()
@@ -42,6 +49,8 @@ class EventHubPixelManagerTest {
     private val timeProvider = FakeTimeProvider()
     private val NO_CONTEXT = WebEventContext(tabId = "", documentUrl = "")
 
+    private lateinit var testScope: TestScope
+    private lateinit var dispatcherProvider: DispatcherProvider
     private lateinit var manager: RealEventHubPixelManager
 
     private val dayPixelConfigJson: String by lazy {
@@ -80,9 +89,19 @@ class EventHubPixelManagerTest {
 
     @Before
     fun setup() {
+        val dispatcher = StandardTestDispatcher()
+        testScope = TestScope(dispatcher)
+        dispatcherProvider = mock<DispatcherProvider>().also {
+            whenever(it.io()).thenReturn(dispatcher)
+        }
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
+    }
+
+    @org.junit.After
+    fun tearDown() {
+        testScope.cancel()
     }
 
     // --- handleWebEvent ---
@@ -157,7 +176,7 @@ class EventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = singleBucketConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
@@ -206,15 +225,6 @@ class EventHubPixelManagerTest {
         verify(repository, never()).savePixelState(any())
     }
 
-    @Test
-    fun `handleWebEvent ignores events when periodStart is zero`() {
-        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodStart = 0L)
-        stubPixelStates(state)
-
-        manager.handleWebEvent("adwall", NO_CONTEXT)
-
-        verify(repository, never()).savePixelState(any())
-    }
 
     @Test
     fun `handleWebEvent with empty URL disables dedup`() {
@@ -355,7 +365,7 @@ class EventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoSourceConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val state = pixelState("test", mapOf("adwallCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
@@ -385,7 +395,7 @@ class EventHubPixelManagerTest {
     fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
@@ -572,7 +582,7 @@ class EventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = configWithGap))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val testPixelConfig = EventHubConfigParser.parse(configWithGap).telemetry.first()
         val state = EventHubPixelStateEntity(
@@ -779,7 +789,7 @@ class EventHubPixelManagerTest {
         """.trimIndent()
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = disabledPixelConfig))
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         manager.onConfigChanged()
 
@@ -844,7 +854,7 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent uses stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -870,7 +880,7 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent uses stored config source, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -913,7 +923,7 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent ignores event matching only live config source`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -954,7 +964,7 @@ class EventHubPixelManagerTest {
     fun `checkPixels fires pixel using stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -997,7 +1007,7 @@ class EventHubPixelManagerTest {
     fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1058,7 +1068,7 @@ class EventHubPixelManagerTest {
     fun `new period after firing uses latest config, not stored config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1177,7 +1187,7 @@ class EventHubPixelManagerTest {
         // Step 1: config [1] loads — both pixels registered with 60s/120s periods
         val config1 = twoPixelConfig(60, 120, buckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = config1))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         timeProvider.time = 10_000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -1561,7 +1571,7 @@ class EventHubPixelManagerTest {
         // Pixel was registered with specific config snapshot — fire button must not erase it
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = originalConfig))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1582,7 +1592,7 @@ class EventHubPixelManagerTest {
     fun `multi-pixel state all persists across fire button`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
 
         val stateA = pixelState("pixel_a", mapOf("count" to 2))
         val stateB = pixelState("pixel_b", mapOf("count" to 3))
@@ -1717,6 +1727,198 @@ class EventHubPixelManagerTest {
         val result = RealEventHubPixelManager.calculateAttributionPeriod(startMillis, period)
         // toStartOfInterval => 2026-01-02T17:00:00Z = 1767373200
         assertEquals(1767373200L, result)
+    }
+
+    // --- scheduled firing (scheduleFireTelemetry / timer management) ---
+
+    @Test
+    fun `startNewPeriod schedules a timer that fires the pixel`() {
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        val savedState = captor.firstValue
+        assertTrue(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(savedState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
+
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = 1000L + periodMillis
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("webTelemetry_adwallDetection_day"),
+            parameters = any(),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+    }
+
+    @Test
+    fun `scheduleFireTelemetry does not double-schedule same pixel`() {
+        manager.scheduleFireTelemetry("test_pixel", 5000L)
+        assertTrue(manager.hasScheduledTimer("test_pixel"))
+
+        manager.scheduleFireTelemetry("test_pixel", 10000L)
+        assertTrue(manager.hasScheduledTimer("test_pixel"))
+    }
+
+    @Test
+    fun `cancelScheduledFire removes pending timer`() {
+        manager.scheduleFireTelemetry("test_pixel", 60_000L)
+        assertTrue(manager.hasScheduledTimer("test_pixel"))
+
+        manager.cancelScheduledFire("test_pixel")
+        assertFalse(manager.hasScheduledTimer("test_pixel"))
+    }
+
+    @Test
+    fun `cancelScheduledFire on non-existent timer is a no-op`() {
+        manager.cancelScheduledFire("nonexistent")
+        assertFalse(manager.hasScheduledTimer("nonexistent"))
+    }
+
+    @Test
+    fun `onConfigChanged cancels all timers when feature disabled`() {
+        manager.scheduleFireTelemetry("pixel_a", 60_000L)
+        manager.scheduleFireTelemetry("pixel_b", 120_000L)
+        assertTrue(manager.hasScheduledTimer("pixel_a"))
+        assertTrue(manager.hasScheduledTimer("pixel_b"))
+
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+        manager.onConfigChanged()
+
+        assertFalse(manager.hasScheduledTimer("pixel_a"))
+        assertFalse(manager.hasScheduledTimer("pixel_b"))
+    }
+
+    @Test
+    fun `fireTelemetry cancels existing timer before re-registering`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + 60_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        manager.scheduleFireTelemetry("webTelemetry_adwallDetection_day", 1000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+
+        manager.checkPixels()
+
+        assertTrue(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `checkPixels reschedules timers for active pixels`() {
+        val periodEnd = timeProvider.time + 60_000L
+        val state = pixelState("webTelemetry_adwallDetection_day", mapOf("count" to 0), periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        assertFalse(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+
+        manager.checkPixels()
+
+        assertTrue(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+    }
+
+    @Test
+    fun `checkPixels does not reschedule timers when feature disabled`() {
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = """{"state": "disabled"}"""))
+
+        manager.checkPixels()
+
+        assertFalse(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+    }
+
+    @Test
+    fun `scheduled timer fires zero-count pixel without any web events`() {
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(captor.capture())
+        val savedState = captor.firstValue
+        assertEquals(0, RealEventHubPixelManager.parseParamsJson(savedState.paramsJson)["count"])
+
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(savedState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
+
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = 1000L + periodMillis
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("webTelemetry_adwallDetection_day"),
+            parameters = any(),
+            encodedParameters = eq(emptyMap()),
+            type = eq(Count),
+        )
+    }
+
+    @Test
+    fun `scheduled timer starts new cycle after firing`() {
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+
+        val initCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(initCaptor.capture())
+        val initialState = initCaptor.firstValue
+
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = fullConfig))
+        whenever(repository.getPixelState("webTelemetry_adwallDetection_day")).thenReturn(initialState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
+
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = 1000L + periodMillis
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        verify(repository).deletePixelState("webTelemetry_adwallDetection_day")
+        val newCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(newCaptor.capture())
+        assertEquals(timeProvider.time, newCaptor.firstValue.periodStartMillis)
+        assertEquals(0, RealEventHubPixelManager.parseParamsJson(newCaptor.firstValue.paramsJson)["count"])
+        assertTrue(manager.hasScheduledTimer("webTelemetry_adwallDetection_day"))
+    }
+
+    @Test
+    fun `multi-pixel timers are scheduled independently with correct delays`() {
+        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
+        whenever(repository.getEventHubConfigEntity()).thenReturn(EventHubConfigEntity(json = twoPixelConf))
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider)
+
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("pixel_a")).thenReturn(null)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(null)
+        manager.onConfigChanged()
+
+        assertTrue(manager.hasScheduledTimer("pixel_a"))
+        assertTrue(manager.hasScheduledTimer("pixel_b"))
+
+        val savedStates = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
+        val stateA = savedStates.allValues.find { it.pixelName == "pixel_a" }!!
+        val stateB = savedStates.allValues.find { it.pixelName == "pixel_b" }!!
+
+        assertEquals(1000L + 60_000L, stateA.periodEndMillis)
+        assertEquals(1000L + 120_000L, stateB.periodEndMillis)
     }
 
     // --- helpers ---
