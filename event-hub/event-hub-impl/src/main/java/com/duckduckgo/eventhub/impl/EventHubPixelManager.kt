@@ -17,6 +17,8 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.eventhub.api.EventHubPixelManager
+import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
 import logcat.LogPriority.DEBUG
@@ -25,17 +27,6 @@ import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
-
-data class WebEventContext(
-    val tabId: String,
-    val documentUrl: String,
-)
-
-interface EventHubPixelManager {
-    fun handleWebEvent(eventType: String, context: WebEventContext)
-    fun checkPixels()
-    fun onConfigChanged()
-}
 
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,

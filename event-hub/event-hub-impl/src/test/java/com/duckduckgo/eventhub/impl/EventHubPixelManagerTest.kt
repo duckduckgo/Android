@@ -18,6 +18,7 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.eventhub.store.EventHubConfigEntity
 import com.duckduckgo.eventhub.store.EventHubPixelStateEntity
 import com.duckduckgo.eventhub.store.EventHubRepository
