@@ -28,7 +28,7 @@ data class WideEventRequest(
 data class GlobalSection(
     @field:Json(name = "platform") val platform: String,
     @field:Json(name = "type") val type: String,
-    @field:Json(name = "sample_rate") val sampleRate: Int,
+    @field:Json(name = "sample_rate") val sampleRate: Float,
 )
 
 data class AppSection(
