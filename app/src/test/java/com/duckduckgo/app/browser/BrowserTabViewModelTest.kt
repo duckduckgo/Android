@@ -9054,7 +9054,7 @@ class BrowserTabViewModelTest {
             subscriptionName = "collect",
             params = JSONObject(),
         )
-        whenever(mockPageContextJSHelper.onContextualOpened()).thenReturn(expectedEvent)
+        whenever(mockPageContextJSHelper.collectPageContext()).thenReturn(expectedEvent)
 
         testee.collectPageContext()
 
