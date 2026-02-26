@@ -29,7 +29,7 @@ class EventHubConfigParserTest {
             "state": "enabled",
             "settings": {
                 "telemetry": {
-                    "webTelemetry_adwallDetection_day": {
+                    "webTelemetry_testPixel1": {
                         "state": "enabled",
                         "trigger": {
                             "period": { "days": 1 }
@@ -37,7 +37,7 @@ class EventHubConfigParserTest {
                         "parameters": {
                             "count": {
                                 "template": "counter",
-                                "source": "adwall",
+                                "source": "test",
                                 "buckets": {
                                     "0":     {"gte": 0,  "lt": 1},
                                     "1-2":   {"gte": 1,  "lt": 3},
@@ -73,7 +73,7 @@ class EventHubConfigParserTest {
         val param = config.telemetry[0].parameters["count"]!!
 
         assertTrue(param.isCounter)
-        assertEquals("adwall", param.source)
+        assertEquals("test", param.source)
         assertEquals(7, param.buckets.size)
 
         val first = param.buckets["0"]!!
