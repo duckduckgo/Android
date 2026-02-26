@@ -36,8 +36,10 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -62,6 +64,11 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
+
+    // Separate from the DROP_OLDEST command channel so error messages can never be evicted by
+    // a concurrent ChangeSheetState (e.g. from the keyboard appearing after a dialog dismisses).
+    private val _errorMessages = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val errorMessages = _errorMessages.asSharedFlow()
 
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
     val subscriptionEventDataFlow = _subscriptionEventDataChannel.receiveAsFlow()
@@ -542,7 +549,10 @@ class DuckChatContextualViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     when (val result = plugin.execute(query)) {
                         is DuckChatContextualResult.Submit -> onHistoryPromptSent(result.prompt, result.context)
-                        is DuckChatContextualResult.ShowError -> logcat { "Duck.ai: command error: ${result.message}" }
+                        is DuckChatContextualResult.ShowError -> {
+                            logcat { "Duck.ai: command error: ${result.message}" }
+                            _errorMessages.emit(result.message)
+                        }
                     }
                 }
                 return true
