@@ -78,11 +78,6 @@ class RealEventHubPixelManager @Inject constructor(
                     val newValue = currentValue + 1
                     params[paramName] = newValue
                     logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
-
-                    if (BucketCounter.shouldStopCounting(newValue, paramConfig.buckets)) {
-                        stopCounting.add(paramName)
-                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName reached max bucket, stopCounting" }
-                    }
                 }
             }
 

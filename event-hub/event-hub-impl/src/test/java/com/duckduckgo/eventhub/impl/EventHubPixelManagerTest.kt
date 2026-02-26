@@ -35,6 +35,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
@@ -129,17 +130,48 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `handleWebEvent sets stopCounting when max bucket reached`() {
+    fun `handleWebEvent can increment multiple times below max bucket`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
+        manager.handleWebEvent("test", NO_CONTEXT)
+
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(captor.firstValue)
+
+        manager.handleWebEvent("test", NO_CONTEXT)
+        verify(repository).savePixelState(captor.capture())
+        assertEquals(2, RealEventHubPixelManager.parseParamsJson(captor.secondValue.paramsJson)["count"])
+    }
+
+    @Test
+    fun `handleWebEvent does not increment through max bucket`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 39))
         stubPixelStates(state)
 
+        val captor = argumentCaptor<EventHubPixelStateEntity>()
         manager.handleWebEvent("test", NO_CONTEXT)
 
-        val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
-        val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
-        assertTrue("count" in stopCounting)
+
+        // re-stub so second call sees saved state (count=40, stopCounting=["count"])
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+
+        manager.handleWebEvent("test", NO_CONTEXT)
+        verify(repository, never()).savePixelState(captor.capture())
+        // stopCounting prevents further changes
+        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+
+        manager.handleWebEvent("test", NO_CONTEXT)
+        verify(repository, never()).savePixelState(captor.capture())
+        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
