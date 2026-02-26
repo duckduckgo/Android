@@ -122,6 +122,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -303,6 +304,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import kotlinx.coroutines.FlowPreview
@@ -494,6 +496,7 @@ class BrowserTabViewModelTest {
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
 
     private val mockPageLoadWideEvent: PageLoadWideEvent = mock()
+    private val mockQueryUrlPredictor: QueryUrlPredictor = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -784,6 +787,7 @@ class BrowserTabViewModelTest {
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(mockQueryUrlPredictor.isReady()).thenReturn(true)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
@@ -917,6 +921,7 @@ class BrowserTabViewModelTest {
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
                 pageLoadWideEvent = mockPageLoadWideEvent,
+                queryUrlPredictor = mockQueryUrlPredictor,
             )
 
         testee.loadData("abc", null, false, false)
@@ -6860,6 +6865,29 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
         verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() {
+        whenever(mockQueryUrlPredictor.classify("bbc.com")).thenReturn(Decision.Navigate("bbc.com"))
+        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
+        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryInFullScreenModeThenNavigateInsteadOfOpeningDuckChat() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        whenever(mockQueryUrlPredictor.classify("bbc.com")).thenReturn(Decision.Navigate("bbc.com"))
+        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
+
+        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
+
+        verify(mockDuckChat, never()).getDuckChatUrl("bbc.com", true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test

@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -45,6 +46,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -94,6 +96,7 @@ class InputScreenViewModelTest {
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val omnibarRepository: OmnibarRepository = mock()
+    private val queryUrlPredictor: QueryUrlPredictor = mock()
 
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
@@ -119,6 +122,7 @@ class InputScreenViewModelTest {
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isReady()).thenReturn(true)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -140,6 +144,7 @@ class InputScreenViewModelTest {
             duckAiFeatureState = duckAiFeatureState,
             duckChatFeature = duckChatFeature,
             chatSuggestionsReader = chatSuggestionsReader,
+            queryUrlPredictor = queryUrlPredictor,
         )
 
     @Test
@@ -563,6 +568,7 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel()
             val url = "https://example.com"
 
+            whenever(queryUrlPredictor.classify(url)).thenReturn(Decision.Navigate(url))
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
@@ -2104,6 +2110,23 @@ class InputScreenViewModelTest {
             viewModel.onChatSubmitted(query)
 
             assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+        }
+
+    @Test
+    fun `when fullscreen mode enabled submitting a URL navigates directly instead of opening DuckChat`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.classify("bbc.com")).thenReturn(Decision.Navigate("bbc.com"))
+
+            val viewModel = createViewModel()
+            val url = "bbc.com"
+
+            viewModel.onChatSubmitted(url)
+
+            assertEquals(SubmitSearch(url), viewModel.command.value)
+            verify(duckChat, never()).getDuckChatUrl(url, true)
         }
 
     @Test

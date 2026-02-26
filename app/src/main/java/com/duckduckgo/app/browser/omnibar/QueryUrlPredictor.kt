@@ -28,43 +28,6 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-interface QueryUrlPredictor {
-
-    /**
-     * Indicates whether the UrlPredictor native library is ready to be used.
-     *
-     * This method is a convenience wrapper around {@link UrlPredictor#isInitialized()},
-     * exposing the initialization state at the application layer.
-     *
-     * Initialization is triggered asynchronously in this class' constructor, via:
-     *
-     * <pre>
-     * coroutineScope.launch(dispatcherProvider.io()) {
-     *     UrlPredictor.init()
-     * }
-     * </pre>
-     *
-     * Until initialization completes, calls to {@link #classify(String)} will fail
-     * if invoked directly on the underlying UrlPredictor instance; therefore,
-     * callers may use {@code isReady()} to determine whether classification is safe.
-     *
-     * This method does not block and is safe to call from any thread.
-     *
-     * @return {@code true} if the UrlPredictor native library has been loaded and
-     *         the predictor instance is fully initialized; {@code false} otherwise.
-     *
-     * @see UrlPredictor#isInitialized()
-     * @see UrlPredictor#init()
-     */
-    fun isReady(): Boolean
-
-    /**
-     * Classifies the input string as a navigable URL or a search query.
-     * You should be calling [isReady] before calling this method to make sure the library is properly initialized
-     */
-    fun classify(input: String): Decision
-}
-
 /**
  * Wrapper around the native implementation of [UrlPredictor] to allow unit testing.
  */

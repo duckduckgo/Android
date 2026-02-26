@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -77,6 +78,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -138,6 +140,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val omnibarRepository: OmnibarRepository,
     private val chatSuggestionsReader: ChatSuggestionsReader,
+    private val queryUrlPredictor: QueryUrlPredictor,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -470,14 +473,21 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
+    private fun isNavigate(query: String): Boolean =
+        if (queryUrlPredictor.isReady()) {
+            queryUrlPredictor.classify(query) is Decision.Navigate
+        } else {
+            isWebUrl(query)
+        }
+
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
             when {
+                isNavigate(query) -> command.value = Command.SubmitSearch(query)
                 visibilityState.value.fullScreenMode -> {
                     val url = duckChat.getDuckChatUrl(query, true)
                     command.value = Command.SubmitSearch(url)
                 }
-                isWebUrl(query) -> command.value = Command.SubmitSearch(query)
                 else -> {
                     command.value = Command.SubmitChat(query)
                     duckChat.openDuckChatWithAutoPrompt(query)
