@@ -268,6 +268,16 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenObserveNativeInputFieldUserSettingEnabledThenEmitCorrectValues() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeNativeInputFieldUserSettingEnabled().take(2).toList()
+
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun whenSetChatSuggestionsUserSettingThenRepositorySetCalled() = runTest {
         testee.setChatSuggestionsUserSetting(true)
         verify(mockDuckChatFeatureRepository).setChatSuggestionsUserSetting(true)

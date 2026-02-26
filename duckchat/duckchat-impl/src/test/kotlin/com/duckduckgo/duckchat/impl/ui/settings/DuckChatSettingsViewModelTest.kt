@@ -765,4 +765,70 @@ class DuckChatSettingsViewModelTest {
                 assertTrue(awaitItem().isNativeInputFieldVisible)
             }
         }
+
+    @Test
+    fun `view state - native input field hidden when flag enabled and duck chat disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isNativeInputFieldVisible)
+            }
+        }
+
+    @Test
+    fun `view state - native input field hidden when flag disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.nativeInputField().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isNativeInputFieldVisible)
+            }
+        }
+
+    @Test
+    fun `view state - native input field disabled then set correct state`() =
+        runTest {
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isNativeInputFieldEnabled)
+            }
+        }
 }
