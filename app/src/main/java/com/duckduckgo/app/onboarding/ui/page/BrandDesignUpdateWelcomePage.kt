@@ -78,8 +78,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private var introAnimatorSet: AnimatorSet? = null
     private var outroAnimatorSet: AnimatorSet? = null
-    private var outroRunnable: Runnable? = null
-    private var welcomeAnimationFinished = false
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
     private var textIntroScale = 1f
 
