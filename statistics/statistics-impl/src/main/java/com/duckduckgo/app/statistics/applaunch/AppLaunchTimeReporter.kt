@@ -55,6 +55,10 @@ import logcat.logcat
  * On API 35+, also captures the system-reported TTID via [ApplicationStartInfo] and includes it
  * as [PARAM_SYSTEM_MS_BUCKET] for comparison. The pixel is held until both measurements arrive.
  *
+ * Trampoline handling: if a new activity is created (or started) while we are already tracking a
+ * different one that has not yet drawn, the previous one is treated as a trampoline and we switch
+ * immediately. A [generation] counter makes any stale frame callback from the old activity a no-op.
+ *
  * Fires exactly once per process lifetime.
  */
 @ContributesMultibinding(AppScope::class)
@@ -67,6 +71,10 @@ class AppLaunchTimeReporter @Inject constructor(
     private var frameListenerAttached = false
     private var warmHotStartUptimeMs: Long? = null
     private var listeningToActivity: Activity? = null
+
+    // Incremented whenever we abandon a previous attachment (trampoline detected or destroyed).
+    // Each frame callback captures the generation at attach time; stale callbacks are ignored.
+    private var generation = 0
 
     // Holds our ViewTreeObserver measurement until the system measurement is also ready.
     private var pendingMeasurement: PendingMeasurement? = null
@@ -136,12 +144,21 @@ class AppLaunchTimeReporter @Inject constructor(
     }
 
     // ---------------------------------------------------------------------------
-    // Warm launch — activity created in an already-running process
+    // Warm/cold launch — activity created in a (possibly freshly started) process
     // ---------------------------------------------------------------------------
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         logcat(DEBUG) { "TTID: onActivityCreated [${activity::class.java.simpleName}] measured=$measured frameListenerAttached=$frameListenerAttached" }
-        if (measured || frameListenerAttached) return
+        if (measured) return
+        if (frameListenerAttached) {
+            if (activity === listeningToActivity) return
+            // A different activity is being created while we are still attached to another one.
+            // The previous activity is a trampoline that launched this one without drawing first.
+            logcat(DEBUG) { "TTID: [${listeningToActivity?.javaClass?.simpleName}] is a trampoline — switching to [${activity.javaClass.simpleName}]" }
+            generation++
+            frameListenerAttached = false
+            listeningToActivity = null
+        }
         maybeRegisterSystemListener(activity)
         captureWarmHotStartIfNeeded()
         frameListenerAttached = true
@@ -160,7 +177,15 @@ class AppLaunchTimeReporter @Inject constructor(
 
     override fun onActivityStarted(activity: Activity) {
         logcat(DEBUG) { "TTID: onActivityStarted [${activity::class.java.simpleName}] measured=$measured frameListenerAttached=$frameListenerAttached" }
-        if (measured || frameListenerAttached) return
+        if (measured) return
+        if (frameListenerAttached) {
+            if (activity === listeningToActivity) return
+            // Same trampoline-in-background detection as in onActivityCreated.
+            logcat(DEBUG) { "TTID: [${listeningToActivity?.javaClass?.simpleName}] is a trampoline — switching to [${activity.javaClass.simpleName}]" }
+            generation++
+            frameListenerAttached = false
+            listeningToActivity = null
+        }
         // onActivityCreated didn't fire, so this is a hot launch.
         maybeRegisterSystemListener(activity)
         captureWarmHotStartIfNeeded()
@@ -175,8 +200,9 @@ class AppLaunchTimeReporter @Inject constructor(
     }
 
     // ---------------------------------------------------------------------------
-    // Trampoline detection — if the activity we attached to is destroyed before
-    // drawing (e.g. a bridge/redirect activity), reset and try the next one.
+    // Trampoline detection (destruction path) — if the activity we attached to is
+    // destroyed before drawing and no new activity has arrived yet, reset so the
+    // next lifecycle callback can pick up measurement.
     // ---------------------------------------------------------------------------
 
     override fun onActivityDestroyed(activity: Activity) {
@@ -184,6 +210,7 @@ class AppLaunchTimeReporter @Inject constructor(
             logcat(DEBUG) { "TTID: [${activity::class.java.simpleName}] destroyed before first draw — resetting to attach to next activity" }
             frameListenerAttached = false
             listeningToActivity = null
+            generation++ // invalidate any in-flight frame callback from this activity
         }
     }
 
@@ -246,13 +273,15 @@ class AppLaunchTimeReporter @Inject constructor(
         temperature: String,
         scenario: String,
     ) {
+        val capturedGeneration = generation
         scheduleFirstFrame(activity.window.decorView, Runnable {
-            storeMeasurement(startUptimeMs, temperature, scenario)
+            storeMeasurement(startUptimeMs, temperature, scenario, capturedGeneration)
         })
     }
 
-    private fun storeMeasurement(startUptimeMs: Long, temperature: String, scenario: String) {
-        if (measured) return
+    private fun storeMeasurement(startUptimeMs: Long, temperature: String, scenario: String, capturedGeneration: Int) {
+        // Discard stale callbacks from activities we have since abandoned (trampoline pattern).
+        if (measured || capturedGeneration != generation) return
         val ttidMs = currentUptimeMs() - startUptimeMs
         logcat(DEBUG) { "TTID: our measurement=${ttidMs}ms [temperature=$temperature, scenario=$scenario] awaitingSystemTtid=$awaitingSystemTtid" }
         pendingMeasurement = PendingMeasurement(ttidMs, temperature, scenario)

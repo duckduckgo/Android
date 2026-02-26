@@ -203,6 +203,48 @@ class AppLaunchTimeReporterTest {
     // ---------------------------------------------------------------------------
 
     @Test
+    fun `when real activity is created before trampoline is destroyed pixel fires for real activity`() {
+        // This is the common device pattern: BrowserActivity is created while
+        // LaunchBridgeActivity is still alive (not yet destroyed).
+        givenColdLaunch(processStartMs = 0L, nowMs = 500L)
+
+        val trampoline = activityWith(launcherIntent())
+        val real = activityWith(launcherIntent())
+
+        // Trampoline is created but never draws.
+        reporter.scheduleFirstFrame = { _, _ -> /* trampoline never draws */ }
+        reporter.onActivityCreated(trampoline, savedInstanceState = null)
+
+        // Real activity arrives while trampoline is still alive — switch immediately.
+        reporter.scheduleFirstFrame = { _, action -> action.run() }
+        reporter.onActivityCreated(real, savedInstanceState = null)
+
+        verifyPixelFiredExactlyOnce()
+    }
+
+    @Test
+    fun `when trampoline draws after we switched to real activity stale draw is ignored`() {
+        givenColdLaunch(processStartMs = 0L, nowMs = 500L)
+
+        val trampoline = activityWith(launcherIntent())
+        val real = activityWith(launcherIntent())
+
+        // Capture the trampoline frame action without running it.
+        var trampolineFrame: Runnable? = null
+        reporter.scheduleFirstFrame = { _, action -> trampolineFrame = action }
+        reporter.onActivityCreated(trampoline, savedInstanceState = null)
+
+        // Switch to real activity (pixel fires here via sync frame).
+        reporter.scheduleFirstFrame = { _, action -> action.run() }
+        reporter.onActivityCreated(real, savedInstanceState = null)
+
+        // Trampoline draws late — stale generation, must be ignored.
+        trampolineFrame?.run()
+
+        verifyPixelFiredExactlyOnce()
+    }
+
+    @Test
     fun `when trampoline activity is destroyed before drawing pixel fires for the next activity`() {
         givenColdLaunch(processStartMs = 0L, nowMs = 500L)
 
