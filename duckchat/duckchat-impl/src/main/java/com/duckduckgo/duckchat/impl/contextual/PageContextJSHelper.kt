@@ -31,7 +31,7 @@ interface PageContextJSHelper {
         tabId: String,
     ): String?
 
-    fun onContextualOpened(): SubscriptionEventData
+    fun collectPageContext(): SubscriptionEventData
 }
 
 @ContributesBinding(AppScope::class)
@@ -53,7 +53,7 @@ class RealPageContextJSHelper @Inject constructor() : PageContextJSHelper {
         return null
     }
 
-    override fun onContextualOpened(): SubscriptionEventData {
+    override fun collectPageContext(): SubscriptionEventData {
         return SubscriptionEventData(
             PAGE_CONTEXT_FEATURE_NAME,
             SUBSCRIPTION_COLLECT,
