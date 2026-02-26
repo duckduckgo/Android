@@ -198,6 +198,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -504,6 +505,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
+    private val queryUrlPredictor: QueryUrlPredictor,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -4730,6 +4732,7 @@ class BrowserTabViewModel @Inject constructor(
             duckAiFeatureState.showFullScreenMode.value -> {
                 val url = when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
                     hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
@@ -4739,6 +4742,7 @@ class BrowserTabViewModel @Inject constructor(
             else -> {
                 when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> onUserSubmittedQuery(query ?: "")
                     hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
                     else -> duckChat.openDuckChat()
                 }

@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -94,6 +95,7 @@ class InputScreenViewModelTest {
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val omnibarRepository: OmnibarRepository = mock()
+    private val queryUrlPredictor: QueryUrlPredictor = mock()
 
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
@@ -119,6 +121,7 @@ class InputScreenViewModelTest {
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isReady()).thenReturn(true)
         }
 
     private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
@@ -140,6 +143,7 @@ class InputScreenViewModelTest {
             duckAiFeatureState = duckAiFeatureState,
             duckChatFeature = duckChatFeature,
             chatSuggestionsReader = chatSuggestionsReader,
+            queryUrlPredictor = queryUrlPredictor,
         )
 
     @Test
@@ -563,6 +567,7 @@ class InputScreenViewModelTest {
             val viewModel = createViewModel()
             val url = "https://example.com"
 
+            whenever(queryUrlPredictor.isUrl(url)).thenReturn(true)
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
@@ -2104,6 +2109,72 @@ class InputScreenViewModelTest {
             viewModel.onChatSubmitted(query)
 
             assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+        }
+
+    @Test
+    fun `when fullscreen mode enabled submitting a URL navigates directly instead of opening DuckChat`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+
+            val viewModel = createViewModel()
+            val url = "bbc.com"
+
+            viewModel.onChatSubmitted(url)
+
+            assertEquals(SubmitSearch(url), viewModel.command.value)
+            verify(duckChat, never()).getDuckChatUrl(url, true)
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL in non-fullscreen mode then SubmitSearch command is emitted`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            assertEquals(SubmitSearch("bbc.com"), viewModel.command.value)
+            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL then chat pixels are not fired`() =
+        runTest {
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED), any(), any(), any())
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL then setHasUsedChatMode is not called`() =
+        runTest {
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            verify(inputScreenSessionStore, never()).setHasUsedChatMode(true)
+        }
+
+    @Test
+    fun `when predictor not ready and input is web url then onChatSubmitted emits SubmitSearch`() =
+        runTest {
+            whenever(queryUrlPredictor.isReady()).thenReturn(false)
+            whenever(queryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("https://example.com")
+
+            assertEquals(SubmitSearch("https://example.com"), viewModel.command.value)
         }
 
     @Test

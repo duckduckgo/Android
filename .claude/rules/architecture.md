@@ -187,12 +187,47 @@ dwellJob = scope.launch { /* cancels previous */ }
 
 ---
 
+## URL vs. Search Classification
+
+Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** use `UriString.isWebUrl()` for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
+
+```kotlin
+private fun isNavigate(query: String): Boolean =
+    if (queryUrlPredictor.isReady()) {
+        queryUrlPredictor.classify(query) is Decision.Navigate
+    } else {
+        UriString.isWebUrl(query)  // fallback while native lib initialises
+    }
+```
+
+- `Decision` is a sealed interface with `Navigate(url)` and `Search(query)` — both are data classes.
+- `isReady()` is false briefly at startup while the native library loads; always guard with a `UriString.isWebUrl` fallback.
+- `QueryUrlPredictor` lives in `browser-api` and is injectable at `AppScope`. `Decision` is exported transitively via `browser-api`'s `api` dep on `url-predictor-android`.
+
+---
+
 ## Logging
 
 ```kotlin
 import logcat.logcat   // correct
 // NOT: import com.squareup.logcat.logcat
 ```
+
+---
+
+## Git Workflow
+
+Branch naming: `<purpose>/<git-username>/<feature-name>`
+
+- `purpose`: `feature`, `fix`, `poc`, `refactor`, `chore`, etc.
+- `git-username`: the author's GitHub handle (run `gh api user --jq '.login'` if unsure — for this repo it is `aitorvs`)
+- `feature-name`: kebab-case description
+
+Examples: `feature/aitorvs/duck-ai-url-routing`, `fix/aitorvs/bookmark-crash`
+
+### Pull Requests
+
+Use the repo's PR template (`.github/PULL_REQUEST_TEMPLATE.md`). Always ask the user for the Asana task link before creating a PR — it goes in the `Task/Issue URL:` field at the top.
 
 ---
 

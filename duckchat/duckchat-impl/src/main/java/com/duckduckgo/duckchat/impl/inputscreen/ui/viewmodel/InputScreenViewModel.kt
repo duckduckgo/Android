@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
@@ -138,6 +139,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val inputScreenConfigResolver: InputScreenConfigResolver,
     private val omnibarRepository: OmnibarRepository,
     private val chatSuggestionsReader: ChatSuggestionsReader,
+    private val queryUrlPredictor: QueryUrlPredictor,
 ) : ViewModel() {
 
     private val autoComplete: AutoComplete = autoCompleteFactory.create(
@@ -472,12 +474,16 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
+            if (queryUrlPredictor.isUrl(query)) {
+                command.value = Command.SubmitSearch(query)
+                return@launch
+            }
+
             when {
                 visibilityState.value.fullScreenMode -> {
                     val url = duckChat.getDuckChatUrl(query, true)
                     command.value = Command.SubmitSearch(url)
                 }
-                isWebUrl(query) -> command.value = Command.SubmitSearch(query)
                 else -> {
                     command.value = Command.SubmitChat(query)
                     duckChat.openDuckChatWithAutoPrompt(query)
