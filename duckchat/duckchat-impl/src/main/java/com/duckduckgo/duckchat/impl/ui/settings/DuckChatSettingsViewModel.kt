@@ -41,7 +41,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -105,12 +105,14 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         }
 
     private val featureVisibility =
-        flowOf(
-            FeatureVisibility(
-                isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
-                isNativeInputFieldSettingVisible = duckChatFeature.nativeInputField().isEnabled(),
-            ),
-        ).flowOn(dispatcherProvider.io())
+        flow {
+            emit(
+                FeatureVisibility(
+                    isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
+                    isNativeInputFieldSettingVisible = duckChatFeature.nativeInputField().isEnabled(),
+                ),
+            )
+        }.flowOn(dispatcherProvider.io())
 
     val viewState =
         combine(
