@@ -158,11 +158,21 @@ class RealDuckChatJSHelper @Inject constructor(
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
                     if (pageContext.isNotEmpty()) {
-                        if (reason == REASON_USER_ACTION) {
-                            duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
-                            getPageContextResponse(featureName, method, it, pageContext, tabId)
-                        } else {
-                            null
+                        when (reason) {
+                            REASON_USER_ACTION -> {
+                                duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
+                                getPageContextResponse(featureName, method, it, pageContext, tabId)
+                            }
+                            REASON_INIT -> {
+                                if (duckChat.areMultipleContentAttachmentsEnabled()) {
+                                    getPageContextResponse(featureName, method, it, pageContext, tabId)
+                                } else {
+                                    null
+                                }
+                            }
+                            else -> {
+                                null
+                            }
                         }
                     } else {
                         logcat { "Duck.ai Contextual: page context is empty, can't add it" }
@@ -335,6 +345,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val ANDROID = "android"
         private const val REASON = "reason"
         private const val REASON_USER_ACTION = "userAction"
+        private const val REASON_INIT = "init"
         private const val ENABLED = "enabled"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"

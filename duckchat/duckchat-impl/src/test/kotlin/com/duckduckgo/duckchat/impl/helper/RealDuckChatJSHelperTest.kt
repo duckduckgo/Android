@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import android.graphics.Bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
@@ -58,12 +57,10 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
-    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
-        faviconManager = mockFaviconManager,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -74,7 +71,13 @@ class RealDuckChatJSHelperTest {
                 {
                     "title": "Example Title",
                     "url": "https://example.com",
-                    "content": "Example content"
+                    "content": "Example content",
+                    "favicon": [
+                        {
+                            "rel": "icon",
+                            "href": "data:image/png;base64,..."
+                        }
+                     ]
                 }
                 """.trimIndent()
         }
@@ -299,8 +302,6 @@ class RealDuckChatJSHelperTest {
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val tabId = "tab-1"
-        val faviconBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-        whenever(mockFaviconManager.loadFromDisk(tabId, "https://example.com")).thenReturn(faviconBitmap)
 
         val result =
             testee.processJsCallbackMessage(

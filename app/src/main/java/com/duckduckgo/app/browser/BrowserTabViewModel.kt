@@ -4226,7 +4226,7 @@ class BrowserTabViewModel @Inject constructor(
         if (url != null) {
             val favicon = faviconManager.loadFromDisk(tabId, url)
             if (favicon != null) {
-                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
+                logcat { "Duck.ai: Enriching context with favicon for tab $tabId and url $url" }
                 val faviconBase64 = favicon.encodeBitmapToBase64()
                 json.put(
                     "favicon",
