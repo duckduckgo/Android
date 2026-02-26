@@ -97,6 +97,13 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when setNativeInputFieldUserSetting then set in data store`() = runTest {
+        testee.setNativeInputFieldUserSetting(false)
+
+        verify(mockDataStore).setNativeInputFieldUserSetting(false)
+    }
+
+    @Test
     fun whenObserveDuckChatUserEnabledThenObserveDataStore() = runTest {
         whenever(mockDataStore.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
 
@@ -161,6 +168,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when observeNativeInputFieldUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeNativeInputFieldUserSettingEnabled().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
     fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
         whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
         assertFalse(testee.isDuckChatUserEnabled())
@@ -195,6 +211,12 @@ class DuckChatFeatureRepositoryTest {
     fun `when isFullScreenModeUserSettingEnabled called, then get from data store`() = runTest {
         whenever(mockDataStore.isFullScreenUserSettingEnabled()).thenReturn(true)
         assertTrue(testee.isFullScreenModeUserSettingEnabled())
+    }
+
+    @Test
+    fun `when isNativeInputFieldUserSettingEnabled called, then get from data store`() = runTest {
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
+        assertFalse(testee.isNativeInputFieldUserSettingEnabled())
     }
 
     @Test

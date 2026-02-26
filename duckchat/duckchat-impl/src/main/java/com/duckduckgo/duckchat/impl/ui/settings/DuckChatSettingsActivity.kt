@@ -87,6 +87,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             updateWidgets()
         }
 
+    private val userEnabledNativeInputFieldToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onNativeInputFieldToggled(isChecked)
+            updateWidgets()
+        }
+
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -136,6 +142,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
         binding.duckAIAutomaticContext.quietlySetIsChecked(viewState.isAutomaticContextEnabled, userEnabledAutomaticPageContextToggleListener)
 
+        binding.duckAiNativeInputField.isVisible = viewState.isNativeInputFieldVisible
+        binding.duckAiNativeInputField.quietlySetIsChecked(viewState.isNativeInputFieldEnabled, userEnabledNativeInputFieldToggleListener)
+
         // align content with the main Duck.ai toggle's text
         val offset =
             resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
@@ -152,6 +161,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenDescription.updatePadding(left = offset)
         binding.duckAiShortcuts.updatePadding(left = offset)
         binding.duckAIAutomaticContext.updatePadding(left = offset)
+        binding.duckAiNativeInputField.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
             textSequence = getText(R.string.duck_chat_settings_activity_description),

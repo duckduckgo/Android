@@ -99,6 +99,11 @@ interface DuckChatInternal : DuckChat {
     suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean)
 
     /**
+     * Set user setting to determine whether the native input field should be used.
+     */
+    suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
+
+    /**
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
@@ -389,6 +394,12 @@ class RealDuckChat @Inject constructor(
         }
     }
 
+    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
+        withContext(dispatchers.io()) {
+            duckChatFeatureRepository.setNativeInputFieldUserSetting(isEnabled)
+        }
+    }
+
     override fun isEnabled(): Boolean = isDuckChatFeatureEnabled && isDuckChatUserEnabled
 
     override fun isInputScreenFeatureAvailable(): Boolean = duckAiInputScreen
@@ -412,6 +423,9 @@ class RealDuckChat @Inject constructor(
 
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
         duckChatFeatureRepository.observeAutomaticContextAttachmentUserSettingEnabled()
+
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> =
+        duckChatFeatureRepository.observeNativeInputFieldUserSettingEnabled()
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeShowInBrowserMenu()
 
