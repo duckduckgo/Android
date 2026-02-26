@@ -331,8 +331,8 @@ import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.eventhub.api.EVENT_HUB_FEATURE_NAME
 import com.duckduckgo.eventhub.api.EventHubPixelManager
+import com.duckduckgo.eventhub.api.WEB_EVENTS_FEATURE_NAME
 import com.duckduckgo.eventhub.api.WebEventContext
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
@@ -4203,7 +4203,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
-            EVENT_HUB_FEATURE_NAME -> {
+            WEB_EVENTS_FEATURE_NAME -> {
                 val eventType = data?.optString("type", "") ?: ""
                 if (eventType.isNotEmpty()) {
                     viewModelScope.launch(dispatchers.io()) {

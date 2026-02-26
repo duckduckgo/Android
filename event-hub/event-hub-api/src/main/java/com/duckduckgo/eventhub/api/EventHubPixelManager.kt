@@ -16,7 +16,7 @@
 
 package com.duckduckgo.eventhub.api
 
-const val EVENT_HUB_FEATURE_NAME = "webEvents"
+const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 
 data class WebEventContext(
     val tabId: String,
