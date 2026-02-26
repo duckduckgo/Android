@@ -39,6 +39,7 @@ class RealEventHubPixelManager @Inject constructor(
     private val timeProvider: TimeProvider,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val foregroundStateProvider: AppForegroundStateProvider,
 ) : EventHubPixelManager {
 
     private val dedupState = ConcurrentHashMap<String, String>()
@@ -111,7 +112,9 @@ class RealEventHubPixelManager @Inject constructor(
     /**
      * Check all pixel states and fire any whose period has elapsed.
      * After firing, starts a new period and schedules the next fire.
-     * Called on app foreground to catch pixels that elapsed while backgrounded.
+     * Called on app foreground to catch pixels that elapsed while backgrounded,
+     * and to start new periods for enabled configs that have no active state
+     * (e.g., timer fired while backgrounded and no new period was started).
      */
     fun checkPixels() {
         val config = getParsedConfig()
@@ -128,6 +131,12 @@ class RealEventHubPixelManager @Inject constructor(
                 scheduleFireTelemetry(state.pixelName, state.periodEndMillis - nowMillis)
             }
         }
+
+        for (pixelConfig in config.telemetry) {
+            if (repository.getPixelState(pixelConfig.name) == null) {
+                startNewPeriod(pixelConfig)
+            }
+        }
     }
 
     fun onConfigChanged() {
@@ -141,8 +150,7 @@ class RealEventHubPixelManager @Inject constructor(
 
         logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${config.telemetry.size} telemetry pixel(s) in config" }
         for (pixelConfig in config.telemetry) {
-            if (repository.getPixelState(pixelConfig.name) == null && pixelConfig.isEnabled) {
-                logcat(DEBUG) { "EventHub: registering pixel ${pixelConfig.name}" }
+            if (repository.getPixelState(pixelConfig.name) == null) {
                 startNewPeriod(pixelConfig)
             }
         }
@@ -213,12 +221,17 @@ class RealEventHubPixelManager @Inject constructor(
 
         val latestConfig = getParsedConfig()
         val latestPixelConfig = latestConfig.telemetry.find { it.name == pixelConfig.name }
-        if (latestConfig.featureEnabled && latestPixelConfig != null && latestPixelConfig.isEnabled) {
+        if (latestPixelConfig != null) {
             startNewPeriod(latestPixelConfig)
         }
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
+        val config = getParsedConfig()
+        if (!foregroundStateProvider.isInForeground || !config.featureEnabled || !pixelConfig.isEnabled) {
+            logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
+            return
+        }
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
         val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
