@@ -504,6 +504,66 @@ class EventHubPixelManagerTest {
     }
 
     @Test
+    fun `returning to same URL is not deduplicated when intermediate page had different event type`() {
+        val twoSourceConfig = """
+            {
+                "state": "enabled",
+                "settings": {
+                    "telemetry": {
+                        "test": {
+                            "state": "enabled",
+                            "trigger": { "period": { "days": 1 } },
+                            "parameters": {
+                                "testCount": {
+                                    "template": "counter",
+                                    "source": "test",
+                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
+                                },
+                                "trackerCount": {
+                                    "template": "counter",
+                                    "source": "trackerBlocked",
+                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+
+        val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
+        stubPixelStates(state)
+
+        // "test" event on page1
+        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        val first = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(first.capture())
+        assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["testCount"])
+
+        // Navigate to page2 — only "trackerBlocked" fires (not "test")
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        stubPixelStates(first.firstValue)
+
+        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1", "https://example.com/page2")
+        val second = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(second.capture())
+        assertEquals(1, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["trackerCount"])
+
+        // Navigate back to page1 — "test" fires again; must NOT be deduplicated
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        stubPixelStates(second.firstValue)
+
+        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        val third = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(third.capture())
+        assertEquals(2, RealEventHubPixelManager.parseParamsJson(third.firstValue.paramsJson)["testCount"])
+    }
+
+    @Test
     fun `same URL in different tabs counts independently`() {
         val url = "https://example.com/page1"
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
