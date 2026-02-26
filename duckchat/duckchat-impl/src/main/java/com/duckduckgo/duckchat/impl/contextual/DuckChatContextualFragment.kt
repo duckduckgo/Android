@@ -357,6 +357,7 @@ class DuckChatContextualFragment :
                                             withContext(dispatcherProvider.main()) {
                                                 contentScopeScripts.onResponse(response)
                                             }
+                                            // once Duck.ai is fully loaded we attach the latest context if needed
                                             if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
                                                 sharedContextualViewModel.requestPageContext()
                                             }
