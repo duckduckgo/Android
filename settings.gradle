@@ -74,7 +74,7 @@ buildCache {
     remote(develocity.buildCache) {
         enabled = true // must be true for this experiment
         allowUntrustedServer = true // set to false if a trusted certificate is configured for the Develocity server
-        path = "cache/exp5-2026-02-25-01" // update for each new run of the experiment
+        path = "cache/exp5-2026-02-26-01" // update for each new run of the experiment
         push = System.getenv("CI") != null // adjust to an env var that is always present only in your CI environment
     }
 }
