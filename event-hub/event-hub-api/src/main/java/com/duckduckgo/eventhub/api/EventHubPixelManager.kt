@@ -20,11 +20,6 @@ import org.json.JSONObject
 
 const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 
-data class WebEventContext(
-    val tabId: String,
-    val documentUrl: String,
-)
-
 interface EventHubPixelManager {
-    fun handleWebEvent(data: JSONObject, context: WebEventContext)
+    fun handleWebEvent(data: JSONObject, tabId: String, documentUrl: String)
 }
