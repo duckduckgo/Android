@@ -209,6 +209,15 @@
                 app:secondaryText="@string/duckAIContextualAutomaticContextMessage"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiNativeInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiNativeInputFieldTitle"
+                app:secondaryText="@string/duckAiNativeInputFieldMessage"
+                app:showSwitch="true" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

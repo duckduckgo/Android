@@ -109,6 +109,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isFullScreenModeUserSettingEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
@@ -810,6 +811,13 @@ class RealDuckChatTest {
         testee.setInputScreenUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
+    }
+
+    @Test
+    fun `when set native input field user setting then repository updated`() = runTest {
+        testee.setNativeInputFieldUserSetting(true)
+
+        verify(mockDuckChatFeatureRepository).setNativeInputFieldUserSetting(true)
     }
 
     @Test

@@ -71,6 +71,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(flowOf(null))
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -606,6 +607,13 @@ class DuckChatSettingsViewModelTest {
     }
 
     @Test
+    fun whenNativeInputFieldToggledThenSetUserSetting() =
+        runTest {
+            testee.onNativeInputFieldToggled(true)
+            verify(duckChat).setNativeInputFieldUserSetting(true)
+        }
+
+    @Test
     fun `view state - automatic context enabled then set correct state`() =
         runTest {
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(true))
@@ -623,6 +631,27 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertTrue(awaitItem().isAutomaticContextEnabled)
+            }
+        }
+
+    @Test
+    fun `view state - native input field enabled then set correct state`() =
+        runTest {
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(true))
+
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isNativeInputFieldEnabled)
             }
         }
 
@@ -711,6 +740,29 @@ class DuckChatSettingsViewModelTest {
 
             testee.viewState.test {
                 assertFalse(awaitItem().isAutomaticContextVisible)
+            }
+        }
+
+    @Test
+    fun `view state - native input field visible when flag enabled and duck chat enabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
+            @Suppress("DenyListedApi")
+            duckChatFeature.nativeInputField().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatNativeSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isNativeInputFieldVisible)
             }
         }
 }

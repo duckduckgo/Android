@@ -99,6 +99,11 @@ interface DuckChat {
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
 
     /**
+     * Observes whether the native input field user setting is enabled.
+     */
+    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
+
+    /**
      * Shows the contextual onboarding bottom sheet dialog.
      * @param context The context to show the dialog in.
      * @param onConfirmed Callback invoked when the user confirms the dialog.

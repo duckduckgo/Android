@@ -41,9 +41,10 @@ class FakeDuckChatInternal(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
+    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
-    private val standaloneMigrationCompleted = MutableStateFlow<Boolean>(false)
+    private val standaloneMigrationCompleted = MutableStateFlow(false)
     var contextualOnboardingCompleted: Boolean = false
 
     // DuckChat interface methods
@@ -77,6 +78,7 @@ class FakeDuckChatInternal(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldUserSettingEnabled
 
     override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) {
         // No-op for testing
@@ -106,6 +108,10 @@ class FakeDuckChatInternal(
 
     override suspend fun setAutomaticPageContextUserSetting(isEnabled: Boolean) {
         automaticContextAttachmentUserSettingEnabled.value = isEnabled
+    }
+
+    override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
+        nativeInputFieldUserSettingEnabled.value = isEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = enableDuckChatUserSetting

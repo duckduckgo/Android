@@ -122,6 +122,11 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when isNativeInputFieldUserSettingEnabled then return default value`() = runTest {
+        assertFalse(testee.isNativeInputFieldUserSettingEnabled())
+    }
+
+    @Test
     fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
         assertFalse(testee.isInputScreenUserSettingEnabled())
     }
@@ -171,6 +176,12 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `when setCosmeticInputScreenUserSetting then cosmetic value is stored`() = runTest {
         testee.setCosmeticInputScreenUserSetting(true)
         assertTrue(testee.isCosmeticInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun `when setNativeInputFieldUserSetting then return value`() = runTest {
+        testee.setNativeInputFieldUserSetting(true)
+        assertTrue(testee.isNativeInputFieldUserSettingEnabled())
     }
 
     @Test
@@ -313,6 +324,21 @@ class SharedPreferencesDuckChatDataStoreTest {
         }
 
         testee.setAutomaticPageContextAttachment(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
+    fun `when observeNativeInputFieldUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeNativeInputFieldUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+
+        testee.setNativeInputFieldUserSetting(true)
         job.join()
 
         assertEquals(listOf(false, true), results)

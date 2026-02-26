@@ -1025,6 +1025,7 @@ class DuckChatContextualViewModelTest {
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
+        private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -1048,6 +1049,7 @@ class DuckChatContextualViewModelTest {
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
+        override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
         override fun showContextualOnboarding(
             context: Context,
             onConfirmed: () -> Unit,
