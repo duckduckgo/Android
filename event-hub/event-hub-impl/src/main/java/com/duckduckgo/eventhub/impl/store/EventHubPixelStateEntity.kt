@@ -23,8 +23,7 @@ import androidx.room.PrimaryKey
  * Per-pixel runtime state.
  * [periodStartMillis] UTC timestamp when the current period began.
  * [periodEndMillis] UTC timestamp when the current period ends (fire time).
- * [paramsJson] parameter data as JSON, e.g. {"count": 5}
- * [stopCountingJson] JSON set of param names that have hit their max bucket, e.g. ["count"]
+ * [paramsJson] parameter data as JSON, e.g. {"count": {"value": 5, "stopCounting": true}}
  * [configJson] snapshot of the per-pixel telemetry config at period start — used for all
  *   processing during the period so that mid-period config changes don't affect the running pixel.
  */
@@ -34,6 +33,5 @@ data class EventHubPixelStateEntity(
     val periodStartMillis: Long,
     val periodEndMillis: Long,
     val paramsJson: String,
-    val stopCountingJson: String = "[]",
     val configJson: String = "{}",
 )
