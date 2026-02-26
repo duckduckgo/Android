@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
-import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -68,34 +67,30 @@ class RealEventHubPixelManager @Inject constructor(
             if (nowMillis > state.periodEndMillis) continue
 
             val params = parseParamsJson(state.paramsJson)
-            val stopCounting = parseStopCountingJson(state.stopCountingJson)
             var changed = false
 
             for ((paramName, paramConfig) in storedConfig.parameters) {
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
-                    if (paramName in stopCounting) continue
+                    val paramState = params[paramName] ?: ParamState(0)
+                    if (paramState.stopCounting) continue
                     if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId, documentUrl)) continue
 
                     changed = true
-                    val currentValue = params[paramName] ?: 0
-                    if (BucketCounter.shouldStopCounting(currentValue, paramConfig.buckets)) {
-                        stopCounting.add(paramName)
+                    if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
+                        params[paramName] = paramState.copy(stopCounting = true)
                         logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName already at max bucket, stopCounting" }
                         continue
                     }
 
-                    val newValue = currentValue + 1
-                    params[paramName] = newValue
+                    val newValue = paramState.value + 1
+                    params[paramName] = paramState.copy(value = newValue)
                     logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
                 }
             }
 
             if (changed) {
                 repository.savePixelState(
-                    state.copy(
-                        paramsJson = serializeParams(params),
-                        stopCountingJson = serializeStopCounting(stopCounting),
-                    ),
+                    state.copy(paramsJson = serializeParams(params)),
                 )
             }
         }
@@ -238,7 +233,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
-        val initialParams = pixelConfig.parameters.keys.associateWith { 0 }.toMutableMap()
+        val initialParams = pixelConfig.parameters.keys.associateWith { ParamState(0) }.toMutableMap()
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=${nowMillis + periodMillis}" }
         repository.savePixelState(
@@ -247,7 +242,6 @@ class RealEventHubPixelManager @Inject constructor(
                 periodStartMillis = nowMillis,
                 periodEndMillis = nowMillis + periodMillis,
                 paramsJson = serializeParams(initialParams),
-                stopCountingJson = "[]",
                 configJson = EventHubConfigParser.serializePixelConfig(pixelConfig),
             ),
         )
@@ -263,8 +257,8 @@ class RealEventHubPixelManager @Inject constructor(
         val pixelData = mutableMapOf<String, String>()
 
         for ((paramName, paramConfig) in pixelConfig.parameters) {
-            val value = params[paramName] ?: 0
             if (paramConfig.isCounter) {
+                val value = (params[paramName] ?: ParamState(0)).value
                 val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucketName != null) {
                     pixelData[paramName] = bucketName
@@ -291,14 +285,22 @@ class RealEventHubPixelManager @Inject constructor(
             return (epochSeconds / periodSeconds) * periodSeconds
         }
 
-        fun parseParamsJson(json: String): MutableMap<String, Int> {
+        fun parseParamsJson(json: String): MutableMap<String, ParamState> {
             return try {
                 val obj = JSONObject(json)
-                val map = mutableMapOf<String, Int>()
+                val map = mutableMapOf<String, ParamState>()
                 val keys = obj.keys()
                 while (keys.hasNext()) {
                     val key = keys.next()
-                    map[key] = obj.optInt(key, 0)
+                    val paramObj = obj.optJSONObject(key)
+                    if (paramObj != null) {
+                        map[key] = ParamState(
+                            value = paramObj.optInt("value", 0),
+                            stopCounting = paramObj.optBoolean("stopCounting", false),
+                        )
+                    } else {
+                        map[key] = ParamState(value = obj.optInt(key, 0))
+                    }
                 }
                 map
             } catch (e: Exception) {
@@ -306,23 +308,21 @@ class RealEventHubPixelManager @Inject constructor(
             }
         }
 
-        fun serializeParams(params: Map<String, Int>): String {
-            return JSONObject(params.mapValues { it.value }).toString()
-        }
-
-        fun parseStopCountingJson(json: String): MutableSet<String> {
-            return try {
-                val arr = JSONArray(json)
-                (0 until arr.length()).mapNotNull { arr.optString(it) }.toMutableSet()
-            } catch (e: Exception) {
-                mutableSetOf()
+        fun serializeParams(params: Map<String, ParamState>): String {
+            val obj = JSONObject()
+            for ((key, state) in params) {
+                val paramObj = JSONObject()
+                paramObj.put("value", state.value)
+                if (state.stopCounting) {
+                    paramObj.put("stopCounting", true)
+                }
+                obj.put(key, paramObj)
             }
-        }
-
-        fun serializeStopCounting(set: Set<String>): String {
-            return JSONArray(set.toList()).toString()
+            return obj.toString()
         }
     }
+
+    data class ParamState(val value: Int, val stopCounting: Boolean = false)
 }
 
 interface TimeProvider {

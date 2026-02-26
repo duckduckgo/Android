@@ -116,7 +116,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(4, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(4, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -139,7 +139,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "", "")
 
         verify(repository).savePixelState(captor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
@@ -147,7 +147,7 @@ class EventHubPixelManagerTest {
 
         manager.handleWebEvent(webEventData("test"), "", "")
         verify(repository).savePixelState(captor.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(captor.secondValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(captor.secondValue.paramsJson)["count"])
     }
 
     @Test
@@ -159,7 +159,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "", "")
 
         verify(repository).savePixelState(captor.capture())
-        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         // re-stub so second call sees saved state (count=40, stopCounting=["count"])
         org.mockito.Mockito.reset(repository)
@@ -168,11 +168,11 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "", "")
         verify(repository, never()).savePixelState(captor.capture())
         // stopCounting prevents further changes
-        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         manager.handleWebEvent(webEventData("test"), "", "")
         verify(repository, never()).savePixelState(captor.capture())
-        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -217,9 +217,9 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
-        val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
-        assertTrue("count" in stopCounting)
+        val params = RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)
+        assertEquals(0, params["count"]?.value)
+        assertTrue(params["count"]?.stopCounting == true)
     }
 
     @Test
@@ -231,9 +231,9 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(40, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
-        val stopCounting = RealEventHubPixelManager.parseStopCountingJson(captor.firstValue.stopCountingJson)
-        assertTrue("count" in stopCounting)
+        val params = RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)
+        assertEquals(40, params["count"]?.value)
+        assertTrue(params["count"]?.stopCounting == true)
     }
 
     @Test
@@ -266,7 +266,7 @@ class EventHubPixelManagerTest {
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         // URL now empty — dedup disabled, should increment again
         org.mockito.Mockito.reset(repository)
@@ -277,7 +277,7 @@ class EventHubPixelManagerTest {
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
     }
 
     // --- deduplication: multiple events on same page should count as one ---
@@ -291,7 +291,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
@@ -311,7 +311,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(6, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(6, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         for (i in 1..5) {
             org.mockito.Mockito.reset(repository)
@@ -333,7 +333,7 @@ class EventHubPixelManagerTest {
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         // Navigate — same tab, different URL
         org.mockito.Mockito.reset(repository)
@@ -344,7 +344,7 @@ class EventHubPixelManagerTest {
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -356,7 +356,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         // Subframe event — same tab + same URL = deduped
         org.mockito.Mockito.reset(repository)
@@ -405,7 +405,7 @@ class EventHubPixelManagerTest {
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
-        val paramsAfterTest = RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)
+        val paramsAfterTest = parseParamValues(firstCaptor.firstValue.paramsJson)
         assertEquals(1, paramsAfterTest["testCount"])
         assertEquals(0, paramsAfterTest["trackerCount"])
 
@@ -417,7 +417,7 @@ class EventHubPixelManagerTest {
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
-        val paramsAfterBoth = RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)
+        val paramsAfterBoth = parseParamValues(secondCaptor.firstValue.paramsJson)
         assertEquals(1, paramsAfterBoth["testCount"])
         assertEquals(1, paramsAfterBoth["trackerCount"])
     }
@@ -438,8 +438,8 @@ class EventHubPixelManagerTest {
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
         val savedA = captor.allValues.find { it.pixelName == "pixel_a" }!!
         val savedB = captor.allValues.find { it.pixelName == "pixel_b" }!!
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(savedA.paramsJson)["count"])
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(savedB.paramsJson)["count"])
+        assertEquals(1, parseParamValues(savedA.paramsJson)["count"])
+        assertEquals(1, parseParamValues(savedB.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
@@ -459,7 +459,7 @@ class EventHubPixelManagerTest {
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
@@ -469,7 +469,7 @@ class EventHubPixelManagerTest {
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -480,7 +480,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
         // Navigate to page2
         org.mockito.Mockito.reset(repository)
@@ -490,7 +490,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page2")
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
 
         // Navigate back to page1
         org.mockito.Mockito.reset(repository)
@@ -500,7 +500,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
-        assertEquals(3, RealEventHubPixelManager.parseParamsJson(third.firstValue.paramsJson)["count"])
+        assertEquals(3, parseParamValues(third.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -540,7 +540,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["testCount"])
+        assertEquals(1, parseParamValues(first.firstValue.paramsJson)["testCount"])
 
         // Navigate to page2 — only "trackerBlocked" fires (not "test")
         org.mockito.Mockito.reset(repository)
@@ -550,7 +550,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1", "https://example.com/page2")
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["trackerCount"])
+        assertEquals(1, parseParamValues(second.firstValue.paramsJson)["trackerCount"])
 
         // Navigate back to page1 — "test" fires again; must NOT be deduplicated
         org.mockito.Mockito.reset(repository)
@@ -560,7 +560,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(third.firstValue.paramsJson)["testCount"])
+        assertEquals(2, parseParamValues(third.firstValue.paramsJson)["testCount"])
     }
 
     @Test
@@ -573,7 +573,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab1", url)
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(firstCaptor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         // Tab 2 fires same source on same URL — different tab, should count
         org.mockito.Mockito.reset(repository)
@@ -583,7 +583,7 @@ class EventHubPixelManagerTest {
         manager.handleWebEvent(webEventData("test"), "tab2", url)
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(secondCaptor.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
 
         // Tab 1 fires again on same page — same tab + same URL, should dedup
         org.mockito.Mockito.reset(repository)
@@ -711,7 +711,7 @@ class EventHubPixelManagerTest {
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
-        assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(0, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -962,7 +962,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        val savedCount = RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"]
+        val savedCount = parseParamValues(captor.firstValue.paramsJson)["count"]
         // Should increment to 5 — original config has "5+" at gte=5 so shouldStopCounting is false at 4
         assertEquals(5, savedCount)
     }
@@ -1007,7 +1007,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1313,8 +1313,8 @@ class EventHubPixelManagerTest {
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
         val updatedA = savedAfterEvent.allValues.find { it.pixelName == "pixel_a" }!!
         val updatedB = savedAfterEvent.allValues.find { it.pixelName == "pixel_b" }!!
-        assertEquals(3, RealEventHubPixelManager.parseParamsJson(updatedA.paramsJson)["count"])
-        assertEquals(4, RealEventHubPixelManager.parseParamsJson(updatedB.paramsJson)["count"])
+        assertEquals(3, parseParamValues(updatedA.paramsJson)["count"])
+        assertEquals(4, parseParamValues(updatedB.paramsJson)["count"])
         // Stored configs unchanged — still config [1]
         assertEquals(stateA1.configJson, updatedA.configJson)
         assertEquals(stateB1.configJson, updatedB.configJson)
@@ -1447,9 +1447,13 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `parseStopCountingJson with malformed JSON returns empty set`() {
-        val result = RealEventHubPixelManager.parseStopCountingJson("{bad")
-        assertTrue(result.isEmpty())
+    fun `parseParamsJson preserves stopCounting flag`() {
+        val json = """{"count": {"value": 5, "stopCounting": true}, "other": {"value": 2}}"""
+        val result = RealEventHubPixelManager.parseParamsJson(json)
+        assertEquals(5, result["count"]?.value)
+        assertTrue(result["count"]?.stopCounting == true)
+        assertEquals(2, result["other"]?.value)
+        assertFalse(result["other"]?.stopCounting == true)
     }
 
     // --- privacy protections independence: eventHub must NOT be disabled by per-site protections ---
@@ -1463,7 +1467,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1475,7 +1479,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
-        assertEquals(6, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(6, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1487,7 +1491,7 @@ class EventHubPixelManagerTest {
 
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
@@ -1497,7 +1501,7 @@ class EventHubPixelManagerTest {
 
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1571,7 +1575,7 @@ class EventHubPixelManagerTest {
 
         val preFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(preFire.capture())
-        assertEquals(6, RealEventHubPixelManager.parseParamsJson(preFire.firstValue.paramsJson)["count"])
+        assertEquals(6, parseParamValues(preFire.firstValue.paramsJson)["count"])
 
         // Simulate fire button: tabs cleared, new tab created — repository state untouched
         org.mockito.Mockito.reset(repository)
@@ -1582,7 +1586,7 @@ class EventHubPixelManagerTest {
 
         val postFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(postFire.capture())
-        assertEquals(7, RealEventHubPixelManager.parseParamsJson(postFire.firstValue.paramsJson)["count"])
+        assertEquals(7, parseParamValues(postFire.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1676,7 +1680,7 @@ class EventHubPixelManagerTest {
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         assertEquals(storedConfigJson, captor.firstValue.configJson)
-        assertEquals(3, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(3, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1696,8 +1700,8 @@ class EventHubPixelManagerTest {
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
         val savedA = captor.allValues.find { it.pixelName == "pixel_a" }!!
         val savedB = captor.allValues.find { it.pixelName == "pixel_b" }!!
-        assertEquals(3, RealEventHubPixelManager.parseParamsJson(savedA.paramsJson)["count"])
-        assertEquals(4, RealEventHubPixelManager.parseParamsJson(savedB.paramsJson)["count"])
+        assertEquals(3, parseParamValues(savedA.paramsJson)["count"])
+        assertEquals(4, parseParamValues(savedB.paramsJson)["count"])
     }
 
     @Test
@@ -1710,7 +1714,7 @@ class EventHubPixelManagerTest {
 
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
-        assertEquals(1, RealEventHubPixelManager.parseParamsJson(first.firstValue.paramsJson)["count"])
+        assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
         // Fire button: tab1 destroyed, new tab created with different tabId
         org.mockito.Mockito.reset(repository)
@@ -1722,7 +1726,7 @@ class EventHubPixelManagerTest {
 
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
-        assertEquals(2, RealEventHubPixelManager.parseParamsJson(second.firstValue.paramsJson)["count"])
+        assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
     }
 
     @Test
@@ -1749,7 +1753,7 @@ class EventHubPixelManagerTest {
 
         val preFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(preFire.capture())
-        assertEquals(3, RealEventHubPixelManager.parseParamsJson(preFire.firstValue.paramsJson)["count"])
+        assertEquals(3, parseParamValues(preFire.firstValue.paramsJson)["count"])
 
         // Fire button — new tabs
         // Post-fire: 2 more events
@@ -1768,7 +1772,7 @@ class EventHubPixelManagerTest {
 
         val postFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(postFire.capture())
-        assertEquals(5, RealEventHubPixelManager.parseParamsJson(postFire.firstValue.paramsJson)["count"])
+        assertEquals(5, parseParamValues(postFire.firstValue.paramsJson)["count"])
 
         // Period elapses — checkPixels fires the total
         org.mockito.Mockito.reset(repository, pixel)
@@ -1940,7 +1944,7 @@ class EventHubPixelManagerTest {
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
         val savedState = captor.firstValue
-        assertEquals(0, RealEventHubPixelManager.parseParamsJson(savedState.paramsJson)["count"])
+        assertEquals(0, parseParamValues(savedState.paramsJson)["count"])
 
         org.mockito.Mockito.reset(repository, pixel)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
@@ -1985,7 +1989,7 @@ class EventHubPixelManagerTest {
         val newCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(newCaptor.capture())
         assertEquals(timeProvider.time, newCaptor.firstValue.periodStartMillis)
-        assertEquals(0, RealEventHubPixelManager.parseParamsJson(newCaptor.firstValue.paramsJson)["count"])
+        assertEquals(0, parseParamValues(newCaptor.firstValue.paramsJson)["count"])
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
 
@@ -2156,7 +2160,7 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
         assertEquals("webTelemetry_testPixel1", captor.firstValue.pixelName)
         assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
-        assertEquals(0, RealEventHubPixelManager.parseParamsJson(captor.firstValue.paramsJson)["count"])
+        assertEquals(0, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
 
     // --- helpers ---
@@ -2174,15 +2178,20 @@ class EventHubPixelManagerTest {
             val pixelConfig = config.telemetry.find { it.name == name }
             pixelConfig?.let { EventHubConfigParser.serializePixelConfig(it) } ?: "{}"
         }
+        val paramStates = params.mapValues { (key, value) ->
+            RealEventHubPixelManager.ParamState(value = value, stopCounting = key in stopCounting)
+        }
         return EventHubPixelStateEntity(
             pixelName = name,
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            paramsJson = RealEventHubPixelManager.serializeParams(params),
-            stopCountingJson = RealEventHubPixelManager.serializeStopCounting(stopCounting),
+            paramsJson = RealEventHubPixelManager.serializeParams(paramStates),
             configJson = resolvedConfigJson,
         )
     }
+
+    private fun parseParamValues(json: String): Map<String, Int> =
+        RealEventHubPixelManager.parseParamsJson(json).mapValues { it.value.value }
 
     private fun stubPixelStates(vararg states: EventHubPixelStateEntity) {
         whenever(repository.getAllPixelStates()).thenReturn(states.toList())
