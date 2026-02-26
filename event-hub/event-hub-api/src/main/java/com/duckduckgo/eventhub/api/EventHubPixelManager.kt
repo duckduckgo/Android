@@ -16,6 +16,8 @@
 
 package com.duckduckgo.eventhub.api
 
+import org.json.JSONObject
+
 const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 
 data class WebEventContext(
@@ -24,5 +26,5 @@ data class WebEventContext(
 )
 
 interface EventHubPixelManager {
-    fun handleWebEvent(eventType: String, context: WebEventContext)
+    fun handleWebEvent(data: JSONObject, context: WebEventContext)
 }

@@ -45,7 +45,10 @@ class RealEventHubPixelManager @Inject constructor(
     private val dedupState = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
-    override fun handleWebEvent(eventType: String, context: WebEventContext) {
+    override fun handleWebEvent(data: JSONObject, context: WebEventContext) {
+        val eventType = data.optString("type", "")
+        if (eventType.isEmpty()) return
+
         val config = getParsedConfig()
         if (!config.featureEnabled) return
 

@@ -4204,11 +4204,10 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             WEB_EVENTS_FEATURE_NAME -> {
-                val eventType = data?.optString("type", "") ?: ""
-                if (eventType.isNotEmpty()) {
+                data?.let {
                     viewModelScope.launch(dispatchers.io()) {
                         val url = withContext(dispatchers.main()) { getWebViewUrl() }
-                        eventHubPixelManager.handleWebEvent(eventType, WebEventContext(tabId = tabId, documentUrl = url ?: ""))
+                        eventHubPixelManager.handleWebEvent(it, WebEventContext(tabId = tabId, documentUrl = url ?: ""))
                     }
                 }
             }
