@@ -74,30 +74,39 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isNativeInputFieldEnabled: Boolean = false,
     )
 
-    private data class SettingsToggles(
+    private data class FeatureState(
+        val isDuckChatUserEnabled: Boolean,
+        val isCosmeticInputScreenEnabled: Boolean?,
+        val isInputScreenEnabled: Boolean,
         val isAutomaticContextEnabled: Boolean,
         val isNativeInputFieldEnabled: Boolean,
     )
 
-    private data class SettingsFeatures(
+    private data class FeatureVisibility(
         val isHideGeneratedImagesOptionVisible: Boolean,
         val isNativeInputFieldSettingVisible: Boolean,
     )
 
-    private val settingsToggles =
+    private val featureState =
         combine(
+            duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
+            duckChat.observeInputScreenUserSettingEnabled(),
             duckChat.observeAutomaticContextAttachmentUserSettingEnabled(),
             duckChat.observeNativeInputFieldUserSettingEnabled(),
-        ) { isAutomaticPageContextEnabled, isNativeInputFieldEnabled ->
-            SettingsToggles(
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, isAutomaticPageContextEnabled, isNativeInputFieldEnabled ->
+            FeatureState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isCosmeticInputScreenEnabled = cosmeticInputScreenEnabled,
+                isInputScreenEnabled = isInputScreenEnabled,
                 isAutomaticContextEnabled = isAutomaticPageContextEnabled,
                 isNativeInputFieldEnabled = isNativeInputFieldEnabled,
             )
         }
 
-    private val settingsFeatures =
+    private val featureVisibility =
         flowOf(
-            SettingsFeatures(
+            FeatureVisibility(
                 isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
                 isNativeInputFieldSettingVisible = duckChatFeature.nativeInputField().isEnabled(),
             ),
@@ -105,23 +114,21 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     val viewState =
         combine(
-            duckChat.observeEnableDuckChatUserSetting(),
-            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
-            duckChat.observeInputScreenUserSettingEnabled(),
-            settingsToggles,
-            settingsFeatures,
-        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, toggles, features ->
+            featureState,
+            featureVisibility,
+        ) { featureState, featureVisibility ->
+            val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
             ViewState(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
-                isInputScreenEnabled = cosmeticInputScreenEnabled ?: isInputScreenEnabled,
+                isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
-                isHideGeneratedImagesOptionVisible = features.isHideGeneratedImagesOptionVisible,
-                isAutomaticContextEnabled = toggles.isAutomaticContextEnabled,
+                isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
+                isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
                 isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
-                isNativeInputFieldEnabled = toggles.isNativeInputFieldEnabled,
-                isNativeInputFieldVisible = isDuckChatUserEnabled && features.isNativeInputFieldSettingVisible,
+                isNativeInputFieldEnabled = featureState.isNativeInputFieldEnabled,
+                isNativeInputFieldVisible = isDuckChatUserEnabled && featureVisibility.isNativeInputFieldSettingVisible,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
