@@ -55,6 +55,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -98,6 +99,35 @@ class BrandDesignUpdatePageViewModelTest {
             mockInputScreenOnboardingWideEvent,
         )
     }
+
+    // region hasPlayedIntroAnimation
+
+    @Test
+    fun whenViewModelCreatedThenHasPlayedIntroAnimationIsFalse() = runTest {
+        val testee = createViewModel()
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.hasPlayedIntroAnimation)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenIntroAnimationFinishedThenHasPlayedIntroAnimationIsTrue() = runTest {
+        val testee = createViewModel()
+        testee.viewState.test {
+            val initialState = awaitItem()
+            assertFalse(initialState.hasPlayedIntroAnimation)
+
+            testee.onIntroAnimationFinished()
+
+            val updatedState = awaitItem()
+            assertTrue(updatedState.hasPlayedIntroAnimation)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
 
     // region Initial state
 

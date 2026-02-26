@@ -22,12 +22,15 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.animation.doOnEnd
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -85,7 +88,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             viewModel.notificationRuntimePermissionGranted()
         }
         if (view?.windowVisibility == View.VISIBLE) {
-            scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
+            // TODO call viewmodel and show dialog
         }
     }
 
@@ -321,8 +324,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
-                state.currentDialog?.let { dialogType ->
-                    configureDaxCta(dialogType, state.showSplitOption)
+                when {
+                    !state.hasPlayedIntroAnimation -> binding.root.doOnLayout { playIntroAnimation() }
+                    state.hasPlayedIntroAnimation && state.currentDialog == null -> snapToIntroEndState()
+                    else -> configureDaxCta(state.currentDialog!!, state.showSplitOption)
                 }
                 // TODO: react to state.selectedAddressBarPosition for address bar toggle UI
             }
@@ -332,15 +337,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { command ->
                 when (command) {
+                    BrandDesignUpdatePageViewModel.Command.RequestNotificationPermissions -> requestNotificationsPermissions()
                     is BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(command.intent)
                     is BrandDesignUpdatePageViewModel.Command.Finish -> onContinuePressed()
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        playIntroAnimation()
-        requestNotificationsPermissions()
     }
 
     override fun onDestroyView() {
@@ -380,7 +383,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            scheduleWelcomeAnimation()
+            // TODO call viewmodel and show dialog
         }
     }
 
