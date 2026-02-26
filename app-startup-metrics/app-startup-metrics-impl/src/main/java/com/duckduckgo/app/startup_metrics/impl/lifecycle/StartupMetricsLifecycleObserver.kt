@@ -33,12 +33,9 @@ import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
 import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
-import com.duckduckgo.app.startup_metrics.impl.store.StartupMetricsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.asExecutor
 import logcat.logcat
 import javax.inject.Inject
 
@@ -50,30 +47,37 @@ import javax.inject.Inject
 class StartupMetricsLifecycleObserver @Inject constructor(
     private val context: Context,
     private val apiLevelProvider: ApiLevelProvider,
-    private val dataStore: StartupMetricsDataStore,
     private val memoryCollector: MemoryCollector,
     private val pixel: Pixel,
     private val startupMetricsFeature: StartupMetricsFeature,
     private val samplingDecider: SamplingDecider,
-    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
-
     @Volatile
     private var hasCollectedThisLaunch = false
 
     @Volatile
     private var startedActivityCount = 0
 
+    @Volatile
+    private var listeningToActivity: Activity? = null
+
     private val activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
+        override fun onActivityCreated(
+            activity: Activity,
+            savedInstanceState: Bundle?,
+        ) {
+            if (hasCollectedThisLaunch || startedActivityCount >= 1) return
+            listeningToActivity = activity
+        }
+
         override fun onActivityStarted(activity: Activity) {
             startedActivityCount++
         }
 
         @SuppressLint("NewApi")
         override fun onActivityPaused(activity: Activity) {
-            if (!hasCollectedThisLaunch) {
+            if (!hasCollectedThisLaunch && listeningToActivity == null) {
                 logcat { "First activity paused, collecting startup metrics" }
-                hasCollectedThisLaunch = true
                 collectAndEmitStartupMetrics()
             }
         }
@@ -86,10 +90,11 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             }
         }
 
-        override fun onActivityCreated(
-            activity: Activity,
-            savedInstanceState: Bundle?,
-        ) {
+        override fun onActivityDestroyed(activity: Activity) {
+            if (!hasCollectedThisLaunch && listeningToActivity == activity) {
+                logcat { "Listening activity destroyed before pause, resetting collection flag" }
+                listeningToActivity = null
+            }
         }
 
         override fun onActivityResumed(activity: Activity) {
@@ -99,9 +104,6 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             activity: Activity,
             outState: Bundle,
         ) {
-        }
-
-        override fun onActivityDestroyed(activity: Activity) {
         }
     }
 
@@ -125,9 +127,8 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     private fun collectAndEmitStartupMetrics() {
         try {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.addApplicationStartInfoCompletionListener(dispatcherProvider.io().asExecutor()) { startInfo ->
-                processStartupInfo(startInfo)
-            }
+            activityManager.getHistoricalProcessStartReasons(1).firstOrNull()
+                ?.let { processStartupInfo(it) }
         } catch (e: Exception) {
             logcat { "Error querying ApplicationStartInfo: $e" }
         }
@@ -144,17 +145,6 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             logcat { "Launch timestamp from ApplicationStartInfo: $launchTimeMs ms" }
         }
 
-        // Thread-safe deduplication: re-check inside synchronized block to prevent race conditions
-        // when multiple callbacks fire simultaneously for the same launch
-        synchronized(this) {
-            val currentLastCollected = dataStore.getLastCollectedLaunchTime()
-            if (launchTimeMs <= currentLastCollected) {
-                logcat { "Startup metrics already collected for this launch: $launchTimeMs ms" }
-                return
-            }
-            dataStore.setLastCollectedLaunchTime(launchTimeMs)
-        }
-
         // Check feature flag and sampling
         if (!startupMetricsFeature.self().isEnabled()) {
             logcat { "Startup metrics feature is disabled" }
@@ -165,6 +155,8 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             logcat { "Startup metrics not sampled" }
             return
         }
+
+        hasCollectedThisLaunch = true
 
         // Extract TTID
         val ttidDurationMs = startInfo.startupTimestamps[ApplicationStartInfo.START_TIMESTAMP_FIRST_FRAME]

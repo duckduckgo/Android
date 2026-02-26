@@ -30,14 +30,10 @@ import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
 import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
-import com.duckduckgo.app.startup_metrics.impl.store.StartupMetricsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -50,7 +46,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.util.function.Consumer
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi")
@@ -59,13 +54,10 @@ class StartupMetricsLifecycleObserverTest {
     private lateinit var context: Context
     private lateinit var application: Application
     private lateinit var apiLevelProvider: ApiLevelProvider
-    private lateinit var dataStore: StartupMetricsDataStore
     private lateinit var memoryCollector: MemoryCollector
     private lateinit var pixel: Pixel
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
-    private lateinit var dispatcherProvider: DispatcherProvider
-    private lateinit var testDispatcher: CoroutineDispatcher
     private lateinit var activityManager: ActivityManager
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var lifecycle: Lifecycle
@@ -77,12 +69,9 @@ class StartupMetricsLifecycleObserverTest {
         context = mock()
         application = mock()
         apiLevelProvider = mock()
-        dataStore = mock()
         memoryCollector = mock()
         pixel = mock()
         samplingDecider = mock()
-        dispatcherProvider = mock()
-        testDispatcher = UnconfinedTestDispatcher()
         activityManager = mock()
         lifecycleOwner = mock()
         lifecycle = mock()
@@ -91,9 +80,7 @@ class StartupMetricsLifecycleObserverTest {
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(activityManager)
         whenever(lifecycleOwner.lifecycle).thenReturn(lifecycle)
         whenever(apiLevelProvider.getApiLevel()).thenReturn(35)
-        whenever(dataStore.getLastCollectedLaunchTime()).thenReturn(0L)
         whenever(samplingDecider.shouldSample()).thenReturn(true)
-        whenever(dispatcherProvider.io()).thenReturn(testDispatcher)
         startupMetricsFeature.self().setRawStoredState(Toggle.State(true))
 
         // Capture the registered callbacks
@@ -104,12 +91,10 @@ class StartupMetricsLifecycleObserverTest {
         observer = StartupMetricsLifecycleObserver(
             context = context,
             apiLevelProvider = apiLevelProvider,
-            dataStore = dataStore,
             memoryCollector = memoryCollector,
             pixel = pixel,
             startupMetricsFeature = startupMetricsFeature,
             samplingDecider = samplingDecider,
-            dispatcherProvider = dispatcherProvider,
         )
     }
 
@@ -163,7 +148,7 @@ class StartupMetricsLifecycleObserverTest {
 
         capturedCallbacks.onActivityPaused(activity)
 
-        verify(activityManager).addApplicationStartInfoCompletionListener(any(), any())
+        verify(activityManager).getHistoricalProcessStartReasons(any())
     }
 
     @Test
@@ -284,100 +269,6 @@ class StartupMetricsLifecycleObserverTest {
     }
 
     @Test
-    fun `when launch timestamp is stale then does not fire pixel`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        whenever(dataStore.getLastCollectedLaunchTime()).thenReturn(2000L)
-
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 1000L * 1_000_000L, // Older than last collected
-            firstFrameTimestamp = 3000L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        verifyNoInteractions(pixel)
-    }
-
-    @Test
-    fun `when launch timestamp is same as last collected then does not fire pixel`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        whenever(dataStore.getLastCollectedLaunchTime()).thenReturn(1000L)
-
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 3000L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        verifyNoInteractions(pixel)
-    }
-
-    @Test
-    fun `when multiple callbacks fire simultaneously then only processes first one`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        var storedLaunchTime = 0L
-
-        // Mock dataStore to return the updated value after setLastCollectedLaunchTime
-        whenever(dataStore.getLastCollectedLaunchTime()).thenAnswer { storedLaunchTime }
-        whenever(dataStore.setLastCollectedLaunchTime(any())).thenAnswer { invocation ->
-            storedLaunchTime = invocation.getArgument(0)
-            null
-        }
-
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 3000L * 1_000_000L,
-        )
-
-        // Setup ActivityManager to fire callback multiple times (simulating race condition)
-        whenever(activityManager.addApplicationStartInfoCompletionListener(any(), any())).then { invocation ->
-            val listener = invocation.getArgument<Consumer<ApplicationStartInfo>>(1)
-            // Simulate 3 simultaneous callbacks
-            listener.accept(startInfo)
-            listener.accept(startInfo)
-            listener.accept(startInfo)
-            null
-        }
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        // Should only fire pixel once due to synchronized block
-        verify(pixel, times(1)).fire(
-            pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
-            parameters = any(),
-            encodedParameters = any(),
-            type = any(),
-        )
-        // Should only store timestamp once
-        verify(dataStore, times(1)).setLastCollectedLaunchTime(1000L)
-    }
-
-    @Test
-    fun `when timestamps collected then stores launch timestamp`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 5000L * 1_000_000L,
-            firstFrameTimestamp = 7000L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        verify(dataStore).setLastCollectedLaunchTime(5000L)
-    }
-
-    @Test
     fun `when multiple activities paused then only collects once`() {
         setupCallbackCapture()
         val activity1 = createMockActivity()
@@ -392,7 +283,7 @@ class StartupMetricsLifecycleObserverTest {
         capturedCallbacks.onActivityPaused(activity1)
         capturedCallbacks.onActivityPaused(activity2)
 
-        verify(activityManager, times(1)).addApplicationStartInfoCompletionListener(any(), any())
+        verify(activityManager, times(1)).getHistoricalProcessStartReasons(any())
     }
 
     @Test
@@ -412,7 +303,7 @@ class StartupMetricsLifecycleObserverTest {
         setupActivityManagerWithStartInfo(startInfo)
         capturedCallbacks.onActivityPaused(activity)
 
-        verify(activityManager).addApplicationStartInfoCompletionListener(any(), any())
+        verify(activityManager).getHistoricalProcessStartReasons(any())
     }
 
     @Test
@@ -476,10 +367,7 @@ class StartupMetricsLifecycleObserverTest {
     }
 
     private fun setupActivityManagerWithStartInfo(startInfo: ApplicationStartInfo) {
-        whenever(activityManager.addApplicationStartInfoCompletionListener(any(), any())).then { invocation ->
-            val listener = invocation.getArgument<Consumer<ApplicationStartInfo>>(1)
-            listener.accept(startInfo)
-            null
-        }
+        whenever(activityManager.getHistoricalProcessStartReasons(any()))
+            .thenReturn(listOf(startInfo))
     }
 }
