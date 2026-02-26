@@ -305,6 +305,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
@@ -4207,8 +4208,9 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
+                        val enrichedContext = enrichPageContextIfPossible(pageContext)
                         withContext(dispatchers.main()) {
-                            command.value = Command.PageContextReceived(tabId, pageContext)
+                            command.value = Command.PageContextReceived(tabId, enrichedContext)
                         }
                     }
                 }
@@ -4216,6 +4218,28 @@ class BrowserTabViewModel @Inject constructor(
 
             else -> {}
         }
+    }
+
+    private suspend fun enrichPageContextIfPossible(pageContext: String): String {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
+                val faviconBase64 = favicon.encodeBitmapToBase64()
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+        return json.toString()
     }
 
     private fun webShare(
@@ -4720,7 +4744,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun collectPageContext() {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+            val subscriptionEvent = pageContextJSHelper.collectPageContext()
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }

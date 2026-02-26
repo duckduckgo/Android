@@ -16,9 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import android.graphics.Bitmap
-import android.util.Base64
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -38,9 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
-import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -74,7 +69,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val faviconManager: FaviconManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -258,41 +252,15 @@ class RealDuckChatJSHelper @Inject constructor(
         pageContext: String,
         tabId: String,
     ): JsCallbackData {
-        val json = JSONObject(pageContext)
-        val url = json.optString("url").takeIf { it.isNotBlank() }
-        if (url != null) {
-            val favicon = faviconManager.loadFromDisk(tabId, url)
-            if (favicon != null) {
-                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
-                val faviconBase64 = encodeBitmapToBase64(favicon)
-                json.put(
-                    "favicon",
-                    JSONArray().put(
-                        JSONObject().apply {
-                            put("href", faviconBase64)
-                            put("rel", "icon")
-                        },
-                    ),
-                )
-            }
-        }
-
         val params =
             JSONObject().apply {
                 put(
                     PAGE_CONTEXT,
-                    json,
+                    JSONObject(pageContext),
                 )
             }
 
         return JsCallbackData(params, featureName, method, id)
-    }
-
-    private fun encodeBitmapToBase64(bitmap: Bitmap): String {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        val encoded = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
-        return "data:image/png;base64,$encoded"
     }
 
     private fun getOpenKeyboardResponse(

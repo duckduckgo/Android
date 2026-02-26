@@ -171,7 +171,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {
-                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
+                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one $existingChatUrl" }
                 withContext(dispatchers.main()) {
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                     val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
@@ -306,21 +306,26 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generatePageContextEventData(): SubscriptionEventData {
-        val pageContext = if (duckChatInternal.areMultipleContentAttachmentsEnabled()) {
-            if (isContextValid(updatedPageContext)) {
-                updatedPageContext
-                    .takeIf { it.isNotBlank() }
-                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
-                    ?: run {
-                        logcat { "Duck.ai: no pageContext available" }
-                        null
-                    }
+        val pageContext = if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            if (duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+                if (isContextValid(updatedPageContext)) {
+                    updatedPageContext
+                        .takeIf { it.isNotBlank() }
+                        ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                        ?: run {
+                            logcat { "Duck.ai: no pageContext available" }
+                            null
+                        }
+                } else {
+                    logcat { "Duck.ai: pageContext is not valid" }
+                    null
+                }
             } else {
-                logcat { "Duck.ai: pageContext is not valid" }
+                logcat { "Duck.ai: areMultipleContentAttachmentsEnabled disabled" }
                 null
             }
         } else {
-            logcat { "Duck.ai: no support for multiple attachments" }
+            logcat { "Duck.ai: isAutomaticContextAttachmentEnabled disabled" }
             null
         }
 
@@ -506,11 +511,9 @@ class DuckChatContextualViewModel @Inject constructor(
                         allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
-                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-                    val pageContext = generatePageContextEventData()
-                    logcat { "Duck.ai: onPageContextReceived attaching new context $pageContext" }
-                    _subscriptionEventDataChannel.trySend(pageContext)
-                }
+                val pageContext = generatePageContextEventData()
+                logcat { "Duck.ai: onPageContextReceived attaching new context" }
+                _subscriptionEventDataChannel.trySend(pageContext)
             }
         } else {
             updatedPageContext = ""
