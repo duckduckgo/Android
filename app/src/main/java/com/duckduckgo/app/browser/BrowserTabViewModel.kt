@@ -4206,7 +4206,7 @@ class BrowserTabViewModel @Inject constructor(
                 data?.let {
                     viewModelScope.launch(dispatchers.io()) {
                         val url = withContext(dispatchers.main()) { getWebViewUrl() }
-                        eventHubPixelManager.handleWebEvent(it, WebEventContext(tabId = tabId, documentUrl = url ?: ""))
+                        eventHubPixelManager.handleWebEvent(it, tabId, url ?: "")
                     }
                 }
             }
