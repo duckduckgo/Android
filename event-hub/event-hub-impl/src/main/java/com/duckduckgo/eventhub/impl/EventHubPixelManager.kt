@@ -42,6 +42,7 @@ class RealEventHubPixelManager @Inject constructor(
 ) : EventHubPixelManager {
 
     private val dedupState = ConcurrentHashMap<String, String>()
+    private val tabCurrentUrl = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
     override fun handleWebEvent(data: JSONObject, tabId: String, documentUrl: String) {
@@ -50,6 +51,14 @@ class RealEventHubPixelManager @Inject constructor(
 
         val config = getParsedConfig()
         if (!config.featureEnabled) return
+
+        if (tabId.isNotEmpty() && documentUrl.isNotEmpty()) {
+            val previousUrl = tabCurrentUrl.put(tabId, documentUrl)
+            if (previousUrl != null && previousUrl != documentUrl) {
+                val suffix = ":$tabId"
+                dedupState.keys.removeAll { it.endsWith(suffix) }
+            }
+        }
 
         val nowMillis = timeProvider.currentTimeMillis()
 
