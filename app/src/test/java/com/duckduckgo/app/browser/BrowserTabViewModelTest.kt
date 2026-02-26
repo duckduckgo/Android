@@ -304,7 +304,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import kotlinx.coroutines.FlowPreview
@@ -6869,7 +6868,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() {
-        whenever(mockQueryUrlPredictor.classify("bbc.com")).thenReturn(Decision.Navigate("bbc.com"))
+        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
         testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
@@ -6880,12 +6879,23 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryInFullScreenModeThenNavigateInsteadOfOpeningDuckChat() = runTest {
         mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-        whenever(mockQueryUrlPredictor.classify("bbc.com")).thenReturn(Decision.Navigate("bbc.com"))
+        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
 
         testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
 
         verify(mockDuckChat, never()).getDuckChatUrl("bbc.com", true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
+    }
+
+    @Test
+    fun whenPredictorNotReadyAndUrlQueryEnteredThenIsUrlFallbackStillNavigates() {
+        whenever(mockQueryUrlPredictor.isReady()).thenReturn(false)
+        whenever(mockQueryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com", null)).thenReturn("https://example.com")
+        testee.onDuckChatOmnibarButtonClicked(query = "https://example.com", hasFocus = true, isNtp = false)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it is Navigate })
     }

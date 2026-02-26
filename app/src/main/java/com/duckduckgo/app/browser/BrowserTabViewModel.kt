@@ -369,7 +369,6 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.urlpredictor.Decision
 import dagger.Lazy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -4702,13 +4701,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun isNavigate(query: String): Boolean =
-        if (queryUrlPredictor.isReady()) {
-            queryUrlPredictor.classify(query) is Decision.Navigate
-        } else {
-            UriString.isWebUrl(query)
-        }
-
     fun onDuckChatOmnibarButtonClicked(
         query: String?,
         hasFocus: Boolean,
@@ -4737,7 +4729,7 @@ class BrowserTabViewModel @Inject constructor(
             duckAiFeatureState.showFullScreenMode.value -> {
                 val url = when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                    hasFocus && isNavigate(query ?: "") -> query ?: ""
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
                     hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
@@ -4747,7 +4739,7 @@ class BrowserTabViewModel @Inject constructor(
             else -> {
                 when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
-                    hasFocus && isNavigate(query ?: "") -> onUserSubmittedQuery(query ?: "")
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> onUserSubmittedQuery(query ?: "")
                     hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
                     else -> duckChat.openDuckChat()
                 }

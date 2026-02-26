@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.urlpredictor.Decision
@@ -36,6 +38,7 @@ import javax.inject.Inject
 class QueryUrlPredictorImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : QueryUrlPredictor {
 
     init {
@@ -50,4 +53,11 @@ class QueryUrlPredictorImpl @Inject constructor(
     }
 
     override fun classify(input: String): Decision = UrlPredictor.get().classify(input)
+
+    override fun isUrl(query: String): Boolean =
+        if (androidBrowserConfigFeature.useUrlPredictor().isEnabled() && isReady()) {
+            classify(query) is Decision.Navigate
+        } else {
+            UriString.isWebUrl(query)
+        }
 }

@@ -53,4 +53,12 @@ interface QueryUrlPredictor {
      * You should be calling [isReady] before calling this method to make sure the library is properly initialized
      */
     fun classify(input: String): Decision
+
+    /**
+     * Returns true if [query] should be treated as a navigable URL, false if it should be treated as a search query.
+     *
+     * Respects the `useUrlPredictor` remote feature flag. When the flag is disabled or the native library is not
+     * yet initialized, falls back to [com.duckduckgo.app.browser.UriString.isWebUrl].
+     */
+    fun isUrl(query: String): Boolean
 }

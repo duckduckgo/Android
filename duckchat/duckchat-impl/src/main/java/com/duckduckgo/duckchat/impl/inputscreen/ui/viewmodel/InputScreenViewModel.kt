@@ -78,7 +78,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.urlpredictor.Decision
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -473,17 +472,14 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
-    private fun isNavigate(query: String): Boolean =
-        if (queryUrlPredictor.isReady()) {
-            queryUrlPredictor.classify(query) is Decision.Navigate
-        } else {
-            isWebUrl(query)
-        }
-
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
+            if (queryUrlPredictor.isUrl(query)) {
+                command.value = Command.SubmitSearch(query)
+                return@launch
+            }
+
             when {
-                isNavigate(query) -> command.value = Command.SubmitSearch(query)
                 visibilityState.value.fullScreenMode -> {
                     val url = duckChat.getDuckChatUrl(query, true)
                     command.value = Command.SubmitSearch(url)
