@@ -60,6 +60,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,6 +69,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
@@ -86,6 +88,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
+        val hasPlayedIntroAnimation: Boolean = false,
         val currentDialog: PreOnboardingDialogType? = null,
         val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
         val inputScreenSelected: Boolean = true,
@@ -112,6 +115,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     }
 
     sealed interface Command {
+        data object RequestNotificationPermissions : Command
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
@@ -130,6 +134,14 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+        }
+    }
+
+    fun onIntroAnimationFinished() {
+        _viewState.update { it.copy(hasPlayedIntroAnimation = true) }
+        viewModelScope.launch {
+            delay(2.seconds)
+            _commands.send(Command.RequestNotificationPermissions)
         }
     }
 
