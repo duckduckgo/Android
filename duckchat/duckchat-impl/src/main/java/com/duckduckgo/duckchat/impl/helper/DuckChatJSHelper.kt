@@ -359,7 +359,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
         private const val REPORT_METRIC = "reportMetric"
-        private const val MODEL_TIER_PAYLOAD_KEY = "modelTier"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
         private const val REASON = "reason"

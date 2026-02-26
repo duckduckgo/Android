@@ -80,6 +80,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
         }
 
         vpnActivationStepRecorded = false
+        duckAiUsedStepRecorded = false
 
         cachedFlowId = wideEventClient
             .flowStart(
@@ -168,6 +169,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                 )
                 cachedFlowId = null
                 vpnActivationStepRecorded = false
+                duckAiUsedStepRecorded = false
             }
 
             // Free trial expired (was free trial, no longer active)
@@ -178,6 +180,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
                 )
                 cachedFlowId = null
                 vpnActivationStepRecorded = false
+                duckAiUsedStepRecorded = false
             }
         }
     }
