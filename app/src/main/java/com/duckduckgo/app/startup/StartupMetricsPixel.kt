@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.pixels
+package com.duckduckgo.app.startup
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 

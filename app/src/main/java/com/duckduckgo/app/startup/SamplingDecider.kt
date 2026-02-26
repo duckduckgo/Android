@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.sampling
+package com.duckduckgo.app.startup
 
-import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi

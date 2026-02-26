@@ -435,8 +435,6 @@ dependencies {
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
 
-    implementation project(":app-startup-metrics-impl")
-
     // Widgets
     implementation "androidx.core:core-remoteviews:1.1.0"
 

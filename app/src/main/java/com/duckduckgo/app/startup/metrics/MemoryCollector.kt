@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.metrics
+package com.duckduckgo.app.startup.metrics
 
 import android.app.ActivityManager
 import android.content.Context

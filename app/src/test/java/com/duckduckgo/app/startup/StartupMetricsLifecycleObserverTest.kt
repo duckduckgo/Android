@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.lifecycle
+package com.duckduckgo.app.startup
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -23,14 +23,10 @@ import android.app.ApplicationStartInfo
 import android.content.Context
 import android.view.View
 import android.view.Window
-import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
-import com.duckduckgo.app.startup_metrics.impl.android.ProcessTimeProvider
-import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
-import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
-import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
-import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
-import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
+import com.duckduckgo.app.startup.metrics.MemoryCollector
+import com.duckduckgo.app.startup.metrics.ProcessTimeProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
@@ -51,11 +47,11 @@ import org.mockito.kotlin.whenever
 class StartupMetricsLifecycleObserverTest {
 
     private lateinit var context: Context
-    private lateinit var apiLevelProvider: ApiLevelProvider
+    private lateinit var apiLevelProvider: AppBuildConfig
     private lateinit var memoryCollector: MemoryCollector
     private lateinit var processTimeProvider: ProcessTimeProvider
     private lateinit var pixel: Pixel
-    private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
+    private val startupMetricsFeature = FakeFeatureToggleFactory.Companion.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
     private lateinit var activityManager: ActivityManager
     private lateinit var observer: StartupMetricsLifecycleObserver
@@ -72,7 +68,7 @@ class StartupMetricsLifecycleObserverTest {
         activityManager = mock()
 
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(activityManager)
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(35)
+        whenever(apiLevelProvider.sdkInt).thenReturn(35)
         whenever(samplingDecider.shouldSample()).thenReturn(true)
         whenever(processTimeProvider.currentUptimeMs()).thenReturn(10_000L)
         whenever(processTimeProvider.startupTimeMs()).thenReturn(1_000L)
@@ -80,7 +76,7 @@ class StartupMetricsLifecycleObserverTest {
 
         observer = StartupMetricsLifecycleObserver(
             context = context,
-            apiLevelProvider = apiLevelProvider,
+            buildConfig = apiLevelProvider,
             memoryCollector = memoryCollector,
             processTimeProvider = processTimeProvider,
             pixel = pixel,
@@ -96,7 +92,7 @@ class StartupMetricsLifecycleObserverTest {
 
     @Test
     fun `when API level is below 35 then does not collect system metrics on pause`() {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
+        whenever(apiLevelProvider.sdkInt).thenReturn(34)
         val activity = createMockActivity()
 
         observer.onActivityPaused(activity)
@@ -275,7 +271,7 @@ class StartupMetricsLifecycleObserverTest {
 
     @Test
     fun `when API level below 35 then fires pixel with manual TTID only`() {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
+        whenever(apiLevelProvider.sdkInt).thenReturn(34)
         val activity = createMockActivity()
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("8gb")
 

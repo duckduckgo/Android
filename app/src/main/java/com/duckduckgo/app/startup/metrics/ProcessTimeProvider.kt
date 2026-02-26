@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.android
+package com.duckduckgo.app.startup.metrics
 
 import android.os.Build
 import android.os.Process

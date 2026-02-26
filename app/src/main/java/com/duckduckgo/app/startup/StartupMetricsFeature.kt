@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.feature
+package com.duckduckgo.app.startup
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
  * Feature flag for App Startup Metrics collection.
@@ -33,6 +32,6 @@ interface StartupMetricsFeature {
      * @return `true` when the remote config has the "appStartupMetrics" feature flag enabled
      * If the remote feature is not present defaults to `internal`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.INTERNAL)
     fun self(): Toggle
 }

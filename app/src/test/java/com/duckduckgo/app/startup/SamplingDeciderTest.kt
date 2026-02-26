@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.sampling
+package com.duckduckgo.app.startup
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import kotlin.random.Random
 
 @SuppressLint("DenyListedApi")
 class SamplingDeciderTest {
-    private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
+    private val startupMetricsFeature = FakeFeatureToggleFactory.Companion.create(StartupMetricsFeature::class.java)
     private lateinit var moshi: Moshi
     private lateinit var mockRandom: Random
     private lateinit var decider: RealSamplingDecider

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl
+package com.duckduckgo.app.startup
 
 /**
  * Classification of app startup type for performance analysis.

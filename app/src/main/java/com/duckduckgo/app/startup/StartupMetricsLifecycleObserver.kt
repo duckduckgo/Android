@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup_metrics.impl.lifecycle
+package com.duckduckgo.app.startup
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -27,20 +27,15 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
-import com.duckduckgo.app.startup_metrics.impl.StartupType
-import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
-import com.duckduckgo.app.startup_metrics.impl.android.ProcessTimeProvider
-import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
-import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
-import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
-import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
-import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
+import com.duckduckgo.app.startup.metrics.MemoryCollector
+import com.duckduckgo.app.startup.metrics.ProcessTimeProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import logcat.LogPriority.DEBUG
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -52,7 +47,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class StartupMetricsLifecycleObserver @Inject constructor(
     private val context: Context,
-    private val apiLevelProvider: ApiLevelProvider,
+    private val buildConfig: AppBuildConfig,
     private val memoryCollector: MemoryCollector,
     private val processTimeProvider: ProcessTimeProvider,
     private val pixel: Pixel,
@@ -81,7 +76,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     // Schedules the provided action to run right after the next frame is drawn on the given decorView.
     // Extracted to a variable for easier testing.
     internal var scheduleFirstFrame: (View, Runnable) -> Unit = { decorView, action ->
-        logcat(DEBUG) { "TTID: attaching OnDrawListener to decorView" }
+        logcat(LogPriority.DEBUG) { "TTID: attaching OnDrawListener to decorView" }
         decorView.viewTreeObserver.addOnDrawListener(
             object : ViewTreeObserver.OnDrawListener {
                 private var invoked = false
@@ -89,7 +84,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
                 override fun onDraw() {
                     if (invoked) return
                     invoked = true
-                    logcat(DEBUG) { "TTID: onDraw fired, scheduling frame commit callback" }
+                    logcat(LogPriority.DEBUG) { "TTID: onDraw fired, scheduling frame commit callback" }
                     // Remove the listener on the next looper pass to avoid mutating the
                     // ViewTreeObserver from within its own callback.
                     decorView.post { decorView.viewTreeObserver.removeOnDrawListener(this) }
@@ -132,7 +127,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     override fun onActivityPaused(activity: Activity) {
         if (!hasCollectedThisLaunch && listeningToActivity == null) {
             logcat { "TTID: First activity paused, collecting startup metrics" }
-            val systemMeasurement = if (apiLevelProvider.getApiLevel() >= 35) {
+            val systemMeasurement = if (buildConfig.sdkInt >= 35) {
                 collectStartupMetrics()
             } else {
                 null
@@ -172,7 +167,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             // Warm launch or bogus device value: use the lifecycle timestamp instead.
             else -> processTimeProvider.currentUptimeMs()
         }
-        logcat(DEBUG) { "TTID: resolveStartTime processAge=${processAge}ms startTime=$startTime" }
+        logcat(LogPriority.DEBUG) { "TTID: resolveStartTime processAge=${processAge}ms startTime=$startTime" }
         return startTime
     }
 
@@ -265,7 +260,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
                 put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, manualTtidMs.toString())
                 manualTtidMs = null
             }
-            put(StartupMetricsPixelParameters.API_LEVEL, apiLevelProvider.getApiLevel().toString())
+            put(StartupMetricsPixelParameters.API_LEVEL, buildConfig.sdkInt.toString())
 
             memoryCollector.collectDeviceRamBucket()?.let {
                 put(StartupMetricsPixelParameters.DEVICE_RAM_BUCKET, it)
