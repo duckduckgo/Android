@@ -18,6 +18,8 @@ package com.duckduckgo.app.statistics.applaunch
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.ApplicationStartInfo
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -50,6 +52,9 @@ import logcat.logcat
  * End time: first frame submitted to the swap chain, via [Handler.postAtFrontOfQueue] triggered
  * from a [ViewTreeObserver.OnDrawListener].
  *
+ * On API 35+, also captures the system-reported TTID via [ApplicationStartInfo] and includes it
+ * as [PARAM_SYSTEM_MS_BUCKET] for comparison. The pixel is held until both measurements arrive.
+ *
  * Fires exactly once per process lifetime.
  */
 @ContributesMultibinding(AppScope::class)
@@ -63,11 +68,21 @@ class AppLaunchTimeReporter @Inject constructor(
     private var warmHotStartUptimeMs: Long? = null
     private var listeningToActivity: Activity? = null
 
+    // Holds our ViewTreeObserver measurement until the system measurement is also ready.
+    private var pendingMeasurement: PendingMeasurement? = null
+    // System TTID from ApplicationStartInfo (null = not available or API < 35).
+    private var systemTtidMs: Long? = null
+    // True while we are still waiting for the ApplicationStartInfo callback on API 35+.
+    private var awaitingSystemTtid = false
+    // Ensures we register the ApplicationStartInfo listener at most once.
+    private var systemListenerRegistered = false
+
     init {
         logcat(DEBUG) { "TTID: AppLaunchTimeReporter instantiated" }
     }
 
     // Testing seams — replaced in unit tests to eliminate static Android API dependencies.
+
     @SuppressLint("NewApi")
     internal var processStartUptimeMs: () -> Long = {
         if (Build.VERSION.SDK_INT >= 33) Process.getStartRequestedUptimeMillis()
@@ -93,6 +108,33 @@ class AppLaunchTimeReporter @Inject constructor(
         })
     }
 
+    /**
+     * Registers an [ApplicationStartInfo] completion listener and delivers the system TTID (in ms)
+     * to the callback once available. On API < 35 the callback is invoked immediately with `null`.
+     *
+     * The callback always runs on the main thread so no additional synchronisation is needed.
+     */
+    @SuppressLint("NewApi")
+    internal var registerSystemTtidListener: (Activity, (Long?) -> Unit) -> Unit = { activity, callback ->
+        if (Build.VERSION.SDK_INT >= 35) {
+            val am = activity.getSystemService(ActivityManager::class.java)
+            am.addApplicationStartInfoCompletionListener(activity.mainExecutor) { startInfo ->
+                val timestamps = startInfo.startupTimestamps
+                val launchNs = timestamps[ApplicationStartInfo.START_TIMESTAMP_LAUNCH]
+                val firstFrameNs = timestamps[ApplicationStartInfo.START_TIMESTAMP_FIRST_FRAME]
+                val systemTtid = if (launchNs != null && firstFrameNs != null) {
+                    (firstFrameNs - launchNs) / 1_000_000L
+                } else {
+                    null
+                }
+                logcat(DEBUG) { "TTID: system START_TIMESTAMP_FIRST_FRAME → ${systemTtid}ms" }
+                callback(systemTtid)
+            }
+        } else {
+            callback(null)
+        }
+    }
+
     // ---------------------------------------------------------------------------
     // Warm launch — activity created in an already-running process
     // ---------------------------------------------------------------------------
@@ -100,6 +142,7 @@ class AppLaunchTimeReporter @Inject constructor(
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         logcat(DEBUG) { "TTID: onActivityCreated [${activity::class.java.simpleName}] measured=$measured frameListenerAttached=$frameListenerAttached" }
         if (measured || frameListenerAttached) return
+        maybeRegisterSystemListener(activity)
         captureWarmHotStartIfNeeded()
         frameListenerAttached = true
         listeningToActivity = activity
@@ -119,6 +162,7 @@ class AppLaunchTimeReporter @Inject constructor(
         logcat(DEBUG) { "TTID: onActivityStarted [${activity::class.java.simpleName}] measured=$measured frameListenerAttached=$frameListenerAttached" }
         if (measured || frameListenerAttached) return
         // onActivityCreated didn't fire, so this is a hot launch.
+        maybeRegisterSystemListener(activity)
         captureWarmHotStartIfNeeded()
         frameListenerAttached = true
         listeningToActivity = activity
@@ -146,6 +190,17 @@ class AppLaunchTimeReporter @Inject constructor(
     // ---------------------------------------------------------------------------
     // Internal helpers
     // ---------------------------------------------------------------------------
+
+    private fun maybeRegisterSystemListener(activity: Activity) {
+        if (systemListenerRegistered) return
+        systemListenerRegistered = true
+        awaitingSystemTtid = true
+        registerSystemTtidListener(activity) { ttidMs ->
+            systemTtidMs = ttidMs
+            awaitingSystemTtid = false
+            trySendPixel()
+        }
+    }
 
     private fun captureWarmHotStartIfNeeded() {
         if (warmHotStartUptimeMs != null) return
@@ -192,23 +247,33 @@ class AppLaunchTimeReporter @Inject constructor(
         scenario: String,
     ) {
         scheduleFirstFrame(activity.window.decorView, Runnable {
-            reportTtid(startUptimeMs, temperature, scenario)
+            storeMeasurement(startUptimeMs, temperature, scenario)
         })
     }
 
-    private fun reportTtid(startUptimeMs: Long, temperature: String, scenario: String) {
+    private fun storeMeasurement(startUptimeMs: Long, temperature: String, scenario: String) {
+        if (measured) return
+        val ttidMs = currentUptimeMs() - startUptimeMs
+        logcat(DEBUG) { "TTID: our measurement=${ttidMs}ms [temperature=$temperature, scenario=$scenario] awaitingSystemTtid=$awaitingSystemTtid" }
+        pendingMeasurement = PendingMeasurement(ttidMs, temperature, scenario)
+        trySendPixel()
+    }
+
+    private fun trySendPixel() {
+        if (awaitingSystemTtid) return
+        val m = pendingMeasurement ?: return
         if (measured) return
         measured = true
-        val ttidMs = currentUptimeMs() - startUptimeMs
-        logcat { "TTID: ${ttidMs}ms [temperature=$temperature, scenario=$scenario]" }
-        pixel.fire(
-            pixelName = PIXEL_NAME,
-            parameters = mapOf(
-                PARAM_MS_BUCKET to bucketTtidMs(ttidMs),
-                PARAM_TEMPERATURE to temperature,
-                PARAM_SCENARIO to scenario,
-            ),
+
+        val params = mutableMapOf(
+            PARAM_MS_BUCKET to bucketTtidMs(m.ttidMs),
+            PARAM_TEMPERATURE to m.temperature,
+            PARAM_SCENARIO to m.scenario,
         )
+        systemTtidMs?.let { params[PARAM_SYSTEM_MS_BUCKET] = bucketTtidMs(it) }
+        logcat { "TTID: firing pixel — ours=${m.ttidMs}ms system=${systemTtidMs}ms [temperature=${m.temperature}, scenario=${m.scenario}]" }
+
+        pixel.fire(pixelName = PIXEL_NAME, parameters = params)
     }
 
     private fun bucketTtidMs(ms: Long): String = when {
@@ -220,9 +285,16 @@ class AppLaunchTimeReporter @Inject constructor(
         else -> ">5s"
     }
 
+    private data class PendingMeasurement(
+        val ttidMs: Long,
+        val temperature: String,
+        val scenario: String,
+    )
+
     companion object {
         private const val PIXEL_NAME = "m_ttid"
         private const val PARAM_MS_BUCKET = "ms_bucket"
+        private const val PARAM_SYSTEM_MS_BUCKET = "system_ms_bucket"
         private const val PARAM_TEMPERATURE = "temperature"
         private const val PARAM_SCENARIO = "scenario"
 

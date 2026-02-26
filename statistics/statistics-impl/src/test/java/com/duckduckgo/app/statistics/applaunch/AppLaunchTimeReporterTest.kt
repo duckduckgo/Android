@@ -50,6 +50,8 @@ class AppLaunchTimeReporterTest {
             it.currentUptimeMs = { fakeCurrentUptimeMs }
             // Invoke the frame callback synchronously so tests don't need to drive a Looper.
             it.scheduleFirstFrame = { _, action -> action.run() }
+            // Simulate API < 35: no system TTID available, callback fires immediately with null.
+            it.registerSystemTtidListener = { _, callback -> callback(null) }
         }
     }
 
@@ -250,6 +252,48 @@ class AppLaunchTimeReporterTest {
     }
 
     // ---------------------------------------------------------------------------
+    // System TTID (ApplicationStartInfo, API 35+)
+    // ---------------------------------------------------------------------------
+
+    @Test
+    fun `when system ttid is available it is included as system_ms_bucket`() {
+        givenColdLaunch(processStartMs = 0L, nowMs = 500L)
+        // Simulate API 35: system reports 800ms TTID.
+        reporter.registerSystemTtidListener = { _, callback -> callback(800L) }
+        reporter.onActivityCreated(activityWith(launcherIntent()), savedInstanceState = null)
+        verifyPixelFired(systemMsBucket = "500ms-1s")
+    }
+
+    @Test
+    fun `when system ttid is not available system_ms_bucket is absent from the pixel`() {
+        givenColdLaunch(processStartMs = 0L, nowMs = 500L)
+        // @Before already sets registerSystemTtidListener to callback(null).
+        reporter.onActivityCreated(activityWith(launcherIntent()), savedInstanceState = null)
+        verify(pixel).fire(
+            pixelName = eq("m_ttid"),
+            parameters = argThat { !this.containsKey("system_ms_bucket") },
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
+    @Test
+    fun `when system callback arrives after our frame pixel waits then fires with system bucket`() {
+        givenColdLaunch(processStartMs = 0L, nowMs = 500L)
+        var capturedCallback: ((Long?) -> Unit)? = null
+        // Capture the callback without invoking it — simulates async API 35 delivery.
+        reporter.registerSystemTtidListener = { _, cb -> capturedCallback = cb }
+
+        reporter.onActivityCreated(activityWith(launcherIntent()), savedInstanceState = null)
+        // Our frame fired synchronously but the system callback hasn't arrived yet.
+        verifyNoInteractions(pixel)
+
+        // System callback arrives with 1.2s TTID.
+        capturedCallback!!(1_200L)
+        verifyPixelFired(msBucket = "500ms-1s", systemMsBucket = "1s-2s")
+    }
+
+    // ---------------------------------------------------------------------------
     // Helpers
     // ---------------------------------------------------------------------------
 
@@ -275,13 +319,15 @@ class AppLaunchTimeReporterTest {
         msBucket: String? = null,
         temperature: String? = null,
         scenario: String? = null,
+        systemMsBucket: String? = null,
     ) {
         verify(pixel).fire(
             pixelName = eq("m_ttid"),
             parameters = argThat {
                 (msBucket == null || this["ms_bucket"] == msBucket) &&
                     (temperature == null || this["temperature"] == temperature) &&
-                    (scenario == null || this["scenario"] == scenario)
+                    (scenario == null || this["scenario"] == scenario) &&
+                    (systemMsBucket == null || this["system_ms_bucket"] == systemMsBucket)
             },
             encodedParameters = any(),
             type = any(),
