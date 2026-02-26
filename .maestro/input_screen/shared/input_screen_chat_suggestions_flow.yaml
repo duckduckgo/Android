@@ -1,0 +1,146 @@
+appId: com.duckduckgo.mobile.android
+---
+
+# TEST 1: Empty state — no suggestions with no history
+- tapOn:
+    id: "omnibarTextInput"
+    optional: true
+- assertVisible:
+    id: "inputModeWidget"
+- tapOn:
+    text: "Duck.ai"
+
+# On a fresh install, no chat history exists
+- assertNotVisible:
+    id: "chatSuggestionsRecyclerView"
+- assertVisible:
+    id: "ddgLogoContainer"
+
+
+# SETUP: Create a chat to populate history
+- inputText: "What is DuckDuckGo"
+- tapOn:
+    id: "actionSend"
+
+# Wait for the Duck.ai WebView to open
+- extendedWaitUntil:
+    visible:
+      text: "Duck.ai"
+      childOf:
+        id: "toolbar"
+    timeout: 10000
+
+# Accept the duck.ai agreement prompt (first time only)
+- runFlow: ../../shared/accept_duckai_agreement.yaml
+
+# Verify the chat message appears in the WebView
+- extendedWaitUntil:
+    visible:
+      text: ".*What is DuckDuckGo.*"
+    timeout: 10000
+
+# Tap the toolbar to return to the input screen (opens in Duck.ai mode)
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/duckAIHeader"
+
+# Wait for chat suggestions to load
+- extendedWaitUntil:
+    visible:
+      id: "chatSuggestionsRecyclerView"
+    timeout: 10000
+
+- assertVisible:
+    id: "chatSuggestionsOverlay"
+- assertVisible:
+    id: "chatSuggestionTitle"
+- assertVisible:
+    id: "chatSuggestionIcon"
+
+# TEST 3: Suggestions hidden in Search mode
+- tapOn:
+    text: "Search"
+- assertNotVisible:
+    id: "chatSuggestionsOverlay"
+
+# Switch back to Chat mode -> suggestions should reappear
+- tapOn:
+    text: "Duck.ai"
+- extendedWaitUntil:
+    visible:
+      id: "chatSuggestionsRecyclerView"
+    timeout: 10000
+- assertVisible:
+    id: "chatSuggestionsOverlay"
+
+# TEST 4: Suggestions filter as user types
+
+# Type a query that won't match any chat title
+- inputText: "xyznonexistent"
+
+# Wait for debounce + fetch —> suggestions should disappear
+- extendedWaitUntil:
+    notVisible:
+      id: "chatSuggestionTitle"
+    timeout: 5000
+- assertNotVisible:
+    id: "chatSuggestionTitle"
+
+# Clear text — suggestions should return
+- tapOn:
+    id: "inputFieldClearText"
+- extendedWaitUntil:
+    visible:
+      id: "chatSuggestionTitle"
+    timeout: 10000
+- assertVisible:
+    id: "chatSuggestionTitle"
+
+# TEST 5: Tapping a suggestion opens the chat
+- tapOn:
+    id: "chatSuggestionTitle"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      text: "Duck.ai"
+      childOf:
+        id: "toolbar"
+    timeout: 10000
+- assertVisible:
+    text: "Duck.ai"
+    childOf:
+      id: "toolbar"
+
+
+# TEST 6: Deleting a chat removes it from suggestions
+# We are currently in the Duck.ai WebView (from Test 5)
+# Open the side panel menu
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/duckAiSidebar"
+
+# Scroll to the Chats section and find our chat
+- scrollUntilVisible:
+    element:
+      text: "Chats"
+    direction: DOWN
+- scrollUntilVisible:
+    element:
+      text: ".*DuckDuckGo.*"
+    direction: DOWN
+
+# Tap the three-dot menu next to the chat and clear it
+- tapOn: "menu"
+- tapOn: "Clear"
+
+# Return to the input screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/duckAIHeader"
+
+# Verify suggestions are gone and logo is back
+- extendedWaitUntil:
+    notVisible:
+      id: "chatSuggestionTitle"
+    timeout: 10000
+- assertNotVisible:
+    id: "chatSuggestionsRecyclerView"
+- assertVisible:
+    id: "ddgLogoContainer"
