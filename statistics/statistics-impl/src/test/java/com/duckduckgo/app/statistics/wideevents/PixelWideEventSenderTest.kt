@@ -92,7 +92,7 @@ class PixelWideEventSenderTest {
                 mapOf(
                     "global.platform" to "Android",
                     "global.type" to "app",
-                    "global.sample_rate" to "1",
+                    "global.sample_rate" to "1.0",
                     "app.name" to "DuckDuckGo Android",
                     "app.version" to "5.123.0",
                     "app.form_factor" to "phone",
@@ -126,6 +126,7 @@ class PixelWideEventSenderTest {
         steps: List<WideEventRepository.WideEventStep> = emptyList(),
         metadata: Map<String, String?> = emptyMap(),
         flowEntryPoint: String? = null,
+        sampleRate: Float = 1.0f,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -141,5 +142,6 @@ class PixelWideEventSenderTest {
             metadata = emptyMap(),
         ),
         createdAt = Instant.parse("2025-12-03T10:15:30.00Z"),
+        sampleRate = sampleRate,
     )
 }
