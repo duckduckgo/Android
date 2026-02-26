@@ -42,6 +42,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.AnyThread
 import androidx.core.content.ContextCompat
@@ -582,7 +583,7 @@ class DuckChatContextualFragment :
                                 }
                             is DuckChatContextualResult.ShowError ->
                                 withContext(dispatcherProvider.main()) {
-                                    root.makeSnackbarWithNoBottomInset(result.message, Snackbar.LENGTH_SHORT)?.show()
+                                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
                                 }
                         }
                     }
@@ -627,7 +628,13 @@ class DuckChatContextualFragment :
                     is DuckChatContextualViewModel.Command.RequestPageContext -> {
                         sharedContextualViewModel.requestPageContext()
                     }
+
                 }
+            }.launchIn(lifecycleScope)
+
+        viewModel.errorMessages
+            .onEach { message ->
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }.launchIn(lifecycleScope)
 
         sharedContextualViewModel.commands
