@@ -1,0 +1,33 @@
+{
+    "m_app_startup_time": {
+        "description": "Fired when app startup completes and reaches interactive state. Measures startup performance including duration, device specifications, and startup type classification.",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "startup_type",
+                "description": "Startup type classification indicating how the app was launched",
+                "type": "string",
+                "enum": ["cold", "warm", "hot", "unknown"]
+            },
+            {
+                "key": "ttid_duration_ms",
+                "description": "Time from process start to first frame state in milliseconds",
+                "type": "integer"
+            },
+            {
+                "key": "device_ram_bucket",
+                "description": "Device memory capacity bucket for classification",
+                "type": "string",
+                "enum": ["<1GB", "1GB", "2GB", "4GB", "6GB", "8GB", "12GB", "16GB+"]
+            },
+            {
+                "key": "api_level",
+                "description": "Android API level of the device",
+                "type": "integer"
+            }
+        ]
+    }
+}
