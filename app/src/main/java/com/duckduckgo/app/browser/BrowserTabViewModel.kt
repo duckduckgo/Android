@@ -4315,9 +4315,12 @@ class BrowserTabViewModel @Inject constructor(
         val referrer = data.get("referrer") as? String
         val sanitizedReferrer = referrer?.removeSurrounding("\"")
         val isExternalLaunch = site?.isExternalLaunch ?: false
+        // breakageData is pre-encoded by content-scope-scripts, pass as-is without re-encoding
+        val breakageData = data.optString("breakageData").takeIf { it.isNotEmpty() }
 
         site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData)
         site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
+        site?.realBrokenSiteContext?.recordBreakageData(breakageData)
     }
 
     fun onHomeShown() {

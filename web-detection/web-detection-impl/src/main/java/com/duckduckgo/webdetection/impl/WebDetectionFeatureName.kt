@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.brokensite
+package com.duckduckgo.webdetection.impl
 
-import org.json.JSONArray
-
-interface BrokenSiteContext {
-    var userRefreshCount: Int
-
-    var openerContext: BrokenSiteOpenerContext?
-
-    var jsPerformance: DoubleArray?
-
-    var breakageData: String?
-
-    fun onUserTriggeredRefresh()
-    fun inferOpenerContext(
-        referrer: String?,
-        wasLaunchedExternally: Boolean,
-    )
-    fun recordJsPerformance(performanceMetrics: JSONArray)
-    fun recordBreakageData(breakageData: String?)
+enum class WebDetectionFeatureName(val value: String) {
+    WebDetection("webDetection"),
 }
