@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.api.EventHubPixelManager
+import com.duckduckgo.eventhub.impl.AppForegroundStateProvider
 import com.duckduckgo.eventhub.impl.EventHubDataStore
 import com.duckduckgo.eventhub.impl.EventHubPrefs
 import com.duckduckgo.eventhub.impl.EventHubRepository
@@ -84,8 +85,9 @@ object EventHubModule {
         timeProvider: TimeProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        foregroundStateProvider: AppForegroundStateProvider,
     ): RealEventHubPixelManager {
-        return RealEventHubPixelManager(repository, pixel, timeProvider, appCoroutineScope, dispatcherProvider)
+        return RealEventHubPixelManager(repository, pixel, timeProvider, appCoroutineScope, dispatcherProvider, foregroundStateProvider)
     }
 
     @Provides
