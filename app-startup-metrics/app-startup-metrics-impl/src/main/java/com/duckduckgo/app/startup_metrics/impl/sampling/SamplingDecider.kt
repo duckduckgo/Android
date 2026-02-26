@@ -67,6 +67,6 @@ class RealSamplingDecider @Inject constructor(
                 jsonAdapter.fromJson(it)
             }.getOrDefault(emptyMap())
         } ?: emptyMap()
-        return config["sampling"]?.toDoubleOrNull() ?: 1.0
+        return config["sampling"]?.toDoubleOrNull() ?: 0.01
     }
 }

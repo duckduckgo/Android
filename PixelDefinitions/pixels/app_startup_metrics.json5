@@ -18,6 +18,11 @@
                 "type": "integer"
             },
             {
+                "key": "ttid_manual_duration_ms",
+                "description": "Time from process start to first frame state measured manually in milliseconds",
+                "type": "integer"
+            },
+            {
                 "key": "device_ram_bucket",
                 "description": "Device memory capacity bucket for classification",
                 "type": "string",

@@ -19,12 +19,12 @@ package com.duckduckgo.app.startup_metrics.impl.lifecycle
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.Application
 import android.app.ApplicationStartInfo
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
+import android.view.View
+import android.view.Window
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
+import com.duckduckgo.app.startup_metrics.impl.android.ProcessTimeProvider
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
@@ -33,8 +33,8 @@ import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -47,97 +47,65 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @SuppressLint("DenyListedApi")
 class StartupMetricsLifecycleObserverTest {
 
     private lateinit var context: Context
-    private lateinit var application: Application
     private lateinit var apiLevelProvider: ApiLevelProvider
     private lateinit var memoryCollector: MemoryCollector
+    private lateinit var processTimeProvider: ProcessTimeProvider
     private lateinit var pixel: Pixel
     private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
     private lateinit var activityManager: ActivityManager
-    private lateinit var lifecycleOwner: LifecycleOwner
-    private lateinit var lifecycle: Lifecycle
     private lateinit var observer: StartupMetricsLifecycleObserver
-    private lateinit var capturedCallbacks: Application.ActivityLifecycleCallbacks
+    private var frameCallbacks = mutableListOf<Runnable>()
 
     @Before
     fun setup() {
         context = mock()
-        application = mock()
         apiLevelProvider = mock()
         memoryCollector = mock()
+        processTimeProvider = mock()
         pixel = mock()
         samplingDecider = mock()
         activityManager = mock()
-        lifecycleOwner = mock()
-        lifecycle = mock()
 
-        whenever(context.applicationContext).thenReturn(application)
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(activityManager)
-        whenever(lifecycleOwner.lifecycle).thenReturn(lifecycle)
         whenever(apiLevelProvider.getApiLevel()).thenReturn(35)
         whenever(samplingDecider.shouldSample()).thenReturn(true)
+        whenever(processTimeProvider.currentUptimeMs()).thenReturn(10_000L)
+        whenever(processTimeProvider.startupTimeMs()).thenReturn(1_000L)
         startupMetricsFeature.self().setRawStoredState(Toggle.State(true))
-
-        // Capture the registered callbacks
-        argumentCaptor<Application.ActivityLifecycleCallbacks>().apply {
-            whenever(application.registerActivityLifecycleCallbacks(capture())).then { }
-        }
 
         observer = StartupMetricsLifecycleObserver(
             context = context,
             apiLevelProvider = apiLevelProvider,
             memoryCollector = memoryCollector,
+            processTimeProvider = processTimeProvider,
             pixel = pixel,
             startupMetricsFeature = startupMetricsFeature,
             samplingDecider = samplingDecider,
         )
+
+        // Mock scheduleFirstFrame to capture frame callbacks
+        observer.scheduleFirstFrame = { _, action ->
+            frameCallbacks.add(action)
+        }
     }
 
     @Test
-    fun `when API level is 35+ then registers activity lifecycle callbacks`() {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(35)
-
-        observer.onCreate(lifecycleOwner)
-
-        verify(application).registerActivityLifecycleCallbacks(any())
-    }
-
-    @Test
-    fun `when API level is below 35 then does not register callbacks`() {
+    fun `when API level is below 35 then does not collect system metrics on pause`() {
         whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
+        val activity = createMockActivity()
 
-        observer.onCreate(lifecycleOwner)
+        observer.onActivityPaused(activity)
 
-        verify(application, never()).registerActivityLifecycleCallbacks(any())
-    }
-
-    @Test
-    fun `when onDestroy called then unregisters activity lifecycle callbacks`() {
-        setupCallbackCapture()
-
-        observer.onDestroy(lifecycleOwner)
-
-        verify(application).unregisterActivityLifecycleCallbacks(capturedCallbacks)
-    }
-
-    @Test
-    fun `when API level is below 35 then onDestroy does not unregister callbacks`() {
-        whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
-        observer.onCreate(lifecycleOwner)
-
-        observer.onDestroy(lifecycleOwner)
-
-        verify(application, never()).unregisterActivityLifecycleCallbacks(any())
+        verify(activityManager, never()).getHistoricalProcessStartReasons(any())
     }
 
     @Test
     fun `when first activity paused then collects startup metrics`() {
-        setupCallbackCapture()
         val activity = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_COLD,
@@ -146,14 +114,13 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        observer.onActivityPaused(activity)
 
         verify(activityManager).getHistoricalProcessStartReasons(any())
     }
 
     @Test
     fun `when feature is disabled then does not fire pixel`() {
-        setupCallbackCapture()
         startupMetricsFeature.self().setRawStoredState(Toggle.State(false))
         val activity = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
@@ -163,14 +130,13 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        observer.onActivityPaused(activity)
 
         verifyNoInteractions(pixel)
     }
 
     @Test
     fun `when sampling returns false then does not fire pixel`() {
-        setupCallbackCapture()
         whenever(samplingDecider.shouldSample()).thenReturn(false)
         val activity = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
@@ -180,14 +146,13 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        observer.onActivityPaused(activity)
 
         verifyNoInteractions(pixel)
     }
 
     @Test
     fun `when startup info collected then fires pixel with correct parameters`() {
-        setupCallbackCapture()
         val activity = createMockActivity()
         whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("4gb")
 
@@ -198,7 +163,16 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        // Trigger manual TTID measurement
+        observer.onActivityCreated(activity, null)
+        observer.onActivityStarted(activity)
+        triggerFirstFrame()
+        observer.onActivityStopped(activity)
+        observer.onActivityDestroyed(activity)
+
+        // Now pause triggers pixel sending (listeningToActivity is now null)
+        val activity2 = createMockActivity()
+        observer.onActivityPaused(activity2)
 
         argumentCaptor<Map<String, String>>().apply {
             verify(pixel).fire(
@@ -210,6 +184,9 @@ class StartupMetricsLifecycleObserverTest {
 
             val params = firstValue
             assertEquals("cold", params[StartupMetricsPixelParameters.STARTUP_TYPE])
+            // Manual TTID: currentUptimeMs (10000) - startupTimeMs (1000) = 9000ms
+            assertEquals("9000", params[StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS])
+            // System TTID: 3000ms - 1000ms = 2000ms
             assertEquals("2000", params[StartupMetricsPixelParameters.TTID_DURATION_MS])
             assertEquals("35", params[StartupMetricsPixelParameters.API_LEVEL])
             assertEquals("4gb", params[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET])
@@ -217,60 +194,7 @@ class StartupMetricsLifecycleObserverTest {
     }
 
     @Test
-    fun `when WARM start detected then fires pixel with warm type`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_WARM,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 2500L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        argumentCaptor<Map<String, String>>().apply {
-            verify(pixel).fire(
-                pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
-                parameters = capture(),
-                encodedParameters = any(),
-                type = any(),
-            )
-
-            assertEquals("warm", firstValue[StartupMetricsPixelParameters.STARTUP_TYPE])
-            assertEquals("1500", firstValue[StartupMetricsPixelParameters.TTID_DURATION_MS])
-        }
-    }
-
-    @Test
-    fun `when HOT start detected then fires pixel with hot type`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_HOT,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 1800L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        capturedCallbacks.onActivityPaused(activity)
-
-        argumentCaptor<Map<String, String>>().apply {
-            verify(pixel).fire(
-                pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
-                parameters = capture(),
-                encodedParameters = any(),
-                type = any(),
-            )
-
-            assertEquals("hot", firstValue[StartupMetricsPixelParameters.STARTUP_TYPE])
-            assertEquals("800", firstValue[StartupMetricsPixelParameters.TTID_DURATION_MS])
-        }
-    }
-
-    @Test
-    fun `when multiple activities paused then only collects once`() {
-        setupCallbackCapture()
+    fun `when multiple activities paused then only collects once per process`() {
         val activity1 = createMockActivity()
         val activity2 = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
@@ -280,36 +204,33 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity1)
-        capturedCallbacks.onActivityPaused(activity2)
+        // Trigger manual measurement for first activity
+        observer.onActivityCreated(activity1, null)
+        observer.onActivityStarted(activity1)
+        triggerFirstFrame()
+        observer.onActivityStopped(activity1)
+        observer.onActivityDestroyed(activity1)
+
+        // First pause after destroy triggers collection
+        observer.onActivityPaused(activity2)
+
+        // Second activity pause should not trigger collection again
+        val activity3 = createMockActivity()
+        observer.onActivityPaused(activity3)
 
         verify(activityManager, times(1)).getHistoricalProcessStartReasons(any())
-    }
-
-    @Test
-    fun `when app backgrounded then resets collection flag for next launch`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
-
-        capturedCallbacks.onActivityStarted(activity)
-        capturedCallbacks.onActivityStopped(activity)
-
-        // Should be able to collect again on next pause
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_WARM,
-            launchTimestamp = 2000L * 1_000_000L,
-            firstFrameTimestamp = 4000L * 1_000_000L,
+        verify(pixel, times(1)).fire(
+            pixel = any<Pixel.PixelName>(),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
         )
-        setupActivityManagerWithStartInfo(startInfo)
-        capturedCallbacks.onActivityPaused(activity)
-
-        verify(activityManager).getHistoricalProcessStartReasons(any())
     }
 
     @Test
     fun `when launch timestamp missing then does not fire pixel`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
+        val activity1 = createMockActivity()
+        val activity2 = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_COLD,
             launchTimestamp = null,
@@ -317,15 +238,22 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        // Trigger launch activity lifecyclees for first activity
+        observer.onActivityCreated(activity1, null)
+        observer.onActivityStarted(activity1)
+        observer.onActivityStopped(activity1)
+        observer.onActivityDestroyed(activity1)
+
+        // First pause after destroy trigger
+        observer.onActivityPaused(activity2)
 
         verifyNoInteractions(pixel)
     }
 
     @Test
     fun `when first frame timestamp missing then does not fire pixel`() {
-        setupCallbackCapture()
-        val activity = createMockActivity()
+        val activity1 = createMockActivity()
+        val activity2 = createMockActivity()
         val startInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_COLD,
             launchTimestamp = 1000L * 1_000_000L,
@@ -333,21 +261,105 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(startInfo)
 
-        capturedCallbacks.onActivityPaused(activity)
+        // Trigger launch activity lifecyclees for first activity
+        observer.onActivityCreated(activity1, null)
+        observer.onActivityStarted(activity1)
+        observer.onActivityStopped(activity1)
+        observer.onActivityDestroyed(activity1)
+
+        // First pause after destroy trigger
+        observer.onActivityPaused(activity2)
 
         verifyNoInteractions(pixel)
     }
 
-    private fun setupCallbackCapture() {
-        observer.onCreate(lifecycleOwner)
-        argumentCaptor<Application.ActivityLifecycleCallbacks>().apply {
-            verify(application).registerActivityLifecycleCallbacks(capture())
-            capturedCallbacks = firstValue
+    @Test
+    fun `when API level below 35 then fires pixel with manual TTID only`() {
+        whenever(apiLevelProvider.getApiLevel()).thenReturn(34)
+        val activity = createMockActivity()
+        whenever(memoryCollector.collectDeviceRamBucket()).thenReturn("8gb")
+
+        observer.onActivityCreated(activity, null)
+        observer.onActivityStarted(activity)
+        triggerFirstFrame()
+        observer.onActivityPaused(activity)
+        observer.onActivityStopped(activity)
+        observer.onActivityDestroyed(activity)
+
+        // Now a second activity is paused, which triggers pixel sending
+        val activity2 = createMockActivity()
+        observer.onActivityPaused(activity2)
+
+        argumentCaptor<Map<String, String>>().apply {
+            verify(pixel).fire(
+                pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
+                parameters = capture(),
+                encodedParameters = any(),
+                type = eq(Pixel.PixelType.Count),
+            )
+
+            val params = firstValue
+            // Manual TTID: currentUptimeMs (10000) - startupTimeMs (1000) = 9000ms
+            assertEquals("9000", params[StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS])
+            // No system TTID on API < 35
+            assertNull(params[StartupMetricsPixelParameters.TTID_DURATION_MS])
+            assertEquals("34", params[StartupMetricsPixelParameters.API_LEVEL])
+            assertEquals("8gb", params[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET])
         }
     }
 
+    @Test
+    fun `when trampoline activity detected then switches to real activity`() {
+        val trampolineActivity = createMockActivity()
+        val realActivity = createMockActivity()
+
+        val startInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_COLD,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+        setupActivityManagerWithStartInfo(startInfo)
+
+        // First activity created but doesn't draw immediately (trampoline)
+        observer.onActivityCreated(trampolineActivity, null)
+        observer.onActivityStarted(trampolineActivity)
+        // No triggerFirstFrame() call - simulates immediate start of real activity
+
+        // Second activity created and draws (real activity)
+        observer.onActivityCreated(realActivity, null)
+        observer.onActivityStarted(realActivity)
+        triggerFirstFrame()
+
+        // Need to destroy trampoline to reset listeningToActivity
+        observer.onActivityStopped(trampolineActivity)
+        observer.onActivityDestroyed(trampolineActivity)
+
+        // Now pause on real activity triggers collection with real activity as source
+        observer.onActivityPaused(realActivity)
+        observer.onActivityStopped(realActivity)
+        observer.onActivityDestroyed(realActivity)
+
+        // Should only fire pixel once with real activity's measurement
+        verify(pixel, times(1)).fire(
+            pixel = any<Pixel.PixelName>(),
+            parameters = any(),
+            encodedParameters = any(),
+            type = any(),
+        )
+    }
+
     private fun createMockActivity(): Activity {
-        return mock()
+        val activity = mock<Activity>()
+        val window = mock<Window>()
+        val decorView = mock<View>()
+        whenever(activity.window).thenReturn(window)
+        whenever(window.decorView).thenReturn(decorView)
+        return activity
+    }
+
+    private fun triggerFirstFrame() {
+        frameCallbacks.forEach { it.run() }
+        frameCallbacks.clear()
     }
 
     private fun createMockApplicationStartInfo(

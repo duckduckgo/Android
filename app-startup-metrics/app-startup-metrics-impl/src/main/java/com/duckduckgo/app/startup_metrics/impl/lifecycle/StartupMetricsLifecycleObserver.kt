@@ -19,23 +19,28 @@ package com.duckduckgo.app.startup_metrics.impl.lifecycle
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.Application
 import android.app.ApplicationStartInfo
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.startup_metrics.impl.StartupType
 import com.duckduckgo.app.startup_metrics.impl.android.ApiLevelProvider
+import com.duckduckgo.app.startup_metrics.impl.android.ProcessTimeProvider
 import com.duckduckgo.app.startup_metrics.impl.feature.StartupMetricsFeature
 import com.duckduckgo.app.startup_metrics.impl.metrics.MemoryCollector
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelName
 import com.duckduckgo.app.startup_metrics.impl.pixels.StartupMetricsPixelParameters
 import com.duckduckgo.app.startup_metrics.impl.sampling.SamplingDecider
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import logcat.LogPriority.DEBUG
 import logcat.logcat
 import javax.inject.Inject
 
@@ -44,126 +49,181 @@ import javax.inject.Inject
  * Metrics are collected once per launch when the first activity is paused.
  */
 @ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class StartupMetricsLifecycleObserver @Inject constructor(
     private val context: Context,
     private val apiLevelProvider: ApiLevelProvider,
     private val memoryCollector: MemoryCollector,
+    private val processTimeProvider: ProcessTimeProvider,
     private val pixel: Pixel,
     private val startupMetricsFeature: StartupMetricsFeature,
     private val samplingDecider: SamplingDecider,
-) : MainProcessLifecycleObserver {
-    @Volatile
+) : ActivityLifecycleCallbacks {
+    // Guard to ensure we only collect and send metrics once per app launch.
     private var hasCollectedThisLaunch = false
 
-    @Volatile
+    // Guard to ensure we only measure TTID once per launch, even if multiple activities are drawn.
+    private var measured = false
+
+    // Guard to ensure we only attach the frame listener to one activity at a time.
+    private var frameListenerAttached = false
+
+    // Count of started activities to detect when the app goes to background.
     private var startedActivityCount = 0
 
-    @Volatile
+    // The activity we are currently listening to for the first frame.
+    // This is needed to handle the case where a trampoline activity launches the main activity without drawing first
     private var listeningToActivity: Activity? = null
 
-    private val activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-        override fun onActivityCreated(
-            activity: Activity,
-            savedInstanceState: Bundle?,
-        ) {
-            if (hasCollectedThisLaunch || startedActivityCount >= 1) return
-            listeningToActivity = activity
-        }
+    // Store the manually measured TTID to compare with the system measurement when available.
+    private var manualTtidMs: Long? = null
 
-        override fun onActivityStarted(activity: Activity) {
-            startedActivityCount++
-        }
+    // Schedules the provided action to run right after the next frame is drawn on the given decorView.
+    // Extracted to a variable for easier testing.
+    internal var scheduleFirstFrame: (View, Runnable) -> Unit = { decorView, action ->
+        logcat(DEBUG) { "TTID: attaching OnDrawListener to decorView" }
+        decorView.viewTreeObserver.addOnDrawListener(
+            object : ViewTreeObserver.OnDrawListener {
+                private var invoked = false
 
-        @SuppressLint("NewApi")
-        override fun onActivityPaused(activity: Activity) {
-            if (!hasCollectedThisLaunch && listeningToActivity == null) {
-                logcat { "First activity paused, collecting startup metrics" }
-                collectAndEmitStartupMetrics()
+                override fun onDraw() {
+                    if (invoked) return
+                    invoked = true
+                    logcat(DEBUG) { "TTID: onDraw fired, scheduling frame commit callback" }
+                    // Remove the listener on the next looper pass to avoid mutating the
+                    // ViewTreeObserver from within its own callback.
+                    decorView.post { decorView.viewTreeObserver.removeOnDrawListener(this) }
+                    // postAtFrontOfQueue fires after the current frame traversal completes,
+                    // i.e. once the frame has been handed off to the render thread / swap chain.
+                    Handler(Looper.getMainLooper()).postAtFrontOfQueue(action)
+                }
+            },
+        )
+    }
+
+    override fun onActivityCreated(
+        activity: Activity,
+        savedInstanceState: Bundle?,
+    ) {
+        if (hasCollectedThisLaunch) return
+        if (frameListenerAttached) {
+            if (activity === listeningToActivity) return
+            // A different activity is being created while we are still attached to another one.
+            // The previous activity is a trampoline that launched this one without drawing first.
+            logcat { "TTID: [${listeningToActivity?.javaClass?.simpleName}] is a trampoline — switching to [${activity.javaClass.simpleName}]" }
+            frameListenerAttached = false
+        }
+        attachFirstFrameListener(
+            activity = activity,
+            startUptimeMs = resolveStartTime(),
+        )
+        if (startedActivityCount >= 1) return
+        listeningToActivity = activity
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+        startedActivityCount++
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+    }
+
+    @SuppressLint("NewApi")
+    override fun onActivityPaused(activity: Activity) {
+        if (!hasCollectedThisLaunch && listeningToActivity == null) {
+            logcat { "TTID: First activity paused, collecting startup metrics" }
+            val systemMeasurement = if (apiLevelProvider.getApiLevel() >= 35) {
+                collectStartupMetrics()
+            } else {
+                null
             }
-        }
-
-        override fun onActivityStopped(activity: Activity) {
-            startedActivityCount--
-            if (startedActivityCount == 0) {
-                logcat { "App backgrounded, resetting collection flag for next launch" }
-                hasCollectedThisLaunch = false
-            }
-        }
-
-        override fun onActivityDestroyed(activity: Activity) {
-            if (!hasCollectedThisLaunch && listeningToActivity == activity) {
-                logcat { "Listening activity destroyed before pause, resetting collection flag" }
-                listeningToActivity = null
-            }
-        }
-
-        override fun onActivityResumed(activity: Activity) {
-        }
-
-        override fun onActivitySaveInstanceState(
-            activity: Activity,
-            outState: Bundle,
-        ) {
+            hasCollectedThisLaunch = true
+            sendPixel(systemMeasurement)
         }
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        if (apiLevelProvider.getApiLevel() >= 35) {
-            (context.applicationContext as? Application)
-                ?.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
+    override fun onActivityStopped(activity: Activity) {
+        startedActivityCount--
+        if (startedActivityCount == 0) {
+            logcat { "TTID: App backgrounded, resetting collection flag for next launch" }
+            hasCollectedThisLaunch = false
         }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        if (apiLevelProvider.getApiLevel() >= 35) {
-            (context.applicationContext as? Application)
-                ?.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks)
+    override fun onActivityDestroyed(activity: Activity) {
+        if (!hasCollectedThisLaunch && listeningToActivity == activity) {
+            logcat { "TTID: Listening activity destroyed before pause, resetting collection flag" }
+            listeningToActivity = null
         }
+    }
+
+    override fun onActivitySaveInstanceState(
+        activity: Activity,
+        outState: Bundle,
+    ) {
+    }
+
+    private fun resolveStartTime(): Long {
+        val processStartMs = processTimeProvider.startupTimeMs()
+        val processAge = processTimeProvider.currentUptimeMs() - processStartMs
+        val startTime = when {
+            // Cold launch: process started recently for this launch.
+            processAge in 0..COLD_LAUNCH_MAX_AGE_MS -> processStartMs
+            // Warm launch or bogus device value: use the lifecycle timestamp instead.
+            else -> processTimeProvider.currentUptimeMs()
+        }
+        logcat(DEBUG) { "TTID: resolveStartTime processAge=${processAge}ms startTime=$startTime" }
+        return startTime
+    }
+
+    private fun attachFirstFrameListener(
+        activity: Activity,
+        startUptimeMs: Long,
+    ) {
+        frameListenerAttached = true
+        scheduleFirstFrame(
+            activity.window.decorView,
+            Runnable {
+                collectManualStartupTime(startUptimeMs)
+                    ?.let { manualTtidMs = it }
+            },
+        )
+    }
+
+    private fun collectManualStartupTime(startUptimeMs: Long): Long? {
+        logcat { "TTID: Collecting manual startup time [measure=$measured]" }
+        if (measured) return null
+        measured = true
+        return processTimeProvider.currentUptimeMs() - startUptimeMs
     }
 
     @RequiresApi(35)
-    private fun collectAndEmitStartupMetrics() {
-        try {
-            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.getHistoricalProcessStartReasons(1).firstOrNull()
-                ?.let { processStartupInfo(it) }
-        } catch (e: Exception) {
-            logcat { "Error querying ApplicationStartInfo: $e" }
+    private fun collectStartupMetrics(): Measurement? {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val startInfo = activityManager.getHistoricalProcessStartReasons(1).firstOrNull()
+        if (startInfo == null) {
+            logcat { "TTID: No ApplicationStartInfo available from ActivityManager" }
+            return null
         }
+        return systemMeasurement(startInfo)
     }
 
     @RequiresApi(35)
-    private fun processStartupInfo(startInfo: ApplicationStartInfo) {
+    private fun systemMeasurement(startInfo: ApplicationStartInfo): Measurement? {
         val launchTimeMs = startInfo.startupTimestamps[ApplicationStartInfo.START_TIMESTAMP_LAUNCH]
             ?.let { it / 1_000_000L }
         if (launchTimeMs == null) {
-            logcat { "No launch timestamp in ApplicationStartInfo" }
-            return
+            logcat { "TTID: No launch timestamp in ApplicationStartInfo" }
+            return null
         } else {
-            logcat { "Launch timestamp from ApplicationStartInfo: $launchTimeMs ms" }
+            logcat { "TTID: Launch timestamp from ApplicationStartInfo: $launchTimeMs ms" }
         }
 
-        // Check feature flag and sampling
-        if (!startupMetricsFeature.self().isEnabled()) {
-            logcat { "Startup metrics feature is disabled" }
-            return
-        }
-
-        if (!samplingDecider.shouldSample()) {
-            logcat { "Startup metrics not sampled" }
-            return
-        }
-
-        hasCollectedThisLaunch = true
-
-        // Extract TTID
         val ttidDurationMs = startInfo.startupTimestamps[ApplicationStartInfo.START_TIMESTAMP_FIRST_FRAME]
             ?.let { (it / 1_000_000L) - launchTimeMs }
         if (ttidDurationMs == null || ttidDurationMs < 0) {
-            logcat { "Invalid TTID duration: $ttidDurationMs" }
-            return
+            logcat { "TTID: Invalid TTID duration: $ttidDurationMs" }
+            return null
         }
 
         // Map startup type
@@ -174,12 +234,37 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             else -> StartupType.UNKNOWN
         }
 
-        logcat { "Emitting startup metrics: type=$startupType, ttid=$ttidDurationMs ms" }
+        logcat { "TTID: type=$startupType, ttid=$ttidDurationMs ms" }
+        return Measurement(ttidMs = ttidDurationMs, startup = startupType)
+    }
 
-        // Fire pixel immediately
+    private fun sendPixel(systemMeasurement: Measurement?) {
+        if (manualTtidMs == null && systemMeasurement == null) {
+            logcat { "TTID: No valid startup time measurement available, skipping pixel" }
+            return
+        }
+
+        if (!startupMetricsFeature.self().isEnabled()) {
+            logcat { "TTID: Startup metrics feature is disabled" }
+            return
+        }
+
+        if (!samplingDecider.shouldSample()) {
+            logcat { "TTID: Startup metrics not sampled" }
+            return
+        }
+
+        logcat { "TTID: firing pixel — ours=${manualTtidMs}ms, system=${systemMeasurement?.ttidMs}ms" }
+
         val parameters = buildMap {
-            put(StartupMetricsPixelParameters.STARTUP_TYPE, startupType.name.lowercase())
-            put(StartupMetricsPixelParameters.TTID_DURATION_MS, ttidDurationMs.toString())
+            if (systemMeasurement != null) {
+                put(StartupMetricsPixelParameters.STARTUP_TYPE, systemMeasurement.startup.name.lowercase())
+                put(StartupMetricsPixelParameters.TTID_DURATION_MS, systemMeasurement.ttidMs.toString())
+            }
+            manualTtidMs?.let {
+                put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, manualTtidMs.toString())
+                manualTtidMs = null
+            }
             put(StartupMetricsPixelParameters.API_LEVEL, apiLevelProvider.getApiLevel().toString())
 
             memoryCollector.collectDeviceRamBucket()?.let {
@@ -193,5 +278,17 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             encodedParameters = emptyMap(),
             type = Pixel.PixelType.Count,
         )
+    }
+
+    private data class Measurement(
+        val ttidMs: Long,
+        val startup: StartupType,
+    )
+
+    companion object {
+        // Process age threshold for distinguishing cold from warm/hot launches.
+        // Also guards against the known device bug where Process.getStartUptimeMillis()
+        // can return a value far in the past before Application.onCreate() is reached.
+        private const val COLD_LAUNCH_MAX_AGE_MS = 10_000L
     }
 }

@@ -42,10 +42,16 @@ object StartupMetricsPixelParameters {
     /**
      * Time from process start to first frame in milliseconds (API 35+ only).
      * Type: Integer
-     * Required: No (null for legacy measurement)
-     * Valid range: 50-30000
+     * Required: Yes
      */
     const val TTID_DURATION_MS = "ttid_duration_ms"
+
+    /**
+     * Time from user action to first frame in milliseconds, as measured by our manual instrumentation.
+     * Type: Integer
+     * Required: Yes
+     */
+    const val TTID_MANUAL_DURATION_MS = "ttid_manual_duration_ms"
 
     /**
      * Device memory capacity bucket for classification.
