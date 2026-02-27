@@ -268,8 +268,6 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
-import com.duckduckgo.common.ui.view.isFullScreen
-import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
@@ -5008,12 +5006,13 @@ class BrowserTabFragment :
 
         private fun renderFullscreenMode(viewState: BrowserViewState) {
             if (!this@BrowserTabFragment.isVisible) return
-            activity?.isImmersiveModeEnabled()?.let {
-                if (viewState.isFullScreen) {
-                    if (!it) goFullScreen()
-                } else {
-                    if (it) exitFullScreen()
-                }
+            // Use isFullScreenMode() which tracks state internally, because
+            // WindowInsetsController updates are asynchronous on API 30+
+            val isCurrentlyFullScreen = (activity as? DuckDuckGoActivity)?.isFullScreenMode() ?: return
+            if (viewState.isFullScreen) {
+                if (!isCurrentlyFullScreen) goFullScreen()
+            } else {
+                if (isCurrentlyFullScreen) exitFullScreen()
             }
         }
 
@@ -5454,7 +5453,7 @@ private class JsOrientationHandler {
         val response =
             if (activity == null) {
                 NO_ACTIVITY_ERROR
-            } else if (!activity.isFullScreen()) {
+            } else if ((activity as? DuckDuckGoActivity)?.isFullScreenMode() != true) {
                 NOT_FULL_SCREEN_ERROR
             } else {
                 val requestedOrientation = data.params.optString("orientation")
