@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.webkit.WebView
 
-android {
-    namespace 'com.duckduckgo.eventhub.api'
-}
-
-dependencies {
+interface ContentScopeScriptsJsMessagingContext {
+    val registeredWebView: WebView?
 }

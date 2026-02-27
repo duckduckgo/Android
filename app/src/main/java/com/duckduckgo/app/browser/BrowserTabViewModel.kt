@@ -331,8 +331,6 @@ import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
-import com.duckduckgo.eventhub.api.EventHubPixelManager
-import com.duckduckgo.eventhub.api.WEB_EVENTS_FEATURE_NAME
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -501,7 +499,6 @@ class BrowserTabViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
-    private val eventHubPixelManager: EventHubPixelManager,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
@@ -4198,15 +4195,6 @@ class BrowserTabViewModel @Inject constructor(
                         withContext(dispatchers.main()) {
                             command.value = Command.PageContextReceived(tabId, pageContext)
                         }
-                    }
-                }
-            }
-
-            WEB_EVENTS_FEATURE_NAME -> {
-                data?.let {
-                    viewModelScope.launch(dispatchers.io()) {
-                        val url = withContext(dispatchers.main()) { getWebViewUrl() }
-                        eventHubPixelManager.handleWebEvent(it, tabId, url ?: "")
                     }
                 }
             }
