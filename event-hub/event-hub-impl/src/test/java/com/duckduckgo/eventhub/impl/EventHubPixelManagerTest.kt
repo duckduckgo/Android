@@ -112,7 +112,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -125,7 +125,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = 100_000L)
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -136,7 +136,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
@@ -145,7 +145,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
         verify(repository).savePixelState(captor.capture())
         assertEquals(2, parseParamValues(captor.secondValue.paramsJson)["count"])
     }
@@ -156,7 +156,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
@@ -165,12 +165,12 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
         verify(repository, never()).savePixelState(captor.capture())
         // stopCounting prevents further changes
         assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
         verify(repository, never()).savePixelState(captor.capture())
         assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
     }
@@ -180,7 +180,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 50), stopCounting = setOf("count"))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -213,7 +213,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("evt"), "", "")
+        manager.handleWebEvent(webEventData("evt"), "")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -227,7 +227,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 40))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -241,7 +241,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("unknownEvent"), "", "")
+        manager.handleWebEvent(webEventData("unknownEvent"), "")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -252,32 +252,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
         whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository, never()).savePixelState(any())
-    }
-
-    @Test
-    fun `handleWebEvent with empty URL disables dedup`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
-        stubPixelStates(state)
-
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
-
-        val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
-        verify(repository).savePixelState(firstCaptor.capture())
-        assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
-
-        // URL now empty — dedup disabled, should increment again
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
-        stubPixelStates(firstCaptor.firstValue)
-
-        manager.handleWebEvent(webEventData("test"), "tab1", "")
-
-        val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
-        verify(repository).savePixelState(secondCaptor.capture())
-        assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
     }
 
     // --- deduplication: multiple events on same page should count as one ---
@@ -287,7 +264,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -297,7 +274,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -307,7 +284,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -318,7 +295,7 @@ class EventHubPixelManagerTest {
             whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
             stubPixelStates(captor.firstValue)
 
-            manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+            manager.handleWebEvent(webEventData("test"), "tab1")
 
             verify(repository, never()).savePixelState(any())
         }
@@ -329,7 +306,8 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -340,7 +318,8 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page2")
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -352,7 +331,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -363,7 +342,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -401,7 +380,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -413,7 +392,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -432,7 +411,7 @@ class EventHubPixelManagerTest {
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
         stubPixelStates(stateA, stateB)
 
-        manager.handleWebEvent(webEventData("evt"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("evt"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -445,7 +424,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
         stubPixelStates(savedA, savedB)
 
-        manager.handleWebEvent(webEventData("evt"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("evt"), "tab1")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -455,7 +434,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "")
 
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -465,7 +444,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "")
 
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -477,7 +456,8 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
@@ -487,7 +467,8 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page2")
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
         assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
@@ -497,10 +478,115 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(second.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
         assertEquals(3, parseParamValues(third.firstValue.paramsJson)["count"])
+    }
+
+    // --- onNavigationStarted: proactive dedup clearing ---
+
+    @Test
+    fun `onNavigationStarted clears dedup so returning to same URL is not deduplicated`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        // Event on page A
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        val first = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(first.capture())
+        assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
+
+        // Navigate to page B (no event fires) — onNavigationStarted called by JsInjectorPlugin
+        manager.onNavigationStarted("tab1", "https://example.com/pageB")
+
+        // Navigate back to page A (no event fires) — onNavigationStarted called again
+        manager.onNavigationStarted("tab1", "https://example.com/pageA")
+
+        // Event on page A again — must NOT be deduplicated
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(first.firstValue)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        val second = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(second.capture())
+        assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
+    }
+
+    @Test
+    fun `onNavigationStarted with same URL does not clear dedup`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        val first = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(first.capture())
+
+        // onNavigationStarted with same URL (e.g. reload) — should not clear dedup
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(first.firstValue)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onNavigationStarted with empty tabId is a no-op`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        val first = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(first.capture())
+
+        // onNavigationStarted with empty tabId — should not affect state
+        manager.onNavigationStarted("", "https://example.com/page2")
+
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(first.firstValue)
+
+        // Same tab, same URL — still deduped because onNavigationStarted was a no-op
+        manager.handleWebEvent(webEventData("test"), "tab1")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onNavigationStarted only clears dedup for navigated tab`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        // Events on tab1 and tab2
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        val first = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(first.capture())
+
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(first.firstValue)
+
+        manager.handleWebEvent(webEventData("test"), "tab2")
+        val second = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(second.capture())
+
+        // Navigate tab1 to a different URL
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+
+        // Tab2 should still be deduped (onNavigationStarted only cleared tab1)
+        org.mockito.Mockito.reset(repository)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        stubPixelStates(second.firstValue)
+
+        manager.handleWebEvent(webEventData("test"), "tab2")
+        verify(repository, never()).savePixelState(any())
     }
 
     @Test
@@ -537,7 +623,8 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         // "test" event on page1
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["testCount"])
@@ -547,7 +634,8 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
         stubPixelStates(first.firstValue)
 
-        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1", "https://example.com/page2")
+        manager.onNavigationStarted("tab1", "https://example.com/page2")
+        manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
         assertEquals(1, parseParamValues(second.firstValue.paramsJson)["trackerCount"])
@@ -557,40 +645,40 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
         stubPixelStates(second.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.onNavigationStarted("tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val third = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(third.capture())
         assertEquals(2, parseParamValues(third.firstValue.paramsJson)["testCount"])
     }
 
     @Test
-    fun `same URL in different tabs counts independently`() {
-        val url = "https://example.com/page1"
+    fun `different tabs count independently`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
         // Tab 1 fires event
-        manager.handleWebEvent(webEventData("test"), "tab1", url)
+        manager.handleWebEvent(webEventData("test"), "tab1")
         val firstCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
-        // Tab 2 fires same source on same URL — different tab, should count
+        // Tab 2 fires same source — different tab, should count
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab2", url)
+        manager.handleWebEvent(webEventData("test"), "tab2")
         val secondCaptor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
 
-        // Tab 1 fires again on same page — same tab + same URL, should dedup
+        // Tab 1 fires again — same tab, should dedup
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(secondCaptor.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", url)
+        manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository, never()).savePixelState(any())
     }
 
@@ -958,7 +1046,7 @@ class EventHubPixelManagerTest {
         val changedConfig = configWithBuckets(*changedBuckets)
         whenever(repository.getEventHubConfigJson()).thenReturn(changedConfig)
 
-        manager.handleWebEvent(webEventData("evt"), "", "")
+        manager.handleWebEvent(webEventData("evt"), "")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -1003,7 +1091,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(changedSourceConfig)
 
         // Event matches stored source ("evt"), not live source ("different_source")
-        manager.handleWebEvent(webEventData("evt"), "", "")
+        manager.handleWebEvent(webEventData("evt"), "")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -1046,7 +1134,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(changedSourceConfig)
 
         // "new_source" matches live config but NOT stored config — should be ignored
-        manager.handleWebEvent(webEventData("new_source"), "", "")
+        manager.handleWebEvent(webEventData("new_source"), "")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1307,7 +1395,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(stateA1WithCount, stateB1WithCount)
 
         // Events still use config [1] stored in state
-        manager.handleWebEvent(webEventData("evt"), "", "")
+        manager.handleWebEvent(webEventData("evt"), "")
 
         val savedAfterEvent = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
@@ -1346,7 +1434,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
 
-        manager.handleWebEvent(webEventData("evt"), "", "")
+        manager.handleWebEvent(webEventData("evt"), "")
 
         val savedAfterConfig3 = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
@@ -1393,7 +1481,7 @@ class EventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "", "")
+        manager.handleWebEvent(webEventData("test"), "")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1463,7 +1551,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://unprotected-site.example.com")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -1475,7 +1563,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://tracker-heavy-site.example.com")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -1487,7 +1575,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://protected-site.example.com")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
@@ -1497,7 +1585,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "tab2", "https://unprotected-site.example.com")
+        manager.handleWebEvent(webEventData("test"), "tab2")
 
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
@@ -1553,14 +1641,14 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository, never()).savePixelState(any())
 
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com")
+        manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository).savePixelState(any())
     }
 
@@ -1571,7 +1659,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5))
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/before-fire")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val preFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(preFire.capture())
@@ -1582,7 +1670,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(preFire.firstValue)
 
-        manager.handleWebEvent(webEventData("test"), "newTab1", "https://example.com/after-fire")
+        manager.handleWebEvent(webEventData("test"), "newTab1")
 
         val postFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(postFire.capture())
@@ -1598,7 +1686,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/before")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val preFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(preFire.capture())
@@ -1611,7 +1699,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(preFire.firstValue)
 
         timeProvider.time = 10_000L
-        manager.handleWebEvent(webEventData("test"), "newTab", "https://example.com/after")
+        manager.handleWebEvent(webEventData("test"), "newTab")
 
         val postFire = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(postFire.capture())
@@ -1656,7 +1744,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         // After fire button, new tab sends same event type — stopCounting still applied
-        manager.handleWebEvent(webEventData("test"), "newTab", "https://example.com/post-fire")
+        manager.handleWebEvent(webEventData("test"), "newTab")
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1675,7 +1763,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         // Simulate fire button: new tab, but the stored config snapshot is preserved
-        manager.handleWebEvent(webEventData("evt"), "newTab1", "https://example.com/post-fire")
+        manager.handleWebEvent(webEventData("evt"), "newTab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(captor.capture())
@@ -1694,7 +1782,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(stateA, stateB)
 
         // Fire button happened — new tabs, same repository state
-        manager.handleWebEvent(webEventData("evt"), "newTab1", "https://example.com/post-fire")
+        manager.handleWebEvent(webEventData("evt"), "newTab1")
 
         val captor = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -1710,7 +1798,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         // Event on tab1 before fire button
-        manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "tab1")
 
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
@@ -1722,7 +1810,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         // Same URL in new tab — different tabId means not deduped
-        manager.handleWebEvent(webEventData("test"), "newTab1", "https://example.com/page1")
+        manager.handleWebEvent(webEventData("test"), "newTab1")
 
         val second = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(second.capture())
@@ -1748,7 +1836,8 @@ class EventHubPixelManagerTest {
                 pixelState("webTelemetry_testPixel1", mapOf("count" to i - 1), periodStart = periodStart, periodEnd = periodEnd)
             }
             stubPixelStates(currentState)
-            manager.handleWebEvent(webEventData("test"), "tab1", "https://example.com/page$i")
+            manager.onNavigationStarted("tab1", "https://example.com/page$i")
+            manager.handleWebEvent(webEventData("test"), "tab1")
         }
 
         val preFire = argumentCaptor<EventHubPixelStateEntity>()
@@ -1767,7 +1856,8 @@ class EventHubPixelManagerTest {
                 periodEnd = periodEnd,
             )
             stubPixelStates(currentState)
-            manager.handleWebEvent(webEventData("test"), "newTab1", "https://other.com/page$i")
+            manager.onNavigationStarted("newTab1", "https://other.com/page$i")
+            manager.handleWebEvent(webEventData("test"), "newTab1")
         }
 
         val postFire = argumentCaptor<EventHubPixelStateEntity>()

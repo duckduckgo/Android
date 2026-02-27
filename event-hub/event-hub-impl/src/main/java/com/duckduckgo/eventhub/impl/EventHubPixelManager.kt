@@ -39,24 +39,25 @@ class RealEventHubPixelManager @Inject constructor(
     private val foregroundStateProvider: AppForegroundStateProvider,
 ) {
 
-    private val dedupState = ConcurrentHashMap<String, String>()
+    private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val tabCurrentUrl = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
-    fun handleWebEvent(data: JSONObject, tabId: String, documentUrl: String) {
+    fun onNavigationStarted(tabId: String, url: String) {
+        if (tabId.isEmpty() || url.isEmpty()) return
+        val previousUrl = tabCurrentUrl.put(tabId, url)
+        if (previousUrl != null && previousUrl != url) {
+            logcat(VERBOSE) { "EventHub: navigation detected for tab $tabId ($previousUrl -> $url), clearing dedup" }
+            dedupSeen.removeAll { it.endsWith(":$tabId") }
+        }
+    }
+
+    fun handleWebEvent(data: JSONObject, tabId: String) {
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
 
         val config = getParsedConfig()
         if (!config.featureEnabled) return
-
-        if (tabId.isNotEmpty() && documentUrl.isNotEmpty()) {
-            val previousUrl = tabCurrentUrl.put(tabId, documentUrl)
-            if (previousUrl != null && previousUrl != documentUrl) {
-                val suffix = ":$tabId"
-                dedupState.keys.removeAll { it.endsWith(suffix) }
-            }
-        }
 
         val nowMillis = timeProvider.currentTimeMillis()
 
@@ -72,7 +73,7 @@ class RealEventHubPixelManager @Inject constructor(
                 if (paramConfig.isCounter && paramConfig.source == eventType) {
                     val paramState = params[paramName] ?: ParamState(0)
                     if (paramState.stopCounting) continue
-                    if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId, documentUrl)) continue
+                    if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId)) continue
 
                     changed = true
                     if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
@@ -95,15 +96,13 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, tabId: String, documentUrl: String): Boolean {
-        if (tabId.isEmpty() || documentUrl.isEmpty()) return false
+    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, tabId: String): Boolean {
+        if (tabId.isEmpty()) return false
         val key = "$pixelName:$paramName:$source:$tabId"
-        val lastUrl = dedupState[key]
-        if (lastUrl == documentUrl) {
-            logcat(VERBOSE) { "EventHub: dedup $key (same page: $documentUrl)" }
+        if (!dedupSeen.add(key)) {
+            logcat(VERBOSE) { "EventHub: dedup $key (already seen on current page)" }
             return true
         }
-        dedupState[key] = documentUrl
         return false
     }
 
