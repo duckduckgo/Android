@@ -42,7 +42,7 @@ import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Named
 
-@ContributesBinding(ActivityScope::class, boundType = JsMessaging::class)
+@ContributesBinding(ActivityScope::class)
 @Named("ContentScopeScripts")
 class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
@@ -67,12 +67,17 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
-            val jsMessage = adapter.fromJson(message)?.copy(webView = webView)
+            val jsMessage = adapter.fromJson(message)
             val domain =
                 runBlocking(dispatcherProvider.main()) {
                     webView.url?.toUri()?.host
                 }
             jsMessage?.let {
+                if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+                    val nativeData = org.json.JSONObject()
+                    nativeData.put("tabId", System.identityHashCode(webView).toString())
+                    jsMessage.params.put("nativeData", nativeData)
+                }
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
