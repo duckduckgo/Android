@@ -17,7 +17,6 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsJsMessagingContext
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -48,9 +47,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
                 return
             }
 
-            val messagingContext = jsMessaging as? ContentScopeScriptsJsMessagingContext
-            val webView = messagingContext?.registeredWebView
-            val tabId = webView?.let { System.identityHashCode(it).toString() } ?: ""
+            val tabId = jsMessage.webView?.let { System.identityHashCode(it).toString() } ?: ""
 
             logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId" }
             pixelManager.handleWebEvent(jsMessage.params, tabId)
