@@ -1953,6 +1953,18 @@ class BrowserTabFragment :
             },
         )
 
+        sharedContextualViewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        logcat { "Duck.ai Contextual: Collect Page Context" }
+                        viewModel.collectPageContext()
+                    }
+
+                    else -> {}
+                }
+            }.launchIn(lifecycleScope)
+
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -3433,8 +3445,6 @@ class BrowserTabFragment :
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
-
-        viewModel.collectPageContext()
     }
 
     private fun createNewContextualFragment(tabId: String) {

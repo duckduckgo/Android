@@ -1293,6 +1293,33 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when multiple context attachments enabled, areMultipleContentAttachmentsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments enabled and contextual mode disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
         whenever(cookiesManager.get()).thenReturn(cookieManager)

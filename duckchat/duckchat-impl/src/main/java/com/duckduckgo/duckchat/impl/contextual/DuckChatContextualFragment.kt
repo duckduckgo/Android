@@ -357,6 +357,10 @@ class DuckChatContextualFragment :
                                             withContext(dispatcherProvider.main()) {
                                                 contentScopeScripts.onResponse(response)
                                             }
+                                            // once Duck.ai is fully loaded we attach the latest context if needed
+                                            if (method == RealDuckChatJSHelper.METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) {
+                                                sharedContextualViewModel.requestPageContext()
+                                            }
                                         }
                                     }
                                 }
@@ -563,7 +567,6 @@ class DuckChatContextualFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        logcat { "Duck.ai Contextual: page context received" }
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
                     }
 
@@ -571,6 +574,8 @@ class DuckChatContextualFragment :
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
                     }
+
+                    else -> {}
                 }
             }.launchIn(lifecycleScope)
 

@@ -113,6 +113,11 @@ class DuckChatContextualViewModel @Inject constructor(
             val currentState = _viewState.value
             if (currentState.sheetMode == SheetMode.WEBVIEW) {
                 reopenWebViewState(currentState)
+                val pageContext = generatePageContextEventData()
+                logcat { "Duck.ai: attaching new context to Duck.ai" }
+                withContext(dispatchers.main()) {
+                    _subscriptionEventDataChannel.trySend(pageContext)
+                }
             } else {
                 withContext(dispatchers.main()) {
                     logcat { "Duck.ai: reopenSheet in Input mode" }
@@ -171,7 +176,7 @@ class DuckChatContextualViewModel @Inject constructor(
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
             if (existingChatUrl.isNullOrBlank()) {
-                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one" }
+                logcat { "Duck.ai: tab=$tabId doesn't have an existing url, use the default one $existingChatUrl" }
                 withContext(dispatchers.main()) {
                     commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
                     val chatUrl = duckChat.getDuckChatUrl("", false, sidebar = true)
@@ -305,6 +310,42 @@ class DuckChatContextualViewModel @Inject constructor(
         )
     }
 
+    private fun generatePageContextEventData(): SubscriptionEventData {
+        val pageContext = if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            if (duckChatInternal.areMultipleContentAttachmentsEnabled()) {
+                if (isContextValid(updatedPageContext)) {
+                    updatedPageContext
+                        .takeIf { it.isNotBlank() }
+                        ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                        ?: run {
+                            logcat { "Duck.ai: no pageContext available" }
+                            null
+                        }
+                } else {
+                    logcat { "Duck.ai: pageContext is not valid" }
+                    null
+                }
+            } else {
+                logcat { "Duck.ai: areMultipleContentAttachmentsEnabled disabled" }
+                null
+            }
+        } else {
+            logcat { "Duck.ai: isAutomaticContextAttachmentEnabled disabled" }
+            null
+        }
+
+        val params =
+            JSONObject().apply {
+                put("pageContext", pageContext)
+            }
+
+        return SubscriptionEventData(
+            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = "submitAIChatPageContext",
+            params = params,
+        )
+    }
+
     fun onContextualClose() {
         viewModelScope.launch(dispatchers.main()) {
             commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HIDDEN))
@@ -369,7 +410,10 @@ class DuckChatContextualViewModel @Inject constructor(
         return title != null && content != null
     }
 
-    fun replacePrompt(input: String, prompt: String) {
+    fun replacePrompt(
+        input: String,
+        prompt: String,
+    ) {
         logcat { "Duck.ai Contextual: add predefined Summarize prompt" }
         duckChatPixels.reportContextualSummarizePromptSelected()
         viewModelScope.launch {
@@ -434,17 +478,14 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
-        logcat { "Duck.ai: onPageContextReceived $pageContext" }
         if (isContextValid(pageContext)) {
-            logcat { "Duck.ai: onPageContextReceived is valid" }
             updatedPageContext = pageContext
-
             val json = JSONObject(updatedPageContext)
             val title = json.optString("title")
             val url = json.optString("url")
 
+            logcat { "Duck.ai: onPageContextReceived for url $url" }
             val inputMode = _viewState.value
-
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
                 val updatedState =
@@ -473,6 +514,9 @@ class DuckChatContextualViewModel @Inject constructor(
                         allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
+                val pageContext = generatePageContextEventData()
+                logcat { "Duck.ai: attaching new context to Duck.ai" }
+                _subscriptionEventDataChannel.trySend(pageContext)
             }
         } else {
             updatedPageContext = ""
