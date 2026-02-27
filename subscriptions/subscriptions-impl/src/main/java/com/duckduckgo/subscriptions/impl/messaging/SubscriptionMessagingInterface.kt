@@ -62,8 +62,11 @@ class SubscriptionMessagingInterface @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     private val handlers = listOf(
         SubscriptionsHandler(),
@@ -82,7 +85,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                _webView.url?.toUri()?.host
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
@@ -99,9 +102,9 @@ class SubscriptionMessagingInterface @Inject constructor(
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, context)
+        this._webView.addJavascriptInterface(this, context)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -111,7 +114,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             subscriptionEventData.subscriptionName,
             subscriptionEventData.params,
         )
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, _webView)
     }
 
     override fun onResponse(response: JsCallbackData) {
@@ -123,7 +126,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             result = response.params,
         )
 
-        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, _webView)
     }
 
     override val context: String = "subscriptionPages"
@@ -191,7 +194,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 )
             }
 
-            jsMessageHelper.sendJsResponse(data, callbackName, secret, webView)
+            jsMessageHelper.sendJsResponse(data, callbackName, secret, _webView)
         }
 
         override val allowedDomains: List<String> = emptyList()
@@ -348,7 +351,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 result = JSONObject(resultJson),
             )
 
-            jsMessageHelper.sendJsResponse(response, callbackName, secret, webView)
+            jsMessageHelper.sendJsResponse(response, callbackName, secret, _webView)
         }
 
         override val allowedDomains: List<String> = emptyList()
@@ -387,7 +390,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 result = resultJson,
             )
 
-            jsMessageHelper.sendJsResponse(response, callbackName, secret, webView)
+            jsMessageHelper.sendJsResponse(response, callbackName, secret, _webView)
         }
 
         override val allowedDomains: List<String> = emptyList()
@@ -426,7 +429,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 result = resultJson,
             )
 
-            jsMessageHelper.sendJsResponse(response, callbackName, secret, webView)
+            jsMessageHelper.sendJsResponse(response, callbackName, secret, _webView)
         }
 
         override val allowedDomains: List<String> = emptyList()

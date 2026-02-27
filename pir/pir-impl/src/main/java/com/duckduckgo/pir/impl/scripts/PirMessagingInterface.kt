@@ -42,7 +42,10 @@ class PirMessagingInterface @Inject constructor(
         BrokerProtectionMessageHandler(),
     )
     private lateinit var jsMessageCallback: JsMessageCallback
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     override fun onResponse(response: JsCallbackData) {
         logcat { "PIR-CSS: onResponse $response" }
@@ -54,7 +57,7 @@ class PirMessagingInterface @Inject constructor(
             result = response.params,
         )
 
-        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, _webView)
     }
 
     override fun register(
@@ -62,9 +65,9 @@ class PirMessagingInterface @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, pirScript.javascriptInterface)
+        this._webView.addJavascriptInterface(this, pirScript.javascriptInterface)
     }
 
     @JavascriptInterface
@@ -99,7 +102,7 @@ class PirMessagingInterface @Inject constructor(
             subscriptionEventData.params,
         )
 
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, _webView)
     }
 
     override val context: String = PIRScriptConstants.SCRIPT_CONTEXT_NAME

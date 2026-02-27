@@ -62,6 +62,14 @@ interface JsMessaging {
      * List of domains where the interface can be added
      */
     val allowedDomains: List<String>
+
+    /**
+     * The WebView associated with this messaging interface, available after [register] has been called.
+     * Handlers can use this to interact with the WebView directly (e.g., evaluating JavaScript).
+     * Must be accessed on the main thread.
+     */
+    val webView: WebView?
+        get() = null
 }
 
 abstract class JsMessageCallback {

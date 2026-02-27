@@ -47,8 +47,11 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     private val handlers = listOf(
         DuckPlayerPageHandler(),
@@ -60,7 +63,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                _webView.url?.toUri()?.host
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
@@ -77,9 +80,9 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, context)
+        this._webView.addJavascriptInterface(this, context)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -89,7 +92,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             subscriptionEventData.subscriptionName,
             subscriptionEventData.params,
         )
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, _webView)
     }
 
     override fun onResponse(response: JsCallbackData) {
@@ -101,7 +104,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             result = response.params,
         )
 
-        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, _webView)
     }
 
     override val context: String = "specialPages"

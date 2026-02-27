@@ -53,7 +53,10 @@ class PirDashboardWebMessagingInterface @Inject constructor(
         Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build()
     }
     private lateinit var jsMessageCallback: JsMessageCallback
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     override val context: String = PirDashboardWebConstants.SCRIPT_CONTEXT_NAME
     override val callbackName: String = PirDashboardWebConstants.MESSAGE_CALLBACK
@@ -65,9 +68,9 @@ class PirDashboardWebMessagingInterface @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, context)
+        this._webView.addJavascriptInterface(this, context)
     }
 
     @JavascriptInterface
@@ -81,7 +84,7 @@ class PirDashboardWebMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                _webView.url?.toUri()?.host
             }
 
             jsMessage?.let {
@@ -108,7 +111,7 @@ class PirDashboardWebMessagingInterface @Inject constructor(
             result = response.params,
         )
 
-        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, _webView)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -121,7 +124,7 @@ class PirDashboardWebMessagingInterface @Inject constructor(
             subscriptionEventData.params,
         )
 
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, _webView)
     }
 
     private fun isUrlAllowed(url: String?): Boolean {

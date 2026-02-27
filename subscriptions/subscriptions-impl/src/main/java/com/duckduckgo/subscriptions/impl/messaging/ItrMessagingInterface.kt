@@ -50,8 +50,11 @@ class ItrMessagingInterface @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
     private var jsMessageCallback: JsMessageCallback? = null
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     private val handlers = listOf(
         GetAccessTokenMessage(subscriptionsManager, dispatcherProvider),
@@ -63,7 +66,7 @@ class ItrMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val url = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
+                _webView.url?.toUri()?.host
             }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
@@ -78,9 +81,9 @@ class ItrMessagingInterface @Inject constructor(
     }
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, context)
+        this._webView.addJavascriptInterface(this, context)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -135,7 +138,7 @@ class ItrMessagingInterface @Inject constructor(
                     )
                 }
             }
-            jsMessageHelper.sendJsResponse(data, callbackName, secret, webView)
+            jsMessageHelper.sendJsResponse(data, callbackName, secret, _webView)
         }
 
         override val allowedDomains: List<String> = emptyList()

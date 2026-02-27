@@ -52,8 +52,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private lateinit var webView: WebView
+    private lateinit var _webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
+
+    override val webView: WebView?
+        get() = if (::_webView.isInitialized) _webView else null
 
     override val context: String = "contentScopeScripts"
     override val callbackName: String = coreContentScopeScripts.callbackName
@@ -70,7 +73,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             val jsMessage = adapter.fromJson(message)
             val domain =
                 runBlocking(dispatcherProvider.main()) {
-                    webView.url?.toUri()?.host
+                    _webView.url?.toUri()?.host
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
@@ -102,9 +105,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        this.webView = webView
+        this._webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        this._webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -115,8 +118,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 subscriptionEventData.subscriptionName,
                 subscriptionEventData.params,
             )
-        if (::webView.isInitialized) {
-            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        if (::_webView.isInitialized) {
+            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, _webView)
         }
     }
 
@@ -129,7 +132,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 id = response.id,
                 result = response.params,
             )
-        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+        jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, _webView)
     }
 
     private fun isUrlAllowed(
