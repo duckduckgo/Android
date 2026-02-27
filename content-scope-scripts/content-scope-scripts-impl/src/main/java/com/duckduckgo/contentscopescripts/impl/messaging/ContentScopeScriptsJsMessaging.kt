@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsJsMessagingContext
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -42,18 +43,20 @@ import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Named
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(ActivityScope::class, boundType = JsMessaging::class)
 @Named("ContentScopeScripts")
 class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
-) : JsMessaging {
+) : JsMessaging, ContentScopeScriptsJsMessagingContext {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
+
+    override val registeredWebView: WebView? get() = if (::webView.isInitialized) webView else null
 
     override val context: String = "contentScopeScripts"
     override val callbackName: String = coreContentScopeScripts.callbackName
