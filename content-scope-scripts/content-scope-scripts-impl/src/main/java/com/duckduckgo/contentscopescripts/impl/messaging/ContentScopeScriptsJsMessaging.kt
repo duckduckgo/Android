@@ -73,6 +73,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                     webView.url?.toUri()?.host
                 }
             jsMessage?.let {
+                if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+                    val nativeData = org.json.JSONObject()
+                    nativeData.put("tabId", System.identityHashCode(webView).toString())
+                    jsMessage.params.put("nativeData", nativeData)
+                }
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features

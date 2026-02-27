@@ -1,0 +1,58 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "25d0b0a38eb36126955eeb7e2b8c80e4",
+    "entities": [
+      {
+        "tableName": "event_hub_pixel_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pixelName` TEXT NOT NULL, `periodStartMillis` INTEGER NOT NULL, `periodEndMillis` INTEGER NOT NULL, `paramsJson` TEXT NOT NULL, `configJson` TEXT NOT NULL, PRIMARY KEY(`pixelName`))",
+        "fields": [
+          {
+            "fieldPath": "pixelName",
+            "columnName": "pixelName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodStartMillis",
+            "columnName": "periodStartMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodEndMillis",
+            "columnName": "periodEndMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paramsJson",
+            "columnName": "paramsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "configJson",
+            "columnName": "configJson",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pixelName"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '25d0b0a38eb36126955eeb7e2b8c80e4')"
+    ]
+  }
+}
