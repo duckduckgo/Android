@@ -83,17 +83,21 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
             CtaId.DAX_FIRE_BUTTON,
         )
 
-        container.addView(SectionHeaderListItem(this).apply {
-            primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsContextDialogsSection)
-        })
+        container.addView(
+            SectionHeaderListItem(this).apply {
+                primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsContextDialogsSection)
+            },
+        )
         contextDialogs.forEach { ctaId ->
             val row = createCtaRow(ctaId)
             ctaRowsById[ctaId] = row
             container.addView(row)
         }
-        container.addView(SectionHeaderListItem(this).apply {
-            primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsInContextDialogsSection)
-        })
+        container.addView(
+            SectionHeaderListItem(this).apply {
+                primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsInContextDialogsSection)
+            },
+        )
         inContextDialogs.forEach { ctaId ->
             val row = createCtaRow(ctaId)
             ctaRowsById[ctaId] = row
