@@ -35,6 +35,7 @@ dependencies {
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.google.mediapipe:tasks-text:0.10.14"
+    implementation "com.google.mlkit:genai-prompt:1.0.0-beta1"
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
@@ -46,5 +47,9 @@ android {
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true
+    }
+    kotlinOptions {
+        // genai-prompt:1.0.0-beta1 was compiled with Kotlin 2.2; skip version check for PoC.
+        freeCompilerArgs += ["-Xskip-metadata-version-check"]
     }
 }

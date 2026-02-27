@@ -40,17 +40,20 @@ class AiHistorySearchInteractor @Inject constructor(
 ) {
 
     private val embeddingScorer: EmbeddingScorer by lazy { EmbeddingScorer(context) }
+    private val geminiNanoSearcher: GeminiNanoSearcher by lazy { GeminiNanoSearcher() }
 
     /**
      * Builds a [DuckChatContextualResult.Submit] for [query] without opening Duck.ai.
      *
      * Routing:
+     * - [AiHistorySearchFeature.aiCoreEnabled] ON  → Gemini Nano shadow call (logcat only,
+     *   never short-circuits). Duck.ai always opens via one of the paths below.
      * - [AiHistorySearchFeature.embeddingsEnabled] ON  → rank entries on-device with semantic
      *   embeddings (USE Lite), send only the top [MAX_ENTRIES_EMBEDDINGS] matches.
      * - [AiHistorySearchFeature.bm25Enabled] ON  → rank entries on-device with BM25, send only the
      *   top [MAX_ENTRIES_BM25] matches. The full history never leaves the device.
-     * - Both OFF → send the full time-filtered history (up to [MAX_ENTRIES_FULL] entries) and let
-     *   Duck.ai do the semantic matching.
+     * - Both embeddings and BM25 OFF → send the full time-filtered history (up to
+     *   [MAX_ENTRIES_FULL] entries) and let Duck.ai do the semantic matching.
      *
      * Throws [NoHistoryException] if no matching history entries are found.
      */
@@ -68,6 +71,11 @@ class AiHistorySearchInteractor @Inject constructor(
             .sortedByDescending { entry -> entry.visits.maxOrNull() }
 
         if (timeFiltered.isEmpty()) throw NoHistoryException()
+
+        // AICore shadow path — logcats result only, never short-circuits Duck.ai
+        if (feature.aiCoreEnabled().isEnabled()) {
+            geminiNanoSearcher.search(query, timeFiltered)
+        }
 
         return when {
             embeddingsOn -> buildEmbeddingsResult(query, timeFiltered)
