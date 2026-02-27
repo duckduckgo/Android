@@ -16,6 +16,10 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.AtbLifecyclePlugin
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -26,18 +30,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Handles VPN lifecycle callbacks for the subscriptions module.
- *
- * This class bridges VPN events to subscription-related functionality,
- * such as reporting VPN activation for free trial conversion analysis.
+ * Handles subscription features related callbacks from multiple sources [e.g. VPN, DuckChat]
  */
-@ContributesMultibinding(VpnScope::class)
-class SubscriptionVpnCallbacks @Inject constructor(
+@ContributesMultibinding(VpnScope::class, boundType = VpnServiceCallbacks::class)
+@ContributesMultibinding(AppScope::class, boundType = AtbLifecyclePlugin::class)
+class SubscriptionFeatureCallbacks @Inject constructor(
     private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
-) : VpnServiceCallbacks {
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : VpnServiceCallbacks, AtbLifecyclePlugin {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             freeTrialConversionWideEvent.onVpnActivatedSuccessfully()
         }
     }
@@ -52,5 +56,22 @@ class SubscriptionVpnCallbacks @Inject constructor(
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         // noop
+    }
+
+    override fun onDuckAiRetentionAtbRefreshed(
+        oldAtb: String,
+        newAtb: String,
+        metadata: Map<String, String?>,
+    ) {
+        if (metadata[KEY_MODEL_TIER] in MODEL_TIERS_PAID) {
+            coroutineScope.launch(dispatcherProvider.io()) {
+                freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+            }
+        }
+    }
+
+    private companion object {
+        const val KEY_MODEL_TIER = "modelTier"
+        val MODEL_TIERS_PAID: Set<String> = setOf("plus")
     }
 }

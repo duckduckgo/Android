@@ -112,7 +112,7 @@ class RealDuckChatPixelsTest {
             DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT,
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "5"),
         )
-        verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
     }
 
@@ -128,7 +128,7 @@ class RealDuckChatPixelsTest {
             DUCK_CHAT_START_NEW_CONVERSATION,
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "10"),
         )
-        verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
     }
 

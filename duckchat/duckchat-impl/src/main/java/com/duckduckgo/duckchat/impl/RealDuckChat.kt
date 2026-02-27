@@ -266,6 +266,18 @@ enum class ReportMetric(
     }
 }
 
+enum class ModelTier(val model: String) {
+    FREE("free"),
+    PLUS("plus"),
+    INTERNAL("internal"),
+    UNKNOWN("unknown"),
+    ;
+
+    companion object {
+        fun fromValue(v: String?): ModelTier? = entries.firstOrNull { it.model.equals(v, ignoreCase = true) }
+    }
+}
+
 data class DuckChatSettingJson(
     val aiChatURL: String?,
     val aiChatBangs: List<String>?,
