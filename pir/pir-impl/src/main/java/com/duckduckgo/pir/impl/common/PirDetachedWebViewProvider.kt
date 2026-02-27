@@ -19,14 +19,18 @@ package com.duckduckgo.pir.impl.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Message
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.api.PirTrackerBlockingInterceptor
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
@@ -64,8 +68,10 @@ interface PirDetachedWebViewProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealPirDetachedWebViewProvider @Inject constructor() :
-    PirDetachedWebViewProvider {
+class RealPirDetachedWebViewProvider @Inject constructor(
+    private val pirTrackerBlockingInterceptor: PirTrackerBlockingInterceptor,
+    private val pirRemoteFeatures: PirRemoteFeatures,
+) : PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun createInstance(
         context: Context,
@@ -99,6 +105,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
             }
             webViewClient = object : WebViewClient() {
                 private var requestedUrl: String? = null
+                private var documentUrl: Uri? = null
                 private var receivedError: Boolean = false
 
                 @SuppressLint("RequiresFeature")
@@ -107,6 +114,23 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     request: WebResourceRequest?,
                 ): Boolean {
                     return false
+                }
+
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest,
+                ): WebResourceResponse? {
+                    val currentDocumentUrl = documentUrl ?: return null
+
+                    if (!pirRemoteFeatures.trackerBlocking().isEnabled()) return null
+
+                    val domain = currentDocumentUrl.host
+                    if (domain != null) {
+                        val exceptions = pirRemoteFeatures.trackerBlocking().getExceptions()
+                        if (exceptions.any { it.domain == domain }) return null
+                    }
+
+                    return pirTrackerBlockingInterceptor.shouldIntercept(request, currentDocumentUrl)
                 }
 
                 override fun onPageStarted(
@@ -118,6 +142,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     logcat { "PIR-SCAN: __________________________" }
                     logcat { "PIR-SCAN: webview onPageStarted $url" }
                     requestedUrl = url
+                    documentUrl = url?.let { Uri.parse(it) }
                     receivedError = false
                     view?.evaluateJavascript("javascript:$scriptToLoad", null)
                 }
