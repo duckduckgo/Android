@@ -16,6 +16,7 @@
 
 package com.duckduckgo.aihistorysearch.impl
 
+import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextualResult
 import com.duckduckgo.history.api.HistoryEntry
@@ -35,22 +36,28 @@ class NoHistoryException : Exception("No history found for the given time period
 class AiHistorySearchInteractor @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val feature: AiHistorySearchFeature,
+    private val context: Context,
 ) {
+
+    private val embeddingScorer: EmbeddingScorer by lazy { EmbeddingScorer(context) }
 
     /**
      * Builds a [DuckChatContextualResult.Submit] for [query] without opening Duck.ai.
      *
      * Routing:
+     * - [AiHistorySearchFeature.embeddingsEnabled] ON  → rank entries on-device with semantic
+     *   embeddings (USE Lite), send only the top [MAX_ENTRIES_EMBEDDINGS] matches.
      * - [AiHistorySearchFeature.bm25Enabled] ON  → rank entries on-device with BM25, send only the
      *   top [MAX_ENTRIES_BM25] matches. The full history never leaves the device.
-     * - [AiHistorySearchFeature.bm25Enabled] OFF → send the full time-filtered history (up to
-     *   [MAX_ENTRIES_FULL] entries) and let Duck.ai do the semantic matching.
+     * - Both OFF → send the full time-filtered history (up to [MAX_ENTRIES_FULL] entries) and let
+     *   Duck.ai do the semantic matching.
      *
      * Throws [NoHistoryException] if no matching history entries are found.
      */
     suspend fun buildResult(query: String): DuckChatContextualResult.Submit {
+        val embeddingsOn = feature.embeddingsEnabled().isEnabled()
         val bm25On = feature.bm25Enabled().isEnabled()
-        logcat { "AiHistorySearch: buildResult query='$query' bm25=$bm25On" }
+        logcat { "AiHistorySearch: buildResult query='$query' embeddings=$embeddingsOn bm25=$bm25On" }
 
         val allHistory = navigationHistory.getHistory().first()
         val pages = allHistory.filterIsInstance<HistoryEntry.VisitedPage>()
@@ -62,10 +69,10 @@ class AiHistorySearchInteractor @Inject constructor(
 
         if (timeFiltered.isEmpty()) throw NoHistoryException()
 
-        return if (bm25On) {
-            buildBm25Result(query, timeFiltered)
-        } else {
-            buildFullResult(query, timeFiltered.take(MAX_ENTRIES_FULL))
+        return when {
+            embeddingsOn -> buildEmbeddingsResult(query, timeFiltered)
+            bm25On       -> buildBm25Result(query, timeFiltered)
+            else         -> buildFullResult(query, timeFiltered.take(MAX_ENTRIES_FULL))
         }
     }
 
@@ -91,6 +98,31 @@ class AiHistorySearchInteractor @Inject constructor(
             prompt = "I searched my browser history and found these pages matching \"$query\". " +
                 "Can you help me understand what I was looking at?",
             context = buildContext(ranked, instructions, "Browser History (top matches)"),
+        )
+    }
+
+    // ---- Embeddings path -----------------------------------------------------------------
+
+    private fun buildEmbeddingsResult(
+        query: String,
+        timeFiltered: List<HistoryEntry.VisitedPage>,
+    ): DuckChatContextualResult.Submit {
+        val ranked = embeddingScorer.rank(query, timeFiltered).take(MAX_ENTRIES_EMBEDDINGS)
+        if (ranked.isEmpty()) throw NoHistoryException()
+        logcat { "AiHistorySearch (embeddings): ${ranked.size} entries after on-device ranking" }
+
+        val instructions =
+            "Instructions for using these results:\n" +
+                "- These are the most relevant pages from my browser history, matched on-device " +
+                "using semantic similarity — not just keywords.\n" +
+                "- Use the visit date to answer any time-based parts of the question.\n" +
+                "- Summarize what these pages are about and how they relate to my question.\n" +
+                "- If nothing here clearly matches, say so."
+
+        return DuckChatContextualResult.Submit(
+            prompt = "I searched my browser history and found these pages matching \"$query\". " +
+                "Can you help me understand what I was looking at?",
+            context = buildContext(ranked, instructions, "Browser History (semantic matches)"),
         )
     }
 
@@ -179,6 +211,7 @@ class AiHistorySearchInteractor @Inject constructor(
         private const val LOOKBACK_DAYS = 30L
         internal const val MAX_ENTRIES_FULL = 20
         internal const val MAX_ENTRIES_BM25 = 10
+        internal const val MAX_ENTRIES_EMBEDDINGS = 10
         private val DAYS_PATTERN = Regex("""(\d+)\s*days?\s*(ago|prior|back|before)""")
         private val WEEKS_PATTERN = Regex("""(\d+)\s*weeks?\s*(ago|prior|back|before)""")
     }

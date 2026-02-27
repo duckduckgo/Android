@@ -44,4 +44,13 @@ interface AiHistorySearchFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun bm25Enabled(): Toggle
+
+    /**
+     * When enabled, history entries are ranked on-device using semantic embeddings
+     * (Universal Sentence Encoder Lite via MediaPipe Tasks Text) instead of BM25.
+     * Takes precedence over [bm25Enabled] when both are on.
+     * Defaults to `internal` for dogfooding before production rollout.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun embeddingsEnabled(): Toggle
 }
