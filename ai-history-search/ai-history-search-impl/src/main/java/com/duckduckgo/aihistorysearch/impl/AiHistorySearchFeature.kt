@@ -53,4 +53,14 @@ interface AiHistorySearchFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun embeddingsEnabled(): Toggle
+
+    /**
+     * When enabled, Gemini Nano is invoked on-device via the ML Kit GenAI Prompt API as a
+     * shadow path before the main routing. The on-device answer is logcatted only — Duck.ai
+     * always opens normally via the embeddings / BM25 / full-history path.
+     * PoC: lets us evaluate on-device quality and latency without any UI changes.
+     * Defaults to `internal` so it only runs on internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiCoreEnabled(): Toggle
 }
