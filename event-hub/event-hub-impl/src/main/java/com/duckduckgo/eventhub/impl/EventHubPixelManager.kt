@@ -22,6 +22,7 @@ import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
@@ -162,7 +163,7 @@ class RealEventHubPixelManager @Inject constructor(
         logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
         val job = appCoroutineScope.launch(dispatcherProvider.io()) {
             delay(delayMillis)
-            scheduledTimers.remove(pixelName)
+            ensureActive()
 
             val config = getParsedConfig()
             if (!config.featureEnabled) return@launch

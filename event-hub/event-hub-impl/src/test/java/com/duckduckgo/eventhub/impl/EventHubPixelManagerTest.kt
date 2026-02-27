@@ -2106,6 +2106,89 @@ class EventHubPixelManagerTest {
         assertEquals(1000L + 120_000L, stateB.periodEndMillis)
     }
 
+    // --- race condition: timer expiry vs checkPixels ---
+
+    @Test
+    fun `checkPixels cancels timer so expired coroutine does not double-fire`() {
+        timeProvider.time = 1000L
+
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+
+        val initCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(initCaptor.capture())
+        val initialState = initCaptor.firstValue
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
+
+        timeProvider.time = initialState.periodEndMillis + 1
+
+        // checkPixels fires the pixel synchronously (simulating foreground)
+        manager.checkPixels()
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        // Still only 1 fire — the timer coroutine was cancelled via ensureActive()
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `cancelled timer does not remove newly scheduled timer from map`() {
+        timeProvider.time = 1000L
+
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+
+        val initCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        verify(repository).savePixelState(initCaptor.capture())
+        val initialState = initCaptor.firstValue
+
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
+
+        timeProvider.time = initialState.periodEndMillis + 1
+
+        // checkPixels fires the pixel, which starts a new period with a new timer
+        manager.checkPixels()
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+
+        // A new timer should exist for the new period
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        // Advance past the original timer delay — the cancelled coroutine must not
+        // remove the new timer entry from scheduledTimers
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        // New timer must still be present (not removed by the stale coroutine)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    }
+
+    @Test
+    fun `timer cancelled between delay and fire does not execute fireTelemetry`() {
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        // Advance time so delay completes, but cancel before the scheduler runs the continuation
+        testScope.testScheduler.advanceTimeBy(5001L)
+        manager.cancelScheduledFire("webTelemetry_testPixel1")
+        testScope.testScheduler.runCurrent()
+
+        // fireTelemetry should never have been called — no pixel fire, no DB delete
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+        verify(repository, never()).deletePixelState(any())
+    }
+
     // --- foreground-gated cycles ---
 
     @Test
