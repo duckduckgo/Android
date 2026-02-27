@@ -478,16 +478,14 @@ class DuckChatContextualViewModel @Inject constructor(
         tabId: String,
         pageContext: String,
     ) {
-        logcat { "Duck.ai: onPageContextReceived" }
         if (isContextValid(pageContext)) {
             updatedPageContext = pageContext
-
             val json = JSONObject(updatedPageContext)
             val title = json.optString("title")
             val url = json.optString("url")
 
+            logcat { "Duck.ai: onPageContextReceived for url $url" }
             val inputMode = _viewState.value
-
             if (inputMode.sheetMode == SheetMode.INPUT) {
                 val allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled()
                 val updatedState =

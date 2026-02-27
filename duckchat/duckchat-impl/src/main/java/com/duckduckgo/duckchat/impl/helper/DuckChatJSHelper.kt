@@ -164,7 +164,7 @@ class RealDuckChatJSHelper @Inject constructor(
                                 getPageContextResponse(featureName, method, it, pageContext, tabId)
                             }
                             REASON_INIT -> {
-                                if (duckChat.areMultipleContentAttachmentsEnabled()) {
+                                if (duckChat.isAutomaticContextAttachmentEnabled()) {
                                     getPageContextResponse(featureName, method, it, pageContext, tabId)
                                 } else {
                                     null
