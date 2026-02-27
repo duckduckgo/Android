@@ -91,4 +91,10 @@
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site data could not be deleted. Please update WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Site data could not be deleted due to an error.</string>
 
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
+    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
+    <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
+    <string name="syncRestoreDialogSecondaryCta">Skip</string>
+
 </resources>
