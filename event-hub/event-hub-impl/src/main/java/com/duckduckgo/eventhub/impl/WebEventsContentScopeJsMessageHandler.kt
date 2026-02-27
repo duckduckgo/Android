@@ -47,7 +47,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
                 return
             }
 
-            val tabId = jsMessage.webView?.let { System.identityHashCode(it).toString() } ?: ""
+            val tabId = jsMessage.params.optJSONObject("nativeData")?.optString("tabId", "") ?: ""
 
             logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId" }
             pixelManager.handleWebEvent(jsMessage.params, tabId)

@@ -112,7 +112,6 @@ data class JsMessage(
     val method: String,
     val params: JSONObject,
     val id: String?,
-    @Transient val webView: WebView? = null,
 )
 
 data class JsCallbackData(
