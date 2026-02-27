@@ -115,7 +115,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 reopenWebViewState(currentState)
                 val pageContext = generatePageContextEventData()
                 logcat { "Duck.ai: attaching new context to Duck.ai" }
-                _subscriptionEventDataChannel.trySend(pageContext)
+                withContext(dispatchers.main()) {
+                    _subscriptionEventDataChannel.trySend(pageContext)
+                }
             } else {
                 withContext(dispatchers.main()) {
                     logcat { "Duck.ai: reopenSheet in Input mode" }
