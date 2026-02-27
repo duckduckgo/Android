@@ -114,7 +114,7 @@ class WelcomePageViewModel @Inject constructor(
 
         data class ShowInitialDialog(val showDuckAiCopy: Boolean) : Command
 
-        data object ShowComparisonChart : Command
+        data class ShowComparisonChart(val showDuckAiCopy: Boolean) : Command
 
         data object ShowSkipOnboardingOption : Command
 
@@ -141,13 +141,13 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
             INITIAL -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
@@ -246,7 +246,7 @@ class WelcomePageViewModel @Inject constructor(
 
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                     pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
                 }
             }
@@ -330,16 +330,17 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
-            val showDuckAiCopy = withContext(dispatchers.io()) {
-                Locale.getDefault().language == "en" &&
-                    androidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().isEnabled()
-            }
             if (isAppReinstall()) {
-                _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy))
+                _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
             } else {
-                _commands.send(ShowInitialDialog(showDuckAiCopy))
+                _commands.send(ShowInitialDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
             }
         }
+    }
+
+    private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {
+        Locale.getDefault().language == "en" &&
+            androidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().isEnabled()
     }
 
     private suspend fun isAppReinstall(): Boolean =

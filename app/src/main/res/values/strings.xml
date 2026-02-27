@@ -822,6 +822,7 @@
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
     <string name="preOnboardingAddressBarTitle">Where should I put your address bar?</string>
     <string name="preOnboardingAddressBarOkButton">Next</string>
