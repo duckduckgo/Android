@@ -18,7 +18,6 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.eventhub.api.EventHubPixelManager
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -38,13 +37,13 @@ class RealEventHubPixelManager @Inject constructor(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val foregroundStateProvider: AppForegroundStateProvider,
-) : EventHubPixelManager {
+) {
 
     private val dedupState = ConcurrentHashMap<String, String>()
     private val tabCurrentUrl = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
-    override fun handleWebEvent(data: JSONObject, tabId: String, documentUrl: String) {
+    fun handleWebEvent(data: JSONObject, tabId: String, documentUrl: String) {
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
 
