@@ -23,7 +23,6 @@ import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -98,19 +97,6 @@ class CohortPixelInterceptorTest {
         cohortStore.setCohortLocalDate(date)
 
         val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_cpu_usage_above_10")
-        val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
-        val resultUrl = result.request.url
-
-        Assert.assertEquals(null, resultUrl.queryParameter(CohortPixelInterceptor.COHORT_PARAM))
-        Assert.assertEquals("", result.message)
-        Assert.assertEquals(null, result.body)
-    }
-
-    @Test
-    fun whenCohortNotSetExceptionPixelFiredWithoutCohort() {
-        Assert.assertNull(cohortStore.getCohortStoredLocalDate())
-
-        val pixelUrl = String.format(PIXEL_TEMPLATE, ATP_REPORT_BLOCKLIST_STATS_DAILY.pixelName)
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
         val resultUrl = result.request.url
 

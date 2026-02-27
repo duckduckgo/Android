@@ -1,14 +1,15 @@
 {
     "m_atp_report_blocklist_stats_d": {
         "description": "Reports AppTP blocklist metadata after each scheduled blocklist update attempt.",
-        "owners": ["lmac012"],
-        "triggers": ["other"],
+        "owners": ["nshuba"],
+        "triggers": ["scheduled"],
         "parameters": [
             "appVersion",
             {
                 "key": "blocklist_etag",
                 "type": "string",
-                "description": "ETag value stored for the AppTP tracker blocklist at report time. Can be \"null\" when no blocklist metadata is stored."
+                "description": "ETag value stored for the AppTP tracker blocklist at report time. Can be empty or \"null\" when no blocklist metadata is stored.",
+                "pattern": "^(null|[A-Fa-f0-9]{32})?$"
             },
             {
                 "key": "blocklist_size",
