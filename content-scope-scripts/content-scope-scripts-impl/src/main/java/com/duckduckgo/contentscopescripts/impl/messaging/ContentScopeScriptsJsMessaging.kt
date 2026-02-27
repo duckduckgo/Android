@@ -23,7 +23,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsJsMessagingContext
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -50,13 +49,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
-) : JsMessaging, ContentScopeScriptsJsMessagingContext {
+) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
-
-    override val registeredWebView: WebView? get() = if (::webView.isInitialized) webView else null
 
     override val context: String = "contentScopeScripts"
     override val callbackName: String = coreContentScopeScripts.callbackName
@@ -70,7 +67,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
-            val jsMessage = adapter.fromJson(message)
+            val jsMessage = adapter.fromJson(message)?.copy(webView = webView)
             val domain =
                 runBlocking(dispatcherProvider.main()) {
                     webView.url?.toUri()?.host
