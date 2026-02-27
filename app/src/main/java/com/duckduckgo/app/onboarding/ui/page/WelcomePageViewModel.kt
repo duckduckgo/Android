@@ -73,6 +73,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -109,9 +110,9 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     sealed interface Command {
-        data object ShowInitialReinstallUserDialog : Command
+        data class ShowInitialReinstallUserDialog(val showDuckAiCopy: Boolean) : Command
 
-        data object ShowInitialDialog : Command
+        data class ShowInitialDialog(val showDuckAiCopy: Boolean) : Command
 
         data object ShowComparisonChart : Command
 
@@ -329,10 +330,14 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
+            val showDuckAiCopy = withContext(dispatchers.io()) {
+                Locale.getDefault().language == "en" &&
+                    androidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().isEnabled()
+            }
             if (isAppReinstall()) {
-                _commands.send(ShowInitialReinstallUserDialog)
+                _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy))
             } else {
-                _commands.send(ShowInitialDialog)
+                _commands.send(ShowInitialDialog(showDuckAiCopy))
             }
         }
     }
