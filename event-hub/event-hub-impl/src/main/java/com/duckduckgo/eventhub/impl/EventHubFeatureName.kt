@@ -20,7 +20,3 @@ enum class EventHubFeatureName(val value: String) {
     EventHub("eventHub"),
     WebEvents("webEvents"),
 }
-
-fun eventHubFeatureValueOf(value: String): EventHubFeatureName? {
-    return EventHubFeatureName.entries.find { it.value == value }
-}
