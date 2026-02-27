@@ -240,6 +240,12 @@ interface AndroidBrowserConfigFeature {
     fun showInputScreenOnboarding(): Toggle
 
     /**
+     * Controls the duck-ai related copy updates related to browser onboarding
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun onboardingDuckAiCopyUpdatesFeb26(): Toggle
+
+    /**
      * Controls default URL display for new users only.
      * @return `true` when the remote config has the global "shorterUrlDefault" androidBrowserConfig
      * sub-feature flag enabled
