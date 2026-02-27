@@ -21,6 +21,7 @@ val flowId: Long = wideEventClient.flowStart(
     flowEntryPoint = origin,              // optional: where the flow was triggered from
     metadata = mapOf("key" to "value"),   // initial data
     cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+    samplingProbability = 1.0f,           // 0.0–1.0; default 1.0 (record all)
 ).getOrNull() ?: return
 
 // Record a step
@@ -73,6 +74,30 @@ CleanupPolicy.OnTimeout(
     flowStatus = FlowStatus.Unknown,
 )
 ```
+
+### Sampling
+
+Use `samplingProbability` to record only a fraction of events for high-volume flows. The value is a probability in `[0.0, 1.0]`:
+
+- `1.0` (default) — record every event.
+- `0.1` — record ~10% of events; the rest are silently dropped.
+- `0.0` — drop all events.
+
+When an event is sampled out, `flowStart` returns `SAMPLED_OUT_FLOW_ID` (`-1`). All subsequent calls (`flowStep`, `flowFinish`, `flowAbort`, `intervalStart`, `intervalEnd`) on that ID are transparent no-ops with zero disk I/O — callers don't need any special handling.
+
+```kotlin
+// Record ~10% of page-load events
+val flowId = wideEventClient.flowStart(
+    name = "page-load",
+    samplingProbability = 0.1f,
+).getOrNull() ?: return
+
+// All subsequent calls work regardless of whether the event was sampled in or out
+wideEventClient.flowStep(wideEventId = flowId, stepName = "dom_loaded")
+wideEventClient.flowFinish(wideEventId = flowId, status = FlowStatus.Success)
+```
+
+The sampling probability is stored alongside the event so the backend can weight results accordingly.
 
 ---
 
