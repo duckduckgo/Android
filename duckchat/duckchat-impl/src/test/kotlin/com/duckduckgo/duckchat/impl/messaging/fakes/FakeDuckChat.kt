@@ -38,7 +38,6 @@ class FakeDuckChat(
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
-    var contextualOnboardingCompleted: Boolean = false
     var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
@@ -97,14 +96,6 @@ class FakeDuckChat(
 
     override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
         return nativeInputFieldUserSettingEnabled
-    }
-
-    override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) {
-        // No-op for testing
-    }
-
-    override suspend fun isContextualOnboardingCompleted(): Boolean {
-        return contextualOnboardingCompleted
     }
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean {

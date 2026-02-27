@@ -33,9 +33,6 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF
@@ -395,9 +392,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY("m_product_telemetry_surface_usage_duck_ai_daily"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE("m_product_telemetry_surface_usage_keyboard_active"),
     PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY("m_product_telemetry_surface_usage_keyboard_active_daily"),
-    DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED("m_aichat_contextual_onboarding_displayed"),
-    DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED("m_aichat_contextual_onboarding_confirm_pressed"),
-    DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED("m_aichat_contextual_onboarding_settings_pressed"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT("m_aichat_contextual_sheet_opened_count"),
     DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY("m_aichat_contextual_sheet_opened_daily"),
     DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_COUNT("m_aichat_contextual_sheet_dismissed_count"),
@@ -524,9 +518,6 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             PRODUCT_TELEMETRY_SURFACE_DUCK_AI_OPEN_DAILY.pixelName to PixelParameter.removeAtb(),
             PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE.pixelName to PixelParameter.removeAtb(),
             PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_CONTEXTUAL_ONBOARDING_DISPLAYED.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_CONTEXTUAL_ONBOARDING_CONFIRM_PRESSED.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_CONTEXTUAL_ONBOARDING_SETTINGS_PRESSED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_SHEET_DISMISSED_COUNT.pixelName to PixelParameter.removeAtb(),

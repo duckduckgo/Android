@@ -1050,12 +1050,6 @@ class DuckChatContextualViewModelTest {
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
         override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
-        override fun showContextualOnboarding(
-            context: Context,
-            onConfirmed: () -> Unit,
-        ) = Unit
-
-        override suspend fun isContextualOnboardingCompleted(): Boolean = true
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun isChatSuggestionsFeatureAvailable(): Boolean = true

@@ -8963,25 +8963,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingCompletedThenShowContextualModeCommandSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingNotCompletedThenShowOnboardingCommandSent() = runTest {
-        mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualOnboarding)
     }
 
     @Test
@@ -9022,9 +9010,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingNotCompletedThenNoPageContextSubscriptionEventSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedWithContextualModeThenNoPageContextSubscriptionEventSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
 
         testee.subscriptionEventDataFlow.test {
             testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)

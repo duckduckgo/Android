@@ -352,17 +352,6 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
-    fun whenSetContextualOnboardingCompletedThenIsContextualOnboardingCompletedReturnsValue() = runTest {
-        assertFalse(testee.isContextualOnboardingCompleted())
-
-        testee.setContextualOnboardingCompleted(true)
-        assertTrue(testee.isContextualOnboardingCompleted())
-
-        testee.setContextualOnboardingCompleted(false)
-        assertFalse(testee.isContextualOnboardingCompleted())
-    }
-
-    @Test
     fun `when setChatSuggestionsUserSetting then observe receives updates`() = runTest {
         val results = mutableListOf<Boolean>()
         val job = launch {

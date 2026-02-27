@@ -29,27 +29,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_onboarding_displayed": {
-        "description": "Contextual onboarding sheet displayed when user first opens Duck.ai contextual mode",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_onboarding_confirm_pressed": {
-        "description": "User pressed 'Got it' button on contextual onboarding sheet",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_onboarding_settings_pressed": {
-        "description": "User pressed 'View settings' button on contextual onboarding sheet",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
     "m_aichat_contextual_sheet_opened_count": {
         "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
         "owners": ["malmstein"],
