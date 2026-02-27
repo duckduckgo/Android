@@ -1067,6 +1067,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+
         disableViewStateSaving()
 
         if (savedInstanceState == null) {
@@ -1343,6 +1344,7 @@ class BrowserTabFragment :
     }
 
     private fun onPageStarted() {
+        uiLockChanged(false)
         lifecycleScope.launch {
             webViewCompatTestHelper.onPageStarted(webView)
         }
@@ -2611,6 +2613,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
+            is Command.UiLockChanged -> uiLockChanged(it.locked)
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
@@ -3754,6 +3757,14 @@ class BrowserTabFragment :
 
     private fun screenUnlock() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    private fun uiLockChanged(locked: Boolean) {
+        omnibar.isUiLocked = locked
+        if (locked) {
+            omnibar.setExpanded(true)
+        }
+        webView?.setContentAllowsSwipeToRefresh(!locked)
     }
 
     private fun showFaviconsPrompt() {
