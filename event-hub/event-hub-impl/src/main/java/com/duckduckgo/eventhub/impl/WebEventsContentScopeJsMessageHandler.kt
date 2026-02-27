@@ -16,7 +16,6 @@
 
 package com.duckduckgo.eventhub.impl
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsJsMessagingContext
 import com.duckduckgo.di.scopes.AppScope
@@ -25,7 +24,6 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -36,7 +34,6 @@ private const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 @ContributesMultibinding(AppScope::class)
 class EventHubContentScopeJsMessageHandler @Inject constructor(
     private val pixelManager: RealEventHubPixelManager,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
@@ -54,12 +51,9 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
             val messagingContext = jsMessaging as? ContentScopeScriptsJsMessagingContext
             val webView = messagingContext?.registeredWebView
             val tabId = webView?.let { System.identityHashCode(it).toString() } ?: ""
-            val documentUrl = runBlocking(dispatcherProvider.main()) {
-                webView?.url ?: ""
-            }
 
-            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId url=$documentUrl" }
-            pixelManager.handleWebEvent(jsMessage.params, tabId, documentUrl)
+            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId" }
+            pixelManager.handleWebEvent(jsMessage.params, tabId)
         }
 
         override val allowedDomains: List<String> = emptyList()
