@@ -126,6 +126,9 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun getRequiredDaxOnboardingCtasForDev(): List<CtaId> =
+        requiredDaxOnboardingCtas().toList()
+
     suspend fun dismissPulseAnimation() {
         withContext(dispatchers.io()) {
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))

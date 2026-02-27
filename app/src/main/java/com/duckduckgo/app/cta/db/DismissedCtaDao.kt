@@ -35,4 +35,7 @@ abstract class DismissedCtaDao {
 
     @Query("select count(1) > 0 from dismissed_cta where ctaId = :ctaId")
     abstract fun exists(ctaId: CtaId): Boolean
+
+    @Query("DELETE FROM dismissed_cta WHERE ctaId = :ctaId")
+    abstract fun delete(ctaId: CtaId)
 }
