@@ -40,6 +40,9 @@ interface PirRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun pirBeta(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun trackerBlocking(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)
