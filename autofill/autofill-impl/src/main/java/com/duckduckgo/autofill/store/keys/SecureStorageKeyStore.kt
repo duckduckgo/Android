@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -71,6 +72,7 @@ class RealSecureStorageKeyStore constructor(
     private val autofillFeature: AutofillFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
+    private val autofillServiceFeature: AutofillServiceFeature,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -106,7 +108,7 @@ class RealSecureStorageKeyStore constructor(
             try {
                 harmonyMutex.withLock {
                     if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, "${FILENAME}2").also {
                             if (it == null) {
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
@@ -141,8 +143,24 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
+            val harmonyPreferences = if (autofillFeature.useHarmony().isEnabled()) {
+                getHarmonyEncryptedPreferences()
+                    ?: run {
+                        pixel.fire(AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to "preferences_null"), type = Daily())
+                        throw IllegalStateException("Harmony preferences unavailable")
+                    }
+            } else {
+                null
+            }
+
+            val preferences = getEncryptedPreferences()
+                ?: run {
+                    pixel.fire(AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED, mapOf("error" to "preferences_null"), type = Daily())
+                    throw IllegalStateException("Encrypted preferences unavailable")
+                }
+
             runCatching {
-                getEncryptedPreferences()?.edit(commit = true) {
+                preferences.edit(commit = true) {
                     if (keyValue == null) {
                         remove(keyName)
                     } else {
@@ -159,24 +177,22 @@ class RealSecureStorageKeyStore constructor(
                 throw it
             }
 
-            if (autofillFeature.useHarmony().isEnabled()) {
-                runCatching {
-                    getHarmonyEncryptedPreferences()?.edit(commit = true) {
-                        if (keyValue == null) {
-                            remove(keyName)
-                        } else {
-                            putString(keyName, keyValue.toByteString().base64())
-                        }
+            runCatching {
+                harmonyPreferences?.edit(commit = true) {
+                    if (keyValue == null) {
+                        remove(keyName)
+                    } else {
+                        putString(keyName, keyValue.toByteString().base64())
                     }
-                }.getOrElse {
-                    ensureActive()
-                    pixel.fire(
-                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                        mapOf("error" to it.error()),
-                        type = Daily(),
-                    )
-                    throw it
                 }
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
+                    mapOf("error" to it.error()),
+                    type = Daily(),
+                )
+                throw it
             }
         }
     }
@@ -184,14 +200,22 @@ class RealSecureStorageKeyStore constructor(
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             val useHarmony = autofillFeature.useHarmony().isEnabled()
-            val preferences = if (useHarmony) {
-                getHarmonyEncryptedPreferences()
-            } else {
-                getEncryptedPreferences()
-            }
             return@withContext runCatching {
-                preferences?.getString(keyName, null)?.run {
-                    this.decodeBase64()?.toByteArray()
+                val legacyPrefs = getEncryptedPreferences()
+                    ?: throw IllegalStateException("Encrypted preferences unavailable")
+                val legacyResult = legacyPrefs.getString(keyName, null)?.decodeBase64()?.toByteArray()
+
+                if (useHarmony) {
+                    val harmonyPrefs = getHarmonyEncryptedPreferences()
+                        ?: throw IllegalStateException("Harmony preferences unavailable")
+                    val harmonyResult = harmonyPrefs.getString(keyName, null)?.decodeBase64()?.toByteArray()
+
+                    if (!autofillServiceFeature.self().isEnabled() && !harmonyResult.contentEquals(legacyResult)) {
+                        throw IllegalStateException("Mismatching preference values")
+                    }
+                    harmonyResult
+                } else {
+                    legacyResult
                 }
             }.getOrElse {
                 ensureActive()
