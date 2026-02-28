@@ -28,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -103,9 +104,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
-                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
-                is ShowInitialDialog -> configureDaxCta(INITIAL)
-                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER, showDuckAiCopy = it.showDuckAiCopy)
+                is ShowInitialDialog -> configureDaxCta(INITIAL, showDuckAiCopy = it.showDuckAiCopy)
+                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
@@ -203,7 +204,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false) {
+    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false, showDuckAiCopy: Boolean = false) {
         context?.let {
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
@@ -215,12 +216,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
+                    val ctaText = it.getString(titleRes)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setText(
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                        )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
@@ -237,12 +241,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
+                    val ctaText = it.getString(titleRes)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setText(
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                        )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -263,7 +270,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.comparisonChart.root.show()
+
+                    binding.daxDialogCta.comparisonChart.root.isVisible = !showDuckAiCopy
+                    binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.isVisible = showDuckAiCopy
                     binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
 
                     afterAnimation = {
@@ -271,7 +281,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        val comparisonChart = if (showDuckAiCopy) {
+                            binding.daxDialogCta.comparisonChartWithDuckAi
+                        } else {
+                            binding.daxDialogCta.comparisonChart
+                        }
+                        comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }

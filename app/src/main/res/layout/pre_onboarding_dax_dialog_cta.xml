@@ -137,6 +137,11 @@
                     android:visibility="gone" />
 
                 <include
+                    android:id="@+id/comparison_chart_with_duck_ai"
+                    layout="@layout/pre_onboarding_comparison_chart_with_duck_ai"
+                    android:visibility="gone" />
+
+                <include
                     android:id="@+id/address_bar_position"
                     layout="@layout/pre_onboarding_address_bar_position_horizontal"
                     android:visibility="gone" />

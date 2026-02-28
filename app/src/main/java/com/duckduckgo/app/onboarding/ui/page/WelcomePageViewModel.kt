@@ -73,6 +73,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -109,11 +110,11 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     sealed interface Command {
-        data object ShowInitialReinstallUserDialog : Command
+        data class ShowInitialReinstallUserDialog(val showDuckAiCopy: Boolean) : Command
 
-        data object ShowInitialDialog : Command
+        data class ShowInitialDialog(val showDuckAiCopy: Boolean) : Command
 
-        data object ShowComparisonChart : Command
+        data class ShowComparisonChart(val showDuckAiCopy: Boolean) : Command
 
         data object ShowSkipOnboardingOption : Command
 
@@ -140,13 +141,13 @@ class WelcomePageViewModel @Inject constructor(
         when (currentDialog) {
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
             INITIAL -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
             }
 
@@ -245,7 +246,7 @@ class WelcomePageViewModel @Inject constructor(
 
             SKIP_ONBOARDING_OPTION -> {
                 viewModelScope.launch {
-                    _commands.send(ShowComparisonChart)
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
                     pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
                 }
             }
@@ -330,11 +331,16 @@ class WelcomePageViewModel @Inject constructor(
     fun loadDaxDialog() {
         viewModelScope.launch {
             if (isAppReinstall()) {
-                _commands.send(ShowInitialReinstallUserDialog)
+                _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
             } else {
-                _commands.send(ShowInitialDialog)
+                _commands.send(ShowInitialDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
             }
         }
+    }
+
+    private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {
+        Locale.getDefault().language == "en" &&
+            androidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().isEnabled()
     }
 
     private suspend fun isAppReinstall(): Boolean =
