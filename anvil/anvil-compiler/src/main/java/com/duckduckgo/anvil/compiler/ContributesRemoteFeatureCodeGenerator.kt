@@ -808,7 +808,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         // Shared JSON model types from feature-toggles-internal-api — visible to all feature
         // modules via the transitive `api project(":feature-toggles-internal-api")` dep in
         // feature-toggles-api. Each one avoids re-generating the same private data class per feature.
-        private val remoteFeatureMoshi = FqName("com.duckduckgo.feature.toggles.internal.api.REMOTE_FEATURE_MOSHI")
         private val jsonFeature = FqName("com.duckduckgo.feature.toggles.internal.api.JsonFeature")
         private val jsonException = FqName("com.duckduckgo.feature.toggles.internal.api.JsonException")
     }
