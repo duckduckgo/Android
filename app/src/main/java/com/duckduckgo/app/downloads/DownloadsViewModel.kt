@@ -143,6 +143,18 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
+    fun syncDownloads() {
+        viewModelScope.launch(dispatcher.io()) {
+            val downloads = downloadsRepository.getDownloads()
+            val staleDownloadIds = downloads
+                .filter { it.downloadStatus == DownloadStatus.FINISHED && !File(it.filePath).exists() }
+                .map { it.downloadId }
+            if (staleDownloadIds.isNotEmpty()) {
+                downloadsRepository.delete(staleDownloadIds)
+            }
+        }
+    }
+
     private fun filtered(items: List<DownloadViewItem>, newText: String): List<DownloadViewItem> {
         val filtered = LinkedHashMap<Header, List<Item>>()
         items.forEach { item ->
