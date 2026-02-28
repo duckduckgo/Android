@@ -35,8 +35,46 @@ Rules:
 | `AppScope` | Singletons that live for the app lifetime |
 | `ActivityScope` | Things scoped to a single Activity (gets activity context) |
 | `FragmentScope` | ViewModels and things scoped to a Fragment |
+| `ViewScope` | Custom views that need injected dependencies |
+| `ReceiverScope` | `BroadcastReceiver` implementations |
+| `ServiceScope` | `Service` implementations |
+| `VpnScope` | VPN-process-specific services and receivers |
 
 Use `@SingleInstanceIn(AppScope::class)` — **not** `@Singleton` (javax). `@Singleton` conflicts with AppComponent's scope.
+
+### Scope hierarchy
+
+The scope hierarchy determines what dependencies each scope can access, where its factory lookup happens, and what `HasDaggerInjector` handles injection. It is encoded implicitly in the Anvil-generated `_SubComponent` files — this diagram is the source of truth:
+
+```
+DuckDuckGoApplication [HasDaggerInjector]
+└── AppComponent [AppScope]
+    │   Factory map contains: ActivityComponent.Factory, ReceiverSubComponent factories,
+    │                         ServiceSubComponent factories, VpnScope factories
+    │
+    ├── ActivityComponent [ActivityScope]  ← subcomponent of AppComponent
+    │   │   Factory map contains: FragmentSubComponent factories, ViewSubComponent factories
+    │   │   Provided bindings: @ActivityContext Context, AppCompatActivity
+    │   │
+    │   ├── EachFragment_SubComponent [FragmentScope]  ← subcomponent of ActivityComponent
+    │   └── EachView_SubComponent [ViewScope]          ← subcomponent of ActivityComponent
+    │
+    ├── EachReceiver_SubComponent [ReceiverScope]  ← subcomponent of AppComponent
+    └── EachService_SubComponent [ServiceScope]    ← subcomponent of AppComponent
+```
+
+**What this means in practice:**
+
+- `FragmentScope` and `ViewScope` subcomponents parent to `ActivityComponent`. Their factory lookup goes through `DaggerActivity.injectorFactoryMap`. A Fragment or View can access `ActivityScope` bindings (e.g. `@ActivityContext Context`).
+- `ReceiverScope` and `ServiceScope` subcomponents parent directly to `AppComponent`. Their factory lookup goes through `DuckDuckGoApplication.injectorFactoryMap`. They can only access `AppScope` bindings — there is no `@ActivityContext` available.
+- `VpnScope` types also parent to `AppComponent` and are only for the VPN secondary process.
+
+**Debugging "could not find dagger component" crashes:**
+
+- Crash in a Fragment/View injection → check `DaggerActivity.injectorFactoryMap` — the class is missing `@InjectWith(FragmentScope::class)` or `@InjectWith(ViewScope::class)`.
+- Crash in a Receiver/Service injection → check `DuckDuckGoApplication.injectorFactoryMap` — the class is missing `@InjectWith(ReceiverScope::class)` or `@InjectWith(ServiceScope::class)`.
+
+**The parent scope is set by the generated `ParentComponent`'s `@ContributesTo` annotation.** When Anvil processes `@InjectWith(FragmentScope::class)` on a Fragment, it generates a `ParentComponent` annotated with `@ContributesTo(ActivityScope::class)`, which causes the factory to be merged into `ActivityComponent`. For Receivers it generates `@ContributesTo(AppScope::class)`. You do not set this manually — it is determined by the scope you pass to `@InjectWith`.
 
 ### Common Annotations
 
