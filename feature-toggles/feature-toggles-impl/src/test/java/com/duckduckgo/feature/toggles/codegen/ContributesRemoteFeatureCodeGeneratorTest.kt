@@ -28,6 +28,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
@@ -164,6 +165,51 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(TriggerTestScope::class, annotation.scope)
         assertEquals(PrivacyFeaturePlugin::class, annotation.boundType)
         assertTrue(annotation.ignoreQualifier)
+    }
+
+    @Test
+    fun `inventory getAll returns exactly all toggle methods declared in the feature interface`() = runTest {
+        val proxyModule = Class.forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_ProxyModule")
+        val instance = proxyModule.getField("INSTANCE").get(null)
+        val method = proxyModule.getMethod("providesTestTriggerFeatureInventory", TestTriggerFeature::class.java)
+        val inventory = method.invoke(instance, testFeature) as FeatureTogglesInventory
+
+        val toggles = inventory.getAll()
+
+        // self() is the root toggle: featureName().name == the feature name, parentName == null
+        // sub-toggles: featureName().name == method name, featureName().parentName == feature name
+        assertEquals(10, toggles.size)
+        val rootToggle = toggles.single { it.featureName().parentName == null }
+        assertEquals("testFeature", rootToggle.featureName().name)
+        val subToggleNames = toggles.filter { it.featureName().parentName != null }.map { it.featureName().name }.toSet()
+        assertEquals(
+            setOf(
+                "fooFeature",
+                "experimentFooFeature",
+                "internalDefaultTrue",
+                "internalDefaultFalse",
+                "defaultValueInternal",
+                "defaultTrue",
+                "defaultFalse",
+                "variantFeature",
+                "experimentDisabledByDefault",
+            ),
+            subToggleNames,
+        )
+    }
+
+    @Test
+    fun `inventory getAll does not include Object methods`() = runTest {
+        val proxyModule = Class.forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_ProxyModule")
+        val instance = proxyModule.getField("INSTANCE").get(null)
+        val method = proxyModule.getMethod("providesTestTriggerFeatureInventory", TestTriggerFeature::class.java)
+        val inventory = method.invoke(instance, testFeature) as FeatureTogglesInventory
+
+        val toggleNames = inventory.getAll().map { it.featureName().name }
+
+        assertFalse(toggleNames.contains("equals"))
+        assertFalse(toggleNames.contains("hashCode"))
+        assertFalse(toggleNames.contains("toString"))
     }
 
     @Test
