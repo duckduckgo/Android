@@ -229,6 +229,12 @@ sealed class Command {
         val extractedUrl: String,
     ) : Command()
 
+    class ShowAddHomeShortcutDialog(
+        val title: String,
+        val url: String,
+        val icon: Bitmap? = null,
+    ) : Command()
+
     class AddHomeShortcut(
         val title: String,
         val url: String,
