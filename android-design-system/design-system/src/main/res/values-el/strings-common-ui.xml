@@ -37,4 +37,7 @@
     <string name="alwaysOn">Πάντα σε λειτουργία</string>
     <string name="on">Ενεργό</string>
     <string name="off">Κλειστό</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Μάθετε περισσότερα</string>
 </resources>
