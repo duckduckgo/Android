@@ -1,0 +1,114 @@
+name: Test Develocity Flank Integration
+
+on:
+  push:
+    branches:
+      - feature/domen/develocity-android-tests
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android_tests:
+    runs-on: android-large-runner
+    name: Android Tests with Develocity
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v1.0.1
+        with:
+          force: true
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.18.3'
+
+      - name: Decode secret
+        env:
+          FLANK: ${{ secrets.FLANK }}
+        run: echo "$FLANK" > flank.json
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Build
+        run: ./gradlew androidTestsBuild
+
+      - name: Find test APK path
+        id: find-apk
+        run: |
+          TEST_APK_PATH=$(find . -path '*/build/outputs/apk/play/debug/*.apk' -type f -print -quit)
+          echo "Found test APK at: $TEST_APK_PATH"
+          echo "apk_path=$TEST_APK_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Make script executable
+        run: chmod +x scripts/check_elf_alignment.sh
+
+      - name: Check native libraries alignment
+        id: check-alignment
+        continue-on-error: true
+        run: ./scripts/check_elf_alignment.sh ${{ steps.find-apk.outputs.apk_path }}
+
+      - name: Handle native alignment failure
+        if: steps.check-alignment.outcome == 'failure'
+        run: |
+          echo "::error::Native library alignment check failed!"
+          echo "::error::Please check the native libraries in your APK for correct page size alignment."
+          exit 1
+
+      - name: Run Android Tests
+        if: steps.check-alignment.outcome == 'success'
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
+
+      - name: Bundle the Android CI tests report
+        if: |
+          always() &&
+          steps.check-alignment.outcome == 'success'
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+
+      - name: Generate json file with failures
+        if: |
+          failure() &&
+          steps.check-alignment.outcome == 'success'
+        run: cut -d\`  -f2 < build/fladle/fladleResults/HtmlErrorReport.html >> results.json
+
+      - name: Print failure report
+        if: |
+          failure() &&
+          steps.check-alignment.outcome == 'success'
+        run: |
+          jq -r '.[] | .label as $id | .items[] | "Test:", $id, "Failure:", .label, "URL:", .url, "\n"' results.json
+
+      - name: Upload the Android CI tests report
+        if: |
+          always() &&
+          steps.check-alignment.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-tests-report
+          path: android-tests-report.zip
+
+      - name: Print Develocity Build Scan URL
+        if: always()
+        run: |
+          echo "::notice::Check Develocity for test results at: https://duckduckgo.develocity.cloud/"
+          echo "### Develocity Build Scan :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "Check [Develocity Dashboard](https://duckduckgo.develocity.cloud/) for detailed test results and analytics." >> $GITHUB_STEP_SUMMARY
