@@ -165,18 +165,17 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .addCode(
                                     CodeBlock.of(
                                         """
-                                            return object : FeatureTogglesInventory {
-                                                override suspend fun getAll(): List<Toggle> {
-                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
-                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
-                                                            method.invoke(feature) as Toggle
-                                                        } else {
-                                                            null
-                                                        }
-                                                    }
+                                            return object : %T {
+                                                override suspend fun getAll(): %T<%T> {
+                                                    return listOf(
+                                                        ${boundType.declaredFunctions().joinToString(separator = ",\n                                                        ") { "feature.${it.name}()" }}
+                                                    )
                                                 }
                                             }
                                         """.trimIndent(),
+                                        FeatureTogglesInventory::class.asClassName(),
+                                        List::class.asClassName(),
+                                        Toggle::class.asClassName(),
                                     ),
                                 )
                                 .returns(FeatureTogglesInventory::class.asClassName())
