@@ -168,7 +168,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                             return object : %T {
                                                 override suspend fun getAll(): %T<%T> {
                                                     return listOf(
-                                                        ${boundType.declaredFunctions().joinToString(separator = ",\n                                                        ") { "feature.${it.name}()" }}
+                                                        ${boundType.declaredFunctions().joinToString(
+                                            separator = ",\n                                                        ",
+                                        ) { "feature.${it.name}()" }}
                                                     )
                                                 }
                                             }
@@ -802,6 +804,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val moshi = FqName("com.squareup.moshi.Moshi")
         private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
         private val okioBuffer = FqName("okio.Buffer")
+
         // Shared JSON model types from feature-toggles-internal-api — visible to all feature
         // modules via the transitive `api project(":feature-toggles-internal-api")` dep in
         // feature-toggles-api. Each one avoids re-generating the same private data class per feature.
