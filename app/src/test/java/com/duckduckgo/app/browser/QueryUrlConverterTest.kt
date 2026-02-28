@@ -114,6 +114,22 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun `when query contains single quote then single quote is encoded`() {
+        val input = "what's new"
+        val expected = "what%27s%20new"
+        val result = testee.convertQueryToUrl(input)
+        assertDuckDuckGoSearchQuery(expected, result)
+    }
+
+    @Test
+    fun `when query contains multiple single quotes then all are encoded`() {
+        val input = "rock'n'roll"
+        val expected = "rock%27n%27roll"
+        val result = testee.convertQueryToUrl(input)
+        assertDuckDuckGoSearchQuery(expected, result)
+    }
+
+    @Test
     fun `when param has invalid characters then adding param appends encoded version`() {
         val input = "43 + 5"
         val expected = "43%20%2B%205"
