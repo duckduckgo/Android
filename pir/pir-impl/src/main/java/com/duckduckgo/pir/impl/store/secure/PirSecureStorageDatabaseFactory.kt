@@ -48,17 +48,6 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
 
     private val mutex = Mutex()
 
-    init {
-        logcat { "PIR-DB: Loading the sqlcipher native library" }
-        try {
-            LibraryLoader.loadLibrary(context, "sqlcipher")
-            logcat { "PIR-DB: sqlcipher native library loaded ok" }
-        } catch (t: Throwable) {
-            // error loading the library
-            logcat(ERROR) { "PIR-DB: Error loading sqlcipher library: ${t.asLog()}" }
-        }
-    }
-
     override suspend fun getDatabase(): PirDatabase? {
         _database?.let { return it }
         return mutex.withLock {
@@ -71,6 +60,15 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
         // If we have already the DB instance then let's use it
         if (_database != null) {
             return _database
+        }
+
+        logcat { "PIR-DB: Loading the sqlcipher native library" }
+        try {
+            LibraryLoader.loadLibrary(context, "sqlcipher")
+            logcat { "PIR-DB: sqlcipher native library loaded ok" }
+        } catch (t: Throwable) {
+            // error loading the library
+            logcat(ERROR) { "PIR-DB: Error loading sqlcipher library: ${t.asLog()}" }
         }
 
         return runCatching {
