@@ -545,6 +545,7 @@ class RealDuckChat @Inject constructor(
         sidebar: Boolean,
     ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
+        val chatUr = "https://ai-euw-serp-dev-testing8.duck.co"
         val url = appendParameters(parameters, duckChatLink)
         return url
     }
