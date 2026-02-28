@@ -189,7 +189,6 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun processCommand(command: AutofillPasswordsManagementViewModel.Command) {
-        var processed = true
         when (command) {
             is ShowCredentialMode -> showCredentialMode()
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Username)
@@ -206,12 +205,9 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             is ExitLockedMode -> exitLockedMode()
             is ExitDisabledMode -> exitDisabledMode()
             is ExitListMode -> exitListMode()
-            else -> processed = false
         }
-        if (processed) {
-            logcat(VERBOSE) { "Processed command $command" }
-            viewModel.commandProcessed(command)
-        }
+        logcat(VERBOSE) { "Processed command $command" }
+        viewModel.commandProcessed(command)
     }
 
     private fun showCopiedToClipboardSnackbar(dataType: CopiedToClipboardDataType) {
