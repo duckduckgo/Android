@@ -1,0 +1,58 @@
+From 80bbb9cc6b0b1d9be98103489bf7fa67a07da458 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Sat, 28 Feb 2026 12:49:46 +0000
+Subject: [PATCH] fix(review): prevent approval-stuck condition when COMMENTED
+ reviews shadow APPROVED
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Two issues caused findAuthorizedApproval to miss valid, non-stale approvals:
+
+1. The latestByUser map tracked ALL review states, so a COMMENTED review
+   (e.g. replying to a thread after approving) would overwrite the user's
+   APPROVED review. GitHub still considers the approval valid, but this
+   code dropped it — leaving the check stuck at 'Waiting for approval'
+   with no event to re-trigger it.
+
+2. listReviews was not paginated, so PRs with 30+ review events could
+   silently miss approvals on later pages.
+
+Fix: only track decision states (APPROVED, CHANGES_REQUESTED, DISMISSED)
+in the per-user map, and use github.paginate for full review history.
+---
+ .github/scripts/review-helpers.mjs | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/.github/scripts/review-helpers.mjs b/.github/scripts/review-helpers.mjs
+index 5d20d9887..df6c6431b 100644
+--- a/.github/scripts/review-helpers.mjs
++++ b/.github/scripts/review-helpers.mjs
+@@ -75,17 +75,20 @@ export async function findTeamForUser(github, orgToken, org, teams, username) {
+  *                        If not provided, team membership checks are skipped.
+  */
+ export async function findAuthorizedApproval(github, { owner, repo, prNumber, org, teams, orgToken }) {
+-    const { data: reviews } = await github.rest.pulls.listReviews({
++    const reviews = await github.paginate(github.rest.pulls.listReviews, {
+         owner,
+         repo,
+         pull_number: prNumber,
+     });
+ 
+-    const latestByUser = new Map();
++    const DECISION_STATES = new Set(['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED']);
++    const latestDecisionByUser = new Map();
+     for (const r of reviews) {
+-        if (r.user?.login) latestByUser.set(r.user.login, r);
++        if (r.user?.login && DECISION_STATES.has(r.state)) {
++            latestDecisionByUser.set(r.user.login, r);
++        }
+     }
+-    const approved = [...latestByUser.values()].filter((r) => r.state === 'APPROVED');
++    const approved = [...latestDecisionByUser.values()].filter((r) => r.state === 'APPROVED');
+     if (approved.length === 0) return null;
+ 
+     if (approved.some((r) => r.user.login === DAX_USERNAME)) {
+-- 
+2.43.0
+
