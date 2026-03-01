@@ -29,7 +29,6 @@ import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import com.duckduckgo.feature.toggles.impl.FakePluginPoint
 import com.duckduckgo.feature.toggles.impl.FakeStore
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
-import com.duckduckgo.feature.toggles.impl.RetentionMetric
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -122,8 +121,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         searchMetricPixelsPlugin.getMetrics().forEach { metric ->
             metric.getPixelDefinitions().forEach { definition ->
-                val tag = "${definition}_${RetentionMetric.SEARCH}"
-                store.metrics[tag] = 3
+                store.metrics["$definition"] = 3
             }
         }
 
@@ -146,8 +144,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
 
         appUseMetricPixelsPlugin.getMetrics().forEach { metric ->
             metric.getPixelDefinitions().forEach { definition ->
-                val tag = "${definition}_${RetentionMetric.APP_USE}"
-                store.metrics[tag] = 3
+                store.metrics["$definition"] = 3
             }
         }
 
