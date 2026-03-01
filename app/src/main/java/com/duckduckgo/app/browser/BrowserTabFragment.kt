@@ -139,6 +139,7 @@ import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
@@ -383,6 +384,9 @@ class BrowserTabFragment :
     private var duckAiContextualFragment: DuckChatContextualFragment? = null
     private var contextualSheetLayoutChangeListener: View.OnLayoutChangeListener? = null
     private var contextualSheetBottomSheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
+
+    @Inject
+    lateinit var nativeInputManager: NativeInputManager
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -1054,6 +1058,7 @@ class BrowserTabFragment :
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
         )
+        nativeInputManager.start(viewLifecycleOwner)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1216,8 +1221,70 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
-            launchInputScreen(query)
+            if (!nativeInputManager.isNativeInputEnabled()) {
+                launchInputScreen(query)
+            } else {
+                showNativeInput(query)
+            }
         }
+    }
+
+    private fun showNativeInput(query: String = "") {
+        nativeInputManager.showNativeInput(
+            omnibar = omnibar,
+            layoutInflater = layoutInflater,
+            rootView = binding.rootView,
+            lifecycleOwner = viewLifecycleOwner,
+            tabs = viewModel.tabs,
+            query = query,
+            onSearchTextChanged = { text -> onUserEnteredText(text) },
+            onClearAutocomplete = {
+                if (binding.autoCompleteSuggestionsList.isVisible) {
+                    viewModel.autoCompleteSuggestionsGone()
+                }
+                viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
+                binding.autoCompleteSuggestionsList.gone()
+                binding.focusedView.gone()
+            },
+            onSearchSubmitted = { query -> onUserSubmittedText(query) },
+            onChatSubmitted = { query ->
+                val url = duckChat.getDuckChatUrl(query, true)
+                browserActivity?.launchNewTab(query = url, skipHome = true)
+            },
+            onDuckAiChatSubmitted = { query ->
+                contentScopeScripts.sendSubscriptionEvent(
+                    SubscriptionEventData(
+                        featureName = "aiChat",
+                        subscriptionName = "submitAIChatNativePrompt",
+                        params = JSONObject().apply {
+                            put("platform", "android")
+                            put(
+                                "query",
+                                JSONObject().apply {
+                                    put("prompt", query)
+                                    put("autoSubmit", true)
+                                },
+                            )
+                        },
+                    ),
+                )
+            },
+            onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+            onFireButtonTapped = { onFireButtonPressed() },
+            onTabSwitcherTapped = { launchTabSwitcher() },
+            onMenuTapped = {
+                launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
+            },
+            onStopClicked = {
+                contentScopeScripts.sendSubscriptionEvent(
+                    SubscriptionEventData(
+                        featureName = "aiChat",
+                        subscriptionName = "submitPromptInterruption",
+                        params = JSONObject("{}"),
+                    ),
+                )
+            },
+        )
     }
 
     private fun launchInputScreen(query: String) {
@@ -2098,6 +2165,7 @@ class BrowserTabFragment :
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
         omnibar.setViewMode(ViewMode.DuckAI)
+        showNativeInput()
     }
 
     private fun showMaliciousWarning(
@@ -2459,7 +2527,9 @@ class BrowserTabFragment :
             }
 
             is Command.ShowKeyboard -> {
-                showKeyboard()
+                if (!nativeInputManager.isNativeInputEnabled()) {
+                    showKeyboard()
+                }
             }
 
             is Command.HideKeyboard -> {
@@ -2690,9 +2760,11 @@ class BrowserTabFragment :
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
-            is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
+            is Command.DisableDuckAIFullScreen -> {
+                omnibar.setViewMode(Browser(it.url))
+                nativeInputManager.hideNativeInput(binding.rootView, omnibar)
+            }
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
-            is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(Browser(it.url))
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
@@ -5404,6 +5476,7 @@ class BrowserTabFragment :
                 if (isVisible) {
                     viewModel.sendKeyboardFocusedPixel()
                 }
+                nativeInputManager.onKeyboardVisibilityChanged(isVisible, binding.rootView, omnibar)
             }
             .launchIn(lifecycleScope)
     }

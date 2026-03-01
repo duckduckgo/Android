@@ -114,6 +114,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
+    private var isNativeInputEnabled: Boolean = false
     private var isSetFavouriteEasterEggLogoFeatureEnabled: Boolean = false
 
     private val _viewState = MutableStateFlow(
@@ -266,11 +267,15 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
-        duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
+        combine(
+            duckAiFeatureState.showInputScreen,
+            duckChat.observeNativeInputFieldUserSettingEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled ->
+            isNativeInputEnabled = nativeInputEnabled
+            inputScreenEnabled || nativeInputEnabled
+        }.onEach { showClickCatcher ->
             _viewState.update {
-                it.copy(
-                    showTextInputClickCatcher = inputScreenEnabled,
-                )
+                it.copy(showTextInputClickCatcher = showClickCatcher)
             }
         }.launchIn(viewModelScope)
 
@@ -323,7 +328,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     ) {
         logcat { "Omnibar: onOmnibarFocusChanged hasFocus $hasFocus" }
         val showClearButton = hasFocus && inputFieldText.isNotBlank()
-        val showControls = inputFieldText.isBlank() && !isSplitOmnibarEnabled
+        val showControls = inputFieldText.isBlank() && showOmnibarControls()
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -416,9 +421,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                     previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
-                    showTabsMenu = !isSplitOmnibarEnabled,
-                    showFireIcon = !isSplitOmnibarEnabled,
-                    showBrowserMenu = !isSplitOmnibarEnabled,
+                    showTabsMenu = showOmnibarControls(),
+                    showFireIcon = showOmnibarControls(),
+                    showBrowserMenu = showOmnibarControls(),
                     showVoiceSearch = shouldShowVoiceSearch(
                         viewMode = _viewState.value.viewMode,
                         hasFocus = false,
@@ -538,6 +543,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
+    private fun showOmnibarControls(): Boolean {
+        if (_viewState.value.viewMode == ViewMode.DuckAI) {
+            return isSplitOmnibarEnabled && isNativeInputEnabled
+        }
+        return !isSplitOmnibarEnabled
+    }
+
     fun onViewModeChanged(viewMode: ViewMode) {
         val currentViewMode = _viewState.value.viewMode
         val hasFocus = _viewState.value.hasFocus
@@ -561,6 +573,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
 
                 is ViewMode.DuckAI -> {
+                    val showSplitButtons = isSplitOmnibarEnabled && isNativeInputEnabled
                     _viewState.update {
                         it.copy(
                             viewMode = viewMode,
@@ -574,6 +587,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                             updateOmnibarText = true,
                             showDuckAIHeader = shouldShowDuckAiHeader(viewMode, hasFocus),
                             showDuckAISidebar = shouldShowDuckAiHeader(viewMode, hasFocus),
+                            showFireIcon = showSplitButtons,
+                            showTabsMenu = showSplitButtons,
+                            showBrowserMenu = showSplitButtons,
                         )
                     }
                 }
@@ -643,9 +659,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                 updateOmnibarText = true,
                 expanded = true,
                 showClearButton = false,
-                showBrowserMenu = !isSplitOmnibarEnabled,
-                showTabsMenu = !isSplitOmnibarEnabled,
-                showFireIcon = !isSplitOmnibarEnabled,
+                showBrowserMenu = showOmnibarControls(),
+                showTabsMenu = showOmnibarControls(),
+                showFireIcon = showOmnibarControls(),
             )
         }
     }
@@ -700,7 +716,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         deleteLastCharacter: Boolean,
     ) {
         val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = (!hasFocus || query.isBlank()) && !isSplitOmnibarEnabled
+        val showControls = (!hasFocus || query.isBlank()) && showOmnibarControls()
 
         logcat { "Omnibar: onInputStateChanged query $query hasFocus $hasFocus clearQuery $clearQuery deleteLastCharacter $deleteLastCharacter" }
 
@@ -1074,7 +1090,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckAiHeaderClicked() {
-        if (duckAiFeatureState.showInputScreen.value) {
+        if (viewState.value.showTextInputClickCatcher) {
             onTextInputClickCatcherClicked()
         } else {
             _viewState.update {
