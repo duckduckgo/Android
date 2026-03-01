@@ -229,6 +229,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -478,6 +479,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(false)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -518,6 +520,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -662,6 +665,7 @@ class RealDuckChatJSHelperTest {
 
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -702,6 +706,7 @@ class RealDuckChatJSHelperTest {
         val id = "123"
 
         whenever(mockDuckChat.isStandaloneMigrationEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -963,6 +968,7 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isImageUploadEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -991,6 +997,42 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativeConfigValuesAndNativeInputEnabledThenReturnSupportsNativeChatInputEnabled() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        val expectedPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", true)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", false)
+            put("supportsAIChatSync", false)
+            put("supportsPageContext", false)
+        }
+
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
     fun whenGetAIChatNativeConfigValuesAndChatSyncEnabledThenReturnJsCallbackDataWithSupportsAIChatSyncEnabled() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeConfigValues"
@@ -999,6 +1041,7 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(false)
         whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,

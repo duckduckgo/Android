@@ -406,6 +406,7 @@ class RealDuckChat @Inject constructor(
     override suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean) {
         withContext(dispatchers.io()) {
             duckChatFeatureRepository.setNativeInputFieldUserSetting(isEnabled)
+            cacheUserSettings()
         }
     }
 
@@ -771,9 +772,10 @@ class RealDuckChat @Inject constructor(
         withContext(dispatchers.io()) {
             isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
+            val isNativeInputFieldEnabled = duckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()
             val showInputScreen =
                 isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-                    duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+                    duckChatFeatureRepository.isInputScreenUserSettingEnabled() && !isNativeInputFieldEnabled
             _showInputScreen.emit(showInputScreen)
 
             _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled
