@@ -36,11 +36,23 @@ data class ConversionWindow(val lowerWindow: Int, val upperWindow: Int)
 
 data class PixelDefinition(val pixelName: String, val params: Map<String, String>)
 
+enum class MetricType {
+    /** Fire the pixel once per conversion window. */
+    NORMAL,
+
+    /** Increment the count only while within the conversion window; fire when count reaches [MetricsPixel.value]. */
+    COUNT_WHEN_IN_WINDOW,
+
+    /** Increment the count unconditionally (regardless of conversion window); fire when count reaches [MetricsPixel.value]. */
+    COUNT_ALWAYS,
+}
+
 data class MetricsPixel(
     val metric: String,
     val value: String,
     val conversionWindow: List<ConversionWindow>,
     val toggle: Toggle,
+    val type: MetricType = MetricType.NORMAL,
 ) {
 
     fun getPixelDefinitions(): List<PixelDefinition> {
@@ -73,3 +85,26 @@ data class MetricsPixel(
 }
 
 const val METRICS_PIXEL_PREFIX = "experiment_metrics"
+
+/**
+ * Internal extension interface for sending metric pixels. Should NEVER be used publicly.
+ * Use [MetricsPixel.send] instead.
+ */
+interface MetricsPixelExtension {
+    suspend fun send(metricsPixel: MetricsPixel): Boolean
+}
+
+/**
+ * Provider for [MetricsPixelExtension]. Initialised by the impl module at process start.
+ * Should NEVER be used publicly — call [MetricsPixel.send] instead.
+ */
+object MetricsPixelExtensionProvider {
+    lateinit var instance: MetricsPixelExtension
+}
+
+/**
+ * Sends this metric pixel, handling conversion window checks, deduplication and count thresholds.
+ * @return true if the pixel was fired, false if no cohort is assigned, the conversion window has
+ * passed, the pixel was already sent, or the count threshold has not been reached yet.
+ */
+suspend fun MetricsPixel.send(): Boolean = MetricsPixelExtensionProvider.instance.send(this)
