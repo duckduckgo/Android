@@ -89,6 +89,7 @@ class OmnibarLayoutViewModelTest {
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
+    private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
     private val urlDisplayRepository: UrlDisplayRepository = mock()
@@ -126,6 +127,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
@@ -1440,6 +1442,17 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenNativeInputFieldEnabledThenShowClickCatcherTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when input text click catcher clicked and no URL then input screen launched with draft query`() = runTest {
         testee.onInputStateChanged(query = "draft", hasFocus = false, clearQuery = false, deleteLastCharacter = false)
 
@@ -2190,6 +2203,19 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is Command.FocusInputField)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiHeaderPressedAndNativeInputEnabledThenInputScreenShown() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        nativeInputFieldSettingFlow.value = true
+        testee.onDuckAiHeaderClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
             cancelAndIgnoreRemainingEvents()
         }
     }

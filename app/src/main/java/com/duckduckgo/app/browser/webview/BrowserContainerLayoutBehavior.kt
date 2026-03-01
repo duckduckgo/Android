@@ -106,9 +106,9 @@ private fun offsetByBottomElementVisibleHeight(
         }
     return if (child.paddingBottom != newBottomPadding) {
         child.setPadding(
-            0,
-            0,
-            0,
+            child.paddingLeft,
+            child.paddingTop,
+            child.paddingRight,
             newBottomPadding,
         )
         true

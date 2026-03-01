@@ -853,6 +853,15 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `input screen feature - when native input enabled then emit disabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreen.value)
+    }
+
+    @Test
     fun `input screen feature - when global feature flag disabled then emit disabled`() = runTest {
         duckChatFeature.self().setRawStoredState(State(false))
 
