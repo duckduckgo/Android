@@ -22,8 +22,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.impl.MetricsPixelStore
-import com.duckduckgo.feature.toggles.impl.RetentionMetric.APP_USE
-import com.duckduckgo.feature.toggles.impl.RetentionMetric.SEARCH
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -47,8 +45,8 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
             searchMetricPixelsPlugin.getMetrics().forEach { metric ->
                 metric.getPixelDefinitions().forEach { definition ->
                     if (isInConversionWindow(definition)) {
-                        store.getMetricForPixelDefinition(definition, SEARCH).takeIf { it < metric.value.toInt() }?.let {
-                            store.increaseMetricForPixelDefinition(definition, SEARCH).takeIf { it == metric.value.toInt() }?.apply {
+                        store.getMetricForPixelDefinition(definition).takeIf { it < metric.value.toInt() }?.let {
+                            store.increaseMetricForPixelDefinition(definition).takeIf { it == metric.value.toInt() }?.apply {
                                 pixel.fire(definition.pixelName, definition.params)
                             }
                         }
@@ -63,8 +61,8 @@ class RetentionMetricsAtbLifecyclePlugin @Inject constructor(
             appUseMetricPixelsPlugin.getMetrics().forEach { metric ->
                 metric.getPixelDefinitions().forEach { definition ->
                     if (isInConversionWindow(definition)) {
-                        store.getMetricForPixelDefinition(definition, APP_USE).takeIf { it < metric.value.toInt() }?.let {
-                            store.increaseMetricForPixelDefinition(definition, APP_USE).takeIf { it == metric.value.toInt() }?.apply {
+                        store.getMetricForPixelDefinition(definition).takeIf { it < metric.value.toInt() }?.let {
+                            store.increaseMetricForPixelDefinition(definition).takeIf { it == metric.value.toInt() }?.apply {
                                 pixel.fire(definition.pixelName, definition.params)
                             }
                         }

@@ -41,19 +41,14 @@ interface MetricsPixelStore {
     fun storePixelTag(tag: String)
 
     /**
-     * Increases the count of searches for the [featureName] passed as parameter
+     * Increases the count for the given [PixelDefinition]
      */
-    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int
+    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int
 
     /**
-     * Returns the number [Int] of app use for the given [featureName]
+     * Returns the current count for the given [PixelDefinition]
      */
-    suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int
-}
-
-enum class RetentionMetric {
-    SEARCH,
-    APP_USE,
+    suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int
 }
 
 @ContributesBinding(
@@ -86,9 +81,9 @@ class RealMetricsPixelStore @Inject constructor(
         }
     }
 
-    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric) =
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition) =
         withContext(dispatcherProvider.io()) {
-            val tag = "${definition}_$metric"
+            val tag = "$definition"
             val count = preferences.getInt(tag, 0)
             preferences.edit {
                 putInt(tag, count + 1)
@@ -97,10 +92,9 @@ class RealMetricsPixelStore @Inject constructor(
             preferences.getInt(tag, 0)
         }
 
-    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition, metric: RetentionMetric): Int {
-        val tag = "${definition}_$metric"
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int {
         return withContext(dispatcherProvider.io()) {
-            preferences.getInt(tag, 0)
+            preferences.getInt("$definition", 0)
         }
     }
 
