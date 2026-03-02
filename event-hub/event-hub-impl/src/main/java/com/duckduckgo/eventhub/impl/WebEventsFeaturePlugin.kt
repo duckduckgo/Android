@@ -17,40 +17,22 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsFeaturePlugin @Inject constructor(
-    private val repository: EventHubRepository,
+    private val webEventsDataStore: WebEventsDataStore,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            repository.setWebEventsConfigJson(jsonString)
+            webEventsDataStore.setWebEventsConfigJson(jsonString)
             return true
         }
         return false
     }
 
     override val featureName: String = WebEventsFeatureName.WebEvents.value
-}
-
-@ContributesMultibinding(
-    AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
-)
-class EventHubPrivacyConfigCallback @Inject constructor(
-    private val pixelManager: EventHubPixelManager,
-) : PrivacyConfigCallbackPlugin {
-
-    override fun onPrivacyConfigDownloaded() {
-        // NO-OP
-    }
-
-    override fun onPrivacyConfigPersisted() {
-        pixelManager.onConfigChanged()
-    }
 }
