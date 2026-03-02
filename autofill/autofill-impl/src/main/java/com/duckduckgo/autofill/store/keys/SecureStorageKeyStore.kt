@@ -113,7 +113,7 @@ class RealSecureStorageKeyStore constructor(
             try {
                 harmonyMutex.withLock {
                     if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME_V2).also {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, FILENAME_V2).also {
                             if (it == null) {
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
@@ -331,7 +331,9 @@ class RealSecureStorageKeyStore constructor(
 
     companion object {
         /*
-         * This file is not in usage anymore, as it might be corrupted.
+         * Legacy EncryptedSharedPreferences file. Always used as the source of truth for reads.
+         * The original Harmony file with this name might be corrupted, which is why
+         * FILENAME_V2 is used as the Harmony destination instead.
          */
         const val FILENAME = "com.duckduckgo.securestorage.store"
         private const val FILENAME_V2 = "${FILENAME}_v2"
