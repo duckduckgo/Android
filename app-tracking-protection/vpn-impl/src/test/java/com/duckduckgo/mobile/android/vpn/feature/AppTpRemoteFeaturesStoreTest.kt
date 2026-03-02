@@ -47,7 +47,7 @@ class AppTpRemoteFeaturesStoreTest {
                     return preferences
                 }
 
-                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String, harmonyFileName: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
             },
@@ -102,7 +102,7 @@ class AppTpRemoteFeaturesStoreTest {
                     return preferences
                 }
 
-                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String, harmonyFileName: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
             },
@@ -146,7 +146,7 @@ class AppTpRemoteFeaturesStoreTest {
                     throw IOException("test")
                 }
 
-                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String, harmonyFileName: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
             },
