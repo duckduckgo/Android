@@ -68,17 +68,6 @@ Note: `jvm_tests` and `jvm_checks` resolve to `testPlayDebugUnitTest` in `:app` 
 | store | `internal`, `fdroid`, `play` |
 | Build types | `debug`, `release`, `upload` |
 
-### Key Gradle Tasks
-
-```bash
-./gradlew jvm_tests              # Unit tests
-./gradlew jvm_checks             # Code quality checks
-./gradlew lint_check             # Lint
-./gradlew spotlessCheck          # Code formatting
-./gradlew installPlayRelease     # Install Play release build
-./gradlew installInternalRelease # Install internal release build
-```
-
 ---
 
 ## Module Architecture
