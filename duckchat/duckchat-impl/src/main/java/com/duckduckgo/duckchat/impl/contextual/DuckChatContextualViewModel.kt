@@ -76,6 +76,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data object SendSubscriptionAuthUpdateEvent : Command()
         data class OpenFullscreenMode(val url: String) : Command()
         data class ChangeSheetState(val newState: Int) : Command()
+        data object RequestPageContext : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -107,16 +108,15 @@ class DuckChatContextualViewModel @Inject constructor(
     )
 
     fun onSheetReopened() {
-        logcat { "Duck.ai: reopenSheet" }
+        logcat { "Duck.ai: onSheetReopened" }
 
         viewModelScope.launch(dispatchers.io()) {
             val currentState = _viewState.value
             if (currentState.sheetMode == SheetMode.WEBVIEW) {
                 reopenWebViewState(currentState)
-                val pageContext = generatePageContextEventData()
-                logcat { "Duck.ai: attaching new context to Duck.ai" }
                 withContext(dispatchers.main()) {
-                    _subscriptionEventDataChannel.trySend(pageContext)
+                    logcat { "Duck.ai: requesting page context after sheet reopened" }
+                    commandChannel.trySend(Command.RequestPageContext)
                 }
             } else {
                 withContext(dispatchers.main()) {
@@ -400,8 +400,12 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun isContextValid(pageContext: String, reportInvalidPixels: Boolean = false): Boolean {
+    private fun isContextValid(
+        pageContext: String,
+        reportInvalidPixels: Boolean = false,
+    ): Boolean {
         if (pageContext.isEmpty()) {
+            logcat { "Duck.ai: pageContext is empty" }
             if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
             return false
         }
@@ -522,7 +526,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
                     val pageContext = generatePageContextEventData()
                     logcat { "Duck.ai: attaching new context to Duck.ai" }
-                    _subscriptionEventDataChannel.trySend(pageContext)
+                    viewModelScope.launch(dispatchers.main()) {
+                        _subscriptionEventDataChannel.trySend(pageContext)
+                    }
                 }
             }
         } else {

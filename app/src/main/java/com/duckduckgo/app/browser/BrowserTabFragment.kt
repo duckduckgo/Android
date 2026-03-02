@@ -3511,7 +3511,6 @@ class BrowserTabFragment :
 
         setupContextualSheetHeightSync()
 
-        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -3520,6 +3519,8 @@ class BrowserTabFragment :
 
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
+
+        omnibar.setExpanded(false)
     }
 
     private fun createNewContextualFragment(tabId: String) {
