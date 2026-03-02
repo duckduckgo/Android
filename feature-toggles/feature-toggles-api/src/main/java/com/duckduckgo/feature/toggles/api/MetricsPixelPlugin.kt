@@ -91,7 +91,7 @@ const val METRICS_PIXEL_PREFIX = "experiment_metrics"
  * Use [MetricsPixel.send] instead.
  */
 interface MetricsPixelExtension {
-    suspend fun send(metricsPixel: MetricsPixel): Boolean
+    suspend fun send(metricsPixel: MetricsPixel)
 }
 
 /**
@@ -104,7 +104,5 @@ object MetricsPixelExtensionProvider {
 
 /**
  * Sends this metric pixel, handling conversion window checks, deduplication and count thresholds.
- * @return true if the pixel was fired, false if no cohort is assigned, the conversion window has
- * passed, the pixel was already sent, or the count threshold has not been reached yet.
  */
-suspend fun MetricsPixel.send(): Boolean = MetricsPixelExtensionProvider.instance.send(this)
+suspend fun MetricsPixel.send() = MetricsPixelExtensionProvider.instance.send(this)
