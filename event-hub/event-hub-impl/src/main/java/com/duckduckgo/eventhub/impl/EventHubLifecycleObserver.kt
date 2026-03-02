@@ -37,7 +37,7 @@ import javax.inject.Inject
     boundType = MainProcessLifecycleObserver::class,
 )
 class EventHubLifecycleObserver @Inject constructor(
-    private val pixelManager: RealEventHubPixelManager,
+    private val pixelManager: EventHubPixelManager,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {

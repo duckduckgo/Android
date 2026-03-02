@@ -26,7 +26,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class EventHubFeaturePlugin @Inject constructor(
     private val repository: EventHubRepository,
-    private val pixelManager: RealEventHubPixelManager,
+    private val pixelManager: EventHubPixelManager,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {

@@ -32,7 +32,7 @@ private const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 
 @ContributesMultibinding(AppScope::class)
 class EventHubContentScopeJsMessageHandler @Inject constructor(
-    private val pixelManager: RealEventHubPixelManager,
+    private val pixelManager: EventHubPixelManager,
 ) : ContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
