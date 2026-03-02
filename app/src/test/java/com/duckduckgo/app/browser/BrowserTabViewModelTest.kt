@@ -3130,6 +3130,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedAddWidgetOnboardingExperimentCtaButtonThenLaunchAddWidgetOnboardingExperimentCommand() {
+        val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
+    }
+
+    @Test
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
