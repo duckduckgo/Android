@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class EventHubNavigationPlugin @Inject constructor(
-    private val pixelManager: RealEventHubPixelManager,
+    private val pixelManager: EventHubPixelManager,
 ) : JsInjectorPlugin {
 
     override fun onPageStarted(
