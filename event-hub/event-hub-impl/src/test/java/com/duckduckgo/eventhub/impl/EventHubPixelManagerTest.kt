@@ -430,7 +430,7 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `empty tabId disables dedup`() {
+    fun `empty webViewId disables dedup`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
@@ -538,7 +538,7 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `onNavigationStarted with empty tabId is a no-op`() {
+    fun `onNavigationStarted with empty webViewId is a no-op`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
@@ -546,7 +546,7 @@ class EventHubPixelManagerTest {
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
 
-        // onNavigationStarted with empty tabId — should not affect state
+        // onNavigationStarted with empty webViewId — should not affect state
         manager.onNavigationStarted("", "https://example.com/page2")
 
         org.mockito.Mockito.reset(repository)
@@ -1804,12 +1804,12 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(first.capture())
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
-        // Fire button: tab1 destroyed, new tab created with different tabId
+        // Fire button: tab1 destroyed, new tab created with different webViewId
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
-        // Same URL in new tab — different tabId means not deduped
+        // Same URL in new tab — different webViewId means not deduped
         manager.handleWebEvent(webEventData("test"), "newTab1")
 
         val second = argumentCaptor<EventHubPixelStateEntity>()
