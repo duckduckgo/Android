@@ -99,19 +99,16 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     fun onOnboardingCompletedToggled(checked: Boolean) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                val required = ctaViewModel.getRequiredDaxOnboardingCtasForDev().toSet()
                 if (checked) {
                     userStageStore.moveToStage(AppStage.ESTABLISHED)
                     settingsDataStore.hideTips = false
-                    // Mark all CTAs as dismissed so all checkboxes turn on
                     orderedCtaIds.forEach { ctaId ->
                         dismissedCtaDao.insert(DismissedCta(ctaId))
                     }
                 } else {
                     userStageStore.moveToStage(AppStage.DAX_ONBOARDING)
                     settingsDataStore.hideTips = false
-                    // Uncheck all required CTAs (not ADD_WIDGET - independent)
-                    required.forEach { ctaId ->
+                    orderedCtaIds.forEach { ctaId ->
                         dismissedCtaDao.delete(ctaId)
                     }
                 }
@@ -123,7 +120,6 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     fun onOnboardingSkippedToggled(checked: Boolean) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                // Skip is independent of dialogs: just hideTips + complete onboarding
                 if (checked) {
                     userStageStore.moveToStage(AppStage.ESTABLISHED)
                     settingsDataStore.hideTips = true
@@ -148,14 +144,11 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 val wasCompletedByCtas = _viewState.value.onboardingCompleted && !settingsDataStore.hideTips
 
                 when {
-                    // ADD_WIDGET is independent: no auto completion/activation
-                    ctaId == CtaId.ADD_WIDGET -> { /* no change to stage */ }
-                    // All required CTAs checked -> set completed (not skipped)
+                    ctaId == CtaId.ADD_WIDGET -> { /* noop */ }
                     isDismissed && allRequiredDismissed -> {
                         userStageStore.moveToStage(AppStage.ESTABLISHED)
                         settingsDataStore.hideTips = false
                     }
-                    // Was completed (by CTAs) and user unchecked a required CTA -> set active
                     !isDismissed && wasCompletedByCtas && required.contains(ctaId) -> {
                         userStageStore.moveToStage(AppStage.DAX_ONBOARDING)
                     }

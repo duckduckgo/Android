@@ -128,7 +128,7 @@ class OnboardingDevSettingsViewModelTest {
     }
 
     @Test
-    fun whenOnboardingCompletedToggledOffThenMoveToDaxOnboardingAndDeleteRequiredCtas() = runTest {
+    fun whenOnboardingCompletedToggledOffThenMoveToDaxOnboardingAndDeleteAllCtas() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(false)
         whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
@@ -137,7 +137,7 @@ class OnboardingDevSettingsViewModelTest {
         testee.onOnboardingCompletedToggled(false)
 
         verify(userStageStore).moveToStage(AppStage.DAX_ONBOARDING)
-        requiredCtas.forEach { verify(dismissedCtaDao).delete(it) }
+        testee.orderedCtaIds.forEach { verify(dismissedCtaDao).delete(it) }
     }
 
     @Test
