@@ -1,6 +1,3 @@
----
-alwaysApply: true
----
 # Android Design System (ADS)
 
 The DuckDuckGo Android Design System lives in `android-design-system/design-system/`. Always use ADS components instead of raw Android/Material widgets. Lint rules will break the build if you bypass ADS.

@@ -1,6 +1,3 @@
----
-alwaysApply: true
----
 # Wide Events
 
 Wide events measure a user's complete journey through a multi-step flow, sending a single event when the journey concludes. Use them when a flow has multiple steps that can succeed or fail independently and you need to understand drop-off and errors across the whole journey.
