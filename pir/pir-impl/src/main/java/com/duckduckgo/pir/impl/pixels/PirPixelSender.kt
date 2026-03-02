@@ -589,7 +589,7 @@ class RealPirPixelSender @Inject constructor(
         totalTimeInMillis: Long,
     ) {
         val params = mapOf(
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_TOTAL_TIME to bucketDuration(totalTimeInMillis),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -614,7 +614,7 @@ class RealPirPixelSender @Inject constructor(
         totalTimeInMillis: Long,
     ) {
         val params = mapOf(
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_TOTAL_TIME to bucketDuration(totalTimeInMillis),
         )
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
@@ -630,7 +630,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parent,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
@@ -662,7 +662,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parent,
             PARAM_BROKER_VERSION to brokerJsonVersion,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_KEY_STAGE to stage.stageName,
             PARAM_TRIES to tries.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
@@ -689,7 +689,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_LINK_AGE to linkAgeMs.toString(),
+            PARAM_LINK_AGE to bucketDuration(linkAgeMs),
         )
         fire(PIR_EMAIL_CONFIRMATION_LINK_RECEIVED, params)
     }
@@ -720,7 +720,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_TRIES to tries.toString(),
         )
         fire(PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION, params)
@@ -753,7 +753,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS, params)
     }
@@ -770,7 +770,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED, params)
     }
@@ -809,7 +809,7 @@ class RealPirPixelSender @Inject constructor(
         totalEmailConfirmationJobs: Int,
     ) {
         val params = mapOf(
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_TOTAL_TIME to bucketDuration(totalTimeInMillis),
             PARAM_TOTAL_FETCH to totalFetchAttempts.toString(),
             PARAM_TOTAL_EMAIL_CONFIRMATION to totalEmailConfirmationJobs.toString(),
         )
@@ -961,7 +961,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_MATCHES_COUNT to totalMatches.toString(),
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
@@ -984,7 +984,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
@@ -1010,7 +1010,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_KEY_ERROR_CATEGORY to errorCategory,
             PARAM_KEY_ERROR_DETAILS to errorDetails,
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
@@ -1236,7 +1236,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
             PARAM_BROKER_VERSION to brokerVersion,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
             PARAM_TRIES to tries.toString(),
             PARAM_ACTION_ID to actionId,
         )
@@ -1250,7 +1250,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_KEY_PARENT to parentUrl,
-            PARAM_DURATION to durationMs.toString(),
+            PARAM_DURATION to bucketDuration(durationMs),
         )
 
         fire(PIR_OPTOUT_STAGE_FINISH, params)
@@ -1325,7 +1325,7 @@ class RealPirPixelSender @Inject constructor(
         profileQueryCount: Int,
     ) {
         val params = mapOf(
-            PARAM_KEY_DURATION_MS to durationMs.toString(),
+            PARAM_KEY_DURATION_MS to bucketDuration(durationMs),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
         )
 
@@ -1382,6 +1382,26 @@ class RealPirPixelSender @Inject constructor(
     }
 
     companion object {
+        /**
+         * Buckets a duration in milliseconds into a privacy-preserving range string.
+         * Exact millisecond values can fingerprint device performance characteristics
+         * (CPU speed, network latency, WebView rendering). Bucketing preserves
+         * analytical value while removing the fingerprinting precision.
+         */
+        internal fun bucketDuration(durationMs: Long): String {
+            return when {
+                durationMs < 0 -> "invalid"
+                durationMs < 1_000 -> "<1s"
+                durationMs < 5_000 -> "1-5s"
+                durationMs < 10_000 -> "5-10s"
+                durationMs < 30_000 -> "10-30s"
+                durationMs < 60_000 -> "30-60s"
+                durationMs < 300_000 -> "1-5m"
+                durationMs < 600_000 -> "5-10m"
+                else -> ">10m"
+            }
+        }
+
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
         private const val PARAM_BROKER_VERSION = "broker_version"

@@ -64,7 +64,7 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
-        assert(paramsCaptor.firstValue["totalTimeInMillis"] == "12345")
+        assert(paramsCaptor.firstValue["totalTimeInMillis"] == "10-30s")
     }
 
     @Test
@@ -140,7 +140,7 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
-        assert(paramsCaptor.firstValue["totalTimeInMillis"] == "54321")
+        assert(paramsCaptor.firstValue["totalTimeInMillis"] == "30-60s")
     }
 
     @Test
@@ -165,7 +165,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
-        assert(params["duration"] == "5000")
+        assert(params["duration"] == "5-10s")
         assert(params["tries"] == "2")
         assert(params["pattern"] == "pattern-abc")
         assert(params["vpn_connection_state"] == "disconnected")
@@ -221,7 +221,7 @@ class RealPirPixelSenderTest {
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "parent-broker")
         assert(params["broker_version"] == "1.0")
-        assert(params["duration"] == "3000")
+        assert(params["duration"] == "1-5s")
         assert(params["stage"] == "fill-form")
         assert(params["tries"] == "3")
         assert(params["pattern"] == "pattern-xyz")
@@ -264,7 +264,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
-        assert(params["link_age_ms"] == "60000")
+        assert(params["link_age_ms"] == "30-60s")
     }
 
     @Test
@@ -313,7 +313,7 @@ class RealPirPixelSenderTest {
         assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "2.0")
         assert(params["action_id"] == "action-2")
-        assert(params["duration"] == "2000")
+        assert(params["duration"] == "1-5s")
         assert(params["tries"] == "1")
     }
 
@@ -364,7 +364,7 @@ class RealPirPixelSenderTest {
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "2")
         assert(params["action_id"] == "action-4")
-        assert(params["duration"] == "1500")
+        assert(params["duration"] == "1-5s")
     }
 
     @Test
@@ -390,7 +390,7 @@ class RealPirPixelSenderTest {
         assert(params["broker_version"] == "2.0")
         assert(params["attempt_number"] == "3")
         assert(params["action_id"] == "action-5")
-        assert(params["duration"] == "1000")
+        assert(params["duration"] == "1-5s")
     }
 
     @Test
@@ -467,7 +467,7 @@ class RealPirPixelSenderTest {
         )
 
         val params = paramsCaptor.firstValue
-        assert(params["totalTimeInMillis"] == "30000")
+        assert(params["totalTimeInMillis"] == "30-60s")
         assert(params["totalFetchAttempts"] == "5")
         assert(params["totalEmailConfirmationJobs"] == "10")
     }
@@ -672,7 +672,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["num_found"] == "3")
-        assert(params["duration"] == "5000")
+        assert(params["duration"] == "5-10s")
         assert(params["is_manual_scan"] == "true")
         assert(params["parent"] == "https://parent.com")
         assert(params["vpn_connection_state"] == "disconnected")
@@ -702,7 +702,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "3.0")
-        assert(params["duration"] == "3000")
+        assert(params["duration"] == "1-5s")
         assert(params["is_manual_scan"] == "false")
         assert(params["parent"] == "https://parent.com")
         assert(params["action_id"] == "action-scan-2")
@@ -736,7 +736,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["broker_version"] == "3.0")
-        assert(params["duration"] == "2000")
+        assert(params["duration"] == "1-5s")
         assert(params["error_category"] == "network")
         assert(params["error_details"] == "timeout")
         assert(params["is_manual_scan"] == "true")
@@ -789,7 +789,7 @@ class RealPirPixelSenderTest {
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
         assert(params["broker_version"] == "4.0")
-        assert(params["duration"] == "1000")
+        assert(params["duration"] == "1-5s")
         assert(params["tries"] == "1")
         assert(params["action_id"] == "action-email-1")
     }
@@ -813,7 +813,7 @@ class RealPirPixelSenderTest {
         val params = paramsCaptor.firstValue
         assert(params["data_broker"] == "https://broker.com")
         assert(params["parent"] == "https://parent.com")
-        assert(params["duration"] == "10000")
+        assert(params["duration"] == "10-30s")
     }
 
     @Test
