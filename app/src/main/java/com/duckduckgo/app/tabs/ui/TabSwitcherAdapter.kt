@@ -506,6 +506,7 @@ class TabSwitcherAdapter(
         private val loadJobs = mutableListOf<Job>()
 
         fun trackJob(job: Job) {
+            loadJobs.removeAll { it.isCompleted }
             loadJobs.add(job)
         }
 
