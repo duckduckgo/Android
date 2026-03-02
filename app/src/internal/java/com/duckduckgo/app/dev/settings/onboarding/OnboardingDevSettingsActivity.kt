@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.dev.settings.onboarding
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingDevSettingsBinding
 import com.duckduckgo.app.cta.model.CtaId
@@ -31,10 +30,12 @@ import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(OnboardingDevSettingsScreen::class)
 class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityOnboardingDevSettingsBinding by viewBinding()
@@ -147,10 +148,8 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
     }
+}
 
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, OnboardingDevSettingsActivity::class.java)
-        }
-    }
+data object OnboardingDevSettingsScreen : GlobalActivityStarter.ActivityParams {
+    private fun readResolve(): Any = OnboardingDevSettingsScreen
 }
