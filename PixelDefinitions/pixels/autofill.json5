@@ -14,7 +14,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -33,7 +34,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -47,7 +49,8 @@
             {
                 "key": "key",
                 "description": "The name of the key that failed to update",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "error",
@@ -57,7 +60,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -71,7 +75,8 @@
             {
                 "key": "key",
                 "description": "The name of the key that failed to update in Harmony",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "error",
@@ -81,7 +86,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -95,7 +101,8 @@
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from Harmony",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "error",
@@ -105,7 +112,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -119,7 +127,8 @@
             {
                 "key": "key",
                 "description": "The name of the key that failed to read from legacy",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "error",
@@ -129,7 +138,8 @@
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -143,12 +153,14 @@
             {
                 "key": "key",
                 "description": "The name of the key that has a mismatch between Harmony and legacy",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -162,12 +174,14 @@
             {
                 "key": "key",
                 "description": "The name of the key that is missing from Harmony",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -181,12 +195,14 @@
             {
                 "key": "key",
                 "description": "The name of the key that already exists and was protected from overwrite",
-                "type": "string"
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
                 "key": "addHarmonyFixes",
                 "description": "Whether the addHarmonyFixes feature flag is enabled",
-                "type": "string"
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
