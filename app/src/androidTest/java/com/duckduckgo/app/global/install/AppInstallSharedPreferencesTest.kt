@@ -19,11 +19,18 @@ package com.duckduckgo.app.global.install
 import android.content.Context
 import androidx.core.content.edit
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class AppInstallSharedPreferencesTest {
+
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: AppInstallSharedPreferences
 
@@ -32,25 +39,49 @@ class AppInstallSharedPreferencesTest {
     @Before
     fun setup() {
         context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        testee = AppInstallSharedPreferences(context)
+        testee = AppInstallSharedPreferences(
+            context = context,
+            appCoroutineScope = coroutineTestRule.testScope,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenInitializedThenInstallTimestampNotYetRecorded() {
+    fun whenInitializedThenInstallTimestampNotYetRecorded() = runTest {
         assertFalse(testee.hasInstallTimestampRecorded())
     }
 
     @Test
-    fun whenInstallTimestampRecordedThenTimestampMarkedAsAvailable() {
+    fun whenInstallTimestampRecordedThenTimestampMarkedAsAvailable() = runTest {
         val timestamp = 1L
         testee.installTimestamp = timestamp
         assertTrue(testee.hasInstallTimestampRecorded())
     }
 
     @Test
-    fun whenTimestampRecordedThenSameTimestampRetrieved() {
+    fun whenTimestampRecordedThenSameTimestampRetrieved() = runTest {
         val timestamp = 1L
         testee.installTimestamp = timestamp
         assertEquals(timestamp, testee.installTimestamp)
+    }
+
+    @Test
+    fun whenOnCreateCalledAndNoTimestampThenTimestampIsRecorded() = runTest {
+        assertFalse(testee.hasInstallTimestampRecorded())
+
+        testee.onCreate(mock())
+
+        assertTrue(testee.hasInstallTimestampRecorded())
+        assertTrue(testee.installTimestamp > 0)
+    }
+
+    @Test
+    fun whenOnCreateCalledAndTimestampExistsThenTimestampIsNotOverwritten() = runTest {
+        val existingTimestamp = 12345L
+        testee.installTimestamp = existingTimestamp
+
+        testee.onCreate(mock())
+
+        assertEquals(existingTimestamp, testee.installTimestamp)
     }
 }
