@@ -25,14 +25,18 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISMATCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -93,7 +97,10 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.error()),
+                    mapOf(
+                        "error" to e.error(),
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
                     type = Daily(),
                 )
                 null
@@ -106,7 +113,7 @@ class RealSecureStorageKeyStore constructor(
             try {
                 harmonyMutex.withLock {
                     if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
+                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME_V2).also {
                             if (it == null) {
                                 logcat { "autofill harmony preferences retrieval returned null" }
                             }
@@ -119,7 +126,10 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.error()),
+                    mapOf(
+                        "error" to e.error(),
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
                     type = Daily(),
                 )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
@@ -141,6 +151,22 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
+            // Guard: encryption keys are write-once. If we're trying to write a non-null value
+            // for a key that already exists in either store, something upstream read null
+            // incorrectly and is about to overwrite a valid key — block the write to prevent
+            // irreversible corruption.
+            if (keyValue != null && keyAlreadyExists(keyName)) {
+                pixel.fire(
+                    AUTOFILL_STORE_KEY_ALREADY_EXISTS,
+                    mapOf(
+                        "key" to keyName,
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
+                    type = Daily(),
+                )
+                return@withContext
+            }
+
             runCatching {
                 getEncryptedPreferences()?.edit(commit = true) {
                     if (keyValue == null) {
@@ -153,7 +179,11 @@ class RealSecureStorageKeyStore constructor(
                 ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    mapOf("error" to it.error()),
+                    mapOf(
+                        "key" to keyName,
+                        "error" to it.error(),
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
                     type = Daily(),
                 )
                 throw it
@@ -172,7 +202,11 @@ class RealSecureStorageKeyStore constructor(
                     ensureActive()
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                        mapOf("error" to it.error()),
+                        mapOf(
+                            "key" to keyName,
+                            "error" to it.error(),
+                            "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        ),
                         type = Daily(),
                     )
                     throw it
@@ -181,41 +215,110 @@ class RealSecureStorageKeyStore constructor(
         }
     }
 
+    /**
+     * Checks if the key already exists in either legacy or Harmony preferences.
+     * Used as a write guard to prevent overwriting write-once encryption keys.
+     */
+    private suspend fun keyAlreadyExists(keyName: String): Boolean {
+        val legacyExists = try {
+            getEncryptedPreferences()?.getString(keyName, null) != null
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            false
+        }
+        if (legacyExists) return true
+
+        if (autofillFeature.useHarmony().isEnabled()) {
+            val harmonyExists = try {
+                getHarmonyEncryptedPreferences()?.getString(keyName, null) != null
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                false
+            }
+            if (harmonyExists) return true
+        }
+
+        return false
+    }
+
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            val useHarmony = autofillFeature.useHarmony().isEnabled()
-            val preferences = if (useHarmony) {
-                getHarmonyEncryptedPreferences()
-            } else {
-                getEncryptedPreferences()
-            }
-            return@withContext runCatching {
-                preferences?.getString(keyName, null)?.run {
+            // Always read from legacy — source of truth
+            val legacyValue = runCatching {
+                getEncryptedPreferences()?.getString(keyName, null)?.run {
                     this.decodeBase64()?.toByteArray()
                 }
             }.getOrElse {
                 ensureActive()
-                val pixelName = if (useHarmony) {
-                    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
-                } else {
-                    AUTOFILL_PREFERENCES_GET_KEY_FAILED
-                }
                 pixel.fire(
-                    pixelName,
-                    mapOf("error" to it.error()),
+                    AUTOFILL_PREFERENCES_GET_KEY_FAILED,
+                    mapOf(
+                        "key" to keyName,
+                        "error" to it.error(),
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
                     type = Daily(),
                 )
                 throw it
+            }
+
+            // When useHarmony is ON, compare with Harmony for diagnostic pixels only
+            if (autofillFeature.useHarmony().isEnabled()) {
+                compareWithHarmony(keyName, legacyValue)
+            }
+
+            return@withContext legacyValue
+        }
+    }
+
+    /**
+     * Purely diagnostic: compares Harmony value with legacy and fires pixels on discrepancies.
+     */
+    private suspend fun compareWithHarmony(keyName: String, legacyValue: ByteArray?) {
+        val harmonyValue = try {
+            getHarmonyEncryptedPreferences()?.getString(keyName, null)?.run {
+                this.decodeBase64()?.toByteArray()
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            pixel.fire(
+                AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
+                mapOf(
+                    "key" to keyName,
+                    "error" to e.error(),
+                    "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                ),
+                type = Daily(),
+            )
+            null
+        }
+
+        when {
+            harmonyValue == null && legacyValue != null -> {
+                pixel.fire(
+                    AUTOFILL_HARMONY_KEY_MISSING,
+                    mapOf(
+                        "key" to keyName,
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
+                    type = Daily(),
+                )
+            }
+            harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
+                pixel.fire(
+                    AUTOFILL_HARMONY_KEY_MISMATCH,
+                    mapOf(
+                        "key" to keyName,
+                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                    ),
+                    type = Daily(),
+                )
             }
         }
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        if (autofillFeature.useHarmony().isEnabled()) {
-            getHarmonyEncryptedPreferences() != null
-        } else {
-            getEncryptedPreferences() != null
-        }
+        getEncryptedPreferences() != null
     }
 
     private fun Throwable.error(): String {
@@ -227,6 +330,10 @@ class RealSecureStorageKeyStore constructor(
     }
 
     companion object {
+        /*
+         * This file is not in usage anymore, as it might be corrupted.
+         */
         const val FILENAME = "com.duckduckgo.securestorage.store"
+        private const val FILENAME_V2 = "${FILENAME}_v2"
     }
 }
