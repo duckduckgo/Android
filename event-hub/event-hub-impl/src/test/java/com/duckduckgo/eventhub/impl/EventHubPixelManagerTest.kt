@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -47,6 +48,8 @@ class EventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
     private val foregroundState = FakeAppForegroundStateProvider()
+    private val eventHubFeature: EventHubFeature = mock()
+    private val selfToggle: Toggle = mock()
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -55,31 +58,28 @@ class EventHubPixelManagerTest {
     private lateinit var manager: RealEventHubPixelManager
 
     private val dayPixelConfigJson: String by lazy {
-        val parsed = EventHubConfigParser.parse(fullConfig)
-        EventHubConfigParser.serializePixelConfig(parsed.telemetry.first { it.name == "webTelemetry_testPixel1" })
+        val parsed = EventHubConfigParser.parseTelemetry(fullConfig)
+        EventHubConfigParser.serializePixelConfig(parsed.first { it.name == "webTelemetry_testPixel1" })
     }
 
     private val fullConfig = """
         {
-            "state": "enabled",
-            "settings": {
-                "telemetry": {
-                    "webTelemetry_testPixel1": {
-                        "state": "enabled",
-                        "trigger": { "period": { "days": 1 } },
-                        "parameters": {
-                            "count": {
-                                "template": "counter",
-                                "source": "test",
-                                "buckets": {
-                                    "0":     {"gte": 0,  "lt": 1},
-                                    "1-2":   {"gte": 1,  "lt": 3},
-                                    "3-5":   {"gte": 3,  "lt": 6},
-                                    "6-10":  {"gte": 6,  "lt": 11},
-                                    "11-20": {"gte": 11, "lt": 21},
-                                    "21-39": {"gte": 21, "lt": 40},
-                                    "40+":   {"gte": 40}
-                                }
+            "telemetry": {
+                "webTelemetry_testPixel1": {
+                    "state": "enabled",
+                    "trigger": { "period": { "days": 1 } },
+                    "parameters": {
+                        "count": {
+                            "template": "counter",
+                            "source": "test",
+                            "buckets": {
+                                "0":     {"gte": 0,  "lt": 1},
+                                "1-2":   {"gte": 1,  "lt": 3},
+                                "3-5":   {"gte": 3,  "lt": 6},
+                                "6-10":  {"gte": 6,  "lt": 11},
+                                "11-20": {"gte": 11, "lt": 21},
+                                "21-39": {"gte": 21, "lt": 40},
+                                "40+":   {"gte": 40}
                             }
                         }
                     }
@@ -95,9 +95,11 @@ class EventHubPixelManagerTest {
         dispatcherProvider = mock<DispatcherProvider>().also {
             whenever(it.io()).thenReturn(dispatcher)
         }
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
     }
 
     @org.junit.After
@@ -141,8 +143,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
@@ -162,8 +166,10 @@ class EventHubPixelManagerTest {
         assertEquals(40, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         // re-stub so second call sees saved state (count=40, stopCounting=["count"])
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
 
         manager.handleWebEvent(webEventData("test"), "")
         verify(repository, never()).savePixelState(captor.capture())
@@ -189,26 +195,23 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent does not increment when already at max bucket`() {
         val singleBucketConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test": {
-                            "state": "enabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": {"0+": {"gte": 0}}
-                                }
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": {"0+": {"gte": 0}}
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(singleBucketConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(singleBucketConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
@@ -250,7 +253,7 @@ class EventHubPixelManagerTest {
     fun `handleWebEvent ignores events when feature disabled`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.handleWebEvent(webEventData("test"), "")
 
@@ -270,8 +273,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -291,8 +296,10 @@ class EventHubPixelManagerTest {
         assertEquals(6, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         for (i in 1..5) {
-            org.mockito.Mockito.reset(repository)
-            whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+            org.mockito.Mockito.reset(repository, selfToggle)
+            whenever(eventHubFeature.self()).thenReturn(selfToggle)
+            whenever(selfToggle.isEnabled()).thenReturn(true)
+            whenever(selfToggle.getSettings()).thenReturn(fullConfig)
             stubPixelStates(captor.firstValue)
 
             manager.handleWebEvent(webEventData("test"), "tab1")
@@ -314,8 +321,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         // Navigate — same tab, different URL
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
@@ -338,8 +347,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(captor.firstValue.paramsJson)["count"])
 
         // Subframe event — same tab + same URL = deduped
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -351,31 +362,28 @@ class EventHubPixelManagerTest {
     fun `different source types on same page are not deduplicated against each other`() {
         val twoSourceConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test": {
-                            "state": "enabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "testCount": {
-                                    "template": "counter",
-                                    "source": "test",
-                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                                },
-                                "trackerCount": {
-                                    "template": "counter",
-                                    "source": "trackerBlocked",
-                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                                }
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "testCount": {
+                                "template": "counter",
+                                "source": "test",
+                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
+                            },
+                            "trackerCount": {
+                                "template": "counter",
+                                "source": "trackerBlocked",
+                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
@@ -388,8 +396,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, paramsAfterTest["testCount"])
         assertEquals(0, paramsAfterTest["trackerCount"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
@@ -404,8 +414,8 @@ class EventHubPixelManagerTest {
     @Test
     fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
@@ -420,8 +430,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(savedA.paramsJson)["count"])
         assertEquals(1, parseParamValues(savedB.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
         stubPixelStates(savedA, savedB)
 
         manager.handleWebEvent(webEventData("evt"), "tab1")
@@ -440,8 +452,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
@@ -463,8 +477,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
         // Navigate to page2
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
@@ -474,8 +490,10 @@ class EventHubPixelManagerTest {
         assertEquals(2, parseParamValues(second.firstValue.paramsJson)["count"])
 
         // Navigate back to page1
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
@@ -505,8 +523,10 @@ class EventHubPixelManagerTest {
         manager.onNavigationStarted("tab1", "https://example.com/pageA")
 
         // Event on page A again — must NOT be deduplicated
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -528,8 +548,10 @@ class EventHubPixelManagerTest {
         // onNavigationStarted with same URL (e.g. reload) — should not clear dedup
         manager.onNavigationStarted("tab1", "https://example.com/page1")
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -549,8 +571,10 @@ class EventHubPixelManagerTest {
         // onNavigationStarted with empty webViewId — should not affect state
         manager.onNavigationStarted("", "https://example.com/page2")
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         // Same tab, same URL — still deduped because onNavigationStarted was a no-op
@@ -569,8 +593,10 @@ class EventHubPixelManagerTest {
         val first = argumentCaptor<EventHubPixelStateEntity>()
         verify(repository).savePixelState(first.capture())
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
@@ -581,8 +607,10 @@ class EventHubPixelManagerTest {
         manager.onNavigationStarted("tab1", "https://example.com/page2")
 
         // Tab2 should still be deduped (onNavigationStarted only cleared tab1)
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(second.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
@@ -593,31 +621,28 @@ class EventHubPixelManagerTest {
     fun `returning to same URL is not deduplicated when intermediate page had different event type`() {
         val twoSourceConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test": {
-                            "state": "enabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "testCount": {
-                                    "template": "counter",
-                                    "source": "test",
-                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                                },
-                                "trackerCount": {
-                                    "template": "counter",
-                                    "source": "trackerBlocked",
-                                    "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
-                                }
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "testCount": {
+                                "template": "counter",
+                                "source": "test",
+                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
+                            },
+                            "trackerCount": {
+                                "template": "counter",
+                                "source": "trackerBlocked",
+                                "buckets": {"0+": {"gte": 0, "lt": 5}, "5+": {"gte": 5}}
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
@@ -630,8 +655,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["testCount"])
 
         // Navigate to page2 — only "trackerBlocked" fires (not "test")
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
@@ -641,8 +668,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(second.firstValue.paramsJson)["trackerCount"])
 
         // Navigate back to page1 — "test" fires again; must NOT be deduplicated
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoSourceConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
@@ -664,8 +693,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(firstCaptor.firstValue.paramsJson)["count"])
 
         // Tab 2 fires same source — different tab, should count
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
@@ -674,8 +705,10 @@ class EventHubPixelManagerTest {
         assertEquals(2, parseParamValues(secondCaptor.firstValue.paramsJson)["count"])
 
         // Tab 1 fires again — same tab, should dedup
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(secondCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -742,28 +775,25 @@ class EventHubPixelManagerTest {
 
         val configWithGap = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test": {
-                            "state": "enabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": {"5-9": {"gte": 5, "lt": 10}}
-                                }
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": {"5-9": {"gte": 5, "lt": 10}}
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(configWithGap)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(configWithGap)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val testPixelConfig = EventHubConfigParser.parse(configWithGap).telemetry.first()
+        val testPixelConfig = EventHubConfigParser.parseTelemetry(configWithGap).first()
         val state = EventHubPixelStateEntity(
             pixelName = "test",
             periodStartMillis = periodStart,
@@ -809,7 +839,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = periodEnd + 1
 
         val originalConfig = configWithBuckets(*originalBuckets)
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = EventHubPixelStateEntity(
@@ -824,25 +854,22 @@ class EventHubPixelManagerTest {
         // Current config has the pixel DISABLED
         val disabledConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "disabled",
-                            "trigger": { "period": { "seconds": 120 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "disabled",
+                        "trigger": { "period": { "seconds": 120 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(disabledConfig)
+        whenever(selfToggle.getSettings()).thenReturn(disabledConfig)
 
         manager.checkPixels()
 
@@ -867,25 +894,22 @@ class EventHubPixelManagerTest {
         // Pixel disabled in current config
         val disabledPixelConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "webTelemetry_testPixel1": {
-                            "state": "disabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "test",
-                                    "buckets": { "0": {"gte": 0, "lt": 1}, "1-2": {"gte": 1, "lt": 3}, "3-5": {"gte": 3, "lt": 6}, "6-10": {"gte": 6, "lt": 11}, "11-20": {"gte": 11, "lt": 21}, "21-39": {"gte": 21, "lt": 40}, "40+": {"gte": 40} }
-                                }
+                "telemetry": {
+                    "webTelemetry_testPixel1": {
+                        "state": "disabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "test",
+                                "buckets": { "0": {"gte": 0, "lt": 1}, "1-2": {"gte": 1, "lt": 3}, "3-5": {"gte": 3, "lt": 6}, "6-10": {"gte": 6, "lt": 11}, "11-20": {"gte": 11, "lt": 21}, "21-39": {"gte": 21, "lt": 40}, "40+": {"gte": 40} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(disabledPixelConfig)
+        whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
 
         manager.checkPixels()
 
@@ -903,7 +927,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
         timeProvider.time = 3000L
 
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
 
@@ -927,7 +951,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged deletes all when feature disabled`() {
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
 
@@ -948,27 +972,24 @@ class EventHubPixelManagerTest {
     fun `onConfigChanged does not register disabled pixel`() {
         val disabledPixelConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "disabled",
-                            "trigger": { "period": { "days": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": {"0+": {"gte": 0}}
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "disabled",
+                        "trigger": { "period": { "days": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": {"0+": {"gte": 0}}
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(disabledPixelConfig)
+        whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         manager.onConfigChanged()
 
@@ -977,7 +998,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged treats absent feature as disabled`() {
-        whenever(repository.getEventHubConfigJson()).thenReturn("{}")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
 
@@ -985,12 +1006,12 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `onConfigChanged treats missing feature in config as disabled`() {
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"unrelated": true}""")
+    fun `onConfigChanged with null settings does not register any pixels`() {
+        whenever(selfToggle.getSettings()).thenReturn(null)
 
         manager.onConfigChanged()
 
-        verify(repository).deleteAllPixelStates()
+        verify(repository, never()).savePixelState(any())
     }
 
     // --- config isolation: live config changes must not affect running pixel lifecycle ---
@@ -999,18 +1020,15 @@ class EventHubPixelManagerTest {
         val bucketEntries = buckets.joinToString(",") { (name, body) -> "\"$name\": $body" }
         return """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "enabled",
-                            "trigger": { "period": { "seconds": 120 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { $bucketEntries }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": 120 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { $bucketEntries }
                             }
                         }
                     }
@@ -1032,10 +1050,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent uses stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         // count=4 is in "0-4" with original buckets, would be in "3+" with changed buckets
@@ -1044,7 +1062,7 @@ class EventHubPixelManagerTest {
 
         // Change live config to different buckets
         val changedConfig = configWithBuckets(*changedBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.handleWebEvent(webEventData("evt"), "")
 
@@ -1058,10 +1076,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent uses stored config source, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
@@ -1070,25 +1088,22 @@ class EventHubPixelManagerTest {
         // Change live config to use a different source
         val changedSourceConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "enabled",
-                            "trigger": { "period": { "seconds": 120 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "different_source",
-                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": 120 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "different_source",
+                                "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedSourceConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedSourceConfig)
 
         // Event matches stored source ("evt"), not live source ("different_source")
         manager.handleWebEvent(webEventData("evt"), "")
@@ -1101,10 +1116,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `handleWebEvent ignores event matching only live config source`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = pixelState("test_pixel", mapOf("count" to 0), configJson = storedConfigJson)
@@ -1113,25 +1128,22 @@ class EventHubPixelManagerTest {
         // Change live config to use a different source
         val changedSourceConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "enabled",
-                            "trigger": { "period": { "seconds": 120 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "new_source",
-                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": 120 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "new_source",
+                                "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedSourceConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedSourceConfig)
 
         // "new_source" matches live config but NOT stored config — should be ignored
         manager.handleWebEvent(webEventData("new_source"), "")
@@ -1142,10 +1154,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `checkPixels fires pixel using stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val periodStart = 1000L
@@ -1164,7 +1176,7 @@ class EventHubPixelManagerTest {
 
         // Change live config to different buckets before firing
         val changedConfig = configWithBuckets(*changedBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.checkPixels()
 
@@ -1185,10 +1197,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val periodStart = 120_000L
@@ -1207,25 +1219,22 @@ class EventHubPixelManagerTest {
         // Change live config to a different period (1 hour instead of 120s)
         val changedPeriodConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "enabled",
-                            "trigger": { "period": { "hours": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "enabled",
+                        "trigger": { "period": { "hours": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedPeriodConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
 
@@ -1246,10 +1255,10 @@ class EventHubPixelManagerTest {
     @Test
     fun `new period after firing uses latest config, not stored config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val periodStart = 1000L
@@ -1268,25 +1277,22 @@ class EventHubPixelManagerTest {
         // Change live config to 1 hour period before firing
         val changedPeriodConfig = """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "test_pixel": {
-                            "state": "enabled",
-                            "trigger": { "period": { "hours": 1 } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
-                                }
+                "telemetry": {
+                    "test_pixel": {
+                        "state": "enabled",
+                        "trigger": { "period": { "hours": 1 } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { "0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5} }
                             }
                         }
                     }
                 }
             }
         """.trimIndent()
-        whenever(repository.getEventHubConfigJson()).thenReturn(changedPeriodConfig)
+        whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
 
@@ -1328,29 +1334,26 @@ class EventHubPixelManagerTest {
     private fun twoPixelConfig(periodSecondsA: Int, periodSecondsB: Int, bucketDef: String): String {
         return """
             {
-                "state": "enabled",
-                "settings": {
-                    "telemetry": {
-                        "pixel_a": {
-                            "state": "enabled",
-                            "trigger": { "period": { "seconds": $periodSecondsA } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { $bucketDef }
-                                }
+                "telemetry": {
+                    "pixel_a": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": $periodSecondsA } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { $bucketDef }
                             }
-                        },
-                        "pixel_b": {
-                            "state": "enabled",
-                            "trigger": { "period": { "seconds": $periodSecondsB } },
-                            "parameters": {
-                                "count": {
-                                    "template": "counter",
-                                    "source": "evt",
-                                    "buckets": { $bucketDef }
-                                }
+                        }
+                    },
+                    "pixel_b": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": $periodSecondsB } },
+                        "parameters": {
+                            "count": {
+                                "template": "counter",
+                                "source": "evt",
+                                "buckets": { $bucketDef }
                             }
                         }
                     }
@@ -1365,8 +1368,8 @@ class EventHubPixelManagerTest {
 
         // Step 1: config [1] loads — both pixels registered with 60s/120s periods
         val config1 = twoPixelConfig(60, 120, buckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config1)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(config1)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         timeProvider.time = 10_000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -1385,17 +1388,21 @@ class EventHubPixelManagerTest {
         assertEquals(120L, configB1.trigger.period.periodSeconds)
 
         // Step 2: config [2] loads — pixels A and B still use config [1]
-        org.mockito.Mockito.reset(repository, pixel)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
         val config2 = twoPixelConfig(90, 180, buckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config2)
+        whenever(selfToggle.getSettings()).thenReturn(config2)
 
         // Simulate accumulated state on both pixels
         val stateA1WithCount = stateA1.copy(paramsJson = """{"count": 2}""")
         val stateB1WithCount = stateB1.copy(paramsJson = """{"count": 3}""")
         stubPixelStates(stateA1WithCount, stateB1WithCount)
         manager.onConfigChanged()
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config2)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(config2)
         stubPixelStates(stateA1WithCount, stateB1WithCount)
 
         // Events still use config [1] stored in state
@@ -1412,8 +1419,10 @@ class EventHubPixelManagerTest {
         assertEquals(stateB1.configJson, updatedB.configJson)
 
         // Step 3: pixel A fires — new cycle uses config [2], pixel B still on config [1]
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config2)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(config2)
 
         timeProvider.time = stateA1.periodEndMillis + 1
         stubPixelStates(updatedA, updatedB)
@@ -1433,13 +1442,17 @@ class EventHubPixelManagerTest {
         assertEquals(90L, configA2.trigger.period.periodSeconds)
 
         // Step 4: config [3] loads — pixel A on [2], pixel B still on [1]
-        org.mockito.Mockito.reset(repository, pixel)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
         val config3 = twoPixelConfig(45, 300, buckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config3)
+        whenever(selfToggle.getSettings()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
         manager.onConfigChanged()
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config3)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
 
         manager.handleWebEvent(webEventData("evt"), "")
@@ -1453,8 +1466,10 @@ class EventHubPixelManagerTest {
         assertEquals(stateB1.configJson, bAfter3.configJson)
 
         // Step 5: pixel B fires — new cycle uses config [3]
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(config3)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(config3)
 
         timeProvider.time = stateB1.periodEndMillis + 1
         stubPixelStates(aAfter3, bAfter3)
@@ -1513,8 +1528,8 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `config round-trip preserves all fields`() {
-        val config = EventHubConfigParser.parse(fullConfig)
-        val pixelConfig = config.telemetry.first()
+        val configs = EventHubConfigParser.parseTelemetry(fullConfig)
+        val pixelConfig = configs.first()
 
         val serialized = EventHubConfigParser.serializePixelConfig(pixelConfig)
         val restored = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, serialized)!!
@@ -1589,8 +1604,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(first.capture())
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
@@ -1648,12 +1665,14 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository, never()).savePixelState(any())
 
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(state)
         manager.onConfigChanged()
 
@@ -1675,8 +1694,10 @@ class EventHubPixelManagerTest {
         assertEquals(6, parseParamValues(preFire.firstValue.paramsJson)["count"])
 
         // Simulate fire button: tabs cleared, new tab created — repository state untouched
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(preFire.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "newTab1")
@@ -1703,8 +1724,10 @@ class EventHubPixelManagerTest {
         assertEquals(periodEnd, preFire.firstValue.periodEndMillis)
 
         // Simulate fire button: new tabs, but repository state (including period) persists
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(preFire.firstValue)
 
         timeProvider.time = 10_000L
@@ -1762,10 +1785,10 @@ class EventHubPixelManagerTest {
     fun `config state persists across fire button`() {
         // Pixel was registered with specific config snapshot — fire button must not erase it
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(repository.getEventHubConfigJson()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        val originalPixelConfig = EventHubConfigParser.parse(originalConfig).telemetry.first()
+        val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
 
         val state = pixelState("test_pixel", mapOf("count" to 2), configJson = storedConfigJson)
@@ -1783,8 +1806,8 @@ class EventHubPixelManagerTest {
     @Test
     fun `multi-pixel state all persists across fire button`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         val stateA = pixelState("pixel_a", mapOf("count" to 2))
         val stateB = pixelState("pixel_b", mapOf("count" to 3))
@@ -1814,8 +1837,10 @@ class EventHubPixelManagerTest {
         assertEquals(1, parseParamValues(first.firstValue.paramsJson)["count"])
 
         // Fire button: tab1 destroyed, new tab created with different webViewId
-        org.mockito.Mockito.reset(repository)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(first.firstValue)
 
         // Same URL in new tab — different webViewId means not deduped
@@ -1837,8 +1862,10 @@ class EventHubPixelManagerTest {
 
         // Pre-fire: 3 events on different pages
         for (i in 1..3) {
-            org.mockito.Mockito.reset(repository)
-            whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+            org.mockito.Mockito.reset(repository, selfToggle)
+            whenever(eventHubFeature.self()).thenReturn(selfToggle)
+            whenever(selfToggle.isEnabled()).thenReturn(true)
+            whenever(selfToggle.getSettings()).thenReturn(fullConfig)
             val currentState = if (i == 1) {
                 state
             } else {
@@ -1856,8 +1883,10 @@ class EventHubPixelManagerTest {
         // Fire button — new tabs
         // Post-fire: 2 more events
         for (i in 1..2) {
-            org.mockito.Mockito.reset(repository)
-            whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+            org.mockito.Mockito.reset(repository, selfToggle)
+            whenever(eventHubFeature.self()).thenReturn(selfToggle)
+            whenever(selfToggle.isEnabled()).thenReturn(true)
+            whenever(selfToggle.getSettings()).thenReturn(fullConfig)
             val currentState = pixelState(
                 "webTelemetry_testPixel1",
                 mapOf("count" to 2 + i),
@@ -1874,8 +1903,10 @@ class EventHubPixelManagerTest {
         assertEquals(5, parseParamValues(postFire.firstValue.paramsJson)["count"])
 
         // Period elapses — checkPixels fires the total
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         timeProvider.time = periodEnd + 1
         val finalState = EventHubPixelStateEntity(
             pixelName = "webTelemetry_testPixel1",
@@ -1937,8 +1968,10 @@ class EventHubPixelManagerTest {
         val savedState = captor.firstValue
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(savedState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
 
@@ -1986,7 +2019,7 @@ class EventHubPixelManagerTest {
         assertTrue(manager.hasScheduledTimer("pixel_a"))
         assertTrue(manager.hasScheduledTimer("pixel_b"))
 
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
 
         assertFalse(manager.hasScheduledTimer("pixel_a"))
@@ -2026,7 +2059,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `checkPixels does not reschedule timers when feature disabled`() {
-        whenever(repository.getEventHubConfigJson()).thenReturn("""{"state": "disabled"}""")
+        whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
 
@@ -2045,8 +2078,10 @@ class EventHubPixelManagerTest {
         val savedState = captor.firstValue
         assertEquals(0, parseParamValues(savedState.paramsJson)["count"])
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(savedState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
 
@@ -2074,8 +2109,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
@@ -2095,8 +2132,8 @@ class EventHubPixelManagerTest {
     @Test
     fun `multi-pixel timers are scheduled independently with correct delays`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(repository.getEventHubConfigJson()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState)
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         timeProvider.time = 1000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -2129,8 +2166,10 @@ class EventHubPixelManagerTest {
         val initialState = initCaptor.firstValue
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
@@ -2159,8 +2198,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
@@ -2283,8 +2324,10 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
@@ -2328,8 +2371,10 @@ class EventHubPixelManagerTest {
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         verify(repository, never()).savePixelState(any())
 
-        org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
@@ -2356,8 +2401,9 @@ class EventHubPixelManagerTest {
         configJson: String? = null,
     ): EventHubPixelStateEntity {
         val resolvedConfigJson = configJson ?: run {
-            val config = EventHubConfigParser.parse(repository.getEventHubConfigJson())
-            val pixelConfig = config.telemetry.find { it.name == name }
+            val settingsJson = selfToggle.getSettings() ?: return@run "{}"
+            val configs = EventHubConfigParser.parseTelemetry(settingsJson)
+            val pixelConfig = configs.find { it.name == name }
             pixelConfig?.let { EventHubConfigParser.serializePixelConfig(it) } ?: "{}"
         }
         val paramStates = params.mapValues { (key, value) ->
