@@ -290,7 +290,7 @@ class RealSecureStorageKeyStore constructor(
                 ),
                 type = Daily(),
             )
-            null
+            return
         }
 
         when {
