@@ -64,6 +64,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
@@ -73,7 +74,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -90,6 +90,7 @@ class WelcomePageViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
+    private val deviceInfo: DeviceInfo,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -339,7 +340,7 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {
-        Locale.getDefault().language == "en" &&
+        deviceInfo.language == "en" &&
             androidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().isEnabled()
     }
 
