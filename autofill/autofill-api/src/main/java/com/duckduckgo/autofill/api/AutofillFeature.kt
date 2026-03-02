@@ -191,4 +191,7 @@ interface AutofillFeature {
      */
     @DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun sqlCipherAsyncLoading(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun addHarmonyFixes(): Toggle
 }

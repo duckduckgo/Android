@@ -10,6 +10,11 @@
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
+                "type": "string"
             }
         ]
     },
@@ -24,6 +29,11 @@
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
                 "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
+                "type": "string"
             }
         ]
     },
@@ -35,8 +45,18 @@
         "parameters": [
             "appVersion",
             {
+                "key": "key",
+                "description": "The name of the key that failed to update",
+                "type": "string"
+            },
+            {
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
                 "type": "string"
             }
         ]
@@ -49,8 +69,18 @@
         "parameters": [
             "appVersion",
             {
+                "key": "key",
+                "description": "The name of the key that failed to update in Harmony",
+                "type": "string"
+            },
+            {
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
                 "type": "string"
             }
         ]
@@ -63,8 +93,18 @@
         "parameters": [
             "appVersion",
             {
+                "key": "key",
+                "description": "The name of the key that failed to read from Harmony",
+                "type": "string"
+            },
+            {
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
                 "type": "string"
             }
         ]
@@ -77,8 +117,75 @@
         "parameters": [
             "appVersion",
             {
+                "key": "key",
+                "description": "The name of the key that failed to read from legacy",
+                "type": "string"
+            },
+            {
                 "key": "error",
                 "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_harmony_key_mismatch": {
+        "description": "Harmony and legacy preferences both have non-null values for the same key but they differ (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that has a mismatch between Harmony and legacy",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_harmony_key_missing": {
+        "description": "Harmony preferences returns null for a key that exists in legacy preferences (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that is missing from Harmony",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
+                "type": "string"
+            }
+        ]
+    },
+    "autofill_store_key_already_exists": {
+        "description": "Write guard blocked an attempt to overwrite an existing encryption key — prevents irreversible credential corruption (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that already exists and was protected from overwrite",
+                "type": "string"
+            },
+            {
+                "key": "addHarmonyFixes",
+                "description": "Whether the addHarmonyFixes feature flag is enabled",
                 "type": "string"
             }
         ]
