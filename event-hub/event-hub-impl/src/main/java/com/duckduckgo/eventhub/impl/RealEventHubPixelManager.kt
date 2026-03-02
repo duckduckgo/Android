@@ -16,9 +16,13 @@
 
 package com.duckduckgo.eventhub.impl
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -330,6 +334,8 @@ interface TimeProvider {
     fun currentTimeMillis(): Long
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealTimeProvider @Inject constructor() : TimeProvider {
     override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
