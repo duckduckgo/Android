@@ -34,9 +34,6 @@ import javax.inject.Qualifier
 internal annotation class EventHubPrefs
 
 interface EventHubDataStore {
-    fun getEventHubConfigJson(): String
-    fun setEventHubConfigJson(value: String)
-
     fun getWebEventsConfigJson(): String
     fun setWebEventsConfigJson(value: String)
 }
@@ -50,12 +47,8 @@ class SharedPreferencesEventHubDataStore @Inject constructor(
 ) : EventHubDataStore {
 
     private object Keys {
-        val EVENT_HUB_RC = stringPreferencesKey(name = "EVENT_HUB_RC")
         val WEB_EVENTS_RC = stringPreferencesKey(name = "WEB_EVENTS_RC")
     }
-
-    @Volatile
-    private var cachedEventHubJson: String = EMPTY_JSON
 
     @Volatile
     private var cachedWebEventsJson: String = EMPTY_JSON
@@ -63,18 +56,8 @@ class SharedPreferencesEventHubDataStore @Inject constructor(
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             store.data.collect { prefs ->
-                cachedEventHubJson = prefs[Keys.EVENT_HUB_RC] ?: EMPTY_JSON
                 cachedWebEventsJson = prefs[Keys.WEB_EVENTS_RC] ?: EMPTY_JSON
             }
-        }
-    }
-
-    override fun getEventHubConfigJson(): String = cachedEventHubJson
-
-    override fun setEventHubConfigJson(value: String) {
-        cachedEventHubJson = value
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            store.edit { prefs -> prefs[Keys.EVENT_HUB_RC] = value }
         }
     }
 

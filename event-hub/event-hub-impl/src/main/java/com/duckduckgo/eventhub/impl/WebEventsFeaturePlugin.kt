@@ -17,30 +17,10 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.LogPriority.DEBUG
-import logcat.logcat
 import javax.inject.Inject
-
-@ContributesMultibinding(AppScope::class)
-class EventHubFeaturePlugin @Inject constructor(
-    private val repository: EventHubRepository,
-    private val pixelManager: EventHubPixelManager,
-) : PrivacyFeaturePlugin {
-
-    override fun store(featureName: String, jsonString: String): Boolean {
-        if (featureName == this.featureName) {
-            logcat(DEBUG) { "EventHub: storing eventHub config (${jsonString.length} chars)" }
-            repository.setEventHubConfigJson(jsonString)
-            pixelManager.onConfigChanged()
-            return true
-        }
-        return false
-    }
-
-    override val featureName: String = EventHubFeatureName.EventHub.value
-}
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsFeaturePlugin @Inject constructor(
@@ -55,5 +35,22 @@ class WebEventsFeaturePlugin @Inject constructor(
         return false
     }
 
-    override val featureName: String = EventHubFeatureName.WebEvents.value
+    override val featureName: String = WebEventsFeatureName.WebEvents.value
+}
+
+@ContributesMultibinding(
+    AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+class EventHubPrivacyConfigCallback @Inject constructor(
+    private val pixelManager: EventHubPixelManager,
+) : PrivacyConfigCallbackPlugin {
+
+    override fun onPrivacyConfigDownloaded() {
+        // NO-OP
+    }
+
+    override fun onPrivacyConfigPersisted() {
+        pixelManager.onConfigChanged()
+    }
 }

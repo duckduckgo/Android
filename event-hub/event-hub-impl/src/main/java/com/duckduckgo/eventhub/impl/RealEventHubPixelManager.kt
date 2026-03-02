@@ -44,14 +44,23 @@ class RealEventHubPixelManager @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val foregroundStateProvider: AppForegroundStateProvider,
+    private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
 
     @Volatile
-    private var cachedConfig: EventHubConfigParser.ParsedConfig? = null
+    private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
+
+    private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
+
+    private fun getTelemetryConfigs(): List<TelemetryPixelConfig> {
+        cachedTelemetryConfigs?.let { return it }
+        val settingsJson = eventHubFeature.self().getSettings() ?: return emptyList()
+        return EventHubConfigParser.parseTelemetry(settingsJson).also { cachedTelemetryConfigs = it }
+    }
 
     override fun onNavigationStarted(webViewId: String, url: String) {
         if (webViewId.isEmpty() || url.isEmpty()) return
@@ -66,8 +75,7 @@ class RealEventHubPixelManager @Inject constructor(
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
 
-        val config = getParsedConfig()
-        if (!config.featureEnabled) return
+        if (!isFeatureEnabled()) return
 
         val nowMillis = timeProvider.currentTimeMillis()
 
@@ -126,8 +134,7 @@ class RealEventHubPixelManager @Inject constructor(
      * (e.g., timer fired while backgrounded and no new period was started).
      */
     override fun checkPixels() {
-        val config = getParsedConfig()
-        if (!config.featureEnabled) return
+        if (!isFeatureEnabled()) return
 
         val nowMillis = timeProvider.currentTimeMillis()
 
@@ -141,7 +148,7 @@ class RealEventHubPixelManager @Inject constructor(
             }
         }
 
-        for (pixelConfig in config.telemetry) {
+        for (pixelConfig in getTelemetryConfigs()) {
             if (repository.getPixelState(pixelConfig.name) == null) {
                 startNewPeriod(pixelConfig)
             }
@@ -149,17 +156,18 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onConfigChanged() {
-        cachedConfig = null
-        val config = getParsedConfig()
-        if (!config.featureEnabled) {
+        cachedTelemetryConfigs = null
+
+        if (!isFeatureEnabled()) {
             logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
             cancelAllTimers()
             repository.deleteAllPixelStates()
             return
         }
 
-        logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${config.telemetry.size} telemetry pixel(s) in config" }
-        for (pixelConfig in config.telemetry) {
+        val telemetry = getTelemetryConfigs()
+        logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+        for (pixelConfig in telemetry) {
             if (repository.getPixelState(pixelConfig.name) == null) {
                 startNewPeriod(pixelConfig)
             }
@@ -177,8 +185,7 @@ class RealEventHubPixelManager @Inject constructor(
             delay(delayMillis)
             ensureActive()
 
-            val config = getParsedConfig()
-            if (!config.featureEnabled) return@launch
+            if (!isFeatureEnabled()) return@launch
 
             val state = repository.getPixelState(pixelName) ?: return@launch
             val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: return@launch
@@ -229,16 +236,14 @@ class RealEventHubPixelManager @Inject constructor(
 
         repository.deletePixelState(pixelConfig.name)
 
-        val latestConfig = getParsedConfig()
-        val latestPixelConfig = latestConfig.telemetry.find { it.name == pixelConfig.name }
+        val latestPixelConfig = getTelemetryConfigs().find { it.name == pixelConfig.name }
         if (latestPixelConfig != null) {
             startNewPeriod(latestPixelConfig)
         }
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
-        val config = getParsedConfig()
-        if (!foregroundStateProvider.isInForeground || !config.featureEnabled || !pixelConfig.isEnabled) {
+        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return
         }
@@ -278,11 +283,6 @@ class RealEventHubPixelManager @Inject constructor(
         }
 
         return pixelData
-    }
-
-    private fun getParsedConfig(): EventHubConfigParser.ParsedConfig {
-        cachedConfig?.let { return it }
-        return EventHubConfigParser.parse(repository.getEventHubConfigJson()).also { cachedConfig = it }
     }
 
     companion object {
