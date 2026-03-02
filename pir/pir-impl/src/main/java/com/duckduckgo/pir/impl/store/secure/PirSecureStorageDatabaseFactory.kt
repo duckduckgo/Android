@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.store.secure
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.pir.impl.store.PirDatabase
@@ -25,6 +26,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -42,6 +44,7 @@ interface PirSecureStorageDatabaseFactory {
 )
 class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
+    private val dispatchers: DispatcherProvider,
     private val keyProvider: PirSecureStorageKeyProvider,
 ) : PirSecureStorageDatabaseFactory {
     private var _database: PirDatabase? = null
@@ -64,7 +67,9 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
 
         logcat { "PIR-DB: Loading the sqlcipher native library" }
         try {
-            LibraryLoader.loadLibrary(context, "sqlcipher")
+            withContext(dispatchers.io()) {
+                LibraryLoader.loadLibrary(context, "sqlcipher")
+            }
             logcat { "PIR-DB: sqlcipher native library loaded ok" }
         } catch (t: Throwable) {
             // error loading the library
