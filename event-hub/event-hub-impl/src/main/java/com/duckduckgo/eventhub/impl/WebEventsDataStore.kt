@@ -31,20 +31,20 @@ import javax.inject.Inject
 import javax.inject.Qualifier
 
 @Qualifier
-internal annotation class EventHubPrefs
+internal annotation class WebEventsPrefs
 
-interface EventHubDataStore {
+interface WebEventsDataStore {
     fun getWebEventsConfigJson(): String
     fun setWebEventsConfigJson(value: String)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class SharedPreferencesEventHubDataStore @Inject constructor(
-    @EventHubPrefs private val store: DataStore<Preferences>,
+class SharedPreferencesWebEventsDataStore @Inject constructor(
+    @WebEventsPrefs private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : EventHubDataStore {
+) : WebEventsDataStore {
 
     private object Keys {
         val WEB_EVENTS_RC = stringPreferencesKey(name = "WEB_EVENTS_RC")

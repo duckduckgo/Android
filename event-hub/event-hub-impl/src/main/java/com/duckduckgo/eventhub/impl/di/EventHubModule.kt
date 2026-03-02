@@ -17,13 +17,8 @@
 package com.duckduckgo.eventhub.impl.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.EventHubDataStore
-import com.duckduckgo.eventhub.impl.EventHubPrefs
 import com.duckduckgo.eventhub.impl.EventHubRepository
 import com.duckduckgo.eventhub.impl.RealEventHubRepository
 import com.duckduckgo.eventhub.impl.store.ALL_MIGRATIONS
@@ -36,14 +31,6 @@ import dagger.SingleInstanceIn
 @Module
 @ContributesTo(AppScope::class)
 object EventHubModule {
-
-    private val Context.eventHubDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "event_hub",
-    )
-
-    @Provides
-    @EventHubPrefs
-    fun provideEventHubDataStore(context: Context): DataStore<Preferences> = context.eventHubDataStore
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -58,9 +45,8 @@ object EventHubModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideEventHubRepository(
-        dataStore: EventHubDataStore,
         database: EventHubPixelStateDatabase,
     ): EventHubRepository {
-        return RealEventHubRepository(dataStore, database.pixelStateDao())
+        return RealEventHubRepository(database.pixelStateDao())
     }
 }
