@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -43,9 +44,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.duckduckgo.common.utils.R as CommonR
@@ -341,6 +344,31 @@ class DownloadsViewModelTest {
         testee.removeFromDownloadManager(downloadId)
 
         verify(mockDownloadsRepository).delete(downloadId)
+    }
+
+    @Test
+    fun whenSyncDownloadsThenStaleFinishedDownloadsAreRemoved() = runTest {
+        val existingFile = File.createTempFile("existing", ".jpg")
+        existingFile.deleteOnExit()
+        val staleItem = oneItem().copy(downloadId = 1L, filePath = "/non/existent/path/file.jpg")
+        val existingItem = oneItem().copy(downloadId = 2L, filePath = existingFile.absolutePath)
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(listOf(staleItem, existingItem))
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(listOf(existingItem)))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadsRepository).delete(listOf(1L))
+    }
+
+    @Test
+    fun whenSyncDownloadsThenInProgressDownloadsAreNotRemoved() = runTest {
+        val inProgressItem = oneItem().copy(downloadId = 1L, downloadStatus = STARTED, filePath = "/non/existent/path/file.jpg")
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(listOf(inProgressItem))
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(listOf(inProgressItem)))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadsRepository, never()).delete(listOf(1L))
     }
 
     private fun oneItem() =
