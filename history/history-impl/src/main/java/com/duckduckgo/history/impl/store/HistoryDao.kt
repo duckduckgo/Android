@@ -108,11 +108,8 @@ interface HistoryDao {
     @Query("DELETE FROM visits_list WHERE tabId = :tabId")
     suspend fun deleteVisitsByTabId(tabId: String)
 
-    @Transaction
-    suspend fun deleteHistoryForTab(tabId: String) {
-        deleteVisitsByTabId(tabId)
-        deleteEntriesWithNoVisits()
-    }
+    @Query("DELETE FROM history_entries WHERE id IN (SELECT DISTINCT historyEntryId FROM visits_list WHERE tabId = :tabId)")
+    suspend fun deleteHistoryForTab(tabId: String)
 
     @Transaction
     suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime) {

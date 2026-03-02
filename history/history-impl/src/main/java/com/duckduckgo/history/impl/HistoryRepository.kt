@@ -21,6 +21,7 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
@@ -62,6 +63,7 @@ class RealHistoryRepository(
     override fun getHistory(): Flow<List<HistoryEntry>> =
         historyDao.getHistoryEntriesWithVisitsFlow()
             .map { entries -> entries.mapNotNull { it.toHistoryEntry() } }
+            .distinctUntilChanged()
 
     override suspend fun saveToHistory(
         url: String,
