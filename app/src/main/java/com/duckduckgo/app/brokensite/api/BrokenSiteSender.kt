@@ -197,9 +197,11 @@ class BrokenSiteSubmitter @Inject constructor(
                 }
                 .onFailure { logcat(WARN) { "Feedback submission failed: ${it.asLog()}" } }
 
+            // Use the sanitized URL (scheme + host + path only, no query/fragment)
+            // to avoid leaking query parameters which may contain PII
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to siteUrl),
+                mapOf(Pixel.PixelParameter.URL to absoluteUrl),
             )
         }
     }
