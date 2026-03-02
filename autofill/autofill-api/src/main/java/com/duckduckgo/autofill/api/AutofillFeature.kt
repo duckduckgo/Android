@@ -192,6 +192,12 @@ interface AutofillFeature {
     @DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun sqlCipherAsyncLoading(): Toggle
 
+    /**
+     * Controls whether fixes for using Harmony preferences should be applied. If disabled, data
+     * stored in Harmony will be queried for instrumentation purposes, but never used to decrypt
+     *
+     * @return `true` to apply fixes
+     */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun addHarmonyFixes(): Toggle
 }
