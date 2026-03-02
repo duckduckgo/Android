@@ -24,6 +24,7 @@ import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.pir.impl.store.PirDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -72,6 +73,7 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
             }
             logcat { "PIR-DB: sqlcipher native library loaded ok" }
         } catch (t: Throwable) {
+            if (t is CancellationException) throw t
             // error loading the library
             logcat(ERROR) { "PIR-DB: Error loading sqlcipher library: ${t.asLog()}" }
         }
