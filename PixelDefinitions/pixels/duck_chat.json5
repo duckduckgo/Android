@@ -141,6 +141,27 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_contextual_page_context_invalid_empty": {
+        "description": "User attempted to attach page context but the context string was empty",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_title": {
+        "description": "User attempted to attach page context but the extracted title was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_content": {
+        "description": "User attempted to attach page context but the extracted content body was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_contextual_page_context_auto_attached_count": {
         "description": "The page context has been automatically attached to the Contextual sheet",
         "owners": ["malmstein"],

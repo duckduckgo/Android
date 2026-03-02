@@ -436,6 +436,52 @@ class DuckChatContextualViewModelTest {
             assertFalse(state.showContext)
             assertFalse(state.userRemovedContext)
             verify(duckChatPixels).reportContextualPlaceholderContextTapped()
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
+        }
+
+    @Test
+    fun `when addPageContext with empty context then invalid empty pixel fired`() =
+        runTest {
+            testee.updatedPageContext = ""
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
+        }
+
+    @Test
+    fun `when addPageContext with missing title then invalid no title pixel fired`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "url": "https://ctx.com",
+                    "content": "some content"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+        }
+
+    @Test
+    fun `when addPageContext with both title and content missing then both invalid pixels fired`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "url": "https://ctx.com"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
         }
 
     @Test

@@ -346,7 +346,7 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai Contextual: addPageContext" }
         duckChatPixels.reportContextualPlaceholderContextTapped()
         viewModelScope.launch {
-            val isContextValid = isContextValid(updatedPageContext)
+            val isContextValid = isContextValid(updatedPageContext, reportInvalidPixels = true)
             if (isContextValid) {
                 duckChatPixels.reportContextualPageContextManuallyAttachedNative()
                 _viewState.update { current ->
@@ -360,12 +360,18 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    private fun isContextValid(pageContext: String): Boolean {
-        if (pageContext.isEmpty()) return false
+    private fun isContextValid(pageContext: String, reportInvalidPixels: Boolean = false): Boolean {
+        if (pageContext.isEmpty()) {
+            if (reportInvalidPixels) duckChatPixels.reportContextualPageContextInvalidEmpty()
+            return false
+        }
         val json = JSONObject(pageContext)
         val title = json.optString("title").takeIf { it.isNotBlank() }
         val content = json.optString("content").takeIf { it.isNotBlank() }
-
+        if (reportInvalidPixels) {
+            if (title == null) duckChatPixels.reportContextualPageContextInvalidNoTitle()
+            if (content == null) duckChatPixels.reportContextualPageContextInvalidNoContent()
+        }
         return title != null && content != null
     }
 
