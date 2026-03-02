@@ -1183,6 +1183,11 @@ class OmnibarLayout @JvmOverloads constructor(
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
                     }
+
+                    customTabSceneRoot.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY, type = PixelType.Daily())
+                    }
                 }
             }
         } else {
