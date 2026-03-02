@@ -58,6 +58,9 @@ dependencies {
     // Dagger
     implementation Google.dagger
 
+    // Moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+
     implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
