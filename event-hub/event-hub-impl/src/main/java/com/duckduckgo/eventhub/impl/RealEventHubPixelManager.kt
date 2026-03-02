@@ -64,6 +64,10 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun onNavigationStarted(webViewId: String, url: String) {
         if (webViewId.isEmpty() || url.isEmpty()) return
+        if (webViewCurrentUrl.size > MAX_TRACKED_WEBVIEWS) {
+            webViewCurrentUrl.clear()
+            dedupSeen.clear()
+        }
         val previousUrl = webViewCurrentUrl.put(webViewId, url)
         if (previousUrl != null && previousUrl != url) {
             logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
@@ -136,21 +140,23 @@ class RealEventHubPixelManager @Inject constructor(
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
+        synchronized(this) {
+            val nowMillis = timeProvider.currentTimeMillis()
 
-        for (state in repository.getAllPixelStates()) {
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
+            for (state in repository.getAllPixelStates()) {
+                val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
-            if (nowMillis >= state.periodEndMillis) {
-                fireTelemetry(storedConfig, state)
-            } else {
-                scheduleFireTelemetry(state.pixelName, state.periodEndMillis - nowMillis)
+                if (nowMillis >= state.periodEndMillis) {
+                    fireTelemetry(storedConfig, state)
+                } else {
+                    scheduleFireTelemetry(state.pixelName, state.periodEndMillis - nowMillis)
+                }
             }
-        }
 
-        for (pixelConfig in getTelemetryConfigs()) {
-            if (repository.getPixelState(pixelConfig.name) == null) {
-                startNewPeriod(pixelConfig)
+            for (pixelConfig in getTelemetryConfigs()) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
+                }
             }
         }
     }
@@ -158,41 +164,59 @@ class RealEventHubPixelManager @Inject constructor(
     override fun onConfigChanged() {
         cachedTelemetryConfigs = null
 
-        if (!isFeatureEnabled()) {
-            logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-            cancelAllTimers()
-            repository.deleteAllPixelStates()
-            return
-        }
+        synchronized(this) {
+            if (!isFeatureEnabled()) {
+                logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
+                cancelAllTimers()
+                repository.deleteAllPixelStates()
+                dedupSeen.clear()
+                webViewCurrentUrl.clear()
+                return
+            }
 
-        val telemetry = getTelemetryConfigs()
-        logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
-        for (pixelConfig in telemetry) {
-            if (repository.getPixelState(pixelConfig.name) == null) {
-                startNewPeriod(pixelConfig)
+            val telemetry = getTelemetryConfigs()
+            logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+            for (pixelConfig in telemetry) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
+                }
             }
         }
     }
 
     fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
-        if (scheduledTimers.containsKey(pixelName)) {
-            logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
-            return
+        synchronized(this) {
+            if (scheduledTimers.containsKey(pixelName)) {
+                logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
+                return
+            }
+
+            logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
+            val job = appCoroutineScope.launch(dispatcherProvider.io()) {
+                delay(delayMillis)
+                ensureActive()
+
+                if (!isFeatureEnabled()) {
+                    scheduledTimers.remove(pixelName)
+                    return@launch
+                }
+
+                synchronized(this@RealEventHubPixelManager) {
+                    val state = repository.getPixelState(pixelName)
+                    if (state == null) {
+                        scheduledTimers.remove(pixelName)
+                        return@launch
+                    }
+                    val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson)
+                    if (storedConfig == null) {
+                        scheduledTimers.remove(pixelName)
+                        return@launch
+                    }
+                    fireTelemetry(storedConfig, state)
+                }
+            }
+            scheduledTimers[pixelName] = job
         }
-
-        logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
-        val job = appCoroutineScope.launch(dispatcherProvider.io()) {
-            delay(delayMillis)
-            ensureActive()
-
-            if (!isFeatureEnabled()) return@launch
-
-            val state = repository.getPixelState(pixelName) ?: return@launch
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: return@launch
-
-            fireTelemetry(storedConfig, state)
-        }
-        scheduledTimers[pixelName] = job
     }
 
     fun hasScheduledTimer(pixelName: String): Boolean = scheduledTimers.containsKey(pixelName)
@@ -214,6 +238,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: EventHubPixelStateEntity) {
         cancelScheduledFire(pixelConfig.name)
+        dedupSeen.removeAll { it.startsWith("${pixelConfig.name}:") }
 
         val pixelData = buildPixel(pixelConfig, state)
 
@@ -287,6 +312,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     companion object {
         const val PARAM_ATTRIBUTION_PERIOD = "attributionPeriod"
+        private const val MAX_TRACKED_WEBVIEWS = 100
 
         fun calculateAttributionPeriod(periodStartMillis: Long, period: TelemetryPeriodConfig): Long {
             return toStartOfInterval(periodStartMillis, period.periodSeconds)

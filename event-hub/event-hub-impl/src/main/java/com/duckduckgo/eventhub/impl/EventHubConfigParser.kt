@@ -122,6 +122,7 @@ object EventHubConfigParser {
             hours = periodJson.hours,
             days = periodJson.days,
         )
+        if (period.periodSeconds <= 0) return null
 
         val parameters = mutableMapOf<String, TelemetryParameterConfig>()
         for ((paramName, paramJson) in json.parameters) {
