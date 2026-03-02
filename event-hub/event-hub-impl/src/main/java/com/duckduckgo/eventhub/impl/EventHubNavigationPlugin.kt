@@ -35,8 +35,8 @@ class EventHubNavigationPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        val tabId = System.identityHashCode(webView).toString()
-        pixelManager.onNavigationStarted(tabId, url ?: "")
+        val webViewId = System.identityHashCode(webView).toString()
+        pixelManager.onNavigationStarted(webViewId, url ?: "")
     }
 
     override fun onPageFinished(webView: WebView, url: String?, site: Site?) {

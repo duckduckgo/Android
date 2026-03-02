@@ -41,19 +41,19 @@ class RealEventHubPixelManager @Inject constructor(
 ) : EventHubPixelManager {
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
-    private val tabCurrentUrl = ConcurrentHashMap<String, String>()
+    private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
     private val scheduledTimers = ConcurrentHashMap<String, Job>()
 
-    override fun onNavigationStarted(tabId: String, url: String) {
-        if (tabId.isEmpty() || url.isEmpty()) return
-        val previousUrl = tabCurrentUrl.put(tabId, url)
+    override fun onNavigationStarted(webViewId: String, url: String) {
+        if (webViewId.isEmpty() || url.isEmpty()) return
+        val previousUrl = webViewCurrentUrl.put(webViewId, url)
         if (previousUrl != null && previousUrl != url) {
-            logcat(VERBOSE) { "EventHub: navigation detected for tab $tabId ($previousUrl -> $url), clearing dedup" }
-            dedupSeen.removeAll { it.endsWith(":$tabId") }
+            logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
+            dedupSeen.removeAll { it.endsWith(":$webViewId") }
         }
     }
 
-    override fun handleWebEvent(data: JSONObject, tabId: String) {
+    override fun handleWebEvent(data: JSONObject, webViewId: String) {
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
 
@@ -75,7 +75,7 @@ class RealEventHubPixelManager @Inject constructor(
                     if (paramConfig.isCounter && paramConfig.source == eventType) {
                         val paramState = params[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId)) continue
+                        if (isDuplicateEvent(storedConfig.name, paramName, eventType, webViewId)) continue
 
                         changed = true
                         if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
@@ -99,9 +99,9 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, tabId: String): Boolean {
-        if (tabId.isEmpty()) return false
-        val key = "$pixelName:$paramName:$source:$tabId"
+    private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, webViewId: String): Boolean {
+        if (webViewId.isEmpty()) return false
+        val key = "$pixelName:$paramName:$source:$webViewId"
         if (!dedupSeen.add(key)) {
             logcat(VERBOSE) { "EventHub: dedup $key (already seen on current page)" }
             return true

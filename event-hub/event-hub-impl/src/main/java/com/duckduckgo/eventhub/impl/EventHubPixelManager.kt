@@ -19,8 +19,8 @@ package com.duckduckgo.eventhub.impl
 import org.json.JSONObject
 
 interface EventHubPixelManager {
-    fun handleWebEvent(data: JSONObject, tabId: String)
-    fun onNavigationStarted(tabId: String, url: String)
+    fun handleWebEvent(data: JSONObject, webViewId: String)
+    fun onNavigationStarted(webViewId: String, url: String)
     fun checkPixels()
     fun onConfigChanged()
 }
