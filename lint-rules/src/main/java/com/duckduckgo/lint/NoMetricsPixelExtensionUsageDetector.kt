@@ -61,7 +61,8 @@ class NoMetricsPixelExtensionUsageDetector : Detector(), SourceCodeScanner {
         }
 
         private fun isBannedImport(importPath: String): Boolean {
-            return importPath.endsWith("MetricsPixelExtension") || importPath.endsWith("MetricsPixelExtensionProvider")
+            val typeName = importPath.substringAfterLast('.')
+            return typeName == "MetricsPixelExtension" || typeName == "MetricsPixelExtensionProvider"
         }
     }
 

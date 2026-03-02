@@ -26,11 +26,11 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -92,33 +92,34 @@ class RealMetricsPixelSenderTest {
     }
 
     @Test
-    fun `NORMAL - returns false when no cohort assigned`() = runTest {
+    fun `NORMAL - pixel not fired when no cohort assigned`() = runTest {
         testFeature.experimentFooFeature().setRawStoredState(
             State(remoteEnableState = true, enable = true, assignedCohort = null),
         )
-        val result = sender.send(metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1))
-        assertFalse(result)
+        sender.send(metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1))
         assertTrue(fakePixel.firedPixels.isEmpty())
     }
 
     @Test
-    fun `NORMAL - returns false when outside conversion window`() = runTest {
-        val result = sender.send(metricsPixel(type = MetricType.NORMAL, lowerWindow = 5, upperWindow = 7))
-        assertFalse(result)
-    }
-
-    @Test
-    fun `NORMAL - returns true when pixel fired`() = runTest {
-        val result = sender.send(metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1))
-        assertTrue(result)
-    }
-
-    @Test
-    fun `NORMAL - returns false when pixel already sent`() = runTest {
+    fun `NORMAL - pixel not fired on second send`() = runTest {
         val pixel = metricsPixel(type = MetricType.NORMAL, lowerWindow = 0, upperWindow = 1)
         sender.send(pixel)
-        val result = sender.send(pixel)
-        assertFalse(result)
+        fakePixel.firedPixels.clear()
+        sender.send(pixel)
+        assertTrue(fakePixel.firedPixels.isEmpty())
+    }
+
+    @Test
+    fun `NORMAL - all conversion windows are processed without short-circuiting`() = runTest {
+        val pixel = MetricsPixel(
+            metric = "test_metric",
+            value = "1",
+            toggle = testFeature.experimentFooFeature(),
+            conversionWindow = listOf(ConversionWindow(0, 0), ConversionWindow(0, 1)),
+            type = MetricType.NORMAL,
+        )
+        sender.send(pixel)
+        assertEquals(2, fakePixel.firedPixels.size)
     }
 
     // COUNT_WHEN_IN_WINDOW type tests
@@ -161,42 +162,35 @@ class RealMetricsPixelSenderTest {
     }
 
     @Test
-    fun `COUNT_WHEN_IN_WINDOW - returns false when not yet at threshold`() = runTest {
-        val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "3", lowerWindow = 0, upperWindow = 1)
-        val result = sender.send(pixel)
-        assertFalse(result)
-    }
-
-    @Test
-    fun `COUNT_WHEN_IN_WINDOW - returns true when threshold reached`() = runTest {
+    fun `COUNT_WHEN_IN_WINDOW - count incremented when in conversion window`() = runTest {
         val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "3", lowerWindow = 0, upperWindow = 1)
         repeat(2) { sender.send(pixel) }
-        val result = sender.send(pixel)
-        assertTrue(result)
+        val definition = pixel.getPixelDefinitions().first()
+        assertEquals(2, store.getMetricForPixelDefinition(definition))
     }
 
     @Test
-    fun `COUNT_WHEN_IN_WINDOW - returns false when pixel already fired`() = runTest {
+    fun `COUNT_WHEN_IN_WINDOW - pixel not fired after single send below threshold`() = runTest {
+        val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "3", lowerWindow = 0, upperWindow = 1)
+        sender.send(pixel)
+        assertTrue(fakePixel.firedPixels.isEmpty())
+    }
+
+    @Test
+    fun `COUNT_WHEN_IN_WINDOW - pixel not fired after threshold already reached`() = runTest {
         val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "3", lowerWindow = 0, upperWindow = 1)
         repeat(3) { sender.send(pixel) }
-        val result = sender.send(pixel)
-        assertFalse(result)
+        fakePixel.firedPixels.clear()
+        sender.send(pixel)
+        assertTrue(fakePixel.firedPixels.isEmpty())
     }
 
     @Test
-    fun `COUNT_WHEN_IN_WINDOW - returns false when outside conversion window`() = runTest {
-        val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "1", lowerWindow = 5, upperWindow = 7)
-        val result = sender.send(pixel)
-        assertFalse(result)
-    }
-
-    @Test
-    fun `COUNT_WHEN_IN_WINDOW - returns false when no cohort assigned`() = runTest {
+    fun `COUNT_WHEN_IN_WINDOW - pixel not fired when no cohort assigned`() = runTest {
         testFeature.experimentFooFeature().setRawStoredState(
             State(remoteEnableState = true, enable = true, assignedCohort = null),
         )
-        val result = sender.send(metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "1", lowerWindow = 0, upperWindow = 1))
-        assertFalse(result)
+        sender.send(metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "1", lowerWindow = 0, upperWindow = 1))
         assertTrue(fakePixel.firedPixels.isEmpty())
     }
 
@@ -212,6 +206,25 @@ class RealMetricsPixelSenderTest {
         conversionWindow = listOf(ConversionWindow(lowerWindow, upperWindow)),
         type = type,
     )
+}
+
+private class FakeStore : MetricsPixelStore {
+    private val firedTags = mutableSetOf<String>()
+    private val metricCounts = mutableMapOf<PixelDefinition, Int>()
+
+    override suspend fun wasPixelFired(tag: String) = firedTags.contains(tag)
+
+    override fun storePixelTag(tag: String) {
+        firedTags.add(tag)
+    }
+
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int {
+        val count = (metricCounts.getOrDefault(definition, 0) + 1)
+        metricCounts[definition] = count
+        return count
+    }
+
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition) = metricCounts.getOrDefault(definition, 0)
 }
 
 private class FakeSenderPixel : Pixel {
