@@ -47,10 +47,10 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
                 return
             }
 
-            val tabId = jsMessage.params.optJSONObject("nativeData")?.optString("tabId", "") ?: ""
+            val webViewId = jsMessage.params.optJSONObject("nativeData")?.optString("webViewId", "") ?: ""
 
-            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType tabId=$tabId" }
-            pixelManager.handleWebEvent(jsMessage.params, tabId)
+            logcat(VERBOSE) { "EventHub: received webEvent type=$eventType webViewId=$webViewId" }
+            pixelManager.handleWebEvent(jsMessage.params, webViewId)
         }
 
         override val allowedDomains: List<String> = emptyList()
