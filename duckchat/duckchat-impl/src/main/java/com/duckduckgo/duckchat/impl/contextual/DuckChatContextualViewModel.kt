@@ -313,21 +313,20 @@ class DuckChatContextualViewModel @Inject constructor(
 
     private fun generatePageContextEventData(): SubscriptionEventData {
         val pageContext = if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-            if (duckChatInternal.areMultipleContentAttachmentsEnabled()) {
-                if (isContextValid(updatedPageContext)) {
-                    updatedPageContext
-                        .takeIf { it.isNotBlank() }
-                        ?.let { runCatching { JSONObject(it) }.getOrNull() }
-                        ?: run {
-                            logcat { "Duck.ai: no pageContext available" }
-                            null
-                        }
-                } else {
-                    logcat { "Duck.ai: pageContext is not valid" }
-                    null
-                }
+            if (isContextValid(updatedPageContext)) {
+                updatedPageContext
+                    .takeIf { it.isNotBlank() }
+                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                    ?: run {
+                        logcat { "Duck.ai: no pageContext available" }
+                        null
+                    }
+
+                val json = JSONObject(updatedPageContext)
+                val url = json.optString("url")
+                logcat { "Duck.ai: generatePageContextEventData for url $url" }
             } else {
-                logcat { "Duck.ai: areMultipleContentAttachmentsEnabled disabled" }
+                logcat { "Duck.ai: pageContext is not valid" }
                 null
             }
         } else {
@@ -521,9 +520,11 @@ class DuckChatContextualViewModel @Inject constructor(
                         allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
-                val pageContext = generatePageContextEventData()
-                logcat { "Duck.ai: attaching new context to Duck.ai" }
-                _subscriptionEventDataChannel.trySend(pageContext)
+                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+                    val pageContext = generatePageContextEventData()
+                    logcat { "Duck.ai: attaching new context to Duck.ai" }
+                    _subscriptionEventDataChannel.trySend(pageContext)
+                }
             }
         } else {
             updatedPageContext = ""
