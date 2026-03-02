@@ -27,7 +27,7 @@ class WebEventsContentScopeConfigPlugin @Inject constructor(
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
-        val featureName = EventHubFeatureName.WebEvents.value
+        val featureName = WebEventsFeatureName.WebEvents.value
         val config = repository.getWebEventsConfigJson()
         return "\"$featureName\":$config"
     }

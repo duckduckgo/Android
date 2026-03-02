@@ -20,9 +20,6 @@ import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
 
 interface EventHubRepository {
-    fun getEventHubConfigJson(): String
-    fun setEventHubConfigJson(value: String)
-
     fun getWebEventsConfigJson(): String
     fun setWebEventsConfigJson(value: String)
 
@@ -37,9 +34,6 @@ class RealEventHubRepository(
     private val dataStore: EventHubDataStore,
     private val pixelStateDao: EventHubPixelStateDao,
 ) : EventHubRepository {
-
-    override fun getEventHubConfigJson(): String = dataStore.getEventHubConfigJson()
-    override fun setEventHubConfigJson(value: String) = dataStore.setEventHubConfigJson(value)
 
     override fun getWebEventsConfigJson(): String = dataStore.getWebEventsConfigJson()
     override fun setWebEventsConfigJson(value: String) = dataStore.setWebEventsConfigJson(value)

@@ -23,12 +23,6 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 
 @JsonClass(generateAdapter = false)
-private data class EventHubFeatureJson(
-    val state: String = "disabled",
-    val settings: EventHubSettingsJson? = null,
-)
-
-@JsonClass(generateAdapter = false)
 private data class EventHubSettingsJson(
     val telemetry: Map<String, TelemetryPixelJson>? = null,
 )
@@ -69,32 +63,19 @@ private data class BucketJson(
 object EventHubConfigParser {
 
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-    private val featureAdapter = moshi.adapter(EventHubFeatureJson::class.java).lenient()
+    private val settingsAdapter = moshi.adapter(EventHubSettingsJson::class.java).lenient()
     private val pixelAdapter = moshi.adapter(TelemetryPixelJson::class.java).lenient()
 
-    data class ParsedConfig(
-        val featureEnabled: Boolean,
-        val telemetry: List<TelemetryPixelConfig>,
-    ) {
-        companion object {
-            val EMPTY = ParsedConfig(featureEnabled = false, telemetry = emptyList())
-        }
-    }
-
-    fun parse(featureJson: String): ParsedConfig {
+    fun parseTelemetry(settingsJson: String): List<TelemetryPixelConfig> {
         return try {
-            val json = featureAdapter.fromJson(featureJson) ?: return ParsedConfig.EMPTY
-            val featureEnabled = json.state == "enabled"
-            val telemetryMap = json.settings?.telemetry ?: return ParsedConfig(featureEnabled, emptyList())
-
-            val telemetry = telemetryMap.mapNotNull { (name, pixelJson) ->
+            val settings = settingsAdapter.fromJson(settingsJson) ?: return emptyList()
+            val telemetryMap = settings.telemetry ?: return emptyList()
+            telemetryMap.mapNotNull { (name, pixelJson) ->
                 toTelemetryPixelConfig(name, pixelJson)
             }
-
-            ParsedConfig(featureEnabled, telemetry)
         } catch (e: Exception) {
-            logcat(WARN) { "Failed to parse eventHub config: ${e.message}" }
-            ParsedConfig.EMPTY
+            logcat(WARN) { "Failed to parse eventHub settings: ${e.message}" }
+            emptyList()
         }
     }
 
