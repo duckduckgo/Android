@@ -482,9 +482,7 @@ class TabSwitcherAdapter(
     }
 
     fun onTabMoved(from: Int, to: Int) {
-        val swapped = pendingList.swap(from, to)
-        pendingList = swapped
-        differ.submitList(swapped)
+        updateData(pendingList.swap(from, to))
     }
 
     @SuppressLint("NotifyDataSetChanged")
