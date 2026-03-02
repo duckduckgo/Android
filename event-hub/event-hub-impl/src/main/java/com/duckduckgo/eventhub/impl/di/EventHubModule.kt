@@ -21,26 +21,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.AppForegroundStateProvider
 import com.duckduckgo.eventhub.impl.EventHubDataStore
-import com.duckduckgo.eventhub.impl.EventHubPixelManager
 import com.duckduckgo.eventhub.impl.EventHubPrefs
 import com.duckduckgo.eventhub.impl.EventHubRepository
-import com.duckduckgo.eventhub.impl.RealEventHubPixelManager
 import com.duckduckgo.eventhub.impl.RealEventHubRepository
-import com.duckduckgo.eventhub.impl.RealTimeProvider
-import com.duckduckgo.eventhub.impl.TimeProvider
 import com.duckduckgo.eventhub.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -71,22 +62,5 @@ object EventHubModule {
         database: EventHubPixelStateDatabase,
     ): EventHubRepository {
         return RealEventHubRepository(dataStore, database.pixelStateDao())
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideTimeProvider(): TimeProvider = RealTimeProvider()
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideEventHubPixelManager(
-        repository: EventHubRepository,
-        pixel: Pixel,
-        timeProvider: TimeProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        foregroundStateProvider: AppForegroundStateProvider,
-    ): EventHubPixelManager {
-        return RealEventHubPixelManager(repository, pixel, timeProvider, appCoroutineScope, dispatcherProvider, foregroundStateProvider)
     }
 }
