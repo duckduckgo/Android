@@ -35,14 +35,19 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val foregroundStateProvider: AppForegroundStateProvider,
 ) : EventHubPixelManager {
+
+    @Volatile
+    private var cachedConfig: EventHubConfigParser.ParsedConfig? = null
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
@@ -144,6 +149,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onConfigChanged() {
+        cachedConfig = null
         val config = getParsedConfig()
         if (!config.featureEnabled) {
             logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
@@ -275,7 +281,8 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun getParsedConfig(): EventHubConfigParser.ParsedConfig {
-        return EventHubConfigParser.parse(repository.getEventHubConfigJson())
+        cachedConfig?.let { return it }
+        return EventHubConfigParser.parse(repository.getEventHubConfigJson()).also { cachedConfig = it }
     }
 
     companion object {

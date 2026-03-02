@@ -1393,6 +1393,10 @@ class EventHubPixelManagerTest {
         val stateA1WithCount = stateA1.copy(paramsJson = """{"count": 2}""")
         val stateB1WithCount = stateB1.copy(paramsJson = """{"count": 3}""")
         stubPixelStates(stateA1WithCount, stateB1WithCount)
+        manager.onConfigChanged()
+        org.mockito.Mockito.reset(repository, pixel)
+        whenever(repository.getEventHubConfigJson()).thenReturn(config2)
+        stubPixelStates(stateA1WithCount, stateB1WithCount)
 
         // Events still use config [1] stored in state
         manager.handleWebEvent(webEventData("evt"), "")
@@ -1431,6 +1435,10 @@ class EventHubPixelManagerTest {
         // Step 4: config [3] loads — pixel A on [2], pixel B still on [1]
         org.mockito.Mockito.reset(repository, pixel)
         val config3 = twoPixelConfig(45, 300, buckets)
+        whenever(repository.getEventHubConfigJson()).thenReturn(config3)
+        stubPixelStates(newStateA2, updatedB)
+        manager.onConfigChanged()
+        org.mockito.Mockito.reset(repository, pixel)
         whenever(repository.getEventHubConfigJson()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
 
@@ -1647,6 +1655,7 @@ class EventHubPixelManagerTest {
         org.mockito.Mockito.reset(repository)
         whenever(repository.getEventHubConfigJson()).thenReturn(fullConfig)
         stubPixelStates(state)
+        manager.onConfigChanged()
 
         manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository).savePixelState(any())
