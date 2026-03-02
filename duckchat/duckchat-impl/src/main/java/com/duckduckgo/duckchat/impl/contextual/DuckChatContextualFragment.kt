@@ -637,6 +637,7 @@ class DuckChatContextualFragment :
 
     private fun observeSubscriptionEventDataChannel() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
+            logcat { "Duck.ai: sending subscription event $subscriptionEventData" }
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
     }
