@@ -62,37 +62,39 @@ class RealEventHubPixelManager @Inject constructor(
 
         val nowMillis = timeProvider.currentTimeMillis()
 
-        for (state in repository.getAllPixelStates()) {
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
+        synchronized(this) {
+            for (state in repository.getAllPixelStates()) {
+                val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
 
-            if (nowMillis > state.periodEndMillis) continue
+                if (nowMillis > state.periodEndMillis) continue
 
-            val params = parseParamsJson(state.paramsJson)
-            var changed = false
+                val params = parseParamsJson(state.paramsJson)
+                var changed = false
 
-            for ((paramName, paramConfig) in storedConfig.parameters) {
-                if (paramConfig.isCounter && paramConfig.source == eventType) {
-                    val paramState = params[paramName] ?: ParamState(0)
-                    if (paramState.stopCounting) continue
-                    if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId)) continue
+                for ((paramName, paramConfig) in storedConfig.parameters) {
+                    if (paramConfig.isCounter && paramConfig.source == eventType) {
+                        val paramState = params[paramName] ?: ParamState(0)
+                        if (paramState.stopCounting) continue
+                        if (isDuplicateEvent(storedConfig.name, paramName, eventType, tabId)) continue
 
-                    changed = true
-                    if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
-                        params[paramName] = paramState.copy(stopCounting = true)
-                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName already at max bucket, stopCounting" }
-                        continue
+                        changed = true
+                        if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
+                            params[paramName] = paramState.copy(stopCounting = true)
+                            logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName already at max bucket, stopCounting" }
+                            continue
+                        }
+
+                        val newValue = paramState.value + 1
+                        params[paramName] = paramState.copy(value = newValue)
+                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
                     }
-
-                    val newValue = paramState.value + 1
-                    params[paramName] = paramState.copy(value = newValue)
-                    logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
                 }
-            }
 
-            if (changed) {
-                repository.savePixelState(
-                    state.copy(paramsJson = serializeParams(params)),
-                )
+                if (changed) {
+                    repository.savePixelState(
+                        state.copy(paramsJson = serializeParams(params)),
+                    )
+                }
             }
         }
     }
