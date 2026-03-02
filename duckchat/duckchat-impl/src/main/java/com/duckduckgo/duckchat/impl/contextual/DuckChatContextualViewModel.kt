@@ -325,6 +325,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 val json = JSONObject(updatedPageContext)
                 val url = json.optString("url")
                 logcat { "Duck.ai: generatePageContextEventData for url $url" }
+                json
             } else {
                 logcat { "Duck.ai: pageContext is not valid" }
                 null
