@@ -336,4 +336,34 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
     }
+
+    @Test
+    fun `when reportContextualPageContextInvalidEmpty then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidEmpty()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextInvalidNoTitle then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidNoTitle()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_TITLE_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_TITLE_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextInvalidNoContent then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidNoContent()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_DAILY, type = Pixel.PixelType.Daily())
+    }
 }
