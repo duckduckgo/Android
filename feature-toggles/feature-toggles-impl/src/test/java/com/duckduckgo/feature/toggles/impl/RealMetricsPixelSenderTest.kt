@@ -26,6 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import kotlinx.coroutines.test.runTest
@@ -212,6 +213,25 @@ class RealMetricsPixelSenderTest {
         conversionWindow = listOf(ConversionWindow(lowerWindow, upperWindow)),
         type = type,
     )
+}
+
+private class FakeStore : MetricsPixelStore {
+    private val firedTags = mutableSetOf<String>()
+    private val metricCounts = mutableMapOf<PixelDefinition, Int>()
+
+    override suspend fun wasPixelFired(tag: String) = firedTags.contains(tag)
+
+    override fun storePixelTag(tag: String) {
+        firedTags.add(tag)
+    }
+
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int {
+        val count = (metricCounts.getOrDefault(definition, 0) + 1)
+        metricCounts[definition] = count
+        return count
+    }
+
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition) = metricCounts.getOrDefault(definition, 0)
 }
 
 private class FakeSenderPixel : Pixel {
