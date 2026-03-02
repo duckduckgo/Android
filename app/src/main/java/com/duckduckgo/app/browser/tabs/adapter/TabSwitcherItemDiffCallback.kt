@@ -53,7 +53,7 @@ class TabSwitcherItemDiffCallback(
     override fun getChangePayload(
         oldItem: TabSwitcherItem,
         newItem: TabSwitcherItem,
-    ): Any {
+    ): Bundle {
         val diffBundle = Bundle()
 
         when {
