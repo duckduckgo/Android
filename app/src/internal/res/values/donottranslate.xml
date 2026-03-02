@@ -135,5 +135,4 @@
     <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
     <string name="onboardingDevSettingsContextDialogsSection">Context dialogs</string>
     <string name="onboardingDevSettingsInContextDialogsSection">In-context dialogs</string>
-    <string name="onboardingDevSettingsStateLabel">State: %1$s</string>
 </resources>
