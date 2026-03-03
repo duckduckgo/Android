@@ -216,6 +216,15 @@ afterEvaluate {
             reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
         }
     }
+
+    // Android connected tests
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_CONNECTED
+        )
+    }
 }
 
 apply plugin: 'android-reporting'
