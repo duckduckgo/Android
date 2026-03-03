@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
+import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -155,7 +156,7 @@ class RealSecureStorageKeyStore constructor(
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (keyValue != null && keyAlreadyExists(keyName)) {
+            if (autofillFeature.addWriteGuard().isEnabled() && keyValue != null && keyAlreadyExists(keyName)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     mapOf(
@@ -164,7 +165,7 @@ class RealSecureStorageKeyStore constructor(
                     ),
                     type = Daily(),
                 )
-                return@withContext
+                SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
             }
 
             runCatching {
