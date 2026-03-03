@@ -1824,17 +1824,18 @@ class BrowserTabFragment :
 
     private fun launchTabSwitcher(tabId: String = this.tabId, previewFile: String? = null) {
         val browserActivity = activity as? BrowserActivity ?: return
-        val sharedElementView = browserActivity.prepareTabPreviewOverlay(tabId, previewFile)
         val intent = TabSwitcherActivity.intent(browserActivity, tabId)
-        if (sharedElementView != null) {
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                browserActivity,
-                sharedElementView,
-                "tab_preview_$tabId",
-            )
-            tabSwitcherActivityResult.launch(intent, options)
-        } else {
-            tabSwitcherActivityResult.launch(intent)
+        browserActivity.prepareTabPreviewOverlay(tabId, previewFile) { sharedElementView ->
+            if (sharedElementView != null) {
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    browserActivity,
+                    sharedElementView,
+                    "tab_preview_$tabId",
+                )
+                tabSwitcherActivityResult.launch(intent, options)
+            } else {
+                tabSwitcherActivityResult.launch(intent)
+            }
         }
     }
 

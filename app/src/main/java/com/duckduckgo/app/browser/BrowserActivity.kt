@@ -1179,16 +1179,53 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun prepareTabPreviewOverlay(tabId: String, previewFile: String?): View? {
-        if (previewFile == null) return null
+    fun prepareTabPreviewOverlay(tabId: String, previewFile: String?, onReady: (View?) -> Unit) {
+        if (previewFile == null) {
+            onReady(null)
+            return
+        }
         val overlay = binding.tabPreviewOverlay
         val previewPath = webViewPreviewPersister.fullPathForFile(tabId, previewFile)
         val file = java.io.File(previewPath)
-        if (!file.exists()) return null
-        Glide.with(this).load(file).into(overlay)
+        if (!file.exists()) {
+            onReady(null)
+            return
+        }
         overlay.visibility = View.VISIBLE
         ViewCompat.setTransitionName(overlay, "tab_preview_$tabId")
-        return overlay
+
+        // Hide browser content during shared element transition
+        window.exitTransition = android.transition.Fade().apply { duration = 100 }
+        window.reenterTransition = android.transition.Fade().apply {
+            startDelay = 300
+            duration = 150
+        }
+
+        Glide.with(this)
+            .load(file)
+            .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                override fun onLoadFailed(
+                    e: com.bumptech.glide.load.engine.GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    onReady(null)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: android.graphics.drawable.Drawable,
+                    model: Any,
+                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                    dataSource: com.bumptech.glide.load.DataSource,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    onReady(overlay)
+                    return false
+                }
+            })
+            .into(overlay)
     }
 
     fun hideTabPreviewOverlay() {
@@ -1196,6 +1233,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         overlay.visibility = View.GONE
         Glide.with(this).clear(overlay)
         ViewCompat.setTransitionName(overlay, null)
+        // Clear window transitions set for tab switcher navigation
+        window.exitTransition = null
+        window.reenterTransition = null
     }
 
     companion object {

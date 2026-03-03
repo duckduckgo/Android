@@ -18,7 +18,6 @@ package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -39,9 +38,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
@@ -85,7 +82,6 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.io.File
-import java.security.MessageDigest
 import com.duckduckgo.mobile.android.R as AndroidR
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -411,20 +407,7 @@ class TabSwitcherAdapter(
         tabPreview: ImageView,
         holder: TabSwitcherViewHolder,
     ) {
-        fun fitAndClipBottom() = object : Transformation<Bitmap> {
-            override fun transform(
-                context: Context,
-                resource: Resource<Bitmap>,
-                outWidth: Int,
-                outHeight: Int,
-            ): Resource<Bitmap> {
-                resource.get().height = context.resources.getDimension(CommonR.dimen.gridItemPreviewHeight).toInt()
-                return resource
-            }
-
-            override fun updateDiskCacheKey(messageDigest: MessageDigest) {
-            }
-        }
+        tabPreview.scaleType = ImageView.ScaleType.CENTER
 
         val previewFile = tab.tabPreviewFile
         if (tab.url.isNullOrBlank() && !tab.isAboutBlank) {
@@ -446,8 +429,8 @@ class TabSwitcherAdapter(
 
                     try {
                         glide.load(cachedWebViewPreview)
-                            .transition(DrawableTransitionOptions.withCrossFade()).transform(
-                                fitAndClipBottom(),
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .transform(
                                 RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
                             )
                             .listener(object : RequestListener<Drawable> {
@@ -468,6 +451,14 @@ class TabSwitcherAdapter(
                                     dataSource: DataSource,
                                     isFirstResource: Boolean,
                                 ): Boolean {
+                                    // Set matrix to fill width and align top, matching overlay's fitStart
+                                    val viewWidth = tabPreview.width.toFloat()
+                                    val imageWidth = resource.intrinsicWidth.toFloat()
+                                    if (viewWidth > 0 && imageWidth > 0) {
+                                        val scale = viewWidth / imageWidth
+                                        tabPreview.scaleType = ImageView.ScaleType.MATRIX
+                                        tabPreview.imageMatrix = android.graphics.Matrix().apply { setScale(scale, scale) }
+                                    }
                                     notifyTransitionReadyIfNeeded(tab.tabId)
                                     return false
                                 }
