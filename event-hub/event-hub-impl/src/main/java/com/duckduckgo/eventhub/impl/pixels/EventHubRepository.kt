@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.pixels
 
-import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDao
-import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
+import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
+import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateEntity
 import org.json.JSONObject
 
 interface EventHubRepository {

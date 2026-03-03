@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.pixels
 
 data class TelemetryPixelConfig(
     val name: String,

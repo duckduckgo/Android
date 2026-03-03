@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.pixels
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
