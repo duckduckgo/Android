@@ -23,7 +23,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"
-    android:background="?attr/daxColorSurface">
+    android:background="?attr/daxColorSurface"
+    tools:ignore="Overdraw">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/onboarding_pager"
