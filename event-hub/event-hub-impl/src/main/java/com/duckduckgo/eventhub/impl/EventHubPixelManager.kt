@@ -151,7 +151,7 @@ class RealEventHubPixelManager @Inject constructor(
 
             for (pixelConfig in getTelemetryConfigs()) {
                 if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                    startNewPeriod(pixelConfig, skipForegroundCheck = true)
                 }
             }
         }
@@ -163,15 +163,19 @@ class RealEventHubPixelManager @Inject constructor(
         if (!isFeatureEnabled()) {
             logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
             cancelAllTimers()
-            repository.deleteAllPixelStates()
+            synchronized(this) {
+                repository.deleteAllPixelStates()
+            }
             return
         }
 
         val telemetry = getTelemetryConfigs()
         logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
-        for (pixelConfig in telemetry) {
-            if (repository.getPixelState(pixelConfig.name) == null) {
-                startNewPeriod(pixelConfig)
+        synchronized(this) {
+            for (pixelConfig in telemetry) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
+                }
             }
         }
     }
@@ -251,8 +255,8 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
-        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig, skipForegroundCheck: Boolean = false) {
+        if ((!skipForegroundCheck && !foregroundStateProvider.isInForeground) || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return
         }
