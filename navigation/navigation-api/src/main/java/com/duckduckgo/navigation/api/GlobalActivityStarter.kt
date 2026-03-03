@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import java.io.Serializable
 import kotlin.jvm.Throws
@@ -84,6 +85,35 @@ interface GlobalActivityStarter {
      * @return the [Intent] that can be used to start the [Activity]
      */
     fun startIntent(context: Context, deeplinkActivityParams: DeeplinkActivityParams): Intent?
+
+    /**
+     * Starts the activity for result using [launcher], given its [params].
+     *
+     * The activity can later retrieve the [Serializable] [params] using the extension function [Bundle.getActivityParams]
+     *
+     * @param params The activity parameters. They also identify the activity
+     * @param context the context used to start the activity
+     * @param launcher the [ActivityResultLauncher] used to start the activity for result
+     *
+     * @throws IllegalArgumentException when the Activity can't be found
+     */
+    @Throws(IllegalArgumentException::class)
+    fun startForResult(context: Context, params: ActivityParams, launcher: ActivityResultLauncher<Intent>)
+
+    /**
+     * Starts the activity for result using [launcher], given [deeplinkActivityParams].
+     *
+     * [deeplinkActivityParams] will be mapped into [ActivityParams] using the [ParamToActivityMapper], and then used to start the activity.
+     * The activity can later retrieve the [Serializable] [params] using the extension function [Bundle.getActivityParams]
+     *
+     * @param deeplinkActivityParams Deeplink activity parameters to be mapped into [ActivityParams]
+     * @param context the context used to start the activity
+     * @param launcher the [ActivityResultLauncher] used to start the activity for result
+     *
+     * @throws IllegalArgumentException when the Activity can't be found, or when the [deeplinkActivityParams] can't be mapped into [ActivityParams]
+     */
+    @Throws(IllegalArgumentException::class)
+    fun startForResult(context: Context, deeplinkActivityParams: DeeplinkActivityParams, launcher: ActivityResultLauncher<Intent>)
 
     /**
      * This is a marker class
