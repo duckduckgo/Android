@@ -186,6 +186,50 @@ class EventHubConfigParserTest {
     }
 
     @Test
+    fun `negative period that sums to zero or below returns no telemetry`() {
+        val json = """
+            {
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "hours": 1, "minutes": -60 } },
+                        "parameters": {
+                            "c": {
+                                "template": "counter",
+                                "source": "e",
+                                "buckets": {"0+": {"gte": 0}}
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        assertTrue(EventHubConfigParser.parseTelemetry(json).isEmpty())
+    }
+
+    @Test
+    fun `negative period that sums below zero returns no telemetry`() {
+        val json = """
+            {
+                "telemetry": {
+                    "test": {
+                        "state": "enabled",
+                        "trigger": { "period": { "seconds": -10 } },
+                        "parameters": {
+                            "c": {
+                                "template": "counter",
+                                "source": "e",
+                                "buckets": {"0+": {"gte": 0}}
+                            }
+                        }
+                    }
+                }
+            }
+        """.trimIndent()
+        assertTrue(EventHubConfigParser.parseTelemetry(json).isEmpty())
+    }
+
+    @Test
     fun `non-counter template is skipped`() {
         val json = """
             {
