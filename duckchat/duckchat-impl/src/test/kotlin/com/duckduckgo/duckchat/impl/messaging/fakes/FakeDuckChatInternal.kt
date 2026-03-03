@@ -78,6 +78,7 @@ class FakeDuckChatInternal(
 
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = cosmeticInputScreenUserSettingEnabled
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachmentUserSettingEnabled
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = inputScreenUserSettingEnabled
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean = standaloneMigrationCompleted.value
 
