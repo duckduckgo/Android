@@ -198,4 +198,10 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun addWriteGuard(): Toggle
+
+    /**
+     * Controls whether to fail reads if preferences file is null, or data differs between files
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun addReadGuard(): Toggle
 }

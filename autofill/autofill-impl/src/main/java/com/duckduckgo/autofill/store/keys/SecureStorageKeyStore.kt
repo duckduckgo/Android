@@ -103,6 +103,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "error" to e.error(),
                         "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                     ),
                     type = Daily(),
                 )
@@ -140,6 +141,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "error" to e.error(),
                         "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                         "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
@@ -173,6 +175,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "key" to keyName,
                         "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                         "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
@@ -196,6 +199,7 @@ class RealSecureStorageKeyStore constructor(
                         "key" to keyName,
                         "error" to it.error(),
                         "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                     ),
                     type = Daily(),
                 )
@@ -219,6 +223,7 @@ class RealSecureStorageKeyStore constructor(
                             "key" to keyName,
                             "error" to it.error(),
                             "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                             "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                         ),
                         type = Daily(),
@@ -258,43 +263,58 @@ class RealSecureStorageKeyStore constructor(
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             // Always read from legacy — source of truth
-            val legacyValue = runCatching {
-                getEncryptedPreferences()?.getString(keyName, null)?.run {
-                    this.decodeBase64()?.toByteArray()
+            val legacyValue = getEncryptedPreferences().let {
+                if (it == null && autofillFeature.addReadGuard().isEnabled()) {
+                    throw SecureStorageException.InternalSecureStorageException("Preferences file is null on read")
                 }
-            }.getOrElse {
-                ensureActive()
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_GET_KEY_FAILED,
-                    mapOf(
-                        "key" to keyName,
-                        "error" to it.error(),
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                    ),
-                    type = Daily(),
-                )
-                throw it
-            }
-
-            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
-            if (autofillFeature.useHarmony().isEnabled()) {
-                val harmonyValue = runCatching {
-                    getHarmonyEncryptedPreferences()?.getString(keyName, null)?.run {
+                runCatching {
+                    it?.getString(keyName, null)?.run {
                         this.decodeBase64()?.toByteArray()
                     }
                 }.getOrElse {
                     ensureActive()
                     pixel.fire(
-                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
+                        AUTOFILL_PREFERENCES_GET_KEY_FAILED,
                         mapOf(
                             "key" to keyName,
                             "error" to it.error(),
                             "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                         ),
                         type = Daily(),
                     )
-                    null
+                    throw it
+                }
+            }
+
+            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
+            if (autofillFeature.useHarmony().isEnabled()) {
+                val harmonyValue = getHarmonyEncryptedPreferences().let {
+                    if (it == null && autofillFeature.addReadGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Preferences file is null on read")
+                    }
+                    runCatching {
+                        it?.getString(keyName, null)?.run {
+                            this.decodeBase64()?.toByteArray()
+                        }
+                    }.getOrElse {
+                        ensureActive()
+                        pixel.fire(
+                            AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
+                            mapOf(
+                                "key" to keyName,
+                                "error" to it.error(),
+                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            ),
+                            type = Daily(),
+                        )
+                        if (autofillFeature.addReadGuard().isEnabled()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
+                        }
+                        null
+                    }
                 }
 
                 when {
@@ -304,10 +324,14 @@ class RealSecureStorageKeyStore constructor(
                             mapOf(
                                 "key" to keyName,
                                 "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                                 "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
                         )
+                        if (autofillFeature.addReadGuard().isEnabled()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
+                        }
                     }
                     harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
                         pixel.fire(
@@ -315,10 +339,14 @@ class RealSecureStorageKeyStore constructor(
                             mapOf(
                                 "key" to keyName,
                                 "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
                                 "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
                         )
+                        if (autofillFeature.addReadGuard().isEnabled()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
+                        }
                     }
                 }
             }
