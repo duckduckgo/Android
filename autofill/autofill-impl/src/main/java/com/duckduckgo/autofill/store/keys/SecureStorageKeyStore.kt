@@ -36,10 +36,10 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -223,7 +223,7 @@ class RealSecureStorageKeyStore constructor(
         val legacyExists = try {
             getEncryptedPreferences()?.getString(keyName, null) != null
         } catch (e: Exception) {
-            if (e is CancellationException) throw e
+            currentCoroutineContext().ensureActive()
             false
         }
         if (legacyExists) return true
@@ -232,7 +232,7 @@ class RealSecureStorageKeyStore constructor(
             val harmonyExists = try {
                 getHarmonyEncryptedPreferences()?.getString(keyName, null) != null
             } catch (e: Exception) {
-                if (e is CancellationException) throw e
+                currentCoroutineContext().ensureActive()
                 false
             }
             if (harmonyExists) return true
@@ -262,58 +262,51 @@ class RealSecureStorageKeyStore constructor(
                 throw it
             }
 
-            // When useHarmony is ON, compare with Harmony for diagnostic pixels only
+            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
             if (autofillFeature.useHarmony().isEnabled()) {
-                compareWithHarmony(keyName, legacyValue)
+                val harmonyValue = runCatching {
+                    getHarmonyEncryptedPreferences()?.getString(keyName, null)?.run {
+                        this.decodeBase64()?.toByteArray()
+                    }
+                }.getOrElse {
+                    ensureActive()
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
+                        mapOf(
+                            "key" to keyName,
+                            "error" to it.error(),
+                            "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        ),
+                        type = Daily(),
+                    )
+                    null
+                }
+
+                when {
+                    harmonyValue == null && legacyValue != null -> {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_KEY_MISSING,
+                            mapOf(
+                                "key" to keyName,
+                                "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            ),
+                            type = Daily(),
+                        )
+                    }
+                    harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_KEY_MISMATCH,
+                            mapOf(
+                                "key" to keyName,
+                                "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            ),
+                            type = Daily(),
+                        )
+                    }
+                }
             }
 
             return@withContext legacyValue
-        }
-    }
-
-    /**
-     * Purely diagnostic: compares Harmony value with legacy and fires pixels on discrepancies.
-     */
-    private suspend fun compareWithHarmony(keyName: String, legacyValue: ByteArray?) {
-        val harmonyValue = try {
-            getHarmonyEncryptedPreferences()?.getString(keyName, null)?.run {
-                this.decodeBase64()?.toByteArray()
-            }
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            pixel.fire(
-                AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
-                mapOf(
-                    "key" to keyName,
-                    "error" to e.error(),
-                    "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
-                ),
-                type = Daily(),
-            )
-            return
-        }
-
-        when {
-            harmonyValue == null && legacyValue != null -> {
-                pixel.fire(
-                    AUTOFILL_HARMONY_KEY_MISSING,
-                    mapOf(
-                        "key" to keyName,
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
-                    ),
-                    type = Daily(),
-                )
-            }
-            harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
-                pixel.fire(
-                    AUTOFILL_HARMONY_KEY_MISMATCH,
-                    mapOf(
-                        "key" to keyName,
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
-                    ),
-                    type = Daily(),
-                )
-            }
         }
     }
 
