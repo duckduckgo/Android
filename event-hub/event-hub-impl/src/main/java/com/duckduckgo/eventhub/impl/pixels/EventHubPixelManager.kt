@@ -144,7 +144,7 @@ class RealEventHubPixelManager @Inject constructor(
         synchronized(this) {
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis >= pixelState.periodEndMillis) {
-                    fireTelemetry(pixelState)
+                    fireTelemetry(pixelState, assumeForeground = true)
                 } else {
                     scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
                 }
@@ -152,7 +152,7 @@ class RealEventHubPixelManager @Inject constructor(
 
             for (pixelConfig in getTelemetryConfigs()) {
                 if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                    startNewPeriod(pixelConfig, assumeForeground = true)
                 }
             }
         }
@@ -228,7 +228,7 @@ class RealEventHubPixelManager @Inject constructor(
         scheduledTimers.clear()
     }
 
-    private fun fireTelemetry(pixelState: PixelState) {
+    private fun fireTelemetry(pixelState: PixelState, assumeForeground: Boolean = false) {
         cancelScheduledFire(pixelState.pixelName)
 
         val pixelData = buildPixel(pixelState)
@@ -254,12 +254,12 @@ class RealEventHubPixelManager @Inject constructor(
 
         val latestPixelConfig = getTelemetryConfigs().find { it.name == pixelState.pixelName }
         if (latestPixelConfig != null) {
-            startNewPeriod(latestPixelConfig)
+            startNewPeriod(latestPixelConfig, assumeForeground = assumeForeground)
         }
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
-        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig, assumeForeground: Boolean = false) {
+        if (!(assumeForeground || foregroundStateProvider.isInForeground) || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return
         }

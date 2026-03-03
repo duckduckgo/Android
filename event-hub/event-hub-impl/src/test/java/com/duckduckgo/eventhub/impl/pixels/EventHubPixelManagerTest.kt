@@ -2357,7 +2357,7 @@ class EventHubPixelManagerTest {
     // --- foreground-gated cycles ---
 
     @Test
-    fun `timer fires while backgrounded - pixel enqueued but no new period started`() {
+    fun `checkPixels fires elapsed pixel and starts new period even if foreground state not yet set`() {
         foregroundState.isInForeground = false
 
         val periodStart = 1000L
@@ -2382,7 +2382,10 @@ class EventHubPixelManagerTest {
             type = eq(Count),
         )
         verify(repository).deletePixelState("webTelemetry_testPixel1")
-        verify(repository, never()).savePixelState(any())
+        val captor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(captor.capture())
+        assertEquals("webTelemetry_testPixel1", captor.firstValue.pixelName)
+        assertEquals(timeProvider.time, captor.firstValue.periodStartMillis)
     }
 
     @Test
@@ -2464,7 +2467,7 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `full background-foreground lifecycle - fire in background, recover on foreground`() {
+    fun `full background-foreground lifecycle - checkPixels fires and starts new period immediately`() {
         foregroundState.isInForeground = false
 
         val periodStart = 1000L
@@ -2484,20 +2487,6 @@ class EventHubPixelManagerTest {
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
-        verify(repository, never()).savePixelState(any())
-
-        org.mockito.Mockito.reset(repository, pixel, selfToggle)
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
-        whenever(repository.getAllPixelStates()).thenReturn(emptyList())
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-
-        foregroundState.isInForeground = true
-        timeProvider.time = periodEnd + 5000L
-
-        manager.checkPixels()
-
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
         assertEquals("webTelemetry_testPixel1", captor.firstValue.pixelName)
