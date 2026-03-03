@@ -196,6 +196,11 @@ class RealEventHubPixelManager @Inject constructor(
             }
 
             synchronized(this@RealEventHubPixelManager) {
+                // Guard against stale timer: if checkPixels or fireTelemetry already replaced
+                // this job with a new one, this coroutine is stale and must not fire.
+                if (scheduledTimers[pixelName] !== coroutineContext[Job]) {
+                    return@launch
+                }
                 val pixelState = repository.getPixelState(pixelName)
                 if (pixelState == null) {
                     scheduledTimers.remove(pixelName)

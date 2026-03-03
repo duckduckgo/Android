@@ -2300,6 +2300,60 @@ class EventHubPixelManagerTest {
         verify(repository, never()).deletePixelState(any())
     }
 
+    @Test
+    fun `stale timer does not fire newly created period state`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+
+        val initCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(initCaptor.capture())
+        val initialState = initCaptor.firstValue
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        // Simulate: timer delay elapses, but checkPixels runs first and fires + restarts
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
+
+        timeProvider.time = initialState.periodEndMillis + 1
+        manager.checkPixels()
+
+        // checkPixels fired once
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+
+        // Now the old timer's delay completes — it should NOT fire the new period
+        val periodMillis = java.util.concurrent.TimeUnit.DAYS.toMillis(1)
+        org.mockito.Mockito.reset(pixel)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        // Stale timer must not have fired
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `stale timer skips when its job no longer matches scheduledTimers entry`() {
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        // Replace with a new timer (simulating cancelScheduledFire + scheduleFireTelemetry)
+        manager.cancelScheduledFire("webTelemetry_testPixel1")
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 60_000L)
+
+        // Advance past old timer's delay but not new timer's
+        testScope.testScheduler.advanceTimeBy(5001L)
+        testScope.testScheduler.runCurrent()
+
+        // Old timer should have been a no-op — no pixel fire
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+        // New timer still scheduled
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    }
+
     // --- foreground-gated cycles ---
 
     @Test
