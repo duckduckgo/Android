@@ -200,4 +200,11 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun addHarmonyFixes(): Toggle
+
+    /**
+     * Controls whether to prevent writing if preferences file already has data, or data differs
+     * between files
+     */
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun addWriteGuard(): Toggle
 }
