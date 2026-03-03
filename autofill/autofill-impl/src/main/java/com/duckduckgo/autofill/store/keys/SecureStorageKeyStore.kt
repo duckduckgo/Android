@@ -348,6 +348,9 @@ class RealSecureStorageKeyStore constructor(
                             throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
                         }
                     }
+                    autofillFeature.readFromHarmony().isEnabled() -> {
+                        return@withContext harmonyValue
+                    }
                 }
             }
 
@@ -356,10 +359,10 @@ class RealSecureStorageKeyStore constructor(
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        if (!autofillFeature.useHarmony().isEnabled()) {
-            getEncryptedPreferences() != null
+        if (autofillFeature.useHarmony().isEnabled() ) {
+            getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
         } else {
-            getHarmonyEncryptedPreferences() != null && getEncryptedPreferences() != null
+            getEncryptedPreferences() != null
         }
     }
 

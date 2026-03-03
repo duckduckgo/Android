@@ -204,4 +204,7 @@ interface AutofillFeature {
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun addReadGuard(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun readFromHarmony(): Toggle
 }
