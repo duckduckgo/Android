@@ -2030,7 +2030,6 @@ class BrowserTabFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
-                        logcat { "Duck.ai Contextual: Collect Page Context" }
                         viewModel.collectPageContext()
                     }
 

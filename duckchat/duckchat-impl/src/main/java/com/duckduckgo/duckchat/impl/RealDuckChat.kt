@@ -777,8 +777,7 @@ class RealDuckChat @Inject constructor(
                     runCatching { jsonAdapter.fromJson(it) }.getOrNull()
                 }
 
-            // duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
-            duckChatLink = "https://euw-serp-dev-testing8.duck.ai"
+            duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
             logcat { "Duck.ai: duckChatLink $duckChatLink" }
 
             settingsJson

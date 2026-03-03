@@ -316,39 +316,42 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun generatePageContextEventData(): SubscriptionEventData {
-        val pageContext = if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
-            if (isContextValid(updatedPageContext)) {
-                updatedPageContext
-                    .takeIf { it.isNotBlank() }
-                    ?.let { runCatching { JSONObject(it) }.getOrNull() }
-                    ?: run {
-                        logcat { "Duck.ai: no pageContext available" }
-                        null
-                    }
+        val pageContext = if (isContextValid(updatedPageContext)) {
+            updatedPageContext
+                .takeIf { it.isNotBlank() }
+                ?.let { runCatching { JSONObject(it) }.getOrNull() }
+                ?: run {
+                    logcat { "Duck.ai: no pageContext available" }
+                    null
+                }
 
-                val json = JSONObject(updatedPageContext)
-                val url = json.optString("url")
-                logcat { "Duck.ai: generatePageContextEventData for url $url" }
-                json
-            } else {
-                logcat { "Duck.ai: pageContext is not valid" }
-                null
-            }
+            val json = JSONObject(updatedPageContext)
+            val url = json.optString("url")
+            logcat { "Duck.ai: generatePageContextEventData for url $url" }
+            json
         } else {
-            logcat { "Duck.ai: isAutomaticContextAttachmentEnabled disabled" }
+            logcat { "Duck.ai: pageContext is not valid" }
             null
         }
 
-        val params =
-            JSONObject().apply {
-                put("pageContext", pageContext)
-            }
+        return if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            val params =
+                JSONObject().apply {
+                    put("pageContext", pageContext)
+                }
 
-        return SubscriptionEventData(
-            featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
-            subscriptionName = "submitAIChatPageContext",
-            params = params,
-        )
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatPageContext",
+                params = params,
+            )
+        } else {
+            SubscriptionEventData(
+                featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatPageContext",
+                params = JSONObject(),
+            )
+        }
     }
 
     fun onContextualClose() {
@@ -510,11 +513,11 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext =
-                        if (allowsAutomaticContextAttachment) {
-                            !inputMode.userRemovedContext
-                        } else {
-                            inputMode.showContext
-                        },
+                            if (allowsAutomaticContextAttachment) {
+                                !inputMode.userRemovedContext
+                            } else {
+                                inputMode.showContext
+                            },
                     )
                 if (updatedState.showContext && !inputMode.showContext) {
                     duckChatPixels.reportContextualPageContextAutoAttached()
@@ -529,7 +532,7 @@ class DuckChatContextualViewModel @Inject constructor(
                         allowsAutomaticContextAttachment = duckChatInternal.isAutomaticContextAttachmentEnabled(),
                     )
                 }
-                if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+                if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
                     val pageContext = generatePageContextEventData()
                     logcat { "Duck.ai: attaching new context to Duck.ai" }
                     viewModelScope.launch(dispatchers.main()) {
