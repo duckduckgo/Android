@@ -20,7 +20,7 @@
     android:id="@+id/onboardingWelcomePageContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/daxColorSurfaceBackdrop"
+    android:background="?attr/onboardingSurfaceBackdrop"
     android:clipChildren="false"
     android:tag="onboardingWelcomePage"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
@@ -68,7 +68,7 @@
         android:lineSpacingExtra="-10sp"
         android:maxLines="2"
         android:text="@string/onboardingWelcomeTitle"
-        android:textColor="@color/onboardingTextPrimary"
+        android:textColor="?attr/onboardingTextPrimary"
         android:textFontWeight="500"
         android:textSize="44sp"
         app:layout_constraintBottom_toTopOf="@id/textGuideline"
@@ -76,9 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="1"
         tools:alpha="1"
-        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute"
-        tools:lottie_progress="0.99"
-        tools:targetApi="28" />
+        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/backgroundAnimation"
