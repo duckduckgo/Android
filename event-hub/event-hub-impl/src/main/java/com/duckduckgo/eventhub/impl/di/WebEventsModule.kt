@@ -21,10 +21,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.WebEventsPrefs
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import javax.inject.Qualifier
+
+@Qualifier
+internal annotation class WebEventsPrefs
 
 @Module
 @ContributesTo(AppScope::class)
