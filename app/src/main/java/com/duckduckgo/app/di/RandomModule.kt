@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.startup
+package com.duckduckgo.app.di
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -24,7 +24,7 @@ import kotlin.random.Random
 
 @Module
 @ContributesTo(AppScope::class)
-object StartupMetricsModule {
+object RandomModule {
 
     @Provides
     fun provideRandom(): Random = Random.Default
