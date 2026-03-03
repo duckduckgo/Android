@@ -2125,6 +2125,47 @@ class EventHubPixelManagerTest {
         assertEquals(1000L + 120_000L, stateB.periodEndMillis)
     }
 
+    @Test
+    fun `timer clears scheduledTimers entry when feature disabled`() {
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+
+        testScope.testScheduler.advanceTimeBy(1001L)
+        testScope.testScheduler.runCurrent()
+
+        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    }
+
+    @Test
+    fun `timer clears scheduledTimers entry when pixel state missing`() {
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+
+        testScope.testScheduler.advanceTimeBy(1001L)
+        testScope.testScheduler.runCurrent()
+
+        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    }
+
+    @Test
+    fun `timer cleanup allows rescheduling after feature disable and re-enable`() {
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+        testScope.testScheduler.advanceTimeBy(1001L)
+        testScope.testScheduler.runCurrent()
+        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    }
+
     // --- race condition: timer expiry vs checkPixels ---
 
     @Test
@@ -2187,10 +2228,8 @@ class EventHubPixelManagerTest {
         // A new timer should exist for the new period
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
-        // Advance past the original timer delay — the cancelled coroutine must not
-        // remove the new timer entry from scheduledTimers
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        // Run any pending continuations (the cancelled coroutine's ensureActive throws)
+        // but don't advance far enough for the NEW timer's delay to complete
         testScope.testScheduler.runCurrent()
 
         // New timer must still be present (not removed by the stale coroutine)
