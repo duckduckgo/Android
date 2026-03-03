@@ -578,7 +578,7 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
-    fun `when page context received in webview mode with auto attachment disabled and multiple attachments enabled then event emitted with null pageContext`() =
+    fun `when page context received in webview mode with auto attachment disabled and multiple attachments enabled then emit null pageContext`() =
         runTest {
             whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
             whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(true)
@@ -1057,7 +1057,6 @@ class DuckChatContextualViewModelTest {
         assertNull(contextualDataStore.getTabChatUrl(tabId))
         verify(duckChatPixels).reportContextualPlaceholderContextShown()
     }
-
 
     @Test
     fun `reopenSheet in webview mode starts new chat when session expired and no stored url`() = runTest {
