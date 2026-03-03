@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.TouchDelegate
@@ -37,10 +38,14 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.Transformation
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
@@ -97,6 +102,21 @@ class TabSwitcherAdapter(
     private var isDragging: Boolean = false
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
+    private var pendingTransitionTabId: String? = null
+    private var onPreviewReadyForTransition: (() -> Unit)? = null
+
+    fun awaitPreviewLoaded(tabId: String, callback: () -> Unit) {
+        pendingTransitionTabId = tabId
+        onPreviewReadyForTransition = callback
+    }
+
+    private fun notifyTransitionReadyIfNeeded(tabId: String) {
+        if (tabId == pendingTransitionTabId) {
+            onPreviewReadyForTransition?.invoke()
+            onPreviewReadyForTransition = null
+            pendingTransitionTabId = null
+        }
+    }
 
     private val differ = AsyncListDiffer(this, TabSwitcherItemDiffCallback(isDragging = { isDragging }))
 
@@ -410,6 +430,7 @@ class TabSwitcherAdapter(
         if (tab.url.isNullOrBlank() && !tab.isAboutBlank) {
             glide.load(AndroidR.drawable.ic_dax_icon_72)
                 .into(tabPreview)
+            notifyTransitionReadyIfNeeded(tab.tabId)
         } else if (previewFile != null) {
             holder.trackJob(
                 lifecycleOwner.lifecycleScope.launch {
@@ -419,6 +440,7 @@ class TabSwitcherAdapter(
 
                     if (cachedWebViewPreview == null) {
                         glide.clear(tabPreview)
+                        notifyTransitionReadyIfNeeded(tab.tabId)
                         return@launch
                     }
 
@@ -428,15 +450,39 @@ class TabSwitcherAdapter(
                                 fitAndClipBottom(),
                                 RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
                             )
+                            .listener(object : RequestListener<Drawable> {
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>,
+                                    isFirstResource: Boolean,
+                                ): Boolean {
+                                    notifyTransitionReadyIfNeeded(tab.tabId)
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Drawable,
+                                    model: Any,
+                                    target: Target<Drawable>?,
+                                    dataSource: DataSource,
+                                    isFirstResource: Boolean,
+                                ): Boolean {
+                                    notifyTransitionReadyIfNeeded(tab.tabId)
+                                    return false
+                                }
+                            })
                             .into(tabPreview)
                     } catch (e: Exception) {
                         logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
                         glide.load(AndroidR.drawable.ic_dax_icon_72).into(tabPreview)
+                        notifyTransitionReadyIfNeeded(tab.tabId)
                     }
                 },
             )
         } else {
             glide.clear(tabPreview)
+            notifyTransitionReadyIfNeeded(tab.tabId)
         }
     }
 

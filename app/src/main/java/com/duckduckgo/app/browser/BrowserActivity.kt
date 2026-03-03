@@ -477,6 +477,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
+        hideTabPreviewOverlay()
         duckAiAnimDelayJob =
             lifecycleScope.launch {
                 delay(DUCK_AI_ANIM_READY_DELAY_MS)
@@ -1196,11 +1197,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         overlay.visibility = View.GONE
         Glide.with(this).clear(overlay)
         ViewCompat.setTransitionName(overlay, null)
-    }
-
-    override fun onActivityReenter(resultCode: Int, data: Intent?) {
-        super.onActivityReenter(resultCode, data)
-        window.decorView.postDelayed({ hideTabPreviewOverlay() }, 400)
     }
 
     companion object {

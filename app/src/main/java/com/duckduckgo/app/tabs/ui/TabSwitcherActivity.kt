@@ -521,8 +521,15 @@ class TabSwitcherActivity :
         if (index != -1) {
             scrollToPosition(index)
         }
-        tabsRecycler.doOnPreDraw {
-            startPostponedEnterTransition()
+        val selectedId = selectedTabId
+        if (selectedId != null) {
+            tabsAdapter.awaitPreviewLoaded(selectedId) {
+                startPostponedEnterTransition()
+            }
+        } else {
+            tabsRecycler.doOnPreDraw {
+                startPostponedEnterTransition()
+            }
         }
     }
 
