@@ -51,3 +51,13 @@ data class BucketConfig(
     val gte: Int,
     val lt: Int?,
 )
+
+data class ParamState(val value: Int, val stopCounting: Boolean = false)
+
+data class PixelState(
+    val pixelName: String,
+    val periodStartMillis: Long,
+    val periodEndMillis: Long,
+    val config: TelemetryPixelConfig,
+    val params: MutableMap<String, ParamState>,
+)
