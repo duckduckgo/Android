@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.urldisplay
 
 import app.cash.turbine.test
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,18 +41,14 @@ class RealUrlDisplayRepositoryTest {
     var coroutineRule = CoroutineTestRule()
 
     private val settingsDataStore = mock<SettingsDataStore>()
-    private val browserConfigFeature = mock<AndroidBrowserConfigFeature>()
     private val shorterUrlToggle = mock<Toggle>()
     private val appBuildConfig = mock<AppBuildConfig>()
     private lateinit var testee: UrlDisplayRepository
 
     @Before
     fun setup() {
-        whenever(browserConfigFeature.shorterUrlDefault()).thenReturn(shorterUrlToggle)
-
         testee = RealUrlDisplayRepository(
             settingsDataStore = settingsDataStore,
-            browserConfigFeature = browserConfigFeature,
             appBuildConfig = appBuildConfig,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -179,22 +174,6 @@ class RealUrlDisplayRepositoryTest {
         assertFalse(result)
         verify(settingsDataStore).urlPreferenceMigrated = true
         verify(settingsDataStore, never()).urlPreferenceSetByUser = true
-    }
-
-    @Test
-    fun `when feature toggle disabled and no manual preference then return true for rollback`() = runTest {
-        // Given: Feature toggle disabled (rollback mode), no manual preference
-        whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
-
-        // When
-        val result = testee.isFullUrlEnabled()
-
-        // Then: Return true (rollback to full URL)
-        assertTrue(result)
-        verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
-        verify(shorterUrlToggle, atLeastOnce()).isEnabled()
     }
 
     @Test
