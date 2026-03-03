@@ -17,6 +17,7 @@
 package com.duckduckgo.eventhub.impl
 
 import android.webkit.WebView
+import androidx.annotation.UiThread
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -29,6 +30,7 @@ class EventHubNavigationPlugin @Inject constructor(
     private val pixelManager: EventHubPixelManager,
 ) : JsInjectorPlugin {
 
+    @UiThread
     override fun onPageStarted(
         webView: WebView,
         url: String?,
