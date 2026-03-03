@@ -12075,4 +12075,40 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
+    </issue>
+
 </issues>

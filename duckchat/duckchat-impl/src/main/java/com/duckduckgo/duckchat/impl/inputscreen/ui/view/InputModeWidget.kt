@@ -64,7 +64,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @InjectWith(ViewScope::class)
-class InputModeWidget @JvmOverloads constructor(
+open class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
