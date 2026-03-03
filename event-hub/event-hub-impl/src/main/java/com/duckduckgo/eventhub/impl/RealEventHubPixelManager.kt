@@ -20,7 +20,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -80,37 +79,33 @@ class RealEventHubPixelManager @Inject constructor(
         val nowMillis = timeProvider.currentTimeMillis()
 
         synchronized(this) {
-            for (state in repository.getAllPixelStates()) {
-                val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
+            for (pixelState in repository.getAllPixelStates()) {
+                if (nowMillis > pixelState.periodEndMillis) continue
 
-                if (nowMillis > state.periodEndMillis) continue
-
-                val params = parseParamsJson(state.paramsJson)
+                val params = pixelState.params
                 var changed = false
 
-                for ((paramName, paramConfig) in storedConfig.parameters) {
+                for ((paramName, paramConfig) in pixelState.config.parameters) {
                     if (paramConfig.isCounter && paramConfig.source == eventType) {
                         val paramState = params[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(storedConfig.name, paramName, eventType, webViewId)) continue
+                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
                         changed = true
                         if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
                             params[paramName] = paramState.copy(stopCounting = true)
-                            logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName already at max bucket, stopCounting" }
+                            logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
                             continue
                         }
 
                         val newValue = paramState.value + 1
                         params[paramName] = paramState.copy(value = newValue)
-                        logcat(VERBOSE) { "EventHub: ${storedConfig.name}.$paramName incremented to $newValue" }
+                        logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                     }
                 }
 
                 if (changed) {
-                    repository.savePixelState(
-                        state.copy(paramsJson = serializeParams(params)),
-                    )
+                    repository.savePixelState(pixelState)
                 }
             }
         }
@@ -138,13 +133,11 @@ class RealEventHubPixelManager @Inject constructor(
 
         val nowMillis = timeProvider.currentTimeMillis()
 
-        for (state in repository.getAllPixelStates()) {
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: continue
-
-            if (nowMillis >= state.periodEndMillis) {
-                fireTelemetry(storedConfig, state)
+        for (pixelState in repository.getAllPixelStates()) {
+            if (nowMillis >= pixelState.periodEndMillis) {
+                fireTelemetry(pixelState)
             } else {
-                scheduleFireTelemetry(state.pixelName, state.periodEndMillis - nowMillis)
+                scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
             }
         }
 
@@ -187,10 +180,8 @@ class RealEventHubPixelManager @Inject constructor(
 
             if (!isFeatureEnabled()) return@launch
 
-            val state = repository.getPixelState(pixelName) ?: return@launch
-            val storedConfig = EventHubConfigParser.parseSinglePixelConfig(state.pixelName, state.configJson) ?: return@launch
-
-            fireTelemetry(storedConfig, state)
+            val pixelState = repository.getPixelState(pixelName) ?: return@launch
+            fireTelemetry(pixelState)
         }
         scheduledTimers[pixelName] = job
     }
@@ -212,31 +203,31 @@ class RealEventHubPixelManager @Inject constructor(
         scheduledTimers.clear()
     }
 
-    private fun fireTelemetry(pixelConfig: TelemetryPixelConfig, state: EventHubPixelStateEntity) {
-        cancelScheduledFire(pixelConfig.name)
+    private fun fireTelemetry(pixelState: PixelState) {
+        cancelScheduledFire(pixelState.pixelName)
 
-        val pixelData = buildPixel(pixelConfig, state)
+        val pixelData = buildPixel(pixelState)
 
         if (pixelData.isNotEmpty()) {
             val additionalParams = mapOf(
                 PARAM_ATTRIBUTION_PERIOD to calculateAttributionPeriod(
-                    state.periodStartMillis,
-                    pixelConfig.trigger.period,
+                    pixelState.periodStartMillis,
+                    pixelState.config.trigger.period,
                 ).toString(),
             )
             val allParams = pixelData + additionalParams
-            logcat(DEBUG) { "EventHub: firing pixel ${pixelConfig.name} params=$allParams" }
+            logcat(DEBUG) { "EventHub: firing pixel ${pixelState.pixelName} params=$allParams" }
             pixel.enqueueFire(
-                pixelName = pixelConfig.name,
+                pixelName = pixelState.pixelName,
                 parameters = allParams,
             )
         } else {
-            logcat(VERBOSE) { "EventHub: skipping pixel ${pixelConfig.name}, no params" }
+            logcat(VERBOSE) { "EventHub: skipping pixel ${pixelState.pixelName}, no params" }
         }
 
-        repository.deletePixelState(pixelConfig.name)
+        repository.deletePixelState(pixelState.pixelName)
 
-        val latestPixelConfig = getTelemetryConfigs().find { it.name == pixelConfig.name }
+        val latestPixelConfig = getTelemetryConfigs().find { it.name == pixelState.pixelName }
         if (latestPixelConfig != null) {
             startNewPeriod(latestPixelConfig)
         }
@@ -249,32 +240,27 @@ class RealEventHubPixelManager @Inject constructor(
         }
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
-        val initialParams = pixelConfig.parameters.keys.associateWith { ParamState(0) }.toMutableMap()
 
         logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=${nowMillis + periodMillis}" }
         repository.savePixelState(
-            EventHubPixelStateEntity(
+            PixelState(
                 pixelName = pixelConfig.name,
                 periodStartMillis = nowMillis,
                 periodEndMillis = nowMillis + periodMillis,
-                paramsJson = serializeParams(initialParams),
-                configJson = EventHubConfigParser.serializePixelConfig(pixelConfig),
+                config = pixelConfig,
+                params = pixelConfig.parameters.keys.associateWith { ParamState(0) }.toMutableMap(),
             ),
         )
 
         scheduleFireTelemetry(pixelConfig.name, periodMillis)
     }
 
-    private fun buildPixel(
-        pixelConfig: TelemetryPixelConfig,
-        state: EventHubPixelStateEntity,
-    ): Map<String, String> {
-        val params = parseParamsJson(state.paramsJson)
+    private fun buildPixel(pixelState: PixelState): Map<String, String> {
         val pixelData = mutableMapOf<String, String>()
 
-        for ((paramName, paramConfig) in pixelConfig.parameters) {
+        for ((paramName, paramConfig) in pixelState.config.parameters) {
             if (paramConfig.isCounter) {
-                val value = (params[paramName] ?: ParamState(0)).value
+                val value = (pixelState.params[paramName] ?: ParamState(0)).value
                 val bucketName = BucketCounter.bucketCount(value, paramConfig.buckets)
                 if (bucketName != null) {
                     pixelData[paramName] = bucketName
@@ -296,45 +282,7 @@ class RealEventHubPixelManager @Inject constructor(
             val epochSeconds = timestampMillis / 1000
             return (epochSeconds / periodSeconds) * periodSeconds
         }
-
-        fun parseParamsJson(json: String): MutableMap<String, ParamState> {
-            return try {
-                val obj = JSONObject(json)
-                val map = mutableMapOf<String, ParamState>()
-                val keys = obj.keys()
-                while (keys.hasNext()) {
-                    val key = keys.next()
-                    val paramObj = obj.optJSONObject(key)
-                    if (paramObj != null) {
-                        map[key] = ParamState(
-                            value = paramObj.optInt("value", 0),
-                            stopCounting = paramObj.optBoolean("stopCounting", false),
-                        )
-                    } else {
-                        map[key] = ParamState(value = obj.optInt(key, 0))
-                    }
-                }
-                map
-            } catch (e: Exception) {
-                mutableMapOf()
-            }
-        }
-
-        fun serializeParams(params: Map<String, ParamState>): String {
-            val obj = JSONObject()
-            for ((key, state) in params) {
-                val paramObj = JSONObject()
-                paramObj.put("value", state.value)
-                if (state.stopCounting) {
-                    paramObj.put("stopCounting", true)
-                }
-                obj.put(key, paramObj)
-            }
-            return obj.toString()
-        }
     }
-
-    data class ParamState(val value: Int, val stopCounting: Boolean = false)
 }
 
 interface TimeProvider {

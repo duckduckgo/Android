@@ -18,11 +18,12 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.store.EventHubPixelStateEntity
+import org.json.JSONObject
 
 interface EventHubRepository {
-    fun getPixelState(name: String): EventHubPixelStateEntity?
-    fun getAllPixelStates(): List<EventHubPixelStateEntity>
-    fun savePixelState(entity: EventHubPixelStateEntity)
+    fun getPixelState(name: String): PixelState?
+    fun getAllPixelStates(): List<PixelState>
+    fun savePixelState(state: PixelState)
     fun deletePixelState(name: String)
     fun deleteAllPixelStates()
 }
@@ -31,9 +32,76 @@ class RealEventHubRepository(
     private val pixelStateDao: EventHubPixelStateDao,
 ) : EventHubRepository {
 
-    override fun getPixelState(name: String): EventHubPixelStateEntity? = pixelStateDao.getPixelState(name)
-    override fun getAllPixelStates(): List<EventHubPixelStateEntity> = pixelStateDao.getAllPixelStates()
-    override fun savePixelState(entity: EventHubPixelStateEntity) = pixelStateDao.insertPixelState(entity)
+    override fun getPixelState(name: String): PixelState? {
+        val entity = pixelStateDao.getPixelState(name) ?: return null
+        return entityToPixelState(entity)
+    }
+
+    override fun getAllPixelStates(): List<PixelState> {
+        return pixelStateDao.getAllPixelStates().mapNotNull { entityToPixelState(it) }
+    }
+
+    override fun savePixelState(state: PixelState) {
+        pixelStateDao.insertPixelState(
+            EventHubPixelStateEntity(
+                pixelName = state.pixelName,
+                periodStartMillis = state.periodStartMillis,
+                periodEndMillis = state.periodEndMillis,
+                paramsJson = serializeParams(state.params),
+                configJson = EventHubConfigParser.serializePixelConfig(state.config),
+            ),
+        )
+    }
+
     override fun deletePixelState(name: String) = pixelStateDao.deletePixelState(name)
     override fun deleteAllPixelStates() = pixelStateDao.deleteAllPixelStates()
+
+    private fun entityToPixelState(entity: EventHubPixelStateEntity): PixelState? {
+        val config = EventHubConfigParser.parseSinglePixelConfig(entity.pixelName, entity.configJson) ?: return null
+        return PixelState(
+            pixelName = entity.pixelName,
+            periodStartMillis = entity.periodStartMillis,
+            periodEndMillis = entity.periodEndMillis,
+            config = config,
+            params = parseParamsJson(entity.paramsJson),
+        )
+    }
+
+    companion object {
+        fun parseParamsJson(json: String): MutableMap<String, ParamState> {
+            return try {
+                val obj = JSONObject(json)
+                val map = mutableMapOf<String, ParamState>()
+                val keys = obj.keys()
+                while (keys.hasNext()) {
+                    val key = keys.next()
+                    val paramObj = obj.optJSONObject(key)
+                    if (paramObj != null) {
+                        map[key] = ParamState(
+                            value = paramObj.optInt("value", 0),
+                            stopCounting = paramObj.optBoolean("stopCounting", false),
+                        )
+                    } else {
+                        map[key] = ParamState(value = obj.optInt(key, 0))
+                    }
+                }
+                map
+            } catch (e: Exception) {
+                mutableMapOf()
+            }
+        }
+
+        fun serializeParams(params: Map<String, ParamState>): String {
+            val obj = JSONObject()
+            for ((key, state) in params) {
+                val paramObj = JSONObject()
+                paramObj.put("value", state.value)
+                if (state.stopCounting) {
+                    paramObj.put("stopCounting", true)
+                }
+                obj.put(key, paramObj)
+            }
+            return obj.toString()
+        }
+    }
 }
