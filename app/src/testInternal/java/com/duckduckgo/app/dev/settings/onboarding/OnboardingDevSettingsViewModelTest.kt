@@ -48,11 +48,11 @@ class OnboardingDevSettingsViewModelTest {
 
     private val requiredCtas = listOf(
         CtaId.DAX_INTRO,
-        CtaId.DAX_INTRO_VISIT_SITE,
-        CtaId.DAX_END,
         CtaId.DAX_DIALOG_SERP,
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         CtaId.DAX_FIRE_BUTTON,
+        CtaId.DAX_END,
+        CtaId.DAX_INTRO_PRIVACY_PRO,
     )
 
     private val testee = OnboardingDevSettingsViewModel(
@@ -76,7 +76,6 @@ class OnboardingDevSettingsViewModelTest {
             val state = awaitItem()
             assertFalse(state.onboardingCompleted)
             assertFalse(state.onboardingSkipped)
-            assertTrue(state.onboardingStateLabel == "Active")
         }
     }
 
@@ -93,7 +92,6 @@ class OnboardingDevSettingsViewModelTest {
             val state = awaitItem()
             assertTrue(state.onboardingCompleted)
             assertFalse(state.onboardingSkipped)
-            assertTrue(state.onboardingStateLabel == "Completed")
         }
     }
 
@@ -110,7 +108,28 @@ class OnboardingDevSettingsViewModelTest {
             val state = awaitItem()
             assertTrue(state.onboardingCompleted)
             assertTrue(state.onboardingSkipped)
-            assertTrue(state.onboardingStateLabel == "Skipped")
+        }
+    }
+
+    @Test
+    fun whenPrivacyProNotRequiredThenVisibleCtaIdsExcludesPrivacyPro() = runTest {
+        val requiredWithoutPrivacyPro = listOf(
+            CtaId.DAX_INTRO,
+            CtaId.DAX_DIALOG_SERP,
+            CtaId.DAX_DIALOG_TRACKERS_FOUND,
+            CtaId.DAX_FIRE_BUTTON,
+            CtaId.DAX_END,
+        )
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        whenever(settingsDataStore.hideTips).thenReturn(false)
+        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredWithoutPrivacyPro)
+        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+
+        testee.start()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.visibleCtaIds.contains(CtaId.DAX_INTRO_PRIVACY_PRO))
         }
     }
 

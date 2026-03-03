@@ -47,9 +47,8 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     data class ViewState(
         val onboardingCompleted: Boolean = false,
         val onboardingSkipped: Boolean = false,
-        val onboardingStateLabel: String = "",
         val ctaDismissedStates: Map<CtaId, Boolean> = emptyMap(),
-        val requiredCtaIds: Set<CtaId> = emptySet(),
+        val visibleCtaIds: List<CtaId> = emptyList(),
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -79,19 +78,14 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             val hideTips = settingsDataStore.hideTips
             val completed = stage == AppStage.ESTABLISHED
             val skipped = completed && hideTips
-            val stateLabel = when {
-                skipped -> "Skipped"
-                completed -> "Completed"
-                else -> "Active"
-            }
             val required = ctaViewModel.getRequiredDaxOnboardingCtasForDev().toSet()
+            val visible = orderedCtaIds.filter { it in required || it == CtaId.ADD_WIDGET || it == CtaId.DAX_INTRO_VISIT_SITE }
             val ctaStates = orderedCtaIds.associateWith { dismissedCtaDao.exists(it) }
             _viewState.value = ViewState(
                 onboardingCompleted = completed,
                 onboardingSkipped = skipped,
-                onboardingStateLabel = stateLabel,
                 ctaDismissedStates = ctaStates,
-                requiredCtaIds = required,
+                visibleCtaIds = visible,
             )
         }
     }

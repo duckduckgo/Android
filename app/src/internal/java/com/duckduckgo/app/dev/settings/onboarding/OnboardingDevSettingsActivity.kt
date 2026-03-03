@@ -57,7 +57,6 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        buildCtaList()
         configureUiEventHandlers()
         observeViewModel()
     }
@@ -67,42 +66,52 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
         viewModel.start()
     }
 
-    private fun buildCtaList() {
+    private val contextDialogIds = setOf(
+        CtaId.DAX_INTRO,
+        CtaId.DAX_INTRO_VISIT_SITE,
+        CtaId.DAX_END,
+        CtaId.DAX_INTRO_PRIVACY_PRO,
+        CtaId.ADD_WIDGET,
+    )
+
+    private val inContextDialogIds = setOf(
+        CtaId.DAX_DIALOG_SERP,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        CtaId.DAX_FIRE_BUTTON,
+    )
+
+    private fun buildCtaList(visibleCtaIds: List<CtaId>) {
         val container = binding.ctaListContainer
         container.removeAllViews()
+        ctaRowsById.clear()
+        ctaRowListeners.clear()
 
-        val contextDialogs = listOf(
-            CtaId.DAX_INTRO,
-            CtaId.DAX_INTRO_VISIT_SITE,
-            CtaId.DAX_END,
-            CtaId.DAX_INTRO_PRIVACY_PRO,
-            CtaId.ADD_WIDGET,
-        )
-        val inContextDialogs = listOf(
-            CtaId.DAX_DIALOG_SERP,
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            CtaId.DAX_FIRE_BUTTON,
-        )
+        val contextCtas = visibleCtaIds.filter { it in contextDialogIds }
+        val inContextCtas = visibleCtaIds.filter { it in inContextDialogIds }
 
-        container.addView(
-            SectionHeaderListItem(this).apply {
-                primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsContextDialogsSection)
-            },
-        )
-        contextDialogs.forEach { ctaId ->
-            val row = createCtaRow(ctaId)
-            ctaRowsById[ctaId] = row
-            container.addView(row)
+        if (contextCtas.isNotEmpty()) {
+            container.addView(
+                SectionHeaderListItem(this).apply {
+                    primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsContextDialogsSection)
+                },
+            )
+            contextCtas.forEach { ctaId ->
+                val row = createCtaRow(ctaId)
+                ctaRowsById[ctaId] = row
+                container.addView(row)
+            }
         }
-        container.addView(
-            SectionHeaderListItem(this).apply {
-                primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsInContextDialogsSection)
-            },
-        )
-        inContextDialogs.forEach { ctaId ->
-            val row = createCtaRow(ctaId)
-            ctaRowsById[ctaId] = row
-            container.addView(row)
+        if (inContextCtas.isNotEmpty()) {
+            container.addView(
+                SectionHeaderListItem(this).apply {
+                    primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsInContextDialogsSection)
+                },
+            )
+            inContextCtas.forEach { ctaId ->
+                val row = createCtaRow(ctaId)
+                ctaRowsById[ctaId] = row
+                container.addView(row)
+            }
         }
     }
 
@@ -129,6 +138,9 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
         viewModel.viewState
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { state ->
+                if (state.visibleCtaIds.isNotEmpty() && ctaRowsById.isEmpty()) {
+                    buildCtaList(state.visibleCtaIds)
+                }
                 binding.onboardingCompletedToggle.quietlySetIsChecked(
                     state.onboardingCompleted,
                     completedToggleListener,
@@ -141,7 +153,7 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
                 // Skip is disabled when completed via dialogs (cannot skip once already completed).
                 binding.onboardingSkippedToggle.isEnabled = !state.onboardingCompleted || state.onboardingSkipped
 
-                viewModel.orderedCtaIds.forEach { ctaId ->
+                state.visibleCtaIds.forEach { ctaId ->
                     val isDismissed = state.ctaDismissedStates[ctaId] ?: false
                     ctaRowsById[ctaId]?.quietlySetIsChecked(isDismissed, ctaRowListeners[ctaId])
                 }
