@@ -346,10 +346,15 @@ class DuckChatContextualViewModel @Inject constructor(
                 params = params,
             )
         } else {
+            val params =
+                JSONObject().apply {
+                    put("pageContext", null)
+                }
+
             SubscriptionEventData(
                 featureName = RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME,
                 subscriptionName = "submitAIChatPageContext",
-                params = JSONObject(),
+                params = params,
             )
         }
     }
@@ -534,7 +539,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
                     val pageContext = generatePageContextEventData()
-                    logcat { "Duck.ai: attaching new context to Duck.ai" }
+                    logcat { "Duck.ai: attaching new context to Duck.ai $pageContext" }
                     viewModelScope.launch(dispatchers.main()) {
                         _subscriptionEventDataChannel.trySend(pageContext)
                     }
