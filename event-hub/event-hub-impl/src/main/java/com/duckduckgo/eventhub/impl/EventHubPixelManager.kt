@@ -187,10 +187,17 @@ class RealEventHubPixelManager @Inject constructor(
             delay(delayMillis)
             ensureActive()
 
-            if (!isFeatureEnabled()) return@launch
+            if (!isFeatureEnabled()) {
+                scheduledTimers.remove(pixelName)
+                return@launch
+            }
 
             synchronized(this@RealEventHubPixelManager) {
-                val pixelState = repository.getPixelState(pixelName) ?: return@launch
+                val pixelState = repository.getPixelState(pixelName)
+                if (pixelState == null) {
+                    scheduledTimers.remove(pixelName)
+                    return@launch
+                }
                 fireTelemetry(pixelState)
             }
         }
