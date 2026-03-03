@@ -159,9 +159,8 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onConfigChanged() {
-        cachedTelemetryConfigs = null
-
         synchronized(this) {
+            cachedTelemetryConfigs = null
             if (!isFeatureEnabled()) {
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 cancelAllTimers()
