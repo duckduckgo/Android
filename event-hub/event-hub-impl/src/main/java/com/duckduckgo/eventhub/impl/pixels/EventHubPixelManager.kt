@@ -161,18 +161,20 @@ class RealEventHubPixelManager @Inject constructor(
     override fun onConfigChanged() {
         cachedTelemetryConfigs = null
 
-        if (!isFeatureEnabled()) {
-            logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-            cancelAllTimers()
-            repository.deleteAllPixelStates()
-            return
-        }
+        synchronized(this) {
+            if (!isFeatureEnabled()) {
+                logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
+                cancelAllTimers()
+                repository.deleteAllPixelStates()
+                return
+            }
 
-        val telemetry = getTelemetryConfigs()
-        logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
-        for (pixelConfig in telemetry) {
-            if (repository.getPixelState(pixelConfig.name) == null) {
-                startNewPeriod(pixelConfig)
+            val telemetry = getTelemetryConfigs()
+            logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+            for (pixelConfig in telemetry) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
+                }
             }
         }
     }

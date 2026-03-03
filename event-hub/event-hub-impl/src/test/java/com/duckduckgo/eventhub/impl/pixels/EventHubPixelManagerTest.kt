@@ -1012,6 +1012,54 @@ class EventHubPixelManagerTest {
         verify(repository, never()).savePixelState(any())
     }
 
+    @Test
+    fun `onConfigChanged does not duplicate period when pixel already exists`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5))
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state)
+
+        manager.onConfigChanged()
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onConfigChanged and checkPixels do not both start period for same pixel`() {
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+
+        val captor = argumentCaptor<PixelState>()
+        verify(repository, times(1)).savePixelState(captor.capture())
+
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(captor.firstValue))
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(captor.firstValue)
+
+        manager.checkPixels()
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `onConfigChanged clears state and timers atomically when feature disabled`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3))
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+        manager.onConfigChanged()
+
+        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(repository).deleteAllPixelStates()
+    }
+
     // --- config isolation: live config changes must not affect running pixel lifecycle ---
 
     private fun configWithBuckets(vararg buckets: Pair<String, String>): String {
