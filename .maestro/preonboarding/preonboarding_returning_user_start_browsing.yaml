@@ -11,8 +11,8 @@ tags:
       - launchApp:
           clearState: true
 - assertVisible:
-    text: ".*Ready for a faster browser that keeps you protected?.*"
-- assertVisible: "let's do it!"
+    text: ".*Ready for a faster browser that protects you and lets you decide when and how to use AI?.*"
+- assertVisible: "let's get started!"
 - tapOn: "I've been here before"
 - assertVisible:
     text: "Got it! I'll skip the other tips."
