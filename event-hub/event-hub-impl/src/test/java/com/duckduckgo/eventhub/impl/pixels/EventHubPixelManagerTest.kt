@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel

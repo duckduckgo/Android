@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl.store
+package com.duckduckgo.eventhub.impl.pixels.store
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
