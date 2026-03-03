@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.app.SharedElementCallback
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -28,6 +29,7 @@ import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -200,6 +202,8 @@ class TabSwitcherActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        postponeEnterTransition()
+        window.decorView.postDelayed({ startPostponedEnterTransition() }, 500)
         setContentView(binding.root)
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
@@ -218,6 +222,21 @@ class TabSwitcherActivity :
         configureOnBackPressedListener()
 
         initMenuClickListeners()
+
+        setEnterSharedElementCallback(object : SharedElementCallback() {
+            override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) {
+                val selectedId = selectedTabId ?: return
+                val position = tabsAdapter.getAdapterPositionForTab(selectedId)
+                val viewHolder = tabsRecycler.findViewHolderForAdapterPosition(position)
+                if (viewHolder is TabSwitcherAdapter.TabSwitcherViewHolder.GridTabViewHolder) {
+                    val transitionName = "tab_preview_$selectedId"
+                    names.clear()
+                    names.add(transitionName)
+                    sharedElements.clear()
+                    sharedElements[transitionName] = viewHolder.tabPreview
+                }
+            }
+        })
     }
 
     private fun configureNavigationBar() {
@@ -502,6 +521,9 @@ class TabSwitcherActivity :
         if (index != -1) {
             scrollToPosition(index)
         }
+        tabsRecycler.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
     }
 
     private fun scrollToPosition(index: Int) {
@@ -633,6 +655,7 @@ class TabSwitcherActivity :
     }
 
     override fun onTabSelected(tabId: String) {
+        selectedTabId = tabId
         launch { viewModel.onTabSelected(tabId) }
     }
 
