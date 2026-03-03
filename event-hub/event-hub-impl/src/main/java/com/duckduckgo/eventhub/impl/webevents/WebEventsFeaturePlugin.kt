@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.webevents
 
-import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class WebEventsContentScopeConfigPlugin @Inject constructor(
+class WebEventsFeaturePlugin @Inject constructor(
     private val webEventsDataStore: WebEventsDataStore,
-) : ContentScopeConfigPlugin {
+) : PrivacyFeaturePlugin {
 
-    override fun config(): String {
-        val featureName = WebEventsFeatureName.WebEvents.value
-        val config = webEventsDataStore.getWebEventsConfigJson()
-        return "\"$featureName\":$config"
+    override fun store(featureName: String, jsonString: String): Boolean {
+        if (featureName == this.featureName) {
+            webEventsDataStore.setWebEventsConfigJson(jsonString)
+            return true
+        }
+        return false
     }
 
-    override fun preferences(): String? {
-        return null
-    }
+    override val featureName: String = WebEventsFeatureName.WebEvents.value
 }
