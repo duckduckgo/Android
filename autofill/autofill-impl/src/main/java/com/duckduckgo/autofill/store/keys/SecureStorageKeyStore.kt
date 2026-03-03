@@ -165,7 +165,7 @@ class RealSecureStorageKeyStore constructor(
                     ),
                     type = Daily(),
                 )
-                SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
             }
 
             runCatching {
