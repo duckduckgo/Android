@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -39,6 +40,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -82,6 +84,8 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             }
 
             message.url.toUri().host ?: return
+
+            reloadLoopDetector.rememberLastHandledCMP(webView, message.cmp, message.isCosmetic)
 
             autoconsentCallback.onPopUpHandled(message.isCosmetic)
             autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = message.isCosmetic)

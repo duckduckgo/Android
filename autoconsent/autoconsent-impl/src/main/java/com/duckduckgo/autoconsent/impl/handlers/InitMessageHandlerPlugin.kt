@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
@@ -49,6 +50,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val settingsCache: AutoconsentSettingsCache,
     private val autoconsentFeature: AutoconsentFeature,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -70,6 +72,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
+                    reloadLoopDetector.updateUrl(webView, url)
+
                     // Remove comment to promote feature and remove @Ignore from tests
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
@@ -84,7 +88,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val autoAction = getAutoAction()
+                    val autoAction = getAutoAction(webView)
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20
                     val disabledCmps = settings.disabledCMPs
@@ -119,7 +123,10 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     override val supportedTypes: List<String> = listOf("init")
 
-    private fun getAutoAction(): String {
+    private fun getAutoAction(webView: WebView): String? {
+        if (reloadLoopDetector.isReloadLoopDetected(webView)) {
+            return null
+        }
         // Remove comment to promote feature
         // return if (!settingsRepository.firstPopupHandled) null else "optOut"
         return "optOut"

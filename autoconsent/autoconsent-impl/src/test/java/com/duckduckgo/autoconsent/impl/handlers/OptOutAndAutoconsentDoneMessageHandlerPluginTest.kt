@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -40,9 +41,10 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val mockPixelManager: AutoconsentPixelManager = mock()
+    private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager)
+    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager, mockReloadLoopDetector)
 
     @Test
     fun whenProcessIfMessageTypeIsNotIncludedInListThenDoNothing() {
@@ -128,6 +130,20 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+    }
+
+    @Test
+    fun whenAutoconsentDoneThenRememberLastHandledCMPCalled() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).rememberLastHandledCMP(webView, "test", false)
+    }
+
+    @Test
+    fun whenAutoconsentDoneCosmeticThenRememberLastHandledCMPCalledWithCosmetic() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).rememberLastHandledCMP(webView, "test", true)
     }
 
     private fun getOptOut(): String = handler.supportedTypes.first()

@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
@@ -34,6 +35,7 @@ import javax.inject.Inject
 class PopUpFoundMessageHandlerPlugin @Inject constructor(
     private val repository: AutoconsentSettingsRepository,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -44,6 +46,7 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
 
                 val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
+                reloadLoopDetector.detectReloadLoop(webView, message.cmp)
                 if (repository.userSetting) return
                 if (message.cmp.endsWith(IGNORE_CMP_SUFFIX, ignoreCase = true)) return
 
