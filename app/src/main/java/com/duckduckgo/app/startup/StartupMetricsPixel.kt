@@ -35,28 +35,28 @@ object StartupMetricsPixelParameters {
     /**
      * Startup type classification (cold/warm/hot/unknown).
      * Type: String (enum)
-     * Required: Yes
+     * Required: No
      */
     const val STARTUP_TYPE = "startup_type"
 
     /**
      * Time from process start to first frame in milliseconds (API 35+ only).
      * Type: Integer
-     * Required: Yes
+     * Required: No
      */
     const val TTID_DURATION_MS = "ttid_duration_ms"
 
     /**
      * Time from user action to first frame in milliseconds, as measured by our manual instrumentation.
      * Type: Integer
-     * Required: Yes
+     * Required: No
      */
     const val TTID_MANUAL_DURATION_MS = "ttid_manual_duration_ms"
 
     /**
      * Device memory capacity bucket for classification.
      * Type: String
-     * Required: No (null if privacy review fails)
+     * Required: No
      * Valid values: <1GB, 1GB, 2GB, 4GB, 6GB, 8GB, 12GB, 16GB+
      */
     const val DEVICE_RAM_BUCKET = "device_ram_bucket"
