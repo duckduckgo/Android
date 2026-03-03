@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -204,6 +205,7 @@ class TabSwitcherAdapter(
 
     private fun bindGridTab(holder: TabSwitcherViewHolder.GridTabViewHolder, tab: Tab) {
         holder.cancelLoadJobs()
+        ViewCompat.setTransitionName(holder.tabPreview, "tab_preview_${tab.tabEntity.tabId}")
         val context = holder.rootView.context
         val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab.tabEntity, context)
