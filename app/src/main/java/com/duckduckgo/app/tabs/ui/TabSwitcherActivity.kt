@@ -204,6 +204,16 @@ class TabSwitcherActivity :
         super.onCreate(savedInstanceState)
         postponeEnterTransition()
         window.decorView.postDelayed({ startPostponedEnterTransition() }, 500)
+
+        // Delay non-shared-element content from appearing until the shared element transition finishes
+        window.enterTransition = android.transition.Fade().apply {
+            startDelay = 300
+            duration = 200
+        }
+        window.returnTransition = android.transition.Fade().apply {
+            duration = 200
+        }
+
         setContentView(binding.root)
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true

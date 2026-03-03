@@ -50,8 +50,9 @@
         android:id="@+id/tabPreviewOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="?attr/actionBarSize"
         android:visibility="gone"
-        android:scaleType="fitStart"
+        android:scaleType="centerCrop"
         android:importantForAccessibility="no" />
 
     <View

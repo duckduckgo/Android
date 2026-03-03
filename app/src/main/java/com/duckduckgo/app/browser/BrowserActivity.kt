@@ -477,7 +477,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        hideTabPreviewOverlay()
         duckAiAnimDelayJob =
             lifecycleScope.launch {
                 delay(DUCK_AI_ANIM_READY_DELAY_MS)

@@ -708,6 +708,7 @@ class BrowserTabFragment :
                     }
                 }
             }
+            (activity as? BrowserActivity)?.hideTabPreviewOverlay()
         }
 
     private val activityResultHandlerEmailProtectionInContextSignup =
