@@ -48,7 +48,6 @@
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikaciji</b> (u proteklih sat vremena).]]></item>
         <item quantity="few"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacije</b> (u proteklih sat vremena).]]></item>
-        <item quantity="many"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacija</b> (u proteklih sat vremena).]]></item>
         <item quantity="other"><![CDATA[ Blokiranih pokušaja praćenja <b>u %1$d aplikacija</b> (u proteklih sat vremena).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">Zaštita od praćenja aplikacija App Tracking Protection onemogućena je. Dodirni za nastavak blokiranja pokušaja praćenja.</string>
@@ -63,14 +62,12 @@
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
         <item quantity="few"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacije</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
-        <item quantity="many"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikacija</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
         <item quantity="other"><![CDATA[%1$s vas je pokušao pratiti <b>u %2$d aplikaciji</b> (u protekla 24 sata). <b>Pogledajte više</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="one"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikaciji <b>%1$s</b> (u protekla 24 sata).]]></item>
         <item quantity="few"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
-        <item quantity="many"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
         <item quantity="other"><![CDATA[Zaštita od praćenja putem aplikacija App Tracking Protection blokirala je najviše pokušaja praćenja u aplikacijama <b>%1$s</b> i <b>%2$s</b> (u protekla 24 sata).]]></item>
     </plurals>
 
@@ -93,7 +90,6 @@
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s u %2$d aplikaciji, %3$s</b> (prošli tjedan).]]></item>
         <item quantity="few"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija/e, uključujući %3$s</b> (prošli tjedan).]]></item>
-        <item quantity="many"><![CDATA[Zaštita od praćenja aplikacije App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija, uključujući %3$s</b> (prošli tjedan).]]></item>
         <item quantity="other"><![CDATA[Zaštita od praćenja aplikacija App Tracking Protection blokirala je <b>%1$s u %2$d aplikacija, uključujući %3$s</b> (prošli tjedan).]]></item>
     </plurals>
 
@@ -222,13 +218,11 @@
     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">pokušaj praćenja</item>
         <item quantity="few">pokušaja praćenja</item>
-        <item quantity="many">pokušaja praćenja</item>
         <item quantity="other">pokušaja praćenja</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">aplikacija</item>
         <item quantity="few">aplikacije</item>
-        <item quantity="many">aplikacija</item>
         <item quantity="other">aplikacije</item>
     </plurals>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je onemogućen</b>\nJe li App Tracking Protection uzrokovao problem s tvojim aplikacijama? <annotation type="report_issues_link">Prijavi probleme</annotation></string>
@@ -283,13 +277,11 @@
     <plurals name="atp_CompanyDetailsTrackingAttempts">
         <item quantity="one">%1$d pokušaj. Poznato je da prikuplja:</item>
         <item quantity="few">%1$d pokušaja. Poznato je da prikuplja:</item>
-        <item quantity="many">%1$d pokušaja. Poznato je da prikuplja:</item>
         <item quantity="other">%1$d pokušaja. Poznato je da prikuplja:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
         <item quantity="one">DuckDuckGo je blokirao %1$d pokušaj praćenja</item>
         <item quantity="few">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
-        <item quantity="many">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
         <item quantity="other">DuckDuckGo je blokirao %1$d pokušaja praćenja</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Prijavi problem s ovom aplikacijom</string>
@@ -415,13 +407,11 @@
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoja aplikacija zaštićena je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
         <item quantity="few">%1$s tvoje aplikacije zaštićene su od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
-        <item quantity="many">%1$s tvojih aplikacija zaštićeno je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
         <item quantity="other">%1$s tvojih aplikacija zaštićeno je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">Onemogućena je zaštita na %1$s aplikaciji</item>
         <item quantity="few">Onemogućena je zaštita na %1$s aplikacije</item>
-        <item quantity="many">Onemogućena je zaštita na %1$s aplikacija</item>
         <item quantity="other">Onemogućena je zaštita na %1$s aplikacija</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Dobre vijesti! Zaštita od praćenja aplikacija App Tracking Protection sada je omogućena.<br/><br/>👍 U stvarnom vremenu će ti pokazivati popis aplikacija na tvom uređaju koje uhvatim u pokušaju praćenja.]]></string>

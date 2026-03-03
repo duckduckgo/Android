@@ -158,6 +158,7 @@
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d palavra-passe eliminada</item>
         <item quantity="other">%1$d palavras-passe eliminadas</item>
+        <item quantity="many">%1$d palavras-passe eliminadas</item>
     </plurals>
 
     <string name="autofill_auth_text_for_delete_all">Autentica para confirmar que pretendes eliminar todas as palavras-passe</string>
@@ -167,6 +168,7 @@
     <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Não é possível sincronizar a tua palavra-passe para %1$s porque um dos campos excede o limite de carateres.</item>
         <item quantity="other">Não é possível sincronizar as tuas palavras-passe para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>
+        <item quantity="many">Não é possível sincronizar as tuas palavras-passe para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gerir palavra-passes</annotation></string>
 
@@ -174,24 +176,28 @@
     <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">A tua palavra-passe será eliminada deste dispositivo.</item>
         <item quantity="other">As tuas palavras-passe serão eliminadas deste dispositivo.</item>
+        <item quantity="many">As tuas palavras-passe serão eliminadas deste dispositivo.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</string>
     <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</item>
         <item quantity="other">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados.</item>
+        <item quantity="many">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Tens a certeza de que pretendes eliminar esta palavra-passe?</string>
     <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Tens a certeza de que pretendes eliminar %1$d palavra-passe?</item>
         <item quantity="other">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
+        <item quantity="many">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Confirma que ainda tens uma forma de aceder à conta.</string>
     <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Confirma que ainda tens uma forma de aceder à conta.</item>
         <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
+        <item quantity="many">Confirma que ainda tens uma forma de aceder às contas.</item>
     </plurals>
 
     <string name="credentialManagementNoLoginsSavedSubtitle">Podes importar palavras-passe guardadas de outro navegador para o DuckDuckGo.</string>

@@ -48,6 +48,7 @@
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d application</b> (dernière heure).]]></item>
         <item quantity="other"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d applications</b> (dernière heure).]]></item>
+        <item quantity="many"><![CDATA[ Tentatives de suivi bloquées <b>dans %1$d applications</b> (dernière heure).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">App Tracking Protection est désactivé. Appuyez pour continuer à bloquer les tentatives de suivi.</string>
     <string name="atp_RevokedNotification">Une application VPN de votre appareil a désactivé App Tracking Protection. Appuyez pour le réactiver.</string>
@@ -61,11 +62,13 @@
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d application</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
         <item quantity="other"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d applications</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
+        <item quantity="many"><![CDATA[%1$s a essayé de vous suivre <b>dans %2$d applications</b> (dernières 24 heures). <b>Voir plus</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> (dernières 24 heures).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> et <b>%2$s</b>(dernières 24 heures).]]></item>
+        <item quantity="many"><![CDATA[App Tracking Protection a bloqué le plus grand nombre de tentatives de suivi dans <b>%1$s</b> et <b>%2$s</b>(dernières 24 heures).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[App Tracking Protection a bloqué <b>%1$s %2$d fois dans %3$s</b> (dernières 24 heures).]]></string>
@@ -87,6 +90,7 @@
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d application, %3$s</b> (semaine dernière).]]></item>
         <item quantity="other"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d applications, dont %3$s</b> (semaine dernière).]]></item>
+        <item quantity="many"><![CDATA[App Tracking Protection a bloqué <b>%1$s dans %2$d applications, dont %3$s</b> (semaine dernière).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Activer App Tracking Protection</string>
@@ -214,10 +218,12 @@
     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tentative de suivi</item>
         <item quantity="other">Tentatives de suivi</item>
+        <item quantity="many">Tentatives de suivi</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Application</item>
         <item quantity="other">Applications</item>
+        <item quantity="many">Applications</item>
     </plurals>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection est désactivé</b>\nVos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android a désactivé App Tracking Protection.</b> Vous voulez éviter que cela se reproduise ? <annotation type="re_enable_link">Réactiver</annotation></string>
@@ -271,10 +277,12 @@
     <plurals name="atp_CompanyDetailsTrackingAttempts">
         <item quantity="one">%1$d tentative. Informations recueillies en général :</item>
         <item quantity="other">%1$d tentatives. Informations recueillies en général :</item>
+        <item quantity="many">%1$d tentatives. Informations recueillies en général :</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
         <item quantity="one">DuckDuckGo a bloqué %1$d tentative de pistage</item>
         <item quantity="other">DuckDuckGo a bloqué %1$d tentatives de pistage</item>
+        <item quantity="many">DuckDuckGo a bloqué %1$d tentatives de pistage</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Signaler un problème avec cette application</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Afficher %1$d de plus</string>
@@ -399,10 +407,12 @@
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s de vos applications est protégée contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
         <item quantity="other">%1$s de vos applications sont protégées contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
+        <item quantity="many">%1$s de vos applications sont protégées contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">La protection de %1$s de vos applications est désactivée</item>
         <item quantity="other">La protection de %1$s de vos applications est désactivée</item>
+        <item quantity="many">La protection de %1$s de vos applications est désactivée</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Bonne nouvelle ! L\'option App Tracking Protection a bien été activée.<br/><br/>👍Je vous communiquerai en temps réel la liste des applications détectées sur votre appareil qui tentent de vous pister.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">J\'ai compris !</string>

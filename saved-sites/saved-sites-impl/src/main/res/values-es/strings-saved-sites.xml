@@ -27,6 +27,7 @@
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">El marcador de %1$s no se puede sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
         <item quantity="other">Los marcadores de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
+        <item quantity="many">Los marcadores de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gestionar marcadores</annotation></string>
 
@@ -69,10 +70,12 @@
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one">%1$s%2$s y %3$d artículo?</item>
         <item quantity="other">%1$s%2$s y %3$d artículos?</item>
+        <item quantity="many">%1$s%2$s y %3$d artículos?</item>
     </plurals>
     <plurals name="bookmarkFolderItems">
         <item quantity="one">%1$d artículo</item>
         <item quantity="other">%1$d artículos</item>
+        <item quantity="many">%1$d artículos</item>
     </plurals>
 
     <!-- Bookmarks -->
@@ -89,6 +92,7 @@
     <plurals name="bookmarkFolderDeleteMessage">
         <item quantity="one">¿Seguro que deseas eliminar esta carpeta y %1$d elemento?</item>
         <item quantity="other">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
+        <item quantity="many">¿Seguro que deseas eliminar esta carpeta y %1$d elementos?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">¿Seguro que deseas eliminar tu marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
 

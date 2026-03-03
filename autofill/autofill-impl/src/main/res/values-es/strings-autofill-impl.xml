@@ -158,6 +158,7 @@
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d contraseña borrada</item>
         <item quantity="other">%1$d contraseñas borradas</item>
+        <item quantity="many">%1$d contraseñas borradas</item>
     </plurals>
 
     <string name="autofill_auth_text_for_delete_all">Autentícate para confirmar que deseas borrar todas las contraseñas</string>
@@ -167,6 +168,7 @@
     <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">La contraseñas de %1$s no se puede sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
         <item quantity="other">Las contraseñas de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
+        <item quantity="many">Las contraseñas de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionar contraseñas</annotation></string>
 
@@ -174,24 +176,28 @@
     <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tu contraseña se borrará de este dispositivo.</item>
         <item quantity="other">Tus contraseñas se borrarán de este dispositivo.</item>
+        <item quantity="many">Tus contraseñas se borrarán de este dispositivo.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tu contraseña se borrará en todos los dispositivos sincronizados.</string>
     <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tu contraseña se borrará en todos los dispositivos sincronizados.</item>
         <item quantity="other">Tus contraseñas se borrarán en todos los dispositivos sincronizados.</item>
+        <item quantity="many">Tus contraseñas se borrarán en todos los dispositivos sincronizados.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">¿Seguro de que quieres borrar esta contraseña?</string>
     <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" tools:ignore="ImpliedQuantity" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">¿Seguro de que quieres borrar %1$d contraseña?</item>
         <item quantity="other">¿Seguro de que quieres borrar %1$d contraseñas?</item>
+        <item quantity="many">¿Seguro de que quieres borrar %1$d contraseñas?</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</string>
     <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="one">Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</item>
         <item quantity="other">Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</item>
+        <item quantity="many">Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</item>
     </plurals>
 
     <string name="credentialManagementNoLoginsSavedSubtitle">Puedes importar contraseñas guardadas de otro navegador a DuckDuckGo.</string>

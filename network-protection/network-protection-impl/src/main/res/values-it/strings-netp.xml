@@ -91,6 +91,7 @@
     <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
         <item quantity="one">%1$d app</item>
         <item quantity="other">%1$d app</item>
+        <item quantity="many">%1$d app</item>
     </plurals>
     <string name="netpManagementVpnSettings">Impostazioni VPN</string>
 
@@ -244,12 +245,14 @@
     <plurals name="netpAutoExcludeAppLabel">
         <item quantity="one">%1$d nuova app che non è compatibile con le VPN. Escludila per poterla usare</item>
         <item quantity="other">%1$d nuove app che non sono compatibili con le VPN. Escludile per poterle usare</item>
+        <item quantity="many">%1$d nuove app che non sono compatibili con le VPN. Escludile per poterle usare</item>
     </plurals>
 
     <string name="netpAutoExcludePromptExcludeAllTitle">Vuoi escludere tutte le app che non sono compatibili con le VPN?</string>
     <plurals name="netpAutoExcludeAllAppLabel">
         <item quantity="one">%1$d altra app che non è compatibile con le VPN. Escludi questa app per poterla utilizzare</item>
         <item quantity="other">%1$d altre app che non sono compatibili con le VPN. Escludi queste app per poterle utilizzare</item>
+        <item quantity="many">%1$d altre app che non sono compatibili con le VPN. Escludi queste app per poterle utilizzare</item>
     </plurals>
     <string name="netpAutoExcludePromptOptionEnable">Escludi automaticamente le app incompatibili</string>
     <string name="netpAutoExcludePromptActionAdd">Escludi app</string>

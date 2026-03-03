@@ -48,6 +48,7 @@
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicação</b> (última hora).]]></item>
         <item quantity="other"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicações</b> (última hora).]]></item>
+        <item quantity="many"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicações</b> (última hora).]]></item>
     </plurals>
     <string name="atp_DisabledNotification">A App Tracking Protection está desativada. Toca para continuar a bloquear tentativas de rastreamento.</string>
     <string name="atp_RevokedNotification">Uma aplicação de VPN no teu dispositivo desativou a App Tracking Protection. Toca para reativar.</string>
@@ -61,11 +62,13 @@
     <plurals name="atp_DailyTopCompanyNotification">
         <item quantity="one"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicação</b> (último dia). <b>Mais informações</b>]]></item>
         <item quantity="other"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicações</b> (último dia). <b>Mais informações</b>]]></item>
+        <item quantity="many"><![CDATA[%1$s tentou rastrear o teu dispositivo <b>em %2$d aplicações</b> (último dia). <b>Mais informações</b>]]></item>
     </plurals>
 
     <plurals name="atp_DailyCompanyBlockedNotification">
         <item quantity="one"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> (último dia).]]></item>
         <item quantity="other"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
+        <item quantity="many"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
     </plurals>
 
     <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vez em %3$s</b> (último dia).]]></string>
@@ -87,6 +90,7 @@
     <plurals name="atp_WeeklyCompanyTeaserNotification">
         <item quantity="one"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicação, %3$s</b> (semana passada).]]></item>
         <item quantity="other"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicações, incluindo %3$s</b> (semana passada).]]></item>
+        <item quantity="many"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicações, incluindo %3$s</b> (semana passada).]]></item>
     </plurals>
 
     <string name="atp_EnableCTA">Ativar a App Tracking Protection</string>
@@ -214,10 +218,12 @@
     <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tentativa de rastreamento</item>
         <item quantity="other">Tentativas de rastreamento</item>
+        <item quantity="many">Tentativas de rastreamento</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplicação</item>
         <item quantity="other">Aplicações</item>
+        <item quantity="many">Aplicações</item>
     </plurals>
     <string name="atp_ActivityDisabledLabel"><b>A App Tracking Protection está desativada</b>\nA App Tracking Protection causou um problema com as tuas aplicações? <annotation type="report_issues_link">Comunicar problemas</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>O Android desativou a App Tracking Protection</b>. Queres impedir que aconteça novamente? <annotation type="re_enable_link">Reativa</annotation></string>
@@ -271,10 +277,12 @@
     <plurals name="atp_CompanyDetailsTrackingAttempts">
         <item quantity="one">%1$d tentativa. Conhecido por recolher:</item>
         <item quantity="other">%1$d tentativas. Conhecido por recolher:</item>
+        <item quantity="many">%1$d tentativas. Conhecido por recolher:</item>
     </plurals>
     <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
         <item quantity="one">O DuckDuckGo bloqueou %1$d tentativa de rastreamento</item>
         <item quantity="other">O DuckDuckGo bloqueou %1$d tentativas de rastreamento</item>
+        <item quantity="many">O DuckDuckGo bloqueou %1$d tentativas de rastreamento</item>
     </plurals>
     <string name="atp_CompanyDetailsTrackingMenuReport">Comunicar um problema com esta aplicação</string>
     <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Mostrar mais %1$d</string>
@@ -399,10 +407,12 @@
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s das tuas aplicações está protegida contra rastreadores ocultos que tentam aceder às tuas informações pessoais</item>
         <item quantity="other">%1$s das tuas aplicações estão protegidas contra rastreadores ocultos que tentam aceder às tuas informações pessoais</item>
+        <item quantity="many">%1$s das tuas aplicações estão protegidas contra rastreadores ocultos que tentam aceder às tuas informações pessoais</item>
     </plurals>
     <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
         <item quantity="one">%1$s das suas aplicações tem a proteção desativada</item>
         <item quantity="other">%1$s das suas aplicações têm a proteção desativada</item>
+        <item quantity="many">%1$s das suas aplicações têm a proteção desativada</item>
     </plurals>
     <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Boas notícias! A App Tracking Protection já está ativa.<br/><br/>👍Vou mostrar-te uma lista em tempo real das aplicações no teu dispositivo que tentam rastrear-te.]]></string>
     <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Entendi!</string>
