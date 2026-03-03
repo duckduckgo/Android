@@ -46,6 +46,14 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/tabPreviewOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:scaleType="fitStart"
+        android:importantForAccessibility="no" />
+
     <View
         android:id="@+id/clearingInProgressView"
         android:layout_width="match_parent"
