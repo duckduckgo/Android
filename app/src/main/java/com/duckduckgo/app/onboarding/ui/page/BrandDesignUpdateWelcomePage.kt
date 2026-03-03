@@ -23,6 +23,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
@@ -90,6 +92,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         requireActivity().apply {
             enableEdgeToEdge()
         }
+    }
+
+    override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
+        val inflater = super.onGetLayoutInflater(savedInstanceState)
+        val themeRes = if (appTheme.isLightModeEnabled()) {
+            CommonR.style.Theme_DuckDuckGo_Light_Onboarding
+        } else {
+            CommonR.style.Theme_DuckDuckGo_Dark_Onboarding
+        }
+        val contextThemeWrapper = ContextThemeWrapper(inflater.context, themeRes)
+        return inflater.cloneInContext(contextThemeWrapper)
     }
 
     private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
