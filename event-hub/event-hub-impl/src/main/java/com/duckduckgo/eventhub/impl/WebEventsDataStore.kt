@@ -23,15 +23,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.impl.di.WebEventsPrefs
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Qualifier
-
-@Qualifier
-internal annotation class WebEventsPrefs
 
 interface WebEventsDataStore {
     fun getWebEventsConfigJson(): String
