@@ -21,6 +21,7 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlin.math.roundToLong
 
 /**
  * Collects device specification metrics for app startup analysis.
@@ -40,7 +41,7 @@ class RealMemoryCollector @Inject constructor(
 ) : MemoryCollector {
 
     companion object {
-        private const val BYTES_PER_GB = 1024 * 1024 * 1024L
+        private const val BYTES_PER_GiB = 1024 * 1024 * 1024L
     }
 
     override fun collectDeviceRamBucket(): String? {
@@ -49,22 +50,22 @@ class RealMemoryCollector @Inject constructor(
                 ?: return null
             val memoryInfo = ActivityManager.MemoryInfo()
             activityManager.getMemoryInfo(memoryInfo)
-            val totalRamGb = memoryInfo.totalMem.toDouble() / BYTES_PER_GB
-            bucketRamSize(totalRamGb)
+            val totalRamGiB = (memoryInfo.totalMem.toDouble() / BYTES_PER_GiB).roundToLong()
+            bucketRamSize(totalRamGiB)
         } catch (_: Exception) {
             null
         }
     }
 
-    private fun bucketRamSize(ramGb: Double): String {
+    private fun bucketRamSize(ramGiB: Long): String {
         return when {
-            ramGb < 1.0 -> "<1GB"
-            ramGb < 2 -> "1GB"
-            ramGb < 4.0 -> "2GB"
-            ramGb < 6.0 -> "4GB"
-            ramGb < 8.0 -> "6GB"
-            ramGb < 12.0 -> "8GB"
-            ramGb < 16.0 -> "12GB"
+            ramGiB < 1L -> "<1GB"
+            ramGiB < 2L -> "1GB"
+            ramGiB < 4L -> "2GB"
+            ramGiB < 6L -> "4GB"
+            ramGiB < 8L -> "6GB"
+            ramGiB < 12L -> "8GB"
+            ramGiB < 16L -> "12GB"
             else -> "16GB+"
         }
     }

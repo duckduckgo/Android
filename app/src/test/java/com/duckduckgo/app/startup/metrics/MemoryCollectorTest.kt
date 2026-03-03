@@ -38,7 +38,7 @@ class MemoryCollectorTest {
 
     @Test
     fun `when device has less than 1GB RAM then returns less than 1GB bucket`() {
-        val memoryInfo = createMemoryInfo(totalRamMb = 512)
+        val memoryInfo = createMemoryInfo(totalRamMb = 256)
         setupMockMemoryInfo(memoryInfo)
 
         val bucket = collector.collectDeviceRamBucket()
@@ -57,8 +57,8 @@ class MemoryCollectorTest {
     }
 
     @Test
-    fun `when device has 1point5GB RAM then returns 1GB bucket`() {
-        val memoryInfo = createMemoryInfo(totalRamMb = 1536)
+    fun `when device has 1point2GB RAM then returns 1GB bucket`() {
+        val memoryInfo = createMemoryInfo(totalRamMb = 1200)
         setupMockMemoryInfo(memoryInfo)
 
         val bucket = collector.collectDeviceRamBucket()
@@ -138,6 +138,46 @@ class MemoryCollectorTest {
     }
 
     @Test
+    fun `when 2GB device reports 2070597632 bytes then returns 2GB bucket`() {
+        val memoryInfo = createMemoryInfoBytes(totalRamBytes = 2070597632L)
+        setupMockMemoryInfo(memoryInfo)
+
+        val bucket = collector.collectDeviceRamBucket()
+
+        assertEquals("2GB", bucket)
+    }
+
+    @Test
+    fun `when 2GB device reports slightly under 2GiB then rounds to 2GB bucket`() {
+        val memoryInfo = createMemoryInfoBytes(totalRamBytes = 1990L * 1024 * 1024)
+        setupMockMemoryInfo(memoryInfo)
+
+        val bucket = collector.collectDeviceRamBucket()
+
+        assertEquals("2GB", bucket)
+    }
+
+    @Test
+    fun `when 4GB device reports slightly under 4GiB then rounds to 4GB bucket`() {
+        val memoryInfo = createMemoryInfoBytes(totalRamBytes = 3900L * 1024 * 1024)
+        setupMockMemoryInfo(memoryInfo)
+
+        val bucket = collector.collectDeviceRamBucket()
+
+        assertEquals("4GB", bucket)
+    }
+
+    @Test
+    fun `when 8GB device reports slightly under 8GiB then rounds to 8GB bucket`() {
+        val memoryInfo = createMemoryInfoBytes(totalRamBytes = 7800L * 1024 * 1024)
+        setupMockMemoryInfo(memoryInfo)
+
+        val bucket = collector.collectDeviceRamBucket()
+
+        assertEquals("8GB", bucket)
+    }
+
+    @Test
     fun `when ActivityManager is null then returns null`() {
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(null)
         collector = RealMemoryCollector(context)
@@ -157,8 +197,12 @@ class MemoryCollectorTest {
     }
 
     private fun createMemoryInfo(totalRamMb: Int): ActivityManager.MemoryInfo {
+        return createMemoryInfoBytes(totalRamMb * 1024L * 1024L)
+    }
+
+    private fun createMemoryInfoBytes(totalRamBytes: Long): ActivityManager.MemoryInfo {
         return ActivityManager.MemoryInfo().apply {
-            totalMem = totalRamMb * 1024L * 1024L // Convert MB to bytes
+            totalMem = totalRamBytes
             availMem = totalMem / 2 // Not used in bucketing, just set to something
         }
     }
