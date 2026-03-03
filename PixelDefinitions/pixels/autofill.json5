@@ -18,6 +18,12 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
@@ -40,6 +46,12 @@
             {
                 "key": "addWriteGuard",
                 "description": "Whether the addWriteGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -66,6 +78,12 @@
             {
                 "key": "addWriteGuard",
                 "description": "Whether the addWriteGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -96,10 +114,22 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -128,10 +158,22 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -158,6 +200,12 @@
                 "description": "Whether the addWriteGuard feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
+            },
+            {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -181,10 +229,22 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -208,10 +268,22 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -262,10 +334,22 @@
                 "enum": ["true", "false"]
             },
             {
+                "key": "addReadGuard",
+                "description": "Whether the addReadGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
                 "key": "initialHarmonyValue",
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
