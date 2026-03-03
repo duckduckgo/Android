@@ -265,7 +265,7 @@ sealed class Command {
 
     data object GenerateWebViewPreviewImage : Command()
 
-    data object LaunchTabSwitcher : Command()
+    data class LaunchTabSwitcher(val tabId: String, val previewFile: String?) : Command()
 
     data object HideWebContent : Command()
 

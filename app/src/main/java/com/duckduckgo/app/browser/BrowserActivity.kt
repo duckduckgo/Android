@@ -38,6 +38,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -50,6 +51,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
+import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity.Companion.DUCK_AI_ANIM_READY_DELAY_MS
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -66,6 +68,7 @@ import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
@@ -215,6 +218,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var webViewPreviewPersister: WebViewPreviewPersister
 
     private val lastActiveTabs = TabList()
 
@@ -1100,6 +1106,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
+            hideTabPreviewOverlay()
         }
 
     private fun observeDuckChatSharedCommands() {
@@ -1161,6 +1168,30 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             viewModel.onFullScreenModeChanged(isFullScreen())
         }
+    }
+
+    fun prepareTabPreviewOverlay(tabId: String, previewFile: String?): View? {
+        if (previewFile == null) return null
+        val overlay = binding.tabPreviewOverlay
+        val previewPath = webViewPreviewPersister.fullPathForFile(tabId, previewFile)
+        val file = java.io.File(previewPath)
+        if (!file.exists()) return null
+        Glide.with(this).load(file).into(overlay)
+        overlay.visibility = View.VISIBLE
+        ViewCompat.setTransitionName(overlay, "tab_preview_$tabId")
+        return overlay
+    }
+
+    fun hideTabPreviewOverlay() {
+        val overlay = binding.tabPreviewOverlay
+        overlay.visibility = View.GONE
+        Glide.with(this).clear(overlay)
+        ViewCompat.setTransitionName(overlay, null)
+    }
+
+    override fun onActivityReenter(resultCode: Int, data: Intent?) {
+        super.onActivityReenter(resultCode, data)
+        window.decorView.postDelayed({ hideTabPreviewOverlay() }, 400)
     }
 
     companion object {

@@ -3396,7 +3396,8 @@ class BrowserTabViewModel @Inject constructor(
         viewMode: Omnibar.ViewMode,
         hasFocus: Boolean,
     ) {
-        command.value = LaunchTabSwitcher
+        val tab = liveSelectedTab.value
+        command.value = LaunchTabSwitcher(tabId = tab?.tabId ?: "", previewFile = tab?.tabPreviewFile)
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)
@@ -3429,7 +3430,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onLaunchTabSwitcherAfterTabsUndeletedRequest() {
-        command.value = LaunchTabSwitcher
+        val tab = liveSelectedTab.value
+        command.value = LaunchTabSwitcher(tabId = tab?.tabId ?: "", previewFile = tab?.tabPreviewFile)
     }
 
     private fun fireDailyLaunchPixel() {

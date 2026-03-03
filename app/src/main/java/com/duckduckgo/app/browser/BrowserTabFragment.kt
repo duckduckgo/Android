@@ -1821,10 +1821,20 @@ class BrowserTabFragment :
         viewModel.onMessageProcessed()
     }
 
-    private fun launchTabSwitcher() {
-        val activity = activity ?: return
-        val intent = TabSwitcherActivity.intent(activity, tabId)
-        tabSwitcherActivityResult.launch(intent)
+    private fun launchTabSwitcher(tabId: String = this.tabId, previewFile: String? = null) {
+        val browserActivity = activity as? BrowserActivity ?: return
+        val sharedElementView = browserActivity.prepareTabPreviewOverlay(tabId, previewFile)
+        val intent = TabSwitcherActivity.intent(browserActivity, tabId)
+        if (sharedElementView != null) {
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                browserActivity,
+                sharedElementView,
+                "tab_preview_$tabId",
+            )
+            tabSwitcherActivityResult.launch(intent, options)
+        } else {
+            tabSwitcherActivityResult.launch(intent)
+        }
     }
 
     override fun onResume() {
@@ -2542,7 +2552,7 @@ class BrowserTabFragment :
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
-            is Command.LaunchTabSwitcher -> launchTabSwitcher()
+            is Command.LaunchTabSwitcher -> launchTabSwitcher(it.tabId, it.previewFile)
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
