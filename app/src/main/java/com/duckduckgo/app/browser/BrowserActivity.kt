@@ -375,6 +375,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         observeDuckChatSharedCommands()
 
+        setExitSharedElementCallback(object : android.app.SharedElementCallback() {
+            override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) {
+                val overlay = binding.tabPreviewOverlay
+                if (overlay.visibility == View.VISIBLE && names.isNotEmpty()) {
+                    sharedElements[names[0]] = overlay
+                }
+            }
+        })
+
         viewModel.awaitClearDataFinishedNotification()
         initializeServiceWorker()
 
