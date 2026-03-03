@@ -267,7 +267,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAndAutomaticEnabledAndUserEnabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAndAutomaticEnabledThenReturnsContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         val result =
             testee.processJsCallbackMessage(
@@ -279,7 +279,10 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
@@ -318,11 +321,8 @@ class RealDuckChatJSHelperTest {
         assertNotNull(result)
         val context = result!!.params.getJSONObject("pageContext")
         assertEquals("Example Title", context.getString("title"))
-        val faviconArray = context.getJSONArray("favicon")
-        val faviconObject = faviconArray.getJSONObject(0)
-        assertEquals("icon", faviconObject.getString("rel"))
-        val faviconHref = faviconObject.getString("href")
-        assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
+        assertEquals("https://example.com", context.getString("url"))
+        assertEquals("Example content", context.getString("content"))
         verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
     }
 
@@ -361,7 +361,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAutomaticEnabledButUserDisabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAutomaticEnabledThenReturnsContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -374,7 +374,10 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
@@ -600,7 +603,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context for init with automatic attachment then return null`() = runTest {
+    fun `when get AI chat page context for init with automatic attachment then return context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -615,11 +618,14 @@ class RealDuckChatJSHelperTest {
             pageContext = viewModel.updatedPageContext,
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
-    fun `when get AI chat page context for init with automatic attachment but user disabled context then return payload`() = runTest {
+    fun `when get AI chat page context for init with automatic attachment then return payload`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -638,7 +644,8 @@ class RealDuckChatJSHelperTest {
             put("pageContext", JSONObject(viewModel.updatedPageContext))
         }
 
-        assertNull(result)
+        assertNotNull(result)
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
     }
 
     @Test
