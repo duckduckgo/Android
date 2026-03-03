@@ -28,7 +28,7 @@ enum class PirPixel(
 ) {
     PIR_FOREGROUND_RUN_STARTED(
         baseName = "m_dbp_foreground-run_started",
-        type = Count,
+        types = setOf(Count, Daily()),
     ),
 
     PIR_FOREGROUND_RUN_COMPLETED(

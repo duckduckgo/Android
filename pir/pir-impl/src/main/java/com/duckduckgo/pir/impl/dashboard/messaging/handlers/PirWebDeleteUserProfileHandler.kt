@@ -53,9 +53,9 @@ class PirWebDeleteUserProfileHandler @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
     ) {
         logcat { "PIR-WEB: PirWebDeleteUserProfileHandler: process $jsMessage" }
+        pirPixelSender.reportUserReset()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
-                pirPixelSender.reportUserReset()
                 pirWebProfileStateHolder.clear()
                 workHandler.cancelWork()
                 pirFeatureDataCleaner.removeUserData()
