@@ -17,6 +17,8 @@
 package com.duckduckgo.navigation.impl
 
 import android.content.Context
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -108,6 +110,60 @@ class GlobalActivityStarterImplTest {
 
         verify(context).startActivity(any(), anyOrNull())
     }
+
+    // Fix 2: FLAG_ACTIVITY_NEW_TASK
+
+    @Test
+    fun whenStartIntentWithNonActivityContextThenFlagNewTaskAdded() {
+        val intent = globalActivityStarter.startIntent(context, TestParams("test"))
+        assertNotNull(intent)
+        assertNotEquals(0, intent!!.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
+    fun whenStartIntentWithActivityContextThenFlagNewTaskNotAdded() {
+        val activityContext: Context = mock<AppCompatActivity>()
+        val intent = globalActivityStarter.startIntent(activityContext, TestParams("test"))
+        assertNotNull(intent)
+        assertEquals(0, intent!!.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    // Fix 3: ActivityResultLauncher overloads
+
+    @Test
+    fun whenStartWithLauncherParamsFindsActivityThenLauncherIsCalledWithIntent() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, TestParams("test"), launcher)
+        verify(launcher).launch(any())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun whenStartWithLauncherParamsNotFoundThenThrows() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, NotFoundParams, launcher)
+    }
+
+    @Test
+    fun whenStartWithLauncherDeeplinkFindsActivityThenLauncherIsCalledWithIntent() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, DeeplinkActivityParams("screenTest"), launcher)
+        verify(launcher).launch(any())
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun whenStartWithLauncherDeeplinkNotFoundThenThrows() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, notFoundDeeplinkParams, launcher)
+    }
+
+    // Fix 4: duplicate mapper warning — behavior is that first match wins, no exception
+
+    @Test
+    fun whenMultipleMappersMatchSameParamsThenFirstMatchIsUsedWithoutException() {
+        val starterWithDuplicates = GlobalActivityStarterImpl(setOf(TestActivityWithParamsMapper(), DuplicateTestParamsMapper()))
+        val intent = starterWithDuplicates.startIntent(context, TestParams("test"))
+        assertNotNull(intent)
+    }
 }
 
 private class TestActivity : AppCompatActivity()
@@ -134,6 +190,13 @@ private class TestActivityNoParamsMapper : GlobalActivityStarter.ParamToActivity
             null
         }
     }
+}
+
+private class DuplicateTestParamsMapper : GlobalActivityStarter.ParamToActivityMapper {
+    override fun map(activityParams: ActivityParams): Class<out AppCompatActivity>? =
+        if (activityParams is TestParams) TestActivity::class.java else null
+
+    override fun map(deeplinkActivityParams: DeeplinkActivityParams): ActivityParams? = null
 }
 
 private class TestActivityWithParamsMapper : GlobalActivityStarter.ParamToActivityMapper {
