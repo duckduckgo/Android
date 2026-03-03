@@ -239,6 +239,9 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             return
         }
 
+        val manualTtidMs = this.manualTtidMs
+        this.manualTtidMs = null
+
         if (!startupMetricsFeature.self().isEnabled()) {
             logcat { "TTID: Startup metrics feature is disabled" }
             return
@@ -258,7 +261,6 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             }
             if (manualTtidMs != null) {
                 put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, manualTtidMs.toString())
-                manualTtidMs = null
             }
             put(StartupMetricsPixelParameters.API_LEVEL, buildConfig.sdkInt.toString())
 

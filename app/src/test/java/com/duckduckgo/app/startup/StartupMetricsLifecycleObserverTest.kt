@@ -51,7 +51,7 @@ class StartupMetricsLifecycleObserverTest {
     private lateinit var memoryCollector: MemoryCollector
     private lateinit var processTimeProvider: ProcessTimeProvider
     private lateinit var pixel: Pixel
-    private val startupMetricsFeature = FakeFeatureToggleFactory.Companion.create(StartupMetricsFeature::class.java)
+    private val startupMetricsFeature = FakeFeatureToggleFactory.create(StartupMetricsFeature::class.java)
     private lateinit var samplingDecider: SamplingDecider
     private lateinit var activityManager: ActivityManager
     private lateinit var observer: StartupMetricsLifecycleObserver
@@ -301,6 +301,67 @@ class StartupMetricsLifecycleObserverTest {
             assertNull(params[StartupMetricsPixelParameters.TTID_DURATION_MS])
             assertEquals("34", params[StartupMetricsPixelParameters.API_LEVEL])
             assertEquals("8gb", params[StartupMetricsPixelParameters.DEVICE_RAM_BUCKET])
+        }
+    }
+
+    @Test
+    fun `when cold launch pixel is sampled, manual TTID is not reused in subsequent warm launch`() {
+        // Start with sampling false to verify that manual TTID is not reused when warm launch pixel fires
+        whenever(samplingDecider.shouldSample()).thenReturn(false)
+
+        val coldActivity = createMockActivity()
+        val coldStartInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_COLD,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+        setupActivityManagerWithStartInfo(coldStartInfo)
+
+        // Cold launch
+        observer.onActivityCreated(coldActivity, null)
+        observer.onActivityStarted(coldActivity)
+        triggerFirstFrame() // sets manualTtidMs
+        observer.onActivityStopped(coldActivity)
+        observer.onActivityDestroyed(coldActivity)
+
+        // Pixel #1 sampled
+        observer.onActivityPaused(createMockActivity())
+
+        // Want to fire pixel for warm launch
+        whenever(samplingDecider.shouldSample()).thenReturn(true)
+
+        // Simulate the app being brought back to foreground
+        val warmActivity = createMockActivity()
+        observer.onActivityCreated(warmActivity, null)
+        observer.onActivityStarted(warmActivity)
+        observer.onActivityStopped(warmActivity)
+        observer.onActivityDestroyed(warmActivity)
+
+        val warmStartInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_WARM,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+        setupActivityManagerWithStartInfo(warmStartInfo)
+
+        // Pixel #2 fires
+        observer.onActivityPaused(createMockActivity())
+
+        argumentCaptor<Map<String, String>>().apply {
+            verify(pixel, times(1)).fire(
+                pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
+                parameters = capture(),
+                encodedParameters = any(),
+                type = eq(Pixel.PixelType.Count),
+            )
+
+            val params = firstValue
+            assertNull(
+                "manualTtidMs must be reset after cold launch and not reused in warm launch",
+                params[StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS],
+            )
+            assertEquals("2000", params[StartupMetricsPixelParameters.TTID_DURATION_MS])
+            assertEquals("warm", params[StartupMetricsPixelParameters.STARTUP_TYPE])
         }
     }
 
