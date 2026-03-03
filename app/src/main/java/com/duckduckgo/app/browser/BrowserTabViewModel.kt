@@ -2095,7 +2095,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        logcat { "Duck.ai pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
+        logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
             logcat(VERBOSE) { "Page refreshed: $refreshedUrl" }
             pageChanged(refreshedUrl, title)
@@ -4228,7 +4228,6 @@ class BrowserTabViewModel @Inject constructor(
         if (url != null) {
             val favicon = faviconManager.loadFromDisk(tabId, url)
             if (favicon != null) {
-                logcat { "Duck.ai: Enriching context with favicon for tab $tabId and url $url" }
                 val faviconBase64 = favicon.encodeBitmapToBase64()
                 json.put(
                     "favicon",
