@@ -140,17 +140,19 @@ class RealEventHubPixelManager @Inject constructor(
 
         val nowMillis = timeProvider.currentTimeMillis()
 
-        for (pixelState in repository.getAllPixelStates()) {
-            if (nowMillis >= pixelState.periodEndMillis) {
-                fireTelemetry(pixelState)
-            } else {
-                scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+        synchronized(this) {
+            for (pixelState in repository.getAllPixelStates()) {
+                if (nowMillis >= pixelState.periodEndMillis) {
+                    fireTelemetry(pixelState)
+                } else {
+                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+                }
             }
-        }
 
-        for (pixelConfig in getTelemetryConfigs()) {
-            if (repository.getPixelState(pixelConfig.name) == null) {
-                startNewPeriod(pixelConfig)
+            for (pixelConfig in getTelemetryConfigs()) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
+                }
             }
         }
     }
@@ -187,8 +189,10 @@ class RealEventHubPixelManager @Inject constructor(
 
             if (!isFeatureEnabled()) return@launch
 
-            val pixelState = repository.getPixelState(pixelName) ?: return@launch
-            fireTelemetry(pixelState)
+            synchronized(this@RealEventHubPixelManager) {
+                val pixelState = repository.getPixelState(pixelName) ?: return@launch
+                fireTelemetry(pixelState)
+            }
         }
         scheduledTimers[pixelName] = job
     }
