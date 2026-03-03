@@ -518,11 +518,11 @@ class DuckChatContextualViewModel @Inject constructor(
                         tabId = tabId,
                         allowsAutomaticContextAttachment = allowsAutomaticContextAttachment,
                         showContext =
-                            if (allowsAutomaticContextAttachment) {
-                                !inputMode.userRemovedContext
-                            } else {
-                                inputMode.showContext
-                            },
+                        if (allowsAutomaticContextAttachment) {
+                            !inputMode.userRemovedContext
+                        } else {
+                            inputMode.showContext
+                        },
                     )
                 if (updatedState.showContext && !inputMode.showContext) {
                     duckChatPixels.reportContextualPageContextAutoAttached()
