@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.eventhub.impl
+package com.duckduckgo.eventhub.impl.webevents
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
