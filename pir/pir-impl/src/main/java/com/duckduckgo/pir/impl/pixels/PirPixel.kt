@@ -293,6 +293,10 @@ enum class PirPixel(
         baseName = "m_dbp_optout_invalid-event_dropped",
         type = Daily(),
     ),
+    PIR_MANUAL_RESET(
+        baseName = "m_dbp_manual_reset",
+        types = setOf(Count, Daily()),
+    ),
     ;
 
     constructor(

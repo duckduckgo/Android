@@ -1518,5 +1518,12 @@
                 "type": "string"
             }
         ]
+    },
+    "m_dbp_manual_reset": {
+        "description": "Android specific pixel fired whenever the user turns off PIR and resets it",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

@@ -52,6 +52,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_FOREGROUND_RUN_START_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_DURATION
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INITIAL_SCAN_INCOMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND
@@ -575,6 +576,8 @@ interface PirPixelSender {
         brokerUrl: String,
         brokerVersion: String,
     )
+
+    fun reportUserReset()
 }
 
 @ContributesBinding(AppScope::class)
@@ -1359,6 +1362,10 @@ class RealPirPixelSender @Inject constructor(
             PARAM_BROKER_VERSION to brokerVersion,
         )
         fire(PIR_OPTOUT_INVALID_EVENT, params)
+    }
+
+    override fun reportUserReset() {
+        fire(PIR_MANUAL_RESET)
     }
 
     private fun fire(
