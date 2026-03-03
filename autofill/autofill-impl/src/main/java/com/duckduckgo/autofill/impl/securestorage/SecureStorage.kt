@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.autofill.store.SecureStorageRepository
 import com.duckduckgo.autofill.store.db.WebsiteLoginCredentialsEntity
@@ -173,7 +172,6 @@ class RealSecureStorage @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val l2DataTransformer: L2DataTransformer,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val autofillFeature: AutofillFeature,
 ) : SecureStorage {
 
     private val secureStorageRepository: Deferred<SecureStorageRepository?> = appCoroutineScope.async(start = CoroutineStart.LAZY) {
@@ -329,15 +327,7 @@ class RealSecureStorage @Inject constructor(
 
     // only encrypt when there's data
     private suspend fun encryptData(data: String?): EncryptedString? = data?.let {
-        try {
-            l2DataTransformer.encrypt(it)
-        } catch (e: SecureStorageException) {
-            if (autofillFeature.addWriteGuard().isEnabled()) {
-                null
-            } else {
-                throw e
-            }
-        }
+        l2DataTransformer.encrypt(it)
     }
 
     private suspend fun decryptData(
@@ -347,15 +337,7 @@ class RealSecureStorage @Inject constructor(
         // only decrypt when there's data and iv
         return data?.let { _data ->
             iv?.let { _iv ->
-                try {
-                    l2DataTransformer.decrypt(_data, _iv)
-                } catch (e: SecureStorageException) {
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
-                        null
-                    } else {
-                        throw e
-                    }
-                }
+                l2DataTransformer.decrypt(_data, _iv)
             }
         }
     }
