@@ -82,6 +82,22 @@ class RealSecureStorageKeyStore constructor(
     private val harmonyMutex: Mutex = Mutex()
 
     private var initialUseHarmonyValue: Boolean? = null
+
+    private val useHarmonyDeferred: Deferred<Boolean> by lazy {
+        coroutineScope.async(dispatcherProvider.io()) {
+            autofillFeature.useHarmony().isEnabled()
+        }
+    }
+
+    private val readFromHarmonyDeferred: Deferred<Boolean> by lazy {
+        coroutineScope.async(dispatcherProvider.io()) {
+            autofillFeature.readFromHarmony().isEnabled()
+        }
+    }
+
+    private suspend fun useHarmony(): Boolean = useHarmonyDeferred.await()
+
+    private suspend fun readFromHarmony(): Boolean = readFromHarmonyDeferred.await()
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
@@ -116,7 +132,7 @@ class RealSecureStorageKeyStore constructor(
         coroutineScope.async(dispatcherProvider.io()) {
             try {
                 harmonyMutex.withLock {
-                    autofillFeature.useHarmony().isEnabled().let { useHarmony ->
+                    useHarmony().let { useHarmony ->
                         initialUseHarmonyValue = useHarmony
                         if (useHarmony) {
                             getEncryptedPreferences()?.let { legacyPreferences ->
@@ -206,7 +222,7 @@ class RealSecureStorageKeyStore constructor(
                 throw it
             }
 
-            if (autofillFeature.useHarmony().isEnabled()) {
+            if (useHarmony()) {
                 runCatching {
                     getHarmonyEncryptedPreferences()?.edit(commit = true) {
                         if (keyValue == null) {
@@ -247,7 +263,7 @@ class RealSecureStorageKeyStore constructor(
         }
         if (legacyExists) return true
 
-        if (autofillFeature.useHarmony().isEnabled()) {
+        if (useHarmony()) {
             val harmonyExists = try {
                 getHarmonyEncryptedPreferences()?.getString(keyName, null) != null
             } catch (e: Exception) {
@@ -288,7 +304,7 @@ class RealSecureStorageKeyStore constructor(
             }
 
             // When useHarmony is ON, read Harmony and compare for diagnostic pixels
-            if (autofillFeature.useHarmony().isEnabled()) {
+            if (useHarmony()) {
                 val harmonyValue = getHarmonyEncryptedPreferences().let {
                     if (it == null && autofillFeature.addReadGuard().isEnabled()) {
                         throw SecureStorageException.InternalSecureStorageException("Preferences file is null on read")
@@ -348,7 +364,7 @@ class RealSecureStorageKeyStore constructor(
                             throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
                         }
                     }
-                    autofillFeature.readFromHarmony().isEnabled() -> {
+                    readFromHarmony() -> {
                         return@withContext harmonyValue
                     }
                 }
@@ -359,7 +375,7 @@ class RealSecureStorageKeyStore constructor(
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        if (autofillFeature.useHarmony().isEnabled() ) {
+        if (useHarmony()) {
             getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
         } else {
             getEncryptedPreferences() != null
