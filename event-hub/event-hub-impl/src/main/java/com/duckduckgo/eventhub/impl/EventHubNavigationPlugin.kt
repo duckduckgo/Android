@@ -21,6 +21,7 @@ import androidx.annotation.UiThread
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

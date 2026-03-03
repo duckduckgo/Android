@@ -18,6 +18,7 @@ package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler

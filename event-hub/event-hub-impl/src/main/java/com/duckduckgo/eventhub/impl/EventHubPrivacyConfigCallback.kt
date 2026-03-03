@@ -17,6 +17,7 @@
 package com.duckduckgo.eventhub.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

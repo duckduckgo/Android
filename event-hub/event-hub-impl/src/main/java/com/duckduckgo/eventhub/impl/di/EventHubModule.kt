@@ -19,10 +19,10 @@ package com.duckduckgo.eventhub.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.EventHubRepository
-import com.duckduckgo.eventhub.impl.RealEventHubRepository
-import com.duckduckgo.eventhub.impl.store.ALL_MIGRATIONS
-import com.duckduckgo.eventhub.impl.store.EventHubPixelStateDatabase
+import com.duckduckgo.eventhub.impl.pixels.EventHubRepository
+import com.duckduckgo.eventhub.impl.pixels.RealEventHubRepository
+import com.duckduckgo.eventhub.impl.pixels.store.ALL_MIGRATIONS
+import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
