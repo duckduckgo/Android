@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Genaktiver</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktiv</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktiverer ...</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktiverer …</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktiveret</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktiverer ...</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktiverer …</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Administration af denne adresse er midlertidigt utilgængelig.</string>
 
@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importer fra browseren på computeren:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Åbn DuckDuckGo på Mac eller Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Gå til <b>Indstillinger</b> > <b>Adgangskoder</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vælg <b>Importer adgangskoder</b>... og følg trinnene for at importere]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vælg <b>Importer adgangskoder</b>… og følg trinnene for at importere]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Når de er importeret til din computer, kan du konfigurere synkronisering på denne enhed</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hent skrivebordsapp</string>

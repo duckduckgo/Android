@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Máte problémy s aplikáciou?</string>
     <string name="atp_OnInitialNotification">"Ochrana pred sledovaním aplikácií je povolená a blokuje pokusy o sledovanie vo vašich aplikáciách"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Skenovanie na sledovanie aktivity... pípnutie... píp"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Skenovanie na sledovanie aktivity… pípnutie… píp"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Sledovanie pokusov o zablokovanie <b>v %1$d aplikácii</b> (za poslednú hodinu).]]></item>
         <item quantity="few"><![CDATA[ Sledovanie pokusov o zablokovanie <b>v %1$d aplikáciách</b> (za poslednú hodinu).]]></item>
@@ -270,7 +270,7 @@
     <string name="atp_WaitlistGetStartedCta">Začnite</string>
     <string name="atp_WaitlistRedeemCodeCta">Pokračovať</string>
     <string name="atp_WaitlistRedeemCodeLabel">Pozývací kód</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Takmer dokončené...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Takmer dokončené…</string>
     <string name="atp_WaitlistRedeemCodeError">Tento pozývací kód sme nerozpoznali.</string>
     <string name="atp_WaitlistFooterDescription">Pri pridávaní sa na zoznam čakateľov nemusíte zadávať žiadne osobné údaje. Svoje miesto si zabezpečíte časovou pečiatkou, ktorá existuje výlučne vo vašom zariadení, aby sme vás mohli upozorniť, keď budete na rade.</string>
     <string name="atp_WaitlistErrorJoining">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>

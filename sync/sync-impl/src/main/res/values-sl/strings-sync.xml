@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Možnosti</string>
     <string name="sync_enable_option_favicons_title">Pridobivanje ikon zaznamkov</string>
     <string name="sync_enable_option_favicons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
-    <string name="sync_enable_connecting">Povezovanje ...</string>
+    <string name="sync_enable_connecting">Povezovanje …</string>
     <string name="sync_intro_enable_title">Sinhronizirajte in varnostno kopirajte to napravo</string>
     <string name="sync_intro_enable_content">S tem ustvarite šifrirano varnostno kopijo zaznamkov in gesel v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_content_with_ai_chat">S tem ustvarite šifrirano varnostno kopijo zaznamkov, gesel in klepetov Duck.ai v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Prikaži besedilno kodo</string>
     <string name="sync_show_qr_code_item">Skeniranje kode QR</string>
     <string name="sync_save_recovery_code_item">Shrani obnovitveni PDF</string>
-    <string name="sync_delete_account_item">Izklopi in izbriši podatke strežnika ...</string>
-    <string name="sync_disable_sync_item">Izklopi sinhronizacijo in varnostno kopiranje ...</string>
+    <string name="sync_delete_account_item">Izklopi in izbriši podatke strežnika …</string>
+    <string name="sync_disable_sync_item">Izklopi sinhronizacijo in varnostno kopiranje …</string>
     <string name="sync_enable_sync_next_button">Naslednji</string>
     <string name="sync_recovery_code_content">Če izgubite dostop do naprav, boste to kodo potrebovali za obnovitev sinhroniziranih podatkov.</string>
     <string name="sync_recovery_code_hint">Vsak, ki ima dostop do te kode, lahko dostopa do sinhroniziranih podatkov, zato jo hranite na varnem mestu.</string>

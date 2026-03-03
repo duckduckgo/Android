@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Ühendage kõigi oma seadme kaitsmiseks\n Internetiliiklus.</string>
     <string name="netpManagementDescriptionOn">Kogu seadme internetiliiklus on turvatud\nläbi VPN-i.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Ühendamine ...</string>
+    <string name="netpManagementToggleSubtitleConnecting">Ühendamine …</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Ühendatud · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Ei ole ühendatud</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN on praegu beetaversioonis. <annotation type="report_issues_link">Jaga tagasisidet</annotation>, et aidata meil paremaks saada!</string>

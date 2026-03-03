@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Midagi muud</string>
 
     <string name="feedbackSubmitVpnHeader">Kas leidsid probleemi, mida meie <annotation type="faqs_link">abikeskuses</annotation> ei käsitleta? Me tahame sellest kindlasti teada saada.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Ütle meile, mis toimub...</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Ütle meile, mis toimub…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Lisaks eespool sisestatud andmetele saadame koos sinu tagasisidega ka mõned anonüümsed andmed:\n\n• Kas mõned brauseri funktsioonid on aktiivsed\n• Rakenduse koonddiagnostika (nt veakoodid)\n\nVajutades nuppu Saada, nõustud, et DuckDuckGo võib kasutada esitatud teavet rakenduse täiustamiseks."</string>
     <string name="feedbackSubmitVpnSubmit">Esita</string>
     <string name="feedbackSubmitCompletedMessage">Aitäh! Tagasiside on esitatud.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet...</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Millist funktsiooni soovid näha?</string>
     <string name="feedbackSubmitContactSupport">Kas vajad abi? <annotation type="support_link">Võta ühendust tugiteenusega</annotation>.</string>
 

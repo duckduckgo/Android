@@ -210,7 +210,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Bekräfta abonnemang</string>
-    <string name="netpVerifySubscriptionInProgress">Vänta medan vi bekräftar ditt abonnemang ...</string>
+    <string name="netpVerifySubscriptionInProgress">Vänta medan vi bekräftar ditt abonnemang …</string>
     <string name="netpVerifySubscriptionNoSubscription">Hoppsan! Du har inget giltigt abonnemang.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Hoppsan! Ditt abonnemang är inte giltigt för DuckDuckGo VPN.</string>
 

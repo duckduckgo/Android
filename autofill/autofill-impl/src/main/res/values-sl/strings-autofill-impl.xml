@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Znova aktiviraj</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktivno</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktiviranje ...</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktiviranje …</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktivirano</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktiviranje ...</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktiviranje …</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Upravljanje tega naslova trenutno ni na voljo.</string>
 
@@ -221,7 +221,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Uvoz iz namiznega brskalnika:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Odprite DuckDuckGo v sistemu Mac ali Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Pojdite v <b>Nastavitve</b> > <b>Gesla</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Izberite <b>Uvozi gesla</b> ... in upoštevajte korake za uvoz]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Izberite <b>Uvozi gesla</b> … in upoštevajte korake za uvoz]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Ko jih uvozite v računalnik, lahko nastavite sinhronizacijo v tej napravi</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Pridobite namizno aplikacijo</string>

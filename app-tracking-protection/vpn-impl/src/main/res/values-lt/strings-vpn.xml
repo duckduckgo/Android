@@ -270,7 +270,7 @@
     <string name="atp_WaitlistGetStartedCta">Pradėti</string>
     <string name="atp_WaitlistRedeemCodeCta">Tęsti</string>
     <string name="atp_WaitlistRedeemCodeLabel">Pakvietimo kodas</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Jau beveik baigėme...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Jau beveik baigėme…</string>
     <string name="atp_WaitlistRedeemCodeError">Šio kvietimo kodo neatpažinome.</string>
     <string name="atp_WaitlistFooterDescription">Jums nereikia dalintis savo asmenine informacija, kad prisijungtumėte prie laukimo sąrašo. Užsitikrinsite vietą eilėje laiko žyma, kuri egzistuoja tik jūsų įrenginyje, kad galėtume jus įspėti, kai ateis jūsų eilė.</string>
     <string name="atp_WaitlistErrorJoining">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>

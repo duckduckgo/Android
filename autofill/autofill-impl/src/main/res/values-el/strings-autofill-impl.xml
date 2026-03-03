@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Ενεργοποίηση</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Ενεργό</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Ενεργοποίηση...</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Ενεργοποίηση…</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Απενεργοποιήθηκε</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Απενεργοποίηση...</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Απενεργοποίηση…</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Η διαχείριση της διεύθυνσης αυτής δεν είναι διαθέσιμη προσωρινά.</string>
 
@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Εισαγωγή από το πρόγραμμα περιήγησης για υπολογιστές:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ανοίξτε το DuckDuckGo σε Mac ή Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Μεταβείτε στις <b>Ρυθμίσεις</b> > <b>Κωδικοί πρόσβασης</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Επιλέξτε <b>Εισαγωγή κωδικών πρόσβασης</b>... και ακολουθήστε τα βήματα για εισαγωγή]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Επιλέξτε <b>Εισαγωγή κωδικών πρόσβασης</b>… και ακολουθήστε τα βήματα για εισαγωγή]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Μόλις εισαχθεί στον υπολογιστή σας, μπορείτε να ρυθμίσετε τον συγχρονισμό στη συσκευή αυτή</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Αποκτήστε την εφαρμογή για υπολογιστές</string>
@@ -295,7 +295,7 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Εισαγωγή σελιδοδεικτών από το Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών…</string>
     <string name="importBookmarksFromGoogleWebFlowTitle">Εισαγωγή σελιδοδεικτών</string>
     <string name="importBookmarksProgressTitle">Εισαγωγή από το Google…</string>
     <string name="importBookmarksProgressSubtitle">Κρατήστε αυτήν την οθόνη ανοιχτή και περιμένετε. Δεν θα χρειαστούν περισσότερο από ένα ή δύο λεπτά.</string>

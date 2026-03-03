@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Maak verbinding om het internetverkeer van al je\napparaten te beveiligen.</string>
     <string name="netpManagementDescriptionOn">Al het internetverkeer van apparaten wordt beveiligd\nvia de VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Er wordt verbinding gemaakt ...</string>
+    <string name="netpManagementToggleSubtitleConnecting">Er wordt verbinding gemaakt …</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Verbonden · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Niet verbonden</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN is momenteel in bèta. <annotation type="report_issues_link">Deel je feedback</annotation> om ons te helpen verbeteren!</string>

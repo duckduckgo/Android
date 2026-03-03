@@ -2323,6 +2323,534 @@
     </issue>
 
     <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="213"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="214"
+            column="32"/>
+    </issue>
+
+    <issue
         id="VectorPath"
         message="Very long vector path (878 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="        android:pathData=&quot;M27.759,12.885L28.891,10.927C29.59,9.704 31.15,9.291 32.373,9.991C33.597,10.69 34.009,12.249 33.31,13.472L22.396,32.363H30.29C32.848,32.363 34.282,35.369 33.17,37.452H10.029C8.617,37.452 7.484,36.32 7.484,34.907C7.484,33.495 8.617,32.363 10.029,32.363H16.517L24.823,17.968L22.229,13.465C21.53,12.242 21.942,10.697 23.166,9.984C24.389,9.284 25.934,9.697 26.647,10.92L27.759,12.885ZM17.943,40.074L15.496,44.318C14.797,45.541 13.238,45.954 12.014,45.255C10.791,44.555 10.378,42.996 11.078,41.773L12.895,38.627C14.951,37.991 16.622,38.48 17.943,40.074ZM39.015,32.377H45.636C47.048,32.377 48.18,33.509 48.18,34.921C48.18,36.334 47.048,37.466 45.636,37.466H41.958L44.44,41.773C45.139,42.996 44.727,44.541 43.503,45.255C42.28,45.954 40.735,45.541 40.021,44.318C35.841,37.068 32.702,31.642 30.618,28.028C28.486,24.351 30.01,20.659 31.513,19.408C33.184,22.274 35.68,26.602 39.015,32.377Z&quot;"
@@ -2408,325 +2936,6 @@
             file="src/main/res/drawable/ic_subscription_128.xml"
             line="8"
             column="25"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;subscriptionSettingActivating&quot;>Aktiviranje u tijeku...&lt;/string>"
-        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="86"
-            column="50"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Кажете ни какъв е проблемът...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Řekni nám, o co jde...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Fortæl os, hvad der foregår...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-da/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Πείτε μας τι συμβαίνει...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-el/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Ütle meile, mis toimub...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-et/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Kerro meille, mitä tapahtuu...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Reci nam što se događa...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Raccontaci cosa sta succedendo...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Praneškite, kas vyksta...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Spune-ne ce se întâmplă...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Сообщите нам, что происходит...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Povedz nám, čo sa deje...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Povejte nam, kaj se dogaja ...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Berätta för oss vad som händer ...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitVpnDescriptionHint&quot;>Bize neler olduğunu anlatın...&lt;/string>"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="159"
-            column="53"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pošli nám svou zpětnou vazbu...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Giv os feedback...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-da/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Στείλτε μας τα σχόλιά σας...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-el/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Palun anna meile tagasisidet...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-et/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Anna meille palautetta...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Comunicaci la tua opinione...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-it/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pateikite mums savo atsiliepimą...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Przekaż opinię...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Te rugăm să ne comunici feedbackul tău...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Оставьте комментарий здесь...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Prosím, daj nám svoju spätnú väzbu...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Pošljite nam povratne informacije ...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;feedbackSubmitGeneralDescriptionHint&quot;>Ge din feedback ...&lt;/string>"
-        errorLine2="                                                        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="164"
-            column="57"/>
     </issue>
 
     <issue

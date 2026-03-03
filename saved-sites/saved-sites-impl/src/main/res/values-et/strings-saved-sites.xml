@@ -114,6 +114,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Impordi järjehoidjad Google\'ist</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Impordi Google\'ist</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail…</string>
     <string name="bookmarksImportDialogClose">Sulge</string>
 </resources>

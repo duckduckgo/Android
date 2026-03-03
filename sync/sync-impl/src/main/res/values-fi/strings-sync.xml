@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Kytke pois päältä</string>
     <string name="turn_off_sync_dialog_secondary_button">Peruuta</string>
     <string name="sync_permission_required_store_recovery_code">Palautuksen PDF-tiedoston tallennus edellyttää tallennusluvan</string>
-    <string name="sync_share_title">Jaa...</string>
+    <string name="sync_share_title">Jaa…</string>
     <string name="sync_pdf_title">Synkronoi palautuskoodi</string>
     <string name="sync_pdf_description">Palautuskoodin avulla voit synkronoida kirjanmerkkisi useiden laitteiden välillä ja palauttaa synkronoidut tiedot, jos menetät pääsyn laitteeseen.</string>
     <string name="sync_code_box_title">Säilytä nämä tiedot turvallisessa paikassa.</string>

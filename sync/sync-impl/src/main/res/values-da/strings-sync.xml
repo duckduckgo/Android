@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Valgmuligheder</string>
     <string name="sync_enable_option_favicons_title">Hent bogmærkeikoner</string>
     <string name="sync_enable_option_favicons_subtitle">Download automatisk ikoner for dine synkroniserede bogmærker.</string>
-    <string name="sync_enable_connecting">Forbinder ...</string>
+    <string name="sync_enable_connecting">Forbinder …</string>
     <string name="sync_intro_enable_title">Synkroniser og sikkerhedskopier denne enhed</string>
     <string name="sync_intro_enable_content">Dette opretter en krypteret sikkerhedskopi af dine bogmærker og adgangskoder på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheder.\n\n Krypteringsnøglen gemmes kun på din enhed, DuckDuckGo har ikke adgang til den.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Dette opretter en krypteret sikkerhedskopi af dine bogmærker, adgangskoder og Duck.ai-chats på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheder. \n\n Krypteringsnøglen gemmes kun på din enhed. DuckDuckGo har ikke adgang til den.</string>
@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Vis tekstkode</string>
     <string name="sync_show_qr_code_item">Scan QR-kode</string>
     <string name="sync_save_recovery_code_item">Gem gendannelses-PDF</string>
-    <string name="sync_delete_account_item">Slå fra og slet serverdata ...</string>
-    <string name="sync_disable_sync_item">Slå synkronisering og sikkerhedskopiering fra ...</string>
+    <string name="sync_delete_account_item">Slå fra og slet serverdata …</string>
+    <string name="sync_disable_sync_item">Slå synkronisering og sikkerhedskopiering fra …</string>
     <string name="sync_enable_sync_next_button">Næste</string>
     <string name="sync_recovery_code_content">Hvis du mister adgang til dine enheder, skal du bruge denne kode for at gendanne dine synkroniserede data.</string>
     <string name="sync_recovery_code_hint">Alle, der har adgang til denne kode, kan få adgang til dine synkroniserede data, så opbevar den på et sikkert sted.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Slå fra</string>
     <string name="turn_off_sync_dialog_secondary_button">Annuller</string>
     <string name="sync_permission_required_store_recovery_code">Download af gendannelses-PDF kræver lagringstilladelse</string>
-    <string name="sync_share_title">Del med ...</string>
+    <string name="sync_share_title">Del med …</string>
     <string name="sync_pdf_title">Kode til gendannelse af synkronisering</string>
     <string name="sync_pdf_description">Gendannelseskoden giver dig mulighed for at synkronisere dine bogmærker på tværs af flere enheder og gendanne dine synkroniserede data, hvis du mister adgangen til en enhed.</string>
     <string name="sync_code_box_title">Opbevar disse oplysninger sikkert.</string>

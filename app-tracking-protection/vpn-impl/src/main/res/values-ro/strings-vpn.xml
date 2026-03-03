@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Ai probleme cu o aplicație?</string>
     <string name="atp_OnInitialNotification">"Protecția împotriva monitorizării de către aplicații este activată și blochează încercările de urmărire în aplicațiile tale"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Se scanează activitatea de urmărire... bip... pac"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Se scanează activitatea de urmărire… bip… pac"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicație</b> (ultima oră).]]></item>
         <item quantity="few"><![CDATA[ Încercările de urmărire blocate <b>în %1$d aplicații</b> (ultima oră).]]></item>
@@ -264,7 +264,7 @@
     <string name="atp_WaitlistGetStartedCta">Să începem</string>
     <string name="atp_WaitlistRedeemCodeCta">Continuă</string>
     <string name="atp_WaitlistRedeemCodeLabel">Codul de invitație</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Mai e puțin...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Mai e puțin…</string>
     <string name="atp_WaitlistRedeemCodeError">Nu am recunoscut acest cod de invitație.</string>
     <string name="atp_WaitlistFooterDescription">Nu va trebui să comunici informații personale, pentru a te înscrie pe lista de așteptare. Îți vei asigura locul la coadă, folosind o marcă de timp care există numai pe dispozitivul tău, astfel încât să te putem înștiința când ți-a sosit rândul.</string>
     <string name="atp_WaitlistErrorJoining">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>

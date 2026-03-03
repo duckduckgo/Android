@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Valikud</string>
     <string name="sync_enable_option_favicons_title">Too järjehoidjaikoonid</string>
     <string name="sync_enable_option_favicons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
-    <string name="sync_enable_connecting">Ühendamine ...</string>
+    <string name="sync_enable_connecting">Ühendamine …</string>
     <string name="sync_intro_enable_title">Selle seadme sünkroonimine ja varundamine</string>
     <string name="sync_intro_enable_content">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele juurde.</string>
     <string name="sync_intro_enable_content_with_ai_chat">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest, paroolidest ja Duck.ai vestlustest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele ligi.</string>

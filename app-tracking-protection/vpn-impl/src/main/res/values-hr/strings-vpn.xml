@@ -270,7 +270,7 @@
     <string name="atp_WaitlistGetStartedCta">Započnite</string>
     <string name="atp_WaitlistRedeemCodeCta">Nastavi</string>
     <string name="atp_WaitlistRedeemCodeLabel">Pozivni kôd</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Još malo i gotovo...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Još malo i gotovo…</string>
     <string name="atp_WaitlistRedeemCodeError">Nismo prepoznali ovu pozivnu šifru.</string>
     <string name="atp_WaitlistFooterDescription">Nećete morati podijeliti nikakve osobne podatke za pridruživanje listi čekanja. Svoje ćete mjesto osigurati u skladu s vremenskom oznakom koja postoji samo na vašem uređaju kako bismo vas mogli obavijestiti kada na vas dođe red.</string>
     <string name="atp_WaitlistErrorJoining">Došlo je do pogreške prilikom pridruživanja listi čekanja; pokušajte ponovo kasnije</string>

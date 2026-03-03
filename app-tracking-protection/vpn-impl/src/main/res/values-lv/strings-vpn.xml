@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Problēmas ar lietotni?</string>
     <string name="atp_OnInitialNotification">"Lietotņu pretizsekošanas aizsardzība ir iespējota un bloķē izsekošanas mēģinājumus tavās lietotnēs"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Notiek izsekošanas aktivitāšu skenēšana… bīp… bīp..."</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Notiek izsekošanas aktivitāšu skenēšana… bīp… bīp…"</string>
     <plurals name="atp_OnNotification">
         <item quantity="zero"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnēs</b> (pēdējās stundas laikā).]]></item>
         <item quantity="one"><![CDATA[ Izsekošanas mēģinājumi bloķēti <b>%1$d lietotnē</b> (pēdējās stundas laikā).]]></item>

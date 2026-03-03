@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Επιλογές</string>
     <string name="sync_enable_option_favicons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
     <string name="sync_enable_option_favicons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες.</string>
-    <string name="sync_enable_connecting">Σύνδεση...</string>
+    <string name="sync_enable_connecting">Σύνδεση…</string>
     <string name="sync_intro_enable_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
     <string name="sync_intro_enable_content">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών και των κωδικών πρόσβασής σας στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών, των κωδικών πρόσβασής σας και των συνομιλιών στο Duck.ai στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. \n\n Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo.</string>
@@ -108,7 +108,7 @@
     <string name="sync_show_qr_code_item">Σάρωση κώδικα QR</string>
     <string name="sync_save_recovery_code_item">Αποθήκευση ανάκτησης PDF</string>
     <string name="sync_delete_account_item">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή…</string>
-    <string name="sync_disable_sync_item">Απενεργοποίηση Συγχρονισμού και δημιουργία αντιγράφων ασφάλειας...</string>
+    <string name="sync_disable_sync_item">Απενεργοποίηση Συγχρονισμού και δημιουργία αντιγράφων ασφάλειας…</string>
     <string name="sync_enable_sync_next_button">Επόμενο</string>
     <string name="sync_recovery_code_content">Σε περίπτωση που χάσετε την πρόσβαση στις συσκευές σας, θα χρειαστείτε αυτόν τον κωδικό για να ανακτήσετε τα συγχρονισμένα δεδομένα σας.</string>
     <string name="sync_recovery_code_hint">Οποιοσδήποτε με πρόσβαση σε αυτόν τον κωδικό μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας. Γι\' αυτό φυλάξτε τον σε ασφαλές μέρος.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Απενεργοποίηση</string>
     <string name="turn_off_sync_dialog_secondary_button">Ακύρωση</string>
     <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
-    <string name="sync_share_title">Κοινή χρήση με...</string>
+    <string name="sync_share_title">Κοινή χρήση με…</string>
     <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
     <string name="sync_pdf_description">Ο Κωδικός ανάκτησης σάς επιτρέπει να συγχρονίζετε τους σελιδοδείκτες σας σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε μια συσκευή.</string>
     <string name="sync_code_box_title">Διατηρήστε αυτές τις πληροφορίες ασφαλείς.</string>

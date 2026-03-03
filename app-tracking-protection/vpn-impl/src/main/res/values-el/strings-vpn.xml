@@ -258,7 +258,7 @@
     <string name="atp_WaitlistGetStartedCta">Ξεκινήστε</string>
     <string name="atp_WaitlistRedeemCodeCta">Συνέχεια</string>
     <string name="atp_WaitlistRedeemCodeLabel">Κωδικός πρόσκλησης</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Σχεδόν έτοιμοι...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Σχεδόν έτοιμοι…</string>
     <string name="atp_WaitlistRedeemCodeError">Δεν αναγνωρίσαμε αυτόν τον Κωδικό πρόσκλησης.</string>
     <string name="atp_WaitlistFooterDescription">Δεν θα χρειαστεί να κοινοποιήσετε προσωπικά στοιχεία για εγγραφή στη λίστα αναμονής. Θα εξασφαλίσετε τη θέση σας στη λίστα αναμονής βάσει χρονικής σήμανσης που υπάρχει αποκλειστικά στη συσκευή σας, ώστε να μπορούμε να σας ειδοποιήσουμε μόλις έρθει η σειρά σας.</string>
     <string name="atp_WaitlistErrorJoining">Προέκυψε σφάλμα κατά την εγγραφή στη Λίστα αναμονής. Ξαναπροσπαθήστε αργότερα.</string>

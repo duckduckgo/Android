@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Desativar</string>
     <string name="turn_off_sync_dialog_secondary_button">Cancelar</string>
     <string name="sync_permission_required_store_recovery_code">É necessária a permissão de armazenamento para guardar o PDF de recuperação</string>
-    <string name="sync_share_title">Partilhar com...</string>
+    <string name="sync_share_title">Partilhar com…</string>
     <string name="sync_pdf_title">Sincronizar código de recuperação</string>
     <string name="sync_pdf_description">O código de recuperação permite sincronizar os teus marcadores em vários dispositivos e recuperar os dados sincronizados se perderes o acesso a um dispositivo.</string>
     <string name="sync_code_box_title">Guarda estas informações em segurança.</string>

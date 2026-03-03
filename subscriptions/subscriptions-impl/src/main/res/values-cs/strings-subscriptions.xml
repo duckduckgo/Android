@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Něco jiného</string>
 
     <string name="feedbackSubmitVpnHeader">Víš o problému, který není popsaný v našem <annotation type="faqs_link">centru nápovědy</annotation>? Chceme o tom vědět!</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Řekni nám, o co jde...</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Řekni nám, o co jde…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Kromě výše zadaných údajů posíláme spolu s tvojí zpětnou vazbou i některé anonymizované informace:\n\n• Jestli jsou některé funkce prohlížeče aktivní\n• Souhrnné diagnostické údaje aplikace (např. chybové kódy)\n\nKliknutím na Odeslat souhlasíš s tím, aby služba DuckDuckGo použila poskytnuté informace k vylepšování aplikace."</string>
     <string name="feedbackSubmitVpnSubmit">Odeslat</string>
     <string name="feedbackSubmitCompletedMessage">Děkujeme! Zpětná vazba odeslána.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Pošli nám svou zpětnou vazbu...</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Pošli nám svou zpětnou vazbu…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Jaká funkce by se ti líbila?</string>
     <string name="feedbackSubmitContactSupport">Potřebuješ pomoc? <annotation type="support_link">Kontaktuj podporu</annotation>.</string>
 

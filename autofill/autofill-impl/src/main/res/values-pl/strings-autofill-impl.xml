@@ -221,7 +221,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Zaimportuj z przeglądarki komputerowej:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Otwórz DuckDuckGo na komputerze Mac lub w systemie Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Wybierz kolejno <b>Ustawienia</b> > <b>Hasła</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wybierz <b>Importuj hasła...</b> i postępuj zgodnie z instrukcjami importu]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wybierz <b>Importuj hasła…</b> i postępuj zgodnie z instrukcjami importu]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Po zaimportowaniu na komputer możesz skonfigurować synchronizację na urządzeniu</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Pobierz aplikację komputerową</string>

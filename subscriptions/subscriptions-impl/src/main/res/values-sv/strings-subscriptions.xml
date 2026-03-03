@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Övrigt</string>
 
     <string name="feedbackSubmitVpnHeader">Har du hittat ett problem som inte täcks av vårt <annotation type="faqs_link">hjälpcenter</annotation> ? Vi vill definitivt veta mer om det.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Berätta för oss vad som händer ...</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Berätta för oss vad som händer …</string>
     <string name="feedbackSubmitVpnDisclaimer">"Förutom de uppgifter som anges ovan skickar vi viss anonymiserad information med din feedback:\n\n• Huruvida vissa webbläsarfunktioner är aktiva\n• Sammanställd appdiagnostik (t.ex. felkoder)\n\nGenom att klicka på Skicka godkänner du att DuckDuckGo får använda den inlämnade informationen för att förbättra appen."</string>
     <string name="feedbackSubmitVpnSubmit">Skicka</string>
     <string name="feedbackSubmitCompletedMessage">Tack! Återkopplingen har skickats.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Ge din feedback ...</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Ge din feedback …</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Vilken funktion vill du ha?</string>
     <string name="feedbackSubmitContactSupport">Behöver du hjälp? <annotation type="support_link">Kontakta supporten</annotation>.</string>
 

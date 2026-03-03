@@ -118,6 +118,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Importă marcajele din Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importă din Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje...</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje…</string>
     <string name="bookmarksImportDialogClose">Închidere</string>
 </resources>

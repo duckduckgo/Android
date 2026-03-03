@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">¿Tienes problemas con una aplicación?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection está activada y bloquea los intentos de rastreo en tus aplicaciones"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Escaneando actividad de rastreo... pi... pi..."</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Escaneando actividad de rastreo… pi… pi…"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Intentos de seguimiento bloqueados <b>en %1$d aplicación</b> (última hora).]]></item>
         <item quantity="other"><![CDATA[ Intentos de seguimiento bloqueados <b>en %1$d aplicaciones</b> (última hora).]]></item>
@@ -258,7 +258,7 @@
     <string name="atp_WaitlistGetStartedCta">Empezar</string>
     <string name="atp_WaitlistRedeemCodeCta">Continuar</string>
     <string name="atp_WaitlistRedeemCodeLabel">Código de invitación</string>
-    <string name="atp_WaitlistRedeemCodeTitle">Casi estamos...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Casi estamos…</string>
     <string name="atp_WaitlistRedeemCodeError">No hemos reconocido este código de invitación.</string>
     <string name="atp_WaitlistFooterDescription">No tendrás que compartir ninguna información personal para unirte a la lista de espera. Asegurarás tu lugar en la fila con una marca de tiempo que existe únicamente en tu dispositivo para que podamos notificarte cuando sea tu turno.</string>
     <string name="atp_WaitlistErrorJoining">Se ha producido un error al unirte a la lista de espera, inténtalo de nuevo más tarde</string>

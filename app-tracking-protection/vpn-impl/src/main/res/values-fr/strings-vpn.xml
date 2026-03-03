@@ -258,7 +258,7 @@
     <string name="atp_WaitlistGetStartedCta">Commencer</string>
     <string name="atp_WaitlistRedeemCodeCta">Continuer</string>
     <string name="atp_WaitlistRedeemCodeLabel">Code d\'invitation</string>
-    <string name="atp_WaitlistRedeemCodeTitle">On y est presque...</string>
+    <string name="atp_WaitlistRedeemCodeTitle">On y est presque…</string>
     <string name="atp_WaitlistRedeemCodeError">Nous n\'avons pas reconnu ce code d\'invitation.</string>
     <string name="atp_WaitlistFooterDescription">Vous n\'aurez pas à fournir d\'informations personnelles pour vous inscrire sur la liste d\'attente. Votre place sera assurée par un horodatage associé uniquement à votre appareil, qui nous permettra de vous informer quand viendra votre tour.</string>
     <string name="atp_WaitlistErrorJoining">Une erreur s\'est produite lors de l\'inscription sur la liste d\'attente. Veuillez réessayer plus tard.</string>

@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Připojte se a zabezpečte všechna svá zařízení\nInternetový provoz.</string>
     <string name="netpManagementDescriptionOn">Veškerý internetový provoz zařízení je zabezpečený\n pomocí VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Připojování...</string>
+    <string name="netpManagementToggleSubtitleConnecting">Připojování…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Připojeno · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Nepřipojeno</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN je momentálně v beta verzi. <annotation type="report_issues_link">Poděl se o zpětnou vazbu</annotation> a pomoz nám se zlepšovat!</string>

@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Κάτι άλλο</string>
 
     <string name="feedbackSubmitVpnHeader">Βρήκατε ένα πρόβλημα που δεν καλύπτεται στο <annotation type="faqs_link">κέντρο βοήθειας</annotation>; Θέλουμε σίγουρα να μάθουμε γι\' αυτό.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Πείτε μας τι συμβαίνει...</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Πείτε μας τι συμβαίνει…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Εκτός από τις λεπτομέρειες που καταχωρήθηκαν παραπάνω, στέλνουμε κάποιες ανώνυμες πληροφορίες με τα σχόλιά σας:\n\n• Εάν κάποιες λειτουργίες του προγράμματος περιήγησης είναι ενεργές\n• Συγκεντρωτικά διαγνωστικά της εφαρμογής (π.χ. κωδικοί σφάλματος)\n\nΚάνοντας κλικ στην επιλογή Υποβολή, συμφωνείτε ότι το DuckDuckGo μπορεί να χρησιμοποιήσει τις πληροφορίες που υποβάλλονται για βελτίωση της εφαρμογής."</string>
     <string name="feedbackSubmitVpnSubmit">Υποβολή</string>
     <string name="feedbackSubmitCompletedMessage">Σας ευχαριστούμε! Το σχόλιο υποβλήθηκε.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Στείλτε μας τα σχόλιά σας...</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Στείλτε μας τα σχόλιά σας…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ποιες λειτουργίες θα θέλατε να δείτε;</string>
     <string name="feedbackSubmitContactSupport">Χρειάζεστε βοήθεια; <annotation type="support_link">Επικοινωνήστε με την υποστήριξη</annotation>.</string>
 

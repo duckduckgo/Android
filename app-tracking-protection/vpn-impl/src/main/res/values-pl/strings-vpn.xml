@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Masz problemy z aplikacją?</string>
     <string name="atp_OnInitialNotification">"Ochrona przed śledzeniem przez aplikacje jest włączona i blokuje próby śledzenia w aplikacjach."</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Trwa wyszukiwanie śladów śledzenia..."</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Trwa wyszukiwanie śladów śledzenia…"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacji</b> (ostatnia godzina).]]></item>
         <item quantity="few"><![CDATA[ Zablokowane próby śledzenia <b>w %1$d aplikacjach</b> (ostatnia godzina).]]></item>

@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Hai problemi con un\'app?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection è attivata e blocca i tentativi di tracciamento nelle tue app"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Scansione per il tracciamento dell'attività in corso..."</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Scansione per il tracciamento dell'attività in corso…"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Tentativi di tracciamento bloccati <b>in %1$d app</b> (ultima ora).]]></item>
         <item quantity="other"><![CDATA[ Tentativi di tracciamento bloccati <b>in %1$d app</b> (ultima ora).]]></item>

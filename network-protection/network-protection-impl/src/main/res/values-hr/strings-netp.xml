@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Poveži se i osiguraj internetski promet\nna svim svojim uređajima.</string>
     <string name="netpManagementDescriptionOn">Sav internetski promet uređaja osiguran je\nputem VPN-a.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Povezivanje u tijeku...</string>
+    <string name="netpManagementToggleSubtitleConnecting">Povezivanje u tijeku…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Povezano %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Nije povezano</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN trenutačno je u beta fazi. <annotation type="report_issues_link">Podijeli povratne informacije</annotation> kako bi nam pomogao da se poboljšamo!</string>
@@ -212,7 +212,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Potvrdi pretplatu</string>
-    <string name="netpVerifySubscriptionInProgress">Pričekaj dok provjeravamo tvoju pretplatu...</string>
+    <string name="netpVerifySubscriptionInProgress">Pričekaj dok provjeravamo tvoju pretplatu…</string>
     <string name="netpVerifySubscriptionNoSubscription">Ups! Nemaš valjanu pretplatu.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Ups! Tvoja pretplata ne vrijedi za DuckDuckGo VPN.</string>
 

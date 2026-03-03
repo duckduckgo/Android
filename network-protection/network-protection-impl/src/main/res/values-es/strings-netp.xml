@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Conéctate para proteger todo el tráfico de Internet\nde tu dispositivo.</string>
     <string name="netpManagementDescriptionOn">Todo el tráfico de Internet del dispositivo está protegido\n a través de VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Conectando...</string>
+    <string name="netpManagementToggleSubtitleConnecting">Conectando…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Conectado · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">No conectado</string>
     <string name="netpManagementBetaDescription">La VPN de DuckDuckGo está actualmente en fase beta. ¡<annotation type="report_issues_link">Comparte tus comentarios</annotation> para ayudarnos a mejorar!</string>

@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Что-то другое</string>
 
     <string name="feedbackSubmitVpnHeader">Столкнулись с проблемой, которая не затронута в нашем <annotation type="faqs_link">справочном центре</annotation>? Мы просто обязаны о ней знать.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Сообщите нам, что происходит...</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Сообщите нам, что происходит…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Помимо указанных выше данных, вместе с отзывом отправляется следующая обезличенная информация:\n\n• сведения о том, были ли активированы те или иные функции браузера;\n• обобщенные результаты диагностики приложений (например, коды ошибок).\n\nНажимая кнопку «Отправить», вы разрешаете DuckDuckGo использовать отправленную информацию для улучшения работы приложения."</string>
     <string name="feedbackSubmitVpnSubmit">Подтвердить</string>
     <string name="feedbackSubmitCompletedMessage">Спасибо! Ваш отзыв отправлен.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь...</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Оставьте комментарий здесь…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Какую функцию вы хотели бы увидеть?</string>
     <string name="feedbackSubmitContactSupport">Нужна помощь? <annotation type="support_link">Обращайтесь в службу поддержки</annotation>.</string>
 

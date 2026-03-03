@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Možnosti</string>
     <string name="sync_enable_option_favicons_title">Načíst ikony záložek</string>
     <string name="sync_enable_option_favicons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
-    <string name="sync_enable_connecting">Připojování...</string>
+    <string name="sync_enable_connecting">Připojování…</string>
     <string name="sync_intro_enable_title">Synchronizace a záloha tohoto zařízení</string>
     <string name="sync_intro_enable_content">Na zabezpečeném serveru DuckDuckGo se vytvoří šifrovaná záloha záložek a hesel, kterou můžeš synchronizovat s ostatními zařízeními. \n\n Šifrovací klíč se ukládá jenom na tvé zařízení, DuckDuckGo k němu nemá přístup.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Na zabezpečeném serveru DuckDuckGo se vytvoří šifrovaná záloha záložek, hesel a chatů Duck.ai, kterou můžeš synchronizovat s ostatními zařízeními.\n\n Šifrovací klíč se ukládá jenom na tvé zařízení, DuckDuckGo k němu nemá přístup.</string>
@@ -107,7 +107,7 @@
     <string name="sync_show_text_code_item">Zobrazit textový kód</string>
     <string name="sync_show_qr_code_item">Skenování QR kódu</string>
     <string name="sync_save_recovery_code_item">Uložit PDF pro obnovení</string>
-    <string name="sync_delete_account_item">Vypnutí a mazání dat serveru...</string>
+    <string name="sync_delete_account_item">Vypnutí a mazání dat serveru…</string>
     <string name="sync_disable_sync_item">Vypnutí synchronizace a zálohování…</string>
     <string name="sync_enable_sync_next_button">Další</string>
     <string name="sync_recovery_code_content">Pokud ztratíš přístup ke svým zařízením, budeš tenhle kód potřebovat k obnovení synchronizovaných dat.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Vypnout</string>
     <string name="turn_off_sync_dialog_secondary_button">Zrušit</string>
     <string name="sync_permission_required_store_recovery_code">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
-    <string name="sync_share_title">Sdílet s...</string>
+    <string name="sync_share_title">Sdílet s…</string>
     <string name="sync_pdf_title">Synchronizovat kód pro obnovení</string>
     <string name="sync_pdf_description">Kód pro obnovení umožňuje synchronizovat záložky v různých zařízeních a obnovit synchronizovaná data v případě ztráty přístupu k zařízení.</string>
     <string name="sync_code_box_title">Uchovávej tyhle informace v bezpečí.</string>
