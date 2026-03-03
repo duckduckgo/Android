@@ -112,13 +112,14 @@ class DuckChatContextualViewModel @Inject constructor(
         logcat { "Duck.ai: onSheetReopened" }
 
         viewModelScope.launch(dispatchers.io()) {
+            withContext(dispatchers.main()) {
+                logcat { "Duck.ai: requesting page context after sheet reopened" }
+                commandChannel.trySend(Command.RequestPageContext)
+            }
+
             val currentState = _viewState.value
             if (currentState.sheetMode == SheetMode.WEBVIEW) {
                 reopenWebViewState(currentState)
-                withContext(dispatchers.main()) {
-                    logcat { "Duck.ai: requesting page context after sheet reopened" }
-                    commandChannel.trySend(Command.RequestPageContext)
-                }
             } else {
                 withContext(dispatchers.main()) {
                     logcat { "Duck.ai: reopenSheet in Input mode" }
@@ -173,6 +174,9 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onSheetOpened(tabId: String) {
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
+            withContext(dispatchers.main()) {
+                commandChannel.trySend(Command.RequestPageContext)
+            }
             sheetTabId = tabId
 
             val existingChatUrl = contextualDataStore.getTabChatUrl(tabId)
