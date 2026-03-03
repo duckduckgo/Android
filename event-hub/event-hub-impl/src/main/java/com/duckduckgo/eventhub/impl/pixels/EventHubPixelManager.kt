@@ -146,7 +146,7 @@ class RealEventHubPixelManager @Inject constructor(
                 if (nowMillis >= pixelState.periodEndMillis) {
                     fireTelemetry(pixelState)
                 } else {
-                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis, pixelState.periodEndMillis)
                 }
             }
 
@@ -179,7 +179,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
+    fun scheduleFireTelemetry(pixelName: String, delayMillis: Long, expectedPeriodEndMillis: Long) {
         if (scheduledTimers.containsKey(pixelName)) {
             logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
             return
@@ -199,6 +199,10 @@ class RealEventHubPixelManager @Inject constructor(
                 val pixelState = repository.getPixelState(pixelName)
                 if (pixelState == null) {
                     scheduledTimers.remove(pixelName)
+                    return@launch
+                }
+                if (pixelState.periodEndMillis != expectedPeriodEndMillis) {
+                    logcat(VERBOSE) { "EventHub: stale timer for $pixelName, period changed, skipping" }
                     return@launch
                 }
                 fireTelemetry(pixelState)
@@ -273,7 +277,7 @@ class RealEventHubPixelManager @Inject constructor(
             ),
         )
 
-        scheduleFireTelemetry(pixelConfig.name, periodMillis)
+        scheduleFireTelemetry(pixelConfig.name, periodMillis, nowMillis + periodMillis)
     }
 
     private fun buildPixel(pixelState: PixelState): Map<String, String> {

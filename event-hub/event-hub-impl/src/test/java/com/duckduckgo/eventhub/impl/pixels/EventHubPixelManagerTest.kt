@@ -2012,16 +2012,16 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `scheduleFireTelemetry does not double-schedule same pixel`() {
-        manager.scheduleFireTelemetry("test_pixel", 5000L)
+        manager.scheduleFireTelemetry("test_pixel", 5000L, 0L)
         assertTrue(manager.hasScheduledTimer("test_pixel"))
 
-        manager.scheduleFireTelemetry("test_pixel", 10000L)
+        manager.scheduleFireTelemetry("test_pixel", 10000L, 0L)
         assertTrue(manager.hasScheduledTimer("test_pixel"))
     }
 
     @Test
     fun `cancelScheduledFire removes pending timer`() {
-        manager.scheduleFireTelemetry("test_pixel", 60_000L)
+        manager.scheduleFireTelemetry("test_pixel", 60_000L, 0L)
         assertTrue(manager.hasScheduledTimer("test_pixel"))
 
         manager.cancelScheduledFire("test_pixel")
@@ -2036,8 +2036,8 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged cancels all timers when feature disabled`() {
-        manager.scheduleFireTelemetry("pixel_a", 60_000L)
-        manager.scheduleFireTelemetry("pixel_b", 120_000L)
+        manager.scheduleFireTelemetry("pixel_a", 60_000L, 0L)
+        manager.scheduleFireTelemetry("pixel_b", 120_000L, 0L)
         assertTrue(manager.hasScheduledTimer("pixel_a"))
         assertTrue(manager.hasScheduledTimer("pixel_b"))
 
@@ -2057,7 +2057,7 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L, periodEnd)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         manager.checkPixels()
@@ -2176,7 +2176,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `timer clears scheduledTimers entry when feature disabled`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L, 0L)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
@@ -2189,7 +2189,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `timer clears scheduledTimers entry when pixel state missing`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L, 0L)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
@@ -2202,7 +2202,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `timer cleanup allows rescheduling after feature disable and re-enable`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L, 0L)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
@@ -2211,7 +2211,7 @@ class EventHubPixelManagerTest {
         assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         whenever(selfToggle.isEnabled()).thenReturn(true)
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L, 0L)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
 
@@ -2287,7 +2287,7 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `timer cancelled between delay and fire does not execute fireTelemetry`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
+        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L, 0L)
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         // Advance time so delay completes, but cancel before the scheduler runs the continuation
