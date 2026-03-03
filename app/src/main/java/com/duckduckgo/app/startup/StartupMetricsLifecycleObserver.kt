@@ -108,10 +108,13 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             logcat { "TTID: [${listeningToActivity?.javaClass?.simpleName}] is a trampoline — switching to [${activity.javaClass.simpleName}]" }
             frameListenerAttached = false
         }
-        attachFirstFrameListener(
-            activity = activity,
-            startUptimeMs = resolveStartTime(),
-        )
+        val startUptimeMs = resolveStartTime()
+        if (startUptimeMs != null) {
+            attachFirstFrameListener(
+                activity = activity,
+                startUptimeMs = startUptimeMs,
+            )
+        }
         if (startedActivityCount >= 1) return
         listeningToActivity = activity
     }
@@ -158,17 +161,14 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     ) {
     }
 
-    private fun resolveStartTime(): Long {
+    private fun resolveStartTime(): Long? {
         val processStartMs = processTimeProvider.startupTimeMs()
         val processAge = processTimeProvider.currentUptimeMs() - processStartMs
-        val startTime = when {
-            // Cold launch: process started recently for this launch.
-            processAge in 0..COLD_LAUNCH_MAX_AGE_MS -> processStartMs
-            // Warm launch or bogus device value: use the lifecycle timestamp instead.
-            else -> processTimeProvider.currentUptimeMs()
+        if (processAge !in 0..COLD_LAUNCH_MAX_AGE_MS) {
+            return null
         }
-        logcat(LogPriority.DEBUG) { "TTID: resolveStartTime processAge=${processAge}ms startTime=$startTime" }
-        return startTime
+        logcat(LogPriority.DEBUG) { "TTID: resolveStartTime processAge=${processAge}ms startTime=$processStartMs" }
+        return processStartMs
     }
 
     private fun attachFirstFrameListener(
@@ -256,7 +256,7 @@ class StartupMetricsLifecycleObserver @Inject constructor(
                 put(StartupMetricsPixelParameters.STARTUP_TYPE, systemMeasurement.startup.name.lowercase())
                 put(StartupMetricsPixelParameters.TTID_DURATION_MS, systemMeasurement.ttidMs.toString())
             }
-            manualTtidMs?.let {
+            if (manualTtidMs != null) {
                 put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, manualTtidMs.toString())
                 manualTtidMs = null
             }
