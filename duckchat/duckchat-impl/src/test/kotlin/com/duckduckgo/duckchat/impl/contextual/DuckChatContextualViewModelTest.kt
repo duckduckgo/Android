@@ -436,6 +436,52 @@ class DuckChatContextualViewModelTest {
             assertFalse(state.showContext)
             assertFalse(state.userRemovedContext)
             verify(duckChatPixels).reportContextualPlaceholderContextTapped()
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
+        }
+
+    @Test
+    fun `when addPageContext with empty context then invalid empty pixel fired`() =
+        runTest {
+            testee.updatedPageContext = ""
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidEmpty()
+        }
+
+    @Test
+    fun `when addPageContext with missing title then invalid no title pixel fired`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "url": "https://ctx.com",
+                    "content": "some content"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+        }
+
+    @Test
+    fun `when addPageContext with both title and content missing then both invalid pixels fired`() =
+        runTest {
+            testee.updatedPageContext =
+                """
+                {
+                    "url": "https://ctx.com"
+                }
+                """.trimIndent()
+
+            testee.addPageContext()
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+            verify(duckChatPixels).reportContextualPageContextInvalidNoTitle()
+            verify(duckChatPixels).reportContextualPageContextInvalidNoContent()
         }
 
     @Test
@@ -1025,6 +1071,7 @@ class DuckChatContextualViewModelTest {
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
+        private val nativeInputFieldSettingEnabled = MutableStateFlow(false)
 
         override fun isEnabled(): Boolean = true
         override fun openDuckChat() = Unit
@@ -1048,12 +1095,7 @@ class DuckChatContextualViewModelTest {
         override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = kotlinx.coroutines.flow.emptyFlow()
         override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> = automaticContextAttachment
-        override fun showContextualOnboarding(
-            context: Context,
-            onConfirmed: () -> Unit,
-        ) = Unit
-
-        override suspend fun isContextualOnboardingCompleted(): Boolean = true
+        override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> = nativeInputFieldSettingEnabled
         override suspend fun isStandaloneMigrationCompleted(): Boolean = true
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun isChatSuggestionsFeatureAvailable(): Boolean = true

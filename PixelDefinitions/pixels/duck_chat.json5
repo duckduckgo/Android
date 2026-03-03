@@ -29,27 +29,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_aichat_contextual_onboarding_displayed": {
-        "description": "Contextual onboarding sheet displayed when user first opens Duck.ai contextual mode",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_onboarding_confirm_pressed": {
-        "description": "User pressed 'Got it' button on contextual onboarding sheet",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_aichat_contextual_onboarding_settings_pressed": {
-        "description": "User pressed 'View settings' button on contextual onboarding sheet",
-        "owners": ["joshliebe"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
     "m_aichat_contextual_sheet_opened_count": {
         "description": "User opened the Contextual sheet via the Duck.ai button in the Omnibar.",
         "owners": ["malmstein"],
@@ -160,6 +139,27 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_empty": {
+        "description": "User attempted to attach page context but the context string was empty",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_title": {
+        "description": "User attempted to attach page context but the extracted title was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_contextual_page_context_invalid_no_content": {
+        "description": "User attempted to attach page context but the extracted content body was missing or blank",
+        "owners": ["malmstein"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion"]
     },
     "m_aichat_contextual_page_context_auto_attached_count": {

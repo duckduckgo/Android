@@ -30,6 +30,7 @@ dependencies {
     implementation AndroidX.webkit
     implementation KotlinX.coroutines.core
 
+    api "com.duckduckgo.urlpredictor:url-predictor-android:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okHttp3.okHttp
     // Room

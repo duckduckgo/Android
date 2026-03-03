@@ -94,11 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Spravovat v nastavení funkcí AI</string>
     <string name="duck_ai_paid_settings_manage_secondary">Nakonfiguruj Duck.ai v nastavení funkcí AI.</string>
 
-    <!-- Duck AI contextual onboarding -->
-    <string name="duck_chat_contextual_onboarding_title" instruction="Title for contextual Duck AI onboarding sheet">Zeptej se na tuhle stránku</string>
-    <string name="duck_chat_contextual_onboarding_body" instruction="Body text for contextual Duck AI onboarding sheet">Duck.ai teď může odpovídat na otázky týkající se stránky, kterou si prohlížíš.\n\nObsah stránky se zobrazí, jen pokud ji přiložíš. Můžeš to kdykoli změnit v Nastavení.</string>
-    <string name="duck_chat_contextual_onboarding_primary" instruction="Button to continue to contextual Duck AI sheet">Mám to</string>
-    <string name="duck_chat_contextual_onboarding_secondary" instruction="Button to go to AI settings">Zobrazit nastavení</string>
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Shrnout tuhle stránku</string>

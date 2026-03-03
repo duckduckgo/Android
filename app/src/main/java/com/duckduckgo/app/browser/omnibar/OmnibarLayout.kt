@@ -1183,6 +1183,11 @@ class OmnibarLayout @JvmOverloads constructor(
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
                     }
+
+                    customTabSceneRoot.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY, type = PixelType.Daily())
+                    }
                 }
             }
         } else {
@@ -1378,7 +1383,9 @@ class OmnibarLayout @JvmOverloads constructor(
         translationY = y
     }
 
-    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
+    override var isUiLocked: Boolean = false
+
+    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled && !isUiLocked
 
     override fun isBottomNavEnabled(): Boolean = false
 

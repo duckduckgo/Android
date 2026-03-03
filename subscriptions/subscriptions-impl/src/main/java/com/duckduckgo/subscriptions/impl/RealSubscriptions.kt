@@ -95,6 +95,11 @@ class RealSubscriptions @Inject constructor(
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
+
+        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+            return isActive
+        }
+
         return isActive || (isEligible && supportsEncryption)
     }
 

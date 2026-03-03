@@ -1067,6 +1067,7 @@ class BrowserTabFragment :
         configureNavigationBar()
         configureOmnibar()
         configureBrowserTabKeyboardListener()
+
         disableViewStateSaving()
 
         if (savedInstanceState == null) {
@@ -1343,6 +1344,7 @@ class BrowserTabFragment :
     }
 
     private fun onPageStarted() {
+        uiLockChanged(false)
         lifecycleScope.launch {
             webViewCompatTestHelper.onPageStarted(webView)
         }
@@ -2534,6 +2536,7 @@ class BrowserTabFragment :
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
+            is Command.LaunchAddWidgetOnboardingExperiment -> addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
@@ -2611,6 +2614,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
+            is Command.UiLockChanged -> uiLockChanged(it.locked)
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
@@ -2689,7 +2693,6 @@ class BrowserTabFragment :
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(ViewMode.Browser(it.url))
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
-            is Command.ShowDuckAIContextualOnboarding -> showDuckAiContextualOnboarding()
             is Command.DisableDuckAIFullScreen -> omnibar.setViewMode(Browser(it.url))
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
@@ -3497,14 +3500,6 @@ class BrowserTabFragment :
         bottomSheetBehavior.addBottomSheetCallback(callback)
     }
 
-    private fun showDuckAiContextualOnboarding() {
-        duckChat.showContextualOnboarding(
-            requireContext(),
-        ) {
-            showDuckChatContextualSheet(tabId)
-        }
-    }
-
     private fun removeDuckChatContextualSheet() {
         duckAiContextualFragment?.let { fragment ->
             val transaction = childFragmentManager.beginTransaction()
@@ -3754,6 +3749,14 @@ class BrowserTabFragment :
 
     private fun screenUnlock() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    private fun uiLockChanged(locked: Boolean) {
+        omnibar.isUiLocked = locked
+        if (locked) {
+            omnibar.setExpanded(true)
+        }
+        webView?.setContentAllowsSwipeToRefresh(!locked)
     }
 
     private fun showFaviconsPrompt() {

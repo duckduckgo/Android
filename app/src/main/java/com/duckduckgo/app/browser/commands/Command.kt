@@ -252,6 +252,7 @@ sealed class Command {
     data object LaunchAppTPOnboarding : Command()
 
     data object LaunchAddWidget : Command()
+    data object LaunchAddWidgetOnboardingExperiment : Command()
 
     class RequiresAuthentication(
         val request: BasicAuthenticationRequest,
@@ -413,6 +414,8 @@ sealed class Command {
 
     data object ScreenUnlock : Command()
 
+    data class UiLockChanged(val locked: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(
@@ -505,7 +508,6 @@ sealed class Command {
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DisableDuckAIFullScreen(val url: String) : Command()
 
-    data object ShowDuckAIContextualOnboarding : Command()
     data class ShowDuckAIContextualMode(val tabId: String) : Command()
 
     data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()

@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -151,11 +152,12 @@ class RealDuckChatJSHelper @Inject constructor(
                 }
 
             REPORT_METRIC -> {
-                ReportMetric
-                    .fromValue(data?.optString("metricName"))
-                    ?.let { reportMetric ->
-                        duckChatPixels.sendReportMetricPixel(reportMetric)
-                    }
+                val reportMetric = ReportMetric.fromValue(data?.optString("metricName"))
+                val modelTier = ModelTier.fromValue(data?.optString("modelTier"))
+
+                reportMetric?.let {
+                    duckChatPixels.sendReportMetricPixel(it, modelTier)
+                }
                 null
             }
 

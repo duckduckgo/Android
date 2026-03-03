@@ -198,6 +198,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             jsPerformance = listOf(123.45),
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = testCase.breakageData,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -250,6 +251,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val consentSelfTestFailed: String,
         val remoteConfigEtag: String?,
         val remoteConfigVersion: String?,
+        val breakageData: String?,
     )
 
     data class UrlParam(

@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.common.utils.baseHost
 import logcat.LogPriority.ERROR
@@ -47,8 +46,6 @@ fun ImageView.loadFavicon(
         Glide.with(context).clear(this@loadFavicon)
         Glide.with(context)
             .load(file)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)
@@ -68,8 +65,6 @@ fun ImageView.loadFavicon(
         Glide.with(context).clear(this)
         Glide.with(context)
             .load(bitmap)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)

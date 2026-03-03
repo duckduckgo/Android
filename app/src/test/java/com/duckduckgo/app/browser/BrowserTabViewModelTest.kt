@@ -122,6 +122,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -131,6 +132,8 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
+import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
+import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
@@ -494,6 +497,7 @@ class BrowserTabViewModelTest {
     private val mockShowOnAppLaunchHandler: ShowOnAppLaunchOptionHandler = mock()
 
     private val mockPageLoadWideEvent: PageLoadWideEvent = mock()
+    private val mockQueryUrlPredictor: QueryUrlPredictor = mock()
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -636,6 +640,7 @@ class BrowserTabViewModelTest {
 
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
+    private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -784,6 +789,7 @@ class BrowserTabViewModelTest {
             fakeContentScopeScriptsSubscriptionEventPluginPoint = FakeContentScopeScriptsSubscriptionEventPluginPoint()
 
             whenever(mockDuckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(mockQueryUrlPredictor.isReady()).thenReturn(true)
             whenever(mockSyncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
 
@@ -917,6 +923,8 @@ class BrowserTabViewModelTest {
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
                 pageLoadWideEvent = mockPageLoadWideEvent,
+                queryUrlPredictor = mockQueryUrlPredictor,
+                browserUiLockFeature = fakeBrowserUiLockFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3119,6 +3127,14 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidget>()
+    }
+
+    @Test
+    fun whenUserClickedAddWidgetOnboardingExperimentCtaButtonThenLaunchAddWidgetOnboardingExperimentCommand() {
+        val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
     }
 
     @Test
@@ -5424,6 +5440,110 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureEnabledThenSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertTrue(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedUnlockedAndFeatureEnabledThenSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": false }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedAndFeatureDisabledThenDoNotSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = false))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandNotIssued<Command.UiLockChanged>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedWithNullDataThenDefaultsToUnlocked() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                null,
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedWithMissingLockedFieldThenDefaultsToUnlocked() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "other": "value" }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageWithUnknownMethodForUiLockThenDoNotSendCommand() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "unknownMethod",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "someUrl" },
+            )
+            assertCommandNotIssued<Command.UiLockChanged>()
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageGetUserPreferencesFromOverlayThenSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
@@ -6860,6 +6980,40 @@ class BrowserTabViewModelTest {
     fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
         verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryThenNavigateInsteadOfOpeningDuckChat() {
+        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
+        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusAndUrlQueryInFullScreenModeThenNavigateInsteadOfOpeningDuckChat() = runTest {
+        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
+        whenever(mockQueryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("bbc.com", null)).thenReturn("https://bbc.com")
+
+        testee.onDuckChatOmnibarButtonClicked(query = "bbc.com", hasFocus = true, isNtp = false)
+
+        verify(mockDuckChat, never()).getDuckChatUrl("bbc.com", true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
+    }
+
+    @Test
+    fun whenPredictorNotReadyAndUrlQueryEnteredThenIsUrlFallbackStillNavigates() {
+        whenever(mockQueryUrlPredictor.isReady()).thenReturn(false)
+        whenever(mockQueryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://example.com", null)).thenReturn("https://example.com")
+        testee.onDuckChatOmnibarButtonClicked(query = "https://example.com", hasFocus = true, isNtp = false)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.any { it is Navigate })
     }
 
     @Test
@@ -8817,25 +8971,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingCompletedThenShowContextualModeCommandSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPThenCommandSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(true)
 
         testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualMode)
-    }
-
-    @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndContextualModeEnabledAndNotNTPAndOnboardingNotCompletedThenShowOnboardingCommandSent() = runTest {
-        mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
-
-        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
-
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.ShowDuckAIContextualOnboarding)
     }
 
     @Test
@@ -8876,9 +9018,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedAndOnboardingNotCompletedThenNoPageContextSubscriptionEventSent() = runTest {
+    fun whenOnDuckChatOmnibarButtonClickedWithContextualModeThenNoPageContextSubscriptionEventSent() = runTest {
         mockDuckAiContextualModeFlow.emit(true)
-        whenever(mockDuckChat.isContextualOnboardingCompleted()).thenReturn(false)
 
         testee.subscriptionEventDataFlow.test {
             testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)

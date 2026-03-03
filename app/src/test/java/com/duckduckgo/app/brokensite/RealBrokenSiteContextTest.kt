@@ -112,4 +112,25 @@ class RealBrokenSiteContextTest {
 
         doubleArrayOf(123.45).contentEquals(testee.jsPerformance)
     }
+
+    @Test
+    fun whenInitializedThenBreakageDataIsNull() {
+        assertNull(testee.breakageData)
+    }
+
+    @Test
+    fun whenBreakageDataIsRecordedThenItIsStored() {
+        val preEncodedBreakageData = "%7B%22test%22%3A%22value%22%7D"
+
+        testee.recordBreakageData(preEncodedBreakageData)
+
+        assertEquals(preEncodedBreakageData, testee.breakageData)
+    }
+
+    @Test
+    fun whenBreakageDataIsNullThenItRemainsNull() {
+        testee.recordBreakageData(null)
+
+        assertNull(testee.breakageData)
+    }
 }

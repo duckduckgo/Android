@@ -41,6 +41,8 @@ interface DuckChatFeatureRepository {
 
     suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean)
 
+    suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
 
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
@@ -48,6 +50,8 @@ interface DuckChatFeatureRepository {
     fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
 
     fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
 
     fun observeShowInBrowserMenu(): Flow<Boolean>
 
@@ -64,6 +68,8 @@ interface DuckChatFeatureRepository {
     suspend fun isFullScreenModeUserSettingEnabled(): Boolean
 
     suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
+
+    suspend fun isNativeInputFieldUserSettingEnabled(): Boolean
 
     suspend fun shouldShowInBrowserMenu(): Boolean
 
@@ -86,10 +92,6 @@ interface DuckChatFeatureRepository {
     suspend fun setAIChatHistoryEnabled(enabled: Boolean)
 
     suspend fun isAIChatHistoryEnabled(): Boolean
-
-    suspend fun setContextualOnboardingCompleted(completed: Boolean)
-
-    suspend fun isContextualOnboardingCompleted(): Boolean
 
     suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
 }
@@ -128,6 +130,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setAutomaticPageContextAttachment(isEnabled)
     }
 
+    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
+        duckChatDataStore.setNativeInputFieldUserSetting(enabled)
+    }
+
     override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
     override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
@@ -136,6 +142,9 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
         duckChatDataStore.observeAutomaticContextAttachmentUserSettingEnabled()
+
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeNativeInputFieldUserSettingEnabled()
 
     override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
 
@@ -153,6 +162,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
 
     override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
+
+    override suspend fun isNativeInputFieldUserSettingEnabled(): Boolean = duckChatDataStore.isNativeInputFieldUserSettingEnabled()
 
     override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
 
@@ -184,12 +195,6 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
-
-    override suspend fun setContextualOnboardingCompleted(completed: Boolean) {
-        duckChatDataStore.setContextualOnboardingCompleted(completed)
-    }
-
-    override suspend fun isContextualOnboardingCompleted(): Boolean = duckChatDataStore.isContextualOnboardingCompleted()
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         duckChatDataStore.setChatSuggestionsUserSetting(enabled)

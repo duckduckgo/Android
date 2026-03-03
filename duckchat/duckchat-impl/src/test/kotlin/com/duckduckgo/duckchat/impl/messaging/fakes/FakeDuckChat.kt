@@ -33,11 +33,11 @@ class FakeDuckChat(
     private val openDuckChatWithAutoPromptCalls = mutableListOf<String>()
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
-    private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
+    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
-    var contextualOnboardingCompleted: Boolean = false
     var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
@@ -94,12 +94,8 @@ class FakeDuckChat(
         return automaticContextAttachmentUserSettingEnabled
     }
 
-    override fun showContextualOnboarding(context: Context, onConfirmed: () -> Unit) {
-        // No-op for testing
-    }
-
-    override suspend fun isContextualOnboardingCompleted(): Boolean {
-        return contextualOnboardingCompleted
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
+        return nativeInputFieldUserSettingEnabled
     }
 
     override suspend fun isStandaloneMigrationCompleted(): Boolean {

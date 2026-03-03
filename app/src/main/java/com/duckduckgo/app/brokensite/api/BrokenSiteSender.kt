@@ -172,10 +172,12 @@ class BrokenSiteSubmitter @Inject constructor(
                 params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
             }
 
-            val encodedParams = mapOf(
+            val encodedParams = mutableMapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates,
             )
+            // breakageData is pre-encoded by content-scope-scripts, add to encodedParams to avoid re-encoding
+            brokenSite.breakageData?.let { encodedParams[BREAKAGE_DATA] = it }
             runCatching {
                 if (toggle) {
                     val unnecessaryKeys = listOf(CATEGORY_KEY, DESCRIPTION_KEY, PROTECTIONS_STATE)
@@ -242,6 +244,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val BLOCKLIST_EXPERIMENT = "blockListExperiment"
         private const val CONTENT_SCOPE_EXPERIMENTS = "contentScopeExperiments"
         private const val DEBUG_FLAGS = "debugFlags"
+        private const val BREAKAGE_DATA = "breakageData"
     }
 }
 

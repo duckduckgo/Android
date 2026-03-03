@@ -112,7 +112,7 @@ class RealDuckChatPixelsTest {
             DUCK_CHAT_SEND_PROMPT_ONGOING_CHAT,
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "5"),
         )
-        verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
     }
 
@@ -128,7 +128,7 @@ class RealDuckChatPixelsTest {
             DUCK_CHAT_START_NEW_CONVERSATION,
             parameters = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to "10"),
         )
-        verify(statisticsUpdater).refreshDuckAiRetentionAtb()
+        verify(statisticsUpdater).refreshDuckAiRetentionAtb(mapOf("modelTier" to null))
         verify(duckAiMetricCollector).onMessageSent()
     }
 
@@ -335,5 +335,35 @@ class RealDuckChatPixelsTest {
         testee.reportChatSyncActive()
 
         verify(mockPixel).fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, emptyMap(), emptyMap(), type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextInvalidEmpty then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidEmpty()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_EMPTY_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextInvalidNoTitle then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidNoTitle()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_TITLE_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_TITLE_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when reportContextualPageContextInvalidNoContent then fires count and daily`() = runTest {
+        testee.reportContextualPageContextInvalidNoContent()
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_COUNT)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_DAILY, type = Pixel.PixelType.Daily())
     }
 }

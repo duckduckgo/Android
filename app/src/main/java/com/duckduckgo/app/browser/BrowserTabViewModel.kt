@@ -105,6 +105,7 @@ import com.duckduckgo.app.browser.commands.Command.HideWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.HideWebContent
 import com.duckduckgo.app.browser.commands.Command.InjectEmailAddress
 import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
+import com.duckduckgo.app.browser.commands.Command.LaunchAddWidgetOnboardingExperiment
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
@@ -162,6 +163,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
+import com.duckduckgo.app.browser.commands.Command.UiLockChanged
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewCompatScreenLock
 import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
@@ -198,11 +200,14 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
+import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
+import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -504,6 +509,8 @@ class BrowserTabViewModel @Inject constructor(
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
+    private val queryUrlPredictor: QueryUrlPredictor,
+    private val browserUiLockFeature: BrowserUiLockFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -3203,7 +3210,8 @@ class BrowserTabViewModel @Inject constructor(
         }
         val onboardingCommand =
             when (cta) {
-                is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetAutoOnboardingExperiment, is HomePanelCta.AddWidgetInstructions -> {
+                is HomePanelCta.AddWidgetAutoOnboardingExperiment -> LaunchAddWidgetOnboardingExperiment
+                is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> {
                     LaunchAddWidget
                 }
 
@@ -4149,6 +4157,15 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when (featureName) {
+            BROWSER_UI_LOCK_FEATURE_NAME -> {
+                when (method) {
+                    "uiLockChanged" -> {
+                        val locked = data?.optBoolean("locked", false) ?: false
+                        uiLockChanged(locked)
+                    }
+                }
+            }
+
             DUCK_PLAYER_FEATURE_NAME, DUCK_PLAYER_PAGE_FEATURE_NAME -> {
                 viewModelScope.launch(dispatchers.io()) {
                     val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
@@ -4310,14 +4327,25 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun uiLockChanged(locked: Boolean) {
+        if (browserUiLockFeature.self().isEnabled()) {
+            viewModelScope.launch(dispatchers.main()) {
+                command.value = UiLockChanged(locked)
+            }
+        }
+    }
+
     fun breakageReportResult(data: JSONObject) {
         val jsPerformanceData = data.get("jsPerformance") as JSONArray
         val referrer = data.get("referrer") as? String
         val sanitizedReferrer = referrer?.removeSurrounding("\"")
         val isExternalLaunch = site?.isExternalLaunch ?: false
+        // breakageData is pre-encoded by content-scope-scripts, pass as-is without re-encoding
+        val breakageData = data.optString("breakageData").takeIf { it.isNotEmpty() }
 
         site?.realBrokenSiteContext?.recordJsPerformance(jsPerformanceData)
         site?.realBrokenSiteContext?.inferOpenerContext(sanitizedReferrer, isExternalLaunch)
+        site?.realBrokenSiteContext?.recordBreakageData(breakageData)
     }
 
     fun onHomeShown() {
@@ -4715,18 +4743,13 @@ class BrowserTabViewModel @Inject constructor(
 
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
-                viewModelScope.launch {
-                    if (duckChat.isContextualOnboardingCompleted()) {
-                        command.value = Command.ShowDuckAIContextualMode(tabId)
-                    } else {
-                        command.value = Command.ShowDuckAIContextualOnboarding
-                    }
-                }
+                command.value = Command.ShowDuckAIContextualMode(tabId)
             }
 
             duckAiFeatureState.showFullScreenMode.value -> {
                 val url = when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
                     hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
                     else -> duckChat.getDuckChatUrl(query ?: "", false)
                 }
@@ -4736,6 +4759,7 @@ class BrowserTabViewModel @Inject constructor(
             else -> {
                 when {
                     hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> onUserSubmittedQuery(query ?: "")
                     hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
                     else -> duckChat.openDuckChat()
                 }

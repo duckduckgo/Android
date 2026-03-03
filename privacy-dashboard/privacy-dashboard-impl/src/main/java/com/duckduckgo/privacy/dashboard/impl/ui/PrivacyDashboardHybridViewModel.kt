@@ -437,6 +437,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                breakageData = site.realBrokenSiteContext.breakageData,
                 contentScopeExperiments = site.activeContentScopeExperiments,
                 debugFlags = site.debugFlags,
             )
@@ -534,6 +535,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                breakageData = site.realBrokenSiteContext.breakageData,
                 contentScopeExperiments = site.activeContentScopeExperiments,
                 debugFlags = site.debugFlags,
             )

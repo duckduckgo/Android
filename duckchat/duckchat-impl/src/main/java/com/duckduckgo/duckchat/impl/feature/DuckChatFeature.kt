@@ -131,6 +131,12 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
+     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun nativeInputField(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */

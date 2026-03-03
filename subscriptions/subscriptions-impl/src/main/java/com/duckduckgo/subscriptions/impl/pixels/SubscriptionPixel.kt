@@ -268,6 +268,12 @@ enum class SubscriptionPixel(
         includedParameters = setOf(APP_VERSION),
         enqueue = true,
     ),
+    FREE_TRIAL_DUCK_AI_PAID_USED(
+        baseName = "subscription_free_trial_duck_ai_paid_used",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
     ;
 
     constructor(
