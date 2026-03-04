@@ -148,13 +148,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
 
         val textScaleX = ObjectAnimator.ofFloat(binding.welcomeTitle, View.SCALE_X, textIntroScale, 1f).apply {
-            startDelay = TEXT_INTRO_DELAY + TEXT_INTRO_SCALE_DELAY
+            startDelay = TEXT_INTRO_DELAY
             duration = TEXT_INTRO_TRANSLATE_DURATION
             interpolator = textSlideInterpolator
         }
 
         val textScaleY = ObjectAnimator.ofFloat(binding.welcomeTitle, View.SCALE_Y, textIntroScale, 1f).apply {
-            startDelay = TEXT_INTRO_DELAY + TEXT_INTRO_SCALE_DELAY
+            startDelay = TEXT_INTRO_DELAY
             duration = TEXT_INTRO_TRANSLATE_DURATION
             interpolator = textSlideInterpolator
         }
@@ -481,8 +481,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val TEXT_INTRO_DELAY = 400L
         private const val TEXT_INTRO_OPACITY_DURATION = 400L
         private const val TEXT_INTRO_TRANSLATE_DURATION = 600L
-        private const val TEXT_INTRO_SCALE_DELAY = 200L
-        private const val MAX_TEXT_INTRO_SCALE = 1.5f
+        private const val MAX_TEXT_INTRO_SCALE = 1.3f
 
         private const val LOGO_INTRO_SCALE = 2.5f
         private const val LOGO_SCALE_DURATION = 600L
