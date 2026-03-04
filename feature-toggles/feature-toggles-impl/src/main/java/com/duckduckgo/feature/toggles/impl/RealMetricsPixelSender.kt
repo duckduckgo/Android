@@ -50,13 +50,16 @@ class RealMetricsPixelSender @Inject constructor(
         val definitions = metricsPixel.getPixelDefinitions()
         if (definitions.isEmpty()) return false
         return withContext(dispatcherProvider.io()) {
-            definitions.any { definition ->
-                when (metricsPixel.type) {
+            var sent = false
+            definitions.forEach { definition ->
+                val definitionSent = when (metricsPixel.type) {
                     MetricType.NORMAL -> sendNormal(definition)
                     MetricType.COUNT_WHEN_IN_WINDOW -> sendCount(definition, metricsPixel.value.toInt())
                     MetricType.COUNT_ALWAYS -> false // TODO: not implemented yet
                 }
+                sent = sent || definitionSent
             }
+            sent
         }
     }
 

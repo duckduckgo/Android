@@ -93,6 +93,21 @@ class RealMetricsPixelSenderTest {
     }
 
     @Test
+    fun `NORMAL - fires all matching conversion windows in a single send`() = runTest {
+        val pixel = metricsPixel(
+            type = MetricType.NORMAL,
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 1),
+                ConversionWindow(lowerWindow = 0, upperWindow = 2),
+            ),
+        )
+
+        sender.send(pixel)
+
+        assertEquals(2, fakePixel.firedPixels.size)
+    }
+
+    @Test
     fun `NORMAL - returns false when no cohort assigned`() = runTest {
         testFeature.experimentFooFeature().setRawStoredState(
             State(remoteEnableState = true, enable = true, assignedCohort = null),
@@ -137,6 +152,22 @@ class RealMetricsPixelSenderTest {
         val pixel = metricsPixel(type = MetricType.COUNT_WHEN_IN_WINDOW, value = "3", lowerWindow = 0, upperWindow = 1)
         repeat(3) { sender.send(pixel) }
         assertEquals(1, fakePixel.firedPixels.size)
+    }
+
+    @Test
+    fun `COUNT_WHEN_IN_WINDOW - fires all matching conversion windows when threshold reached`() = runTest {
+        val pixel = metricsPixel(
+            type = MetricType.COUNT_WHEN_IN_WINDOW,
+            value = "2",
+            conversionWindow = listOf(
+                ConversionWindow(lowerWindow = 0, upperWindow = 1),
+                ConversionWindow(lowerWindow = 0, upperWindow = 2),
+            ),
+        )
+
+        repeat(2) { sender.send(pixel) }
+
+        assertEquals(2, fakePixel.firedPixels.size)
     }
 
     @Test
@@ -206,11 +237,12 @@ class RealMetricsPixelSenderTest {
         value: String = "1",
         lowerWindow: Int = 0,
         upperWindow: Int = 1,
+        conversionWindow: List<ConversionWindow> = listOf(ConversionWindow(lowerWindow, upperWindow)),
     ) = MetricsPixel(
         metric = "test_metric",
         value = value,
         toggle = testFeature.experimentFooFeature(),
-        conversionWindow = listOf(ConversionWindow(lowerWindow, upperWindow)),
+        conversionWindow = conversionWindow,
         type = type,
     )
 }
