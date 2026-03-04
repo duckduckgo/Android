@@ -874,7 +874,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportDownloadMainConfigFailureThenFiresCorrectPixel() = runTest {
-        testee.reportDownloadMainConfigFailure()
+        testee.reportDownloadMainConfigFailure("test")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -884,7 +884,8 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        val params = paramsCaptor.allValues.first()
+        assert(params["error_details"] == "test")
     }
 
     @Test
