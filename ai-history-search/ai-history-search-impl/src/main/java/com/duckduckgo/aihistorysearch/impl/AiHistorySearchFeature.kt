@@ -63,4 +63,14 @@ interface AiHistorySearchFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiCoreEnabled(): Toggle
+
+    /**
+     * When enabled, Gemma 3 1B IT runs on-device via MediaPipe LLM Inference Task as a
+     * shadow path before the main routing. Produces both a ranked list and a synthesized
+     * answer, logcatted only — Duck.ai always opens normally.
+     * PoC: evaluates on-device LLM quality across ~90% of devices (≥4 GB RAM).
+     * Defaults to `internal` so it only runs on internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun gemmaEnabled(): Toggle
 }
