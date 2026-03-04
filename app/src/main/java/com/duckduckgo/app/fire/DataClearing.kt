@@ -63,10 +63,8 @@ class DataClearing @Inject constructor(
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
-        val shouldClearDuckAiData = fireDataStore.getManualClearOptions()
-            .contains(FireClearOption.DUCKAI_CHATS)
 
-        val result = clearDataAction.clearDataForSpecificDomains(visitedSites, shouldClearDuckAiData)
+        val result = clearDataAction.clearDataForSpecificDomains(visitedSites)
         navigationHistory.removeHistoryForTab(tabId)
         tabVisitedSitesRepository.clearTab(tabId)
         tabRepository.deleteTabAndSelectSource(tabId)

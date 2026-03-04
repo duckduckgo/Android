@@ -87,7 +87,7 @@ class DataClearingTest {
         showClearDuckAIChatHistoryFlow.value = true
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
         runBlocking {
-            whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Success)
+            whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
         }
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
@@ -646,37 +646,24 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabData_thenClearSiteDataWithVisitedDomains() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com", "test.com"))
-        configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com", "test.com")), eq(false))
-    }
-
-    @Test
-    fun whenClearSingleTabDataAndDuckAiChatsInManualOptions_thenClearDuckAiDataForDomains() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
-        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com")), eq(true))
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(setOf("example.com", "test.com")))
     }
 
     @Test
     fun whenClearSingleTabDataWithNoVisitedSites_thenStillCallClearDataForSpecificDomains() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockClearDataAction).clearDataForSpecificDomains(eq(emptySet()), eq(false))
+        verify(mockClearDataAction).clearDataForSpecificDomains(eq(emptySet()))
     }
 
     @Test
     fun whenClearSingleTabData_thenRemoveHistoryForTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
@@ -686,7 +673,6 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabData_thenCleanUpVisitedSitesStore() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
@@ -696,7 +682,6 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabData_thenDeleteTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
@@ -706,7 +691,6 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabDataSucceeds_thenReturnSuccess() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
 
         val result = testee.clearSingleTabData("tab1")
 
@@ -716,8 +700,7 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabDataFeatureNotSupported_thenReturnFeatureNotSupported() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
-        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.FeatureNotSupported)
 
         val result = testee.clearSingleTabData("tab1")
 
@@ -727,9 +710,8 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabDataError_thenReturnError() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
         val exception = RuntimeException("test error")
-        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Error(exception))
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Error(exception))
 
         val result = testee.clearSingleTabData("tab1")
 
@@ -739,8 +721,7 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabDataFeatureNotSupported_thenStillDeleteTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
-        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.FeatureNotSupported)
 
         testee.clearSingleTabData("tab1")
 
@@ -750,8 +731,7 @@ class DataClearingTest {
     @Test
     fun whenClearSingleTabDataError_thenStillDeleteTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        configureManualOptions(emptySet())
-        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
 
         testee.clearSingleTabData("tab1")
 
