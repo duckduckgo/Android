@@ -27,14 +27,18 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.RequiresApi
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.startup.metrics.MemoryCollector
 import com.duckduckgo.app.startup.metrics.ProcessTimeProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
@@ -53,6 +57,8 @@ class StartupMetricsLifecycleObserver @Inject constructor(
     private val pixel: Pixel,
     private val startupMetricsFeature: StartupMetricsFeature,
     private val samplingDecider: SamplingDecider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : ActivityLifecycleCallbacks {
     // Guard to ensure we only collect and send metrics once per app launch.
     private var hasCollectedThisLaunch = false
@@ -239,42 +245,45 @@ class StartupMetricsLifecycleObserver @Inject constructor(
             return
         }
 
-        val manualTtidMs = this.manualTtidMs
+        // Snapshot measured values before leaving the main thread.
+        val capturedManualTtidMs = this.manualTtidMs
         this.manualTtidMs = null
 
-        if (!startupMetricsFeature.self().isEnabled()) {
-            logcat { "TTID: Startup metrics feature is disabled" }
-            return
-        }
-
-        if (!samplingDecider.shouldSample()) {
-            logcat { "TTID: Startup metrics not sampled" }
-            return
-        }
-
-        logcat { "TTID: firing pixel — ours=${manualTtidMs}ms, system=${systemMeasurement?.ttidMs}ms" }
-
-        val parameters = buildMap {
-            if (systemMeasurement != null) {
-                put(StartupMetricsPixelParameters.STARTUP_TYPE, systemMeasurement.startup.name.lowercase())
-                put(StartupMetricsPixelParameters.TTID_DURATION_MS, systemMeasurement.ttidMs.toString())
+        appCoroutineScope.launch(dispatchers.io()) {
+            val toggle = startupMetricsFeature.self()
+            if (!toggle.isEnabled()) {
+                logcat { "TTID: Startup metrics feature is disabled" }
+                return@launch
             }
-            if (manualTtidMs != null) {
-                put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, manualTtidMs.toString())
+            if (!samplingDecider.shouldSample(toggle.getSettings())) {
+                logcat { "TTID: Startup metrics not sampled" }
+                return@launch
             }
-            put(StartupMetricsPixelParameters.API_LEVEL, buildConfig.sdkInt.toString())
 
-            memoryCollector.collectDeviceRamBucket()?.let {
-                put(StartupMetricsPixelParameters.DEVICE_RAM_BUCKET, it)
+            logcat { "TTID: firing pixel — ours=${capturedManualTtidMs}ms, system=${systemMeasurement?.ttidMs}ms" }
+
+            val parameters = buildMap {
+                if (systemMeasurement != null) {
+                    put(StartupMetricsPixelParameters.STARTUP_TYPE, systemMeasurement.startup.name.lowercase())
+                    put(StartupMetricsPixelParameters.TTID_DURATION_MS, systemMeasurement.ttidMs.toString())
+                }
+                if (capturedManualTtidMs != null) {
+                    put(StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS, capturedManualTtidMs.toString())
+                }
+                put(StartupMetricsPixelParameters.API_LEVEL, buildConfig.sdkInt.toString())
+
+                memoryCollector.collectDeviceRamBucket()?.let {
+                    put(StartupMetricsPixelParameters.DEVICE_RAM_BUCKET, it)
+                }
             }
+
+            pixel.fire(
+                pixel = StartupMetricsPixelName.APP_STARTUP_TIME,
+                parameters = parameters,
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Count,
+            )
         }
-
-        pixel.fire(
-            pixel = StartupMetricsPixelName.APP_STARTUP_TIME,
-            parameters = parameters,
-            encodedParameters = emptyMap(),
-            type = Pixel.PixelType.Count,
-        )
     }
 
     private data class Measurement(

@@ -27,13 +27,16 @@ import com.duckduckgo.app.startup.metrics.MemoryCollector
 import com.duckduckgo.app.startup.metrics.ProcessTimeProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -45,6 +48,9 @@ import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class StartupMetricsLifecycleObserverTest {
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private lateinit var context: Context
     private lateinit var apiLevelProvider: AppBuildConfig
@@ -69,7 +75,7 @@ class StartupMetricsLifecycleObserverTest {
 
         whenever(context.getSystemService(Context.ACTIVITY_SERVICE)).thenReturn(activityManager)
         whenever(apiLevelProvider.sdkInt).thenReturn(35)
-        whenever(samplingDecider.shouldSample()).thenReturn(true)
+        whenever(samplingDecider.shouldSample(anyOrNull())).thenReturn(true)
         whenever(processTimeProvider.currentUptimeMs()).thenReturn(10_000L)
         whenever(processTimeProvider.startupTimeMs()).thenReturn(1_000L)
         startupMetricsFeature.self().setRawStoredState(Toggle.State(true))
@@ -82,12 +88,83 @@ class StartupMetricsLifecycleObserverTest {
             pixel = pixel,
             startupMetricsFeature = startupMetricsFeature,
             samplingDecider = samplingDecider,
+            appCoroutineScope = coroutineRule.testScope,
+            dispatchers = coroutineRule.testDispatcherProvider,
         )
 
         // Mock scheduleFirstFrame to capture frame callbacks
         observer.scheduleFirstFrame = { _, action ->
             frameCallbacks.add(action)
         }
+    }
+
+    @Test
+    fun `when feature is disabled then does not fire pixel`() {
+        startupMetricsFeature.self().setRawStoredState(Toggle.State(false))
+        val activity = createMockActivity()
+        val startInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_COLD,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+        setupActivityManagerWithStartInfo(startInfo)
+
+        // Full lifecycle so sendPixel is reached (listeningToActivity must be null)
+        observer.onActivityCreated(activity, null)
+        observer.onActivityStarted(activity)
+        observer.onActivityStopped(activity)
+        observer.onActivityDestroyed(activity)
+        val activity2 = createMockActivity()
+        observer.onActivityStarted(activity2)
+        observer.onActivityPaused(activity2)
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when not sampled then does not fire pixel`() {
+        whenever(samplingDecider.shouldSample(anyOrNull())).thenReturn(false)
+        val activity = createMockActivity()
+        val startInfo = createMockApplicationStartInfo(
+            startType = ApplicationStartInfo.START_TYPE_COLD,
+            launchTimestamp = 1000L * 1_000_000L,
+            firstFrameTimestamp = 3000L * 1_000_000L,
+        )
+        setupActivityManagerWithStartInfo(startInfo)
+
+        // Full lifecycle so sendPixel is reached (listeningToActivity must be null)
+        observer.onActivityCreated(activity, null)
+        observer.onActivityStarted(activity)
+        observer.onActivityStopped(activity)
+        observer.onActivityDestroyed(activity)
+        val activity2 = createMockActivity()
+        observer.onActivityStarted(activity2)
+        observer.onActivityPaused(activity2)
+
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `when feature is disabled then sampling is never consulted`() {
+        startupMetricsFeature.self().setRawStoredState(Toggle.State(false))
+        val activity = createMockActivity()
+        setupActivityManagerWithStartInfo(
+            createMockApplicationStartInfo(
+                startType = ApplicationStartInfo.START_TYPE_COLD,
+                launchTimestamp = 1000L * 1_000_000L,
+                firstFrameTimestamp = 3000L * 1_000_000L,
+            ),
+        )
+
+        observer.onActivityCreated(activity, null)
+        observer.onActivityStarted(activity)
+        observer.onActivityStopped(activity)
+        observer.onActivityDestroyed(activity)
+        val activity2 = createMockActivity()
+        observer.onActivityStarted(activity2)
+        observer.onActivityPaused(activity2)
+
+        verify(samplingDecider, never()).shouldSample(anyOrNull())
     }
 
     @Test
@@ -113,38 +190,6 @@ class StartupMetricsLifecycleObserverTest {
         observer.onActivityPaused(activity)
 
         verify(activityManager).getHistoricalProcessStartReasons(any())
-    }
-
-    @Test
-    fun `when feature is disabled then does not fire pixel`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(false))
-        val activity = createMockActivity()
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 3000L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        observer.onActivityPaused(activity)
-
-        verifyNoInteractions(pixel)
-    }
-
-    @Test
-    fun `when sampling returns false then does not fire pixel`() {
-        whenever(samplingDecider.shouldSample()).thenReturn(false)
-        val activity = createMockActivity()
-        val startInfo = createMockApplicationStartInfo(
-            startType = ApplicationStartInfo.START_TYPE_COLD,
-            launchTimestamp = 1000L * 1_000_000L,
-            firstFrameTimestamp = 3000L * 1_000_000L,
-        )
-        setupActivityManagerWithStartInfo(startInfo)
-
-        observer.onActivityPaused(activity)
-
-        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -305,11 +350,7 @@ class StartupMetricsLifecycleObserverTest {
     }
 
     @Test
-    fun `when cold launch pixel is sampled, manual TTID is not reused in subsequent warm launch`() {
-        // Start with sampling false to verify that manual TTID is not reused when warm launch pixel fires
-        whenever(samplingDecider.shouldSample()).thenReturn(false)
-
-        val coldActivity = createMockActivity()
+    fun `when cold launch pixel fires, manual TTID is not reused in subsequent warm launch`() {
         val coldStartInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_COLD,
             launchTimestamp = 1000L * 1_000_000L,
@@ -317,26 +358,22 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(coldStartInfo)
 
-        // Cold launch
+        // Cold launch: first activity goes through full lifecycle, frame listener fires and sets manualTtidMs
+        val coldActivity = createMockActivity()
         observer.onActivityCreated(coldActivity, null)
         observer.onActivityStarted(coldActivity)
-        triggerFirstFrame() // sets manualTtidMs
+        triggerFirstFrame()
+        observer.onActivityPaused(coldActivity)
         observer.onActivityStopped(coldActivity)
         observer.onActivityDestroyed(coldActivity)
 
-        // Pixel #1 sampled
-        observer.onActivityPaused(createMockActivity())
+        // A second activity triggers the cold launch pixel (listeningToActivity is now null)
+        val pauseActivity1 = createMockActivity()
+        observer.onActivityStarted(pauseActivity1)
+        observer.onActivityPaused(pauseActivity1)
+        observer.onActivityStopped(pauseActivity1)
 
-        // Want to fire pixel for warm launch
-        whenever(samplingDecider.shouldSample()).thenReturn(true)
-
-        // Simulate the app being brought back to foreground
-        val warmActivity = createMockActivity()
-        observer.onActivityCreated(warmActivity, null)
-        observer.onActivityStarted(warmActivity)
-        observer.onActivityStopped(warmActivity)
-        observer.onActivityDestroyed(warmActivity)
-
+        // Warm launch: measured=true prevents frame listener from setting manualTtidMs again
         val warmStartInfo = createMockApplicationStartInfo(
             startType = ApplicationStartInfo.START_TYPE_WARM,
             launchTimestamp = 1000L * 1_000_000L,
@@ -344,24 +381,33 @@ class StartupMetricsLifecycleObserverTest {
         )
         setupActivityManagerWithStartInfo(warmStartInfo)
 
-        // Pixel #2 fires
-        observer.onActivityPaused(createMockActivity())
+        val warmActivity = createMockActivity()
+        observer.onActivityCreated(warmActivity, null)
+        observer.onActivityStarted(warmActivity)
+        observer.onActivityPaused(warmActivity)
+        observer.onActivityStopped(warmActivity)
+        observer.onActivityDestroyed(warmActivity)
+
+        val pauseActivity2 = createMockActivity()
+        observer.onActivityStarted(pauseActivity2)
+        observer.onActivityPaused(pauseActivity2)
+        observer.onActivityStopped(pauseActivity2)
 
         argumentCaptor<Map<String, String>>().apply {
-            verify(pixel, times(1)).fire(
+            verify(pixel, times(2)).fire(
                 pixel = eq(StartupMetricsPixelName.APP_STARTUP_TIME),
                 parameters = capture(),
                 encodedParameters = any(),
                 type = eq(Pixel.PixelType.Count),
             )
 
-            val params = firstValue
+            val warmParams = allValues[1]
             assertNull(
-                "manualTtidMs must be reset after cold launch and not reused in warm launch",
-                params[StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS],
+                "manualTtidMs must be cleared after cold launch and not reused in warm launch",
+                warmParams[StartupMetricsPixelParameters.TTID_MANUAL_DURATION_MS],
             )
-            assertEquals("2000", params[StartupMetricsPixelParameters.TTID_DURATION_MS])
-            assertEquals("warm", params[StartupMetricsPixelParameters.STARTUP_TYPE])
+            assertEquals("2000", warmParams[StartupMetricsPixelParameters.TTID_DURATION_MS])
+            assertEquals("warm", warmParams[StartupMetricsPixelParameters.STARTUP_TYPE])
         }
     }
 

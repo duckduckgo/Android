@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.startup
 
-import android.annotation.SuppressLint
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -30,9 +27,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.random.Random
 
-@SuppressLint("DenyListedApi")
 class SamplingDeciderTest {
-    private val startupMetricsFeature = FakeFeatureToggleFactory.Companion.create(StartupMetricsFeature::class.java)
     private lateinit var moshi: Moshi
     private lateinit var mockRandom: Random
     private lateinit var decider: RealSamplingDecider
@@ -41,61 +36,62 @@ class SamplingDeciderTest {
     fun setup() {
         moshi = Moshi.Builder().build()
         mockRandom = mock()
+        decider = RealSamplingDecider(moshi, mockRandom)
     }
 
     @Test
     fun `when samplingRate 0_0 configured then always returns false`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"0.0"}"""))
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
-
-        assertFalse(decider.shouldSample())
+        assertFalse(decider.shouldSample("""{"sampling":"0.0"}"""))
         verifyNoInteractions(mockRandom)
     }
 
     @Test
     fun `when samplingRate 1_0 configured then always returns true`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"1.0"}"""))
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
-
-        assertTrue(decider.shouldSample())
+        assertTrue(decider.shouldSample("""{"sampling":"1.0"}"""))
         verifyNoInteractions(mockRandom)
     }
 
     @Test
     fun `when samplingRate 0_5 and random below threshold then returns true`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"0.5"}"""))
         whenever(mockRandom.nextDouble()).thenReturn(0.3)
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
 
-        assertTrue(decider.shouldSample())
+        assertTrue(decider.shouldSample("""{"sampling":"0.5"}"""))
         verify(mockRandom).nextDouble()
     }
 
     @Test
     fun `when samplingRate 0_5 and random above threshold then returns false`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"0.5"}"""))
         whenever(mockRandom.nextDouble()).thenReturn(0.7)
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
 
-        assertFalse(decider.shouldSample())
+        assertFalse(decider.shouldSample("""{"sampling":"0.5"}"""))
         verify(mockRandom).nextDouble()
     }
 
     @Test
     fun `when negative samplingRate then treated as 0_0`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"-0.5"}"""))
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
-
-        assertFalse(decider.shouldSample())
+        assertFalse(decider.shouldSample("""{"sampling":"-0.5"}"""))
         verifyNoInteractions(mockRandom)
     }
 
     @Test
     fun `when samplingRate greater than 1_0 then treated as 1_0`() {
-        startupMetricsFeature.self().setRawStoredState(Toggle.State(settings = """{"sampling":"1.5"}"""))
-        decider = RealSamplingDecider(startupMetricsFeature, moshi, mockRandom)
-
-        assertTrue(decider.shouldSample())
+        assertTrue(decider.shouldSample("""{"sampling":"1.5"}"""))
         verifyNoInteractions(mockRandom)
+    }
+
+    @Test
+    fun `when settings JSON is null then falls back to default 1 percent sampling`() {
+        whenever(mockRandom.nextDouble()).thenReturn(0.005)
+
+        assertTrue(decider.shouldSample(null))
+        verify(mockRandom).nextDouble()
+    }
+
+    @Test
+    fun `when settings JSON is malformed then falls back to default 1 percent sampling`() {
+        whenever(mockRandom.nextDouble()).thenReturn(0.005)
+
+        assertTrue(decider.shouldSample("not-valid-json"))
+        verify(mockRandom).nextDouble()
     }
 }

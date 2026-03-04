@@ -24,23 +24,23 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 /**
- * Interface for probabilistic sampling decisions based on feature flag configuration.
+ * Interface for probabilistic sampling decisions.
  */
 interface SamplingDecider {
     /**
-     * Determines if metrics should be sampled based on feature flag configuration.
+     * Determines if metrics should be sampled based on the provided feature flag settings JSON.
      *
+     * @param settingsJson the raw settings JSON from the feature toggle, or null if unavailable
      * @return true if metrics should be reported, false otherwise
      */
-    fun shouldSample(): Boolean
+    fun shouldSample(settingsJson: String?): Boolean
 }
 
 /**
- * Real implementation of SamplingDecider using random sampling with feature flag configuration.
+ * Real implementation of SamplingDecider using random sampling.
  */
 @ContributesBinding(AppScope::class)
 class RealSamplingDecider @Inject constructor(
-    private val startupMetricsFeature: StartupMetricsFeature,
     private val moshi: Moshi,
     private val random: Random = Random.Default,
 ) : SamplingDecider {
@@ -49,8 +49,8 @@ class RealSamplingDecider @Inject constructor(
         moshi.adapter<Map<String, String>>(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
     }
 
-    override fun shouldSample(): Boolean {
-        val samplingRate = getSamplingRate()
+    override fun shouldSample(settingsJson: String?): Boolean {
+        val samplingRate = getSamplingRate(settingsJson)
         val clampedRate = samplingRate.coerceIn(0.0, 1.0)
         if (clampedRate <= 0.0) return false
         if (clampedRate >= 1.0) return true
@@ -58,10 +58,11 @@ class RealSamplingDecider @Inject constructor(
     }
 
     /**
-     * Retrieves the sampling rate from feature flag settings.
+     * Parses the sampling rate from the provided settings JSON.
+     * Falls back to 1% if the JSON is absent or malformed.
      */
-    private fun getSamplingRate(): Double {
-        val config = startupMetricsFeature.self().getSettings()?.let {
+    private fun getSamplingRate(settingsJson: String?): Double {
+        val config = settingsJson?.let {
             runCatching {
                 jsonAdapter.fromJson(it)
             }.getOrDefault(emptyMap())
