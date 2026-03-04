@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
 import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
-import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
@@ -206,7 +205,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
 }
 
 afterEvaluate {
-    // Firebase Test Lab (Flank) tests
+    // Export Firebase Test Lab (Flank) tests to Develocity
     tasks.matching { it.name.startsWith("execFlank") }.names.each {
         ImportJUnitXmlReports.register(
                 tasks,
@@ -215,15 +214,6 @@ afterEvaluate {
         ).configure {
             reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
         }
-    }
-
-    // Android connected tests
-    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
-        ImportJUnitXmlReports.register(
-                tasks,
-                tasks.named(it),
-                ANDROID_CONNECTED
-        )
     }
 }
 
