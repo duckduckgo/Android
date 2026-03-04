@@ -33,9 +33,11 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.net.URI
+import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
@@ -68,6 +70,12 @@ class TrackerDetectorImpl @Inject constructor(
     private val adClickManager: AdClickManager,
 ) : TrackerDetector {
 
+    val uuid = UUID.randomUUID()
+
+    init {
+        logcat(LogPriority.ERROR) { "PIR-TRACKER init: $uuid" }
+    }
+
     private val clients = CopyOnWriteArrayList<Client>()
 
     /**
@@ -84,6 +92,7 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
+        logcat(LogPriority.ERROR) { "PIR-TRACKER evaluate 1: $uuid" }
         val cleanedUrl = removePortFromUrl(url)
         val urlString = url.toString()
         val documentUrlString = documentUrl.toString()
@@ -110,6 +119,7 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
+        logcat(LogPriority.ERROR) { "PIR-TRACKER evaluate 2: $uuid" }
         val cleanedUrl = removePortFromUrl(url)
         val documentUrlString = documentUrl.toString()
 
@@ -137,6 +147,7 @@ class TrackerDetectorImpl @Inject constructor(
         isDocumentInAllowedList: Boolean,
         entity: Entity?,
     ): TrackingEvent {
+        logcat(LogPriority.ERROR) { "PIR-TRACKER evaluate 3: $uuid" }
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
         val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)

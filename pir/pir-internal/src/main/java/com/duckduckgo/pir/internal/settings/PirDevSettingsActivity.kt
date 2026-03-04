@@ -90,7 +90,7 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             pirWorkHandler.canRunPir().collectLatest { canRunPir ->
                 binding.pirDebugScan.isEnabled = canRunPir
-                binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
+                binding.pirDebugOptOut.isEnabled = canRunPir // 67 && repository.getBrokersForOptOut(true).isNotEmpty()
             }
         }
     }

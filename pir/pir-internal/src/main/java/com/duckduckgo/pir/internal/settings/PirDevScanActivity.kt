@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.impl.common.PirDevSettings
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -84,6 +85,9 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pirDatabaseExporter: PirDatabaseExporter
+
+    @Inject
+    lateinit var pirDevSettings: PirDevSettings
 
     private val binding: ActivityPirInternalScanBinding by viewBinding()
     private val recordStringBuilder = StringBuilder()
@@ -235,6 +239,20 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             lifecycleScope.launch(dispatcherProvider.io()) {
                 pirDatabaseExporter.exportToPlaintext()
             }
+        }
+
+        updateTrackerBlockingButtonText()
+        binding.toggleTrackerBlocking.setOnClickListener {
+            pirDevSettings.trackerBlockingEnabled = !pirDevSettings.trackerBlockingEnabled
+            updateTrackerBlockingButtonText()
+        }
+    }
+
+    private fun updateTrackerBlockingButtonText() {
+        binding.toggleTrackerBlocking.text = if (pirDevSettings.trackerBlockingEnabled) {
+            getString(R.string.pirDevTrackerBlockingOn)
+        } else {
+            getString(R.string.pirDevTrackerBlockingOff)
         }
     }
 

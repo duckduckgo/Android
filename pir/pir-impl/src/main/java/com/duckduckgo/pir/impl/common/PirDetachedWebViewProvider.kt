@@ -71,6 +71,7 @@ interface PirDetachedWebViewProvider {
 class RealPirDetachedWebViewProvider @Inject constructor(
     private val pirTrackerBlockingInterceptor: PirTrackerBlockingInterceptor,
     private val pirRemoteFeatures: PirRemoteFeatures,
+    private val pirDevSettings: PirDevSettings,
 ) : PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun createInstance(
@@ -122,13 +123,22 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                 ): WebResourceResponse? {
                     val currentDocumentUrl = documentUrl ?: return null
 
-                    if (!pirRemoteFeatures.trackerBlocking().isEnabled()) return null
+                    // Skip tracker blocking for the initial blank page — it has no real content
+                    // to protect and evaluating requests against dbp://blank causes false blocks.
+                    if (currentDocumentUrl.toString() == DBP_INITIAL_URL) return null
+
+                    logcat { "PIR-TRACKER: PirDetachedWebViewProvider shouldInterceptRequest 1: $documentUrl" }
+
+                    if (!pirDevSettings.trackerBlockingEnabled) return null
 
                     val domain = currentDocumentUrl.host
                     if (domain != null) {
                         val exceptions = pirRemoteFeatures.trackerBlocking().getExceptions()
+                        logcat { "PIR-TRACKER: PirDetachedWebViewProvider shouldInterceptRequest 2: $exceptions" }
                         if (exceptions.any { it.domain == domain }) return null
                     }
+
+                    logcat { "PIR-TRACKER: PirDetachedWebViewProvider shouldInterceptRequest 3: $documentUrl" }
 
                     return pirTrackerBlockingInterceptor.shouldIntercept(request, currentDocumentUrl)
                 }

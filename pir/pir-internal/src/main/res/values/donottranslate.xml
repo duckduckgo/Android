@@ -73,4 +73,6 @@
     <string name="pirDevEmailActions">Actions</string>
     <string name="pirDevRunEmailConfirmation">Run Email Confirmation</string>
     <string name="pirDevFetchLink">Fetch Link</string>
+    <string name="pirDevTrackerBlockingOn">Tracker Blocking: ON</string>
+    <string name="pirDevTrackerBlockingOff">Tracker Blocking: OFF</string>
 </resources>

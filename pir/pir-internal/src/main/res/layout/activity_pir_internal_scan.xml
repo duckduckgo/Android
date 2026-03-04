@@ -207,6 +207,13 @@
                 app:editable="true"
                 app:type="single_line" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/toggleTrackerBlocking"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevTrackerBlockingOn" />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
