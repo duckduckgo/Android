@@ -94,6 +94,7 @@ class GlobalActivityStarterImpl @Inject constructor(
             logcat(ERROR) { "No activity found for params $params" }
             throw IllegalArgumentException("Activity for params $params not found")
         }
+        intent.removeFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         launcher.launch(intent)
     }
 
@@ -103,6 +104,7 @@ class GlobalActivityStarterImpl @Inject constructor(
             logcat(ERROR) { "No activity found for params $deeplinkActivityParams" }
             throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")
         }
+        intent.removeFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         launcher.launch(intent)
     }
 }
