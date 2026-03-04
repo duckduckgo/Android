@@ -102,7 +102,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                             isMainWorld = true,
                             enableCosmeticRules = true,
                             enableHeuristicDetection = true,
-                            enableHeuristicAction = true,
+                            enableHeuristicAction = autoconsentFeature.heuristicAction().isEnabled(),
                         )
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
