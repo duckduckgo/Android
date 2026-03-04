@@ -299,6 +299,32 @@ class InitMessageHandlerPluginTest {
     }
 
     @Test
+    fun whenHeuristicActionToggleDisabledThenEnableHeuristicActionIsFalse() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val result = shadowOf(webView).lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+        assertFalse(initResp!!.config.enableHeuristicAction)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenHeuristicActionToggleEnabledThenEnableHeuristicActionIsTrue() {
+        settingsRepository.userSetting = true
+        settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
+        feature.heuristicAction().setRawStoredState(Toggle.State(enable = true))
+
+        initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
+
+        val result = shadowOf(webView).lastEvaluatedJavascript
+        val initResp = jsonToInitResp(result)
+        assertTrue(initResp!!.config.enableHeuristicAction)
+    }
+
+    @Test
     fun whenInitProcessedThenUpdateUrlCalledOnDetector() {
         settingsRepository.userSetting = true
         settingsCache.updateSettings("{\"disabledCMPs\": [], \"compactRuleList\": {\"v\": 1, \"s\": [], \"r\": []}}")
