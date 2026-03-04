@@ -20,7 +20,6 @@ import app.cash.turbine.test
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -41,7 +40,6 @@ class RealUrlDisplayRepositoryTest {
     var coroutineRule = CoroutineTestRule()
 
     private val settingsDataStore = mock<SettingsDataStore>()
-    private val shorterUrlToggle = mock<Toggle>()
     private val appBuildConfig = mock<AppBuildConfig>()
     private lateinit var testee: UrlDisplayRepository
 
@@ -59,7 +57,6 @@ class RealUrlDisplayRepositoryTest {
         // Given: User manually set preference to true
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -68,7 +65,6 @@ class RealUrlDisplayRepositoryTest {
         assertTrue(result)
         verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled
-        verify(shorterUrlToggle, never()).isEnabled()
         verify(settingsDataStore, never()).hasUrlPreferenceSet()
     }
 
@@ -77,7 +73,6 @@ class RealUrlDisplayRepositoryTest {
         // Given: User manually set preference to false
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -86,7 +81,6 @@ class RealUrlDisplayRepositoryTest {
         assertFalse(result)
         verify(settingsDataStore, atLeastOnce()).urlPreferenceSetByUser
         verify(settingsDataStore, atLeastOnce()).isFullUrlEnabled
-        verify(shorterUrlToggle, never()).isEnabled()
         verify(settingsDataStore, never()).hasUrlPreferenceSet()
     }
 
@@ -130,15 +124,12 @@ class RealUrlDisplayRepositoryTest {
         // Given: Old app user who was migrated to manual (chose shorter URL)
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        // Feature flag disabled (rollback)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
 
         // When
         val result = testee.isFullUrlEnabled()
 
         // Then: Manual preference wins over rollback
         assertFalse(result)
-        verify(shorterUrlToggle, never()).isEnabled()
     }
 
     @Test
@@ -148,7 +139,6 @@ class RealUrlDisplayRepositoryTest {
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
 
         // When
         val result = testee.isFullUrlEnabled()
@@ -163,7 +153,6 @@ class RealUrlDisplayRepositoryTest {
     fun `when new user with auto-assigned preference then not migrated to manual`() = runTest {
         // Given: New user (fresh install), feature enabled, no preference
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
@@ -180,7 +169,6 @@ class RealUrlDisplayRepositoryTest {
     fun `when auto assigned preference exists and feature enabled then return stored value`() = runTest {
         // Given: Auto-assigned preference (not manual), feature enabled
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
 
@@ -199,7 +187,6 @@ class RealUrlDisplayRepositoryTest {
     fun `when existing user and feature enabled then set and return true`() = runTest {
         // Given: Existing user (app update), feature enabled, no preference
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(false)
 
@@ -217,7 +204,6 @@ class RealUrlDisplayRepositoryTest {
     fun `when new user and feature enabled then set and return false`() = runTest {
         // Given: New user (fresh install), feature enabled, no preference
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
@@ -272,7 +258,6 @@ class RealUrlDisplayRepositoryTest {
     fun `when flow collected and setter called then emit new value`() = runTest {
         // Given: Initial state - new user
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(false)
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
 
@@ -344,7 +329,6 @@ class RealUrlDisplayRepositoryTest {
         // Given: User starts with auto-assigned preference
         whenever(settingsDataStore.urlPreferenceSetByUser).thenReturn(false)
         whenever(settingsDataStore.urlPreferenceMigrated).thenReturn(true)
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(true)
         whenever(settingsDataStore.hasUrlPreferenceSet()).thenReturn(true)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
 
@@ -361,7 +345,6 @@ class RealUrlDisplayRepositoryTest {
         verify(settingsDataStore).urlPreferenceSetByUser = true
 
         // And: Future calls honor manual preference even if feature flag changes
-        whenever(shorterUrlToggle.isEnabled()).thenReturn(false)
         val manualResult = testee.isFullUrlEnabled()
         assertTrue(manualResult)
     }
