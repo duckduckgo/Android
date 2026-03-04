@@ -94,12 +94,6 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
-        // Phase 2: validate any deferred parentFeatureName markers emitted by sibling modules.
-        // This is a no-op in leaf/impl modules (deferred package is empty in their deps).
-        // In the composition root (:app), all sibling-module deferred markers are visible
-        // alongside all sentinels, so mis-matched parentFeatureNames fail here.
-        validateDeferredMarkers(module)
-
         val annotated = projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { reference -> reference.isAnnotatedWith(activePluginPointAnnotations.map { it.fqName }) }
@@ -115,6 +109,15 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                     ?.pluginPointFeatureNameOrNull()
             }
             .toSet()
+
+        // Phase 2: validate any deferred parentFeatureName markers emitted by sibling modules.
+        // This is a no-op in leaf/impl modules (deferred package is empty in their deps).
+        // In the composition root (:app), all sibling-module deferred markers are visible
+        // alongside all sentinels, so mis-matched parentFeatureNames fail here.
+        // localPluginPointFeatureNames is passed so that plugin points declared in the SAME
+        // module (e.g. :app declaring both a plugin point and plugins that reference it via
+        // deferred markers) are also accepted without requiring them to be in the classpath.
+        validateDeferredMarkers(module, localPluginPointFeatureNames)
 
         // Second pass: generate code for all annotated classes.
         return annotated
@@ -138,35 +141,39 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
      * This method is a no-op in modules whose dependency graph does not include any
      * sentinel-producing impl modules (i.e. the deferred package is empty).
      */
-    private fun validateDeferredMarkers(module: ModuleDescriptor) {
+    private fun validateDeferredMarkers(module: ModuleDescriptor, localPluginPointFeatureNames: Set<String>) {
+        // Only validate at modules that also declare plugin points. Intermediate modules that
+        // happen to have sentinels in their classpath (from dependencies) but do NOT declare
+        // plugin points themselves should NOT validate deferred markers — their view of the
+        // sentinel universe is incomplete. The composition root (:app) always declares at
+        // least one plugin point (pluginPointNewTabPagePlugin), so it always validates.
+        if (localPluginPointFeatureNames.isEmpty()) return
+
         val deferredScope = module.getPackage(FqName(DEFERRED_SENTINEL_PACKAGE)).memberScope
         val deferredDescriptors = deferredScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
         if (deferredDescriptors.isEmpty()) return
 
         val sentinelScope = module.getPackage(FqName(SENTINEL_PACKAGE)).memberScope
-        // Only validate if at least one sentinel is visible in the current classpath.
-        // When the sentinel package is empty we can't distinguish "wrong name" from
-        // "correct name but the plugin-point module is a sibling not yet on our classpath".
-        // The composition root (:app) always has a non-empty sentinel registry once any
-        // plugin point has been migrated to use an explicit featureName.
         val knownSentinels = sentinelScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
-        if (knownSentinels.isEmpty()) return
 
-        val availableFeatureNames = knownSentinels
-            .map { it.name.asString() }
-            .filter { it.startsWith("ActivePluginPointRegistry_") }
-            .map { it.removePrefix("ActivePluginPointRegistry_") }
-            .sorted()
+        val availableFeatureNames = (
+            knownSentinels
+                .map { it.name.asString() }
+                .filter { it.startsWith("ActivePluginPointRegistry_") }
+                .map { it.removePrefix("ActivePluginPointRegistry_") } +
+                localPluginPointFeatureNames
+            ).sorted()
 
         for (descriptor in deferredDescriptors) {
             val name = descriptor.name.asString()
             if (!name.startsWith(DEFERRED_MARKER_PREFIX)) continue
             val parentFeatureName = name.removePrefix(DEFERRED_MARKER_PREFIX)
-            val sentinelFound = sentinelScope.getContributedClassifier(
+            val foundInSentinel = sentinelScope.getContributedClassifier(
                 Name.identifier("ActivePluginPointRegistry_$parentFeatureName"),
                 NoLookupLocation.FROM_BACKEND,
             ) != null
-            if (!sentinelFound) {
+            val foundLocally = parentFeatureName in localPluginPointFeatureNames
+            if (!foundInSentinel && !foundLocally) {
                 throw AnvilCompilationException(
                     "parentFeatureName \"$parentFeatureName\" does not match any @ContributesActivePluginPoint.\n" +
                         "Known plugin point featureNames: ${availableFeatureNames.joinToString(", ")}",
