@@ -126,13 +126,8 @@
 
     <!-- Onboarding Dev Settings -->
     <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
-    <string name="onboardingDevSettingsSubtitle">View and edit onboarding state and CTA visibility</string>
     <string name="onboardingDevSettingsStateSection">Onboarding state</string>
     <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
-    <string name="onboardingDevSettingsCompletedSubtitle">AppStage.ESTABLISHED when on</string>
     <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
-    <string name="onboardingDevSettingsSkippedSubtitle">hideTips = true when on (only when completed)</string>
     <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
-    <string name="onboardingDevSettingsContextDialogsSection">Context dialogs</string>
-    <string name="onboardingDevSettingsInContextDialogsSection">In-context dialogs</string>
 </resources>
