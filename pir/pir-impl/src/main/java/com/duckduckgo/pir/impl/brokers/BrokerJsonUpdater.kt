@@ -110,13 +110,13 @@ class RealBrokerJsonUpdater @Inject constructor(
 
         val updatedJsons = jsonEtagsFromConfig.toSet() - existingEtags.toSet()
 
-        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
-
         if (updatedJsons.isNotEmpty()) {
             logcat { "PIR-update: Downloading updated broker json files: $updatedJsons" }
             brokerDataDownloader.downloadBrokerData(updatedJsons.map { it.fileName })
         } else {
             logcat { "PIR-update: No broker json files to update." }
         }
+
+        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
     }
 }

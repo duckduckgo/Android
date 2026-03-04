@@ -273,4 +273,24 @@ class RealBrokerJsonUpdaterTest {
         verify(mockPirRepository, never()).updateMainEtag(any())
         verify(mockPirRepository, never()).updateBrokerJsons(any())
     }
+
+    @Test
+    fun whenDownloadBrokerDataThrowsExceptionThenBrokerJsonsNotUpdated() = runTest {
+        // Given
+        val successResponse = Response.success(testMainConfig)
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
+        whenever(mockDbpService.getMainConfig("old-etag")).thenReturn(successResponse)
+        whenever(mockPirRepository.getAllLocalBrokerJsons()).thenReturn(testExistingBrokerJsons)
+        whenever(mockBrokerDataDownloader.downloadBrokerData(any())).thenThrow(RuntimeException("Download failed"))
+
+        // When
+        val result = testee.update()
+
+        // Then - etags should NOT be saved when download fails
+        assertFalse(result)
+        verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName2, testFileName3))
+        verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockPirRepository, never()).updateMainEtag(any())
+    }
 }
