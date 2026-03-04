@@ -26,7 +26,9 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiChatClearer
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -57,20 +59,33 @@ class DataClearing @Inject constructor(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val tabRepository: TabRepository,
+    private val duckChat: DuckChat,
+    private val duckAiChatClearer: DuckAiChatClearer,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
+        val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
 
-        val result = clearDataAction.clearDataForSpecificDomains(visitedSites)
+        val tabUrl = tabRepository.getTab(tabId)?.url
+        clearDuckAiChatIfNeeded(tabUrl)
+
         navigationHistory.removeHistoryForTab(tabId)
-        tabVisitedSitesRepository.clearTab(tabId)
         tabRepository.deleteTabAndSelectSource(tabId)
 
         logcat { "Single tab clear completed for tab: $tabId" }
-        return result
+        return clearDataResult
+    }
+
+    private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
+        if (tabUrl == null) return
+        val shouldClear = FireClearOption.DUCKAI_CHATS in fireDataStore.getManualClearOptions()
+        if (!shouldClear) return
+        val chatId = duckChat.extractChatId(tabUrl) ?: return
+
+        duckAiChatClearer.deleteChat(chatId)
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {

@@ -24,9 +24,12 @@ import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiChatClearer
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -77,6 +80,12 @@ class DataClearingTest {
     private lateinit var mockNavigationHistory: NavigationHistory
 
     @Mock
+    private lateinit var mockDuckChat: DuckChat
+
+    @Mock
+    private lateinit var mockDuckAiChatClearer: DuckAiChatClearer
+
+    @Mock
     private lateinit var mockTabRepository: TabRepository
 
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
@@ -88,6 +97,7 @@ class DataClearingTest {
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
+            whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
         }
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
@@ -99,6 +109,8 @@ class DataClearingTest {
             tabVisitedSitesRepository = mockTabVisitedSitesRepository,
             navigationHistory = mockNavigationHistory,
             tabRepository = mockTabRepository,
+            duckChat = mockDuckChat,
+            duckAiChatClearer = mockDuckAiChatClearer,
         )
     }
 
@@ -671,12 +683,12 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabData_thenCleanUpVisitedSitesStore() = runTest {
+    fun whenClearSingleTabData_thenVisitedSitesClearedByDeleteTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabVisitedSitesRepository).clearTab("tab1")
+        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
     }
 
     @Test
@@ -736,6 +748,55 @@ class DataClearingTest {
         testee.clearSingleTabData("tab1")
 
         verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckAiChatTab_thenDeleteChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.extractChatId("https://duck.ai/chat?chatID=abc-123")).thenReturn("abc-123")
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckAiChatClearer).deleteChat("abc-123")
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNonDuckAiTab_thenDoNotDeleteChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+        whenever(mockDuckChat.extractChatId("https://example.com")).thenReturn(null)
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckAiChatClearer, never()).deleteChat(any())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckAiTabButChatsClearingDisabled_thenDoNotDeleteChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.extractChatId("https://duck.ai/chat?chatID=abc-123")).thenReturn("abc-123")
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckAiChatClearer, never()).deleteChat(any())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckAiTabButFeatureDisabled_thenDoNotDeleteChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.extractChatId("https://duck.ai/chat?chatID=abc-123")).thenReturn("abc-123")
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        showClearDuckAIChatHistoryFlow.value = false
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckAiChatClearer, never()).deleteChat(any())
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
