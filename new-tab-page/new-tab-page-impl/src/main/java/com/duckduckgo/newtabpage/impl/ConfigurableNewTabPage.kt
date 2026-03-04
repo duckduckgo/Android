@@ -32,6 +32,8 @@ import javax.inject.Inject
     defaultActiveValue = DefaultFeatureValue.FALSE,
     supportExperiments = true,
     internalAlwaysEnabled = false,
+    featureName = "pluginConfigurableNewTabPage",
+    parentFeatureName = "pluginPointNewTabPagePlugin",
 )
 class ConfigurableNewTabPage @Inject constructor() : NewTabPagePlugin {
 

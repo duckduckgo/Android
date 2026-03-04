@@ -125,7 +125,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val pluginPointRemoteFeatureStoreClassName = "${vmClass.shortName}_ActivePluginPoint_RemoteFeature_MultiProcessStore"
         val scope = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName }?.scopeOrNull(0)!!
         val pluginClassType = vmClass.pluginClassName(ContributesActivePluginPoint::class.fqName) ?: vmClass.asClassName()
-        val featureName = "pluginPoint${pluginClassType.simpleName}"
+        val featureName = vmClass.annotations.first { it.fqName == ContributesActivePluginPoint::class.fqName }.pluginPointFeatureNameOrNull()!!
 
         // Check if there's another plugin point class that has the same class simplename
         // we can't allow that because the backing remote feature would be the same
@@ -319,9 +319,9 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val featureDefaultValue = vmClass.annotations.firstOrNull {
             it.fqName == ContributesActivePlugin::class.fqName
         }?.defaultActiveValueOrNull() ?: DefaultFeatureValue.TRUE
-        // the parent feature name is taken from the plugin interface name implemented by this class
-        val parentFeatureName = "pluginPoint${boundType.shortName}"
-        val featureName = "plugin${vmClass.shortName}"
+        val activePluginAnnotation = vmClass.annotations.first { it.fqName == ContributesActivePlugin::class.fqName }
+        val parentFeatureName = activePluginAnnotation.parentFeatureNameOrNull()!!
+        val featureName = activePluginAnnotation.pluginFeatureNameOrNull()!!
         val generatedPackage = vmClass.packageFqName.toString()
         val pluginClassName = "${vmClass.shortName}_ActivePlugin"
         val pluginRemoteFeatureClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature"
@@ -631,6 +631,15 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
     @OptIn(ExperimentalAnvilApi::class)
     private fun AnnotationReference.internalAlwaysEnabledOrNull(): Boolean? = argumentAt("internalAlwaysEnabled", 5)?.value()
+
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.pluginFeatureNameOrNull(): String? = argumentAt("featureName", 6)?.value()
+
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.parentFeatureNameOrNull(): String? = argumentAt("parentFeatureName", 7)?.value()
+
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.pluginPointFeatureNameOrNull(): String? = argumentAt("featureName", 2)?.value()
 
     private fun ClassReference.Psi.pluginClassName(
         fqName: FqName,

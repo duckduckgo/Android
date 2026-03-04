@@ -73,4 +73,17 @@ annotation class ContributesActivePlugin(
      * When `true` the backing feature flag will ALWAYS be enabled for internal builds, regardless of remote config or default value.
      */
     val internalAlwaysEnabled: Boolean = false,
+
+    /**
+     * The name of the remote feature flag toggle for this plugin.
+     * This name must be explicitly specified and will be used as the toggle name in the generated remote feature.
+     */
+    val featureName: String,
+
+    /**
+     * The name of the parent remote feature flag (the one guarding the plugin point).
+     * This must match the [ContributesActivePluginPoint.featureName] of the plugin point
+     * this plugin contributes to.
+     */
+    val parentFeatureName: String,
 )

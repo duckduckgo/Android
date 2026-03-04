@@ -53,4 +53,11 @@ annotation class ContributesActivePluginPoint(
      * ```
      */
     val boundType: KClass<*> = Unit::class,
+
+    /**
+     * The name of the remote feature flag that guards this plugin point.
+     * This name must be explicitly specified and must match the [ContributesActivePlugin.parentFeatureName]
+     * used by plugins contributing to this plugin point.
+     */
+    val featureName: String,
 )

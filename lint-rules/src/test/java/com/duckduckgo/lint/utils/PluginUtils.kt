@@ -37,10 +37,14 @@ internal val PLUGIN_POINT_API = TestFiles.kt(
 internal val PLUGIN_POINT_ANNOTATIONS_API = TestFiles.kt(
     """
                     package com.duckduckgo.anvil.annotations
-    
-                    annotation class ContributesActivePlugin
+
+                    annotation class ContributesActivePlugin(
+                        val featureName: String = "",
+                        val parentFeatureName: String = "",
+                    )
                     annotation class ContributesActivePluginPoint(
                         val boundType: KClass<*> = Unit::class,
+                        val featureName: String = "",
                     )
 
             """
