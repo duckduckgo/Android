@@ -3395,9 +3395,10 @@ class BrowserTabViewModel @Inject constructor(
     fun userLaunchingTabSwitcher(
         viewMode: Omnibar.ViewMode,
         hasFocus: Boolean,
+        freshPreviewFile: String? = null,
     ) {
         val tab = liveSelectedTab.value
-        command.value = LaunchTabSwitcher(tabId = tab?.tabId ?: "", previewFile = tab?.tabPreviewFile)
+        command.value = LaunchTabSwitcher(tabId = tab?.tabId ?: "", previewFile = freshPreviewFile ?: tab?.tabPreviewFile)
 
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_TAB_MANAGER_CLICKED)

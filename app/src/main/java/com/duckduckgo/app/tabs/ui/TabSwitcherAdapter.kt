@@ -40,7 +40,6 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.duckduckgo.app.browser.R
@@ -429,7 +428,7 @@ class TabSwitcherAdapter(
 
                     try {
                         glide.load(cachedWebViewPreview)
-                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .dontAnimate()
                             .transform(
                                 RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
                             )

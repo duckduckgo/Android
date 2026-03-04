@@ -38,7 +38,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
-import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
@@ -51,7 +50,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
-import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity.Companion.DUCK_AI_ANIM_READY_DELAY_MS
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -68,7 +66,6 @@ import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
@@ -218,9 +215,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
-
-    @Inject
-    lateinit var webViewPreviewPersister: WebViewPreviewPersister
 
     private val lastActiveTabs = TabList()
 
@@ -377,8 +371,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         setExitSharedElementCallback(object : android.app.SharedElementCallback() {
             override fun onMapSharedElements(names: MutableList<String>, sharedElements: MutableMap<String, View>) {
-                val overlay = binding.tabPreviewOverlay
-                if (overlay.visibility == View.VISIBLE && names.isNotEmpty()) {
+                val overlay = currentTab?.getTabPreviewOverlay()
+                if (overlay != null && names.isNotEmpty()) {
                     sharedElements[names[0]] = overlay
                 }
             }
@@ -1115,7 +1109,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
-            hideTabPreviewOverlay()
+            currentTab?.hideTabPreviewOverlay()
         }
 
     private fun observeDuckChatSharedCommands() {
@@ -1177,65 +1171,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (swipingTabsFeature.isEnabled) {
             viewModel.onFullScreenModeChanged(isFullScreen())
         }
-    }
-
-    fun prepareTabPreviewOverlay(tabId: String, previewFile: String?, onReady: (View?) -> Unit) {
-        if (previewFile == null) {
-            onReady(null)
-            return
-        }
-        val overlay = binding.tabPreviewOverlay
-        val previewPath = webViewPreviewPersister.fullPathForFile(tabId, previewFile)
-        val file = java.io.File(previewPath)
-        if (!file.exists()) {
-            onReady(null)
-            return
-        }
-        overlay.visibility = View.VISIBLE
-        ViewCompat.setTransitionName(overlay, "tab_preview_$tabId")
-
-        // Hide browser content during shared element transition
-        window.exitTransition = android.transition.Fade().apply { duration = 100 }
-        window.reenterTransition = android.transition.Fade().apply {
-            startDelay = 300
-            duration = 150
-        }
-
-        Glide.with(this)
-            .load(file)
-            .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
-                override fun onLoadFailed(
-                    e: com.bumptech.glide.load.engine.GlideException?,
-                    model: Any?,
-                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
-                    isFirstResource: Boolean,
-                ): Boolean {
-                    onReady(null)
-                    return false
-                }
-
-                override fun onResourceReady(
-                    resource: android.graphics.drawable.Drawable,
-                    model: Any,
-                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
-                    dataSource: com.bumptech.glide.load.DataSource,
-                    isFirstResource: Boolean,
-                ): Boolean {
-                    onReady(overlay)
-                    return false
-                }
-            })
-            .into(overlay)
-    }
-
-    fun hideTabPreviewOverlay() {
-        val overlay = binding.tabPreviewOverlay
-        overlay.visibility = View.GONE
-        Glide.with(this).clear(overlay)
-        ViewCompat.setTransitionName(overlay, null)
-        // Clear window transitions set for tab switcher navigation
-        window.exitTransition = null
-        window.reenterTransition = null
     }
 
     companion object {

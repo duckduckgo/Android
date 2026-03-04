@@ -708,7 +708,8 @@ class BrowserTabFragment :
                     }
                 }
             }
-            (activity as? BrowserActivity)?.hideTabPreviewOverlay()
+            // Delay hiding overlay to let tab switch complete, preventing a flash of the previous tab
+            view?.postDelayed({ hideTabPreviewOverlay() }, 200)
         }
 
     private val activityResultHandlerEmailProtectionInContextSignup =
@@ -1297,7 +1298,24 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        launch { viewModel.userLaunchingTabSwitcher(omnibar.viewMode, omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()) }
+        launch {
+            val freshPreviewFile = captureWebViewPreview()
+            viewModel.userLaunchingTabSwitcher(
+                omnibar.viewMode,
+                omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus(),
+                freshPreviewFile,
+            )
+        }
+    }
+
+    private suspend fun captureWebViewPreview(): String? {
+        val wv = webView ?: return null
+        return try {
+            val preview = previewGenerator.generatePreview(wv)
+            previewPersister.save(preview, tabId)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun onTabsButtonLongPressed() {
@@ -1825,7 +1843,7 @@ class BrowserTabFragment :
     private fun launchTabSwitcher(tabId: String = this.tabId, previewFile: String? = null) {
         val browserActivity = activity as? BrowserActivity ?: return
         val intent = TabSwitcherActivity.intent(browserActivity, tabId)
-        browserActivity.prepareTabPreviewOverlay(tabId, previewFile) { sharedElementView ->
+        prepareTabPreviewOverlay(tabId, previewFile) { sharedElementView ->
             if (sharedElementView != null) {
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                     browserActivity,
@@ -1837,6 +1855,67 @@ class BrowserTabFragment :
                 tabSwitcherActivityResult.launch(intent)
             }
         }
+    }
+
+    private fun prepareTabPreviewOverlay(tabId: String, previewFile: String?, onReady: (View?) -> Unit) {
+        if (previewFile == null) {
+            onReady(null)
+            return
+        }
+        val overlay = binding.tabPreviewOverlay
+        val previewPath = previewPersister.fullPathForFile(tabId, previewFile)
+        val file = java.io.File(previewPath)
+        if (!file.exists()) {
+            onReady(null)
+            return
+        }
+        overlay.visibility = View.VISIBLE
+        ViewCompat.setTransitionName(overlay, "tab_preview_$tabId")
+
+        val browserActivity = activity as? BrowserActivity ?: run {
+            onReady(null)
+            return
+        }
+        browserActivity.window.exitTransition = android.transition.Fade().apply { duration = 100 }
+
+        com.bumptech.glide.Glide.with(this)
+            .load(file)
+            .listener(object : com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable> {
+                override fun onLoadFailed(
+                    e: com.bumptech.glide.load.engine.GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    onReady(null)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: android.graphics.drawable.Drawable,
+                    model: Any,
+                    target: com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable>?,
+                    dataSource: com.bumptech.glide.load.DataSource,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    onReady(overlay)
+                    return false
+                }
+            })
+            .into(overlay)
+    }
+
+    fun hideTabPreviewOverlay() {
+        val overlay = binding.tabPreviewOverlay
+        overlay.visibility = View.GONE
+        com.bumptech.glide.Glide.with(this).clear(overlay)
+        ViewCompat.setTransitionName(overlay, null)
+        (activity as? BrowserActivity)?.window?.exitTransition = null
+    }
+
+    fun getTabPreviewOverlay(): View? {
+        val overlay = binding.tabPreviewOverlay
+        return if (overlay.visibility == View.VISIBLE) overlay else null
     }
 
     override fun onResume() {

@@ -140,6 +140,15 @@
             android:elevation="1dp"
             android:layout_alignParentBottom="true" />
 
+        <ImageView
+            android:id="@+id/tabPreviewOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:scaleType="fitStart"
+            android:elevation="20dp"
+            android:importantForAccessibility="no" />
+
     </RelativeLayout>
 
     <FrameLayout
@@ -157,5 +166,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
