@@ -468,7 +468,6 @@ class WelcomePageViewModelTest {
             verify(mockDuckChat).setInputScreenUserSetting(true)
         }
 
-
     @Test
     fun givenInitialReinstallUserDialogWhenOnSecondaryCtaClickedThenShowSkipOnboardingOptionAndSendPixel() =
         runTest {
