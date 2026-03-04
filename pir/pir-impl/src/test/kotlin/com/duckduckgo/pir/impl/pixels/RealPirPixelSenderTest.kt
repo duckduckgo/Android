@@ -23,6 +23,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 class RealPirPixelSenderTest {
@@ -39,7 +40,7 @@ class RealPirPixelSenderTest {
         testee.reportManualScanStarted()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender, times(2)).fire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
