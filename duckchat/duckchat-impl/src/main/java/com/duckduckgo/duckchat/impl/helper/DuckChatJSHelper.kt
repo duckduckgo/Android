@@ -251,7 +251,8 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
-                        duckChat.areMultipleContentAttachmentsEnabled(),
+                        duckChat.areMultipleContentAttachmentsEnabled() &&
+                        mode == Mode.CONTEXTUAL,
                 )
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
