@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.startup.metrics
 
-import android.os.Build
+import android.annotation.SuppressLint
 import android.os.Process
 import android.os.SystemClock
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -40,8 +41,11 @@ interface ProcessTimeProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealProcessTimeProvider @Inject constructor() : ProcessTimeProvider {
-    override fun startupTimeMs(): Long = if (Build.VERSION.SDK_INT >= 33) {
+class RealProcessTimeProvider @Inject constructor(
+    private val buildConfig: AppBuildConfig,
+) : ProcessTimeProvider {
+    @SuppressLint("NewApi")
+    override fun startupTimeMs(): Long = if (buildConfig.sdkInt >= 33) {
         Process.getStartRequestedUptimeMillis()
     } else {
         Process.getStartUptimeMillis()
