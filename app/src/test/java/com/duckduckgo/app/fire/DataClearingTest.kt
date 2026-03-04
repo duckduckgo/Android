@@ -27,7 +27,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -76,9 +75,6 @@ class DataClearingTest {
 
     @Mock
     private lateinit var mockNavigationHistory: NavigationHistory
-
-    @Mock
-    private lateinit var mockDuckChat: DuckChat
 
     @Mock
     private lateinit var mockTabRepository: TabRepository

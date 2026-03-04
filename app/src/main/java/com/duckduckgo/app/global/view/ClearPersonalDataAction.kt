@@ -40,6 +40,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -248,6 +249,8 @@ class ClearPersonalDataAction(
                 logcat(INFO) { "Cleared site data for ${domains.size} domains" }
             }
             ClearDataResult.Success
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logcat(WARN) { "Failed to clear site data: ${e.message}" }
             ClearDataResult.Error(e)
