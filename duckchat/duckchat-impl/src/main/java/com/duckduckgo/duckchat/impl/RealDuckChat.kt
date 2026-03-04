@@ -654,6 +654,12 @@ class RealDuckChat @Inject constructor(
         }.getOrDefault(false)
     }
 
+    override fun extractChatId(url: String): String? {
+        val uri = Uri.parse(url) ?: return null
+        if (!isDuckChatUrl(uri)) return null
+        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
+    }
+
     private fun isDuckChatBang(uri: Uri): Boolean = bangRegex?.containsMatchIn(uri.toString()) == true
 
     override suspend fun wasOpenedBefore(): Boolean = duckChatFeatureRepository.wasOpenedBefore()
@@ -838,6 +844,7 @@ class RealDuckChat @Inject constructor(
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
+        private const val CHAT_ID_PARAM = "chatID"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }
