@@ -58,10 +58,8 @@ annotation class ContributesActivePluginPoint(
      * The remote feature flag name for this plugin point.
      * This is an external contract referenced in remote config — must not change after first release.
      *
-     * Convention (to preserve existing names): "pluginPoint" + the plugin interface simple name.
+     * Convention: "pluginPoint" + the plugin interface simple name.
      * Example: if bound to NewTabPageSectionPlugin, use "pluginPointNewTabPageSectionPlugin".
-     *
-     * When not set, the codegen derives the name from the bound type's class name (legacy behaviour).
      */
-    val featureName: String = "",
+    val featureName: String,
 )
