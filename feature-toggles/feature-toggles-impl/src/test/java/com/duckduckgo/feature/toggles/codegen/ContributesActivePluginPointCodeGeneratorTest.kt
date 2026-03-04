@@ -422,9 +422,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
     }
 
     @Test
-    fun `legacy plugin without explicit names still derives feature name from class name`() {
-        // Regression: existing plugins without featureName/parentFeatureName must keep
-        // working with the class-name derivation so existing remote config keys are unchanged.
+    fun `explicit featureName and parentFeatureName are used in generated remote feature`() {
         val clazz = Class
             .forName("com.duckduckgo.feature.toggles.codegen.BarActivePlugin_ActivePlugin_RemoteFeature")
 
