@@ -944,6 +944,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun observeSubscriptionChangesForDuckChat() {
         subscriptions.getSubscriptionStatusFlow()
+            .map { status -> Pair(status, subscriptions.getAccessToken()) }
             .distinctUntilChanged()
             .onEach { _ ->
                 if (!androidBrowserConfig.refreshDuckAiOnSubscriptionChanges().isEnabled()) return@onEach
