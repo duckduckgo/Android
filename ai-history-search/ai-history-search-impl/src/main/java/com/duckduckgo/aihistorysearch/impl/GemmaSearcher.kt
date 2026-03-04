@@ -83,6 +83,10 @@ internal class GemmaSearcher(
         return withContext(Dispatchers.IO) {
             val ctx = context ?: return@withContext null
             val file = File(modelPath)
+            if (file.exists() && file.length() < MIN_MODEL_BYTES) {
+                logcat { "GemmaSearcher: model file looks truncated (${file.length()} bytes < $MIN_MODEL_BYTES), skipping" }
+                return@withContext null
+            }
             if (!file.exists()) {
                 logcat { "GemmaSearcher: model not found at $modelPath" }
                 logcat { "GemmaSearcher: to set up (requires free HuggingFace account + Gemma terms):" }
@@ -127,5 +131,6 @@ internal class GemmaSearcher(
     companion object {
         internal const val MAX_ENTRIES = 30
         const val MODEL_FILENAME = "gemma3-1b-it-int4.task"
+        private const val MIN_MODEL_BYTES = 100 * 1024 * 1024L // 100 MB — guards against truncated copies
     }
 }
