@@ -93,9 +93,19 @@ class SharedPreferencesProviderImpl @Inject constructor(
         return runCatching { getEncryptedSharedPreferencesInternal(name, multiprocess) }.getOrNull()
     }
 
-    override suspend fun getMigratedEncryptedSharedPreferences(name: String, harmonyFileName: String): SharedPreferences? {
-        logcat { "Migrate encrypted preferences from $name to Harmony $harmonyFileName" }
-        return migrateEncryptedToHarmonyIfNecessary(legacyName = name, harmonyName = harmonyFileName)?.let {
+    override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+        logcat { "Migrate and return encrypted preferences to Harmony" }
+        return migrateEncryptedToHarmonyIfNecessary(name)?.let {
+            SafeSharedPreferences(it, crashLogger.get())
+        }
+    }
+
+    override suspend fun getMigratedEncryptedSharedPreferences(
+        origin: SharedPreferences,
+        name: String,
+    ): SharedPreferences? {
+        logcat { "Migrate and return encrypted preferences to Harmony" }
+        return migrateEncryptedToHarmonyIfNecessary(origin, name)?.let {
             SafeSharedPreferences(it, crashLogger.get())
         }
     }
@@ -212,11 +222,11 @@ class SharedPreferencesProviderImpl @Inject constructor(
         return destination
     }
 
-    private suspend fun migrateEncryptedToHarmonyIfNecessary(legacyName: String, harmonyName: String): SharedPreferences? {
+    private suspend fun migrateEncryptedToHarmonyIfNecessary(name: String): SharedPreferences? {
         return withContext(dispatcherProvider.io()) {
             val destination = runCatching {
                 context.getEncryptedHarmonySharedPreferences(
-                    harmonyName,
+                    name,
                     masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
                     prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
@@ -225,7 +235,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.error(), "name" to harmonyName),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -237,7 +247,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.error(), "name" to harmonyName),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -248,7 +258,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             val origin = runCatching {
                 EncryptedSharedPreferences.create(
                     context,
-                    legacyName,
+                    name,
                     MasterKey.Builder(context)
                         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                         .build(),
@@ -259,13 +269,13 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED,
-                    mapOf("error" to it.error(), "name" to legacyName),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
             }
 
-            logcat { "Performing encrypted migration from $legacyName to Harmony $harmonyName" }
+            logcat { "Performing encrypted migration to Harmony" }
 
             val contents: Map<String?, Any?>? = runCatching {
                 origin.all
@@ -273,7 +283,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED,
-                    mapOf("error" to it.error(), "name" to legacyName),
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
@@ -301,10 +311,10 @@ class SharedPreferencesProviderImpl @Inject constructor(
                             if (originalValue.all { it is String }) {
                                 destination.edit { putStringSet(key, originalValue.filterIsInstance<String>().toSet()) }
                             } else {
-                                logcat(WARN) { "Could not migrate $key from $legacyName preferences" }
+                                logcat(WARN) { "Could not migrate $key from $name preferences" }
                             }
                         }
-                        else -> logcat(WARN) { "Could not migrate $key from $legacyName preferences" }
+                        else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
                     }
                 }
                 destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
@@ -312,7 +322,103 @@ class SharedPreferencesProviderImpl @Inject constructor(
                 ensureActive()
                 pixel.fire(
                     DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
-                    mapOf("error" to it.error(), "name" to harmonyName),
+                    mapOf("error" to it.error(), "name" to name),
+                    type = Pixel.PixelType.Daily(),
+                )
+                return@withContext null
+            }
+
+            return@withContext destination
+        }
+    }
+
+    private suspend fun migrateEncryptedToHarmonyIfNecessary(origin: SharedPreferences, name: String): SharedPreferences? {
+        return withContext(dispatcherProvider.io()) {
+            val destination = runCatching {
+                context.getEncryptedHarmonySharedPreferences(
+                    name,
+                    masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                    prefKeyEncryptionScheme = EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    prefValueEncryptionScheme = EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                )
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_DESTINATION_FAILED,
+                    mapOf("error" to it.error(), "name" to name),
+                    type = Pixel.PixelType.Daily(),
+                )
+                return@withContext null
+            }
+
+            val alreadyMigrated = runCatching {
+                destination.getBoolean(MIGRATED_TO_HARMONY, false)
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    DATA_STORE_MIGRATE_ENCRYPTED_QUERY_PREFERENCES_DESTINATION_FAILED,
+                    mapOf("error" to it.error(), "name" to name),
+                    type = Pixel.PixelType.Daily(),
+                )
+                return@withContext null
+            }
+
+            if (alreadyMigrated) return@withContext destination
+
+            logcat { "Performing encrypted migration to Harmony" }
+
+            val contents: Map<String?, Any?>? = runCatching {
+                origin.all
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    DATA_STORE_MIGRATE_ENCRYPTED_QUERY_ALL_PREFERENCES_ORIGIN_FAILED,
+                    mapOf("error" to it.error(), "name" to name),
+                    type = Pixel.PixelType.Daily(),
+                )
+                return@withContext null
+            }
+
+            runCatching {
+                contents?.keys?.forEach { key ->
+                    when (val originalValue = contents[key]) {
+                        is Boolean -> {
+                            destination.edit { putBoolean(key, originalValue) }
+                        }
+
+                        is Long -> {
+                            destination.edit { putLong(key, originalValue) }
+                        }
+
+                        is Int -> {
+                            destination.edit { putInt(key, originalValue) }
+                        }
+
+                        is Float -> {
+                            destination.edit { putFloat(key, originalValue) }
+                        }
+
+                        is String -> {
+                            destination.edit { putString(key, originalValue) }
+                        }
+
+                        is Set<*> -> {
+                            if (originalValue.all { it is String }) {
+                                destination.edit { putStringSet(key, originalValue.filterIsInstance<String>().toSet()) }
+                            } else {
+                                logcat(WARN) { "Could not migrate $key from $name preferences" }
+                            }
+                        }
+
+                        else -> logcat(WARN) { "Could not migrate $key from $name preferences" }
+                    }
+                }
+                destination.edit(commit = true) { putBoolean(MIGRATED_TO_HARMONY, true) }
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    DATA_STORE_MIGRATE_ENCRYPTED_UPDATE_PREFERENCES_DESTINATION_FAILED,
+                    mapOf("error" to it.error(), "name" to name),
                     type = Pixel.PixelType.Daily(),
                 )
                 return@withContext null
