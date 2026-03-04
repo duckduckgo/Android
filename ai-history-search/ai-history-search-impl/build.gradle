@@ -35,7 +35,7 @@ dependencies {
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.google.mediapipe:tasks-text:0.10.14"
-    implementation "com.google.mediapipe:tasks-genai:0.10.14"
+    implementation "com.google.mediapipe:tasks-genai:0.10.22"  // 0.10.14 is missing STABLEHLO_COMPOSITE op required by Gemma 3
     implementation "com.google.mlkit:genai-prompt:1.0.0-beta1"
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
