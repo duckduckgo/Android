@@ -462,6 +462,14 @@ class WelcomePageViewModelTest {
         }
 
     @Test
+    fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenInputScreenEnabledByDefault() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+            verify(mockDuckChat).setInputScreenUserSetting(true)
+        }
+
+
+    @Test
     fun givenInitialReinstallUserDialogWhenOnSecondaryCtaClickedThenShowSkipOnboardingOptionAndSendPixel() =
         runTest {
             testee.onSecondaryCtaClicked(PreOnboardingDialogType.INITIAL_REINSTALL_USER)
