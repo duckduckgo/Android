@@ -16,7 +16,9 @@
 
 package com.duckduckgo.sync.impl.messaging
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -31,6 +33,8 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.logcat
 import org.json.JSONObject
@@ -42,6 +46,8 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
     private val syncStore: SyncStore,
     private val deviceSyncState: DeviceSyncState,
     private val syncPixels: SyncPixels,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -70,14 +76,16 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
                         return
                     }
 
-                val jsonPayload = runCatching {
-                    handleRescopeTokenResult(syncApi.rescopeToken(token, SCOPE))
-                }.getOrElse { e ->
-                    logcat(LogPriority.ERROR) { "DuckChat-Sync: exception during rescope token: ${e.message}" }
-                    createErrorPayload("internal error")
-                }
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    val jsonPayload = runCatching {
+                        handleRescopeTokenResult(syncApi.rescopeToken(token, SCOPE))
+                    }.getOrElse { e ->
+                        logcat(LogPriority.ERROR) { "DuckChat-Sync: exception during rescope token: ${e.message}" }
+                        createErrorPayload("internal error")
+                    }
 
-                sendResponse(jsMessaging, jsMessage, jsonPayload)
+                    sendResponse(jsMessaging, jsMessage, jsonPayload)
+                }
             }
 
             private fun handleRescopeTokenResult(result: Result<String>): JSONObject {
