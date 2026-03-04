@@ -543,7 +543,9 @@ interface PirPixelSender {
         errorCode: String,
     )
 
-    fun reportDownloadMainConfigFailure()
+    fun reportDownloadMainConfigFailure(
+        message: String,
+    )
 
     fun reportBrokerActionFailure(
         brokerUrl: String,
@@ -1291,8 +1293,11 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE, params)
     }
 
-    override fun reportDownloadMainConfigFailure() {
-        fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE)
+    override fun reportDownloadMainConfigFailure(message: String) {
+        val params = mapOf(
+            PARAM_KEY_ERROR_DETAILS to message,
+        )
+        fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE, params)
     }
 
     override fun reportBrokerActionFailure(
