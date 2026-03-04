@@ -390,7 +390,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
     fun `explicit featureName on plugin point generates sentinel class`() {
         // The sentinel is used by sibling-module plugins to validate parentFeatureName at :app
         // compile time. Its mere existence (loadable class) proves the codegen emitted it.
-        Class.forName("com.duckduckgo.anvil.generated.ActivePluginPointRegistry_myExplicitPluginPoint")
+        Class.forName("com.duckduckgo.anvil.generated.ActivePluginPointRegistry_pluginPointExplicit")
     }
 
     @Test
@@ -399,7 +399,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
             .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNamePlugin_ActivePluginPoint_RemoteFeature")
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
-        assertEquals("myExplicitPluginPoint", featureAnnotation.featureName)
+        assertEquals("pluginPointExplicit", featureAnnotation.featureName)
     }
 
     @Test
@@ -408,7 +408,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
             .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNameActivePlugin_ActivePlugin_RemoteFeature")
 
         assertNotNull(
-            clazz.methods.find { it.name == "myExplicitPlugin" && it.returnType.kotlin == Toggle::class },
+            clazz.methods.find { it.name == "pluginExplicit" && it.returnType.kotlin == Toggle::class },
         )
     }
 
@@ -418,7 +418,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
             .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNameActivePlugin_ActivePlugin_RemoteFeature")
 
         val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
-        assertEquals("myExplicitPluginPoint", featureAnnotation.featureName)
+        assertEquals("pluginPointExplicit", featureAnnotation.featureName)
     }
 
     @Test

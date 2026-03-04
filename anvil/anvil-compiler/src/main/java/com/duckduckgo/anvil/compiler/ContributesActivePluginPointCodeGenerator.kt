@@ -214,6 +214,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                 "${vmClass.fqName}: @ContributesActivePluginPoint requires a non-blank featureName.",
                 element = vmClass.clazz.identifyingElement,
             )
+        if (!featureName.startsWith("pluginPoint")) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: @ContributesActivePluginPoint featureName must start with \"pluginPoint\" (got \"$featureName\").",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         // Check if there's another plugin point class that has the same class simplename
         // we can't allow that because the backing remote feature would be the same
@@ -446,6 +452,21 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                 "${vmClass.fqName}: @ContributesActivePlugin requires a non-blank featureName.",
                 element = vmClass.clazz.identifyingElement,
             )
+        if (!featureName.startsWith("plugin") || featureName.startsWith("pluginPoint")) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: @ContributesActivePlugin featureName must start with \"plugin\" but not \"pluginPoint\" (got \"$featureName\").",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+        if (!parentFeatureName.startsWith("pluginPoint")) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: @ContributesActivePlugin parentFeatureName must start with \"pluginPoint\" (got \"$parentFeatureName\").",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
+        check(!parentFeatureName.contains("__")) {
+            "${vmClass.fqName}: parentFeatureName must not contain \"__\" — it is used as a separator in deferred validation marker class names (got \"$parentFeatureName\")."
+        }
 
         // Validate parentFeatureName.
         // Same-module: check the set collected in generateCode's first pass.

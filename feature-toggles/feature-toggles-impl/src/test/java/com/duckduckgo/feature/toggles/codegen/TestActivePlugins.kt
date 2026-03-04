@@ -133,7 +133,7 @@ class InternalAlwaysEnabledActivePlugin @Inject constructor() : MyPlugin {
 
 @ContributesActivePluginPoint(
     scope = AppScope::class,
-    featureName = "myExplicitPluginPoint",
+    featureName = "pluginPointExplicit",
 )
 interface ExplicitNamePlugin : ActivePlugin {
     fun doSomething()
@@ -142,8 +142,8 @@ interface ExplicitNamePlugin : ActivePlugin {
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = ExplicitNamePlugin::class,
-    featureName = "myExplicitPlugin",
-    parentFeatureName = "myExplicitPluginPoint",
+    featureName = "pluginExplicit",
+    parentFeatureName = "pluginPointExplicit",
 )
 class ExplicitNameActivePlugin @Inject constructor() : ExplicitNamePlugin {
     override fun doSomething() {}
