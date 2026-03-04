@@ -21,21 +21,27 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInference.LlmInferenceOptions
 import java.io.File
+import java.net.URL
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
 /**
- * Shadow path that runs Gemma 3 1B IT (or Gemma 2B fallback) on-device via the MediaPipe
- * LLM Inference Task. Works on any Android device with ≥4 GB RAM (~90% coverage).
+ * Shadow path that runs Gemma 3 1B IT on-device via the MediaPipe LLM Inference Task.
+ * Works on any Android device with ≥4 GB RAM (~90% coverage).
  *
  * Nothing leaves the device. Produces both a ranked list and a synthesized answer,
  * logcatted only — the caller always falls through to the next ranking path so Duck.ai
  * opens normally. PoC to evaluate on-device LLM quality and latency without UI work.
  *
- * The model (~700 MB) must be present at [modelPath] before first use. Push it with:
- *   adb push <model>.bin /data/data/com.duckduckgo.mobile.android.debug/files/models/<model>.bin
+ * The model (~529 MB) is downloaded automatically to [modelPath] on the first @history
+ * query that has [gemmaEnabled] ON. Subsequent calls return null while downloading;
+ * inference begins on the next call after the download completes.
  */
 internal class GemmaSearcher(
     private val context: Context?,
@@ -54,6 +60,8 @@ internal class GemmaSearcher(
     )
 
     @Volatile private var llmInference: LlmInference? = null
+    private val isDownloading = AtomicBoolean(false)
+    private val downloaderScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
      * Runs on-device inference. Never throws — all outcomes are logcatted.
@@ -75,25 +83,55 @@ internal class GemmaSearcher(
     private suspend fun getOrLoadModel(): LlmInference? {
         llmInference?.let { return it }
         return withContext(Dispatchers.IO) {
-            val ctx = context ?: run {
-                logcat { "GemmaSearcher: no context available" }
-                return@withContext null
-            }
+            val ctx = context ?: return@withContext null
             val file = File(modelPath)
-            if (!file.exists()) {
-                logcat { "GemmaSearcher: model not found at $modelPath" }
-                logcat { "GemmaSearcher: push with: adb push $MODEL_FILENAME $modelPath" }
-                return@withContext null
+            when {
+                file.exists() -> loadModel(ctx, file)
+                isDownloading.get() -> {
+                    logcat { "GemmaSearcher: model download in progress, skipping this query" }
+                    null
+                }
+                else -> {
+                    startDownload()
+                    null
+                }
             }
+        }
+    }
+
+    private fun loadModel(ctx: Context, file: File): LlmInference? {
+        return try {
+            val options = LlmInferenceOptions.builder()
+                .setModelPath(file.absolutePath)
+                .setMaxTokens(512)
+                .build()
+            LlmInference.createFromOptions(ctx, options).also { llmInference = it }
+        } catch (e: Exception) {
+            logcat { "GemmaSearcher: failed to load model — ${e.message}" }
+            null
+        }
+    }
+
+    private fun startDownload() {
+        if (!isDownloading.compareAndSet(false, true)) return
+        downloaderScope.launch {
+            val dest = File(modelPath)
+            val partial = File("$modelPath.part")
             try {
-                val options = LlmInferenceOptions.builder()
-                    .setModelPath(modelPath)
-                    .setMaxTokens(512)
-                    .build()
-                LlmInference.createFromOptions(ctx, options).also { llmInference = it }
+                dest.parentFile?.mkdirs()
+                logcat { "GemmaSearcher: downloading model (~529 MB) from $DOWNLOAD_URL" }
+                URL(DOWNLOAD_URL).openStream().use { input ->
+                    partial.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                partial.renameTo(dest)
+                logcat { "GemmaSearcher: model ready — trigger @history again to run inference" }
             } catch (e: Exception) {
-                logcat { "GemmaSearcher: failed to load model — ${e.message}" }
-                null
+                partial.delete()
+                logcat { "GemmaSearcher: download failed — ${e.message}" }
+            } finally {
+                isDownloading.set(false)
             }
         }
     }
@@ -118,7 +156,8 @@ internal class GemmaSearcher(
 
     companion object {
         internal const val MAX_ENTRIES = 30
-        // Update to gemma2b-it-gpu-int4.bin if Gemma 3 1B is not yet in MediaPipe format
-        const val MODEL_FILENAME = "gemma3-1b-it-int4.bin"
+        const val MODEL_FILENAME = "gemma3-1b-it-int4.task"
+        private const val DOWNLOAD_URL =
+            "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task"
     }
 }
