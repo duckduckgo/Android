@@ -80,6 +80,8 @@ class RealSecureStorageKeyStore constructor(
 
     private val mutex: Mutex = Mutex()
     private val harmonyMutex: Mutex = Mutex()
+
+    private var initialUseHarmonyValue: Boolean? = null
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
@@ -113,14 +115,17 @@ class RealSecureStorageKeyStore constructor(
         coroutineScope.async(dispatcherProvider.io()) {
             try {
                 harmonyMutex.withLock {
-                    if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, FILENAME_V2).also {
-                            if (it == null) {
-                                logcat { "autofill harmony preferences retrieval returned null" }
+                    autofillFeature.useHarmony().isEnabled().let { useHarmony ->
+                        initialUseHarmonyValue = useHarmony
+                        if (useHarmony) {
+                            sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, FILENAME_V2).also {
+                                if (it == null) {
+                                    logcat { "autofill harmony preferences retrieval returned null" }
+                                }
                             }
+                        } else {
+                            null
                         }
-                    } else {
-                        null
                     }
                 }
             } catch (e: Exception) {
@@ -130,6 +135,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "error" to e.error(),
                         "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
                 )
@@ -162,6 +168,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "key" to keyName,
                         "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
                 )
@@ -207,6 +214,7 @@ class RealSecureStorageKeyStore constructor(
                             "key" to keyName,
                             "error" to it.error(),
                             "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                         ),
                         type = Daily(),
                     )
@@ -277,6 +285,7 @@ class RealSecureStorageKeyStore constructor(
                             "key" to keyName,
                             "error" to it.error(),
                             "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                         ),
                         type = Daily(),
                     )
@@ -290,6 +299,7 @@ class RealSecureStorageKeyStore constructor(
                             mapOf(
                                 "key" to keyName,
                                 "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
                         )
@@ -300,6 +310,7 @@ class RealSecureStorageKeyStore constructor(
                             mapOf(
                                 "key" to keyName,
                                 "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
                         )
