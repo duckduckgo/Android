@@ -37,12 +37,21 @@ interface SharedPreferencesProvider {
     fun getEncryptedSharedPreferences(name: String, multiprocess: Boolean = false): SharedPreferences?
 
     /**
-     * Returns an instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed.
-     * @param name Name of the legacy EncryptedSharedPreferences to migrate from
-     * @param harmonyFileName Name for the Harmony destination file. Defaults to [name].
-     *   Use a different value when the Harmony file with the same name might be corrupted.
+     * Returns an instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed
+     * @param name Name of the shared preferences
+     *
      *
      * @return the encrypted shared preferences or null if there was any error (eg. device doesn't support it)
      */
-    suspend fun getMigratedEncryptedSharedPreferences(name: String, harmonyFileName: String = name): SharedPreferences?
+    suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences?
+
+    /**
+     * Returns an instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed
+     * @param origin The SharedPreferences instance to migrate
+     * @param name Name of the shared preferences
+     *
+     *
+     * @return the encrypted shared preferences or null if there was any error (eg. device doesn't support it)
+     */
+    suspend fun getMigratedEncryptedSharedPreferences(origin: SharedPreferences, name: String): SharedPreferences?
 }
