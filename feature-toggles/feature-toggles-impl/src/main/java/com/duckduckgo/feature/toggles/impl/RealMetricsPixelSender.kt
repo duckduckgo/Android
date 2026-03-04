@@ -46,40 +46,38 @@ class RealMetricsPixelSender @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : MetricsPixelExtension {
 
-    override suspend fun send(metricsPixel: MetricsPixel): Boolean {
+    override suspend fun send(metricsPixel: MetricsPixel) {
         val definitions = metricsPixel.getPixelDefinitions()
-        if (definitions.isEmpty()) return false
-        return withContext(dispatcherProvider.io()) {
-            definitions.any { definition ->
+        if (definitions.isEmpty()) return
+        withContext(dispatcherProvider.io()) {
+            definitions.forEach { definition ->
                 when (metricsPixel.type) {
                     MetricType.NORMAL -> sendNormal(definition)
                     MetricType.COUNT_WHEN_IN_WINDOW -> sendCount(definition, metricsPixel.value.toInt())
-                    MetricType.COUNT_ALWAYS -> false // TODO: not implemented yet
+                    MetricType.COUNT_ALWAYS -> Unit // TODO: not implemented yet
                 }
             }
         }
     }
 
-    private suspend fun sendNormal(definition: PixelDefinition): Boolean {
-        if (!isInConversionWindow(definition)) return false
+    private suspend fun sendNormal(definition: PixelDefinition) {
+        if (!isInConversionWindow(definition)) return
         val tag = tagFor(definition)
-        if (store.wasPixelFired(tag)) return false
+        if (store.wasPixelFired(tag)) return
         pixel.fire(definition.pixelName, definition.params)
         store.storePixelTag(tag)
-        return true
     }
 
-    private suspend fun sendCount(definition: PixelDefinition, threshold: Int): Boolean {
-        if (!isInConversionWindow(definition)) return false
+    private suspend fun sendCount(definition: PixelDefinition, threshold: Int) {
+        if (!isInConversionWindow(definition)) return
         val count = store.getMetricForPixelDefinition(definition)
-        if (count >= threshold) return false
+        if (count >= threshold) return
         val newCount = store.increaseMetricForPixelDefinition(definition)
-        if (newCount != threshold) return false
+        if (newCount != threshold) return
         val tag = tagFor(definition)
-        if (store.wasPixelFired(tag)) return false
+        if (store.wasPixelFired(tag)) return
         pixel.fire(definition.pixelName, definition.params)
         store.storePixelTag(tag)
-        return true
     }
 
     private fun tagFor(definition: PixelDefinition): String {

@@ -20,9 +20,8 @@ class FakeMetricsPixelExtension : MetricsPixelExtension {
 
     val sentMetrics = mutableListOf<MetricsPixel>()
 
-    override suspend fun send(metricsPixel: MetricsPixel): Boolean {
+    override suspend fun send(metricsPixel: MetricsPixel) {
         sentMetrics.add(metricsPixel)
-        return true
     }
 
     fun register() {
