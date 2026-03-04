@@ -89,7 +89,8 @@ internal class GemmaSearcher(
                 logcat { "GemmaSearcher:   pip install huggingface_hub && huggingface-cli login" }
                 logcat { "GemmaSearcher:   huggingface-cli download litert-community/Gemma3-1B-IT $MODEL_FILENAME --local-dir ." }
                 logcat { "GemmaSearcher:   adb push $MODEL_FILENAME /data/local/tmp/$MODEL_FILENAME" }
-                logcat { "GemmaSearcher:   adb shell run-as com.duckduckgo.mobile.android.debug sh -c 'mkdir -p files/models && cp /data/local/tmp/$MODEL_FILENAME files/models/'" }
+                logcat { "GemmaSearcher:   adb shell run-as com.duckduckgo.mobile.android.debug mkdir files/models" }
+                logcat { "GemmaSearcher:   adb shell run-as com.duckduckgo.mobile.android.debug cp /data/local/tmp/$MODEL_FILENAME files/models/$MODEL_FILENAME" }
                 return@withContext null
             }
             try {
