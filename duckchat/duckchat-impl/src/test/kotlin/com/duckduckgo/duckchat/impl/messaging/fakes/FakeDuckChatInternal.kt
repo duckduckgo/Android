@@ -61,6 +61,10 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
+    override fun extractChatId(url: String): String? {
+        return Uri.parse(url)?.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
+    }
+
     override suspend fun wasOpenedBefore(): Boolean = false
 
     override fun showNewAddressBarOptionChoiceScreen(context: Context, isDarkThemeEnabled: Boolean) { }

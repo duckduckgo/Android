@@ -1339,6 +1339,36 @@ class RealDuckChatTest {
         assertFalse(testee.isStandaloneMigrationCompleted())
     }
 
+    @Test
+    fun `when duck ai url with chatID then extractChatId returns the chatID`() {
+        val chatId = testee.extractChatId("https://duck.ai/chat?chatID=abc-123")
+        assertEquals("abc-123", chatId)
+    }
+
+    @Test
+    fun `when duck ai url without chatID then extractChatId returns null`() {
+        val chatId = testee.extractChatId("https://duck.ai/chat")
+        assertNull(chatId)
+    }
+
+    @Test
+    fun `when non duck ai url with chatID param then extractChatId returns null`() {
+        val chatId = testee.extractChatId("https://example.com/?chatID=abc-123")
+        assertNull(chatId)
+    }
+
+    @Test
+    fun `when duck ai url with blank chatID then extractChatId returns null`() {
+        val chatId = testee.extractChatId("https://duck.ai/chat?chatID=")
+        assertNull(chatId)
+    }
+
+    @Test
+    fun `when legacy duckduckgo duck ai url with chatID then extractChatId returns the chatID`() {
+        val chatId = testee.extractChatId("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc-123")
+        assertEquals("abc-123", chatId)
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {
