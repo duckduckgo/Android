@@ -46,9 +46,6 @@ import com.squareup.kotlinpoet.KModifier.INTERNAL
 import com.squareup.kotlinpoet.KModifier.OVERRIDE
 import com.squareup.kotlinpoet.KModifier.PRIVATE
 import com.squareup.kotlinpoet.KModifier.SUSPEND
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.kotlin.name.Name
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -56,8 +53,11 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import dagger.Binds
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -422,7 +422,8 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                     .build(),
             )
         }
-        val sentinelFile = createGeneratedFile(codeGenDir, SENTINEL_PACKAGE, sentinelClassName, sentinelContent, setOf(vmClass.containingFileAsJavaFile))
+        val sentinelFile =
+            createGeneratedFile(codeGenDir, SENTINEL_PACKAGE, sentinelClassName, sentinelContent, setOf(vmClass.containingFileAsJavaFile))
 
         return listOf(mainFile, sentinelFile)
     }
@@ -465,7 +466,8 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
             )
         }
         check(!parentFeatureName.contains("__")) {
-            "${vmClass.fqName}: parentFeatureName must not contain \"__\" — it is used as a separator in deferred validation marker class names (got \"$parentFeatureName\")."
+            "${vmClass.fqName}: parentFeatureName must not contain \"__\" — it is used as a separator in deferred validation marker class names " +
+                "(got \"$parentFeatureName\")."
         }
 
         // Validate parentFeatureName.
@@ -673,8 +675,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                     )
                 }
                 createGeneratedFile(codeGenDir, DEFERRED_SENTINEL_PACKAGE, markerClassName, markerContent, setOf(vmClass.containingFileAsJavaFile))
-            } else null
-        } else null
+            } else {
+                null
+            }
+        } else {
+            null
+        }
 
         return listOfNotNull(mainFile, deferredMarkerFile)
     }
