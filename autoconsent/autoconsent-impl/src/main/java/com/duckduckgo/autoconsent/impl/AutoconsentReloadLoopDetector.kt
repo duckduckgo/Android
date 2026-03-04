@@ -82,6 +82,10 @@ class AutoconsentReloadLoopDetector @Inject constructor(
         return tabStates[webView]?.reloadLoopDetected == true
     }
 
+    fun getLastHandledCMP(webView: WebView): String? {
+        return tabStates[webView]?.lastHandledCMP
+    }
+
     private fun isSamePageUrl(a: Uri, b: Uri): Boolean {
         return a.scheme == b.scheme && a.host == b.host && a.path == b.path
     }

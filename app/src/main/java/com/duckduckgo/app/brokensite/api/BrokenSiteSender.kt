@@ -125,6 +125,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 CONSENT_MANAGED to brokenSite.consentManaged.toBinaryString(),
                 CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toBinaryString(),
                 CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
+                CONSENT_RULE to brokenSite.consentRule.orEmpty(),
+                CONSENT_RELOAD_LOOP to brokenSite.consentReloadLoop.toBinaryString(),
                 REMOTE_CONFIG_VERSION to privacyConfig.privacyConfigData()?.version.orEmpty(),
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
                 ERROR_CODES_KEY to brokenSite.errorCodes,
@@ -228,6 +230,8 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val CONSENT_MANAGED = "consentManaged"
         private const val CONSENT_OPT_OUT_FAILED = "consentOptoutFailed"
         private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
+        private const val CONSENT_RULE = "consentRule"
+        private const val CONSENT_RELOAD_LOOP = "consentReloadLoop"
         private const val REMOTE_CONFIG_VERSION = "remoteConfigVersion"
         private const val REMOTE_CONFIG_ETAG = "remoteConfigEtag"
         private const val ERROR_CODES_KEY = "errorDescriptions"

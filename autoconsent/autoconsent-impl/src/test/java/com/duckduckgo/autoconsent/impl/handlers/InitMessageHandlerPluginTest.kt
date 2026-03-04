@@ -238,7 +238,14 @@ class InitMessageHandlerPluginTest {
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+        verify(mockCallback).onResultReceived(
+            consentManaged = false,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = false,
+            consentRule = null,
+            consentReloadLoop = false,
+        )
     }
 
     @Test
@@ -267,7 +274,14 @@ class InitMessageHandlerPluginTest {
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+        verify(mockCallback).onResultReceived(
+            consentManaged = false,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = false,
+            consentRule = null,
+            consentReloadLoop = false,
+        )
     }
 
     @Test

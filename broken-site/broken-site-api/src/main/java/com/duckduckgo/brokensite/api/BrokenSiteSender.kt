@@ -34,6 +34,8 @@ data class BrokenSite(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
+    val consentRule: String?,
+    val consentReloadLoop: Boolean,
     val errorCodes: String,
     val httpErrorCodes: String,
     val loginSite: String?,

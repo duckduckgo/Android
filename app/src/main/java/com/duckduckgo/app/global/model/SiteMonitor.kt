@@ -223,6 +223,10 @@ class SiteMonitor(
 
     override var consentCosmeticHide: Boolean? = false
 
+    override var consentRule: String? = null
+
+    override var consentReloadLoop: Boolean = false
+
     override var isDesktopMode: Boolean = false
 
     override var nextUrl: String = url

@@ -85,7 +85,14 @@ class InitMessageHandlerPlugin @Inject constructor(
                     autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
 
                     // Reset site
-                    autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+                    autoconsentCallback.onResultReceived(
+                        consentManaged = false,
+                        optOutFailed = false,
+                        selfTestFailed = false,
+                        isCosmetic = false,
+                        consentRule = reloadLoopDetector.getLastHandledCMP(webView),
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    )
 
                     val settings = settingsCache.getSettings() ?: return@launch
                     val autoAction = getAutoAction(webView)

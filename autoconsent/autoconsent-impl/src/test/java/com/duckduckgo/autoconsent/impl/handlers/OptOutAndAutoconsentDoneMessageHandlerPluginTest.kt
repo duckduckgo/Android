@@ -70,21 +70,42 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     fun whenProcessOptOutIfResultIsFailsThenSendResultWithFailure() {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
+        verify(mockCallback).onResultReceived(
+            consentManaged = true,
+            optOutFailed = true,
+            selfTestFailed = false,
+            isCosmetic = null,
+            consentRule = "test",
+            consentReloadLoop = false,
+        )
     }
 
     @Test
     fun whenProcessAutoconsentDoneIfCosmeticThenResultSentWithCosmeticSetToTrue() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = true)
+        verify(mockCallback).onResultReceived(
+            consentManaged = true,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = true,
+            consentRule = "test",
+            consentReloadLoop = false,
+        )
     }
 
     @Test
     fun whenProcessAutoconsentDoneIfNotCosmeticThenResultSentWithCosmeticSetToFalse() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+        verify(mockCallback).onResultReceived(
+            consentManaged = true,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = false,
+            consentRule = "test",
+            consentReloadLoop = false,
+        )
     }
 
     @Test
