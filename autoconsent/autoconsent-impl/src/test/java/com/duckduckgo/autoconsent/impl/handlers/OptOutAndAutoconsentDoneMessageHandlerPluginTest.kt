@@ -44,7 +44,8 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager, mockReloadLoopDetector)
+    private val handler =
+        OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager, mockReloadLoopDetector)
 
     @Test
     fun whenProcessIfMessageTypeIsNotIncludedInListThenDoNothing() {

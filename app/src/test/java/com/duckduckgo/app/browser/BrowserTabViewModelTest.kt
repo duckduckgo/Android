@@ -4868,7 +4868,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnAutoconsentResultReceivedThenSiteUpdated() {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true, consentRule = null, consentReloadLoop = false)
+        testee.onAutoconsentResultReceived(
+            consentManaged = true,
+            optOutFailed = true,
+            selfTestFailed = true,
+            isCosmetic = true,
+            consentRule = null,
+            consentReloadLoop = false,
+        )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
@@ -4878,7 +4885,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnPageChangeThenAutoconsentReset() {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true, consentRule = null, consentReloadLoop = false)
+        testee.onAutoconsentResultReceived(
+            consentManaged = true,
+            optOutFailed = true,
+            selfTestFailed = true,
+            isCosmetic = true,
+            consentRule = null,
+            consentReloadLoop = false,
+        )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
