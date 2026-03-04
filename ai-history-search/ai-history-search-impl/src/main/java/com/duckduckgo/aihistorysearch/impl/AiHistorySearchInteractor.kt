@@ -17,12 +17,15 @@
 package com.duckduckgo.aihistorysearch.impl
 
 import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChatContextualResult
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
@@ -37,6 +40,7 @@ class AiHistorySearchInteractor @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val feature: AiHistorySearchFeature,
     private val context: Context,
+    @AppCoroutineScope private val appScope: CoroutineScope,
 ) {
 
     private val embeddingScorer: EmbeddingScorer by lazy { EmbeddingScorer(context) }
@@ -75,10 +79,10 @@ class AiHistorySearchInteractor @Inject constructor(
 
         // AICore shadow path — logcats result only, never short-circuits Duck.ai
         if (feature.aiCoreEnabled().isEnabled()) {
-            geminiNanoSearcher.search(query, timeFiltered)
+            appScope.launch { geminiNanoSearcher.search(query, timeFiltered) }
         }
         if (feature.gemmaEnabled().isEnabled()) {
-            gemmaSearcher.search(query, timeFiltered)
+            appScope.launch { gemmaSearcher.search(query, timeFiltered) }
         }
 
         return when {

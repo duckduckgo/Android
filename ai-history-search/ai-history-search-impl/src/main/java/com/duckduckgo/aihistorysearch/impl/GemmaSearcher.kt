@@ -72,7 +72,7 @@ internal class GemmaSearcher(
             val start = System.currentTimeMillis()
             val response = withContext(Dispatchers.IO) { model.generateResponse(prompt) }
             val ms = System.currentTimeMillis() - start
-            logcat { "GemmaSearcher: result in ${ms}ms:\n$response" }
+            logcat { "GemmaSearcher: result in ${ms}ms:\n prompt: $prompt\n\n\n$response" }
         } catch (e: Exception) {
             logcat { "GemmaSearcher: error — ${e.message}" }
         }
@@ -100,7 +100,8 @@ internal class GemmaSearcher(
             try {
                 val options = LlmInferenceOptions.builder()
                     .setModelPath(modelPath)
-                    .setMaxTokens(512)
+                    .setMaxTokens(8192)
+                    .setPreferredBackend(LlmInference.Backend.CPU) // DEFAULT uses legacy CPU path, incompatible with Gemma 3
                     .build()
                 LlmInference.createFromOptions(ctx, options).also { llmInference = it }
             } catch (e: Exception) {
@@ -122,7 +123,7 @@ internal class GemmaSearcher(
 
             Question: $query
 
-            1. List the 3–5 most relevant pages in order of relevance, with a one-sentence reason for each.
+            1. List the 3–5 relevant pages (only the relevant pages) in order of relevance, with a one-sentence reason for each.
             2. Write a 2–3 sentence summary of what these pages suggest about my research on this topic.
             If nothing is relevant, say so clearly.
         """.trimIndent()
