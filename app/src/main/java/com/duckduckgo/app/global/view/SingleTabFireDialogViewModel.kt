@@ -227,8 +227,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             when (result) {
                 is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
-                is ClearDataResult.Error -> command.send(Command.OnSingleTabClearError)
-                else -> command.send(Command.OnSingleTabClearComplete)
+                is ClearDataResult.Success -> command.send(Command.OnSingleTabClearComplete)
+                else -> command.send(Command.OnSingleTabClearError)
             }
         }
     }
