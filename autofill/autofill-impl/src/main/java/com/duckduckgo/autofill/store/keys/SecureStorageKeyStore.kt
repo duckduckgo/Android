@@ -118,10 +118,15 @@ class RealSecureStorageKeyStore constructor(
                     autofillFeature.useHarmony().isEnabled().let { useHarmony ->
                         initialUseHarmonyValue = useHarmony
                         if (useHarmony) {
-                            sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME, FILENAME_V2).also {
-                                if (it == null) {
-                                    logcat { "autofill harmony preferences retrieval returned null" }
+                            getEncryptedPreferences()?.let { legacyPreferences ->
+                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(legacyPreferences, FILENAME_V2).also {
+                                    if (it == null) {
+                                        logcat { "autofill harmony preferences retrieval returned null" }
+                                    }
                                 }
+                            } ?: run {
+                                logcat { "autofill harmony preferences retrieval returned null" }
+                                null
                             }
                         } else {
                             null
@@ -323,7 +328,11 @@ class RealSecureStorageKeyStore constructor(
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        getEncryptedPreferences() != null
+        if (!autofillFeature.useHarmony().isEnabled()) {
+            getEncryptedPreferences() != null
+        } else {
+            getHarmonyEncryptedPreferences() != null && getEncryptedPreferences() != null
+        }
     }
 
     private fun Throwable.error(): String {
