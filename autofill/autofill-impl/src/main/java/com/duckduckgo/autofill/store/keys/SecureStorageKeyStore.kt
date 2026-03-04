@@ -102,7 +102,7 @@ class RealSecureStorageKeyStore constructor(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
                     mapOf(
                         "error" to e.error(),
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                     ),
                     type = Daily(),
                 )
@@ -134,7 +134,7 @@ class RealSecureStorageKeyStore constructor(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
                     mapOf(
                         "error" to e.error(),
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                         "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
@@ -167,7 +167,7 @@ class RealSecureStorageKeyStore constructor(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     mapOf(
                         "key" to keyName,
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                         "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                     ),
                     type = Daily(),
@@ -190,7 +190,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "key" to keyName,
                         "error" to it.error(),
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                     ),
                     type = Daily(),
                 )
@@ -213,7 +213,7 @@ class RealSecureStorageKeyStore constructor(
                         mapOf(
                             "key" to keyName,
                             "error" to it.error(),
-                            "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                             "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                         ),
                         type = Daily(),
@@ -264,7 +264,7 @@ class RealSecureStorageKeyStore constructor(
                     mapOf(
                         "key" to keyName,
                         "error" to it.error(),
-                        "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                     ),
                     type = Daily(),
                 )
@@ -284,7 +284,7 @@ class RealSecureStorageKeyStore constructor(
                         mapOf(
                             "key" to keyName,
                             "error" to it.error(),
-                            "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                             "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                         ),
                         type = Daily(),
@@ -298,7 +298,7 @@ class RealSecureStorageKeyStore constructor(
                             AUTOFILL_HARMONY_KEY_MISSING,
                             mapOf(
                                 "key" to keyName,
-                                "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                                 "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
@@ -309,7 +309,7 @@ class RealSecureStorageKeyStore constructor(
                             AUTOFILL_HARMONY_KEY_MISMATCH,
                             mapOf(
                                 "key" to keyName,
-                                "addHarmonyFixes" to autofillFeature.addHarmonyFixes().isEnabled().toString(),
+                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                                 "initialHarmonyValue" to initialUseHarmonyValue.toString(),
                             ),
                             type = Daily(),
