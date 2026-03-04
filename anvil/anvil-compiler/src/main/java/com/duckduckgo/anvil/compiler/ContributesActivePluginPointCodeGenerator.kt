@@ -167,7 +167,9 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         for (descriptor in deferredDescriptors) {
             val name = descriptor.name.asString()
             if (!name.startsWith(DEFERRED_MARKER_PREFIX)) continue
-            val parentFeatureName = name.removePrefix(DEFERRED_MARKER_PREFIX)
+            // Marker names include the emitting class as a suffix separated by "__" to ensure
+            // uniqueness across modules. e.g. ActivePluginDeferredValidation_<parent>__<Class>
+            val parentFeatureName = name.removePrefix(DEFERRED_MARKER_PREFIX).substringBefore("__")
             val foundInSentinel = sentinelScope.getContributedClassifier(
                 Name.identifier("ActivePluginPointRegistry_$parentFeatureName"),
                 NoLookupLocation.FROM_BACKEND,
@@ -631,11 +633,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
         // Emit a deferred marker so the composition root can validate this parentFeatureName
         // once it has all sibling-module sentinels on its classpath.
+        // The emitting class name is appended (separated by "__") to guarantee uniqueness
+        // across modules: two sibling modules can both emit a marker for the same
+        // parentFeatureName without producing duplicate class files at DEX merge time.
         val deferredMarkerFile = if (emitDeferredMarker) {
-            // Guard against duplicate emission when multiple plugins in the same module
-            // point to the same parent (both would try to emit the same marker file).
-            if (emittedDeferredMarkers.putIfAbsent(parentFeatureName, true) == null) {
-                val markerClassName = "$DEFERRED_MARKER_PREFIX$parentFeatureName"
+            val markerClassName = "${DEFERRED_MARKER_PREFIX}${parentFeatureName}__${vmClass.shortName}"
+            if (emittedDeferredMarkers.putIfAbsent(markerClassName, true) == null) {
                 val markerContent = FileSpec.buildFile(DEFERRED_SENTINEL_PACKAGE, markerClassName) {
                     addType(
                         TypeSpec.objectBuilder(markerClassName)
@@ -857,10 +860,14 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
         /**
          * Fixed package where deferred validation markers are emitted by sibling impl modules.
-         * Marker FQN: `$DEFERRED_SENTINEL_PACKAGE.$DEFERRED_MARKER_PREFIX<parentFeatureName>`
+         * Marker FQN: `$DEFERRED_SENTINEL_PACKAGE.${DEFERRED_MARKER_PREFIX}<parentFeatureName>__<EmittingClass>`
          *
-         * Emitted when a @ContributesActivePlugin has an explicit parentFeatureName but the
-         * sentinel registry is empty (sibling module — plugin point not on our classpath).
+         * The emitting class name suffix (after "__") makes each marker unique per emitting
+         * class, preventing DEX duplicate class errors when multiple sibling modules each emit
+         * a marker for the same parentFeatureName.
+         *
+         * Emitted when a @ContributesActivePlugin has a parentFeatureName but the sentinel
+         * registry is empty (sibling module — plugin point not on our classpath).
          * The composition root (:app) validates these markers against the sentinel registry.
          */
         internal const val DEFERRED_SENTINEL_PACKAGE = "com.duckduckgo.anvil.generated.deferred"
@@ -869,9 +876,10 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         internal const val DEFERRED_MARKER_PREFIX = "ActivePluginDeferredValidation_"
 
         /**
-         * Tracks which parentFeatureNames have already had a deferred marker emitted in this
-         * module's compilation run, to prevent duplicate file creation when multiple plugins
-         * in the same module share the same parentFeatureName.
+         * Tracks which deferred marker class names have already been emitted in this
+         * module's compilation run, to prevent duplicate file creation if the same class
+         * is processed more than once.
+         * Key is the full marker class name (includes emitting class name as suffix).
          */
         internal val emittedDeferredMarkers = ConcurrentHashMap<String, Boolean>()
 
