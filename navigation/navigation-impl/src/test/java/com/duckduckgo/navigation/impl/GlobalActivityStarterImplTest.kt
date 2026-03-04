@@ -34,6 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -137,6 +138,16 @@ class GlobalActivityStarterImplTest {
         verify(launcher).launch(any())
     }
 
+    @Test
+    fun whenStartForResultWithNonActivityContextThenIntentDoesNotContainNewTaskFlag() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, TestParams("test"), launcher)
+
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(launcher).launch(intentCaptor.capture())
+        assertEquals(0, intentCaptor.firstValue.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun whenStartWithLauncherParamsNotFoundThenThrows() {
         val launcher: ActivityResultLauncher<Intent> = mock()
@@ -148,6 +159,16 @@ class GlobalActivityStarterImplTest {
         val launcher: ActivityResultLauncher<Intent> = mock()
         globalActivityStarter.startForResult(context, DeeplinkActivityParams("screenTest"), launcher)
         verify(launcher).launch(any())
+    }
+
+    @Test
+    fun whenStartForResultWithDeeplinkAndNonActivityContextThenIntentDoesNotContainNewTaskFlag() {
+        val launcher: ActivityResultLauncher<Intent> = mock()
+        globalActivityStarter.startForResult(context, DeeplinkActivityParams("screenTest"), launcher)
+
+        val intentCaptor = argumentCaptor<Intent>()
+        verify(launcher).launch(intentCaptor.capture())
+        assertEquals(0, intentCaptor.firstValue.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
     @Test(expected = IllegalArgumentException::class)

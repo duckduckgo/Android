@@ -50,6 +50,12 @@ class GlobalActivityStarterImpl @Inject constructor(
     }
 
     override fun startIntent(context: Context, params: GlobalActivityStarter.ActivityParams): Intent? {
+        return buildIntent(context, params)?.apply {
+            if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    }
+
+    private fun buildIntent(context: Context, params: GlobalActivityStarter.ActivityParams): Intent? {
         val matchingClasses = activityMappers.mapNotNull { it.map(params) }
         if (matchingClasses.size > 1) {
             logcat(WARN) { "Multiple mappers found for ${params::class.java.simpleName}: $matchingClasses. First match will be used." }
@@ -59,9 +65,6 @@ class GlobalActivityStarterImpl @Inject constructor(
         logcat { "Activity $activityClass for params $params found" }
         return Intent(context, activityClass).apply {
             putExtra(ACTIVITY_SERIALIZABLE_PARAMETERS_ARG, params)
-            if (context !is Activity) {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
         }
     }
 
@@ -89,7 +92,7 @@ class GlobalActivityStarterImpl @Inject constructor(
     }
 
     override fun startForResult(context: Context, params: ActivityParams, launcher: ActivityResultLauncher<Intent>) {
-        val intent = startIntent(context, params)
+        val intent = buildIntent(context, params)
         if (intent == null) {
             logcat(ERROR) { "No activity found for params $params" }
             throw IllegalArgumentException("Activity for params $params not found")
@@ -98,7 +101,8 @@ class GlobalActivityStarterImpl @Inject constructor(
     }
 
     override fun startForResult(context: Context, deeplinkActivityParams: DeeplinkActivityParams, launcher: ActivityResultLauncher<Intent>) {
-        val intent = startIntent(context, deeplinkActivityParams)
+        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull { it.map(deeplinkActivityParams) }
+        val intent = activityParams?.let { buildIntent(context, it) }
         if (intent == null) {
             logcat(ERROR) { "No activity found for params $deeplinkActivityParams" }
             throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")
