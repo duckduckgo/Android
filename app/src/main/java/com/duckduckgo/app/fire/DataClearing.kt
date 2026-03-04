@@ -20,6 +20,7 @@ import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -58,19 +59,20 @@ class DataClearing @Inject constructor(
     private val tabRepository: TabRepository,
 ) : ManualDataClearing, AutomaticDataClearing {
 
-    override suspend fun clearSingleTabData(tabId: String) {
+    override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
         val shouldClearDuckAiData = fireDataStore.getManualClearOptions()
             .contains(FireClearOption.DUCKAI_CHATS)
 
-        clearDataAction.clearDataForSpecificDomains(visitedSites, shouldClearDuckAiData)
+        val result = clearDataAction.clearDataForSpecificDomains(visitedSites, shouldClearDuckAiData)
         navigationHistory.removeHistoryForTab(tabId)
         tabVisitedSitesRepository.clearTab(tabId)
         tabRepository.deleteTabAndSelectSource(tabId)
 
         logcat { "Single tab clear completed for tab: $tabId" }
+        return result
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {

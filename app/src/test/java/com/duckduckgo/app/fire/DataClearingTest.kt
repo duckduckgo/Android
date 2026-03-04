@@ -20,6 +20,7 @@ import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -29,7 +30,9 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -87,6 +90,9 @@ class DataClearingTest {
         MockitoAnnotations.openMocks(this)
         showClearDuckAIChatHistoryFlow.value = true
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
+        runBlocking {
+            whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Success)
+        }
         testee = DataClearing(
             fireDataStore = mockFireDataStore,
             clearDataAction = mockClearDataAction,
@@ -695,6 +701,61 @@ class DataClearingTest {
     fun whenClearSingleTabData_thenDeleteTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabDataSucceeds_thenReturnSuccess() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+
+        val result = testee.clearSingleTabData("tab1")
+
+        assertEquals(ClearDataResult.Success, result)
+    }
+
+    @Test
+    fun whenClearSingleTabDataFeatureNotSupported_thenReturnFeatureNotSupported() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+
+        val result = testee.clearSingleTabData("tab1")
+
+        assertEquals(ClearDataResult.FeatureNotSupported, result)
+    }
+
+    @Test
+    fun whenClearSingleTabDataError_thenReturnError() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+        val exception = RuntimeException("test error")
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Error(exception))
+
+        val result = testee.clearSingleTabData("tab1")
+
+        assertEquals(ClearDataResult.Error(exception), result)
+    }
+
+    @Test
+    fun whenClearSingleTabDataFeatureNotSupported_thenStillDeleteTab() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.FeatureNotSupported)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabDataError_thenStillDeleteTab() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        configureManualOptions(emptySet())
+        whenever(mockClearDataAction.clearDataForSpecificDomains(any(), any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
 
         testee.clearSingleTabData("tab1")
 

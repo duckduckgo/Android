@@ -97,6 +97,7 @@ class SingleTabFireDialogViewModelTest {
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
             whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
             whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
+            whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.Success)
         }
     }
 
@@ -803,6 +804,63 @@ class SingleTabFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockDataClearing, never()).clearDataUsingManualFireOptions()
+    }
+
+    @Test
+    fun `when delete this tab returns feature not supported then OnSingleTabClearFeatureNotSupported command is sent`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.onDeleteThisTabClicked()
+
+            awaitItem() // Skip OnClearStarted
+            awaitItem() // Skip PlayAnimation
+
+            assertEquals(Command.OnSingleTabClearFeatureNotSupported, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab returns error then OnSingleTabClearError command is sent`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.onDeleteThisTabClicked()
+
+            awaitItem() // Skip OnClearStarted
+            awaitItem() // Skip PlayAnimation
+
+            assertEquals(Command.OnSingleTabClearError, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab returns feature not supported then OnSingleTabClearComplete is not sent`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.FeatureNotSupported)
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.onDeleteThisTabClicked()
+
+            val commands = cancelAndConsumeRemainingEvents().mapNotNull { (it as? app.cash.turbine.Event.Item)?.value }
+
+            assertTrue(commands.none { it is Command.OnSingleTabClearComplete })
+        }
     }
 
     // endregion

@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
@@ -87,6 +88,7 @@ object PrivacyModule {
         dispatcherProvider: DispatcherProvider,
         webTrackingRepository: WebTrackersBlockedRepository,
         tabVisitedSitesRepository: TabVisitedSitesRepository,
+        webViewCapabilityChecker: WebViewCapabilityChecker,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -105,6 +107,7 @@ object PrivacyModule {
             dispatcherProvider,
             webTrackingRepository,
             tabVisitedSitesRepository,
+            webViewCapabilityChecker,
         )
     }
 

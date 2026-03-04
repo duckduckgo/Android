@@ -91,6 +91,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
         data object OnCancel : Command()
         data object OnClearStarted : Command()
         data object OnSingleTabClearComplete : Command()
+        data object OnSingleTabClearFeatureNotSupported : Command()
+        data object OnSingleTabClearError : Command()
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -214,14 +216,20 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 command.send(Command.PlayAnimation)
             }
 
-            withContext(dispatcherProvider.io()) {
+            val result = withContext(dispatcherProvider.io()) {
                 val selectedTabId = tabRepository.getSelectedTab()?.tabId
                 if (selectedTabId != null) {
                     dataClearing.clearSingleTabData(selectedTabId)
+                } else {
+                    null
                 }
             }
 
-            command.send(Command.OnSingleTabClearComplete)
+            when (result) {
+                is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
+                is ClearDataResult.Error -> command.send(Command.OnSingleTabClearError)
+                else -> command.send(Command.OnSingleTabClearComplete)
+            }
         }
     }
 
