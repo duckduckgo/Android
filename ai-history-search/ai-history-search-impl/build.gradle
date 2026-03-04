@@ -39,6 +39,10 @@ dependencies {
     implementation "com.google.mlkit:genai-prompt:1.0.0-beta1"
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
 }
 
 android {
