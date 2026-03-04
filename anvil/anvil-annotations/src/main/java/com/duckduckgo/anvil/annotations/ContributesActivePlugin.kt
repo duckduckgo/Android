@@ -73,4 +73,25 @@ annotation class ContributesActivePlugin(
      * When `true` the backing feature flag will ALWAYS be enabled for internal builds, regardless of remote config or default value.
      */
     val internalAlwaysEnabled: Boolean = false,
+
+    /**
+     * The remote feature flag toggle name for this individual plugin.
+     * This is an external contract referenced in remote config — must not change after first release.
+     *
+     * Convention (to preserve existing names): "plugin" + this class's simple name.
+     * Example: class FavouritesNewTabSectionView → "pluginFavouritesNewTabSectionView"
+     *
+     * When not set, the codegen derives the name from the class name (legacy behaviour).
+     */
+    val featureName: String = "",
+
+    /**
+     * The featureName of the @ContributesActivePluginPoint this plugin belongs to.
+     * Must exactly match the featureName declared on the corresponding plugin point.
+     *
+     * Example: "pluginPointNewTabPageSectionPlugin"
+     *
+     * When not set, the codegen derives the parent name from the bound type's class name (legacy behaviour).
+     */
+    val parentFeatureName: String = "",
 )

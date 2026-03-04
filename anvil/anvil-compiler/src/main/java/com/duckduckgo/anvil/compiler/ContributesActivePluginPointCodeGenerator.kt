@@ -42,9 +42,13 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier.ABSTRACT
+import com.squareup.kotlinpoet.KModifier.INTERNAL
 import com.squareup.kotlinpoet.KModifier.OVERRIDE
 import com.squareup.kotlinpoet.KModifier.PRIVATE
 import com.squareup.kotlinpoet.KModifier.SUSPEND
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
+import org.jetbrains.kotlin.name.Name
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -90,32 +94,101 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
-        return projectFiles.classAndInnerClassReferences(module)
+        // Phase 2: validate any deferred parentFeatureName markers emitted by sibling modules.
+        // This is a no-op in leaf/impl modules (deferred package is empty in their deps).
+        // In the composition root (:app), all sibling-module deferred markers are visible
+        // alongside all sentinels, so mis-matched parentFeatureNames fail here.
+        validateDeferredMarkers(module)
+
+        val annotated = projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { reference -> reference.isAnnotatedWith(activePluginPointAnnotations.map { it.fqName }) }
-            .flatMap {
-                listOf(
-                    generateActivePluginsPointAndPlugins(it, codeGenDir, module),
-                )
+
+        // First pass: collect plugin point featureNames declared explicitly in this module's source.
+        // Used to validate @ContributesActivePlugin.parentFeatureName in the second pass.
+        // Only includes plugin points that have an explicit featureName set (empty = legacy, skip).
+        val localPluginPointFeatureNames: Set<String> = annotated
+            .filter { it.isContributesActivePluginPoint() }
+            .mapNotNull { ref ->
+                ref.annotations
+                    .firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName }
+                    ?.pluginPointFeatureNameOrNull()
             }
+            .toSet()
+
+        // Second pass: generate code for all annotated classes.
+        return annotated
+            .flatMap { generateActivePluginsPointAndPlugins(it, codeGenDir, module, localPluginPointFeatureNames) }
             .toMutableList().apply {
                 // this.addAll(generatePluginPointRemoteFeature(codeGenDir, module))
             }.toList()
+    }
+
+    /**
+     * Phase 2 of the two-phase deferred validation.
+     *
+     * Scans [DEFERRED_SENTINEL_PACKAGE] for any [DEFERRED_MARKER_PREFIX]* objects emitted by
+     * sibling modules (modules that could not see the plugin-point sentinel at their own
+     * compile time because they are not transitive dependencies of that module).
+     *
+     * For each deferred marker, checks whether the expected
+     * `ActivePluginPointRegistry_<parentFeatureName>` sentinel exists in [SENTINEL_PACKAGE].
+     * If not, the parentFeatureName is invalid and we fail with a compile error.
+     *
+     * This method is a no-op in modules whose dependency graph does not include any
+     * sentinel-producing impl modules (i.e. the deferred package is empty).
+     */
+    private fun validateDeferredMarkers(module: ModuleDescriptor) {
+        val deferredScope = module.getPackage(FqName(DEFERRED_SENTINEL_PACKAGE)).memberScope
+        val deferredDescriptors = deferredScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
+        if (deferredDescriptors.isEmpty()) return
+
+        val sentinelScope = module.getPackage(FqName(SENTINEL_PACKAGE)).memberScope
+        // Only validate if at least one sentinel is visible in the current classpath.
+        // When the sentinel package is empty we can't distinguish "wrong name" from
+        // "correct name but the plugin-point module is a sibling not yet on our classpath".
+        // The composition root (:app) always has a non-empty sentinel registry once any
+        // plugin point has been migrated to use an explicit featureName.
+        val knownSentinels = sentinelScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
+        if (knownSentinels.isEmpty()) return
+
+        val availableFeatureNames = knownSentinels
+            .map { it.name.asString() }
+            .filter { it.startsWith("ActivePluginPointRegistry_") }
+            .map { it.removePrefix("ActivePluginPointRegistry_") }
+            .sorted()
+
+        for (descriptor in deferredDescriptors) {
+            val name = descriptor.name.asString()
+            if (!name.startsWith(DEFERRED_MARKER_PREFIX)) continue
+            val parentFeatureName = name.removePrefix(DEFERRED_MARKER_PREFIX)
+            val sentinelFound = sentinelScope.getContributedClassifier(
+                Name.identifier("ActivePluginPointRegistry_$parentFeatureName"),
+                NoLookupLocation.FROM_BACKEND,
+            ) != null
+            if (!sentinelFound) {
+                throw AnvilCompilationException(
+                    "parentFeatureName \"$parentFeatureName\" does not match any @ContributesActivePluginPoint.\n" +
+                        "Known plugin point featureNames: ${availableFeatureNames.joinToString(", ")}",
+                )
+            }
+        }
     }
 
     private fun generateActivePluginsPointAndPlugins(
         vmClass: ClassReference.Psi,
         codeGenDir: File,
         module: ModuleDescriptor,
-    ): GeneratedFileWithSources {
+        localPluginPointFeatureNames: Set<String>,
+    ): List<GeneratedFileWithSources> {
         return if (vmClass.isContributesActivePluginPoint()) {
             generatedActivePluginPoint(vmClass, codeGenDir, module)
         } else {
-            generatedActivePlugin(vmClass, codeGenDir, module)
+            generatedActivePlugin(vmClass, codeGenDir, module, localPluginPointFeatureNames)
         }
     }
 
-    private fun generatedActivePluginPoint(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
+    private fun generatedActivePluginPoint(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): List<GeneratedFileWithSources> {
         val generatedPackage = vmClass.packageFqName.toString()
         val pluginPointClassFileName = "${vmClass.shortName}_ActivePluginPoint"
         val pluginPointClassName = "Trigger_${vmClass.shortName}_ActivePluginPoint"
@@ -125,7 +198,11 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val pluginPointRemoteFeatureStoreClassName = "${vmClass.shortName}_ActivePluginPoint_RemoteFeature_MultiProcessStore"
         val scope = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName }?.scopeOrNull(0)!!
         val pluginClassType = vmClass.pluginClassName(ContributesActivePluginPoint::class.fqName) ?: vmClass.asClassName()
-        val featureName = "pluginPoint${pluginClassType.simpleName}"
+        // Read featureName from annotation; fall back to class-name derivation for unannotated sites.
+        val explicitFeatureName = vmClass.annotations
+            .firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName }
+            ?.pluginPointFeatureNameOrNull()
+        val featureName = explicitFeatureName ?: "pluginPoint${pluginClassType.simpleName}"
 
         // Check if there's another plugin point class that has the same class simplename
         // we can't allow that because the backing remote feature would be the same
@@ -310,18 +387,93 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassFileName, content, setOf(vmClass.containingFileAsJavaFile))
+        val mainFile = createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassFileName, content, setOf(vmClass.containingFileAsJavaFile))
+
+        // When featureName is explicit, generate a sentinel object in a fixed package so that
+        // plugins in other modules can verify this plugin point exists via ModuleDescriptor at
+        // their own codegen time (cross-module parentFeatureName validation).
+        val sentinelFile = if (explicitFeatureName != null) {
+            val sentinelClassName = "ActivePluginPointRegistry_$explicitFeatureName"
+            val sentinelContent = FileSpec.buildFile(SENTINEL_PACKAGE, sentinelClassName) {
+                addType(
+                    TypeSpec.objectBuilder(sentinelClassName)
+                        .addModifiers(INTERNAL)
+                        .addAnnotation(
+                            AnnotationSpec.builder(Suppress::class)
+                                .addMember("%S", "unused")
+                                .build(),
+                        )
+                        .build(),
+                )
+            }
+            createGeneratedFile(codeGenDir, SENTINEL_PACKAGE, sentinelClassName, sentinelContent, setOf(vmClass.containingFileAsJavaFile))
+        } else null
+
+        return listOfNotNull(mainFile, sentinelFile)
     }
 
-    private fun generatedActivePlugin(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
+    private fun generatedActivePlugin(
+        vmClass: ClassReference.Psi,
+        codeGenDir: File,
+        module: ModuleDescriptor,
+        localPluginPointFeatureNames: Set<String>,
+    ): List<GeneratedFileWithSources> {
         val scope = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.scopeOrNull(0)!!
         val boundType = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.boundTypeOrNull()!!
         val featureDefaultValue = vmClass.annotations.firstOrNull {
             it.fqName == ContributesActivePlugin::class.fqName
         }?.defaultActiveValueOrNull() ?: DefaultFeatureValue.TRUE
-        // the parent feature name is taken from the plugin interface name implemented by this class
-        val parentFeatureName = "pluginPoint${boundType.shortName}"
-        val featureName = "plugin${vmClass.shortName}"
+        // Read featureNames from annotation; fall back to class-name derivation for unannotated sites.
+        val explicitParentFeatureName = vmClass.annotations
+            .firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }
+            ?.activePluginParentFeatureNameOrNull()
+        val parentFeatureName = explicitParentFeatureName ?: "pluginPoint${boundType.shortName}"
+        val featureName = vmClass.annotations
+            .firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }
+            ?.activePluginFeatureNameOrNull()
+            ?: "plugin${vmClass.shortName}"
+
+        // Validate parentFeatureName when explicitly set.
+        // Same-module: check the set collected in generateCode's first pass.
+        // Direct-dependency module: resolve the sentinel object emitted by the plugin point's codegen.
+        // Sibling module (neither depending on the other): the sentinel isn't in scope here.
+        //   → Emit a DeferredValidation marker so the composition root (:app) can re-validate
+        //     once it has both the sentinels and all sibling-module outputs on its classpath.
+        var emitDeferredMarker = false
+        if (explicitParentFeatureName != null) {
+            val foundLocally = explicitParentFeatureName in localPluginPointFeatureNames
+            if (!foundLocally) {
+                val registryScope = module.getPackage(FqName(SENTINEL_PACKAGE)).memberScope
+                val registryHasContent = registryScope
+                    .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
+                    .isNotEmpty()
+                if (registryHasContent) {
+                    val sentinelFound = registryScope.getContributedClassifier(
+                        Name.identifier("ActivePluginPointRegistry_$explicitParentFeatureName"),
+                        NoLookupLocation.FROM_BACKEND,
+                    ) != null
+                    if (!sentinelFound) {
+                        val available = (
+                            registryScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
+                                .map { it.name.asString() }
+                                .filter { it.startsWith("ActivePluginPointRegistry_") }
+                                .map { it.removePrefix("ActivePluginPointRegistry_") } +
+                                localPluginPointFeatureNames
+                            ).sorted()
+                        throw AnvilCompilationException(
+                            "${vmClass.fqName}: parentFeatureName \"$explicitParentFeatureName\" does not match " +
+                                "any @ContributesActivePluginPoint.\n" +
+                                "Known plugin point featureNames: ${available.joinToString(", ")}",
+                            element = vmClass.clazz.identifyingElement,
+                        )
+                    }
+                    // else: sentinel found — validation passed, no marker needed
+                } else {
+                    // Sibling module: defer validation to the composition root.
+                    emitDeferredMarker = true
+                }
+            }
+        }
         val generatedPackage = vmClass.packageFqName.toString()
         val pluginClassName = "${vmClass.shortName}_ActivePlugin"
         val pluginRemoteFeatureClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature"
@@ -465,7 +617,32 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, pluginClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        val mainFile = createGeneratedFile(codeGenDir, generatedPackage, pluginClassName, content, setOf(vmClass.containingFileAsJavaFile))
+
+        // Emit a deferred marker so the composition root can validate this parentFeatureName
+        // once it has all sibling-module sentinels on its classpath.
+        val deferredMarkerFile = if (emitDeferredMarker && explicitParentFeatureName != null) {
+            // Guard against duplicate emission when multiple plugins in the same module
+            // point to the same parent (both would try to emit the same marker file).
+            if (emittedDeferredMarkers.putIfAbsent(explicitParentFeatureName, true) == null) {
+                val markerClassName = "$DEFERRED_MARKER_PREFIX$explicitParentFeatureName"
+                val markerContent = FileSpec.buildFile(DEFERRED_SENTINEL_PACKAGE, markerClassName) {
+                    addType(
+                        TypeSpec.objectBuilder(markerClassName)
+                            .addModifiers(INTERNAL)
+                            .addAnnotation(
+                                AnnotationSpec.builder(Suppress::class)
+                                    .addMember("%S", "unused")
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                }
+                createGeneratedFile(codeGenDir, DEFERRED_SENTINEL_PACKAGE, markerClassName, markerContent, setOf(vmClass.containingFileAsJavaFile))
+            } else null
+        } else null
+
+        return listOfNotNull(mainFile, deferredMarkerFile)
     }
 
     private fun FileSpec.Builder.createRemoteFeatureFlagMultiprocessStore(
@@ -612,6 +789,21 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         return this.annotations.firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName } != null
     }
 
+    /** Reads `featureName` from @ContributesActivePluginPoint (index 2). Returns null when blank/unset. */
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.pluginPointFeatureNameOrNull(): String? =
+        (argumentAt("featureName", 2)?.value() as? String)?.takeIf { it.isNotBlank() }
+
+    /** Reads `featureName` from @ContributesActivePlugin (index 6). Returns null when blank/unset. */
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.activePluginFeatureNameOrNull(): String? =
+        (argumentAt("featureName", 6)?.value() as? String)?.takeIf { it.isNotBlank() }
+
+    /** Reads `parentFeatureName` from @ContributesActivePlugin (index 7). Returns null when blank/unset. */
+    @OptIn(ExperimentalAnvilApi::class)
+    private fun AnnotationReference.activePluginParentFeatureNameOrNull(): String? =
+        (argumentAt("parentFeatureName", 7)?.value() as? String)?.takeIf { it.isNotBlank() }
+
     @OptIn(ExperimentalAnvilApi::class)
     private fun AnnotationReference.defaultActiveValueOrNull(): DefaultFeatureValue? {
         val rawValue = argumentAt("defaultActiveValue", 2)?.value() as FqName? ?: return null
@@ -645,6 +837,33 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
     companion object {
         internal val featureBackedClassNames = ConcurrentHashMap<String, FqName>()
+
+        /**
+         * Fixed package where sentinel objects are generated for each plugin point.
+         * Sentinel FQN: `$SENTINEL_PACKAGE.ActivePluginPointRegistry_<featureName>`
+         * Used for cross-module parentFeatureName validation via ModuleDescriptor.
+         */
+        internal const val SENTINEL_PACKAGE = "com.duckduckgo.anvil.generated"
+
+        /**
+         * Fixed package where deferred validation markers are emitted by sibling impl modules.
+         * Marker FQN: `$DEFERRED_SENTINEL_PACKAGE.$DEFERRED_MARKER_PREFIX<parentFeatureName>`
+         *
+         * Emitted when a @ContributesActivePlugin has an explicit parentFeatureName but the
+         * sentinel registry is empty (sibling module — plugin point not on our classpath).
+         * The composition root (:app) validates these markers against the sentinel registry.
+         */
+        internal const val DEFERRED_SENTINEL_PACKAGE = "com.duckduckgo.anvil.generated.deferred"
+
+        /** Prefix for deferred validation marker class names. */
+        internal const val DEFERRED_MARKER_PREFIX = "ActivePluginDeferredValidation_"
+
+        /**
+         * Tracks which parentFeatureNames have already had a deferred marker emitted in this
+         * module's compilation run, to prevent duplicate file creation when multiple plugins
+         * in the same module share the same parentFeatureName.
+         */
+        internal val emittedDeferredMarkers = ConcurrentHashMap<String, Boolean>()
 
         private val pluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.PluginPoint")
         private val dispatcherProviderFqName = FqName("com.duckduckgo.common.utils.DispatcherProvider")

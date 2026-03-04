@@ -112,3 +112,23 @@ class InternalAlwaysEnabledActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
     }
 }
+
+// Fixtures for explicit featureName / parentFeatureName tests
+
+@ContributesActivePluginPoint(
+    scope = AppScope::class,
+    featureName = "myExplicitPluginPoint",
+)
+interface ExplicitNamePlugin : ActivePlugin {
+    fun doSomething()
+}
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = ExplicitNamePlugin::class,
+    featureName = "myExplicitPlugin",
+    parentFeatureName = "myExplicitPluginPoint",
+)
+class ExplicitNameActivePlugin @Inject constructor() : ExplicitNamePlugin {
+    override fun doSomething() {}
+}
