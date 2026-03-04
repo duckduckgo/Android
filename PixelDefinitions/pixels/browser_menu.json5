@@ -5,6 +5,8 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
+            "appVersion",
+            "atb",
             "vpnMenuItemStatus",
             {
                 "key": "from_focused_ntp",
@@ -18,6 +20,6 @@
         "owners": ["nalcalag"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["vpnMenuItemStatus"]
+        "parameters": ["appVersion", "atb", "vpnMenuItemStatus"]
     }
 }
