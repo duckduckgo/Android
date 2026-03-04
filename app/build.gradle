@@ -380,6 +380,12 @@ dependencies {
     implementation project(':sync-settings-api')
     implementation project(':sync-settings-impl')
 
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
