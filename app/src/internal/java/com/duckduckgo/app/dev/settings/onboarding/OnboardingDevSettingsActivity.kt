@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.databinding.ActivityOnboardingDevSettingsBindi
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
-import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -66,52 +65,15 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
         viewModel.start()
     }
 
-    private val contextDialogIds = setOf(
-        CtaId.DAX_INTRO,
-        CtaId.DAX_INTRO_VISIT_SITE,
-        CtaId.DAX_END,
-        CtaId.DAX_INTRO_PRIVACY_PRO,
-        CtaId.ADD_WIDGET,
-    )
-
-    private val inContextDialogIds = setOf(
-        CtaId.DAX_DIALOG_SERP,
-        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-        CtaId.DAX_FIRE_BUTTON,
-    )
-
     private fun buildCtaList(visibleCtaIds: List<CtaId>) {
         val container = binding.ctaListContainer
         container.removeAllViews()
         ctaRowsById.clear()
         ctaRowListeners.clear()
-
-        val contextCtas = visibleCtaIds.filter { it in contextDialogIds }
-        val inContextCtas = visibleCtaIds.filter { it in inContextDialogIds }
-
-        if (contextCtas.isNotEmpty()) {
-            container.addView(
-                SectionHeaderListItem(this).apply {
-                    primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsContextDialogsSection)
-                },
-            )
-            contextCtas.forEach { ctaId ->
-                val row = createCtaRow(ctaId)
-                ctaRowsById[ctaId] = row
-                container.addView(row)
-            }
-        }
-        if (inContextCtas.isNotEmpty()) {
-            container.addView(
-                SectionHeaderListItem(this).apply {
-                    primaryText = getString(com.duckduckgo.app.browser.R.string.onboardingDevSettingsInContextDialogsSection)
-                },
-            )
-            inContextCtas.forEach { ctaId ->
-                val row = createCtaRow(ctaId)
-                ctaRowsById[ctaId] = row
-                container.addView(row)
-            }
+        visibleCtaIds.forEach { ctaId ->
+            val row = createCtaRow(ctaId)
+            ctaRowsById[ctaId] = row
+            container.addView(row)
         }
     }
 
@@ -136,7 +98,7 @@ class OnboardingDevSettingsActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
                 if (state.visibleCtaIds.isNotEmpty() && ctaRowsById.isEmpty()) {
                     buildCtaList(state.visibleCtaIds)

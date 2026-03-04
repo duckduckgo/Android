@@ -54,17 +54,11 @@ class OnboardingDevSettingsViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    /** Order and grouping for the dev settings UI: context dialogs first, then in-context. */
-    val orderedCtaIds: List<CtaId> = listOf(
-        CtaId.DAX_INTRO,
-        CtaId.DAX_INTRO_VISIT_SITE,
-        CtaId.DAX_END,
-        CtaId.DAX_INTRO_PRIVACY_PRO,
-        CtaId.ADD_WIDGET,
-        CtaId.DAX_DIALOG_SERP,
-        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-        CtaId.DAX_FIRE_BUTTON,
-    )
+    private suspend fun visibleCtaIds(): List<CtaId> {
+        val requiredDialogs = ctaViewModel.requiredDaxOnboardingCtas()
+        val extraDialogs = listOf(CtaId.DAX_INTRO_VISIT_SITE, CtaId.ADD_WIDGET).filterNot { it in requiredDialogs }
+        return requiredDialogs + extraDialogs
+    }
 
     fun start() {
         viewModelScope.launch {
@@ -78,14 +72,13 @@ class OnboardingDevSettingsViewModel @Inject constructor(
             val hideTips = settingsDataStore.hideTips
             val completed = stage == AppStage.ESTABLISHED
             val skipped = completed && hideTips
-            val required = ctaViewModel.getRequiredDaxOnboardingCtasForDev().toSet()
-            val visible = orderedCtaIds.filter { it in required || it == CtaId.ADD_WIDGET || it == CtaId.DAX_INTRO_VISIT_SITE }
-            val ctaStates = orderedCtaIds.associateWith { dismissedCtaDao.exists(it) }
+            val visibleCtas = visibleCtaIds()
+            val ctaStates = visibleCtas.associateWith { dismissedCtaDao.exists(it) }
             _viewState.value = ViewState(
                 onboardingCompleted = completed,
                 onboardingSkipped = skipped,
                 ctaDismissedStates = ctaStates,
-                visibleCtaIds = visible,
+                visibleCtaIds = visibleCtas,
             )
         }
     }
@@ -96,13 +89,13 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 if (checked) {
                     userStageStore.moveToStage(AppStage.ESTABLISHED)
                     settingsDataStore.hideTips = false
-                    orderedCtaIds.forEach { ctaId ->
+                    visibleCtaIds().forEach { ctaId ->
                         dismissedCtaDao.insert(DismissedCta(ctaId))
                     }
                 } else {
                     userStageStore.moveToStage(AppStage.DAX_ONBOARDING)
                     settingsDataStore.hideTips = false
-                    orderedCtaIds.forEach { ctaId ->
+                    visibleCtaIds().forEach { ctaId ->
                         dismissedCtaDao.delete(ctaId)
                     }
                 }
@@ -133,7 +126,7 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 } else {
                     dismissedCtaDao.delete(ctaId)
                 }
-                val required = ctaViewModel.getRequiredDaxOnboardingCtasForDev().toSet()
+                val required = ctaViewModel.requiredDaxOnboardingCtas().toSet()
                 val allRequiredDismissed = required.all { dismissedCtaDao.exists(it) }
                 val wasCompletedByCtas = _viewState.value.onboardingCompleted && !settingsDataStore.hideTips
 

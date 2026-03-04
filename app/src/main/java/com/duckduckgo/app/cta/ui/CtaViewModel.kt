@@ -105,9 +105,11 @@ class CtaViewModel @Inject constructor(
     private suspend fun isPrivacyProCtaAvailable(): Boolean =
         subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
-    private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
+    // Exposed for onboarding dev settings and tests. Used internally for completion checks
+    @VisibleForTesting
+    suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
         return if (isPrivacyProCtaAvailable()) {
-            arrayOf(
+            listOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -116,7 +118,7 @@ class CtaViewModel @Inject constructor(
                 CtaId.DAX_INTRO_PRIVACY_PRO,
             )
         } else {
-            arrayOf(
+            listOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -125,9 +127,6 @@ class CtaViewModel @Inject constructor(
             )
         }
     }
-
-    suspend fun getRequiredDaxOnboardingCtasForDev(): List<CtaId> =
-        requiredDaxOnboardingCtas().toList()
 
     suspend fun dismissPulseAnimation() {
         withContext(dispatchers.io()) {

@@ -55,6 +55,9 @@ class OnboardingDevSettingsViewModelTest {
         CtaId.DAX_INTRO_PRIVACY_PRO,
     )
 
+    /** requiredCtas + ADD_WIDGET + DAX_INTRO_VISIT_SITE (matches ViewModel's visibleCtaIds()). */
+    private val allCtaIds = requiredCtas + listOf(CtaId.ADD_WIDGET, CtaId.DAX_INTRO_VISIT_SITE)
+
     private val testee = OnboardingDevSettingsViewModel(
         userStageStore = userStageStore,
         settingsDataStore = settingsDataStore,
@@ -67,8 +70,8 @@ class OnboardingDevSettingsViewModelTest {
     fun whenStartWithActiveOnboardingThenViewStateShowsNotCompletedNotSkipped() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.start()
 
@@ -83,8 +86,8 @@ class OnboardingDevSettingsViewModelTest {
     fun whenStartWithCompletedOnboardingThenViewStateShowsCompletedNotSkipped() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
 
         testee.start()
 
@@ -99,8 +102,8 @@ class OnboardingDevSettingsViewModelTest {
     fun whenStartWithSkippedOnboardingThenViewStateShowsCompletedAndSkipped() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(true)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.start()
 
@@ -122,8 +125,8 @@ class OnboardingDevSettingsViewModelTest {
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredWithoutPrivacyPro)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredWithoutPrivacyPro)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.start()
 
@@ -137,34 +140,34 @@ class OnboardingDevSettingsViewModelTest {
     fun whenOnboardingCompletedToggledOnThenMoveToEstablishedAndInsertAllCtas() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.onOnboardingCompletedToggled(true)
 
         verify(userStageStore).moveToStage(AppStage.ESTABLISHED)
-        testee.orderedCtaIds.forEach { ctaId -> verify(dismissedCtaDao).insert(DismissedCta(ctaId)) }
+        allCtaIds.forEach { ctaId -> verify(dismissedCtaDao).insert(DismissedCta(ctaId)) }
     }
 
     @Test
     fun whenOnboardingCompletedToggledOffThenMoveToDaxOnboardingAndDeleteAllCtas() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(true) }
 
         testee.onOnboardingCompletedToggled(false)
 
         verify(userStageStore).moveToStage(AppStage.DAX_ONBOARDING)
-        testee.orderedCtaIds.forEach { ctaId -> verify(dismissedCtaDao).delete(ctaId) }
+        allCtaIds.forEach { ctaId -> verify(dismissedCtaDao).delete(ctaId) }
     }
 
     @Test
     fun whenOnboardingSkippedToggledOnThenMoveToEstablishedAndSetHideTipsTrue() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.onOnboardingSkippedToggled(true)
 
@@ -176,8 +179,8 @@ class OnboardingDevSettingsViewModelTest {
     fun whenOnboardingSkippedToggledOffThenSetHideTipsFalse() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(settingsDataStore.hideTips).thenReturn(true)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.onOnboardingSkippedToggled(false)
 
@@ -186,7 +189,7 @@ class OnboardingDevSettingsViewModelTest {
 
     @Test
     fun whenCtaDismissedToggledOnThenInsertCta() = runTest {
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         whenever(dismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
 
         testee.onCtaDismissedToggled(CtaId.DAX_INTRO, isDismissed = true)
@@ -196,7 +199,7 @@ class OnboardingDevSettingsViewModelTest {
 
     @Test
     fun whenCtaDismissedToggledOffThenDeleteCta() = runTest {
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
         whenever(dismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
 
         testee.onCtaDismissedToggled(CtaId.DAX_INTRO, isDismissed = false)
@@ -208,8 +211,8 @@ class OnboardingDevSettingsViewModelTest {
     fun whenAddWidgetToggledThenOnlyDaoUpdatedNoStageChange() = runTest {
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.getRequiredDaxOnboardingCtasForDev()).thenReturn(requiredCtas)
-        testee.orderedCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredCtas)
+        allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.onCtaDismissedToggled(CtaId.ADD_WIDGET, isDismissed = true)
 
