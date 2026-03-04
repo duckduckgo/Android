@@ -131,13 +131,16 @@ class RealNativeInputManager @Inject constructor(
         rootView: ViewGroup,
         omnibar: Omnibar,
     ): Boolean {
-        if (!isNativeInputFieldEnabled) return true
+        if (!isNativeInputFieldEnabled) return false
 
         if (omnibar.viewMode == DuckAI) return false
         val removed = removeWidget(rootView)
         if (!removed) return false
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
+        if (omnibar.viewMode is Omnibar.ViewMode.Browser) {
+            rootView.findViewById<View?>(R.id.webViewContainer)?.show()
+        }
         restoreOmnibar(omnibar, rootView)
         omnibar.show()
         return true
@@ -163,16 +166,11 @@ class RealNativeInputManager @Inject constructor(
 
         if (!isNativeInputFieldEnabled || isVisible) return
 
-        if (omnibar.viewMode == DuckAI) {
-            widgetFrom(rootView)?.requestInputFocus()
-            return
-        }
         val widget = widgetFrom(rootView) ?: return
         val focusedView = rootView.findFocus()
         val focusWithinWidget = focusedView?.let { isDescendantOf(widget, it) } ?: false
         if (widget.hasInputFocus() || !focusWithinWidget) {
             widget.clearInputFocus()
-            hideNativeInput(rootView, omnibar)
         } else {
             widget.requestInputFocus()
         }
@@ -231,6 +229,7 @@ class RealNativeInputManager @Inject constructor(
         attachWidget(widgetView, rootView, omnibar)
         if (omnibar.viewMode != DuckAI) {
             omnibar.hide()
+            rootView.findViewById<View?>(R.id.webViewContainer)?.gone()
         }
     }
 
