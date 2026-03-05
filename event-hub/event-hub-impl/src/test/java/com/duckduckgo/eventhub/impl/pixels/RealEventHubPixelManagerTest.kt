@@ -18,18 +18,17 @@ package com.duckduckgo.eventhub.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -44,6 +43,9 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealEventHubPixelManagerTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule(StandardTestDispatcher())
+
     private val repository: EventHubRepository = mock()
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
@@ -53,8 +55,6 @@ class RealEventHubPixelManagerTest {
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
-    private lateinit var testScope: TestScope
-    private lateinit var dispatcherProvider: DispatcherProvider
     private lateinit var manager: RealEventHubPixelManager
 
     private val dayPixelConfig: TelemetryPixelConfig by lazy {
@@ -89,22 +89,22 @@ class RealEventHubPixelManagerTest {
 
     @Before
     fun setup() {
-        val dispatcher = StandardTestDispatcher()
-        testScope = TestScope(dispatcher)
-        dispatcherProvider = mock<DispatcherProvider>().also {
-            whenever(it.io()).thenReturn(dispatcher)
-        }
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
     }
 
-    @org.junit.After
-    fun tearDown() {
-        testScope.cancel()
-    }
+    private fun createManager() = RealEventHubPixelManager(
+        repository,
+        pixel,
+        timeProvider,
+        coroutineRule.testScope,
+        coroutineRule.testDispatcherProvider,
+        foregroundState,
+        eventHubFeature,
+    )
 
     // --- handleWebEvent ---
 
@@ -114,7 +114,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -128,7 +128,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -140,7 +140,7 @@ class RealEventHubPixelManagerTest {
 
         val captor = argumentCaptor<PixelState>()
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, captor.firstValue.params.mapValues { it.value.value }["count"])
@@ -152,7 +152,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(captor.capture())
         assertEquals(2, captor.secondValue.params.mapValues { it.value.value }["count"])
     }
@@ -164,7 +164,7 @@ class RealEventHubPixelManagerTest {
 
         val captor = argumentCaptor<PixelState>()
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
@@ -176,13 +176,13 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(captor.capture())
         // stopCounting prevents further changes
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(captor.capture())
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
     }
@@ -193,7 +193,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -218,13 +218,13 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(singleBucketConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("evt"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -239,7 +239,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -254,7 +254,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("unknownEvent"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -266,7 +266,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -279,7 +279,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -292,7 +292,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -303,7 +303,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -317,7 +317,7 @@ class RealEventHubPixelManagerTest {
             stubPixelStates(captor.firstValue)
 
             manager.handleWebEvent(webEventData("test"), "tab1")
-            testScope.testScheduler.runCurrent()
+            coroutineRule.testScope.testScheduler.runCurrent()
 
             verify(repository, never()).savePixelState(any())
         }
@@ -329,9 +329,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -345,9 +345,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -360,7 +360,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -374,7 +374,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -404,13 +404,13 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -425,7 +425,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -438,14 +438,14 @@ class RealEventHubPixelManagerTest {
     fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
         stubPixelStates(stateA, stateB)
 
         manager.handleWebEvent(webEventData("evt"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -461,7 +461,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(savedA, savedB)
 
         manager.handleWebEvent(webEventData("evt"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -472,7 +472,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -485,7 +485,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -498,9 +498,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
@@ -513,9 +513,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
         assertEquals(2, second.firstValue.params.mapValues { it.value.value }["count"])
@@ -528,9 +528,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val third = argumentCaptor<PixelState>()
         verify(repository).savePixelState(third.capture())
         assertEquals(3, third.firstValue.params.mapValues { it.value.value }["count"])
@@ -545,18 +545,18 @@ class RealEventHubPixelManagerTest {
 
         // Event on page A
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
 
         // Navigate to page B (no event fires) — onNavigationStarted called by JsInjectorPlugin
         manager.onNavigationStarted("tab1", "https://example.com/pageB")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Navigate back to page A (no event fires) — onNavigationStarted called again
         manager.onNavigationStarted("tab1", "https://example.com/pageA")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Event on page A again — must NOT be deduplicated
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -566,7 +566,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -579,13 +579,13 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
         // onNavigationStarted with same URL (e.g. reload) — should not clear dedup
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(repository, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -594,7 +594,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -605,13 +605,13 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
         // onNavigationStarted with empty webViewId — should not affect state
         manager.onNavigationStarted("", "https://example.com/page2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(repository, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -621,7 +621,7 @@ class RealEventHubPixelManagerTest {
 
         // Same tab, same URL — still deduped because onNavigationStarted was a no-op
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -633,7 +633,7 @@ class RealEventHubPixelManagerTest {
 
         // Events on tab1 and tab2
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
@@ -644,13 +644,13 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
 
         // Navigate tab1 to a different URL
         manager.onNavigationStarted("tab1", "https://example.com/page2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Tab2 should still be deduped (onNavigationStarted only cleared tab1)
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -660,7 +660,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
     }
 
@@ -689,16 +689,16 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
 
         // "test" event on page1
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["testCount"])
@@ -711,9 +711,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
         assertEquals(1, second.firstValue.params.mapValues { it.value.value }["trackerCount"])
@@ -726,9 +726,9 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val third = argumentCaptor<PixelState>()
         verify(repository).savePixelState(third.capture())
         assertEquals(2, third.firstValue.params.mapValues { it.value.value }["testCount"])
@@ -741,7 +741,7 @@ class RealEventHubPixelManagerTest {
 
         // Tab 1 fires event
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, firstCaptor.firstValue.params.mapValues { it.value.value }["count"])
@@ -754,7 +754,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, secondCaptor.firstValue.params.mapValues { it.value.value }["count"])
@@ -767,7 +767,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(secondCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
     }
 
@@ -789,7 +789,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -820,7 +820,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -849,7 +849,7 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(configWithGap)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val testPixelConfig = EventHubConfigParser.parseTelemetry(configWithGap).first()
         val state = PixelState(
@@ -862,7 +862,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -883,7 +883,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val captor = argumentCaptor<PixelState>()
@@ -931,7 +931,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(disabledConfig)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Should STILL fire using stored config (per design: "still fire the telemetry, as it was enabled when initialised")
         verify(pixel).enqueueFire(
@@ -972,7 +972,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Fires the pixel
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -991,7 +991,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1004,7 +1004,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 5000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1017,7 +1017,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deleteAllPixelStates()
     }
@@ -1028,7 +1028,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(existingState)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1054,10 +1054,10 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1067,7 +1067,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deleteAllPixelStates()
     }
@@ -1077,7 +1077,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(null)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1088,7 +1088,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1099,7 +1099,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, times(1)).savePixelState(captor.capture())
@@ -1112,7 +1112,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(captor.firstValue)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1123,12 +1123,12 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deleteAllPixelStates()
     }
@@ -1170,7 +1170,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent uses stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1184,7 +1184,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.handleWebEvent(webEventData("evt"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1197,7 +1197,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent uses stored config source, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1227,7 +1227,7 @@ class RealEventHubPixelManagerTest {
 
         // Event matches stored source ("evt"), not live source ("different_source")
         manager.handleWebEvent(webEventData("evt"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1238,7 +1238,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent ignores event matching only live config source`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1268,7 +1268,7 @@ class RealEventHubPixelManagerTest {
 
         // "new_source" matches live config but NOT stored config — should be ignored
         manager.handleWebEvent(webEventData("new_source"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1277,7 +1277,7 @@ class RealEventHubPixelManagerTest {
     fun `checkPixels fires pixel using stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1300,7 +1300,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1320,7 +1320,7 @@ class RealEventHubPixelManagerTest {
     fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1358,7 +1358,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Attribution period must be based on stored 120s period, not live 1hr
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
@@ -1378,7 +1378,7 @@ class RealEventHubPixelManagerTest {
     fun `new period after firing uses latest config, not stored config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1416,7 +1416,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // The NEW period should use the latest config (1 hour = 3600s = 3600000ms)
         verify(repository).deletePixelState("test_pixel")
@@ -1437,7 +1437,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 5000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1488,13 +1488,13 @@ class RealEventHubPixelManagerTest {
         // Step 1: config [1] loads — both pixels registered with 60s/120s periods
         val config1 = twoPixelConfig(60, 120, buckets)
         whenever(selfToggle.getSettings()).thenReturn(config1)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         timeProvider.time = 10_000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
         whenever(repository.getPixelState("pixel_b")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val savedStates = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
@@ -1517,7 +1517,7 @@ class RealEventHubPixelManagerTest {
         val stateB1WithCount = stateB1.copy(params = mutableMapOf("count" to ParamState(3)))
         stubPixelStates(stateA1WithCount, stateB1WithCount)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
@@ -1526,7 +1526,7 @@ class RealEventHubPixelManagerTest {
 
         // Events still use config [1] stored in state
         manager.handleWebEvent(webEventData("evt"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val savedAfterEvent = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
@@ -1548,7 +1548,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(updatedA, updatedB)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("pixel_a")
         verify(repository, never()).deletePixelState("pixel_b")
@@ -1569,7 +1569,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
@@ -1577,7 +1577,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(newStateA2, updatedB)
 
         manager.handleWebEvent(webEventData("evt"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val savedAfterConfig3 = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
@@ -1597,7 +1597,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(aAfter3, bAfter3)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("pixel_b")
         val savedAfterBFire = argumentCaptor<PixelState>()
@@ -1620,7 +1620,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState(any())).thenReturn(null)
 
         manager.handleWebEvent(webEventData("test"), "")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1632,7 +1632,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 3000L
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1686,7 +1686,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1699,7 +1699,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1712,7 +1712,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
@@ -1725,7 +1725,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -1748,7 +1748,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1769,7 +1769,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 42_000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1784,7 +1784,7 @@ class RealEventHubPixelManagerTest {
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
 
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -1793,10 +1793,10 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(state)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
     }
 
@@ -1808,7 +1808,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val preFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(preFire.capture())
@@ -1822,7 +1822,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(preFire.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "newTab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val postFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(postFire.capture())
@@ -1839,7 +1839,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val preFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(preFire.capture())
@@ -1855,7 +1855,7 @@ class RealEventHubPixelManagerTest {
 
         timeProvider.time = 10_000L
         manager.handleWebEvent(webEventData("test"), "newTab")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val postFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(postFire.capture())
@@ -1880,7 +1880,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1902,7 +1902,7 @@ class RealEventHubPixelManagerTest {
 
         // After fire button, new tab sends same event type — stopCounting still applied
         manager.handleWebEvent(webEventData("test"), "newTab")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1912,7 +1912,7 @@ class RealEventHubPixelManagerTest {
         // Pixel was registered with specific config snapshot — fire button must not erase it
         val originalConfig = configWithBuckets(*originalBuckets)
         whenever(selfToggle.getSettings()).thenReturn(originalConfig)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1922,7 +1922,7 @@ class RealEventHubPixelManagerTest {
 
         // Simulate fire button: new tab, but the stored config snapshot is preserved
         manager.handleWebEvent(webEventData("evt"), "newTab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1934,7 +1934,7 @@ class RealEventHubPixelManagerTest {
     fun `multi-pixel state all persists across fire button`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         val stateA = pixelState("pixel_a", mapOf("count" to 2))
         val stateB = pixelState("pixel_b", mapOf("count" to 3))
@@ -1942,7 +1942,7 @@ class RealEventHubPixelManagerTest {
 
         // Fire button happened — new tabs, same repository state
         manager.handleWebEvent(webEventData("evt"), "newTab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -1959,7 +1959,7 @@ class RealEventHubPixelManagerTest {
 
         // Event on tab1 before fire button
         manager.handleWebEvent(webEventData("test"), "tab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
@@ -1974,7 +1974,7 @@ class RealEventHubPixelManagerTest {
 
         // Same URL in new tab — different webViewId means not deduped
         manager.handleWebEvent(webEventData("test"), "newTab1")
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -2003,9 +2003,9 @@ class RealEventHubPixelManagerTest {
             }
             stubPixelStates(currentState)
             manager.onNavigationStarted("tab1", "https://example.com/page$i")
-            testScope.testScheduler.runCurrent()
+            coroutineRule.testScope.testScheduler.runCurrent()
             manager.handleWebEvent(webEventData("test"), "tab1")
-            testScope.testScheduler.runCurrent()
+            coroutineRule.testScope.testScheduler.runCurrent()
         }
 
         val preFire = argumentCaptor<PixelState>()
@@ -2027,9 +2027,9 @@ class RealEventHubPixelManagerTest {
             )
             stubPixelStates(currentState)
             manager.onNavigationStarted("newTab1", "https://other.com/page$i")
-            testScope.testScheduler.runCurrent()
+            coroutineRule.testScope.testScheduler.runCurrent()
             manager.handleWebEvent(webEventData("test"), "newTab1")
-            testScope.testScheduler.runCurrent()
+            coroutineRule.testScope.testScheduler.runCurrent()
         }
 
         val postFire = argumentCaptor<PixelState>()
@@ -2052,7 +2052,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(finalState)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -2097,7 +2097,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2112,8 +2112,8 @@ class RealEventHubPixelManagerTest {
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         timeProvider.time = 1000L + periodMillis
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2127,23 +2127,23 @@ class RealEventHubPixelManagerTest {
     fun `onConfigChanged cancels all timers when feature disabled - no pixel fires after delay`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         timeProvider.time = 1000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
         whenever(repository.getPixelState("pixel_b")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, times(2)).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(pixel)
-        testScope.testScheduler.advanceTimeBy(121_000L)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(121_000L)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2158,7 +2158,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).savePixelState(any())
@@ -2171,14 +2171,14 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state, null)
         timeProvider.time = periodEnd + 1
-        testScope.testScheduler.advanceTimeBy(60_001L)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(60_001L)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2188,7 +2188,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository, never()).getAllPixelStates()
     }
@@ -2199,7 +2199,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2215,8 +2215,8 @@ class RealEventHubPixelManagerTest {
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         timeProvider.time = 1000L + periodMillis
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2232,7 +2232,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2247,8 +2247,8 @@ class RealEventHubPixelManagerTest {
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         timeProvider.time = 1000L + periodMillis
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val newCaptor = argumentCaptor<PixelState>()
@@ -2261,13 +2261,13 @@ class RealEventHubPixelManagerTest {
     fun `multi-pixel timers are scheduled independently with correct delays`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
-        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
+        manager = createManager()
 
         timeProvider.time = 1000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
         whenever(repository.getPixelState("pixel_b")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val savedStates = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
@@ -2283,12 +2283,12 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2298,7 +2298,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2310,8 +2310,8 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2321,12 +2321,12 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(repository).deleteAllPixelStates()
 
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -2336,7 +2336,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(any())
     }
@@ -2349,7 +2349,7 @@ class RealEventHubPixelManagerTest {
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2365,12 +2365,12 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = initialState.periodEndMillis + 1
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Still only 1 fire — the stale timer coroutine must not double-fire
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
@@ -2382,7 +2382,7 @@ class RealEventHubPixelManagerTest {
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2399,11 +2399,11 @@ class RealEventHubPixelManagerTest {
 
         // checkPixels fires the pixel, which starts a new period with a new timer
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         // Run any pending continuations — the stale coroutine must not fire again
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Still only 1 fire
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
@@ -2416,19 +2416,19 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(any())
 
         // Disable feature before timer fires
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(pixel)
         val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2438,7 +2438,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2454,7 +2454,7 @@ class RealEventHubPixelManagerTest {
 
         timeProvider.time = initialState.periodEndMillis + 1
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // checkPixels fired once
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
@@ -2462,8 +2462,8 @@ class RealEventHubPixelManagerTest {
         // Now the old timer's delay completes — it should NOT fire the new period
         val periodMillis = java.util.concurrent.TimeUnit.DAYS.toMillis(1)
         org.mockito.Mockito.reset(pixel)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         // Stale timer must not have fired
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
@@ -2474,7 +2474,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2490,14 +2490,14 @@ class RealEventHubPixelManagerTest {
         // checkPixels fires the expired pixel and starts a new period (with a new timer)
         timeProvider.time = initialState.periodEndMillis + 1
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         // Now advance past the OLD timer's original delay — it should be a no-op
         org.mockito.Mockito.reset(pixel)
         val periodMillis = TimeUnit.DAYS.toMillis(1)
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2522,7 +2522,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2552,7 +2552,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2570,7 +2570,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 50_000L
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2585,7 +2585,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2602,8 +2602,8 @@ class RealEventHubPixelManagerTest {
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         timeProvider.time = 1000L + periodMillis
-        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2633,7 +2633,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2650,7 +2650,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = periodEnd + 5000L
 
         manager.checkPixels()
-        testScope.testScheduler.runCurrent()
+        coroutineRule.testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
