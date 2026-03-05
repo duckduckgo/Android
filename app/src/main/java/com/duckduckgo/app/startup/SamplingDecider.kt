@@ -19,7 +19,6 @@ package com.duckduckgo.app.startup
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -46,10 +45,7 @@ class RealSamplingDecider @Inject constructor(
 ) : SamplingDecider {
 
     private val jsonAdapter by lazy {
-        Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
-            .adapter(AppStartupMetricsJson::class.java)
+        moshi.adapter(AppStartupMetricsJson::class.java)
     }
 
     override fun shouldSample(settingsJson: String?): Boolean {
