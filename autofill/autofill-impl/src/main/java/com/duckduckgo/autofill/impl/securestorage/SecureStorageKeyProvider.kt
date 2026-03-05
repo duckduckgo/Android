@@ -37,13 +37,11 @@ interface SecureStorageKeyProvider {
     /**
      * Ready to use key for L1 encryption
      */
-    @Throws(SecureStorageException::class)
     suspend fun getl1Key(): ByteArray
 
     /**
      * Ready to use key for L2 encryption using the generated user password
      */
-    @Throws(SecureStorageException::class)
     suspend fun getl2Key(): Key
 }
 
