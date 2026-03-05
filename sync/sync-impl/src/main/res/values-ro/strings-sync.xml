@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Afișează codul text</string>
     <string name="sync_show_qr_code_item">Scanează codul QR</string>
     <string name="sync_save_recovery_code_item">Salvează PDF de recuperare</string>
-    <string name="sync_delete_account_item">Oprește și șterge datele de pe server…</string>
-    <string name="sync_disable_sync_item">Dezactivează Sincronizare și backup…</string>
+    <string name="sync_delete_account_item">Oprește și șterge datele de pe server...</string>
+    <string name="sync_disable_sync_item">Dezactivează Sincronizare și backup...</string>
     <string name="sync_enable_sync_next_button">Următorul</string>
     <string name="sync_recovery_code_content">Dacă pierzi accesul la dispozitivele tale, vei avea nevoie de acest cod pentru a-ți recupera datele sincronizate.</string>
     <string name="sync_recovery_code_hint">Oricine are acces la acest cod poate accesa datele sincronizate, așa că te rugăm să îl păstrezi într-un loc sigur.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Oprește</string>
     <string name="turn_off_sync_dialog_secondary_button">Anulare</string>
     <string name="sync_permission_required_store_recovery_code">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
-    <string name="sync_share_title">Distribuie către…</string>
+    <string name="sync_share_title">Distribuie către...</string>
     <string name="sync_pdf_title">Codul de recuperare a sincronizării</string>
     <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
     <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>

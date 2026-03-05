@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Параметры</string>
     <string name="sync_enable_option_favicons_title">Загружать значки закладок</string>
     <string name="sync_enable_option_favicons_subtitle">Позволяет автоматически загружать значки для синхронизированных закладок.</string>
-    <string name="sync_enable_connecting">Выполняется подключение…</string>
+    <string name="sync_enable_connecting">Выполняется подключение...</string>
     <string name="sync_intro_enable_title">Синхронизация и резервное копирование устройства</string>
     <string name="sync_intro_enable_content">DuckDuckGo создаст зашифрованную резервную копию ваших закладок и паролей на защищенном сервере. Копию можно синхронизировать с другими устройствами.\n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
     <string name="sync_intro_enable_content_with_ai_chat">DuckDuckGo создаст зашифрованную резервную копию ваших закладок, паролей и чатов Duck.ai на надежном сервере. Копию можно синхронизировать с другими устройствами. \n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Показать текстовый код</string>
     <string name="sync_show_qr_code_item">Сканирование QR-кода</string>
     <string name="sync_save_recovery_code_item">Сохранить код в PDF</string>
-    <string name="sync_delete_account_item">Отключить и удалить данные с сервера…</string>
-    <string name="sync_disable_sync_item">Отключить синхронизацию и резервное копирование…</string>
+    <string name="sync_delete_account_item">Отключить и удалить данные с сервера...</string>
+    <string name="sync_disable_sync_item">Отключить синхронизацию и резервное копирование...</string>
     <string name="sync_enable_sync_next_button">Далее</string>
     <string name="sync_recovery_code_content">Если вы утратите доступ к своим устройствам, этот код позволит вам восстановить синхронизированные данные.</string>
     <string name="sync_recovery_code_hint">Этот код позволяет получить доступ к вашим синхронизированным данным, поэтому храните его в надежном месте.</string>

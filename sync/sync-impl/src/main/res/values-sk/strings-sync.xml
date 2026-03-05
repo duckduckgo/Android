@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Možnosti</string>
     <string name="sync_enable_option_favicons_title">Prevzatie ikon záložiek</string>
     <string name="sync_enable_option_favicons_subtitle">Automatické preberanie ikon pre synchronizované záložky.</string>
-    <string name="sync_enable_connecting">Pripája sa…</string>
+    <string name="sync_enable_connecting">Pripája sa...</string>
     <string name="sync_intro_enable_title">Synchronizujte a zálohujte toto zariadenie</string>
     <string name="sync_intro_enable_content">Vytvorí sa tak šifrovaná záloha vašich záložiek a hesiel na zabezpečenom serveri DuckDuckGo, ktorú môžete synchronizovať s ostatnými zariadeniami. \n\n Šifrovací kľúč je uložený iba vo vašom zariadení - DuckDuckGo k nemu nemá prístup.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Tým sa na zabezpečenom serveri DuckDuckGo vytvorí šifrovaná záloha tvojich záložiek, hesiel a četov Duck.ai, ktorú môžeš synchronizovať s tvojimi ostatnými zariadeniami. \n\n Šifrovací kľúč je uložený iba v tvojom zariadení - DuckDuckGo k nemu nemá prístup.</string>
@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Zobraziť textový kód</string>
     <string name="sync_show_qr_code_item">Skenovanie kódu QR</string>
     <string name="sync_save_recovery_code_item">Uložiť obnovovací PDF súbor</string>
-    <string name="sync_delete_account_item">Vypnúť a zmazať údaje servera…</string>
-    <string name="sync_disable_sync_item">Vypnúť Synchronizáciu a zálohovanie…</string>
+    <string name="sync_delete_account_item">Vypnúť a zmazať údaje servera...</string>
+    <string name="sync_disable_sync_item">Vypnúť Synchronizáciu a zálohovanie...</string>
     <string name="sync_enable_sync_next_button">Ďalšie</string>
     <string name="sync_recovery_code_content">Ak stratíte prístup k zariadeniam, budete tento kód potrebovať na obnovenie synchronizovaných údajov.</string>
     <string name="sync_recovery_code_hint">Každý, kto má prístup k tomuto kódu, má prístup k vašim synchronizovaným údajom, takže ich uchovávajte na bezpečnom mieste.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Vypnúť</string>
     <string name="turn_off_sync_dialog_secondary_button">Zrušiť</string>
     <string name="sync_permission_required_store_recovery_code">Uloženie PDF na obnovenie vyžaduje povolenie na ukladanie</string>
-    <string name="sync_share_title">Zdieľať s…</string>
+    <string name="sync_share_title">Zdieľať s...</string>
     <string name="sync_pdf_title">Kód obnovenia synchronizácie</string>
     <string name="sync_pdf_description">Obnovovací kód vám umožňuje synchronizovať záložky medzi viacerými zariadeniami a obnoviť synchronizované údaje, ak stratíte prístup k zariadeniu.</string>
     <string name="sync_code_box_title">Uchovajte tieto informácie v bezpečí.</string>

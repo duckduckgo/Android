@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Parinktys</string>
     <string name="sync_enable_option_favicons_title">Gauti žymių piktogramas</string>
     <string name="sync_enable_option_favicons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
-    <string name="sync_enable_connecting">Jungiamasi…</string>
+    <string name="sync_enable_connecting">Jungiamasi...</string>
     <string name="sync_intro_enable_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
     <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Tai sukuria užšifruotą jūsų žymių, slaptažodžių ir Duck.ai pokalbių atsarginę kopiją “DuckDuckGo” saugiame serveryje, kurią galima sinchronizuoti su kitais jūsų įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
@@ -108,7 +108,7 @@
     <string name="sync_show_qr_code_item">Nuskaityti QR kodą</string>
     <string name="sync_save_recovery_code_item">Išsaugoti atkūrimo PDF</string>
     <string name="sync_delete_account_item">Išjungti ir ištrinti serverio duomenis…</string>
-    <string name="sync_disable_sync_item">Išjungti sinchronizavimą ir atsarginės kopijos kūrimą…</string>
+    <string name="sync_disable_sync_item">Išjungti sinchronizavimą ir atsarginės kopijos kūrimą...</string>
     <string name="sync_enable_sync_next_button">Kitas</string>
     <string name="sync_recovery_code_content">Jei neteksite prieigos prie savo įrenginių, šio kodo reikės norint atkurti sinchronizuotus duomenis.</string>
     <string name="sync_recovery_code_hint">Kiekvienas, turintis prieigą prie šio kodo, gali pasiekti jūsų sinchronizuotus duomenis, todėl prašome laikyti juos saugioje vietoje.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Išjungti</string>
     <string name="turn_off_sync_dialog_secondary_button">Atšaukti</string>
     <string name="sync_permission_required_store_recovery_code">Išsaugoti atkūrimo PDF reikia saugojimo leidimo</string>
-    <string name="sync_share_title">Dalintis su…</string>
+    <string name="sync_share_title">Dalintis su...</string>
     <string name="sync_pdf_title">Sinchronizuoti atkūrimo kodą</string>
     <string name="sync_pdf_description">Atkūrimo kodas leidžia sinchronizuoti žymes keliuose įrenginiuose ir atkurti sinchronizuotus duomenis, jei prarandate prieigą prie įrenginio.</string>
     <string name="sync_code_box_title">Saugokite šią informaciją.</string>

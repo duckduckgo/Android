@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Opcije</string>
     <string name="sync_enable_option_favicons_title">Dohvaćanje ikona knjižnih oznaka</string>
     <string name="sync_enable_option_favicons_subtitle">Automatski preuzmi ikone za sinkronizirane oznake.</string>
-    <string name="sync_enable_connecting">Povezivanje u tijeku…</string>
+    <string name="sync_enable_connecting">Povezivanje u tijeku...</string>
     <string name="sync_intro_enable_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
     <string name="sync_intro_enable_content">Time se stvara šifrirana sigurnosna kopija tvojih oznaka i lozinki na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Time se stvara šifrirana sigurnosna kopija tvojih oznaka, lozinki i Duck.ai čavrljanja na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Isključi</string>
     <string name="turn_off_sync_dialog_secondary_button">Odustani</string>
     <string name="sync_permission_required_store_recovery_code">Spremanje PDF za oporavak zahtijeva dopuštenje za pohranu</string>
-    <string name="sync_share_title">Podijeli s…</string>
+    <string name="sync_share_title">Podijeli s...</string>
     <string name="sync_pdf_title">Šifra za oporavak sinkronizacije</string>
     <string name="sync_pdf_description">Šifra za oporavak omogućuje ti sinkronizaciju oznaka na više uređaja i oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
     <string name="sync_code_box_title">Čuvaj ove podatke na sigurnom.</string>

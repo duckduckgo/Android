@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Opties</string>
     <string name="sync_enable_option_favicons_title">Bladwijzerpictogrammen ophalen</string>
     <string name="sync_enable_option_favicons_subtitle">Download automatisch pictogrammen voor gesynchroniseerde bladwijzers.</string>
-    <string name="sync_enable_connecting">Er wordt verbinding gemaakt …</string>
+    <string name="sync_enable_connecting">Er wordt verbinding gemaakt ...</string>
     <string name="sync_intro_enable_title">Dit apparaat synchroniseren en back-up maken</string>
     <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Hiermee maak je een versleutelde back-up van je bladwijzers, wachtwoorden en Duck.ai-chats op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
@@ -107,8 +107,8 @@
     <string name="sync_show_text_code_item">Tekstcode weergeven</string>
     <string name="sync_show_qr_code_item">QR-code scannen</string>
     <string name="sync_save_recovery_code_item">PDF voor herstel opslaan</string>
-    <string name="sync_delete_account_item">Servergegevens uitschakelen en verwijderen …</string>
-    <string name="sync_disable_sync_item">\'Synchronisatie en back-up\' uitschakelen …</string>
+    <string name="sync_delete_account_item">Servergegevens uitschakelen en verwijderen ...</string>
+    <string name="sync_disable_sync_item">\'Synchronisatie en back-up\' uitschakelen ...</string>
     <string name="sync_enable_sync_next_button">Volgende</string>
     <string name="sync_recovery_code_content">Als je geen toegang meer hebt tot je apparaten, heb je deze code nodig om je gesynchroniseerde gegevens te herstellen.</string>
     <string name="sync_recovery_code_hint">Iedereen met toegang tot deze code kan bij je gesynchroniseerde gegevens. Bewaar de code daarom op een veilige plek.</string>
@@ -118,7 +118,7 @@
     <string name="turn_off_sync_dialog_primary_button">Uitschakelen</string>
     <string name="turn_off_sync_dialog_secondary_button">Annuleren</string>
     <string name="sync_permission_required_store_recovery_code">We hebben toegang tot je opslag nodig om het PDF-bestand met herstelgegevens op te slaan</string>
-    <string name="sync_share_title">Delen met…</string>
+    <string name="sync_share_title">Delen met...</string>
     <string name="sync_pdf_title">Herstelcode synchroniseren</string>
     <string name="sync_pdf_description">Met de herstelcode kun je je bladwijzers synchroniseren op meerdere apparaten en je gesynchroniseerde gegevens herstellen als je geen toegang meer hebt tot een apparaat.</string>
     <string name="sync_code_box_title">Bewaar deze informatie veilig.</string>

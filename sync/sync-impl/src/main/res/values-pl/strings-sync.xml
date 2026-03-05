@@ -50,7 +50,7 @@
     <string name="sync_enable_options">Opcje</string>
     <string name="sync_enable_option_favicons_title">Pobierz ikony zakładek</string>
     <string name="sync_enable_option_favicons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
-    <string name="sync_enable_connecting">Łączenie…</string>
+    <string name="sync_enable_connecting">Łączenie...</string>
     <string name="sync_intro_enable_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
     <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
     <string name="sync_intro_enable_content_with_ai_chat">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek, haseł i czatów Duck.ai, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.</string>
@@ -107,7 +107,7 @@
     <string name="sync_show_text_code_item">Pokaż kod tekstowy</string>
     <string name="sync_show_qr_code_item">Zeskanuj kod QR</string>
     <string name="sync_save_recovery_code_item">Zapisz PDF odzyskiwania</string>
-    <string name="sync_delete_account_item">Wyłącz i usuń dane serwera…</string>
+    <string name="sync_delete_account_item">Wyłącz i usuń dane serwera...</string>
     <string name="sync_disable_sync_item">Wyłącz synchronizację i kopię zapasową…</string>
     <string name="sync_enable_sync_next_button">Dalej</string>
     <string name="sync_recovery_code_content">Jeśli utracisz dostęp do swoich urządzeń, będziesz potrzebować tego kodu, aby odzyskać zsynchronizowane dane.</string>
