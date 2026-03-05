@@ -775,7 +775,7 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataWithDuckAiTabButChatsClearingDisabled_thenDoNotDeleteChat() = runTest {
+    fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfManualOptions() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
         whenever(mockDuckChat.extractChatId("https://duck.ai/chat?chatID=abc-123")).thenReturn("abc-123")
@@ -783,16 +783,25 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer, never()).deleteChat(any())
+        verify(mockDuckAiChatClearer).deleteChat("abc-123")
     }
 
     @Test
-    fun whenClearSingleTabDataWithDuckAiTabButFeatureDisabled_thenDoNotDeleteChat() = runTest {
+    fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfFeatureFlag() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
         whenever(mockDuckChat.extractChatId("https://duck.ai/chat?chatID=abc-123")).thenReturn("abc-123")
-        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
         showClearDuckAIChatHistoryFlow.value = false
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckAiChatClearer).deleteChat("abc-123")
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNullTabUrl_thenDoNotDeleteChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
 
         testee.clearSingleTabData("tab1")
 
