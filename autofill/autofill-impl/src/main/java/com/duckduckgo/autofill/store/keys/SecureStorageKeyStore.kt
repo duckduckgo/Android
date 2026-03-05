@@ -167,27 +167,27 @@ class RealSecureStorageKeyStore constructor(
         withContext(dispatcherProvider.io()) {
             val legacyPrefs = getEncryptedPreferences().also {
                 if (it == null) {
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
-                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
-                    }
                     pixel.fire(
                         AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
+                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                    }
                 }
             }
 
             val harmonyPrefs = getHarmonyEncryptedPreferences().also {
                 if (it == null && useHarmony()) {
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
-                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
-                    }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
+                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
+                    }
                 }
             }
 
@@ -236,14 +236,14 @@ class RealSecureStorageKeyStore constructor(
                 }.getOrElse {
                     ensureActive()
                     // Rollback legacy write so we don't cause a corrupted state with out of sync files
-                    if (keyValue != null && autofillFeature.addWriteGuard().isEnabled()) {
-                        legacyPrefs?.edit(commit = true) { remove(keyName) }
-                    }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
                         getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
+                    if (keyValue != null && autofillFeature.addWriteGuard().isEnabled()) {
+                        legacyPrefs?.edit(commit = true) { remove(keyName) }
+                    }
                     throw it
                 }
             }
