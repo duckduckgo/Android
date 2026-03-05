@@ -16,11 +16,8 @@
 
 package com.duckduckgo.autofill.store.keys
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -74,13 +71,13 @@ interface SecureStorageKeyStore {
     suspend fun canUseEncryption(): Boolean
 }
 
-class RealSecureStorageKeyStore constructor(
-    private val context: Context,
+class RealSecureStorageKeyStore(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
+    private val encryptedPreferencesFactory: EncryptedPreferencesFactory,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
@@ -96,15 +93,7 @@ class RealSecureStorageKeyStore constructor(
         coroutineScope.async(dispatcherProvider.io()) {
             try {
                 mutex.withLock {
-                    EncryptedSharedPreferences.create(
-                        context,
-                        FILENAME,
-                        MasterKey.Builder(context)
-                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                            .build(),
-                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-                    )
+                    encryptedPreferencesFactory.create(FILENAME)
                 }
             } catch (e: Exception) {
                 coroutineContext.ensureActive()
