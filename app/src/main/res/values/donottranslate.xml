@@ -91,4 +91,7 @@
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site data could not be deleted. Please update WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Site data could not be deleted due to an error.</string>
 
+    <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
+    <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that keeps you protected?</string>
+
 </resources>
