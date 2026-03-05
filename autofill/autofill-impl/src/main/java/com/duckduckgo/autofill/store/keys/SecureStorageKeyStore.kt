@@ -168,14 +168,18 @@ class RealSecureStorageKeyStore(
                 }
             }
 
-            val harmonyPrefs = getHarmonyEncryptedPreferences().also {
-                if (it == null && useHarmony()) {
-                    pixel.fire(
-                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
-                        getPixelParams(keyName = keyName),
-                        type = Daily(),
-                    )
-                    throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
+            val harmonyPrefs = if (!useHarmony()) {
+                null
+            } else {
+                getHarmonyEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
+                    }
                 }
             }
 
@@ -289,15 +293,19 @@ class RealSecureStorageKeyStore(
                 }
             }
 
-            val harmonyPrefs = getHarmonyEncryptedPreferences().also {
-                if (it == null && useHarmony()) {
-                    pixel.fire(
-                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
-                        getPixelParams(keyName = keyName),
-                        type = Daily(),
-                    )
-                    if (readFromHarmony()) {
-                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
+            val harmonyPrefs = if (!useHarmony()) {
+                null
+            } else {
+                getHarmonyEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        if (readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
+                        }
                     }
                 }
             }
