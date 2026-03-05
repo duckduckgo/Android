@@ -90,7 +90,12 @@ class RealSecureStorageKeyStore constructor(
 
     private fun useHarmony(): Boolean = autofillFeature.useHarmony().isEnabled()
 
-    private fun readFromHarmony(): Boolean = autofillFeature.readFromHarmony().isEnabled()
+    private fun readFromHarmony(): Boolean = autofillFeature.useHarmony().isEnabled() && autofillFeature.readFromHarmony().isEnabled()
+
+    private fun addWriteGuard(): Boolean = autofillFeature.useHarmony().isEnabled() && autofillFeature.addWriteGuard().isEnabled()
+
+    private fun addReadGuard(): Boolean = autofillFeature.useHarmony().isEnabled() && autofillFeature.addReadGuard().isEnabled()
+
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
@@ -172,7 +177,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                    if (addWriteGuard()) {
                         throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
                     }
                 }
@@ -185,7 +190,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                    if (addWriteGuard()) {
                         throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
                     }
                 }
@@ -201,7 +206,7 @@ class RealSecureStorageKeyStore constructor(
                     getPixelParams(keyName = keyName),
                     type = Daily(),
                 )
-                if (autofillFeature.addWriteGuard().isEnabled()) {
+                if (addWriteGuard()) {
                     throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
                 }
             }
@@ -241,7 +246,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
-                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                    if (addWriteGuard()) {
                         if (keyValue != null) {
                             runCatching {
                                 legacyPrefs?.edit(commit = true) { remove(keyName) }
@@ -297,7 +302,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                    if (addReadGuard() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
                     }
                 }
@@ -310,7 +315,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                    if (addReadGuard() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
                     }
                 }
@@ -343,7 +348,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
-                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                    if (addReadGuard() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
                     }
                     null
@@ -356,7 +361,7 @@ class RealSecureStorageKeyStore constructor(
                             getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
-                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                        if (addReadGuard() && readFromHarmony()) {
                             throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
                         }
                     }
@@ -366,7 +371,7 @@ class RealSecureStorageKeyStore constructor(
                             getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
-                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                        if (addReadGuard() && readFromHarmony()) {
                             throw SecureStorageException.InternalSecureStorageException("Legacy key missing")
                         }
                     }
@@ -376,7 +381,7 @@ class RealSecureStorageKeyStore constructor(
                             getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
-                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                        if (addReadGuard() && readFromHarmony()) {
                             throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
                         }
                     }
@@ -400,10 +405,11 @@ class RealSecureStorageKeyStore constructor(
 
     private fun getPixelParams(keyName: String? = null, throwable: Throwable? = null) = buildMap {
         keyName?.let { put("key", it) }
-        put("addWriteGuard", autofillFeature.addWriteGuard().isEnabled().toString())
-        put("addReadGuard", autofillFeature.addReadGuard().isEnabled().toString())
+        put("addWriteGuard", addWriteGuard().toString())
+        put("addReadGuard", addReadGuard().toString())
+        put("useHarmony", useHarmony().toString())
         put("initialHarmonyValue", initialUseHarmonyValue.toString())
-        put("readFromHarmony", autofillFeature.readFromHarmony().isEnabled().toString())
+        put("readFromHarmony", readFromHarmony().toString())
         throwable?.error()?.let { put("error", it) }
     }
 
