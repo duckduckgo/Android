@@ -181,6 +181,18 @@ class RealHistoryRepositoryTest {
         assertEquals(1, result!!.size)
     }
 
+    @Test
+    fun whenUpdateHistoryMetadataThenDaoUpdateMetadataCalled() = runTest {
+        testee.updateHistoryMetadata("https://example.com", "A description", "A heading")
+        verify(mockHistoryDao).updateMetadata("https://example.com", "A description", "A heading")
+    }
+
+    @Test
+    fun whenUpdateHistoryMetadataWithNullFieldsThenDaoCalledWithNulls() = runTest {
+        testee.updateHistoryMetadata("https://example.com", null, null)
+        verify(mockHistoryDao).updateMetadata("https://example.com", null, null)
+    }
+
     private fun historyEntryWithVisits(
         url: String,
         title: String,

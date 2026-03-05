@@ -237,4 +237,17 @@ class HistoryTest {
 
         assertFalse(testee.hasHistory())
     }
+
+    @Test
+    fun whenHistoryDisabledThenUpdateHistoryMetadataIsNoOp() = runTest {
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
+        testee.updateHistoryMetadata("https://example.com", "desc", "heading")
+        verify(mockHistoryRepository, never()).updateHistoryMetadata(any(), any(), any())
+    }
+
+    @Test
+    fun whenHistoryEnabledThenUpdateHistoryMetadataDelegatesToRepository() = runTest {
+        testee.updateHistoryMetadata("https://example.com", "desc", "heading")
+        verify(mockHistoryRepository).updateHistoryMetadata("https://example.com", "desc", "heading")
+    }
 }
