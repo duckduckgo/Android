@@ -464,9 +464,12 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                 element = vmClass.clazz.identifyingElement,
             )
         }
-        check(!parentFeatureName.contains("__")) {
-            "${vmClass.fqName}: parentFeatureName must not contain \"__\" — it is used as a separator in deferred validation marker class names " +
-                "(got \"$parentFeatureName\")."
+        if (parentFeatureName.contains("__")) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: parentFeatureName can't contain \"__\" — it's used as a separator in deferred validation marker class names " +
+                    "(got \"$parentFeatureName\").",
+                element = vmClass.clazz.identifyingElement,
+            )
         }
 
         // Validate parentFeatureName.
