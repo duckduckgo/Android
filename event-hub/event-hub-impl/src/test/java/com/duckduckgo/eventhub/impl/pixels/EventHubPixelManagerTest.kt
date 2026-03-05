@@ -1119,19 +1119,17 @@ class EventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged clears state and timers atomically when feature disabled`() {
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3))
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(repository).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
         verify(repository).deleteAllPixelStates()
     }
 
@@ -2104,7 +2102,6 @@ class EventHubPixelManagerTest {
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
         val savedState = captor.firstValue
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -2127,46 +2124,32 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `scheduleFireTelemetry does not double-schedule same pixel`() {
-        manager.scheduleFireTelemetry("test_pixel", 5000L)
-        assertTrue(manager.hasScheduledTimer("test_pixel"))
+    fun `onConfigChanged cancels all timers when feature disabled - no pixel fires after delay`() {
+        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
-        manager.scheduleFireTelemetry("test_pixel", 10000L)
-        assertTrue(manager.hasScheduledTimer("test_pixel"))
-    }
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("pixel_a")).thenReturn(null)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(null)
+        manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
-    @Test
-    fun `cancelScheduledFire removes pending timer`() {
-        manager.scheduleFireTelemetry("test_pixel", 60_000L)
-        assertTrue(manager.hasScheduledTimer("test_pixel"))
-
-        manager.cancelScheduledFire("test_pixel")
-        assertFalse(manager.hasScheduledTimer("test_pixel"))
-    }
-
-    @Test
-    fun `cancelScheduledFire on non-existent timer is a no-op`() {
-        manager.cancelScheduledFire("nonexistent")
-        assertFalse(manager.hasScheduledTimer("nonexistent"))
-    }
-
-    @Test
-    fun `onConfigChanged cancels all timers when feature disabled`() {
-        manager.scheduleFireTelemetry("pixel_a", 60_000L)
-        manager.scheduleFireTelemetry("pixel_b", 120_000L)
-        assertTrue(manager.hasScheduledTimer("pixel_a"))
-        assertTrue(manager.hasScheduledTimer("pixel_b"))
+        verify(repository, times(2)).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        assertFalse(manager.hasScheduledTimer("pixel_a"))
-        assertFalse(manager.hasScheduledTimer("pixel_b"))
+        org.mockito.Mockito.reset(pixel)
+        testScope.testScheduler.advanceTimeBy(121_000L)
+        testScope.testScheduler.runCurrent()
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `fireTelemetry cancels existing timer before re-registering`() {
+    fun `checkPixels fires expired pixel and starts new period`() {
         val periodStart = 1000L
         val periodEnd = periodStart + 60_000L
         timeProvider.time = periodEnd + 1
@@ -2174,38 +2157,40 @@ class EventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        manager.checkPixels()
+        testScope.testScheduler.runCurrent()
+
+        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
+    fun `checkPixels schedules timer for active pixel that fires after delay`() {
+        val periodEnd = timeProvider.time + 60_000L
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5), periodEnd = periodEnd)
+        stubPixelStates(state)
 
         manager.checkPixels()
         testScope.testScheduler.runCurrent()
 
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state, null)
+        timeProvider.time = periodEnd + 1
+        testScope.testScheduler.advanceTimeBy(60_001L)
+        testScope.testScheduler.runCurrent()
+
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `checkPixels reschedules timers for active pixels`() {
-        val periodEnd = timeProvider.time + 60_000L
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd)
-        stubPixelStates(state)
-
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-
-        manager.checkPixels()
-        testScope.testScheduler.runCurrent()
-
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-    }
-
-    @Test
-    fun `checkPixels does not reschedule timers when feature disabled`() {
+    fun `checkPixels does not fire when feature disabled`() {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
         testScope.testScheduler.runCurrent()
 
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(repository, never()).getAllPixelStates()
     }
 
     @Test
@@ -2270,7 +2255,6 @@ class EventHubPixelManagerTest {
         verify(repository).savePixelState(newCaptor.capture())
         assertEquals(timeProvider.time, newCaptor.firstValue.periodStartMillis)
         assertEquals(0, newCaptor.firstValue.params.mapValues { it.value.value }["count"])
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
 
     @Test
@@ -2285,9 +2269,6 @@ class EventHubPixelManagerTest {
         manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        assertTrue(manager.hasScheduledTimer("pixel_a"))
-        assertTrue(manager.hasScheduledTimer("pixel_b"))
-
         val savedStates = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
         val stateA = savedStates.allValues.find { it.pixelName == "pixel_a" }!!
@@ -2298,44 +2279,66 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `timer clears scheduledTimers entry when feature disabled`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-
-        whenever(selfToggle.isEnabled()).thenReturn(false)
-
-        testScope.testScheduler.advanceTimeBy(1001L)
+    fun `timer does not fire pixel when feature disabled at expiry`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `timer clears scheduledTimers entry when pixel state missing`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    fun `timer does not fire when pixel state is missing at expiry`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
+        val initCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(initCaptor.capture())
+
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
-        testScope.testScheduler.advanceTimeBy(1001L)
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
         testScope.testScheduler.runCurrent()
 
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `timer cleanup allows rescheduling after feature disable and re-enable`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 1000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+    fun `new period can be started after feature disable and re-enable`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
+        verify(repository).savePixelState(any())
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
-        testScope.testScheduler.advanceTimeBy(1001L)
+        manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
-        assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        verify(repository).deleteAllPixelStates()
 
+        org.mockito.Mockito.reset(repository, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+
+        manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
+
+        verify(repository).savePixelState(any())
     }
 
     // --- race condition: timer expiry vs checkPixels ---
@@ -2351,7 +2354,6 @@ class EventHubPixelManagerTest {
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -2362,7 +2364,6 @@ class EventHubPixelManagerTest {
 
         timeProvider.time = initialState.periodEndMillis + 1
 
-        // checkPixels fires the pixel synchronously (simulating foreground)
         manager.checkPixels()
         testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
@@ -2371,12 +2372,12 @@ class EventHubPixelManagerTest {
         testScope.testScheduler.advanceTimeBy(periodMillis + 1)
         testScope.testScheduler.runCurrent()
 
-        // Still only 1 fire — the timer coroutine was cancelled via ensureActive()
+        // Still only 1 fire — the stale timer coroutine must not double-fire
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `cancelled timer does not remove newly scheduled timer from map`() {
+    fun `stale timer coroutine does not interfere with newly scheduled timer`() {
         timeProvider.time = 1000L
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
@@ -2401,30 +2402,35 @@ class EventHubPixelManagerTest {
         testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
-        // A new timer should exist for the new period
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-
-        // Run any pending continuations (the cancelled coroutine's ensureActive throws)
-        // but don't advance far enough for the NEW timer's delay to complete
+        // Run any pending continuations — the stale coroutine must not fire again
         testScope.testScheduler.runCurrent()
 
-        // New timer must still be present (not removed by the stale coroutine)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
+        // Still only 1 fire
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+        // New period was saved (proves the new timer was created)
+        verify(repository).savePixelState(any())
     }
 
     @Test
-    fun `timer cancelled between delay and fire does not execute fireTelemetry`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-
-        // Advance time so delay completes, but cancel before the scheduler runs the continuation
-        testScope.testScheduler.advanceTimeBy(5001L)
-        manager.cancelScheduledFire("webTelemetry_testPixel1")
+    fun `disabling feature before timer fires prevents pixel fire`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        // fireTelemetry should never have been called — no pixel fire, no DB delete
+        verify(repository).savePixelState(any())
+
+        // Disable feature before timer fires
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+        manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
+
+        org.mockito.Mockito.reset(pixel)
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-        verify(repository, never()).deletePixelState(any())
     }
 
     @Test
@@ -2437,7 +2443,6 @@ class EventHubPixelManagerTest {
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         // Simulate: timer delay elapses, but checkPixels runs first and fires + restarts
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
@@ -2465,22 +2470,36 @@ class EventHubPixelManagerTest {
     }
 
     @Test
-    fun `stale timer skips when its job no longer matches scheduledTimers entry`() {
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 5000L)
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
-
-        // Replace with a new timer (simulating cancelScheduledFire + scheduleFireTelemetry)
-        manager.cancelScheduledFire("webTelemetry_testPixel1")
-        manager.scheduleFireTelemetry("webTelemetry_testPixel1", 60_000L)
-
-        // Advance past old timer's delay but not new timer's
-        testScope.testScheduler.advanceTimeBy(5001L)
+    fun `stale timer from previous period does not fire after checkPixels restarts period`() {
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        manager.onConfigChanged()
         testScope.testScheduler.runCurrent()
 
-        // Old timer should have been a no-op — no pixel fire
+        val initCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(initCaptor.capture())
+        val initialState = initCaptor.firstValue
+
+        org.mockito.Mockito.reset(repository, pixel, selfToggle)
+        whenever(eventHubFeature.self()).thenReturn(selfToggle)
+        whenever(selfToggle.isEnabled()).thenReturn(true)
+        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
+
+        // checkPixels fires the expired pixel and starts a new period (with a new timer)
+        timeProvider.time = initialState.periodEndMillis + 1
+        manager.checkPixels()
+        testScope.testScheduler.runCurrent()
+        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
+
+        // Now advance past the OLD timer's original delay — it should be a no-op
+        org.mockito.Mockito.reset(pixel)
+        val periodMillis = TimeUnit.DAYS.toMillis(1)
+        testScope.testScheduler.advanceTimeBy(periodMillis + 1)
+        testScope.testScheduler.runCurrent()
+
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-        // New timer still scheduled
-        assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
 
     // --- foreground-gated cycles ---
