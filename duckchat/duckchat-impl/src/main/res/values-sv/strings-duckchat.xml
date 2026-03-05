@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Duck.ai i inställningarna för AI-funktioner.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Sammanfatta denna sida</string>
     <string name="duckAIContextualAutomaticContextTitle">Skicka sidinnehåll automatiskt</string>

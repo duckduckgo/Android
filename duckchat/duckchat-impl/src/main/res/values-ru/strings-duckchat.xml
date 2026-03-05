@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>
     <string name="duck_ai_paid_settings_manage_secondary">Параметры Duck.ai можно задать в разделе «Настройки функций ИИ».</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Кратко изложи содержимое страницы</string>
     <string name="duckAIContextualAutomaticContextTitle">Автоматически отправлять содержимое страницы</string>

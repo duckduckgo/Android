@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Halda tehisintellekti funktsioonide seadetes</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigureerige Duck.ai tehisintellekti funktsioonide seadetes.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Loo lehekülje kokkuvõte</string>
     <string name="duckAIContextualAutomaticContextTitle">Saada lehe sisu automaatselt</string>

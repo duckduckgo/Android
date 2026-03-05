@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Διαχείριση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_secondary">Διαμόρφωση του Duck.ai στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Συνοψίστε αυτήν τη σελίδα</string>
     <string name="duckAIContextualAutomaticContextTitle">Αυτόματη αποστολή περιεχομένου σελίδας</string>

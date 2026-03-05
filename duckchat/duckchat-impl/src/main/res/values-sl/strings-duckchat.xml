@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>

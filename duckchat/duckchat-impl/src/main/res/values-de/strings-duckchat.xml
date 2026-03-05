@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">In Einstellungen für KI-Funktionen verwalten</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfiguriere Duck.ai in den Einstellungen für KI-Funktionen.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Diese Seite zusammenfassen</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatisch Seiteninhalte senden</string>

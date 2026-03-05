@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Hallinnoi tekoälyominaisuuksien asetuksissa</string>
     <string name="duck_ai_paid_settings_manage_secondary">Määritä Duck.ai tekoälyominaisuuksien asetuksissa.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Yhteenveto tästä sivusta</string>
     <string name="duckAIContextualAutomaticContextTitle">Lähetä sivun sisältö automaattisesti</string>

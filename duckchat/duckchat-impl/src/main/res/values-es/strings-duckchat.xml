@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Administrar en la configuración de funciones de IA</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configura Duck.ai en los ajustes de funciones de IA.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Resumir esta página</string>
     <string name="duckAIContextualAutomaticContextTitle">Enviar contenido de la página automáticamente</string>

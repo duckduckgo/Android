@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Gestionează în setările funcțiilor IA</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configurează Duck.ai în setările funcțiilor IA.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Rezumă această pagină</string>
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>

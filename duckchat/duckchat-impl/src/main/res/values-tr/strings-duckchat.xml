@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">AI Özellikleri Ayarlarında Yönet</string>
     <string name="duck_ai_paid_settings_manage_secondary">AI Özellikleri ayarlarından Duck.ai\'ı yapılandırın.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Bu Sayfayı Özetle</string>
     <string name="duckAIContextualAutomaticContextTitle">Sayfa İçeriğini Otomatik Olarak Gönder</string>

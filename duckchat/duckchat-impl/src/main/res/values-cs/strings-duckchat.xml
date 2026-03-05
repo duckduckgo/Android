@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Spravovat v nastavení funkcí AI</string>
     <string name="duck_ai_paid_settings_manage_secondary">Nakonfiguruj Duck.ai v nastavení funkcí AI.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Shrnout tuhle stránku</string>
     <string name="duckAIContextualAutomaticContextTitle">Automaticky odesílat obsah stránky</string>

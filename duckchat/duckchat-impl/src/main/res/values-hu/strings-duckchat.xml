@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Kezelés az AI-funkciók beállításaiban</string>
     <string name="duck_ai_paid_settings_manage_secondary">A Duck.ai az AI-funkciók beállításaiban konfigurálható.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Oldal összefoglalása</string>
     <string name="duckAIContextualAutomaticContextTitle">Oldal tartalmának automatikus küldése</string>

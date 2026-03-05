@@ -94,7 +94,6 @@
     <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Duck.ai“ DI funkcijų nustatymuose.</string>
 
-
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Apibendrinti šį puslapį</string>
     <string name="duckAIContextualAutomaticContextTitle">Automatiškai siųsti puslapio turinį</string>
