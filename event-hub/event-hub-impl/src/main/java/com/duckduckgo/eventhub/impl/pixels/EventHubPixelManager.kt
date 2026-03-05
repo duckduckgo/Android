@@ -28,11 +28,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 interface EventHubPixelManager {
@@ -54,12 +55,12 @@ class RealEventHubPixelManager @Inject constructor(
     private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
 
-    @Volatile
-    private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
+    private val mutex = Mutex()
 
-    private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
-    private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
-    private val scheduledTimers = ConcurrentHashMap<String, Job>()
+    private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
+    private val dedupSeen = mutableSetOf<String>()
+    private val webViewCurrentUrl = mutableMapOf<String, String>()
+    private val scheduledTimers = mutableMapOf<String, Job>()
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
@@ -71,49 +72,53 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun onNavigationStarted(webViewId: String, url: String) {
         if (webViewId.isEmpty() || url.isEmpty()) return
-        val previousUrl = webViewCurrentUrl.put(webViewId, url)
-        if (previousUrl != null && previousUrl != url) {
-            logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
-            dedupSeen.removeAll { it.endsWith(":$webViewId") }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                val previousUrl = webViewCurrentUrl.put(webViewId, url)
+                if (previousUrl != null && previousUrl != url) {
+                    logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
+                    dedupSeen.removeAll { it.endsWith(":$webViewId") }
+                }
+            }
         }
     }
 
     override fun handleWebEvent(data: JSONObject, webViewId: String) {
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
-
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                val nowMillis = timeProvider.currentTimeMillis()
+                for (pixelState in repository.getAllPixelStates()) {
+                    if (nowMillis > pixelState.periodEndMillis) continue
 
-        synchronized(this) {
-            for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis > pixelState.periodEndMillis) continue
+                    val params = pixelState.params
+                    var changed = false
 
-                val params = pixelState.params
-                var changed = false
+                    for ((paramName, paramConfig) in pixelState.config.parameters) {
+                        if (paramConfig.isCounter && paramConfig.source == eventType) {
+                            val paramState = params[paramName] ?: ParamState(0)
+                            if (paramState.stopCounting) continue
+                            if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
-                for ((paramName, paramConfig) in pixelState.config.parameters) {
-                    if (paramConfig.isCounter && paramConfig.source == eventType) {
-                        val paramState = params[paramName] ?: ParamState(0)
-                        if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
+                            changed = true
+                            if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
+                                params[paramName] = paramState.copy(stopCounting = true)
+                                logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
+                                continue
+                            }
 
-                        changed = true
-                        if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
-                            params[paramName] = paramState.copy(stopCounting = true)
-                            logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
-                            continue
+                            val newValue = paramState.value + 1
+                            params[paramName] = paramState.copy(value = newValue)
+                            logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                         }
-
-                        val newValue = paramState.value + 1
-                        params[paramName] = paramState.copy(value = newValue)
-                        logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                     }
-                }
 
-                if (changed) {
-                    repository.savePixelState(pixelState)
+                    if (changed) {
+                        repository.savePixelState(pixelState)
+                    }
                 }
             }
         }
@@ -139,40 +144,43 @@ class RealEventHubPixelManager @Inject constructor(
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
-
-        synchronized(this) {
-            for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis >= pixelState.periodEndMillis) {
-                    fireTelemetry(pixelState)
-                } else {
-                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                val nowMillis = timeProvider.currentTimeMillis()
+                for (pixelState in repository.getAllPixelStates()) {
+                    if (nowMillis >= pixelState.periodEndMillis) {
+                        fireTelemetry(pixelState)
+                    } else {
+                        scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+                    }
                 }
-            }
 
-            for (pixelConfig in getTelemetryConfigs()) {
-                if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                for (pixelConfig in getTelemetryConfigs()) {
+                    if (repository.getPixelState(pixelConfig.name) == null) {
+                        startNewPeriod(pixelConfig)
+                    }
                 }
             }
         }
     }
 
     override fun onConfigChanged() {
-        synchronized(this) {
-            cachedTelemetryConfigs = null
-            if (!isFeatureEnabled()) {
-                logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-                cancelAllTimers()
-                repository.deleteAllPixelStates()
-                return
-            }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                cachedTelemetryConfigs = null
+                if (!isFeatureEnabled()) {
+                    logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
+                    cancelAllTimers()
+                    repository.deleteAllPixelStates()
+                    return@launch
+                }
 
-            val telemetry = getTelemetryConfigs()
-            logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
-            for (pixelConfig in telemetry) {
-                if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                val telemetry = getTelemetryConfigs()
+                logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+                for (pixelConfig in telemetry) {
+                    if (repository.getPixelState(pixelConfig.name) == null) {
+                        startNewPeriod(pixelConfig)
+                    }
                 }
             }
         }
@@ -190,11 +198,11 @@ class RealEventHubPixelManager @Inject constructor(
             ensureActive()
 
             if (!isFeatureEnabled()) {
-                scheduledTimers.remove(pixelName)
+                mutex.withLock { scheduledTimers.remove(pixelName) }
                 return@launch
             }
 
-            synchronized(this@RealEventHubPixelManager) {
+            mutex.withLock {
                 // Guard against stale timer: if checkPixels or fireTelemetry already replaced
                 // this job with a new one, this coroutine is stale and must not fire.
                 if (scheduledTimers[pixelName] !== coroutineContext[Job]) {

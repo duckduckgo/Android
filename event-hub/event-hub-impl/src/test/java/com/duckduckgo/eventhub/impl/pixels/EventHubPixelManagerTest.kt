@@ -114,6 +114,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -127,6 +128,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -138,6 +140,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<PixelState>()
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(1, captor.firstValue.params.mapValues { it.value.value }["count"])
@@ -149,6 +152,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(captor.capture())
         assertEquals(2, captor.secondValue.params.mapValues { it.value.value }["count"])
     }
@@ -160,6 +164,7 @@ class EventHubPixelManagerTest {
 
         val captor = argumentCaptor<PixelState>()
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository).savePixelState(captor.capture())
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
@@ -171,11 +176,13 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(captor.capture())
         // stopCounting prevents further changes
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(captor.capture())
         assertEquals(40, captor.firstValue.params.mapValues { it.value.value }["count"])
     }
@@ -186,6 +193,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -216,6 +224,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("evt"), "")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -230,6 +239,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -244,6 +254,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("unknownEvent"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -255,6 +266,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -267,6 +279,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -279,6 +292,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -289,6 +303,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -302,6 +317,7 @@ class EventHubPixelManagerTest {
             stubPixelStates(captor.firstValue)
 
             manager.handleWebEvent(webEventData("test"), "tab1")
+            testScope.testScheduler.runCurrent()
 
             verify(repository, never()).savePixelState(any())
         }
@@ -313,7 +329,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -327,7 +345,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -340,6 +360,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -353,6 +374,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(captor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -388,6 +410,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -402,6 +425,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -421,6 +445,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(stateA, stateB)
 
         manager.handleWebEvent(webEventData("evt"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -436,6 +461,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(savedA, savedB)
 
         manager.handleWebEvent(webEventData("evt"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -446,6 +472,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
@@ -458,6 +485,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
@@ -470,7 +498,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
@@ -483,7 +513,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
         assertEquals(2, second.firstValue.params.mapValues { it.value.value }["count"])
@@ -496,7 +528,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val third = argumentCaptor<PixelState>()
         verify(repository).savePixelState(third.capture())
         assertEquals(3, third.firstValue.params.mapValues { it.value.value }["count"])
@@ -511,15 +545,18 @@ class EventHubPixelManagerTest {
 
         // Event on page A
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["count"])
 
         // Navigate to page B (no event fires) — onNavigationStarted called by JsInjectorPlugin
         manager.onNavigationStarted("tab1", "https://example.com/pageB")
+        testScope.testScheduler.runCurrent()
 
         // Navigate back to page A (no event fires) — onNavigationStarted called again
         manager.onNavigationStarted("tab1", "https://example.com/pageA")
+        testScope.testScheduler.runCurrent()
 
         // Event on page A again — must NOT be deduplicated
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -529,6 +566,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -541,11 +579,13 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
         // onNavigationStarted with same URL (e.g. reload) — should not clear dedup
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(repository, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -554,6 +594,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -564,11 +605,13 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
         // onNavigationStarted with empty webViewId — should not affect state
         manager.onNavigationStarted("", "https://example.com/page2")
+        testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(repository, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
@@ -578,6 +621,7 @@ class EventHubPixelManagerTest {
 
         // Same tab, same URL — still deduped because onNavigationStarted was a no-op
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -589,6 +633,7 @@ class EventHubPixelManagerTest {
 
         // Events on tab1 and tab2
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
 
@@ -599,11 +644,13 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
+        testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
 
         // Navigate tab1 to a different URL
         manager.onNavigationStarted("tab1", "https://example.com/page2")
+        testScope.testScheduler.runCurrent()
 
         // Tab2 should still be deduped (onNavigationStarted only cleared tab1)
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -613,6 +660,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
+        testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
     }
 
@@ -648,7 +696,9 @@ class EventHubPixelManagerTest {
 
         // "test" event on page1
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
         assertEquals(1, first.firstValue.params.mapValues { it.value.value }["testCount"])
@@ -661,7 +711,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page2")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("trackerBlocked"), "tab1")
+        testScope.testScheduler.runCurrent()
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
         assertEquals(1, second.firstValue.params.mapValues { it.value.value }["trackerCount"])
@@ -674,7 +726,9 @@ class EventHubPixelManagerTest {
         stubPixelStates(second.firstValue)
 
         manager.onNavigationStarted("tab1", "https://example.com/page1")
+        testScope.testScheduler.runCurrent()
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val third = argumentCaptor<PixelState>()
         verify(repository).savePixelState(third.capture())
         assertEquals(2, third.firstValue.params.mapValues { it.value.value }["testCount"])
@@ -687,6 +741,7 @@ class EventHubPixelManagerTest {
 
         // Tab 1 fires event
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         val firstCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(firstCaptor.capture())
         assertEquals(1, firstCaptor.firstValue.params.mapValues { it.value.value }["count"])
@@ -699,6 +754,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(firstCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
+        testScope.testScheduler.runCurrent()
         val secondCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(secondCaptor.capture())
         assertEquals(2, secondCaptor.firstValue.params.mapValues { it.value.value }["count"])
@@ -711,6 +767,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(secondCaptor.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
     }
 
@@ -732,6 +789,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -762,6 +820,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -803,6 +862,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -823,6 +883,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val captor = argumentCaptor<PixelState>()
@@ -870,6 +931,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(disabledConfig)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         // Should STILL fire using stored config (per design: "still fire the telemetry, as it was enabled when initialised")
         verify(pixel).enqueueFire(
@@ -910,6 +972,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         // Fires the pixel
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -928,6 +991,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -940,6 +1004,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 5000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -952,6 +1017,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository).deleteAllPixelStates()
     }
@@ -962,6 +1028,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(existingState)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -990,6 +1057,7 @@ class EventHubPixelManagerTest {
         manager = RealEventHubPixelManager(repository, pixel, timeProvider, testScope, dispatcherProvider, foregroundState, eventHubFeature)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -999,6 +1067,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository).deleteAllPixelStates()
     }
@@ -1008,6 +1077,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(null)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1018,6 +1088,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state)
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1028,6 +1099,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, times(1)).savePixelState(captor.capture())
@@ -1040,6 +1112,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(captor.firstValue)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1051,10 +1124,12 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
         verify(repository).deleteAllPixelStates()
@@ -1111,6 +1186,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.handleWebEvent(webEventData("evt"), "")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1153,6 +1229,7 @@ class EventHubPixelManagerTest {
 
         // Event matches stored source ("evt"), not live source ("different_source")
         manager.handleWebEvent(webEventData("evt"), "")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1193,6 +1270,7 @@ class EventHubPixelManagerTest {
 
         // "new_source" matches live config but NOT stored config — should be ignored
         manager.handleWebEvent(webEventData("new_source"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1224,6 +1302,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1281,6 +1360,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         // Attribution period must be based on stored 120s period, not live 1hr
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
@@ -1338,6 +1418,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         // The NEW period should use the latest config (1 hour = 3600s = 3600000ms)
         verify(repository).deletePixelState("test_pixel")
@@ -1358,6 +1439,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 5000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1414,6 +1496,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
         whenever(repository.getPixelState("pixel_b")).thenReturn(null)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val savedStates = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedStates.capture())
@@ -1436,6 +1519,7 @@ class EventHubPixelManagerTest {
         val stateB1WithCount = stateB1.copy(params = mutableMapOf("count" to ParamState(3)))
         stubPixelStates(stateA1WithCount, stateB1WithCount)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
@@ -1444,6 +1528,7 @@ class EventHubPixelManagerTest {
 
         // Events still use config [1] stored in state
         manager.handleWebEvent(webEventData("evt"), "")
+        testScope.testScheduler.runCurrent()
 
         val savedAfterEvent = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterEvent.capture())
@@ -1465,6 +1550,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(updatedA, updatedB)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("pixel_a")
         verify(repository, never()).deletePixelState("pixel_b")
@@ -1485,6 +1571,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(config3)
         stubPixelStates(newStateA2, updatedB)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
         org.mockito.Mockito.reset(repository, pixel, selfToggle)
         whenever(eventHubFeature.self()).thenReturn(selfToggle)
         whenever(selfToggle.isEnabled()).thenReturn(true)
@@ -1492,6 +1579,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(newStateA2, updatedB)
 
         manager.handleWebEvent(webEventData("evt"), "")
+        testScope.testScheduler.runCurrent()
 
         val savedAfterConfig3 = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(savedAfterConfig3.capture())
@@ -1511,6 +1599,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(aAfter3, bAfter3)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(repository).deletePixelState("pixel_b")
         val savedAfterBFire = argumentCaptor<PixelState>()
@@ -1533,6 +1622,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState(any())).thenReturn(null)
 
         manager.handleWebEvent(webEventData("test"), "")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1544,6 +1634,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 3000L
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1597,6 +1688,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1609,6 +1701,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1621,6 +1714,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
@@ -1633,6 +1727,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(first.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "tab2")
+        testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -1655,6 +1750,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1675,6 +1771,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 42_000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1689,6 +1786,7 @@ class EventHubPixelManagerTest {
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         verify(repository, never()).savePixelState(any())
 
         org.mockito.Mockito.reset(repository, selfToggle)
@@ -1697,8 +1795,10 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         stubPixelStates(state)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
     }
 
@@ -1710,6 +1810,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val preFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(preFire.capture())
@@ -1723,6 +1824,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(preFire.firstValue)
 
         manager.handleWebEvent(webEventData("test"), "newTab1")
+        testScope.testScheduler.runCurrent()
 
         val postFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(postFire.capture())
@@ -1739,6 +1841,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val preFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(preFire.capture())
@@ -1754,6 +1857,7 @@ class EventHubPixelManagerTest {
 
         timeProvider.time = 10_000L
         manager.handleWebEvent(webEventData("test"), "newTab")
+        testScope.testScheduler.runCurrent()
 
         val postFire = argumentCaptor<PixelState>()
         verify(repository).savePixelState(postFire.capture())
@@ -1778,6 +1882,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1799,6 +1904,7 @@ class EventHubPixelManagerTest {
 
         // After fire button, new tab sends same event type — stopCounting still applied
         manager.handleWebEvent(webEventData("test"), "newTab")
+        testScope.testScheduler.runCurrent()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1818,6 +1924,7 @@ class EventHubPixelManagerTest {
 
         // Simulate fire button: new tab, but the stored config snapshot is preserved
         manager.handleWebEvent(webEventData("evt"), "newTab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -1837,6 +1944,7 @@ class EventHubPixelManagerTest {
 
         // Fire button happened — new tabs, same repository state
         manager.handleWebEvent(webEventData("evt"), "newTab1")
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository, org.mockito.kotlin.times(2)).savePixelState(captor.capture())
@@ -1853,6 +1961,7 @@ class EventHubPixelManagerTest {
 
         // Event on tab1 before fire button
         manager.handleWebEvent(webEventData("test"), "tab1")
+        testScope.testScheduler.runCurrent()
 
         val first = argumentCaptor<PixelState>()
         verify(repository).savePixelState(first.capture())
@@ -1867,6 +1976,7 @@ class EventHubPixelManagerTest {
 
         // Same URL in new tab — different webViewId means not deduped
         manager.handleWebEvent(webEventData("test"), "newTab1")
+        testScope.testScheduler.runCurrent()
 
         val second = argumentCaptor<PixelState>()
         verify(repository).savePixelState(second.capture())
@@ -1895,7 +2005,9 @@ class EventHubPixelManagerTest {
             }
             stubPixelStates(currentState)
             manager.onNavigationStarted("tab1", "https://example.com/page$i")
+            testScope.testScheduler.runCurrent()
             manager.handleWebEvent(webEventData("test"), "tab1")
+            testScope.testScheduler.runCurrent()
         }
 
         val preFire = argumentCaptor<PixelState>()
@@ -1917,7 +2029,9 @@ class EventHubPixelManagerTest {
             )
             stubPixelStates(currentState)
             manager.onNavigationStarted("newTab1", "https://other.com/page$i")
+            testScope.testScheduler.runCurrent()
             manager.handleWebEvent(webEventData("test"), "newTab1")
+            testScope.testScheduler.runCurrent()
         }
 
         val postFire = argumentCaptor<PixelState>()
@@ -1940,6 +2054,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(finalState)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1984,6 +2099,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2043,6 +2159,7 @@ class EventHubPixelManagerTest {
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         assertFalse(manager.hasScheduledTimer("pixel_a"))
         assertFalse(manager.hasScheduledTimer("pixel_b"))
@@ -2061,6 +2178,7 @@ class EventHubPixelManagerTest {
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -2075,6 +2193,7 @@ class EventHubPixelManagerTest {
         assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         assertTrue(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
@@ -2084,6 +2203,7 @@ class EventHubPixelManagerTest {
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         assertFalse(manager.hasScheduledTimer("webTelemetry_testPixel1"))
     }
@@ -2094,6 +2214,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2126,6 +2247,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2161,6 +2283,7 @@ class EventHubPixelManagerTest {
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
         whenever(repository.getPixelState("pixel_b")).thenReturn(null)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         assertTrue(manager.hasScheduledTimer("pixel_a"))
         assertTrue(manager.hasScheduledTimer("pixel_b"))
@@ -2223,6 +2346,7 @@ class EventHubPixelManagerTest {
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2240,6 +2364,7 @@ class EventHubPixelManagerTest {
 
         // checkPixels fires the pixel synchronously (simulating foreground)
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
@@ -2256,6 +2381,7 @@ class EventHubPixelManagerTest {
 
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2272,6 +2398,7 @@ class EventHubPixelManagerTest {
 
         // checkPixels fires the pixel, which starts a new period with a new timer
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         // A new timer should exist for the new period
@@ -2305,6 +2432,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2321,6 +2449,7 @@ class EventHubPixelManagerTest {
 
         timeProvider.time = initialState.periodEndMillis + 1
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         // checkPixels fired once
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
@@ -2374,6 +2503,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2403,6 +2533,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2420,6 +2551,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 50_000L
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2434,6 +2566,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = 1000L
 
         manager.onConfigChanged()
+        testScope.testScheduler.runCurrent()
 
         val initCaptor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(initCaptor.capture())
@@ -2481,6 +2614,7 @@ class EventHubPixelManagerTest {
         stubPixelStates(state)
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2497,6 +2631,7 @@ class EventHubPixelManagerTest {
         timeProvider.time = periodEnd + 5000L
 
         manager.checkPixels()
+        testScope.testScheduler.runCurrent()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
