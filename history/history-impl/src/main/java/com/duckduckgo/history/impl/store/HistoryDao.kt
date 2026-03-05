@@ -39,6 +39,9 @@ interface HistoryDao {
     @Query("UPDATE history_entries SET title = :title WHERE id = :id")
     suspend fun updateTitle(id: Long, title: String)
 
+    @Query("UPDATE history_entries SET description = :description, h1 = :h1 WHERE url = :url")
+    suspend fun updateMetadata(url: String, description: String?, h1: String?)
+
     @Transaction
     suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime, tabId: String) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)

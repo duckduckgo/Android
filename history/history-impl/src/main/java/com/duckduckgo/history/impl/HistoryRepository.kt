@@ -52,6 +52,8 @@ interface HistoryRepository {
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 
     suspend fun hasHistory(): Boolean
+
+    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?)
 }
 
 class RealHistoryRepository(
@@ -130,6 +132,12 @@ class RealHistoryRepository(
         return withContext(dispatcherProvider.io()) {
             historyDao.getHistoryEntriesWithVisits()
                 .any { it.toHistoryEntry() != null }
+        }
+    }
+
+    override suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?) {
+        withContext(dispatcherProvider.io()) {
+            historyDao.updateMetadata(url, description, h1)
         }
     }
 }

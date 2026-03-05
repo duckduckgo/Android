@@ -28,6 +28,12 @@ fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry? {
     return if (historyEntry.isSerp && !historyEntry.query.isNullOrBlank()) {
         VisitedSERP(historyEntry.url.toUri(), historyEntry.title, historyEntry.query, visits = visits.map { LocalDateTime.parse(it.timestamp) })
     } else {
-        VisitedPage(historyEntry.url.toUri(), historyEntry.title, visits.map { LocalDateTime.parse(it.timestamp) })
+        VisitedPage(
+            url = historyEntry.url.toUri(),
+            title = historyEntry.title,
+            visits = visits.map { LocalDateTime.parse(it.timestamp) },
+            description = historyEntry.description,
+            h1 = historyEntry.h1,
+        )
     }
 }
