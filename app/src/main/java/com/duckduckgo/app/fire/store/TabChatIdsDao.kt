@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
 
 package com.duckduckgo.app.fire.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
-@Database(
-    exportSchema = true,
-    version = 2,
-    entities = [TabVisitedSiteEntity::class, TabChatIdEntity::class],
-)
-abstract class TabVisitedSitesDatabase : RoomDatabase() {
-    abstract fun dao(): TabVisitedSitesDao
-    abstract fun chatIdsDao(): TabChatIdsDao
+@Dao
+interface TabChatIdsDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(entity: TabChatIdEntity)
+
+    @Query("SELECT chatId FROM tab_chat_ids WHERE tabId = :tabId")
+    suspend fun getChatIds(tabId: String): List<String>
+
+    @Query("DELETE FROM tab_chat_ids WHERE tabId = :tabId")
+    suspend fun clearTab(tabId: String)
+
+    @Query("DELETE FROM tab_chat_ids")
+    suspend fun clearAll()
 }

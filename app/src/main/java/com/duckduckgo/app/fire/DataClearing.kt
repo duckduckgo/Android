@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.store.TabChatIdsRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -28,7 +29,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiChatClearer
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -57,9 +57,9 @@ class DataClearing @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val dataClearingWideEvent: DataClearingWideEvent,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val tabChatIdsRepository: TabChatIdsRepository,
     private val navigationHistory: NavigationHistory,
     private val tabRepository: TabRepository,
-    private val duckChat: DuckChat,
     private val duckAiChatClearer: DuckAiChatClearer,
 ) : ManualDataClearing, AutomaticDataClearing {
 
@@ -69,8 +69,7 @@ class DataClearing @Inject constructor(
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
         val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
 
-        val tabUrl = tabRepository.getTab(tabId)?.url
-        clearDuckAiChatIfNeeded(tabUrl)
+        clearDuckAiChatsForTab(tabId)
 
         navigationHistory.removeHistoryForTab(tabId)
         tabRepository.deleteTabAndSelectSource(tabId)
@@ -79,10 +78,12 @@ class DataClearing @Inject constructor(
         return clearDataResult
     }
 
-    private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
-        if (tabUrl == null) return
-        val chatId = duckChat.extractChatId(tabUrl) ?: return
-        duckAiChatClearer.deleteChat(chatId)
+    private suspend fun clearDuckAiChatsForTab(tabId: String) {
+        val chatIds = tabChatIdsRepository.getChatIds(tabId)
+        for (chatId in chatIds) {
+            duckAiChatClearer.deleteChat(chatId)
+        }
+        tabChatIdsRepository.clearTab(tabId)
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {

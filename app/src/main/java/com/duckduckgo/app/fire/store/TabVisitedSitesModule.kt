@@ -39,4 +39,8 @@ class TabVisitedSitesModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideDao(db: TabVisitedSitesDatabase): TabVisitedSitesDao = db.dao()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideChatIdsDao(db: TabVisitedSitesDatabase): TabChatIdsDao = db.chatIdsDao()
 }

@@ -242,6 +242,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.fire.store.TabChatIdsRepository
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -508,6 +509,7 @@ class BrowserTabViewModel @Inject constructor(
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val tabChatIdsRepository: TabChatIdsRepository,
     private val pageLoadWideEvent: PageLoadWideEvent,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val browserUiLockFeature: BrowserUiLockFeature,
@@ -992,6 +994,9 @@ class BrowserTabViewModel @Inject constructor(
                 val domain = uri.host?.toTldPlusOne() ?: uri.host
                 if (domain != null) {
                     tabVisitedSitesRepository.recordVisitedSite(tabId, domain)
+                }
+                duckChat.extractChatId(url)?.let { chatId ->
+                    tabChatIdsRepository.recordChatId(tabId, chatId)
                 }
             }
         }

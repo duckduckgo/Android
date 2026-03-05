@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 
 package com.duckduckgo.app.fire.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.Entity
 
-@Database(
-    exportSchema = true,
-    version = 2,
-    entities = [TabVisitedSiteEntity::class, TabChatIdEntity::class],
+@Entity(
+    tableName = "tab_chat_ids",
+    primaryKeys = ["tabId", "chatId"],
 )
-abstract class TabVisitedSitesDatabase : RoomDatabase() {
-    abstract fun dao(): TabVisitedSitesDao
-    abstract fun chatIdsDao(): TabChatIdsDao
-}
+data class TabChatIdEntity(
+    val tabId: String,
+    val chatId: String,
+)
