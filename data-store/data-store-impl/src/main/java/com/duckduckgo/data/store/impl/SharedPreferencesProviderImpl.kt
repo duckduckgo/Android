@@ -224,13 +224,14 @@ class SharedPreferencesProviderImpl @Inject constructor(
 
     private suspend fun migrateEncryptedToHarmonyIfNecessary(name: String): SharedPreferences? {
         return withContext(dispatcherProvider.io()) {
-            val destination = getEncryptedHarmonyDestination(name) ?: return@withContext null
+            val destination = getEncryptedHarmonyDestination(name) ?: run { ensureActive(); return@withContext null }
             runCatching {
                 when (isAlreadyMigratedToHarmony(destination, name)) {
                     true -> return@withContext destination
                     false -> Unit
                 }
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
@@ -257,6 +258,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             runCatching {
                 migrateContentsToHarmony(origin, destination, name)
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
@@ -266,19 +268,21 @@ class SharedPreferencesProviderImpl @Inject constructor(
 
     private suspend fun migrateEncryptedToHarmonyIfNecessary(origin: SharedPreferences, name: String): SharedPreferences? {
         return withContext(dispatcherProvider.io()) {
-            val destination = getEncryptedHarmonyDestination(name) ?: return@withContext null
+            val destination = getEncryptedHarmonyDestination(name) ?: run { ensureActive(); return@withContext null }
             runCatching {
                 when (isAlreadyMigratedToHarmony(destination, name)) {
                     true -> return@withContext destination
                     false -> Unit
                 }
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
             runCatching {
                 migrateContentsToHarmony(origin, destination, name)
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
