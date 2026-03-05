@@ -162,7 +162,10 @@ class RealSecureStorageKeyStore(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                    if (useHarmony()) {
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                    }
+                    return@withContext
                 }
             }
 
@@ -191,7 +194,9 @@ class RealSecureStorageKeyStore(
                     getPixelParams(keyName = keyName),
                     type = Daily(),
                 )
-                throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                if (useHarmony()) {
+                    throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                }
             }
 
             runCatching {
