@@ -189,7 +189,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
+    private fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
         if (scheduledTimers.containsKey(pixelName)) {
             logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
             return
@@ -222,9 +222,7 @@ class RealEventHubPixelManager @Inject constructor(
         scheduledTimers[pixelName] = job
     }
 
-    fun hasScheduledTimer(pixelName: String): Boolean = scheduledTimers.containsKey(pixelName)
-
-    fun cancelScheduledFire(pixelName: String) {
+    private fun cancelScheduledFire(pixelName: String) {
         scheduledTimers.remove(pixelName)?.let { job ->
             job.cancel()
             logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
