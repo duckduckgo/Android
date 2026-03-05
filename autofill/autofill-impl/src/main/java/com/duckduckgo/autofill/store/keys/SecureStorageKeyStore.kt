@@ -233,6 +233,10 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }.getOrElse {
                     ensureActive()
+                    // Rollback legacy write so we don't cause a corrupted state with out of sync files
+                    if (keyValue != null) {
+                        legacyPrefs?.edit(commit = true) { remove(keyName) }
+                    }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
                         getPixelParams(keyName = keyName, throwable = it),
