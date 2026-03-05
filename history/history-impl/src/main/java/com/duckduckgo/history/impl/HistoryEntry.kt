@@ -34,6 +34,7 @@ fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry? {
             visits = visits.map { LocalDateTime.parse(it.timestamp) },
             description = historyEntry.description,
             h1 = historyEntry.h1,
+            chunkText = historyEntry.chunkText,
         )
     }
 }

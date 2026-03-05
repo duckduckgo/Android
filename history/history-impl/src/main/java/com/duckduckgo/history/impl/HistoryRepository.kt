@@ -53,7 +53,7 @@ interface HistoryRepository {
 
     suspend fun hasHistory(): Boolean
 
-    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?)
+    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?, chunkText: String?)
 }
 
 class RealHistoryRepository(
@@ -135,9 +135,9 @@ class RealHistoryRepository(
         }
     }
 
-    override suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?) {
+    override suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?, chunkText: String?) {
         withContext(dispatcherProvider.io()) {
-            historyDao.updateMetadata(url, description, h1)
+            historyDao.updateMetadata(url, description, h1, chunkText)
         }
     }
 }

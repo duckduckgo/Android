@@ -97,8 +97,8 @@ class RealNavigationHistory @Inject constructor(
         historyRepository.removeHistoryForTab(tabId)
     }
 
-    override suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?) {
+    override suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?, chunkText: String?) {
         if (!historyFeature.shouldStoreHistory || !isHistoryUserEnabled()) return
-        historyRepository.updateHistoryMetadata(url, description, h1)
+        historyRepository.updateHistoryMetadata(url, description, h1, chunkText)
     }
 }

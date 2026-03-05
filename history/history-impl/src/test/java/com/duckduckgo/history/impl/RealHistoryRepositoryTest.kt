@@ -183,14 +183,14 @@ class RealHistoryRepositoryTest {
 
     @Test
     fun whenUpdateHistoryMetadataThenDaoUpdateMetadataCalled() = runTest {
-        testee.updateHistoryMetadata("https://example.com", "A description", "A heading")
-        verify(mockHistoryDao).updateMetadata("https://example.com", "A description", "A heading")
+        testee.updateHistoryMetadata("https://example.com", "A description", "A heading", "some body text")
+        verify(mockHistoryDao).updateMetadata("https://example.com", "A description", "A heading", "some body text")
     }
 
     @Test
     fun whenUpdateHistoryMetadataWithNullFieldsThenDaoCalledWithNulls() = runTest {
-        testee.updateHistoryMetadata("https://example.com", null, null)
-        verify(mockHistoryDao).updateMetadata("https://example.com", null, null)
+        testee.updateHistoryMetadata("https://example.com", null, null, null)
+        verify(mockHistoryDao).updateMetadata("https://example.com", null, null, null)
     }
 
     private fun historyEntryWithVisits(
