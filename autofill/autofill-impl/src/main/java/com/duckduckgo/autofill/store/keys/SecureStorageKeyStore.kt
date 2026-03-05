@@ -213,7 +213,9 @@ class RealSecureStorageKeyStore(
                     getPixelParams(keyName = keyName, throwable = it),
                     type = Daily(),
                 )
-                throw SecureStorageException.InternalSecureStorageException("Error reading legacy preferences", it)
+                if (useHarmony()) {
+                    throw SecureStorageException.InternalSecureStorageException("Error reading legacy preferences", it)
+                }
             }
 
             if (useHarmony()) {
