@@ -242,7 +242,15 @@ class RealSecureStorageKeyStore constructor(
                         type = Daily(),
                     )
                     if (keyValue != null && autofillFeature.addWriteGuard().isEnabled()) {
-                        legacyPrefs?.edit(commit = true) { remove(keyName) }
+                        runCatching {
+                            legacyPrefs?.edit(commit = true) { remove(keyName) }
+                        }.onFailure { rollbackError ->
+                            pixel.fire(
+                                AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                                getPixelParams(keyName = keyName, throwable = rollbackError),
+                                type = Daily(),
+                            )
+                        }
                     }
                     throw it
                 }
@@ -281,13 +289,13 @@ class RealSecureStorageKeyStore constructor(
             // Always read from legacy — source of truth
 
             val legacyPrefs = getEncryptedPreferences().also {
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
-                    getPixelParams(keyName = keyName),
-                    type = Daily(),
-                )
                 if (it == null) {
-                    if (autofillFeature.addReadGuard().isEnabled() && autofillFeature.readFromHarmony().isEnabled()) {
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
+                    )
+                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
                     }
                 }
@@ -300,7 +308,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (autofillFeature.addReadGuard().isEnabled() && autofillFeature.readFromHarmony().isEnabled()) {
+                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
                     }
                 }
