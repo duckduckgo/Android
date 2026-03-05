@@ -19,7 +19,7 @@ package com.duckduckgo.app.startup
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -46,7 +46,10 @@ class RealSamplingDecider @Inject constructor(
 ) : SamplingDecider {
 
     private val jsonAdapter by lazy {
-        moshi.adapter<Map<String, String>>(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
+        moshi.newBuilder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(AppStartupMetricsJson::class.java)
     }
 
     override fun shouldSample(settingsJson: String?): Boolean {
@@ -65,8 +68,12 @@ class RealSamplingDecider @Inject constructor(
         val config = settingsJson?.let {
             runCatching {
                 jsonAdapter.fromJson(it)
-            }.getOrDefault(emptyMap())
-        } ?: emptyMap()
-        return config["sampling"]?.toDoubleOrNull() ?: 0.01
+            }.getOrDefault(AppStartupMetricsJson())
+        } ?: AppStartupMetricsJson()
+        return config.sampling
     }
+
+    private data class AppStartupMetricsJson(
+        val sampling: Double = 0.01,
+    )
 }
