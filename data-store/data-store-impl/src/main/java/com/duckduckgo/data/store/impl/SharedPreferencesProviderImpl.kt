@@ -231,6 +231,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
                     false -> Unit
                 }
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
@@ -257,6 +258,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             runCatching {
                 migrateContentsToHarmony(origin, destination, name)
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
@@ -273,12 +275,14 @@ class SharedPreferencesProviderImpl @Inject constructor(
                     false -> Unit
                 }
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
             runCatching {
                 migrateContentsToHarmony(origin, destination, name)
             }.getOrElse {
+                ensureActive()
                 return@withContext null
             }
 
