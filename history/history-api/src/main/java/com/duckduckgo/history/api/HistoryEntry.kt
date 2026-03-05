@@ -40,6 +40,8 @@ sealed class HistoryEntry {
         override val url: Uri,
         override val title: String,
         override val visits: List<LocalDateTime>,
+        val description: String? = null,
+        val h1: String? = null,
     ) : HistoryEntry()
 
     /**

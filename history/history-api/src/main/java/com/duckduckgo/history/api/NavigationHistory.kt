@@ -76,4 +76,10 @@ interface NavigationHistory {
      * @param tabId The tab ID whose history entries should be removed.
      */
     suspend fun removeHistoryForTab(tabId: String)
+
+    /**
+     * Updates the description and h1 for an existing history entry identified by [url].
+     * No-op if the entry does not exist. Both fields are optional — pass null to leave unchanged.
+     */
+    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?)
 }
