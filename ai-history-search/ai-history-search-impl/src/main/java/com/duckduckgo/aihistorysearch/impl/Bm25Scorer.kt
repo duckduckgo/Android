@@ -48,7 +48,10 @@ internal object Bm25Scorer {
         val queryTerms = tokenize(query)
         if (queryTerms.isEmpty()) return entries
 
-        val docs: List<List<String>> = entries.map { tokenize("${it.title} ${it.url}") }
+        val docs: List<List<String>> = entries.map { entry ->
+            val extra = listOfNotNull(entry.description, entry.h1).joinToString(" ")
+            tokenize("${entry.title} ${entry.url} $extra")
+        }
         val n = docs.size
         val avgDocLen = docs.map { it.size }.average().takeIf { it > 0.0 } ?: 1.0
 

@@ -115,7 +115,11 @@ internal class GemmaSearcher(
         val formatter = DateTimeFormatter.ofPattern("MMM d")
         val history = entries.take(MAX_ENTRIES).joinToString("\n") { entry ->
             val date = entry.visits.maxOrNull()?.format(formatter) ?: "?"
-            "- ${entry.title} — ${entry.url} ($date)"
+            buildString {
+                append("- ${entry.title} — ${entry.url} ($date)")
+                entry.h1?.takeIf { it.isNotBlank() && it != entry.title }?.let { append(" [$it]") }
+                entry.description?.takeIf { it.isNotBlank() }?.let { append(": $it") }
+            }
         }
         return """
             Here are pages from my browser history:

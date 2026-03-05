@@ -40,7 +40,7 @@ class GemmaSearcherTest {
     @Test
     fun whenPromptBuiltThenIncludesRankingAndSynthesisInstructions() {
         val prompt = testee.buildPrompt("query", entries(5))
-        assertTrue("Prompt should ask for ranking", prompt.contains("most relevant"))
+        assertTrue("Prompt should ask for ranking", prompt.contains("in order of relevance"))
         assertTrue("Prompt should ask for synthesis", prompt.contains("summary"))
     }
 
