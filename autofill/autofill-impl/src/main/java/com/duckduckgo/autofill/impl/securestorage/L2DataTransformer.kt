@@ -60,13 +60,11 @@ class RealL2DataTransformer @Inject constructor(
         }
     }
 
-    @Throws(SecureStorageException::class)
     suspend fun getL2Key(): Key = l2KeyDeferred.await()
 
     override suspend fun canProcessData(): Boolean = secureStorageKeyProvider.canAccessKeyStore()
 
     // get ByteArray -> encrypt -> encode to String
-    @Throws(SecureStorageException::class)
     override suspend fun encrypt(data: String): EncryptedString = encryptionHelper.encrypt(data.toByteArray(), getL2Key()).run {
         EncryptedString(
             this.data.transformToString(),
