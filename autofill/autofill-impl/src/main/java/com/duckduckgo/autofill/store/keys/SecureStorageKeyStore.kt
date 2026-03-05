@@ -281,28 +281,28 @@ class RealSecureStorageKeyStore constructor(
             // Always read from legacy — source of truth
 
             val legacyPrefs = getEncryptedPreferences().also {
+                pixel.fire(
+                    AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
+                    getPixelParams(keyName = keyName),
+                    type = Daily(),
+                )
                 if (it == null) {
-                    if (autofillFeature.addReadGuard().isEnabled()) {
+                    if (autofillFeature.addReadGuard().isEnabled() && autofillFeature.readFromHarmony().isEnabled()) {
                         throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
                     }
-                    pixel.fire(
-                        AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
-                        getPixelParams(keyName = keyName),
-                        type = Daily(),
-                    )
                 }
             }
 
             val harmonyPrefs = getHarmonyEncryptedPreferences().also {
                 if (it == null && useHarmony()) {
-                    if (autofillFeature.addReadGuard().isEnabled()) {
-                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
-                    }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
+                    if (autofillFeature.addReadGuard().isEnabled() && autofillFeature.readFromHarmony().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
+                    }
                 }
             }
 
@@ -333,7 +333,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
-                    if (autofillFeature.addReadGuard().isEnabled()) {
+                    if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
                         throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
                     }
                     null
@@ -346,7 +346,7 @@ class RealSecureStorageKeyStore constructor(
                             getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
-                        if (autofillFeature.addReadGuard().isEnabled()) {
+                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
                             throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
                         }
                     }
@@ -360,16 +360,10 @@ class RealSecureStorageKeyStore constructor(
                     harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISMATCH,
-                            mapOf(
-                                "key" to keyName,
-                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                                "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                            ),
+                            getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
-                        if (autofillFeature.addReadGuard().isEnabled()) {
+                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
                             throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
                         }
                     }
