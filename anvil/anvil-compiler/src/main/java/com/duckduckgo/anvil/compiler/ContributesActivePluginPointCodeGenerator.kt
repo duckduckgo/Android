@@ -471,42 +471,27 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
         // Validate parentFeatureName.
         // Same-module: check the set collected in generateCode's first pass.
-        // Direct-dependency module: resolve the sentinel object emitted by the plugin point's codegen.
-        // Sibling module (neither depending on the other): the sentinel isn't in scope here.
-        //   → Emit a DeferredValidation marker so the composition root (:app) can re-validate
-        //     once it has both the sentinels and all sibling-module outputs on its classpath.
+        // Direct-dependency module: sentinel emitted by the plugin point's codegen is visible —
+        //   look it up directly. If found, validation passes immediately.
+        // Sibling module (or no plugin points compiled yet): sentinel is not in scope.
+        //   → Always emit a DeferredValidation marker so the composition root (:app) can
+        //     re-validate once it has both the sentinels and all sibling-module outputs on
+        //     its classpath. We do NOT throw here: "sentinel package has other content" does
+        //     not mean we have a complete view of all plugin points (other sentinels may live
+        //     in sibling modules not on this module's classpath).
         var emitDeferredMarker = false
         val foundLocally = parentFeatureName in localPluginPointFeatureNames
         if (!foundLocally) {
             val registryScope = module.getPackage(FqName(SENTINEL_PACKAGE)).memberScope
-            val registryHasContent = registryScope
-                .getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
-                .isNotEmpty()
-            if (registryHasContent) {
-                val sentinelFound = registryScope.getContributedClassifier(
-                    Name.identifier("ActivePluginPointRegistry_$parentFeatureName"),
-                    NoLookupLocation.FROM_BACKEND,
-                ) != null
-                if (!sentinelFound) {
-                    val available = (
-                        registryScope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
-                            .map { it.name.asString() }
-                            .filter { it.startsWith("ActivePluginPointRegistry_") }
-                            .map { it.removePrefix("ActivePluginPointRegistry_") } +
-                            localPluginPointFeatureNames
-                        ).sorted()
-                    throw AnvilCompilationException(
-                        "${vmClass.fqName}: parentFeatureName \"$parentFeatureName\" does not match " +
-                            "any @ContributesActivePluginPoint.\n" +
-                            "Known plugin point featureNames: ${available.joinToString(", ")}",
-                        element = vmClass.clazz.identifyingElement,
-                    )
-                }
-                // else: sentinel found — validation passed, no marker needed
-            } else {
-                // Sibling module: defer validation to the composition root.
+            val sentinelFound = registryScope.getContributedClassifier(
+                Name.identifier("ActivePluginPointRegistry_$parentFeatureName"),
+                NoLookupLocation.FROM_BACKEND,
+            ) != null
+            if (!sentinelFound) {
+                // Sentinel missing — could be a sibling module or a typo. Defer to :app.
                 emitDeferredMarker = true
             }
+            // else: sentinel found — direct dependency, validation passed, no marker needed.
         }
         val generatedPackage = vmClass.packageFqName.toString()
         val pluginClassName = "${vmClass.shortName}_ActivePlugin"
