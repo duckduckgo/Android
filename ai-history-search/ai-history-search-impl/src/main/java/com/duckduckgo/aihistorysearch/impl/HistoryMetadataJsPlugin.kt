@@ -16,6 +16,7 @@
 
 package com.duckduckgo.aihistorysearch.impl
 
+import android.app.Application
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
@@ -32,17 +33,33 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 
 /**
- * Parses page metadata (og:description / meta description and h1) from a result string produced
- * by [evaluateJavascript] when the JS returns an object directly (not JSON.stringify'd).
+ * Page metadata extracted from a visited page.
  *
- * Returns a (description, h1) pair when at least one value is non-blank, null otherwise.
+ * @property description The page meta description (og:description or meta[name=description]), if available.
+ * @property h1 The primary heading (first h1 element) of the page, if available.
+ * @property chunkText The readable body text extracted by Readability.js, capped at 2000 chars, if available.
  */
-internal fun parseMetadata(result: String): Pair<String?, String?>? {
+internal data class PageMetadata(
+    val description: String?,
+    val h1: String?,
+    val chunkText: String?,
+)
+
+/**
+ * Parses page metadata from a JSON result produced by [evaluateJavascript].
+ * The JS returns a plain object `{description, h1, chunkText}` so the result is already
+ * a JSON object string — no unquoting needed.
+ *
+ * Returns [PageMetadata] when at least one value is non-blank, null otherwise.
+ */
+internal fun parseMetadata(result: String): PageMetadata? {
     return try {
         val map = HistoryMetadataJsPlugin.ADAPTER.fromJson(result) ?: return null
         val description = map["description"]?.takeIf { it.isNotBlank() }
         val h1 = map["h1"]?.takeIf { it.isNotBlank() }
-        if (description == null && h1 == null) null else Pair(description, h1)
+        val chunkText = map["chunkText"]?.takeIf { it.isNotBlank() }
+        if (description == null && h1 == null && chunkText == null) null
+        else PageMetadata(description, h1, chunkText)
     } catch (e: Exception) {
         logcat(tag = "HistoryMetadataJsPlugin") { "HistoryMetadata: parse error — ${e.message}" }
         null
@@ -54,7 +71,12 @@ class HistoryMetadataJsPlugin @Inject constructor(
     private val feature: AiHistorySearchFeature,
     private val navigationHistory: NavigationHistory,
     @AppCoroutineScope private val appScope: CoroutineScope,
+    private val application: Application,
 ) : JsInjectorPlugin {
+
+    private val readabilityJs: String by lazy {
+        application.assets.open("readability.js").bufferedReader().use { it.readText() }
+    }
 
     companion object {
         val ADAPTER = Moshi.Builder().build()
@@ -69,23 +91,40 @@ class HistoryMetadataJsPlugin @Inject constructor(
         if (!feature.historyMetadataEnabled().isEnabled()) return
         val pageUrl = url ?: return
 
-        // Return the object directly (not JSON.stringify) so that evaluateJavascript gives us
-        // a plain JSON object string rather than a double-encoded quoted string.
-        val js = """
-            (function() {
-                var d = document.querySelector('meta[property="og:description"]')?.content
-                    || document.querySelector('meta[name="description"]')?.content
-                    || null;
-                var h = document.querySelector('h1')?.textContent?.trim() || null;
-                return {description: d, h1: h};
-            })()
-        """.trimIndent()
+        // Readability.js source is prepended so it is available in the same evaluation context.
+        // The extractor returns a plain object — evaluateJavascript delivers it as a JSON string
+        // directly to Moshi without any manual unquoting.
+        val js = buildString {
+            append(readabilityJs)
+            append("""
+                ;(function() {
+                    var d = document.querySelector('meta[property="og:description"]')?.content
+                        || document.querySelector('meta[name="description"]')?.content
+                        || null;
+                    var h = document.querySelector('h1')?.textContent?.trim() || null;
+                    var chunkText = null;
+                    try {
+                        var docClone = document.cloneNode(true);
+                        var article = new Readability(docClone).parse();
+                        if (article && article.textContent) {
+                            chunkText = article.textContent.replace(/\s+/g, ' ').trim().substring(0, 2000) || null;
+                        }
+                    } catch(e) {}
+                    return {description: d, h1: h, chunkText: chunkText};
+                })()
+            """.trimIndent())
+        }
 
         webView.evaluateJavascript(js) { result ->
             if (result == null) return@evaluateJavascript
-            val (description, h1) = parseMetadata(result) ?: return@evaluateJavascript
-            logcat { "HistoryMetadata: url=$pageUrl description=${description?.take(80)} h1=${h1?.take(60)}" }
-            appScope.launch { navigationHistory.updateHistoryMetadata(pageUrl, description, h1) }
+            val metadata = parseMetadata(result) ?: return@evaluateJavascript
+            logcat {
+                "HistoryMetadata: url=$pageUrl description=${metadata.description?.take(80)} " +
+                    "h1=${metadata.h1?.take(60)} chunkText=${metadata.chunkText?.take(60)}"
+            }
+            appScope.launch {
+                navigationHistory.updateHistoryMetadata(pageUrl, metadata.description, metadata.h1, metadata.chunkText)
+            }
         }
     }
 }

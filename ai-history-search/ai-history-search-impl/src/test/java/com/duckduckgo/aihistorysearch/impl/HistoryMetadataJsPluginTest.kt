@@ -27,38 +27,38 @@ class HistoryMetadataJsPluginTest {
     @Test
     fun `returns description and h1 when both are present`() {
         val result = parseMetadata("""{"description":"A page about ducks","h1":"Ducks"}""")
-        assertEquals(Pair("A page about ducks", "Ducks"), result)
+        assertEquals(PageMetadata("A page about ducks", "Ducks", null), result)
     }
 
     @Test
     fun `returns description only when h1 is null`() {
         val result = parseMetadata("""{"description":"Only a description","h1":null}""")
-        assertEquals(Pair("Only a description", null), result)
+        assertEquals(PageMetadata("Only a description", null, null), result)
     }
 
     @Test
     fun `returns h1 only when description is null`() {
         val result = parseMetadata("""{"description":null,"h1":"Only an H1"}""")
-        assertEquals(Pair(null, "Only an H1"), result)
+        assertEquals(PageMetadata(null, "Only an H1", null), result)
     }
 
     @Test
     fun `handles values with special characters`() {
         val result = parseMetadata("""{"description":"Line1\nLine2","h1":"Title & More"}""")
-        assertEquals(Pair("Line1\nLine2", "Title & More"), result)
+        assertEquals(PageMetadata("Line1\nLine2", "Title & More", null), result)
     }
 
     @Test
     fun `handles unicode values`() {
         val result = parseMetadata("""{"description":"\u00e9l\u00e8ve","h1":"\u4e2d\u6587"}""")
-        assertEquals(Pair("élève", "中文"), result)
+        assertEquals(PageMetadata("élève", "中文", null), result)
     }
 
     // --- null / empty returns ---
 
     @Test
     fun `returns null when both fields are null`() {
-        val result = parseMetadata("""{"description":null,"h1":null}""")
+        val result = parseMetadata("""{"description":null,"h1":null,"chunkText":null}""")
         assertNull(result)
     }
 
@@ -86,5 +86,19 @@ class HistoryMetadataJsPluginTest {
     fun `returns null for empty string`() {
         val result = parseMetadata("")
         assertNull(result)
+    }
+
+    // --- chunkText ---
+
+    @Test
+    fun `returns chunkText when present alongside description and h1`() {
+        val result = parseMetadata("""{"description":"About ducks","h1":"Ducks","chunkText":"Ducks are birds that..."}""")
+        assertEquals(PageMetadata("About ducks", "Ducks", "Ducks are birds that..."), result)
+    }
+
+    @Test
+    fun `returns non-null when only chunkText is present`() {
+        val result = parseMetadata("""{"description":null,"h1":null,"chunkText":"Some body text"}""")
+        assertEquals(PageMetadata(null, null, "Some body text"), result)
     }
 }
