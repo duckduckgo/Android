@@ -186,9 +186,7 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName),
                         type = Daily(),
                     )
-                    if (useHarmony()) {
-                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
-                    }
+                    throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
                 }
             }
 
