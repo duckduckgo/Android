@@ -28,11 +28,15 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISMATCH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -182,11 +186,47 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
+            val legacyPrefs = getEncryptedPreferences().also {
+                if (it == null) {
+                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                    }
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                        mapOf(
+                            "key" to keyName,
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
+                        ),
+                    )
+                }
+            }
+
+            val harmonyPrefs = getHarmonyEncryptedPreferences().also {
+                if (it == null && useHarmony()) {
+                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
+                    }
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                        mapOf(
+                            "key" to keyName,
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
+                        ),
+                    )
+                }
+            }
+
             // Guard: encryption keys are write-once. If we're trying to write a non-null value
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (autofillFeature.addWriteGuard().isEnabled() && keyValue != null && keyAlreadyExists(keyName)) {
+            if (autofillFeature.addWriteGuard().isEnabled() && keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     mapOf(
@@ -202,7 +242,7 @@ class RealSecureStorageKeyStore constructor(
             }
 
             runCatching {
-                getEncryptedPreferences()?.edit(commit = true) {
+                legacyPrefs?.edit(commit = true) {
                     if (keyValue == null) {
                         remove(keyName)
                     } else {
@@ -226,7 +266,7 @@ class RealSecureStorageKeyStore constructor(
 
             if (useHarmony()) {
                 runCatching {
-                    getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                    harmonyPrefs?.edit(commit = true) {
                         if (keyValue == null) {
                             remove(keyName)
                         } else {
@@ -257,9 +297,9 @@ class RealSecureStorageKeyStore constructor(
      * Checks if the key already exists in either legacy or Harmony preferences.
      * Used as a write guard to prevent overwriting write-once encryption keys.
      */
-    private suspend fun keyAlreadyExists(keyName: String): Boolean {
+    private suspend fun keyAlreadyExists(legacyPrefs: SharedPreferences?, harmonyPrefs: SharedPreferences?, keyName: String): Boolean {
         val legacyExists = try {
-            getEncryptedPreferences()?.getString(keyName, null) != null
+            legacyPrefs?.getString(keyName, null) != null
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             false
@@ -268,7 +308,7 @@ class RealSecureStorageKeyStore constructor(
 
         if (useHarmony()) {
             val harmonyExists = try {
-                getHarmonyEncryptedPreferences()?.getString(keyName, null) != null
+                harmonyPrefs?.getString(keyName, null) != null
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()
                 false
@@ -282,59 +322,86 @@ class RealSecureStorageKeyStore constructor(
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             // Always read from legacy — source of truth
-            val legacyValue = getEncryptedPreferences().let {
-                if (it == null && autofillFeature.addReadGuard().isEnabled()) {
-                    throw SecureStorageException.InternalSecureStorageException("Preferences file is null on read")
+
+            val legacyPrefs = getEncryptedPreferences().also {
+                if (it == null) {
+                    if (autofillFeature.addReadGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
+                    }
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
+                        mapOf(
+                            "key" to keyName,
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
+                        ),
+                    )
                 }
-                runCatching {
-                    it?.getString(keyName, null)?.run {
+            }
+
+            val harmonyPrefs = getHarmonyEncryptedPreferences().also {
+                if (it == null && useHarmony()) {
+                    if (autofillFeature.addReadGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
+                    }
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
+                        mapOf(
+                            "key" to keyName,
+                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
+                        ),
+                    )
+                }
+            }
+
+            val legacyValue: ByteArray? = runCatching {
+                legacyPrefs?.getString(keyName, null)?.run {
+                    this.decodeBase64()?.toByteArray()
+                }
+            }.getOrElse {
+                ensureActive()
+                pixel.fire(
+                    AUTOFILL_PREFERENCES_GET_KEY_FAILED,
+                    mapOf(
+                        "key" to keyName,
+                        "error" to it.error(),
+                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                    ),
+                    type = Daily(),
+                )
+                throw it
+            }
+
+            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
+            if (useHarmony()) {
+                val harmonyValue = runCatching {
+                    harmonyPrefs?.getString(keyName, null)?.run {
                         this.decodeBase64()?.toByteArray()
                     }
                 }.getOrElse {
                     ensureActive()
                     pixel.fire(
-                        AUTOFILL_PREFERENCES_GET_KEY_FAILED,
+                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
                         mapOf(
                             "key" to keyName,
                             "error" to it.error(),
                             "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
                             "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
+                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
                         ),
                         type = Daily(),
                     )
-                    throw it
-                }
-            }
-
-            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
-            if (useHarmony()) {
-                val harmonyValue = getHarmonyEncryptedPreferences().let {
-                    if (it == null && autofillFeature.addReadGuard().isEnabled()) {
-                        throw SecureStorageException.InternalSecureStorageException("Preferences file is null on read")
+                    if (autofillFeature.addReadGuard().isEnabled()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
                     }
-                    runCatching {
-                        it?.getString(keyName, null)?.run {
-                            this.decodeBase64()?.toByteArray()
-                        }
-                    }.getOrElse {
-                        ensureActive()
-                        pixel.fire(
-                            AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
-                            mapOf(
-                                "key" to keyName,
-                                "error" to it.error(),
-                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                                "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                            ),
-                            type = Daily(),
-                        )
-                        if (autofillFeature.addReadGuard().isEnabled()) {
-                            throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
-                        }
-                        null
-                    }
+                    null
                 }
 
                 when {
