@@ -89,13 +89,13 @@ class OnboardingDevSettingsViewModel @Inject constructor(
                 if (checked) {
                     userStageStore.moveToStage(AppStage.ESTABLISHED)
                     settingsDataStore.hideTips = false
-                    visibleCtaIds().forEach { ctaId ->
+                    _viewState.value.visibleCtaIds.forEach { ctaId ->
                         dismissedCtaDao.insert(DismissedCta(ctaId))
                     }
                 } else {
                     userStageStore.moveToStage(AppStage.DAX_ONBOARDING)
                     settingsDataStore.hideTips = false
-                    visibleCtaIds().forEach { ctaId ->
+                    _viewState.value.visibleCtaIds.forEach { ctaId ->
                         dismissedCtaDao.delete(ctaId)
                     }
                 }
