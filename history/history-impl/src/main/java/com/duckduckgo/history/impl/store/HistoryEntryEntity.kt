@@ -26,6 +26,8 @@ data class HistoryEntryEntity(
     val title: String,
     val query: String?,
     val isSerp: Boolean,
+    val description: String? = null,
+    val h1: String? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         return this.url == (other as? HistoryEntryEntity)?.url
