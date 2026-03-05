@@ -114,6 +114,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Bladwijzers importeren uit Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importeren van Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren...</string>
     <string name="bookmarksImportDialogClose">Sluiten</string>
 </resources>

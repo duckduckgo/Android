@@ -114,6 +114,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Importa segnalibri da Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importa da Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri...</string>
     <string name="bookmarksImportDialogClose">Chiudi</string>
 </resources>

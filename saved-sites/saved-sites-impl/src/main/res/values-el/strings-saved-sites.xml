@@ -114,6 +114,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Εισαγωγή σελιδοδεικτών από το Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
     <string name="bookmarksImportDialogClose">Κλείσιμο</string>
 </resources>

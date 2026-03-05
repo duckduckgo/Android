@@ -114,6 +114,6 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Импортирай отметки от Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортиране от Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки...</string>
     <string name="bookmarksImportDialogClose">Затваряне</string>
 </resources>
