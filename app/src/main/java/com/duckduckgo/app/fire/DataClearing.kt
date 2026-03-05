@@ -81,10 +81,7 @@ class DataClearing @Inject constructor(
 
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
         if (tabUrl == null) return
-        val shouldClear = FireClearOption.DUCKAI_CHATS in fireDataStore.getManualClearOptions()
-        if (!shouldClear) return
         val chatId = duckChat.extractChatId(tabUrl) ?: return
-
         duckAiChatClearer.deleteChat(chatId)
     }
 
