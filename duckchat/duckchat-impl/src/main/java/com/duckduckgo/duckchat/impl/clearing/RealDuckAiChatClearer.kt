@@ -118,7 +118,7 @@ class RealDuckAiChatClearer @Inject constructor(
     internal fun getContentScopeJson(): String {
         val toggle = duckAiDataClearingFeature.self()
         val state = if (toggle.isEnabled()) "enabled" else "disabled"
-        val settings = toggle.getSettings() ?: "{}"
+        val settings = toggle.getSettings() ?: DEFAULT_SETTINGS
         val exceptions = JSONArray().apply {
             toggle.getExceptions().forEach { exception ->
                 put(
@@ -251,5 +251,6 @@ class RealDuckAiChatClearer @Inject constructor(
         private const val USER_UNPROTECTED_DOMAINS_PLACEHOLDER = "\$USER_UNPROTECTED_DOMAINS$"
         private const val USER_PREFERENCES_PLACEHOLDER = "\$USER_PREFERENCES$"
         private const val MESSAGING_PARAMETERS_PLACEHOLDER = "\$ANDROID_MESSAGING_PARAMETERS$"
+        private const val DEFAULT_SETTINGS = """{"chatsLocalStorageKeys":["savedAIChats"],"chatImagesIndexDbNameObjectStoreNamePairs":[["savedAIChatData","chat-images"],["savedAIChatData","saved-chats"]]}"""
     }
 }
