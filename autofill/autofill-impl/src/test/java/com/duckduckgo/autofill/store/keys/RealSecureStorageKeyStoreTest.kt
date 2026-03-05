@@ -262,14 +262,19 @@ class RealSecureStorageKeyStoreTest {
     }
 
     @Test
-    fun whenHarmonyDisabledAndKeyAlreadyExistsThenPixelFiredButNoException() = runTest {
+    fun whenHarmonyDisabledAndKeyAlreadyExistsThenPixelFiredAndThrowException() = runTest {
         configureHarmonyDisabled()
         whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
         createTestee()
 
-        // Should not throw
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
 
+        assertTrue(exceptionThrown)
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
     }
 
@@ -341,14 +346,20 @@ class RealSecureStorageKeyStoreTest {
     }
 
     @Test
-    fun whenLegacyPrefsThrowsOnWriteAndHarmonyDisabledThenPixelFiredButNoException() = runTest {
+    fun whenLegacyPrefsThrowsOnWriteAndHarmonyDisabledThenPixelFiredAndThrowException() = runTest {
         configureHarmonyDisabled()
         encryptedPreferencesFactory = FakeEncryptedPreferencesFactory(exception = RuntimeException("Failed"))
         createTestee()
 
-        // Should not throw
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+            assertEquals("Legacy Preferences file is null on write", e.message)
+        }
 
+        assertTrue(exceptionThrown)
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE), any(), any(), any())
     }
 
