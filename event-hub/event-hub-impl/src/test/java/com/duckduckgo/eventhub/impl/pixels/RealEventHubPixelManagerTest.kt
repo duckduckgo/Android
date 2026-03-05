@@ -42,7 +42,7 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class EventHubPixelManagerTest {
+class RealEventHubPixelManagerTest {
 
     private val repository: EventHubRepository = mock()
     private val pixel: Pixel = mock()
