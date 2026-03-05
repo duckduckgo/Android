@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
@@ -301,6 +302,17 @@ class RealSecureStorageKeyStore constructor(
                     harmonyValue == null && legacyValue != null -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
+                            mapOf(
+                                "key" to keyName,
+                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
+                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
+                            ),
+                            type = Daily(),
+                        )
+                    }
+                    harmonyValue != null && legacyValue == null -> {
+                        pixel.fire(
+                            AUTOFILL_PREFERENCES_KEY_MISSING,
                             mapOf(
                                 "key" to keyName,
                                 "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
