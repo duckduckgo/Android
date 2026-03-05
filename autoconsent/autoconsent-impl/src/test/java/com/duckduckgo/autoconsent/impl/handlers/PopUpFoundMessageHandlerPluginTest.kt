@@ -26,6 +26,7 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -87,6 +88,22 @@ class PopUpFoundMessageHandlerPluginTest {
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp"), webView, mockCallback)
 
         verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp")
+    }
+
+    @Test
+    fun whenUserSettingIsTrueThenDetectReloadLoopShouldNotBeCalled() {
+        repository.userSetting = true
+
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp"), webView, mockCallback)
+
+        verify(mockReloadLoopDetector, never()).detectReloadLoop(any(), any())
+    }
+
+    @Test
+    fun whenCmpEndsWithTopSuffixThenDetectReloadLoopShouldNotBeCalled() {
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp-top"), webView, mockCallback)
+
+        verify(mockReloadLoopDetector, never()).detectReloadLoop(any(), any())
     }
 
     private fun message(cmp: String): String {

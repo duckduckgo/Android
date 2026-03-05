@@ -32,6 +32,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows
 
 @RunWith(AndroidJUnit4::class)
@@ -166,6 +167,22 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
 
         verify(mockReloadLoopDetector).rememberLastHandledCMP(webView, "test", true)
+    }
+
+    @Test
+    fun whenReloadLoopDetectedThenAutoconsentDoneResultHasReloadLoopTrue() {
+        whenever(mockReloadLoopDetector.isReloadLoopDetected(webView)).thenReturn(true)
+
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(
+            consentManaged = true,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = false,
+            consentRule = "test",
+            consentReloadLoop = true,
+        )
     }
 
     private fun getOptOut(): String = handler.supportedTypes.first()

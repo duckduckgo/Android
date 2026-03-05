@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SelfTestResultMessageHandlerPluginTest {
@@ -99,6 +100,25 @@ class SelfTestResultMessageHandlerPluginTest {
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
+    }
+
+    @Test
+    fun whenReloadLoopDetectedThenSelfTestResultHasReloadLoopTrue() {
+        whenever(mockReloadLoopDetector.isReloadLoopDetected(webView)).thenReturn(true)
+        val message = """
+            {"type":"${selfTestPlugin.supportedTypes.first()}", "cmp": "test", "result": false, "url": "http://example.com"}
+        """.trimIndent()
+
+        selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(
+            consentManaged = true,
+            optOutFailed = false,
+            selfTestFailed = false,
+            isCosmetic = null,
+            consentRule = "test",
+            consentReloadLoop = true,
+        )
     }
 
     @Test
