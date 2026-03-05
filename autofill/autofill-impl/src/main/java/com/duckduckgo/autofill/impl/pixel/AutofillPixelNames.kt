@@ -236,6 +236,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED("autofill_harmony_preferences_update_key_failed"),
     AUTOFILL_HARMONY_KEY_MISMATCH("autofill_harmony_key_mismatch"),
     AUTOFILL_HARMONY_KEY_MISSING("autofill_harmony_key_missing"),
+    AUTOFILL_PREFERENCES_KEY_MISSING("autofill_preferences_key_missing"),
     AUTOFILL_STORE_KEY_ALREADY_EXISTS("autofill_store_key_already_exists"),
     LIBRARY_LOAD_TIMEOUT_SQLCIPHER("library_load_timeout_sqlcipher"),
     LIBRARY_LOAD_FAILURE_SQLCIPHER("library_load_failure_sqlcipher"),
