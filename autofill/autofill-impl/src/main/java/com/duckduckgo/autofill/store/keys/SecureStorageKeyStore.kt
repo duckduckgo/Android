@@ -241,15 +241,17 @@ class RealSecureStorageKeyStore constructor(
                         getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
-                    if (keyValue != null && autofillFeature.addWriteGuard().isEnabled()) {
-                        runCatching {
-                            legacyPrefs?.edit(commit = true) { remove(keyName) }
-                        }.onFailure { rollbackError ->
-                            pixel.fire(
-                                AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
-                                getPixelParams(keyName = keyName, throwable = rollbackError),
-                                type = Daily(),
-                            )
+                    if (autofillFeature.addWriteGuard().isEnabled()) {
+                        if (keyValue != null) {
+                            runCatching {
+                                legacyPrefs?.edit(commit = true) { remove(keyName) }
+                            }.onFailure { rollbackError ->
+                                pixel.fire(
+                                    AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                                    getPixelParams(keyName = keyName, throwable = rollbackError),
+                                    type = Daily(),
+                                )
+                            }
                         }
                     }
                     throw it
@@ -364,6 +366,9 @@ class RealSecureStorageKeyStore constructor(
                             getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
+                        if (autofillFeature.addReadGuard().isEnabled() && readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Legacy key missing")
+                        }
                     }
                     harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
                         pixel.fire(
