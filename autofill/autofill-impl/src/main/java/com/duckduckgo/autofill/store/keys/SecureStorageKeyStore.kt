@@ -121,11 +121,7 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf(
-                        "error" to e.error(),
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                    ),
+                    getPixelParams(throwable = e),
                     type = Daily(),
                 )
                 null
@@ -159,12 +155,7 @@ class RealSecureStorageKeyStore constructor(
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf(
-                        "error" to e.error(),
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                        "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                    ),
+                    getPixelParams(throwable = e),
                     type = Daily(),
                 )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
@@ -193,13 +184,8 @@ class RealSecureStorageKeyStore constructor(
                     }
                     pixel.fire(
                         AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
-                        mapOf(
-                            "key" to keyName,
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
                     )
                 }
             }
@@ -211,13 +197,8 @@ class RealSecureStorageKeyStore constructor(
                     }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
-                        mapOf(
-                            "key" to keyName,
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
                     )
                 }
             }
@@ -229,13 +210,7 @@ class RealSecureStorageKeyStore constructor(
             if (autofillFeature.addWriteGuard().isEnabled() && keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
-                    mapOf(
-                        "key" to keyName,
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                        "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                        "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                    ),
+                    getPixelParams(keyName = keyName),
                     type = Daily(),
                 )
                 throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
@@ -253,12 +228,7 @@ class RealSecureStorageKeyStore constructor(
                 ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    mapOf(
-                        "key" to keyName,
-                        "error" to it.error(),
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                    ),
+                    getPixelParams(keyName = keyName, throwable = it),
                     type = Daily(),
                 )
                 throw it
@@ -277,14 +247,7 @@ class RealSecureStorageKeyStore constructor(
                     ensureActive()
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                        mapOf(
-                            "key" to keyName,
-                            "error" to it.error(),
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
                     throw it
@@ -330,13 +293,8 @@ class RealSecureStorageKeyStore constructor(
                     }
                     pixel.fire(
                         AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
-                        mapOf(
-                            "key" to keyName,
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
                     )
                 }
             }
@@ -348,13 +306,8 @@ class RealSecureStorageKeyStore constructor(
                     }
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
-                        mapOf(
-                            "key" to keyName,
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
                     )
                 }
             }
@@ -367,12 +320,7 @@ class RealSecureStorageKeyStore constructor(
                 ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_GET_KEY_FAILED,
-                    mapOf(
-                        "key" to keyName,
-                        "error" to it.error(),
-                        "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                        "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                    ),
+                    getPixelParams(keyName = keyName, throwable = it),
                     type = Daily(),
                 )
                 throw it
@@ -388,14 +336,7 @@ class RealSecureStorageKeyStore constructor(
                     ensureActive()
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
-                        mapOf(
-                            "key" to keyName,
-                            "error" to it.error(),
-                            "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                            "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                            "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                        ),
+                        getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
                     if (autofillFeature.addReadGuard().isEnabled()) {
@@ -408,13 +349,7 @@ class RealSecureStorageKeyStore constructor(
                     harmonyValue == null && legacyValue != null -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
-                            mapOf(
-                                "key" to keyName,
-                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                                "addReadGuard" to autofillFeature.addReadGuard().isEnabled().toString(),
-                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                                "readFromHarmony" to autofillFeature.readFromHarmony().isEnabled().toString(),
-                            ),
+                            getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
                         if (autofillFeature.addReadGuard().isEnabled()) {
@@ -424,11 +359,7 @@ class RealSecureStorageKeyStore constructor(
                     harmonyValue != null && legacyValue == null -> {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_KEY_MISSING,
-                            mapOf(
-                                "key" to keyName,
-                                "addWriteGuard" to autofillFeature.addWriteGuard().isEnabled().toString(),
-                                "initialHarmonyValue" to initialUseHarmonyValue.toString(),
-                            ),
+                            getPixelParams(keyName = keyName),
                             type = Daily(),
                         )
                     }
@@ -464,6 +395,15 @@ class RealSecureStorageKeyStore constructor(
         } else {
             getEncryptedPreferences() != null
         }
+    }
+
+    private fun getPixelParams(keyName: String? = null, throwable: Throwable? = null) = buildMap {
+        keyName?.let { put("key", it) }
+        put("addWriteGuard", autofillFeature.addWriteGuard().isEnabled().toString())
+        put("addReadGuard", autofillFeature.addReadGuard().isEnabled().toString())
+        put("initialHarmonyValue", initialUseHarmonyValue.toString())
+        put("readFromHarmony", autofillFeature.readFromHarmony().isEnabled().toString())
+        throwable?.error()?.let { put("error", it) }
     }
 
     private fun Throwable.error(): String {
