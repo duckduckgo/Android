@@ -44,7 +44,7 @@
     <!-- App Tracking Protection Ongoing Notification -->
     <string name="atp_ReportIssue">Ongelmia sovelluksen kanssa?</string>
     <string name="atp_OnInitialNotification">"App Tracking Protection on käytössä ja estää seurantayritykset kaikissa sovelluksissasi"</string>
-    <string name="atp_OnNoTrackersNotificationHeader">"Skannataan seurantatoiminnan varalta… piip… puup"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Skannataan seurantatoiminnan varalta... piip... puup"</string>
     <plurals name="atp_OnNotification">
         <item quantity="one"><![CDATA[ Seurantayrityksiä estetty <b>%1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
         <item quantity="other"><![CDATA[ Seurantayrityksiä estetty <b>kaikkiaan %1$d sovelluksessa</b> (viimeisen tunnin aikana).]]></item>
