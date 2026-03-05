@@ -89,4 +89,8 @@
     <string name="afterInactivityOptionTitle">After Inactivity</string>
     <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s hours of inactivity.</string>
 
+    <!--Onboarding Rebrand Design Update-->
+    <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
+    <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that keeps you protected?</string>
+
 </resources>
