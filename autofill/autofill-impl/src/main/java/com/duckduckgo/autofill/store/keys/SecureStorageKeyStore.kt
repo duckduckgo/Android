@@ -195,13 +195,15 @@ class RealSecureStorageKeyStore constructor(
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (autofillFeature.addWriteGuard().isEnabled() && keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName)) {
+            if (keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     getPixelParams(keyName = keyName),
                     type = Daily(),
                 )
-                throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                if (autofillFeature.addWriteGuard().isEnabled()) {
+                    throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                }
             }
 
             runCatching {
