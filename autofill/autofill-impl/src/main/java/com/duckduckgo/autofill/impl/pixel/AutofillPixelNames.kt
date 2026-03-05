@@ -244,6 +244,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_harmony_preferences_update_key_null_file"),
     AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE("autofill_preferences_get_key_null_file"),
     AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE("autofill_harmony_preferences_get_key_null_file"),
+    AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED("autofill_harmony_update_key_rollback_failed"),
 }
 
 object AutofillPixelParameters {
