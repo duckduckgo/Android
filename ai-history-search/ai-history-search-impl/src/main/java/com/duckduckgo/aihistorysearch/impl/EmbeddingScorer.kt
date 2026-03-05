@@ -41,6 +41,7 @@ internal class EmbeddingScorer(context: Context) {
      * Called from a background coroutine — synchronous inference is fine here.
      */
     fun rank(query: String, entries: List<HistoryEntry.VisitedPage>): List<HistoryEntry.VisitedPage> {
+        if (entries.isEmpty()) return emptyList()
         val queryEmbedding = embed(query)
         val scored = entries.map { entry ->
             val text = buildString {
@@ -48,7 +49,7 @@ internal class EmbeddingScorer(context: Context) {
                 append(entry.url)
                 entry.h1?.takeIf { it.isNotBlank() && it != entry.title }?.let { append(" ").append(it) }
                 entry.description?.takeIf { it.isNotBlank() }?.let { append(" ").append(it) }
-                entry.chunkText?.takeIf { it.isNotBlank() }?.let { append(" ").append(it) }
+                entry.chunkText?.takeIf { it.isNotBlank() }?.let { append(" ").append(it.take(CHUNK_TEXT_EMBED_LIMIT)) }
             }
             entry to TextEmbedder.cosineSimilarity(queryEmbedding, embed(text))
         }
@@ -74,5 +75,7 @@ internal class EmbeddingScorer(context: Context) {
         // keep entries within SIMILARITY_MARGIN of the top score, but never below SIMILARITY_MIN_THRESHOLD.
         private const val SIMILARITY_MIN_THRESHOLD = 0.75
         private const val SIMILARITY_MARGIN = 0.10
+        // USE Lite has a fixed input limit; cap chunkText to avoid silent truncation inside the SDK.
+        private const val CHUNK_TEXT_EMBED_LIMIT = 500
     }
 }

@@ -32,6 +32,7 @@ internal object Bm25Scorer {
 
     private const val K1 = 1.5
     private const val B = 0.75
+    private const val CHUNK_TEXT_BM25_LIMIT = 500
 
     /**
      * Returns [entries] sorted descending by BM25 relevance to [query].
@@ -49,7 +50,7 @@ internal object Bm25Scorer {
         if (queryTerms.isEmpty()) return entries
 
         val docs: List<List<String>> = entries.map { entry ->
-            val extra = listOfNotNull(entry.description, entry.h1, entry.chunkText).joinToString(" ")
+            val extra = listOfNotNull(entry.description, entry.h1, entry.chunkText?.take(CHUNK_TEXT_BM25_LIMIT)).joinToString(" ")
             tokenize("${entry.title} ${entry.url} $extra")
         }
         val n = docs.size
