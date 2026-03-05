@@ -326,9 +326,7 @@ class RealSecureStorage @Inject constructor(
         )
 
     // only encrypt when there's data
-    private suspend fun encryptData(data: String?): EncryptedString? = data?.let {
-        l2DataTransformer.encrypt(it)
-    }
+    private suspend fun encryptData(data: String?): EncryptedString? = data?.let { l2DataTransformer.encrypt(it) }
 
     private suspend fun decryptData(
         data: String?,
