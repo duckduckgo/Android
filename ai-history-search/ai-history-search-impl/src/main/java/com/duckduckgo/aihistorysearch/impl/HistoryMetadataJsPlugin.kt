@@ -45,6 +45,9 @@ internal data class PageMetadata(
     val chunkText: String?,
 )
 
+private val METADATA_ADAPTER = Moshi.Builder().build()
+    .adapter<Map<String, String?>>(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
+
 /**
  * Parses page metadata from a JSON result produced by [evaluateJavascript].
  * The JS returns a plain object `{description, h1, chunkText}` so the result is already
@@ -54,7 +57,7 @@ internal data class PageMetadata(
  */
 internal fun parseMetadata(result: String): PageMetadata? {
     return try {
-        val map = HistoryMetadataJsPlugin.ADAPTER.fromJson(result) ?: return null
+        val map = METADATA_ADAPTER.fromJson(result) ?: return null
         val description = map["description"]?.takeIf { it.isNotBlank() }
         val h1 = map["h1"]?.takeIf { it.isNotBlank() }
         val chunkText = map["chunkText"]?.takeIf { it.isNotBlank() }
@@ -74,13 +77,28 @@ class HistoryMetadataJsPlugin @Inject constructor(
     private val application: Application,
 ) : JsInjectorPlugin {
 
-    private val readabilityJs: String by lazy {
-        application.assets.open("readability.js").bufferedReader().use { it.readText() }
-    }
-
-    companion object {
-        val ADAPTER = Moshi.Builder().build()
-            .adapter<Map<String, String?>>(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
+    // Readability.js source is prepended so it is available in the same evaluation context.
+    // The extractor returns a plain object — evaluateJavascript delivers it as a JSON string
+    // directly to Moshi without any manual unquoting. Built once and reused across all page loads.
+    private val extractorJs: String by lazy {
+        val readability = application.assets.open("readability.js").bufferedReader().use { it.readText() }
+        readability + """
+            ;(function() {
+                var d = document.querySelector('meta[property="og:description"]')?.content
+                    || document.querySelector('meta[name="description"]')?.content
+                    || null;
+                var h = document.querySelector('h1')?.textContent?.trim() || null;
+                var chunkText = null;
+                try {
+                    var docClone = document.cloneNode(true);
+                    var article = new Readability(docClone).parse();
+                    if (article && article.textContent) {
+                        chunkText = article.textContent.replace(/\s+/g, ' ').trim().substring(0, 2000) || null;
+                    }
+                } catch(e) {}
+                return {description: d, h1: h, chunkText: chunkText};
+            })()
+        """.trimIndent()
     }
 
     override fun onPageStarted(webView: WebView, url: String?, isDesktopMode: Boolean?, activeExperiments: List<Toggle>) {
@@ -91,32 +109,8 @@ class HistoryMetadataJsPlugin @Inject constructor(
         if (!feature.historyMetadataEnabled().isEnabled()) return
         val pageUrl = url ?: return
 
-        // Readability.js source is prepended so it is available in the same evaluation context.
-        // The extractor returns a plain object — evaluateJavascript delivers it as a JSON string
-        // directly to Moshi without any manual unquoting.
-        val js = buildString {
-            append(readabilityJs)
-            append("""
-                ;(function() {
-                    var d = document.querySelector('meta[property="og:description"]')?.content
-                        || document.querySelector('meta[name="description"]')?.content
-                        || null;
-                    var h = document.querySelector('h1')?.textContent?.trim() || null;
-                    var chunkText = null;
-                    try {
-                        var docClone = document.cloneNode(true);
-                        var article = new Readability(docClone).parse();
-                        if (article && article.textContent) {
-                            chunkText = article.textContent.replace(/\s+/g, ' ').trim().substring(0, 2000) || null;
-                        }
-                    } catch(e) {}
-                    return {description: d, h1: h, chunkText: chunkText};
-                })()
-            """.trimIndent())
-        }
-
-        webView.evaluateJavascript(js) { result ->
-            if (result == null) return@evaluateJavascript
+        webView.evaluateJavascript(extractorJs) { result ->
+            if (result == null || result == "null") return@evaluateJavascript
             val metadata = parseMetadata(result) ?: return@evaluateJavascript
             logcat {
                 "HistoryMetadata: url=$pageUrl description=${metadata.description?.take(80)} " +
