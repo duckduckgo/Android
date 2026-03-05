@@ -236,7 +236,7 @@ class RealSecureStorageKeyStore constructor(
                 }.getOrElse {
                     ensureActive()
                     // Rollback legacy write so we don't cause a corrupted state with out of sync files
-                    if (keyValue != null) {
+                    if (keyValue != null && autofillFeature.addWriteGuard().isEnabled()) {
                         legacyPrefs?.edit(commit = true) { remove(keyName) }
                     }
                     pixel.fire(
