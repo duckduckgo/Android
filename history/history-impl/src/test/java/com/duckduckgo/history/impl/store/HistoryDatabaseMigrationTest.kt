@@ -130,6 +130,24 @@ class HistoryDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun whenMigratingFromV3ToV4ThenExistingRowHasNullChunkText() {
+        testHelper.createDatabase(TEST_DB_NAME, 3).apply {
+            execSQL(
+                "INSERT INTO history_entries (id, url, title, query, isSerp, description, h1) VALUES (1, 'https://example.com', 'Example', NULL, 0, NULL, NULL)",
+            )
+            close()
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 4, true, MIGRATION_3_4).apply {
+            val cursor = query("SELECT chunkText FROM history_entries WHERE id = 1")
+            cursor.moveToFirst()
+            assertEquals(null, cursor.getString(cursor.getColumnIndexOrThrow("chunkText")))
+            cursor.close()
+            close()
+        }
+    }
+
     companion object {
         private const val TEST_DB_NAME = "history_migration_test"
     }

@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
  * @property isSerp Whether the history entry is a Search Engine Results Page (SERP).
  * @property description An optional description extracted from the page, if any.
  * @property h1 The primary heading of the page, if any.
+ * @property chunkText The readable body text of the page extracted by Readability.js, if available.
  */
 @Entity(tableName = "history_entries", indices = [Index(value = ["url"], unique = true)])
 data class HistoryEntryEntity(
@@ -30,6 +31,7 @@ data class HistoryEntryEntity(
     val isSerp: Boolean,
     val description: String? = null,
     val h1: String? = null,
+    val chunkText: String? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         return this.url == (other as? HistoryEntryEntity)?.url
