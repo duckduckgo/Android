@@ -1796,7 +1796,7 @@ class BrowserTabViewModelTest {
                 flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
             whenever(mockNavigationHistory.getHistory()).thenReturn(
-                flowOf(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+                flowOf(listOf(VisitedPage(url = "https://foo.com".toUri(), title = "title", visits = listOf(LocalDateTime.now())))),
             )
             whenever(mockTabRepository.flowTabs).thenReturn(
                 flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
@@ -1845,7 +1845,7 @@ class BrowserTabViewModelTest {
             flowOf(listOf(Favorite("abc", "query", "https://example.com", position = 1, lastModified = null))),
         )
         whenever(mockNavigationHistory.getHistory()).thenReturn(
-            flowOf(listOf(VisitedPage("https://foo.com".toUri(), "query", listOf(LocalDateTime.now())))),
+            flowOf(listOf(VisitedPage(url = "https://foo.com".toUri(), title = "query", visits = listOf(LocalDateTime.now())))),
         )
         whenever(mockTabRepository.flowTabs).thenReturn(
             flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "query"))),

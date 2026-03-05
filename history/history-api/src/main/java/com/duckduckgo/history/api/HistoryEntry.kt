@@ -35,6 +35,8 @@ sealed class HistoryEntry {
      * @property url The URL of the visited page.
      * @property title The title of the visited page.
      * @property visits List of [LocalDateTime] objects representing the visit times.
+     * @property description The page meta description (og:description or meta[name=description]), if available.
+     * @property h1 The primary heading (first h1 element) of the page, if available.
      */
     data class VisitedPage(
         override val url: Uri,

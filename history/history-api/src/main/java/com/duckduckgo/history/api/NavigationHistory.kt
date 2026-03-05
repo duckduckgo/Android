@@ -79,7 +79,8 @@ interface NavigationHistory {
 
     /**
      * Updates the description and h1 for an existing history entry identified by [url].
-     * No-op if the entry does not exist. Both fields are optional — pass null to leave unchanged.
+     * No-op if the entry does not exist.
+     * Pass null for either field to leave that field unchanged (not to clear it).
      */
     suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?)
 }
