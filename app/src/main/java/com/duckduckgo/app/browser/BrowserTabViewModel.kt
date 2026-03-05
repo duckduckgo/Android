@@ -2019,7 +2019,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun shouldShowLocationPermissionMessage(): Boolean {
         val url = site?.url ?: return true
-        return !duckChat.isDuckChatUrl(Uri.parse(url))
+        return !duckChat.isDuckChatUrl(url.toUri()) || duckDuckGoUrlDetector.isDuckDuckGoUrl(url)
     }
 
     private fun urlUpdated(url: String) {
