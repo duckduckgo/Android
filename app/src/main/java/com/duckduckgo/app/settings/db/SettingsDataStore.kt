@@ -37,7 +37,6 @@ import javax.inject.Inject
 interface SettingsDataStore {
     var lastExecutedJobId: String?
 
-    @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
     var maliciousSiteProtectionEnabled: Boolean
     var appIcon: AppIcon
