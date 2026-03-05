@@ -111,6 +111,25 @@ class HistoryDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun whenMigratingFromV2ToV3ThenExistingRowHasNullDescriptionAndH1() {
+        testHelper.createDatabase(TEST_DB_NAME, 2).apply {
+            execSQL(
+                "INSERT INTO history_entries (id, url, title, query, isSerp) VALUES (1, 'https://example.com', 'Example', NULL, 0)",
+            )
+            close()
+        }
+
+        testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, MIGRATION_2_3).apply {
+            val cursor = query("SELECT description, h1 FROM history_entries WHERE id = 1")
+            cursor.moveToFirst()
+            assertEquals(null, cursor.getString(cursor.getColumnIndexOrThrow("description")))
+            assertEquals(null, cursor.getString(cursor.getColumnIndexOrThrow("h1")))
+            cursor.close()
+            close()
+        }
+    }
+
     companion object {
         private const val TEST_DB_NAME = "history_migration_test"
     }

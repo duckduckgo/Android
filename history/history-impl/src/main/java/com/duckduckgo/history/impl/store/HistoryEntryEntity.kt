@@ -18,6 +18,8 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
  * @property title The title of the history entry.
  * @property query The search query associated with the history entry, if any.
  * @property isSerp Whether the history entry is a Search Engine Results Page (SERP).
+ * @property description An optional description extracted from the page, if any.
+ * @property h1 The primary heading of the page, if any.
  */
 @Entity(tableName = "history_entries", indices = [Index(value = ["url"], unique = true)])
 data class HistoryEntryEntity(
