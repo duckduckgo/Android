@@ -171,7 +171,7 @@ class RealSecureStorageKeyStore(
             val harmonyPrefs = if (!useHarmony()) {
                 null
             } else {
-                getNullPrefs().also {
+                getHarmonyEncryptedPreferences().also {
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
@@ -278,7 +278,6 @@ class RealSecureStorageKeyStore(
         return false
     }
 
-    private fun getNullPrefs(): SharedPreferences? = null
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             // Always read from legacy — source of truth
@@ -299,7 +298,7 @@ class RealSecureStorageKeyStore(
             val harmonyPrefs = if (!useHarmony()) {
                 null
             } else {
-                getNullPrefs().also {
+                getHarmonyEncryptedPreferences().also {
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
