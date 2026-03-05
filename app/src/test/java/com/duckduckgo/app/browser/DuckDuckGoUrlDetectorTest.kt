@@ -161,4 +161,13 @@ class DuckDuckGoUrlDetectorTest {
         val vertical = testee.extractVertical("https://duckduckgo.com/?q=new+zealand+images&t=ffab&atb=v218-6&iar=images&iax=images&ia=images")
         assertEquals("images", vertical)
     }
+
+    @Test
+    fun test() {
+        val isDDG = testee.isDuckDuckGoUrl("https://duckduckgo.com/")
+        assertTrue(isDDG)
+    }
+
+
+
 }
