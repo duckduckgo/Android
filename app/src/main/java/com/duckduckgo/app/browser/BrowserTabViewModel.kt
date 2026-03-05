@@ -2420,6 +2420,8 @@ class BrowserTabViewModel @Inject constructor(
         site?.consentManaged = false
         site?.consentOptOutFailed = false
         site?.consentSelfTestFailed = false
+        site?.consentRule = null
+        site?.consentReloadLoop = false
     }
 
     override fun getSite(): Site? = site
