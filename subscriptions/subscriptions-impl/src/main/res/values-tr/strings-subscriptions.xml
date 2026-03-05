@@ -156,7 +156,7 @@
     <string name="feedbackSubCategorySubsOther">Başka bir şey</string>
 
     <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın…</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Yukarıda girilen ayrıntılara ek olarak, geri bildiriminizle birlikte bazı anonimleştirilmiş bilgiler gönderiyoruz:\n\n• Bazı tarayıcı özelliklerinin etkin olup olmadığı\n• Toplu uygulama tanılama (ör. hata kodları)\n\nGönder'e tıklayarak, DuckDuckGo'nun uygulamayı geliştirmek için gönderilen bilgileri kullanabileceğini kabul ediyorsunuz."</string>
     <string name="feedbackSubmitVpnSubmit">Gönder</string>
     <string name="feedbackSubmitCompletedMessage">Teşekkür Ederiz! Geri bildirim gönderildi.</string>

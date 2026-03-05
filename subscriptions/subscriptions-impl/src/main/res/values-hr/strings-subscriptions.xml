@@ -83,7 +83,7 @@
     <string name="subscriptionSettingRemoveFromDevice">Ukloni s ovog uređaja</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Pomoć i podrška</string>
     <string name="subscriptionSettingSendFeedback">Pošalji povratnu informaciju</string>
-    <string name="subscriptionSettingActivating">Aktiviranje u tijeku…</string>
+    <string name="subscriptionSettingActivating">Aktiviranje u tijeku...</string>
     <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Uštedi %1$s %% s godišnjim planom</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Najbolja ponuda</string>
@@ -156,7 +156,7 @@
     <string name="feedbackSubCategorySubsOther">Nešto drugo</string>
 
     <string name="feedbackSubmitVpnHeader">Pronašao si problem koji nije pokriven u našem <annotation type="faqs_link">centru za pomoć</annotation> ? Definitivno želimo znati više o tome.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Reci nam što se događa…</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Reci nam što se događa...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Osim gore unesenih pojedinosti, šaljemo neke anonimizirane podatke s tvojim povratnim informacijama:\n\n • Jesu li neke značajke preglednika aktivne\n • Objedinjena dijagnostika aplikacije (npr. kodovi pogrešaka)\n\nKlikom \"Pošalji\" slažeš se da DuckDuckGo može koristiti poslane podatke za poboljšanje aplikacije."</string>
     <string name="feedbackSubmitVpnSubmit">Pošalji</string>
     <string name="feedbackSubmitCompletedMessage">Hvala! Povratne informacije su poslane.</string>

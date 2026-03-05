@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Altceva</string>
 
     <string name="feedbackSubmitVpnHeader">Ai găsit o problemă care nu este prezentată în <annotation type="faqs_link">centrul nostru de ajutor</annotation> ? Ne dorim foarte mult să știm acest lucru.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Spune-ne ce se întâmplă…</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Spune-ne ce se întâmplă...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Pe lângă detaliile introduse mai sus, trimitem câteva informații anonimizate împreună cu feedbackul tău:\n\n• Dacă unele caracteristici ale browserului sunt active\n• Diagnosticarea agregată a aplicației (de exemplu, coduri de eroare)\n\nFăcând click pe Trimite, ești de acord că DuckDuckGo poate utiliza informațiile trimise pentru a îmbunătăți aplicația."</string>
     <string name="feedbackSubmitVpnSubmit">Trimite</string>
     <string name="feedbackSubmitCompletedMessage">Mulțumesc! Feedback trimis.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Te rugăm să ne comunici feedbackul tău…</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Te rugăm să ne comunici feedbackul tău...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Ce caracteristică ai dori să vezi?</string>
     <string name="feedbackSubmitContactSupport">Ai nevoie de ajutor? <annotation type="support_link">Contactează Serviciul de asistență</annotation>.</string>
 

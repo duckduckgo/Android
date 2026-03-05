@@ -156,12 +156,12 @@
     <string name="feedbackSubCategorySubsOther">Kažkas kito</string>
 
     <string name="feedbackSubmitVpnHeader">Ar radote problemą, kurios nėra mūsų <annotation type="faqs_link">pagalbos centre</annotation> ? Mes tikrai norime apie tai sužinoti.</string>
-    <string name="feedbackSubmitVpnDescriptionHint">Praneškite, kas vyksta…</string>
+    <string name="feedbackSubmitVpnDescriptionHint">Praneškite, kas vyksta...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Be pirmiau įvestos informacijos, kartu su jūsų atsiliepimais siunčiame anoniminę informaciją:\n\n• Ar kai kurios naršyklės funkcijos yra aktyvios\n• Apibendrinta programėlės diagnostika (pvz., klaidų kodai)\n\nSpausdami „Pateikti“ sutinkate, kad „DuckDuckGo“ gali naudoti pateiktą informaciją programėlei tobulinti."</string>
     <string name="feedbackSubmitVpnSubmit">Pateikti</string>
     <string name="feedbackSubmitCompletedMessage">Dėkojame! Atsiliepimas pateiktas.</string>
 
-    <string name="feedbackSubmitGeneralDescriptionHint">Pateikite mums savo atsiliepimą…</string>
+    <string name="feedbackSubmitGeneralDescriptionHint">Pateikite mums savo atsiliepimą...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kokią funkciją norėtumėte pamatyti?</string>
     <string name="feedbackSubmitContactSupport">Reikia pagalbos? <annotation type="support_link">Kreipkitės į palaikymo tarnybą</annotation>.</string>
 
