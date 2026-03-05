@@ -1501,7 +1501,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun renderBrowserMenu(viewState: BrowserViewState, omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode) {
+    private fun renderBrowserMenu(
+        viewState: BrowserViewState,
+        omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode
+    ) {
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
@@ -2767,10 +2770,12 @@ class BrowserTabFragment :
                 omnibar.setViewMode(Browser(it.url))
                 nativeInputManager.hideNativeInput(binding.rootView, omnibar)
             }
+
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)
             }
+
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext)
             }
@@ -3279,6 +3284,7 @@ class BrowserTabFragment :
                                             showToast(R.string.unableToOpenLink)
                                         }
                                     }
+
                                     LaunchInExternalAppOptions.CLOSE_TAB -> {
                                         launch {
                                             viewModel.closeCurrentTab()
