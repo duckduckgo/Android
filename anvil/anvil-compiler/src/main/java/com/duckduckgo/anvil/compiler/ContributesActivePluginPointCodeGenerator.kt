@@ -100,7 +100,6 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
 
         // First pass: collect plugin point featureNames declared explicitly in this module's source.
         // Used to validate @ContributesActivePlugin.parentFeatureName in the second pass.
-        // Only includes plugin points that have an explicit featureName set (empty = legacy, skip).
         val localPluginPointFeatureNames: Set<String> = annotated
             .filter { it.isContributesActivePluginPoint() }
             .mapNotNull { ref ->
