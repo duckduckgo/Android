@@ -211,7 +211,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Verifică abonamentul</string>
-    <string name="netpVerifySubscriptionInProgress">Te rugăm să aștepți până verificăm abonamentul tău…</string>
+    <string name="netpVerifySubscriptionInProgress">Te rugăm să aștepți până verificăm abonamentul tău...</string>
     <string name="netpVerifySubscriptionNoSubscription">Ups! Nu ai niciun abonament valabil.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Ups! Abonamentul tău nu este valabil pentru DuckDuckGo VPN.</string>
 

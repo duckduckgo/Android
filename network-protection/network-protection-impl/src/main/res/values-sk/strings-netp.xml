@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Pripojte sa, aby ste zabezpečili všetky svoje zariadenia\n Internetový prenos.</string>
     <string name="netpManagementDescriptionOn">Celá internetová prevádzka zariadenia je zabezpečená\nProstredníctvom VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Pripája sa…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Pripája sa...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Pripojené · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Nie je pripojený</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN je momentálne v beta verzii. <annotation type="report_issues_link">Podeľ sa o spätnú väzbu</annotation> a pomôž nám tak zlepšiť sa!</string>
@@ -212,7 +212,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Overiť predplatné</string>
-    <string name="netpVerifySubscriptionInProgress">Počkaj, prosím, kým overíme tvoje predplatné…</string>
+    <string name="netpVerifySubscriptionInProgress">Počkaj, prosím, kým overíme tvoje predplatné...</string>
     <string name="netpVerifySubscriptionNoSubscription">Ach! Nemáš žiadne platné predplatné.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Ach! Tvoje predplatné nie je platné pre DuckDuckGo VPN.</string>
 

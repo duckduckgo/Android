@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Opret forbindelse for at sikre al din enheds\ninternettrafik.</string>
     <string name="netpManagementDescriptionOn">Al internettrafik på enheden er sikret\ngennem VPN-forbindelsen.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Forbinder …</string>
+    <string name="netpManagementToggleSubtitleConnecting">Forbinder ...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Forbundet · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Ikke forbundet</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN er i øjeblikket i beta. <annotation type="report_issues_link">Del feedback</annotation> for at hjælpe os med at blive bedre!</string>

@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Nawiąż połączenie, aby zabezpieczyć ruch internetowy urządzenia.</string>
     <string name="netpManagementDescriptionOn">Cały ruch internetowy urządzenia jest zabezpieczony\nprzez VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Łączenie…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Łączenie...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Połączono · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Nie połączono</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN jest obecnie w wersji beta. <annotation type="report_issues_link">Podziel się opinią</annotation>, aby pomóc nam ulepszać usługę!</string>
@@ -212,7 +212,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Zweryfikuj subskrypcję</string>
-    <string name="netpVerifySubscriptionInProgress">Poczekaj, aż zweryfikujemy Twoją subskrypcję…</string>
+    <string name="netpVerifySubscriptionInProgress">Poczekaj, aż zweryfikujemy Twoją subskrypcję...</string>
     <string name="netpVerifySubscriptionNoSubscription">Błąd! Nie masz żadnej ważnej subskrypcji.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Błąd! Twoja subskrypcja nie obejmuje DuckDuckGo VPN.</string>
 

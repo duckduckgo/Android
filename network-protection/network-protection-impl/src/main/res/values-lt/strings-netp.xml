@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Prisijunkite, kad apsaugotumėte visų savo įrenginių\ninterneto srautą.</string>
     <string name="netpManagementDescriptionOn">Visas įrenginio interneto srautas yra apsaugotas\nnaudojant VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Jungiamasi…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Jungiamasi...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Prisijungta · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Neprijungta</string>
     <string name="netpManagementBetaDescription">„DuckDuckGo“ VPN šiuo metu yra beta versijoje. <annotation type="report_issues_link">Pasidalink atsiliepimais</annotation>, kad padėtum mums tobulėti!</string>

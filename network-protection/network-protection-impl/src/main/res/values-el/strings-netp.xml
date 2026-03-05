@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Συνδεθείτε για να διασφαλίσετε όλη την επισκεψιμότητά σας στο διαδίκτυο\nαπό τη συσκευή σας.</string>
     <string name="netpManagementDescriptionOn">Όλη η επισκεψιμότητα στο διαδίκτυο από τη συσκευή διασφαλίζεται\n μέσω του VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Σύνδεση…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Σύνδεση...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Συνδεδεμένο · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Δεν έχει συνδεθεί</string>
     <string name="netpManagementBetaDescription">Το DuckDuckGo VPN βρίσκεται επί του παρόντος σε έκδοση beta. <annotation type="report_issues_link">Πείτε μας τα σχόλιά σας</annotation> για να μας βοηθήσετε να βελτιωθούμε!</string>
@@ -210,7 +210,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Επαλήθευση συνδρομής</string>
-    <string name="netpVerifySubscriptionInProgress">Περιμένετε μέχρι να επαληθεύσουμε τη συνδρομή σας…</string>
+    <string name="netpVerifySubscriptionInProgress">Περιμένετε μέχρι να επαληθεύσουμε τη συνδρομή σας...</string>
     <string name="netpVerifySubscriptionNoSubscription">Κρίμα! Δεν έχετε καμία έγκυρη συνδρομή.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Κρίμα! Η συνδρομή σας δεν είναι έγκυρη για το DuckDuckGo VPN.</string>
 

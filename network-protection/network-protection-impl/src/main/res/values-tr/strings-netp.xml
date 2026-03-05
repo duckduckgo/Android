@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Tüm cihazlarınızın internet trafiğinde güvenliği sağlamak\niçin bağlanın.</string>
     <string name="netpManagementDescriptionOn">Tüm cihaz internet trafiği VPN ile güvence altında.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Bağlantı kuruluyor…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Bağlantı kuruluyor...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Bağlı · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Bağlı değil</string>
     <string name="netpManagementBetaDescription">DuckDuckGo VPN şu anda beta sürümünde. <annotation type="report_issues_link">Geri bildirim paylaşarak</annotation> gelişmemize yardımcı olun!</string>

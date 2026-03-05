@@ -24,7 +24,7 @@
     <string name="netpManagementDescriptionOff">Выполните подключение для защиты\nтрафика всех устройств.</string>
     <string name="netpManagementDescriptionOn">Трафик всех устройств \nзащищен по VPN.</string>
     <string name="netpManagementToggleTitle" translatable="false">VPN</string>
-    <string name="netpManagementToggleSubtitleConnecting">Выполняется подключение…</string>
+    <string name="netpManagementToggleSubtitleConnecting">Выполняется подключение...</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Подключено · %1$s</string>
     <string name="netpManagementToggleSubtitleDisconnected">Не подключен</string>
     <string name="netpManagementBetaDescription">Сервис DuckDuckGo VPN пока что работает в бета-версии. <annotation type="report_issues_link">Поделитесь отзывом</annotation>, чтобы улучшить его!</string>
@@ -188,8 +188,8 @@
     <!-- Notifications -->
     <string name="netpNotificationCTAEnableNetp">Подключиться</string>
     <string name="netpNotificationCTAReportIssue">Возникли проблемы с приложением?</string>
-    <string name="netpNotificationDisabled">VPN отключен. Продолжить защиту трафика…</string>
-    <string name="netpNotificationDisabledByVpn">VPN-приложение на вашем устройстве отключило VPN DuckDuckGo. Подключиться заново…</string>
+    <string name="netpNotificationDisabled">VPN отключен. Продолжить защиту трафика...</string>
+    <string name="netpNotificationDisabledByVpn">VPN-приложение на вашем устройстве отключило VPN DuckDuckGo. Подключиться заново...</string>
     <string name="netpUnsafeWifi">Установлено соединение с небезопасной сетью Wi-Fi.</string>
     <string name="netpNotificationCTAReconnectNow">Подключитесь заново</string>
     <string name="netpNotificationSnoozeTitle">Работа VPN приостановлена</string>
@@ -212,7 +212,7 @@
 
     <!-- Susbcription -->
     <string name="netpVerifySubscriptionLabel">Подтвердить подписку</string>
-    <string name="netpVerifySubscriptionInProgress">Идет проверка подписки. Подождите…</string>
+    <string name="netpVerifySubscriptionInProgress">Идет проверка подписки. Подождите...</string>
     <string name="netpVerifySubscriptionNoSubscription">Упс! У вас нет действующей подписки.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Упс! Ваша подписка не покрывает услуги для DuckDuckGo VPN.</string>
 
@@ -237,7 +237,7 @@
     <!-- Block malware DNS -->
     <string name="netpDnsBlockMalwareHeader">Блокировка вредоносного контента</string>
     <string name="netpDnsBlockMalwarePrimary">Блокировщик мошенничества</string>
-    <string name="netpDnsBlockMalwareByline">Стоп-списки на уровне DNS блокируют более 150 тысяч доменов, на которые поступили жалобы за размещение вредоносного ПО, фишинговые атаки и онлайн-мошенничество. <annotation type="learn_more_link">Подробнее…</annotation></string>
+    <string name="netpDnsBlockMalwareByline">Стоп-списки на уровне DNS блокируют более 150 тысяч доменов, на которые поступили жалобы за размещение вредоносного ПО, фишинговые атаки и онлайн-мошенничество. <annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Стоп-списки DNS</string>
 
     <!-- Auto-exclude -->
