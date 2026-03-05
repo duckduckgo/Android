@@ -12,14 +12,8 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -28,6 +22,12 @@
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -44,14 +44,20 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
             {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -76,14 +82,20 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
             {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -108,14 +120,8 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -152,14 +158,8 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -196,14 +196,20 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
             {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             }
@@ -223,14 +229,8 @@
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -262,14 +262,8 @@
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -301,8 +295,8 @@
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -311,6 +305,12 @@
                 "description": "The value of useHarmony flag when harmony preferences were first initialized",
                 "type": "string",
                 "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
             }
         ]
     },
@@ -328,14 +328,8 @@
                 "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
@@ -372,14 +366,8 @@
                 "type": "string"
             },
             {
-                "key": "addWriteGuard",
-                "description": "Whether the addWriteGuard feature flag is enabled",
-                "type": "string",
-                "enum": ["true", "false"]
-            },
-            {
-                "key": "addReadGuard",
-                "description": "Whether the addReadGuard feature flag is enabled",
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
                 "type": "string",
                 "enum": ["true", "false"]
             },
