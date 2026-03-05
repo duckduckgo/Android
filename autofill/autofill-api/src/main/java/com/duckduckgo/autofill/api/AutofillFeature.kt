@@ -192,19 +192,6 @@ interface AutofillFeature {
     @DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun sqlCipherAsyncLoading(): Toggle
 
-    /**
-     * Controls whether to prevent writing if preferences file already has data, or data differs
-     * between files
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
-    fun addWriteGuard(): Toggle
-
-    /**
-     * Controls whether to fail reads if preferences file is null, or data differs between files
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
-    fun addReadGuard(): Toggle
-
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun readFromHarmony(): Toggle
 }
