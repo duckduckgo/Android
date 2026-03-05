@@ -61,7 +61,7 @@ class RealRequestBlocklist @Inject constructor(
         documentUrl: String,
         requestUrl: String,
     ): Boolean {
-        // if (!requestBlocklistFeature.self().isEnabled()) return false
+        if (!requestBlocklistFeature.self().isEnabled()) return false
 
         val httpUrl = requestUrl.toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
