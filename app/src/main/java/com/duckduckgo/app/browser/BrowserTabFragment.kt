@@ -1503,7 +1503,7 @@ class BrowserTabFragment :
 
     private fun renderBrowserMenu(
         viewState: BrowserViewState,
-        omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode
+        omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode,
     ) {
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
