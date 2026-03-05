@@ -19,9 +19,8 @@ package com.duckduckgo.eventhub.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.eventhub.impl.pixels.EventHubRepository
-import com.duckduckgo.eventhub.impl.pixels.RealEventHubRepository
 import com.duckduckgo.eventhub.impl.pixels.store.ALL_MIGRATIONS
+import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -42,11 +41,8 @@ object EventHubModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideEventHubRepository(
-        database: EventHubPixelStateDatabase,
-    ): EventHubRepository {
-        return RealEventHubRepository(database.pixelStateDao())
+    fun provideEventHubPixelStateDao(database: EventHubPixelStateDatabase): EventHubPixelStateDao {
+        return database.pixelStateDao()
     }
 }
