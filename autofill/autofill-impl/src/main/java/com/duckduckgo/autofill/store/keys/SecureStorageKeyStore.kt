@@ -214,7 +214,7 @@ class RealSecureStorageKeyStore(
                     type = Daily(),
                 )
                 if (useHarmony()) {
-                    throw SecureStorageException.InternalSecureStorageException("Error reading legacy preferences", it)
+                    throw SecureStorageException.InternalSecureStorageException("Error writing to legacy preferences", it)
                 }
             }
 
@@ -246,7 +246,7 @@ class RealSecureStorageKeyStore(
                             )
                         }
                     }
-                    throw it
+                    throw SecureStorageException.InternalSecureStorageException("Error writing to harmony preferences", it)
                 }
             }
         }
