@@ -73,4 +73,14 @@ interface AiHistorySearchFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun gemmaEnabled(): Toggle
+
+    /**
+     * When enabled, a JS snippet is injected after each page load to extract the page's
+     * og:description / meta description and first h1 text, and write them back to the
+     * history entry via [NavigationHistory.updateHistoryMetadata].
+     * Richer metadata improves semantic ranking quality in the history search path.
+     * Defaults to `internal` so it can be validated before a production rollout.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun historyMetadataEnabled(): Toggle
 }
