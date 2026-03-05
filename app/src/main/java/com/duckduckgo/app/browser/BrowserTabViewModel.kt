@@ -2002,7 +2002,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (!locationPermissionMessages.containsKey(domain)) {
                     logcat { "Location Permission: We haven't shown message for $domain this session" }
                     setDomainHasLocationPermissionShown(domain)
-                    if (shouldShowLocationPermissionMessage()) {
+                    if (shouldShowLocationPermissionMessage(domain)) {
                         logcat { "Location Permission: Show location permission for $domain" }
                         withContext(dispatchers.main()) {
                             command.postValue(ShowDomainHasPermissionMessage(domain))
@@ -2017,9 +2017,8 @@ class BrowserTabViewModel @Inject constructor(
         locationPermissionMessages[domain] = true
     }
 
-    private fun shouldShowLocationPermissionMessage(): Boolean {
-        val url = site?.url ?: return true
-        return !duckChat.isDuckChatUrl(url.toUri()) || duckDuckGoUrlDetector.isDuckDuckGoUrl(url)
+    private fun shouldShowLocationPermissionMessage(domain: String): Boolean {
+        return !duckChat.isDuckChatUrl(domain.toUri()) && !duckDuckGoUrlDetector.isDuckDuckGoUrl(domain)
     }
 
     private fun urlUpdated(url: String) {
