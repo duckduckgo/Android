@@ -167,7 +167,4 @@ class DuckDuckGoUrlDetectorTest {
         val isDDG = testee.isDuckDuckGoUrl("https://duckduckgo.com/")
         assertTrue(isDDG)
     }
-
-
-
 }

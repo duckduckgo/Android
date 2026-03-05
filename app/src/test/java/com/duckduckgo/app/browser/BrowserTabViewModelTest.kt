@@ -3679,8 +3679,6 @@ class BrowserTabViewModelTest {
             assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
         }
 
-
-
     @Test
     fun whenPrefetchFaviconThenFetchFaviconForCurrentTab() =
         runTest {
