@@ -79,7 +79,7 @@
         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/backgroundAnimation"
+        android:id="@+id/backgroundPrimary"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
@@ -92,9 +92,24 @@
         app:lottie_rawRes="@raw/onboarding_launch_screen_background"
         tools:lottie_progress="1" />
 
+    <ImageView
+        android:id="@+id/backgroundSecondary"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintVertical_bias="1"
+        android:visibility="invisible"
+        android:scaleType="centerCrop"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@drawable/onboarding_welcome_screen_background"
+        app:layout_constraintTop_toTopOf="@id/backgroundGuideline" />
+
     <include
         android:id="@+id/daxDialogCta"
-        layout="@layout/pre_onboarding_dax_dialog_cta"
+        layout="@layout/pre_onboarding_dax_dialog_cta_brand_design_update"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
