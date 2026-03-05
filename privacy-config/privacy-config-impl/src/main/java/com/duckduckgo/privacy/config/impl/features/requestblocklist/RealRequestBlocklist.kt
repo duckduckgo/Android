@@ -113,7 +113,7 @@ class RealRequestBlocklist @Inject constructor(
     ): Boolean = buildString {
         for (char in rule) {
             if (char == '*') {
-                append(".*")
+                append("[^/]*")
             } else {
                 append(Regex.escape(char.toString()))
             }
