@@ -46,6 +46,8 @@ internal class EmbeddingScorer(context: Context) {
             val text = buildString {
                 if (entry.title.isNotBlank()) append(entry.title).append(" ")
                 append(entry.url)
+                entry.h1?.takeIf { it.isNotBlank() && it != entry.title }?.let { append(" ").append(it) }
+                entry.description?.takeIf { it.isNotBlank() }?.let { append(" ").append(it) }
             }
             entry to TextEmbedder.cosineSimilarity(queryEmbedding, embed(text))
         }
