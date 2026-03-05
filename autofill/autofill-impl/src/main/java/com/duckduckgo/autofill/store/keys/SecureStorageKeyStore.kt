@@ -171,7 +171,7 @@ class RealSecureStorageKeyStore(
             val harmonyPrefs = if (!useHarmony()) {
                 null
             } else {
-                getHarmonyEncryptedPreferences().also {
+                getNullPrefs().also {
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
@@ -278,6 +278,7 @@ class RealSecureStorageKeyStore(
         return false
     }
 
+    private fun getNullPrefs(): SharedPreferences? = null
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             // Always read from legacy — source of truth
@@ -298,7 +299,7 @@ class RealSecureStorageKeyStore(
             val harmonyPrefs = if (!useHarmony()) {
                 null
             } else {
-                getHarmonyEncryptedPreferences().also {
+                getNullPrefs().also {
                     if (it == null) {
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
@@ -346,7 +347,7 @@ class RealSecureStorageKeyStore(
                 }
 
                 when {
-                    harmonyValue == null && legacyValue != null -> {
+                    harmonyPrefs != null && harmonyValue == null && legacyValue != null -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
                             getPixelParams(keyName = keyName),
@@ -356,7 +357,7 @@ class RealSecureStorageKeyStore(
                             throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
                         }
                     }
-                    harmonyValue != null && legacyValue == null -> {
+                    harmonyPrefs != null && harmonyValue != null && legacyValue == null -> {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_KEY_MISSING,
                             getPixelParams(keyName = keyName),
