@@ -45,45 +45,57 @@ class AutoconsentReloadLoopDetector @Inject constructor(
     fun updateUrl(webView: WebView, url: String) {
         val newUri = url.toUri()
         val state = tabStates.getOrPut(webView) { TabState() }
-        val oldUri = state.lastUrl
+        synchronized(state) {
+            val oldUri = state.lastUrl
 
-        if (oldUri != null && !isSamePageUrl(oldUri, newUri)) {
-            logcat { "URL changed from $oldUri to $newUri, clearing reload loop state" }
-            state.lastHandledCMP = null
-            state.reloadLoopDetected = false
+            if (oldUri != null && !isSamePageUrl(oldUri, newUri)) {
+                logcat { "URL changed from $oldUri to $newUri, clearing reload loop state" }
+                state.lastHandledCMP = null
+                state.reloadLoopDetected = false
+            }
+            state.lastUrl = newUri
         }
-        state.lastUrl = newUri
     }
 
     fun detectReloadLoop(webView: WebView, cmp: String) {
         val state = tabStates[webView] ?: return
-        if (!state.reloadLoopDetected && state.lastHandledCMP == cmp) {
-            logcat { "Reload loop detected: $cmp on ${state.lastUrl}" }
-            state.reloadLoopDetected = true
-            autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_RELOAD_LOOP_DAILY)
+        synchronized(state) {
+            if (!state.reloadLoopDetected && state.lastHandledCMP == cmp) {
+                logcat { "Reload loop detected: $cmp on ${state.lastUrl}" }
+                state.reloadLoopDetected = true
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_RELOAD_LOOP_DAILY)
+            }
         }
     }
 
     fun rememberLastHandledCMP(webView: WebView, cmp: String, isCosmetic: Boolean) {
         val state = tabStates.getOrPut(webView) { TabState() }
-        if (isCosmetic) {
-            state.lastHandledCMP = null
-            state.reloadLoopDetected = false
-            return
+        synchronized(state) {
+            if (isCosmetic) {
+                state.lastHandledCMP = null
+                state.reloadLoopDetected = false
+                return
+            }
+            if (state.lastHandledCMP != cmp) {
+                state.lastHandledCMP = null
+                state.reloadLoopDetected = false
+            }
+            state.lastHandledCMP = cmp
         }
-        if (state.lastHandledCMP != cmp) {
-            state.lastHandledCMP = null
-            state.reloadLoopDetected = false
-        }
-        state.lastHandledCMP = cmp
     }
 
     fun isReloadLoopDetected(webView: WebView): Boolean {
-        return tabStates[webView]?.reloadLoopDetected == true
+        val state = tabStates[webView] ?: return false
+        synchronized(state) {
+            return state.reloadLoopDetected
+        }
     }
 
     fun getLastHandledCMP(webView: WebView): String? {
-        return tabStates[webView]?.lastHandledCMP
+        val state = tabStates[webView] ?: return null
+        synchronized(state) {
+            return state.lastHandledCMP
+        }
     }
 
     private fun isSamePageUrl(a: Uri, b: Uri): Boolean {
