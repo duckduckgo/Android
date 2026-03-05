@@ -3,6 +3,7 @@
         "description": "Reports AppTP blocklist metadata after each scheduled blocklist update attempt.",
         "owners": ["nshuba"],
         "triggers": ["scheduled"],
+        "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
             {
