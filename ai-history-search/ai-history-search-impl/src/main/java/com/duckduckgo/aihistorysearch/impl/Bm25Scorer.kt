@@ -49,7 +49,7 @@ internal object Bm25Scorer {
         if (queryTerms.isEmpty()) return entries
 
         val docs: List<List<String>> = entries.map { entry ->
-            val extra = listOfNotNull(entry.description, entry.h1).joinToString(" ")
+            val extra = listOfNotNull(entry.description, entry.h1, entry.chunkText).joinToString(" ")
             tokenize("${entry.title} ${entry.url} $extra")
         }
         val n = docs.size

@@ -48,6 +48,7 @@ internal class EmbeddingScorer(context: Context) {
                 append(entry.url)
                 entry.h1?.takeIf { it.isNotBlank() && it != entry.title }?.let { append(" ").append(it) }
                 entry.description?.takeIf { it.isNotBlank() }?.let { append(" ").append(it) }
+                entry.chunkText?.takeIf { it.isNotBlank() }?.let { append(" ").append(it) }
             }
             entry to TextEmbedder.cosineSimilarity(queryEmbedding, embed(text))
         }

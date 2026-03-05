@@ -119,6 +119,7 @@ internal class GemmaSearcher(
                 append("- ${entry.title} — ${entry.url} ($date)")
                 entry.h1?.takeIf { it.isNotBlank() && it != entry.title }?.let { append(" [$it]") }
                 entry.description?.takeIf { it.isNotBlank() }?.let { append(": $it") }
+                entry.chunkText?.takeIf { it.isNotBlank() }?.let { append("\n  ").append(it.take(300)) }
             }
         }
         return """

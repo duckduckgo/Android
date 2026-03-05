@@ -79,7 +79,8 @@ class AiHistorySearchInteractor @Inject constructor(
 
         val withDescription = timeFiltered.count { it.description != null }
         val withH1 = timeFiltered.count { it.h1 != null }
-        logcat { "AiHistorySearch: ${timeFiltered.size} entries in window, description=$withDescription h1=$withH1" }
+        val withChunkText = timeFiltered.count { it.chunkText != null }
+        logcat { "AiHistorySearch: ${timeFiltered.size} entries in window, description=$withDescription h1=$withH1 chunkText=$withChunkText" }
 
         // AICore shadow path — logcats result only, never short-circuits Duck.ai
         if (feature.aiCoreEnabled().isEnabled()) {
