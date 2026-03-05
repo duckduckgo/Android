@@ -94,4 +94,12 @@ class SamplingDeciderTest {
         assertTrue(decider.shouldSample("not-valid-json"))
         verify(mockRandom).nextDouble()
     }
+
+    @Test
+    fun `when sampling key is missing then falls back to default 1 percent sampling`() {
+        whenever(mockRandom.nextDouble()).thenReturn(0.005)
+
+        assertTrue(decider.shouldSample("{}"))
+        verify(mockRandom).nextDouble()
+    }
 }
