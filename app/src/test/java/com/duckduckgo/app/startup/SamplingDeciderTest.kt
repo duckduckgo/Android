@@ -41,13 +41,13 @@ class SamplingDeciderTest {
 
     @Test
     fun `when samplingRate 0_0 configured then always returns false`() {
-        assertFalse(decider.shouldSample("""{"sampling":"0.0"}"""))
+        assertFalse(decider.shouldSample("""{"sampling":0.0}"""))
         verifyNoInteractions(mockRandom)
     }
 
     @Test
     fun `when samplingRate 1_0 configured then always returns true`() {
-        assertTrue(decider.shouldSample("""{"sampling":"1.0"}"""))
+        assertTrue(decider.shouldSample("""{"sampling":1.0}"""))
         verifyNoInteractions(mockRandom)
     }
 
@@ -55,7 +55,7 @@ class SamplingDeciderTest {
     fun `when samplingRate 0_5 and random below threshold then returns true`() {
         whenever(mockRandom.nextDouble()).thenReturn(0.3)
 
-        assertTrue(decider.shouldSample("""{"sampling":"0.5"}"""))
+        assertTrue(decider.shouldSample("""{"sampling":0.5}"""))
         verify(mockRandom).nextDouble()
     }
 
@@ -63,19 +63,19 @@ class SamplingDeciderTest {
     fun `when samplingRate 0_5 and random above threshold then returns false`() {
         whenever(mockRandom.nextDouble()).thenReturn(0.7)
 
-        assertFalse(decider.shouldSample("""{"sampling":"0.5"}"""))
+        assertFalse(decider.shouldSample("""{"sampling":0.5}"""))
         verify(mockRandom).nextDouble()
     }
 
     @Test
     fun `when negative samplingRate then treated as 0_0`() {
-        assertFalse(decider.shouldSample("""{"sampling":"-0.5"}"""))
+        assertFalse(decider.shouldSample("""{"sampling":-0.5}"""))
         verifyNoInteractions(mockRandom)
     }
 
     @Test
     fun `when samplingRate greater than 1_0 then treated as 1_0`() {
-        assertTrue(decider.shouldSample("""{"sampling":"1.5"}"""))
+        assertTrue(decider.shouldSample("""{"sampling":1.5}"""))
         verifyNoInteractions(mockRandom)
     }
 
