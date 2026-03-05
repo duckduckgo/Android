@@ -77,6 +77,10 @@ class AiHistorySearchInteractor @Inject constructor(
 
         if (timeFiltered.isEmpty()) throw NoHistoryException()
 
+        val withDescription = timeFiltered.count { it.description != null }
+        val withH1 = timeFiltered.count { it.h1 != null }
+        logcat { "AiHistorySearch: ${timeFiltered.size} entries in window, description=$withDescription h1=$withH1" }
+
         // AICore shadow path — logcats result only, never short-circuits Duck.ai
         if (feature.aiCoreEnabled().isEnabled()) {
             appScope.launch { geminiNanoSearcher.search(query, timeFiltered) }
