@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Активировать</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Активирован</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Активация…</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Активация...</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Деактивирован</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Деактивация…</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Деактивация...</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Управление этим адресом временно недоступно.</string>
 
@@ -123,7 +123,7 @@
     <string name="autofillManagementScreenTitleNew">Пароли и автозаполнение</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
     <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
-    <string name="credentialManagementAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее…</annotation></string>
+    <string name="credentialManagementAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="credentialManagementAutofillHelpPageTitle">Безопасность менеджера паролей</string>
     <string name="saveLoginDialogSubtitle">Вы можете сохранить этот пароль на устройстве под надежной защитой функции «Пароли и автозаполнение» от DuckDuckGo.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
@@ -221,7 +221,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Импорт из настольного браузера:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Запустите DuckDuckGo на Mac или Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Откройте раздел «<b>Настройки</b> > <b>Пароли</b>»]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Выберите вариант «<b>Импортировать пароли…</b>» и следуйте дальнейшим инструкциям.]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Выберите вариант «<b>Импортировать пароли...</b>» и следуйте дальнейшим инструкциям.]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">По окончании импортирования на компьютер вы сможете настроить синхронизацию на данном устройстве.</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Наше настольное приложение</string>
@@ -287,7 +287,7 @@
     <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Отменить</string>
     <string name="autofillSettingsPasswordsEntry">Пароли</string>
     <string name="autofillSettingsAutofillToggleLabel">Предлагать сохранение и автозаполнение данных</string>
-    <string name="autofillSettingsAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее…</annotation></string>
+    <string name="autofillSettingsAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="autofillSettingsImportSectionLabel">Импорт паролей</string>
     <string name="autofillSettingsImportFromGoogleLabel">Импортировать пароли из Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Взять пароли из настольного приложения</string>

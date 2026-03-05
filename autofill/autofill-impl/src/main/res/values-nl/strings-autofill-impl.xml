@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importeren vanuit de desktopbrowser:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Open DuckDuckGo op Mac of Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ga naar <b>Instellingen</b> > <b>wachtwoorden</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecteer <b>Wachtwoorden importeren</b>… en volg de stappen om te importeren]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecteer <b>Wachtwoorden importeren</b>... en volg de stappen om te importeren]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Na het importeren op uw computer, kunt u synchronisatie instellen op dit apparaat</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Desktop-app downloaden</string>
@@ -295,7 +295,7 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Bladwijzers importeren uit Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importeren van Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren...</string>
     <string name="importBookmarksFromGoogleWebFlowTitle">Bladwijzers importeren</string>
     <string name="importBookmarksProgressTitle">Importeren van Google…</string>
     <string name="importBookmarksProgressSubtitle">Houd dit scherm open en wacht even — het zou niet langer dan een minuut of twee moeten duren.</string>

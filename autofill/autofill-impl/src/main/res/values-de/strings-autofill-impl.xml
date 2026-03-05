@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Reaktivieren</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktiv</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktivieren …</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktivieren ...</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktiviert</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktivieren …</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktivieren ...</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Die Verwaltung dieser Adresse ist vorübergehend nicht möglich.</string>
 
@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Aus dem Desktop-Browser importieren:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Öffne DuckDuckGo auf Mac oder Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Geh zu <b>Einstellungen</b> > <b>Passwörter</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wähle <b>Passwörter importieren</b> … und folge den Schritten zum Importieren]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Wähle <b>Passwörter importieren</b> ... und folge den Schritten zum Importieren]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Sobald du sie auf deinen Computer importiert hast, kannst du die Synchronisierung auf diesem Gerät einrichten</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Lade dir die Desktop-App herunter</string>

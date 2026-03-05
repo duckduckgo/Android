@@ -295,9 +295,9 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Importa segnalibri da Google</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importa da Google</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleziona il file dei segnalibri...</string>
     <string name="importBookmarksFromGoogleWebFlowTitle">Importa segnalibri</string>
-    <string name="importBookmarksProgressTitle">Importazione da Google…</string>
+    <string name="importBookmarksProgressTitle">Importazione da Google...</string>
     <string name="importBookmarksProgressSubtitle">Tieni aperta questa schermata e attendi, ci vorrà solo qualche minuto.</string>
     <string name="importBookmarksProgressInfoMessage1">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
     <string name="importBookmarksProgressInfoMessage2">Google potrebbe inviarti un\'email per confermare che i tuoi segnalibri sono in fase di esportazione.</string>

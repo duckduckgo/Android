@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importar desde el navegador de escritorio:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Abre DuckDuckGo en Mac o Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ve a <b>Ajustes</b> > <b>Contraseñas</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecciona <b>Importar contraseñas</b>… y sigue los pasos para importar]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Selecciona <b>Importar contraseñas</b>... y sigue los pasos para importar]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Una vez importado a tu ordenador, puedes configurar la sincronización en este dispositivo</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Obtener la aplicación de escritorio</string>

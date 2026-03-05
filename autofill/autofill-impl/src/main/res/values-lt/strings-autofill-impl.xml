@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Iš naujo įjungti</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktyvus</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktyvinama…</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktyvinama...</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktyvinta</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktyvinama…</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktyvinama...</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Šio adreso tvarkymas laikinai nepasiekiamas.</string>
 
@@ -221,7 +221,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importuoti iš kompiuterio naršyklės:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Atidarykite „DuckDuckGo“ sistemoje „Mac“ arba „Windows“</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Eikite į <b>Nustatymai</b> > <b>Slaptažodžiai</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Pasirinkite <b>Importuoti slaptažodžius</b>… ir atlikite veiksmus, kad importuotumėte]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Pasirinkite <b>Importuoti slaptažodžius</b>... ir atlikite veiksmus, kad importuotumėte]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kai importuosite į savo kompiuterį, galite nustatyti sinchronizavimą šiame įrenginyje</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Gauti kompiuterio programą</string>

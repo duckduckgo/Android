@@ -209,7 +209,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Impordi töölaua brauserist:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Ava DuckDuckGo Macis või Windowsis</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Ava <b>Seaded</b> > <b>Paroolid</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vali <b>Impordi paroolid</b>… ja järgi samme importimiseks]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vali <b>Impordi paroolid</b>... ja järgi samme importimiseks]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Kui need on arvutisse imporditud, saad seadistada selle seadme sünkroonimise</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Hangi töölaua rakendus</string>
@@ -295,7 +295,7 @@
     <string name="importBookmarksFromGooglePreImportDialogTitle">Impordi järjehoidjad Google\'ist</string>
     <string name="importBookmarksFromGooglePreImportDialogInstruction">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Impordi Google\'ist</string>
-    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail…</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
     <string name="importBookmarksFromGoogleWebFlowTitle">Impordi järjehoidjaid</string>
     <string name="importBookmarksProgressTitle">Importimine Google\'ist…</string>
     <string name="importBookmarksProgressSubtitle">Hoia see ekraan avatuna ja ole kannatlik — see ei tohiks võtta rohkem kui minut või kaks.</string>

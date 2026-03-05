@@ -92,10 +92,10 @@
     <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Reaktivovať</string>
 
     <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Aktívne</string>
-    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktivuje sa…</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Aktivuje sa...</string>
 
     <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Deaktivované</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktivuje sa…</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Deaktivuje sa...</string>
 
     <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">Správa tejto adresy je dočasne nedostupná.</string>
 
@@ -221,7 +221,7 @@
     <string name="autofillManagementImportPasswordsImportFromDesktopTitle">Importovať z prehliadača na počítači:</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionOne">Otvoriť DuckDuckGo na Macu alebo v systéme Windows</string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionTwo">"<![CDATA[Prejdite do <b>časti Nastavenia</b> > <b>Heslá</b>]]>"</string>
-    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vyberte <b>Importovať heslá</b>… a pre importovanie postupujte podľa krokov]]></string>
+    <string name="autofillManagementImportPasswordsImportFromDesktopInstructionThree"><![CDATA[Vyberte <b>Importovať heslá</b>... a pre importovanie postupujte podľa krokov]]></string>
     <string name="autofillManagementImportPasswordsImportFromDesktopInstructionFour">Po importovaní do počítača môžete nastaviť synchronizáciu na tomto zariadení</string>
 
     <string name="autofillManagementImportPasswordsGetDesktopAppTitle">Získajte aplikáciu pre počítače</string>
