@@ -16,9 +16,13 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateEntity
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface EventHubRepository {
     fun getPixelState(name: String): PixelState?
@@ -28,7 +32,9 @@ interface EventHubRepository {
     fun deleteAllPixelStates()
 }
 
-class RealEventHubRepository(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealEventHubRepository @Inject constructor(
     private val pixelStateDao: EventHubPixelStateDao,
 ) : EventHubRepository {
 
