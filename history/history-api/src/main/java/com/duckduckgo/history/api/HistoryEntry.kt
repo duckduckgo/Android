@@ -37,6 +37,7 @@ sealed class HistoryEntry {
      * @property visits List of [LocalDateTime] objects representing the visit times.
      * @property description The page meta description (og:description or meta[name=description]), if available.
      * @property h1 The primary heading (first h1 element) of the page, if available.
+     * @property chunkText The readable body text extracted by Readability.js, if available.
      */
     data class VisitedPage(
         override val url: Uri,
@@ -44,6 +45,7 @@ sealed class HistoryEntry {
         override val visits: List<LocalDateTime>,
         val description: String? = null,
         val h1: String? = null,
+        val chunkText: String? = null,
     ) : HistoryEntry()
 
     /**

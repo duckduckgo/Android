@@ -78,9 +78,9 @@ interface NavigationHistory {
     suspend fun removeHistoryForTab(tabId: String)
 
     /**
-     * Updates the description and h1 for an existing history entry identified by [url].
+     * Updates the description, h1, and chunkText for an existing history entry identified by [url].
      * No-op if the entry does not exist.
      * Passing null for a field sets it to null (clears it).
      */
-    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?)
+    suspend fun updateHistoryMetadata(url: String, description: String?, h1: String?, chunkText: String?)
 }
