@@ -88,21 +88,9 @@ class RealSecureStorageKeyStore constructor(
 
     private var initialUseHarmonyValue: Boolean? = null
 
-    private val useHarmonyDeferred: Deferred<Boolean> by lazy {
-        coroutineScope.async(dispatcherProvider.io()) {
-            autofillFeature.useHarmony().isEnabled()
-        }
-    }
+    private fun useHarmony(): Boolean = autofillFeature.useHarmony().isEnabled()
 
-    private val readFromHarmonyDeferred: Deferred<Boolean> by lazy {
-        coroutineScope.async(dispatcherProvider.io()) {
-            autofillFeature.readFromHarmony().isEnabled()
-        }
-    }
-
-    private suspend fun useHarmony(): Boolean = useHarmonyDeferred.await()
-
-    private suspend fun readFromHarmony(): Boolean = readFromHarmonyDeferred.await()
+    private fun readFromHarmony(): Boolean = autofillFeature.readFromHarmony().isEnabled()
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
@@ -143,7 +131,7 @@ class RealSecureStorageKeyStore constructor(
                                     }
                                 }
                             } ?: run {
-                                logcat { "autofill harmony preferences retrieval returned null" }
+                                logcat { "autofill legacy preferences retrieval returned null. Harmony will also return null" }
                                 null
                             }
                         } else {
