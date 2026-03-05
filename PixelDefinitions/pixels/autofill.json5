@@ -215,6 +215,33 @@
             }
         ]
     },
+    "autofill_preferences_key_missing": {
+        "description": "Legacy preferences returns null for a key that exists in harmony preferences (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that is missing from legacy preferences",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "addWriteGuard",
+                "description": "Whether the addWriteGuard feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            }
+        ]
+    },
     "autofill_store_key_already_exists": {
         "description": "Write guard blocked an attempt to overwrite an existing encryption key — prevents irreversible credential corruption (daily unique)",
         "owners": ["CrisBarreiro"],
