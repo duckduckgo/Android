@@ -18,14 +18,10 @@ package com.duckduckgo.eventhub.impl
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -39,15 +35,11 @@ import javax.inject.Inject
 )
 class EventHubLifecycleObserver @Inject constructor(
     private val pixelManager: EventHubPixelManager,
-    private val dispatcherProvider: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
         logcat(VERBOSE) { "EventHub: app foregrounded, checking pixels" }
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            pixelManager.checkPixels()
-        }
+        pixelManager.checkPixels()
     }
 }

@@ -159,7 +159,7 @@ class RealEventHubPixelManager @Inject constructor(
 
                 for (pixelConfig in getTelemetryConfigs()) {
                     if (repository.getPixelState(pixelConfig.name) == null) {
-                        startNewPeriod(pixelConfig)
+                        startNewPeriod(pixelConfig, skipForegroundCheck = true)
                     }
                 }
             }
@@ -267,8 +267,8 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
-        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig, skipForegroundCheck: Boolean = false) {
+        if ((!skipForegroundCheck && !foregroundStateProvider.isInForeground) || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return
         }
