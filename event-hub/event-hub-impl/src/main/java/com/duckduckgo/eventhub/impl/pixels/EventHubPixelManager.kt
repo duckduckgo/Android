@@ -36,9 +36,27 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 interface EventHubPixelManager {
+    /**
+     * Process an incoming web event against active telemetry pixel configs.
+     * [webViewId] is the id of the WebView that the event originated from.
+     */
     fun handleWebEvent(data: JSONObject, webViewId: String)
+
+    /**
+     * Signal that a WebView has navigated to a new URL (for example used for
+     * event deduplication)
+     */
     fun onNavigationStarted(webViewId: String, url: String)
+
+    /**
+     * Reconcile pixel state: fire any whose collection period has elapsed
+     * and ensure active configs have scheduled work.
+     */
     fun checkPixels()
+
+    /**
+     * Notify that the remote feature config has changed.
+     */
     fun onConfigChanged()
 }
 
@@ -129,13 +147,6 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    /**
-     * Check all pixel states and fire any whose period has elapsed.
-     * After firing, starts a new period and schedules the next fire.
-     * Called on app foreground to catch pixels that elapsed while backgrounded,
-     * and to start new periods for enabled configs that have no active state
-     * (e.g., timer fired while backgrounded and no new period was started).
-     */
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
