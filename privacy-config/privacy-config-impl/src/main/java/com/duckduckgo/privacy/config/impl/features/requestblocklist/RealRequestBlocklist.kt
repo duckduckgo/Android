@@ -32,7 +32,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -45,7 +44,7 @@ class RealRequestBlocklist @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : RequestBlocklist, PrivacyConfigCallbackPlugin {
 
-    private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
+    @Volatile private var blockedRequests: Map<String, List<BlocklistRuleEntity>> = emptyMap()
 
     init {
         if (isMainProcess) {
@@ -77,7 +76,7 @@ class RealRequestBlocklist @Inject constructor(
 
     private fun loadToMemory() {
         appCoroutineScope.launch(dispatchers.io()) {
-            val newBlockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
+            val newBlockedRequests = mutableMapOf<String, List<BlocklistRuleEntity>>()
 
             requestBlocklistFeature.self().getSettings()?.let { settingsJson ->
                 runCatching {
@@ -101,9 +100,7 @@ class RealRequestBlocklist @Inject constructor(
                 }
             }
 
-            blockedRequests.clear()
-            blockedRequests.putAll(newBlockedRequests)
-            println(blockedRequests)
+            blockedRequests = newBlockedRequests.toMap()
         }
     }
 
