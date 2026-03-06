@@ -72,8 +72,16 @@ class RealBrokerJsonUpdater @Inject constructor(
                     logcat { "PIR-update: Main config is new." }
                     it.body()?.let { config ->
                         logcat { "PIR-update: Main config $config." }
-                        checkUpdatesFromMainConfig(config)
-                        pirRepository.updateMainEtag(config.etag)
+                        runCatching { checkUpdatesFromMainConfig(config) }
+                            .onSuccess {
+                                pirRepository.updateMainEtag(config.etag)
+                            }
+                            .onFailure { e ->
+                                logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
+                                val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
+                                pixelSender.reportDownloadBrokerJsonFailure(message)
+                                return@withContext false
+                            }
                     }
                 } else {
                     logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }
