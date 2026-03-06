@@ -3650,15 +3650,16 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDuckChatUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
         runTest {
-            val domain = "https://duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+            val url = "https://duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+            val permissionOrigin = "https://duck.ai/"
 
-            whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION))
+            whenever(mockSitePermissionsManager.hasSitePermanentPermission(permissionOrigin, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION))
                 .thenReturn(true)
             whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
-            givenCurrentSite(domain)
+            givenCurrentSite(url)
 
-            loadUrl("https://duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5", isBrowserShowing = true)
+            loadUrl(url, isBrowserShowing = true)
 
             assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
         }
