@@ -66,6 +66,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -387,17 +388,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
                         if (showDuckAiCopy) {
-                            com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_without_ai_updated
+                            DuckChatR.string.input_screen_user_pref_without_ai_updated
                         } else {
-                            com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_without_ai
+                            DuckChatR.string.input_screen_user_pref_without_ai
                         },
                     )
 
                     binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
                         if (showDuckAiCopy) {
-                            com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_with_ai_updated
+                            DuckChatR.string.input_screen_user_pref_with_ai_updated
                         } else {
-                            com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_with_ai
+                            DuckChatR.string.input_screen_user_pref_with_ai
                         },
                     )
 
