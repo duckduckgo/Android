@@ -16,16 +16,12 @@
 
 package com.duckduckgo.privacy.config.impl.features.requestblocklist
 
-data class RequestBlocklistSettings(
-    val blockedRequests: Map<String, BlockedRequestEntry>?,
-)
-
 data class BlockedRequestEntry(
     val rules: List<Map<String, @JvmSuppressWildcards Any>>?,
 )
 
 class BlocklistRuleEntity(
-    val rule: String,
+    val rule: Regex,
     val domains: List<String>,
     val reason: String?,
 ) {
@@ -39,9 +35,21 @@ class BlocklistRuleEntity(
         @Suppress("UNCHECKED_CAST")
         fun fromJson(map: Map<String, Any>): BlocklistRuleEntity? {
             if (map.keys.any { it !in KNOWN_PROPERTIES }) return null
-            val rule = map[PROPERTY_RULE] as? String ?: return null
+
+            val ruleString = map[PROPERTY_RULE] as? String ?: return null
             val domains = map[PROPERTY_DOMAINS] as? List<String> ?: return null
             val reason = map[PROPERTY_REASON] as? String
+
+            val rule = buildString {
+                for (char in ruleString) {
+                    if (char == '*') {
+                        append("[^/]*")
+                    } else {
+                        append(Regex.escape(char.toString()))
+                    }
+                }
+            }.toRegex()
+
             return BlocklistRuleEntity(rule = rule, domains = domains, reason = reason)
         }
     }

@@ -43,9 +43,13 @@ class RealRequestBlocklist @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    moshi: Moshi,
 ) : RequestBlocklist, PrivacyConfigCallbackPlugin {
 
     private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
+
+    private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
+        moshi.adapter(RequestBlocklistSettings::class.java)
 
     init {
         if (isMainProcess) {
@@ -71,7 +75,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            ruleMatches(normalizedUrl, rule.rule) && domainMatches(documentUrl, rule.domains)
+            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentUrl, rule.domains)
         }
     }
 
@@ -81,10 +85,7 @@ class RealRequestBlocklist @Inject constructor(
 
             requestBlocklistFeature.self().getSettings()?.let { settingsJson ->
                 runCatching {
-                    val moshi = Moshi.Builder().build()
-                    val jsonAdapter: JsonAdapter<RequestBlocklistSettings> =
-                        moshi.adapter(RequestBlocklistSettings::class.java)
-                    val settings = jsonAdapter.fromJson(settingsJson)
+                    val settings = blockListSettingsJsonAdapter.fromJson(settingsJson)
 
                     settings?.blockedRequests?.entries?.forEach { entry ->
                         val domain = entry.key
@@ -105,19 +106,6 @@ class RealRequestBlocklist @Inject constructor(
             blockedRequests.putAll(newBlockedRequests)
         }
     }
-
-    private fun ruleMatches(
-        normalizedUrl: String,
-        rule: String,
-    ): Boolean = buildString {
-        for (char in rule) {
-            if (char == '*') {
-                append("[^/]*")
-            } else {
-                append(Regex.escape(char.toString()))
-            }
-        }
-    }.toRegex().containsMatchIn(normalizedUrl)
 
     private fun domainMatches(
         documentUrl: String?,
