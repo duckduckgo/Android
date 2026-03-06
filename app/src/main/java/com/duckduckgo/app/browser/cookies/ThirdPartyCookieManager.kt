@@ -84,7 +84,7 @@ class AppThirdPartyCookieManager(
     }
 
     private suspend fun addHostToList(uri: Uri) {
-        val ssDomain = uri.getQueryParameter(SS_DOMAIN)
+        val ssDomain = uri.getQueryParameter(SS_DOMAIN_PARAM) ?: uri.getQueryParameter(APP_DOMAIN_PARAM)
         val accessType = uri.getQueryParameter(RESPONSE_TYPE)
         ssDomain?.let {
             if (accessType?.contains(CODE) == false) {
@@ -103,7 +103,8 @@ class AppThirdPartyCookieManager(
 
     // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below values
     companion object {
-        private const val SS_DOMAIN = "ss_domain"
+        private const val SS_DOMAIN_PARAM = "ss_domain"
+        private const val APP_DOMAIN_PARAM = "app_domain"
         private const val RESPONSE_TYPE = "response_type"
         private const val CODE = "code"
         const val GOOGLE_ACCOUNTS_URL = "https://accounts.google.com"

@@ -150,6 +150,23 @@ class AppThirdPartyCookieManagerTest {
         assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
+    @UiThreadTest
+    @Test
+    fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithAppDomainAndNoSsDomainThenDomainAddedToTheList() = runTest {
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_APP_DOMAIN_URI)
+
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithBothSsDomainAndAppDomainThenSsDomainUsed() = runTest {
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_BOTH_DOMAINS_URI)
+
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain("ss.com"))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain("app.com"))
+    }
+
     @Test
     fun whenClearAllDataThenDomainDeletedFromDatabase() = runTest {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
@@ -194,6 +211,10 @@ class AppThirdPartyCookieManagerTest {
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fexample.com".toUri()
         val NON_THIRD_PARTY_AUTH_URI =
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=code&ss_domain=https%3A%2F%2Fexample.com".toUri()
+        val THIRD_PARTY_AUTH_APP_DOMAIN_URI =
+            "https://accounts.google.com/v3/signin/identifier?response_type=permission%20id_token&app_domain=https%3A%2F%2Fexample.com".toUri()
+        val THIRD_PARTY_AUTH_BOTH_DOMAINS_URI =
+            "https://accounts.google.com?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fss.com&app_domain=https%3A%2F%2Fapp.com".toUri()
         const val USER_ID_COOKIE = "user_id"
     }
 }
