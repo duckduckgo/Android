@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -77,6 +78,7 @@ class RealBrokerJsonUpdater @Inject constructor(
                                 pirRepository.updateMainEtag(config.etag)
                             }
                             .onFailure { e ->
+                                if (e is CancellationException) throw e
                                 logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
                                 val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
                                 pixelSender.reportDownloadBrokerJsonFailure(message)
