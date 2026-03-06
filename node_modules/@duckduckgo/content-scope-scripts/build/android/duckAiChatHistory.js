@@ -4213,7 +4213,10 @@
         filteredChats = filteredChats.filter((chat) => this.isNotOlderThan(chat, since));
       }
       const matchingChats = query ? filteredChats.filter((chat) => this.chatMatchesQuery(chat, query)) : filteredChats;
-      for (const chat of matchingChats) {
+      const sortedChats = [...matchingChats].sort((a2, b2) => {
+        return (this.getLastEditTime(b2) ?? 0) - (this.getLastEditTime(a2) ?? 0);
+      });
+      for (const chat of sortedChats) {
         const formattedChat = this.formatChat(chat);
         if (chat.pinned) {
           pinnedChats.push(formattedChat);
@@ -4222,6 +4225,18 @@
         }
       }
       return { pinnedChats, chats };
+    }
+    /**
+     * @param {object} chat - Chat object
+     * @returns {string|null} The first user message content, or null if not found
+     */
+    extractFirstUserMessageContent(chat) {
+      const messages = chat?.messages;
+      if (!Array.isArray(messages)) {
+        return null;
+      }
+      const firstUserMessage = messages.find((msg) => msg?.role === "user");
+      return typeof firstUserMessage?.content === "string" ? firstUserMessage.content : null;
     }
     /**
      * Formats a chat object for sending to native, extracting only needed keys
@@ -4242,15 +4257,17 @@
       };
     }
     /**
-     * Checks if a chat matches the search query by checking if all query words appear in title
+     * Checks if a chat matches the search query by checking if all query words appear in title or first user message
      * @param {object} chat - Chat object
      * @param {string} query - Lowercase search query
-     * @returns {boolean} True if chat title contains all query words
+     * @returns {boolean} True if chat title or first user message contains all query words
      */
     chatMatchesQuery(chat, query) {
       const title = typeof chat.title === "string" ? chat.title.toLowerCase() : "";
+      const firstUserQuery = this.extractFirstUserMessageContent(chat);
+      const formattedUserQuery = typeof firstUserQuery === "string" ? firstUserQuery.toLowerCase() : "";
       const words = query.split(/\s+/).filter((w2) => w2);
-      return words.every((word) => title.includes(word));
+      return words.every((word) => title.includes(word) || formattedUserQuery.includes(word));
     }
     /**
      * Checks if a chat's lastEdit is not older than the given timestamp
@@ -4259,15 +4276,20 @@
      * @returns {boolean} True if chat is not older than the timestamp
      */
     isNotOlderThan(chat, since) {
+      const time = this.getLastEditTime(chat);
+      return time === null || time >= since;
+    }
+    /**
+     * Parses a chat's lastEdit into a numeric timestamp.
+     * Returns null if lastEdit is missing or malformed.
+     * @param {object} chat - Chat object
+     * @returns {number | null} Timestamp in milliseconds, or null
+     */
+    getLastEditTime(chat) {
       const lastEdit = chat.lastEdit;
-      if (!lastEdit) {
-        return true;
-      }
-      const timestamp = new Date(lastEdit).getTime();
-      if (Number.isNaN(timestamp)) {
-        return true;
-      }
-      return timestamp >= since;
+      if (!lastEdit) return null;
+      const time = new Date(lastEdit).getTime();
+      return Number.isNaN(time) ? null : time;
     }
   };
   /** @type {number} Default maximum number of chats to return */
