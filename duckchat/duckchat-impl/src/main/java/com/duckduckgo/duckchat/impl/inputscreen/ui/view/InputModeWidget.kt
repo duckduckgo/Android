@@ -318,8 +318,8 @@ open class InputModeWidget @JvmOverloads constructor(
                     if (tabAttachmentsEnabled) {
                         if (!isDeletingTag) {
                             removeCorruptedTags(text)
+                            notifyRemovedTags(text)
                         }
-                        notifyRemovedTags(text)
                     }
                 }
             }
@@ -578,7 +578,6 @@ open class InputModeWidget @JvmOverloads constructor(
                 val deleteEnd = if (spanEnd < text.length && text[spanEnd] == ' ') spanEnd + 1 else spanEnd
                 text.removeSpan(tag)
                 text.delete(spanStart, deleteEnd)
-                onTabAttachmentRemoved?.invoke(tag.tabId)
             }
         }
         isDeletingTag = false

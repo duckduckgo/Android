@@ -60,21 +60,17 @@ class TabAttachmentPopup(
         }
     }
 
-    val isShowing: Boolean
-        get() = popupWindow.isShowing
-
     fun update(items: List<TabAttachmentItem>) {
         adapter.submitList(items.take(MAX_VISIBLE_ITEMS))
     }
 
     fun show(anchor: View) {
-        if (popupWindow.isShowing) {
-            popupWindow.update()
-            return
-        }
-
         if (useTopBar) {
-            popupWindow.showAsDropDown(anchor)
+            if (popupWindow.isShowing) {
+                popupWindow.update()
+            } else {
+                popupWindow.showAsDropDown(anchor)
+            }
         } else {
             recyclerView.measure(
                 View.MeasureSpec.makeMeasureSpec(anchor.width, View.MeasureSpec.AT_MOST),
@@ -85,13 +81,18 @@ class TabAttachmentPopup(
             val anchorLocation = IntArray(2)
             anchor.getLocationOnScreen(anchorLocation)
             val anchorTop = anchorLocation[1]
+            val y = anchorTop - popupHeight
 
-            popupWindow.showAtLocation(
-                anchor,
-                Gravity.NO_GRAVITY,
-                0,
-                anchorTop - popupHeight,
-            )
+            if (popupWindow.isShowing) {
+                popupWindow.update(0, y, -1, popupHeight)
+            } else {
+                popupWindow.showAtLocation(
+                    anchor,
+                    Gravity.NO_GRAVITY,
+                    0,
+                    y,
+                )
+            }
         }
     }
 
