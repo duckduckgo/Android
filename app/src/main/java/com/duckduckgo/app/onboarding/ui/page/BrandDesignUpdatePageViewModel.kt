@@ -267,16 +267,20 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
-        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-        setCurrentDialog(ADDRESS_BAR_POSITION)
+        viewModelScope.launch {
+            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+            setCurrentDialog(ADDRESS_BAR_POSITION)
+        }
     }
 
     fun onDefaultBrowserNotSet() {
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = false
         pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
-        _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
-        setCurrentDialog(ADDRESS_BAR_POSITION)
+        viewModelScope.launch {
+            _viewState.update { it.copy(showSplitOption = isSplitOmnibarEnabled()) }
+            setCurrentDialog(ADDRESS_BAR_POSITION)
+        }
     }
 
     fun onAddressBarPositionOptionSelected(selectedOption: OmnibarType) {
@@ -307,7 +311,9 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             appBuildConfig.isAppReinstall()
         }
 
-    private fun isSplitOmnibarEnabled(): Boolean =
-        androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
-            androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
+    private suspend fun isSplitOmnibarEnabled(): Boolean =
+        withContext(dispatchers.io()) {
+            androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
+                androidBrowserConfigFeature.splitOmnibarWelcomePage().isEnabled()
+        }
 }
