@@ -32,6 +32,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCO
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_BROKER_JSON_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_MAINCONFIG_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED
@@ -540,6 +541,10 @@ interface PirPixelSender {
     )
 
     suspend fun reportDownloadMainConfigFailure(
+        message: String,
+    )
+
+    suspend fun reportDownloadBrokerJsonFailure(
         message: String,
     )
 
@@ -1292,6 +1297,14 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
         fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE, params)
+    }
+
+    override suspend fun reportDownloadBrokerJsonFailure(message: String) {
+        val params = mapOf(
+            PARAM_KEY_ERROR_DETAILS to message,
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+        )
+        fire(PIR_DOWNLOAD_BROKER_JSON_FAILURE, params)
     }
 
     override fun reportBrokerActionFailure(

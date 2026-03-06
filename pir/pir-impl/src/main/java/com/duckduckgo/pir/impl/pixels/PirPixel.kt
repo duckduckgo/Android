@@ -267,7 +267,11 @@ enum class PirPixel(
     ),
     PIR_DOWNLOAD_MAINCONFIG_FAILURE(
         baseName = "m_dbp_download_mainconfig_failure",
-        type = Count,
+        types = setOf(Count, Daily()),
+    ),
+    PIR_DOWNLOAD_BROKER_JSON_FAILURE(
+        baseName = "m_dbp_download_broker-json_failure",
+        types = setOf(Count, Daily()),
     ),
     PIR_BROKER_ACTION_FAILED(
         baseName = "m_dbp_data_broker_action-failed_error",

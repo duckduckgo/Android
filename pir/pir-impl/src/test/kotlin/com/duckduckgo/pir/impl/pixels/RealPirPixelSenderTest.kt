@@ -883,7 +883,7 @@ class RealPirPixelSenderTest {
         testee.reportDownloadMainConfigFailure("test")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender, times(2)).fire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
