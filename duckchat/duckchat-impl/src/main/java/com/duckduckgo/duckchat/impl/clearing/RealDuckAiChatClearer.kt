@@ -37,6 +37,8 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
@@ -55,6 +57,8 @@ class RealDuckAiChatClearer @Inject constructor(
     private val duckAiDataClearingFeature: DuckAiDataClearingFeature,
 ) : DuckAiChatClearer {
 
+    private val mutex = Mutex()
+
     private var webView: WebView? = null
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
     private var readyDeferred: CompletableDeferred<Unit>? = null
@@ -64,25 +68,27 @@ class RealDuckAiChatClearer @Inject constructor(
     private var cachedScript: String? = null
 
     override suspend fun deleteChat(chatId: String): Boolean {
-        return withContext(dispatchers.main()) {
-            try {
-                val script = getScript()
-                val wv = getOrCreateWebView(script)
+        return mutex.withLock {
+            withContext(dispatchers.main()) {
+                try {
+                    val script = getScript()
+                    val wv = getOrCreateWebView(script)
 
-                var allSucceeded = true
-                for (domain in DOMAINS) {
-                    val success = clearFromDomain(wv, domain, chatId)
-                    if (!success) {
-                        logcat { "DuckAiChatClearer: clearing failed for domain $domain, chatId $chatId" }
-                        allSucceeded = false
+                    var allSucceeded = true
+                    for (domain in DOMAINS) {
+                        val success = clearFromDomain(wv, domain, chatId)
+                        if (!success) {
+                            logcat { "DuckAiChatClearer: clearing failed for domain $domain, chatId $chatId" }
+                            allSucceeded = false
+                        }
                     }
+                    allSucceeded
+                } catch (e: Exception) {
+                    logcat { "DuckAiChatClearer: deleteChat failed with ${e.message}" }
+                    false
+                } finally {
+                    tearDown()
                 }
-                allSucceeded
-            } catch (e: Exception) {
-                logcat { "DuckAiChatClearer: deleteChat failed with ${e.message}" }
-                false
-            } finally {
-                tearDown()
             }
         }
     }
@@ -251,6 +257,9 @@ class RealDuckAiChatClearer @Inject constructor(
         private const val USER_UNPROTECTED_DOMAINS_PLACEHOLDER = "\$USER_UNPROTECTED_DOMAINS$"
         private const val USER_PREFERENCES_PLACEHOLDER = "\$USER_PREFERENCES$"
         private const val MESSAGING_PARAMETERS_PLACEHOLDER = "\$ANDROID_MESSAGING_PARAMETERS$"
-        private const val DEFAULT_SETTINGS = """{"chatsLocalStorageKeys":["savedAIChats"],"chatImagesIndexDbNameObjectStoreNamePairs":[["savedAIChatData","chat-images"],["savedAIChatData","saved-chats"]]}"""
+        private const val DEFAULT_SETTINGS =
+            """{"chatsLocalStorageKeys":["savedAIChats"],""" +
+                """"chatImagesIndexDbNameObjectStoreNamePairs":""" +
+                """[["savedAIChatData","chat-images"],["savedAIChatData","saved-chats"]]}"""
     }
 }

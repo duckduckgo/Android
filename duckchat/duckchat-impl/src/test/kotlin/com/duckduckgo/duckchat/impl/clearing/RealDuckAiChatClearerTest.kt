@@ -83,7 +83,11 @@ class RealDuckAiChatClearerTest {
     @Test
     fun `when feature has settings then content scope includes settings`() {
         duckAiDataClearingFeature.self().setRawStoredState(
-            State(enable = true, settings = """{"chatsLocalStorageKeys":["savedAIChats"],"chatImagesIndexDbNameObjectStoreNamePairs":[["savedAIChatData","chat-images"]]}"""),
+            State(
+                enable = true,
+                settings = """{"chatsLocalStorageKeys":["savedAIChats"],""" +
+                    """"chatImagesIndexDbNameObjectStoreNamePairs":[["savedAIChatData","chat-images"]]}""",
+            ),
         )
 
         val result = JSONObject(clearer.getContentScopeJson())
