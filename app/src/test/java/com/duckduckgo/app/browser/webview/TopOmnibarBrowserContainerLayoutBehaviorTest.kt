@@ -31,6 +31,7 @@ class TopOmnibarBrowserContainerLayoutBehaviorTest {
     private lateinit var behavior: TopOmnibarBrowserContainerLayoutBehavior
     private lateinit var parent: CoordinatorLayout
     private lateinit var child: View
+    private lateinit var dependency: View
 
     @Before
     fun setup() {
@@ -38,6 +39,7 @@ class TopOmnibarBrowserContainerLayoutBehaviorTest {
         behavior = TopOmnibarBrowserContainerLayoutBehavior(context, null)
         parent = CoordinatorLayout(context)
         child = View(context)
+        dependency = View(context)
         parent.addView(
             child,
             CoordinatorLayout.LayoutParams(
@@ -48,44 +50,82 @@ class TopOmnibarBrowserContainerLayoutBehaviorTest {
     }
 
     @Test
-    fun whenChildDoesNotExtendPastParentThenMarginResetToZero() {
+    fun whenDependencyFullyExpandedThenMarginSetToExactVisibleHeight() {
+        dependency.layout(0, 0, 500, 224)
+
         val lp = child.layoutParams as CoordinatorLayout.LayoutParams
-        lp.bottomMargin = 19
+        lp.bottomMargin = 0
         child.layoutParams = lp
 
-        behavior.correctBottomMarginIfNeeded(child, parent)
+        behavior.correctBottomMargin(child, dependency)
+
+        assertEquals(224, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenDependencyFullyCollapsedThenMarginSetToZero() {
+        dependency.layout(0, -224, 500, 0)
+
+        val lp = child.layoutParams as CoordinatorLayout.LayoutParams
+        lp.bottomMargin = 100
+        child.layoutParams = lp
+
+        behavior.correctBottomMargin(child, dependency)
 
         assertEquals(0, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
     }
 
     @Test
-    fun whenChildExtendsPastParentThenMarginSetToDiff() {
-        // Force layout so child.bottom and parent.height have real values
-        parent.measure(
-            View.MeasureSpec.makeMeasureSpec(500, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(500, View.MeasureSpec.EXACTLY),
-        )
-        parent.layout(0, 0, 500, 500)
+    fun whenDependencyPartiallyCollapsedThenMarginSetToVisiblePortionMinusOffset() {
+        dependency.layout(0, -112, 500, 112)
+
+        val lp = child.layoutParams as CoordinatorLayout.LayoutParams
+        lp.bottomMargin = 0
+        child.layoutParams = lp
+
+        behavior.correctBottomMargin(child, dependency)
+
+        val marginOffsetPx = (7 * child.resources.displayMetrics.density).toInt()
+        assertEquals(112 - marginOffsetPx, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenMarginAlreadyCorrectThenNoChange() {
+        dependency.layout(0, -224, 500, 0)
+
+        val lp = child.layoutParams as CoordinatorLayout.LayoutParams
+        lp.bottomMargin = 0
+        child.layoutParams = lp
+
+        behavior.correctBottomMargin(child, dependency)
+
+        assertEquals(0, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenChildIsGoneThenNoChange() {
+        dependency.layout(0, 0, 500, 224)
+
+        val lp = child.layoutParams as CoordinatorLayout.LayoutParams
+        lp.bottomMargin = 50
+        child.layoutParams = lp
+        child.visibility = View.GONE
+
+        behavior.correctBottomMargin(child, dependency)
+
+        assertEquals(50, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
+    }
+
+    @Test
+    fun whenVisibleHeightLessThanOffsetThenMarginIsZero() {
+        // dependency.top = -220, height = 224, visible = 4, less than marginOffsetPx
+        dependency.layout(0, -220, 500, 4)
 
         val lp = child.layoutParams as CoordinatorLayout.LayoutParams
         lp.bottomMargin = 50
         child.layoutParams = lp
 
-        // Shift the child down so child.bottom + translationY > parent.height
-        child.translationY = 30f
-
-        behavior.correctBottomMarginIfNeeded(child, parent)
-
-        assertEquals(30, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
-    }
-
-    @Test
-    fun whenBottomMarginIsAlreadyZeroThenNoChange() {
-        val lp = child.layoutParams as CoordinatorLayout.LayoutParams
-        lp.bottomMargin = 0
-        child.layoutParams = lp
-
-        behavior.correctBottomMarginIfNeeded(child, parent)
+        behavior.correctBottomMargin(child, dependency)
 
         assertEquals(0, (child.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin)
     }
