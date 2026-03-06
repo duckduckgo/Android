@@ -4941,7 +4941,6 @@ class BrowserTabFragment :
                         showBrowser()
                         viewModel.resetBrowserError()
                     }
-                    webView?.setBottomMatchingBehaviourEnabled(true)
                 }
                 omnibar.renderLoadingViewState(viewState)
 
@@ -5060,9 +5059,6 @@ class BrowserTabFragment :
                 }
 
                 omnibar.renderBrowserViewState(viewState)
-                if (omnibar.isPulseAnimationPlaying()) {
-                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
-                }
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
 

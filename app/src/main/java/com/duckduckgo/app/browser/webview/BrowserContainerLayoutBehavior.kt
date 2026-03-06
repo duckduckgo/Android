@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 
 /**
@@ -44,6 +43,7 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
+
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: View,
@@ -58,8 +58,27 @@ class TopOmnibarBrowserContainerLayoutBehavior(
         if (dependency.isBrowserNavigationBar()) {
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
-            super.onDependentViewChanged(parent, child, dependency)
+            val result = super.onDependentViewChanged(parent, child, dependency)
+            correctBottomMarginIfNeeded(child, parent)
+            result
         }
+
+    /**
+     * Corrects stale `bottomMargin` that may be left on [child] after the AppBarLayout snap animation.
+     * Resets the margin to 0 when [child] no longer extends past [parent].
+     */
+    internal fun correctBottomMarginIfNeeded(child: View, parent: CoordinatorLayout) {
+        val lp = child.layoutParams as? CoordinatorLayout.LayoutParams ?: return
+        if (lp.bottomMargin == 0) return
+
+        val childBottom = child.bottom + child.translationY.toInt()
+        val parentBottom = parent.height
+        val diff = childBottom - parentBottom
+        val newMargin = if (diff > 0) diff else 0
+        if (lp.bottomMargin != newMargin) {
+            lp.bottomMargin = newMargin
+        }
+    }
 }
 
 /**
@@ -116,7 +135,6 @@ private fun offsetByBottomElementVisibleHeight(
         false
     }
 }
-
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 
 private fun View.isBottomOmnibar(): Boolean = this is OmnibarView && this.omnibarType == OmnibarType.SINGLE_BOTTOM

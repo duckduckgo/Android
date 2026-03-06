@@ -75,7 +75,6 @@ class DuckDuckGoWebView :
     private val scrollConsumed = IntArray(2)
     private var nestedOffsetY: Int = 0
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
-    private val helper = CoordinatorLayoutHelper()
 
     private var isDestroyed: Boolean = false
     private var isSafeWebViewEnabled: Boolean = true
@@ -94,7 +93,6 @@ class DuckDuckGoWebView :
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-        helper.onViewAttached(this)
     }
 
     override fun destroy() {
@@ -241,10 +239,6 @@ class DuckDuckGoWebView :
             if (isDestroyed) return null
             return getHitTestResult()
         }
-
-    fun setBottomMatchingBehaviourEnabled(value: Boolean) {
-        helper.setBottomMatchingBehaviourEnabled(value)
-    }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val inputConnection = super.onCreateInputConnection(outAttrs) ?: return null
@@ -419,7 +413,6 @@ class DuckDuckGoWebView :
         }
 
         enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
-        post(helper::computeBottomMarginIfNeeded)
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
