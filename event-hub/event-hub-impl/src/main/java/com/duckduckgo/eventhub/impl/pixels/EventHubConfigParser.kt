@@ -16,30 +16,25 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
-import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import logcat.LogPriority.WARN
 import logcat.logcat
 
-@JsonClass(generateAdapter = false)
 private data class EventHubSettingsJson(
     val telemetry: Map<String, TelemetryPixelJson>? = null,
 )
 
-@JsonClass(generateAdapter = false)
 private data class TelemetryPixelJson(
     val state: String,
     val trigger: TelemetryTriggerJson,
     val parameters: Map<String, TelemetryParameterJson>,
 )
 
-@JsonClass(generateAdapter = false)
 private data class TelemetryTriggerJson(
     val period: TelemetryPeriodJson,
 )
 
-@JsonClass(generateAdapter = false)
 private data class TelemetryPeriodJson(
     val seconds: Int = 0,
     val minutes: Int = 0,
@@ -47,14 +42,12 @@ private data class TelemetryPeriodJson(
     val days: Int = 0,
 )
 
-@JsonClass(generateAdapter = false)
 private data class TelemetryParameterJson(
     val template: String,
     val source: String? = null,
     val buckets: Map<String, BucketJson>? = null,
 )
 
-@JsonClass(generateAdapter = false)
 private data class BucketJson(
     val gte: Int,
     val lt: Int? = null,
