@@ -386,12 +386,10 @@ class TabSwitcherActivity :
                 tabsRecycler.invalidateItemDecorations()
 
                 val shouldScroll = firstTimeLoadingTabsList && it.tabs.isNotEmpty()
-                if (shouldScroll) {
-                    firstTimeLoadingTabsList = false
-                }
 
                 tabsAdapter.updateData(it.tabSwitcherItems) {
                     if (shouldScroll) {
+                        firstTimeLoadingTabsList = false
                         scrollToActiveTab()
                     }
                 }
