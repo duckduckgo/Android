@@ -384,7 +384,17 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
-                tabsAdapter.updateData(it.tabSwitcherItems)
+
+                val shouldScroll = firstTimeLoadingTabsList && it.tabs.isNotEmpty()
+                if (shouldScroll) {
+                    firstTimeLoadingTabsList = false
+                }
+
+                tabsAdapter.updateData(it.tabSwitcherItems) {
+                    if (shouldScroll) {
+                        scrollToActiveTab()
+                    }
+                }
 
                 updateToolbarTitle(it.mode, it.tabs.size)
                 updateTabGridItemDecorator()
@@ -392,11 +402,6 @@ class TabSwitcherActivity :
                 tabTouchHelper.mode = it.mode
 
                 invalidateOptionsMenu()
-
-                if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
-                    firstTimeLoadingTabsList = false
-                    scrollToActiveTab()
-                }
             }
         }
 
