@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
@@ -138,13 +139,12 @@ interface PirPixelSender {
      * @param optOutAttemptCount - The number of tries it took to submit successfully.
      * @param emailPattern - Email pattern used during submission, when available else null.
      */
-    fun reportOptOutSubmitted(
+    suspend fun reportOptOutSubmitted(
         brokerUrl: String,
         parent: String,
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
-        isVpnRunning: Boolean,
     )
 
     /**
@@ -160,7 +160,7 @@ interface PirPixelSender {
      * @param actionId - Predefined identifier of the broker action that failed
      * @param actionType - Type of action that failed
      */
-    fun reportOptOutFailed(
+    suspend fun reportOptOutFailed(
         brokerUrl: String,
         parent: String,
         brokerJsonVersion: String,
@@ -170,7 +170,6 @@ interface PirPixelSender {
         emailPattern: String?,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     )
 
     /**
@@ -404,16 +403,15 @@ interface PirPixelSender {
         actionType: String,
     )
 
-    fun reportScanMatches(
+    suspend fun reportScanMatches(
         brokerUrl: String,
         totalMatches: Int,
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
-        isVpnRunning: Boolean,
     )
 
-    fun reportScanNoMatch(
+    suspend fun reportScanNoMatch(
         brokerUrl: String,
         brokerVersion: String,
         durationMs: Long,
@@ -421,10 +419,9 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     )
 
-    fun reportScanError(
+    suspend fun reportScanError(
         brokerUrl: String,
         brokerVersion: String,
         durationMs: Long,
@@ -434,7 +431,6 @@ interface PirPixelSender {
         parentUrl: String,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     )
 
     fun reportOptOutStageStart(
@@ -539,11 +535,11 @@ interface PirPixelSender {
         removedAtMs: Long,
     )
 
-    fun reportDownloadMainConfigBEFailure(
+    suspend fun reportDownloadMainConfigBEFailure(
         errorCode: String,
     )
 
-    fun reportDownloadMainConfigFailure(
+    suspend fun reportDownloadMainConfigFailure(
         message: String,
     )
 
@@ -585,6 +581,7 @@ interface PirPixelSender {
 @ContributesBinding(AppScope::class)
 class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
+    private val networkProtectionState: NetworkProtectionState,
 ) : PirPixelSender {
     override fun reportManualScanStarted() {
         fire(PIR_FOREGROUND_RUN_STARTED)
@@ -624,13 +621,12 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
 
-    override fun reportOptOutSubmitted(
+    override suspend fun reportOptOutSubmitted(
         brokerUrl: String,
         parent: String,
         durationMs: Long,
         optOutAttemptCount: Int,
         emailPattern: String?,
-        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -638,7 +634,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_DURATION to durationMs.toString(),
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
-            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
     }
@@ -651,7 +647,7 @@ class RealPirPixelSender @Inject constructor(
         }
     }
 
-    override fun reportOptOutFailed(
+    override suspend fun reportOptOutFailed(
         brokerUrl: String,
         parent: String,
         brokerJsonVersion: String,
@@ -661,7 +657,6 @@ class RealPirPixelSender @Inject constructor(
         emailPattern: String?,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -673,7 +668,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
-            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
@@ -955,13 +950,12 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_SCAN_STAGE, params)
     }
 
-    override fun reportScanMatches(
+    override suspend fun reportScanMatches(
         brokerUrl: String,
         totalMatches: Int,
         durationMs: Long,
         inManualStarted: Boolean,
         parentUrl: String,
-        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -970,13 +964,13 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
-            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
     }
 
-    override fun reportScanNoMatch(
+    override suspend fun reportScanNoMatch(
         brokerUrl: String,
         brokerVersion: String,
         durationMs: Long,
@@ -984,7 +978,6 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -994,13 +987,13 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
-            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
     }
 
-    override fun reportScanError(
+    override suspend fun reportScanError(
         brokerUrl: String,
         brokerVersion: String,
         durationMs: Long,
@@ -1010,7 +1003,6 @@ class RealPirPixelSender @Inject constructor(
         parentUrl: String,
         actionId: String,
         actionType: String,
-        isVpnRunning: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
@@ -1022,7 +1014,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
-            PARAM_KEY_VPN_STATE to isVpnRunning.toVpnConnectionState(),
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
@@ -1285,17 +1277,19 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_UPDATE_BROKER_FAILURE, params)
     }
 
-    override fun reportDownloadMainConfigBEFailure(errorCode: String) {
+    override suspend fun reportDownloadMainConfigBEFailure(errorCode: String) {
         val params = mapOf(
             PARAM_ERROR_CODE to errorCode,
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
 
         fire(PIR_DOWNLOAD_MAINCONFIG_BE_FAILURE, params)
     }
 
-    override fun reportDownloadMainConfigFailure(message: String) {
+    override suspend fun reportDownloadMainConfigFailure(message: String) {
         val params = mapOf(
             PARAM_KEY_ERROR_DETAILS to message,
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
         fire(PIR_DOWNLOAD_MAINCONFIG_FAILURE, params)
     }
@@ -1391,6 +1385,10 @@ class RealPirPixelSender @Inject constructor(
             logcat { "PIR-LOGGING: $pixelName params: $params" }
             pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
         }
+    }
+
+    private suspend fun NetworkProtectionState.safeIsVpnRunning(): Boolean {
+        return runCatching { this.isRunning() }.getOrElse { false }
     }
 
     companion object {
