@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.requestblocklist
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.moshi.Moshi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -34,6 +35,8 @@ class RealRequestBlocklistTest {
     var coroutineTestRule = CoroutineTestRule()
 
     private val mockToggle: Toggle = mock()
+
+    private val moshi = Moshi.Builder().build()
     private val mockFeature: RequestBlocklistFeature = mock<RequestBlocklistFeature>().apply {
         whenever(self()).thenReturn(mockToggle)
     }
@@ -50,6 +53,7 @@ class RealRequestBlocklistTest {
             dispatchers = coroutineTestRule.testDispatcherProvider,
             isMainProcess = isMainProcess,
             appCoroutineScope = coroutineTestRule.testScope,
+            moshi = moshi,
         )
     }
 
@@ -242,6 +246,7 @@ class RealRequestBlocklistTest {
             dispatchers = coroutineTestRule.testDispatcherProvider,
             isMainProcess = false,
             appCoroutineScope = coroutineTestRule.testScope,
+            moshi = moshi,
         )
 
         assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))

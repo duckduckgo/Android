@@ -29,3 +29,7 @@ interface RequestBlocklistFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
+
+data class RequestBlocklistSettings(
+    val blockedRequests: Map<String, BlockedRequestEntry>?,
+)
