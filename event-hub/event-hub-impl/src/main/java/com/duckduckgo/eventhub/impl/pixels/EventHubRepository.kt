@@ -20,9 +20,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateEntity
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import org.json.JSONObject
 
 interface EventHubRepository {
     fun getPixelState(name: String): PixelState?
@@ -74,40 +76,20 @@ class RealEventHubRepository @Inject constructor(
     }
 
     companion object {
+        private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        private val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
+        private val paramsAdapter = moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
+
         fun parseParamsJson(json: String): MutableMap<String, ParamState> {
             return try {
-                val obj = JSONObject(json)
-                val map = mutableMapOf<String, ParamState>()
-                val keys = obj.keys()
-                while (keys.hasNext()) {
-                    val key = keys.next()
-                    val paramObj = obj.optJSONObject(key)
-                    if (paramObj != null) {
-                        map[key] = ParamState(
-                            value = paramObj.optInt("value", 0),
-                            stopCounting = paramObj.optBoolean("stopCounting", false),
-                        )
-                    } else {
-                        map[key] = ParamState(value = obj.optInt(key, 0))
-                    }
-                }
-                map
+                paramsAdapter.fromJson(json)?.toMutableMap() ?: mutableMapOf()
             } catch (e: Exception) {
                 mutableMapOf()
             }
         }
 
         fun serializeParams(params: Map<String, ParamState>): String {
-            val obj = JSONObject()
-            for ((key, state) in params) {
-                val paramObj = JSONObject()
-                paramObj.put("value", state.value)
-                if (state.stopCounting) {
-                    paramObj.put("stopCounting", true)
-                }
-                obj.put(key, paramObj)
-            }
-            return obj.toString()
+            return paramsAdapter.toJson(params)
         }
     }
 }
