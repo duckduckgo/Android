@@ -217,7 +217,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                             settingsDataStore.omnibarType = OmnibarType.SINGLE_TOP
                         }
                     }
-                    if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
+                    val showInputScreen = withContext(dispatchers.io()) {
+                        androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()
+                    }
+                    if (showInputScreen) {
                         setCurrentDialog(INPUT_SCREEN)
                     } else {
                         _commands.send(Command.Finish)
