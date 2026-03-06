@@ -179,6 +179,7 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
                     pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                    duckChat.setInputScreenUserSetting(true)
                 }
             }
 
