@@ -18,13 +18,13 @@ package com.duckduckgo.eventhub.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -63,7 +63,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
-    private val scheduledTimers = ConcurrentHashMap<String, Job>()
+    private val scheduledTimers = ConcurrentHashMap<String, ConflatedJob>()
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
@@ -189,13 +189,16 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
-        if (scheduledTimers.containsKey(pixelName)) {
+        val existing = scheduledTimers[pixelName]
+        if (existing != null && existing.isActive) {
             logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
             return
         }
 
         logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
-        val job = appCoroutineScope.launch(dispatcherProvider.io()) {
+        val conflatedJob = ConflatedJob()
+        scheduledTimers[pixelName] = conflatedJob
+        conflatedJob += appCoroutineScope.launch(dispatcherProvider.io()) {
             delay(delayMillis)
             ensureActive()
 
@@ -205,9 +208,6 @@ class RealEventHubPixelManager @Inject constructor(
             }
 
             mutex.withLock {
-                if (scheduledTimers[pixelName] !== coroutineContext[Job]) {
-                    return@withLock
-                }
                 val pixelState = repository.getPixelState(pixelName)
                 if (pixelState == null) {
                     scheduledTimers.remove(pixelName)
@@ -216,21 +216,22 @@ class RealEventHubPixelManager @Inject constructor(
                 fireTelemetry(pixelState)
             }
         }
-        scheduledTimers[pixelName] = job
     }
 
-    fun hasScheduledTimer(pixelName: String): Boolean = scheduledTimers.containsKey(pixelName)
+    fun hasScheduledTimer(pixelName: String): Boolean {
+        return scheduledTimers[pixelName]?.isActive == true
+    }
 
     fun cancelScheduledFire(pixelName: String) {
-        scheduledTimers.remove(pixelName)?.let { job ->
-            job.cancel()
+        scheduledTimers.remove(pixelName)?.let { conflatedJob ->
+            conflatedJob.cancel()
             logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
         }
     }
 
     private fun cancelAllTimers() {
-        scheduledTimers.forEach { (name, job) ->
-            job.cancel()
+        scheduledTimers.forEach { (name, conflatedJob) ->
+            conflatedJob.cancel()
             logcat(VERBOSE) { "EventHub: cancelled timer for $name" }
         }
         scheduledTimers.clear()
