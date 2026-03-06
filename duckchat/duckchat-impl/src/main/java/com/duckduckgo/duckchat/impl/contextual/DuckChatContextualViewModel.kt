@@ -31,7 +31,6 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +55,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
 ) : ViewModel() {
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
+    private val commandChannel = Channel<Command>(capacity = Channel.BUFFERED)
     val commands = commandChannel.receiveAsFlow()
 
     private val _subscriptionEventDataChannel = Channel<SubscriptionEventData>(capacity = Channel.BUFFERED)
