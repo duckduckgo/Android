@@ -18,8 +18,8 @@ keywords: ["maestro", "ui tests", "testing", "maestro cloud", "tags"]
 
 ## Types of UI tests
 The Maestro tests are organized into the following (non-exhaustive) main categories: 
-- `ad_click_detection` - Tests for ad click detection functionality 
-- `ads_preview` - Tests for Android Design System (ADS) preview functionality  
+- `ad_click_detection_flows` - Tests for ad click detection functionality 
+- `ads_preview_flows` - Tests for Android Design System (ADS) preview functionality  
 - `app_tp` - App Tracking Protection tests 
 - `autofill` - Password manager and autofill functionality tests 
 - `bookmarks` - Bookmark management tests 
@@ -35,7 +35,7 @@ The Maestro tests are organized into the following (non-exhaustive) main categor
 - `preonboarding` - Pre-onboarding flow tests 
 - `privacy_tests` - Privacy protection feature tests 
 - `security_tests` - Security-related tests (address bar spoofing, etc.) 
-- `sync` - Sync & Backup functionality tests 
+- `sync_flows` - Sync & Backup functionality tests 
 - `tabs` - Tab management tests 
 
 ## Shared flows

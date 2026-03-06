@@ -19,7 +19,7 @@ DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The ap
 
 **SDK targets:** minSdk 26, targetSdk 35, compileSdk 35
 **Language:** Kotlin (1.9.24), Java 17 (JVM toolchain)
-**Build:** Gradle 7.6, AGP via refreshVersions, Anvil (Dagger2)
+**Build:** Gradle 8.10.2, AGP via refreshVersions, Anvil (Dagger2)
 
 ---
 ## Build System
@@ -66,7 +66,7 @@ Note: `jvm_tests` and `jvm_checks` resolve to `testPlayDebugUnitTest` in `:app` 
 | Dimension | Flavors |
 |---|---|
 | store | `internal`, `fdroid`, `play` |
-| Build types | `debug`, `release`, `upload` |
+| Build types | `debug`, `release` |
 
 ---
 
@@ -82,7 +82,7 @@ my-feature/
 
 Key rules enforced at build time (`build.gradle`):
 - `-api` modules cannot use Anvil, depend on Dagger (except `:feature-toggles-api`, `:settings-api`), depend on other `-api` modules (except `:feature-toggles-api`, `:navigation-api`, `:js-messaging-api`), or depend on `:di`
-- Only `:app` can depend on `-impl` modules — features communicate through `-api` only
+- Only `:app` and `-internal` modules can depend on `-impl` modules — features communicate through `-api` only
 - `-internal` modules must use `internalImplementation` configuration
 - No KAPT anywhere except `:app` — use KSP
 - No `strings.xml` outside `:app` — use `strings-<feature>.xml`
@@ -140,7 +140,7 @@ These rules are enforced in the root `build.gradle`. Violations fail the build.
 | API modules cannot depend on Dagger | Except `:feature-toggles-api` and `:settings-api` |
 | API modules cannot depend on other APIs | Except `:feature-toggles-api`, `:navigation-api`, `:js-messaging-api` |
 | API modules cannot depend on `:di` | DI wiring belongs in `-impl` |
-| Only `:app` depends on `-impl` modules | Features communicate through `-api` only |
+| Only `:app` and `-internal` modules depend on `-impl` modules | Features communicate through `-api` only |
 | `-internal` modules use `internalImplementation` | Excluded from non-internal builds (Play, F-Droid) |
 | No KAPT anywhere (except `:app`) | Use KSP for annotation processing |
 | No `strings.xml` outside `:app` | Use `strings-<feature>.xml` instead |
