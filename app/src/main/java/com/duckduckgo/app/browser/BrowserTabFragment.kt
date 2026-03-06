@@ -4501,6 +4501,7 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
+        if (nativeInputManager.hideNativeInput(binding.rootView, omnibar)) return true
         return viewModel.onUserPressedBack(isCustomTab)
     }
 

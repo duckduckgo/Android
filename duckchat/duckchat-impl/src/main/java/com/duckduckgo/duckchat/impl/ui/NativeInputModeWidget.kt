@@ -76,6 +76,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun observeChatState() {
+        var isFocussed = false
+
         chatStateJob?.cancel()
         chatStateJob = duckChatInternal.chatState
             .drop(1)
@@ -83,18 +85,20 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 setChatStreaming(state == ChatState.STREAMING)
                 when (state) {
                     ChatState.HIDE -> {
+                        isFocussed = hasInputFocus()
                         (context as? Activity)?.hideKeyboard()
                         clearInputFocus()
                         widgetRoot?.visibility = GONE
                     }
                     ChatState.SHOW -> {
                         widgetRoot?.visibility = VISIBLE
-                        requestInputFocus()
-                        (context as? Activity)?.showKeyboard(inputField)
+                        if (isFocussed) {
+                            requestInputFocus()
+                            (context as? Activity)?.showKeyboard(inputField)
+                        }
                     }
                     ChatState.READY -> {
                         widgetRoot?.visibility = VISIBLE
-                        requestInputFocus()
                     }
                     else -> {}
                 }
