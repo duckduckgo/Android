@@ -77,6 +77,7 @@ class TopOmnibarBrowserContainerLayoutBehavior(
         val newMargin = if (diff > 0) diff else 0
         if (lp.bottomMargin != newMargin) {
             lp.bottomMargin = newMargin
+            child.postOnAnimation { child.requestLayout() }
         }
     }
 }
