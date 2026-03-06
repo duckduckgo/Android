@@ -3664,7 +3664,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenUserVisitsSERPUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
+    fun whenUserVisitsSDDGUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
         runTest {
             val domain = "https://duckduckgo.com/"
 
