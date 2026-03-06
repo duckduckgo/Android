@@ -85,7 +85,6 @@ enum class Size {
             return when (size) {
                 Small -> R.dimen.buttonSmallHeight
                 Large -> R.dimen.buttonLargeHeight
-                else -> R.dimen.buttonSmallHeight
             }
         }
     }

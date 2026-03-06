@@ -146,10 +146,6 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                     ),
                 )
             }
-
-            else -> {
-                // No-op
-            }
         }
     }
 
