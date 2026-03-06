@@ -467,8 +467,8 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(updatedList: List<TabSwitcherItem>) {
-        differ.submitList(updatedList)
+    fun updateData(updatedList: List<TabSwitcherItem>, onDataUpdated: Runnable? = null) {
+        differ.submitList(updatedList, onDataUpdated)
     }
 
     fun getTabSwitcherItem(position: Int): TabSwitcherItem? = differ.currentList.getOrNull(position)
