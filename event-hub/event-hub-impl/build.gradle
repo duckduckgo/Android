@@ -49,6 +49,7 @@ dependencies {
     implementation project(path: ':browser-api')
 
     implementation AndroidX.lifecycle.common
+    implementation AndroidX.work.runtimeKtx
 
     api AndroidX.dataStore.preferences
 

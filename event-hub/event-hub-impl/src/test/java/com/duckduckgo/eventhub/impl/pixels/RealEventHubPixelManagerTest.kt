@@ -16,13 +16,17 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -52,6 +56,7 @@ class RealEventHubPixelManagerTest {
     private val foregroundState = FakeAppForegroundStateProvider()
     private val eventHubFeature: EventHubFeature = mock()
     private val selfToggle: Toggle = mock()
+    private val workManager: WorkManager = mock()
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
 
@@ -104,6 +109,7 @@ class RealEventHubPixelManagerTest {
         coroutineRule.testDispatcherProvider,
         foregroundState,
         eventHubFeature,
+        workManager,
     )
 
     // --- handleWebEvent ---
@@ -788,8 +794,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -819,8 +824,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -861,8 +865,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -882,8 +885,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val captor = argumentCaptor<PixelState>()
@@ -930,8 +932,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(disabledConfig)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         // Should STILL fire using stored config (per design: "still fire the telemetry, as it was enabled when initialised")
         verify(pixel).enqueueFire(
@@ -971,8 +972,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         // Fires the pixel
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -990,8 +990,7 @@ class RealEventHubPixelManagerTest {
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1111,8 +1110,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(listOf(captor.firstValue))
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(captor.firstValue)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1299,8 +1297,7 @@ class RealEventHubPixelManagerTest {
         val changedConfig = configWithBuckets(*changedBuckets)
         whenever(selfToggle.getSettings()).thenReturn(changedConfig)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1357,8 +1354,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         // Attribution period must be based on stored 120s period, not live 1hr
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
@@ -1415,8 +1411,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         // The NEW period should use the latest config (1 hour = 3600s = 3600000ms)
         verify(repository).deletePixelState("test_pixel")
@@ -1547,8 +1542,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = stateA1.periodEndMillis + 1
         stubPixelStates(updatedA, updatedB)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(repository).deletePixelState("pixel_a")
         verify(repository, never()).deletePixelState("pixel_b")
@@ -1596,8 +1590,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = stateB1.periodEndMillis + 1
         stubPixelStates(aAfter3, bAfter3)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(repository).deletePixelState("pixel_b")
         val savedAfterBFire = argumentCaptor<PixelState>()
@@ -1631,8 +1624,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState(any())).thenReturn(null)
         timeProvider.time = 3000L
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1747,8 +1739,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1879,8 +1870,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -2051,8 +2041,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(finalState)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -2089,10 +2078,78 @@ class RealEventHubPixelManagerTest {
         assertEquals(1767373200L, result)
     }
 
-    // --- scheduled firing (scheduleFireTelemetry / timer management) ---
+    // --- scheduled firing (WorkManager-backed scheduling) ---
 
     @Test
-    fun `startNewPeriod schedules a timer that fires the pixel`() {
+    fun `onConfigChanged schedules work for new pixel`() {
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
+        timeProvider.time = 1000L
+
+        manager.onConfigChanged()
+        coroutineRule.testScope.testScheduler.runCurrent()
+
+        verify(workManager).enqueueUniqueWork(eq("webTelemetry_testPixel1"), eq(ExistingWorkPolicy.KEEP), any<androidx.work.OneTimeWorkRequest>())
+    }
+
+    @Test
+    fun `onConfigChanged cancels all work when feature disabled`() {
+        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
+        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        manager = createManager()
+
+        timeProvider.time = 1000L
+        whenever(repository.getPixelState("pixel_a")).thenReturn(null)
+        whenever(repository.getPixelState("pixel_b")).thenReturn(null)
+        manager.onConfigChanged()
+        coroutineRule.testScope.testScheduler.runCurrent()
+
+        verify(repository, times(2)).savePixelState(any())
+
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+        manager.onConfigChanged()
+        coroutineRule.testScope.testScheduler.runCurrent()
+
+        verify(workManager).cancelAllWorkByTag(eq(EventHubPixelFireWorker.WORK_TAG))
+    }
+
+    @Test
+    fun `checkPixels schedules work for active pixel`() {
+        val periodEnd = timeProvider.time + 60_000L
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5), periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        runTest { manager.checkPixels() }
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+        verify(workManager).enqueueUniqueWork(eq("webTelemetry_testPixel1"), eq(ExistingWorkPolicy.KEEP), any<androidx.work.OneTimeWorkRequest>())
+    }
+
+    @Test
+    fun `checkPixels fires expired pixel and starts new period`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + 60_000L
+        timeProvider.time = periodEnd + 1
+
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        runTest { manager.checkPixels() }
+
+        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
+    fun `checkPixels does not fire when feature disabled`() {
+        whenever(selfToggle.isEnabled()).thenReturn(false)
+
+        runTest { manager.checkPixels() }
+
+        verify(repository, never()).getAllPixelStates()
+    }
+
+    @Test
+    fun `checkPixels fires expired pixel`() {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
@@ -2110,10 +2167,8 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(savedState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
 
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        timeProvider.time = 1000L + periodMillis
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        timeProvider.time = savedState.periodEndMillis + 1
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2124,77 +2179,7 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `onConfigChanged cancels all timers when feature disabled - no pixel fires after delay`() {
-        val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
-        manager = createManager()
-
-        timeProvider.time = 1000L
-        whenever(repository.getPixelState("pixel_a")).thenReturn(null)
-        whenever(repository.getPixelState("pixel_b")).thenReturn(null)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(repository, times(2)).savePixelState(any())
-
-        whenever(selfToggle.isEnabled()).thenReturn(false)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        org.mockito.Mockito.reset(pixel)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(121_000L)
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `checkPixels fires expired pixel and starts new period`() {
-        val periodStart = 1000L
-        val periodEnd = periodStart + 60_000L
-        timeProvider.time = periodEnd + 1
-
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
-        stubPixelStates(state)
-
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
-        verify(repository).savePixelState(any())
-    }
-
-    @Test
-    fun `checkPixels schedules timer for active pixel that fires after delay`() {
-        val periodEnd = timeProvider.time + 60_000L
-        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5), periodEnd = periodEnd)
-        stubPixelStates(state)
-
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state, null)
-        timeProvider.time = periodEnd + 1
-        coroutineRule.testScope.testScheduler.advanceTimeBy(60_001L)
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `checkPixels does not fire when feature disabled`() {
-        whenever(selfToggle.isEnabled()).thenReturn(false)
-
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(repository, never()).getAllPixelStates()
-    }
-
-    @Test
-    fun `scheduled timer fires zero-count pixel without any web events`() {
+    fun `checkPixels fires zero-count pixel without any web events`() {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
@@ -2213,10 +2198,8 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(savedState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(savedState))
 
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        timeProvider.time = 1000L + periodMillis
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        timeProvider.time = savedState.periodEndMillis + 1
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2227,7 +2210,7 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `scheduled timer starts new cycle after firing`() {
+    fun `checkPixels starts new cycle after firing`() {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
@@ -2245,10 +2228,8 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        timeProvider.time = 1000L + periodMillis
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        timeProvider.time = initialState.periodEndMillis + 1
+        runTest { manager.checkPixels() }
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val newCaptor = argumentCaptor<PixelState>()
@@ -2279,22 +2260,20 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `timer does not fire pixel when feature disabled at expiry`() {
+    fun `checkPixels does nothing when feature disabled`() {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
         coroutineRule.testScope.testScheduler.runCurrent()
 
         whenever(selfToggle.isEnabled()).thenReturn(false)
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
     @Test
-    fun `timer does not fire when pixel state is missing at expiry`() {
+    fun `checkPixels does nothing when pixel state missing`() {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
@@ -2309,9 +2288,7 @@ class RealEventHubPixelManagerTest {
         whenever(selfToggle.getSettings()).thenReturn(fullConfig)
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2341,78 +2318,8 @@ class RealEventHubPixelManagerTest {
         verify(repository).savePixelState(any())
     }
 
-    // --- race condition: timer expiry vs checkPixels ---
-
     @Test
-    fun `checkPixels cancels timer so expired coroutine does not double-fire`() {
-        timeProvider.time = 1000L
-
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        val initCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(initCaptor.capture())
-        val initialState = initCaptor.firstValue
-
-        org.mockito.Mockito.reset(repository, pixel, selfToggle)
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
-        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
-
-        timeProvider.time = initialState.periodEndMillis + 1
-
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        // Still only 1 fire — the stale timer coroutine must not double-fire
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `stale timer coroutine does not interfere with newly scheduled timer`() {
-        timeProvider.time = 1000L
-
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        val initCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(initCaptor.capture())
-        val initialState = initCaptor.firstValue
-
-        org.mockito.Mockito.reset(repository, pixel, selfToggle)
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
-        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
-
-        timeProvider.time = initialState.periodEndMillis + 1
-
-        // checkPixels fires the pixel, which starts a new period with a new timer
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-
-        // Run any pending continuations — the stale coroutine must not fire again
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        // Still only 1 fire
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-        // New period was saved (proves the new timer was created)
-        verify(repository).savePixelState(any())
-    }
-
-    @Test
-    fun `disabling feature before timer fires prevents pixel fire`() {
+    fun `disabling feature before checkPixels prevents pixel fire`() {
         timeProvider.time = 1000L
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         manager.onConfigChanged()
@@ -2420,84 +2327,12 @@ class RealEventHubPixelManagerTest {
 
         verify(repository).savePixelState(any())
 
-        // Disable feature before timer fires
         whenever(selfToggle.isEnabled()).thenReturn(false)
         manager.onConfigChanged()
         coroutineRule.testScope.testScheduler.runCurrent()
 
         org.mockito.Mockito.reset(pixel)
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `stale timer does not fire newly created period state`() {
-        timeProvider.time = 1000L
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        val initCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(initCaptor.capture())
-        val initialState = initCaptor.firstValue
-
-        // Simulate: timer delay elapses, but checkPixels runs first and fires + restarts
-        org.mockito.Mockito.reset(repository, pixel, selfToggle)
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
-        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
-
-        timeProvider.time = initialState.periodEndMillis + 1
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        // checkPixels fired once
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-
-        // Now the old timer's delay completes — it should NOT fire the new period
-        val periodMillis = java.util.concurrent.TimeUnit.DAYS.toMillis(1)
-        org.mockito.Mockito.reset(pixel)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        // Stale timer must not have fired
-        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `stale timer from previous period does not fire after checkPixels restarts period`() {
-        timeProvider.time = 1000L
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-        manager.onConfigChanged()
-        coroutineRule.testScope.testScheduler.runCurrent()
-
-        val initCaptor = argumentCaptor<PixelState>()
-        verify(repository).savePixelState(initCaptor.capture())
-        val initialState = initCaptor.firstValue
-
-        org.mockito.Mockito.reset(repository, pixel, selfToggle)
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
-        whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
-
-        // checkPixels fires the expired pixel and starts a new period (with a new timer)
-        timeProvider.time = initialState.periodEndMillis + 1
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
-        verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
-
-        // Now advance past the OLD timer's original delay — it should be a no-op
-        org.mockito.Mockito.reset(pixel)
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2521,8 +2356,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2551,8 +2385,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2569,8 +2402,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 50_000L
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2600,10 +2432,8 @@ class RealEventHubPixelManagerTest {
 
         foregroundState.isInForeground = false
 
-        val periodMillis = TimeUnit.DAYS.toMillis(1)
-        timeProvider.time = 1000L + periodMillis
-        coroutineRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        timeProvider.time = initialState.periodEndMillis + 1
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2632,8 +2462,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2649,8 +2478,7 @@ class RealEventHubPixelManagerTest {
         foregroundState.isInForeground = true
         timeProvider.time = periodEnd + 5000L
 
-        manager.checkPixels()
-        coroutineRule.testScope.testScheduler.runCurrent()
+        runTest { manager.checkPixels() }
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2695,9 +2523,11 @@ class RealEventHubPixelManagerTest {
         }
     }
 
-    private class FakeTimeProvider : TimeProvider {
+    private class FakeTimeProvider : CurrentTimeProvider {
         var time: Long = 0L
         override fun currentTimeMillis(): Long = time
+        override fun elapsedRealtime(): Long = time
+        override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
     }
 
     private class FakeAppForegroundStateProvider : AppForegroundStateProvider {

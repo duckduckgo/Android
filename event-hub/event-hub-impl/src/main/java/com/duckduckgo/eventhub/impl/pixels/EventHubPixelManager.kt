@@ -16,17 +16,18 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -34,6 +35,7 @@ import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface EventHubPixelManager {
@@ -53,7 +55,7 @@ interface EventHubPixelManager {
      * Reconcile pixel state: fire any whose collection period has elapsed
      * and ensure active configs have scheduled work.
      */
-    fun checkPixels()
+    suspend fun checkPixels()
 
     /**
      * Notify that the remote feature config has changed.
@@ -66,11 +68,12 @@ interface EventHubPixelManager {
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,
     private val pixel: Pixel,
-    private val timeProvider: TimeProvider,
+    private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val foregroundStateProvider: AppForegroundStateProvider,
     private val eventHubFeature: EventHubFeature,
+    private val workManager: WorkManager,
 ) : EventHubPixelManager {
 
     private val mutex = Mutex()
@@ -78,7 +81,6 @@ class RealEventHubPixelManager @Inject constructor(
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
     private val dedupSeen = mutableSetOf<String>()
     private val webViewCurrentUrl = mutableMapOf<String, String>()
-    private val scheduledTimers = mutableMapOf<String, Job>()
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
@@ -152,24 +154,22 @@ class RealEventHubPixelManager @Inject constructor(
         return false
     }
 
-    override fun checkPixels() {
+    override suspend fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            mutex.withLock {
-                val nowMillis = timeProvider.currentTimeMillis()
-                for (pixelState in repository.getAllPixelStates()) {
-                    if (nowMillis >= pixelState.periodEndMillis) {
-                        fireTelemetry(pixelState)
-                    } else {
-                        scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
-                    }
+        mutex.withLock {
+            val nowMillis = timeProvider.currentTimeMillis()
+            for (pixelState in repository.getAllPixelStates()) {
+                if (nowMillis >= pixelState.periodEndMillis) {
+                    fireTelemetry(pixelState)
+                } else {
+                    schedulePixelFire(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
                 }
+            }
 
-                for (pixelConfig in getTelemetryConfigs()) {
-                    if (repository.getPixelState(pixelConfig.name) == null) {
-                        startNewPeriod(pixelConfig)
-                    }
+            for (pixelConfig in getTelemetryConfigs()) {
+                if (repository.getPixelState(pixelConfig.name) == null) {
+                    startNewPeriod(pixelConfig)
                 }
             }
         }
@@ -181,7 +181,7 @@ class RealEventHubPixelManager @Inject constructor(
                 cachedTelemetryConfigs = null
                 if (!isFeatureEnabled()) {
                     logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-                    cancelAllTimers()
+                    cancelAllScheduledWork()
                     repository.deleteAllPixelStates()
                     return@launch
                 }
@@ -197,56 +197,27 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    private fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
-        if (scheduledTimers.containsKey(pixelName)) {
-            logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
-            return
-        }
-
+    private fun schedulePixelFire(pixelName: String, delayMillis: Long) {
         logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
-        val job = appCoroutineScope.launch(dispatcherProvider.io()) {
-            delay(delayMillis)
-            ensureActive()
-
-            if (!isFeatureEnabled()) {
-                mutex.withLock { scheduledTimers.remove(pixelName) }
-                return@launch
-            }
-
-            mutex.withLock {
-                // Guard against stale timer: if checkPixels or fireTelemetry already replaced
-                // this job with a new one, this coroutine is stale and must not fire.
-                if (scheduledTimers[pixelName] !== coroutineContext[Job]) {
-                    return@launch
-                }
-                val pixelState = repository.getPixelState(pixelName)
-                if (pixelState == null) {
-                    scheduledTimers.remove(pixelName)
-                    return@launch
-                }
-                fireTelemetry(pixelState)
-            }
-        }
-        scheduledTimers[pixelName] = job
+        val request = OneTimeWorkRequestBuilder<EventHubPixelFireWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .addTag(EventHubPixelFireWorker.WORK_TAG)
+            .build()
+        workManager.enqueueUniqueWork(pixelName, ExistingWorkPolicy.KEEP, request)
     }
 
-    private fun cancelScheduledFire(pixelName: String) {
-        scheduledTimers.remove(pixelName)?.let { job ->
-            job.cancel()
-            logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
-        }
+    private fun cancelScheduledWork(pixelName: String) {
+        workManager.cancelUniqueWork(pixelName)
+        logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
     }
 
-    private fun cancelAllTimers() {
-        scheduledTimers.forEach { (name, job) ->
-            job.cancel()
-            logcat(VERBOSE) { "EventHub: cancelled timer for $name" }
-        }
-        scheduledTimers.clear()
+    private fun cancelAllScheduledWork() {
+        workManager.cancelAllWorkByTag(EventHubPixelFireWorker.WORK_TAG)
+        logcat(VERBOSE) { "EventHub: cancelled all scheduled pixel fires" }
     }
 
     private fun fireTelemetry(pixelState: PixelState) {
-        cancelScheduledFire(pixelState.pixelName)
+        cancelScheduledWork(pixelState.pixelName)
 
         val pixelData = buildPixel(pixelState)
 
@@ -294,7 +265,7 @@ class RealEventHubPixelManager @Inject constructor(
             ),
         )
 
-        scheduleFireTelemetry(pixelConfig.name, periodMillis)
+        schedulePixelFire(pixelConfig.name, periodMillis)
     }
 
     private fun buildPixel(pixelState: PixelState): Map<String, String> {
@@ -325,14 +296,4 @@ class RealEventHubPixelManager @Inject constructor(
             return (epochSeconds / periodSeconds) * periodSeconds
         }
     }
-}
-
-interface TimeProvider {
-    fun currentTimeMillis(): Long
-}
-
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealTimeProvider @Inject constructor() : TimeProvider {
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
