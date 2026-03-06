@@ -66,6 +66,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -110,7 +111,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
-                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
+                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
@@ -380,8 +381,27 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 3
-                    val ctaText = it.getString(R.string.preOnboardingInputScreenTitle)
+                    val ctaText = it.getString(
+                        if (showDuckAiCopy) R.string.preOnboardingInputScreenTitleUpdated else R.string.preOnboardingInputScreenTitle,
+                    )
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_without_ai
+                        },
+                    )
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_with_ai
+                        },
+                    )
+
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.show()
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.alpha = MIN_ALPHA
