@@ -103,13 +103,12 @@ class RealRequestBlocklist @Inject constructor(
 
             blockedRequests.clear()
             blockedRequests.putAll(newBlockedRequests)
-            println(blockedRequests)
         }
     }
 
     private fun ruleMatches(
         normalizedUrl: String,
-        rule: String
+        rule: String,
     ): Boolean = buildString {
         for (char in rule) {
             if (char == '*') {
@@ -122,7 +121,7 @@ class RealRequestBlocklist @Inject constructor(
 
     private fun domainMatches(
         documentUrl: String?,
-        domains: List<String>
+        domains: List<String>,
     ): Boolean {
         if (documentUrl == null) return false
         if (domains.contains("<all>")) return true

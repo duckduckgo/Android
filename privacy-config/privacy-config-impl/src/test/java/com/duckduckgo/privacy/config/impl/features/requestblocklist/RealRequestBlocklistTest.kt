@@ -41,7 +41,7 @@ class RealRequestBlocklistTest {
     private fun createTestee(
         settings: String? = null,
         isMainProcess: Boolean = true,
-        featureEnabled: Boolean = true
+        featureEnabled: Boolean = true,
     ): RealRequestBlocklist {
         whenever(mockToggle.getSettings()).thenReturn(settings)
         whenever(mockToggle.isEnabled()).thenReturn(featureEnabled)
@@ -391,7 +391,7 @@ class RealRequestBlocklistTest {
     private fun settingsWithRule(
         entry: String,
         rule: String,
-        domains: List<String>
+        domains: List<String>,
     ): String {
         val domainsJson = domains.joinToString(",") { "\"$it\"" }
         return """
