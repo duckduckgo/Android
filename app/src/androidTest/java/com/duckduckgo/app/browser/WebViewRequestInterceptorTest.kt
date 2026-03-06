@@ -51,7 +51,11 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.RequestBlocklist
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -84,6 +88,10 @@ class WebViewRequestInterceptorTest {
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockResourceSurrogates: ResourceSurrogates = mock()
     private var mockRequest: WebResourceRequest = mock()
+    private val requestBlocklist: RequestBlocklist = mock()
+    private val mockContentBlocking: ContentBlocking = mock()
+    private val mockTrackerAllowlist: TrackerAllowlist = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
@@ -123,6 +131,10 @@ class WebViewRequestInterceptorTest {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            requestBlocklist = requestBlocklist,
+            contentBlocking = mockContentBlocking,
+            trackerAllowlist = mockTrackerAllowlist,
+            userAllowListRepository = mockUserAllowListRepository,
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = fakeMaliciousSiteBlockerWebViewIntegration,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -189,6 +201,10 @@ class WebViewRequestInterceptorTest {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            requestBlocklist = requestBlocklist,
+            contentBlocking = mockContentBlocking,
+            trackerAllowlist = mockTrackerAllowlist,
+            userAllowListRepository = mockUserAllowListRepository,
             duckPlayer = mockDuckPlayer,
             maliciousSiteBlockerWebViewIntegration = fakeMaliciousSiteBlockerWebViewIntegration,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -758,8 +774,94 @@ class WebViewRequestInterceptorTest {
         assertCancelledResponse(response)
     }
 
+    @Test
+    fun whenRequestIsInBlocklistAndNotMainFrameAndNotAllowlistedThenBlockRequest() = runTest {
+        configureShouldNotUpgrade()
+        configureSubframeRequest()
+        configureRequestInBlocklist()
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        assertCancelledResponse(response)
+    }
+
+    @Test
+    fun whenRequestIsInBlocklistButIsContentBlockingExceptionThenContinueToLoad() = runTest {
+        configureShouldNotUpgrade()
+        configureSubframeRequest()
+        configureRequestInBlocklist()
+        whenever(mockContentBlocking.isAnException(anyString())).thenReturn(true)
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        assertRequestCanContinueToLoad(response)
+    }
+
+    @Test
+    fun whenRequestIsInBlocklistButIsInTrackerAllowlistThenContinueToLoad() = runTest {
+        configureShouldNotUpgrade()
+        configureSubframeRequest()
+        configureRequestInBlocklist()
+        whenever(mockTrackerAllowlist.isAnException(anyString(), anyString())).thenReturn(true)
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        assertRequestCanContinueToLoad(response)
+    }
+
+    @Test
+    fun whenRequestIsInBlocklistButIsUserAllowlistedThenContinueToLoad() = runTest {
+        configureShouldNotUpgrade()
+        configureSubframeRequest()
+        configureRequestInBlocklist()
+        whenever(mockUserAllowListRepository.isUriInUserAllowList(any())).thenReturn(true)
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        assertRequestCanContinueToLoad(response)
+    }
+
+    @Test
+    fun whenRequestIsNotInBlocklistThenContinueToLoad() = runTest {
+        configureShouldNotUpgrade()
+        configureSubframeRequest()
+        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(false)
+        val response = testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        assertRequestCanContinueToLoad(response)
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
+    }
+
+    private fun configureSubframeRequest() {
+        whenever(mockRequest.isForMainFrame).thenReturn(false)
+    }
+
+    private fun configureRequestInBlocklist() {
+        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(true)
     }
 
     private fun configureShouldBlock() {

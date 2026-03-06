@@ -19,7 +19,9 @@
 package com.duckduckgo.app.referencetests
 
 import android.util.Base64
-import android.webkit.*
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
@@ -60,7 +62,9 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -71,13 +75,16 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(Parameterized::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
@@ -99,6 +106,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
+    private val mockRequestBlocklist: RequestBlocklist = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
@@ -176,8 +185,12 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
-            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
+            requestBlocklist = mockRequestBlocklist,
+            contentBlocking = mockContentBlocking,
+            trackerAllowlist = mockTrackerAllowlist,
+            userAllowListRepository = mockUserAllowListRepository,
             duckPlayer = mockDuckPlayer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
@@ -200,7 +213,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             webView = webView,
             webViewClientListener = null,
         )
-
         when (testCase.expectAction) {
             "redirect" -> {
                 assertRedirectCorrectlyDone(response, testCase.expectRedirect)
