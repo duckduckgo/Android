@@ -188,7 +188,7 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
+    internal fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
         val existing = scheduledTimers[pixelName]
         if (existing != null && existing.isActive) {
             logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
@@ -218,11 +218,11 @@ class RealEventHubPixelManager @Inject constructor(
         }
     }
 
-    fun hasScheduledTimer(pixelName: String): Boolean {
+    internal fun hasScheduledTimer(pixelName: String): Boolean {
         return scheduledTimers[pixelName]?.isActive == true
     }
 
-    fun cancelScheduledFire(pixelName: String) {
+    internal fun cancelScheduledFire(pixelName: String) {
         scheduledTimers.remove(pixelName)?.let { conflatedJob ->
             conflatedJob.cancel()
             logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
