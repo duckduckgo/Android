@@ -179,11 +179,11 @@
                             android:src="@drawable/searchbox_withoutai_active" />
 
                         <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiCaption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:gravity="center"
-                            android:text="@string/input_screen_user_pref_without_ai"
                             app:textType="primary"
                             app:typography="caption" />
 
@@ -221,11 +221,11 @@
                             android:src="@drawable/searchbox_withai_inactive" />
 
                         <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithAiCaption"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:gravity="center"
-                            android:text="@string/input_screen_user_pref_with_ai"
                             app:textType="primary"
                             app:typography="caption" />
 
