@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -30,6 +31,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +43,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
-import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class DuckChatContextualViewModel @Inject constructor(
@@ -529,7 +530,11 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun hasChatId(url: String?): Boolean {
-        return url != null && duckChat.extractChatId(url) != null
+        return url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)?.isNotBlank() == true
+    }
+
+    companion object {
+        private const val CHAT_ID_PARAM = "chatID"
     }
 
     private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
