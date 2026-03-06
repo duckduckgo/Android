@@ -21,6 +21,7 @@ package com.duckduckgo.app.browser
 import android.view.View
 import android.view.ViewParent
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 
 class CoordinatorLayoutHelper {
 
@@ -61,6 +62,11 @@ class CoordinatorLayoutHelper {
 
     fun computeBottomMarginIfNeeded() {
         if (coordinatorChildView == null || coordinatorParentView == null || !isBottomMatchingBehaviourEnabled) {
+            return
+        }
+
+        val lp = coordinatorChildView!!.layoutParams as? CoordinatorLayout.LayoutParams
+        if (lp?.behavior is TopOmnibarBrowserContainerLayoutBehavior) {
             return
         }
 
