@@ -26,6 +26,7 @@ import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -52,10 +53,14 @@ class PirAuthInterceptor @Inject constructor(
                 .header("Authorization", "bearer $accessToken")
                 .build()
 
-            chain.proceed(authenticatedRequest)
+            chain.withReadTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS).proceed(authenticatedRequest)
         } else {
             chain.proceed(request)
         }
+    }
+
+    companion object {
+        private const val READ_TIMEOUT_SECONDS = 30
     }
 }
 

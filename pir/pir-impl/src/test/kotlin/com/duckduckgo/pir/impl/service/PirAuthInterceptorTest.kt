@@ -32,6 +32,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Invocation
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class PirAuthInterceptorTest {
     private lateinit var testee: PirAuthInterceptor
@@ -76,11 +77,14 @@ class PirAuthInterceptorTest {
             .build()
 
         whenever(mockChain.request()).thenReturn(request)
+        val timeoutChain: Interceptor.Chain = mock()
+        whenever(mockChain.withReadTimeout(30, TimeUnit.SECONDS)).thenReturn(timeoutChain)
+        whenever(timeoutChain.proceed(any())).thenReturn(mockResponse)
 
         testee.intercept(mockChain)
 
         val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
-        verify(mockChain).proceed(requestCaptor.capture())
+        verify(timeoutChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
         assertNotNull(capturedRequest.header("Authorization"))
