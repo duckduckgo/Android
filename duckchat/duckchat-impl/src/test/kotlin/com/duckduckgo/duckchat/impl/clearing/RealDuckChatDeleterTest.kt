@@ -35,21 +35,21 @@ import org.mockito.kotlin.mock
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
-class RealDuckAiChatClearerTest {
+class RealDuckChatDeleterTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val context: Context = mock()
     private val appBuildConfig: AppBuildConfig = mock()
-    private val messaging: DuckAiChatClearerJsMessaging = mock()
+    private val messaging: DuckChatDeleterJsMessaging = mock()
     private val duckAiDataClearingFeature = FakeFeatureToggleFactory.create(DuckAiDataClearingFeature::class.java)
 
-    private lateinit var clearer: RealDuckAiChatClearer
+    private lateinit var clearer: RealDuckChatDeleter
 
     @Before
     fun setup() {
-        clearer = RealDuckAiChatClearer(
+        clearer = RealDuckChatDeleter(
             context = context,
             dispatchers = coroutineRule.testDispatcherProvider,
             appBuildConfig = appBuildConfig,

@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.clearing
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.duckchat.impl.clearing.DuckAiChatClearerJsMessaging.Companion.JS_INTERFACE_NAME
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.JS_INTERFACE_NAME
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -33,17 +33,17 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class DuckAiChatClearerJsMessagingTest {
+class DuckChatDeleterJsMessagingTest {
 
     private val jsMessageHelper: JsMessageHelper = mock()
     private val webView: WebView = mock()
     private val jsMessageCallback: JsMessageCallback = mock()
 
-    private lateinit var messaging: DuckAiChatClearerJsMessaging
+    private lateinit var messaging: DuckChatDeleterJsMessaging
 
     @Before
     fun setup() {
-        messaging = DuckAiChatClearerJsMessaging(
+        messaging = DuckChatDeleterJsMessaging(
             jsMessageHelper = jsMessageHelper,
         )
         messaging.register(webView, jsMessageCallback)
@@ -52,7 +52,7 @@ class DuckAiChatClearerJsMessagingTest {
     @Test
     fun `when register called then javascript interface is added to webview`() {
         val newWebView: WebView = mock()
-        val newMessaging = DuckAiChatClearerJsMessaging(jsMessageHelper)
+        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper)
 
         newMessaging.register(newWebView, jsMessageCallback)
 
@@ -61,7 +61,7 @@ class DuckAiChatClearerJsMessagingTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `when register called with null callback then throws`() {
-        val newMessaging = DuckAiChatClearerJsMessaging(jsMessageHelper)
+        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper)
         newMessaging.register(webView, null)
     }
 

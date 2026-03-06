@@ -26,11 +26,11 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiChatClearer
-import com.duckduckgo.duckchat.impl.clearing.DuckAiChatClearerJsMessaging.Companion.FEATURE_NAME
-import com.duckduckgo.duckchat.impl.clearing.DuckAiChatClearerJsMessaging.Companion.METHOD_CLEAR_DATA_COMPLETED
-import com.duckduckgo.duckchat.impl.clearing.DuckAiChatClearerJsMessaging.Companion.METHOD_CLEAR_DATA_FAILED
-import com.duckduckgo.duckchat.impl.clearing.DuckAiChatClearerJsMessaging.Companion.METHOD_CLEAR_DATA_READY
+import com.duckduckgo.duckchat.api.DuckChatDeleter
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.FEATURE_NAME
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_COMPLETED
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_FAILED
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_READY
 import com.duckduckgo.duckchat.impl.feature.DuckAiDataClearingFeature
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -49,13 +49,13 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealDuckAiChatClearer @Inject constructor(
+class RealDuckChatDeleter @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
-    private val messaging: DuckAiChatClearerJsMessaging,
+    private val messaging: DuckChatDeleterJsMessaging,
     private val duckAiDataClearingFeature: DuckAiDataClearingFeature,
-) : DuckAiChatClearer {
+) : DuckChatDeleter {
 
     private val mutex = Mutex()
 
@@ -78,13 +78,13 @@ class RealDuckAiChatClearer @Inject constructor(
                     for (domain in DOMAINS) {
                         val success = clearFromDomain(wv, domain, chatId)
                         if (!success) {
-                            logcat { "DuckAiChatClearer: clearing failed for domain $domain, chatId $chatId" }
+                            logcat { "DuckChatDeleter: clearing failed for domain $domain, chatId $chatId" }
                             allSucceeded = false
                         }
                     }
                     allSucceeded
                 } catch (e: Exception) {
-                    logcat { "DuckAiChatClearer: deleteChat failed with ${e.message}" }
+                    logcat { "DuckChatDeleter: deleteChat failed with ${e.message}" }
                     false
                 } finally {
                     tearDown()
@@ -151,7 +151,7 @@ class RealDuckAiChatClearer @Inject constructor(
     private fun getDesktopModeKeyValuePair() = "\"desktopModeEnabled\":false"
     private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"${messaging.secret}\""
     private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"${messaging.callbackName}\""
-    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"${DuckAiChatClearerJsMessaging.JS_INTERFACE_NAME}\""
+    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"${DuckChatDeleterJsMessaging.JS_INTERFACE_NAME}\""
 
     private fun loadJs(resourceName: String): String {
         return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()?.use { it.readText() }.orEmpty()
@@ -198,7 +198,7 @@ class RealDuckAiChatClearer @Inject constructor(
                             METHOD_CLEAR_DATA_COMPLETED -> clearResultDeferred?.complete(true)
                             METHOD_CLEAR_DATA_FAILED -> {
                                 val error = data?.optString("error", "unknown")
-                                logcat { "DuckAiChatClearer: clear data failed with error: $error" }
+                                logcat { "DuckChatDeleter: clear data failed with error: $error" }
                                 clearResultDeferred?.complete(false)
                             }
                         }
