@@ -642,7 +642,16 @@ class RealDuckChat @Inject constructor(
 
     override fun isDuckChatUrl(uri: Uri): Boolean {
         if (!isDuckChatFeatureEnabled) return false
+        return matchesDuckChatUrlPattern(uri)
+    }
 
+    override fun extractChatId(url: String): String? {
+        val uri = Uri.parse(url) ?: return null
+        if (!matchesDuckChatUrlPattern(uri)) return null
+        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
+    }
+
+    private fun matchesDuckChatUrlPattern(uri: Uri): Boolean {
         if (isDuckChatBang(uri)) return true
 
         if (uri.host == DUCK_AI_HOST || uri.toString() == DUCK_AI_HOST) return true
@@ -652,12 +661,6 @@ class RealDuckChat @Inject constructor(
             val queryParameters = uri.queryParameterNames
             queryParameters.contains(CHAT_QUERY_NAME) && uri.getQueryParameter(CHAT_QUERY_NAME) == CHAT_QUERY_VALUE
         }.getOrDefault(false)
-    }
-
-    override fun extractChatId(url: String): String? {
-        val uri = Uri.parse(url) ?: return null
-        if (!isDuckChatUrl(uri)) return null
-        return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
     }
 
     private fun isDuckChatBang(uri: Uri): Boolean = bangRegex?.containsMatchIn(uri.toString()) == true
