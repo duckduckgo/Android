@@ -2,8 +2,7 @@
 Handles web events from Content Scope Scripts (C-S-S) via the eventHub feature, aggregating counters and firing bucketed pixels based on remote configuration.
 
 ## Architecture
-- **event-hub-store**: Room database for eventHub config, webEvents CSS feature config, and pixel state
-- **event-hub-impl**: Feature plugins, config parser, pixel manager, JS message handler, pixel firing
+- **event-hub-impl**: Feature plugins, config parser, pixel manager, JS message handler, pixel firing, Room database for pixel state
 
 ## How it works
 1. Remote config defines pixel telemetry under the `eventHub` feature
