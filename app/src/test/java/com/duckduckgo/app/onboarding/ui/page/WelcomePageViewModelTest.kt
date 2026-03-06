@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
@@ -535,6 +536,32 @@ class WelcomePageViewModelTest {
 
             Assert.assertEquals(2, viewModel.getMaxPageCount())
         }
+
+    @Test
+    fun whenShowingInputScreenDialogAndDuckAiCopyEligibleThenShowInputScreenDialogWithDuckAiCopyEnabled() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDeviceInfo.language).thenReturn("en")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInputScreenDialog(showDuckAiCopy = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowingInputScreenDialogAndDuckAiCopyNotEligibleThenShowInputScreenDialogWithDuckAiCopyDisabled() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDeviceInfo.language).thenReturn("pl")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInputScreenDialog(showDuckAiCopy = false), awaitItem())
+        }
+    }
 
     @Test
     fun whenInputScreenDialogIsShownThenFireChooseSearchExperienceImpressionsUniquePixel() {
