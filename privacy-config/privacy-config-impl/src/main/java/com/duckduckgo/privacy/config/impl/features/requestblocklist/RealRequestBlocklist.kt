@@ -71,7 +71,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            ruleMatches(normalizedUrl, rule.rule) && domainMatches(documentUrl, rule.domains)
+            rule.ruleRegex.containsMatchIn(normalizedUrl) && domainMatches(documentUrl, rule.domains)
         }
     }
 
@@ -105,19 +105,6 @@ class RealRequestBlocklist @Inject constructor(
             blockedRequests.putAll(newBlockedRequests)
         }
     }
-
-    private fun ruleMatches(
-        normalizedUrl: String,
-        rule: String,
-    ): Boolean = buildString {
-        for (char in rule) {
-            if (char == '*') {
-                append("[^/]*")
-            } else {
-                append(Regex.escape(char.toString()))
-            }
-        }
-    }.toRegex().containsMatchIn(normalizedUrl)
 
     private fun domainMatches(
         documentUrl: String?,

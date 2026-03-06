@@ -28,6 +28,7 @@ class BlocklistRuleEntity(
     val rule: String,
     val domains: List<String>,
     val reason: String?,
+    val ruleRegex: Regex,
 ) {
     companion object {
         private const val PROPERTY_RULE = "rule"
@@ -42,7 +43,22 @@ class BlocklistRuleEntity(
             val rule = map[PROPERTY_RULE] as? String ?: return null
             val domains = map[PROPERTY_DOMAINS] as? List<String> ?: return null
             val reason = map[PROPERTY_REASON] as? String
-            return BlocklistRuleEntity(rule = rule, domains = domains, reason = reason)
+            return BlocklistRuleEntity(
+                rule = rule,
+                domains = domains,
+                reason = reason,
+                ruleRegex = compileRuleRegex(rule),
+            )
         }
+
+        private fun compileRuleRegex(rule: String): Regex = buildString {
+            for (char in rule) {
+                if (char == '*') {
+                    append("[^/]*")
+                } else {
+                    append(Regex.escape(char.toString()))
+                }
+            }
+        }.toRegex()
     }
 }
