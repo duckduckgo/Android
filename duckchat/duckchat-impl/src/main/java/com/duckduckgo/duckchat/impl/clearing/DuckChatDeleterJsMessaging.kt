@@ -33,10 +33,10 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * JsMessaging for the headless chat clearer WebView.
+ * JsMessaging for the headless chat deleter WebView.
  * Handles the @JavascriptInterface bridge for receiving messages from the injected JS.
  */
-class DuckAiChatClearerJsMessaging @Inject constructor(
+class DuckChatDeleterJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
 

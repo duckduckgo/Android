@@ -27,9 +27,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiChatClearer
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatDeleter
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -83,7 +83,7 @@ class DataClearingTest {
     private lateinit var mockDuckChat: DuckChat
 
     @Mock
-    private lateinit var mockDuckAiChatClearer: DuckAiChatClearer
+    private lateinit var mockDuckChatDeleter: DuckChatDeleter
 
     @Mock
     private lateinit var mockTabRepository: TabRepository
@@ -110,7 +110,7 @@ class DataClearingTest {
             navigationHistory = mockNavigationHistory,
             tabRepository = mockTabRepository,
             duckChat = mockDuckChat,
-            duckAiChatClearer = mockDuckAiChatClearer,
+            duckChatDeleter = mockDuckChatDeleter,
         )
     }
 
@@ -759,7 +759,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer).deleteChat("abc-123")
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
     }
 
     @Test
@@ -771,7 +771,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer, never()).deleteChat(any())
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
     }
 
     @Test
@@ -783,7 +783,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer).deleteChat("abc-123")
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
     }
 
     @Test
@@ -795,7 +795,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer).deleteChat("abc-123")
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
     }
 
     @Test
@@ -805,7 +805,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckAiChatClearer, never()).deleteChat(any())
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {

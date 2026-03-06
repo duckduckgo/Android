@@ -16,6 +16,18 @@
 
 package com.duckduckgo.duckchat.api
 
-interface DuckAiChatClearer {
+/**
+ * Handles deletion of individual Duck AI chat conversations from local storage.
+ *
+ * This is used during single-tab burn to delete the chat data associated with a specific
+ * Duck AI chat tab across all relevant domains (duck.ai, duckduckgo.com).
+ */
+interface DuckChatDeleter {
+    /**
+     * Deletes the local storage data for a specific chat conversation.
+     *
+     * @param chatId the unique identifier of the chat to delete
+     * @return true if the chat was successfully deleted from all domains, false otherwise
+     */
     suspend fun deleteChat(chatId: String): Boolean
 }
