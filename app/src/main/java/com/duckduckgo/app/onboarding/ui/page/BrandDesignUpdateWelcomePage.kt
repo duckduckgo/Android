@@ -367,7 +367,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+        if (appBuildConfig.sdkInt >= 33) {
             viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
