@@ -350,7 +350,7 @@ class RealSecureStorageKeyStore(
                             throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
                         }
                     }
-                    harmonyPrefs != null && harmonyValue != null && legacyValue == null -> {
+                    legacyPrefs != null && harmonyValue != null && legacyValue == null -> {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_KEY_MISSING,
                             getPixelParams(keyName = keyName),
