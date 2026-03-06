@@ -74,10 +74,13 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
-                    if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+                    // webViewId must be injected here because the plugin handler
+                    // doesn't have access to the WebView instance. This is needed
+                    // so event-hub can deduplicate events per tab.
+                    if (jsMessage.featureName == WEB_EVENTS_FEATURE && jsMessage.method == WEB_EVENT_METHOD) {
                         val nativeData = org.json.JSONObject()
-                        nativeData.put("webViewId", System.identityHashCode(webView).toString())
-                        jsMessage.params.put("nativeData", nativeData)
+                        nativeData.put(WEB_VIEW_ID_KEY, System.identityHashCode(webView).toString())
+                        jsMessage.params.put(NATIVE_DATA_KEY, nativeData)
                     }
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
@@ -144,5 +147,12 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         if (allowedDomains.isEmpty()) return true
         val eTld = url?.toTldPlusOne() ?: return false
         return (allowedDomains.contains(eTld))
+    }
+
+    companion object {
+        private const val WEB_EVENTS_FEATURE = "webEvents"
+        private const val WEB_EVENT_METHOD = "webEvent"
+        private const val WEB_VIEW_ID_KEY = "webViewId"
+        private const val NATIVE_DATA_KEY = "nativeData"
     }
 }
