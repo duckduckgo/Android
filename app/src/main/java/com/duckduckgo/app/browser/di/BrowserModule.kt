@@ -92,8 +92,12 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.RequestBlocklist
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.settings.api.SerpSettingsFeature
@@ -224,6 +228,10 @@ class BrowserModule {
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
+        requestBlocklist: RequestBlocklist,
+        contentBlocking: ContentBlocking,
+        trackerAllowlist: TrackerAllowlist,
+        userAllowListRepository: UserAllowListRepository,
         duckPlayer: DuckPlayer,
         maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -241,6 +249,10 @@ class BrowserModule {
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
+            requestBlocklist,
+            contentBlocking,
+            trackerAllowlist,
+            userAllowListRepository,
             duckPlayer,
             maliciousSiteBlockerWebViewIntegration,
             dispatchers,

@@ -47,7 +47,11 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.RequestBlocklist
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
@@ -94,6 +98,10 @@ class WebViewRequestInterceptor(
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
+    private val requestBlocklist: RequestBlocklist,
+    private val contentBlocking: ContentBlocking,
+    private val trackerAllowlist: TrackerAllowlist,
+    private val userAllowListRepository: UserAllowListRepository,
     private val duckPlayer: DuckPlayer,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
@@ -201,6 +209,18 @@ class WebViewRequestInterceptor(
 
         if (url != null && url.isHttp) {
             webViewClientListener?.pageHasHttpResources(documentUri)
+        }
+
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString())) {
+            val isContentBlockingException = contentBlocking.isAnException(documentUri.toString())
+            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUri.toString(), url.toString())
+            val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)
+
+            if (!isContentBlockingException && !isInTrackerAllowList && !isUserAllowlisted) {
+                logcat { "Blocking request $url by request blocklist" }
+                return WebResourceResponse(null, null, null)
+            }
+            return null
         }
 
         return getWebResourceResponse(request, documentUri, webViewClientListener)
