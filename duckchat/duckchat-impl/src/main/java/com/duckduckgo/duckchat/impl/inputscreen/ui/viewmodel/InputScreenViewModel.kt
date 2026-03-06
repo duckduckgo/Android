@@ -155,6 +155,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private var hasUserSeenHistoryIAM = false
     private var isTapTransition = false
     private var chatSuggestionsFetchJob: Job? = null
+    private var tabAttachmentFilterJob: Job? = null
     private val chatSuggestionsUserEnabled = MutableStateFlow(true)
 
     private val newTabPageHasContent = MutableStateFlow(false)
@@ -804,6 +805,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatTagTextChanged(text: String, cursorPosition: Int) {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
+        tabAttachmentFilterJob?.cancel()
         val tagQuery = TagDetector.detect(text, cursorPosition)
         if (tagQuery == null) {
             if (_tabAttachmentState.value.popupVisible) {
@@ -812,7 +814,7 @@ class InputScreenViewModel @AssistedInject constructor(
             return
         }
 
-        viewModelScope.launch(dispatchers.io()) {
+        tabAttachmentFilterJob = viewModelScope.launch(dispatchers.io()) {
             if (cachedTabs.isEmpty()) {
                 cachedTabs = tabRepository.getTabs()
                     .filter { !it.url.isNullOrBlank() }
