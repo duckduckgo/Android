@@ -220,7 +220,6 @@ class WebViewRequestInterceptor(
                 logcat { "Blocking request $url by request blocklist" }
                 return WebResourceResponse(null, null, null)
             }
-            return null
         }
 
         return getWebResourceResponse(request, documentUri, webViewClientListener)
