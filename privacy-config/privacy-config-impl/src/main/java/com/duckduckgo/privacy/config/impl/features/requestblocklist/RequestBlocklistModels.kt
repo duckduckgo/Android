@@ -32,12 +32,11 @@ class BlocklistRuleEntity(
 
         private val KNOWN_PROPERTIES = setOf(PROPERTY_RULE, PROPERTY_DOMAINS, PROPERTY_REASON)
 
-        @Suppress("UNCHECKED_CAST")
         fun fromJson(map: Map<String, Any>): BlocklistRuleEntity? {
             if (map.keys.any { it !in KNOWN_PROPERTIES }) return null
 
             val ruleString = map[PROPERTY_RULE] as? String ?: return null
-            val domains = map[PROPERTY_DOMAINS] as? List<String> ?: return null
+            val domains = (map[PROPERTY_DOMAINS] as? List<*>)?.map { it as? String ?: return null } ?: return null
             val reason = map[PROPERTY_REASON] as? String
 
             val rule = buildString {
