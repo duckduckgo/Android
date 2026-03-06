@@ -28,6 +28,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -53,6 +55,8 @@ class RealEventHubPixelManager @Inject constructor(
     private val foregroundStateProvider: AppForegroundStateProvider,
     private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
+
+    private val mutex = Mutex()
 
     @Volatile
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
@@ -84,36 +88,38 @@ class RealEventHubPixelManager @Inject constructor(
 
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val nowMillis = timeProvider.currentTimeMillis()
 
-        synchronized(this) {
-            for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis > pixelState.periodEndMillis) continue
+            mutex.withLock {
+                for (pixelState in repository.getAllPixelStates()) {
+                    if (nowMillis > pixelState.periodEndMillis) continue
 
-                val updatedParams = pixelState.params.toMutableMap()
-                var changed = false
+                    val updatedParams = pixelState.params.toMutableMap()
+                    var changed = false
 
-                for ((paramName, paramConfig) in pixelState.config.parameters) {
-                    if (paramConfig.isCounter && paramConfig.source == eventType) {
-                        val paramState = updatedParams[paramName] ?: ParamState(0)
-                        if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
+                    for ((paramName, paramConfig) in pixelState.config.parameters) {
+                        if (paramConfig.isCounter && paramConfig.source == eventType) {
+                            val paramState = updatedParams[paramName] ?: ParamState(0)
+                            if (paramState.stopCounting) continue
+                            if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
-                        changed = true
-                        if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
-                            updatedParams[paramName] = paramState.copy(stopCounting = true)
-                            logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
-                            continue
+                            changed = true
+                            if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
+                                updatedParams[paramName] = paramState.copy(stopCounting = true)
+                                logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
+                                continue
+                            }
+
+                            val newValue = paramState.value + 1
+                            updatedParams[paramName] = paramState.copy(value = newValue)
+                            logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                         }
-
-                        val newValue = paramState.value + 1
-                        updatedParams[paramName] = paramState.copy(value = newValue)
-                        logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                     }
-                }
 
-                if (changed) {
-                    repository.savePixelState(pixelState.copy(params = updatedParams))
+                    if (changed) {
+                        repository.savePixelState(pixelState.copy(params = updatedParams))
+                    }
                 }
             }
         }
@@ -139,40 +145,44 @@ class RealEventHubPixelManager @Inject constructor(
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val nowMillis = timeProvider.currentTimeMillis()
 
-        synchronized(this) {
-            for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis >= pixelState.periodEndMillis) {
-                    fireTelemetry(pixelState)
-                } else {
-                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+            mutex.withLock {
+                for (pixelState in repository.getAllPixelStates()) {
+                    if (nowMillis >= pixelState.periodEndMillis) {
+                        fireTelemetry(pixelState)
+                    } else {
+                        scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
+                    }
                 }
-            }
 
-            for (pixelConfig in getTelemetryConfigs()) {
-                if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                for (pixelConfig in getTelemetryConfigs()) {
+                    if (repository.getPixelState(pixelConfig.name) == null) {
+                        startNewPeriod(pixelConfig)
+                    }
                 }
             }
         }
     }
 
     override fun onConfigChanged() {
-        synchronized(this) {
-            cachedTelemetryConfigs = null
-            if (!isFeatureEnabled()) {
-                logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-                cancelAllTimers()
-                repository.deleteAllPixelStates()
-                return
-            }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            mutex.withLock {
+                cachedTelemetryConfigs = null
+                if (!isFeatureEnabled()) {
+                    logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
+                    cancelAllTimers()
+                    repository.deleteAllPixelStates()
+                    return@withLock
+                }
 
-            val telemetry = getTelemetryConfigs()
-            logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
-            for (pixelConfig in telemetry) {
-                if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                val telemetry = getTelemetryConfigs()
+                logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+                for (pixelConfig in telemetry) {
+                    if (repository.getPixelState(pixelConfig.name) == null) {
+                        startNewPeriod(pixelConfig)
+                    }
                 }
             }
         }
@@ -194,16 +204,14 @@ class RealEventHubPixelManager @Inject constructor(
                 return@launch
             }
 
-            synchronized(this@RealEventHubPixelManager) {
-                // Guard against stale timer: if checkPixels or fireTelemetry already replaced
-                // this job with a new one, this coroutine is stale and must not fire.
+            mutex.withLock {
                 if (scheduledTimers[pixelName] !== coroutineContext[Job]) {
-                    return@launch
+                    return@withLock
                 }
                 val pixelState = repository.getPixelState(pixelName)
                 if (pixelState == null) {
                     scheduledTimers.remove(pixelName)
-                    return@launch
+                    return@withLock
                 }
                 fireTelemetry(pixelState)
             }
