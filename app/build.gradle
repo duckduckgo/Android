@@ -22,8 +22,8 @@ ext {
 
 android {
     defaultConfig {
-//        applicationId "com.duckduckgo.mobile.android"
-        applicationId "com.duckduckgo.dev.android"
+        applicationId "com.duckduckgo.mobile.android"
+//        applicationId "com.duckduckgo.dev.android"
 
         minSdk min_sdk
         targetSdk target_sdk
