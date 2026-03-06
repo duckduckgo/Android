@@ -43,6 +43,7 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
+    private val marginOffsetPx = (MARGIN_OFFSET_DP * context.resources.displayMetrics.density).toInt()
 
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
@@ -59,22 +60,22 @@ class TopOmnibarBrowserContainerLayoutBehavior(
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
             val result = super.onDependentViewChanged(parent, child, dependency)
-            correctBottomMarginIfNeeded(child, parent)
+            correctBottomMargin(child, dependency)
             result
         }
 
     /**
-     * Corrects stale `bottomMargin` that may be left on [child] after the AppBarLayout snap animation.
-     * Resets the margin to 0 when [child] no longer extends past [parent].
+     * Sets `bottomMargin` based on the visible height of the AppBarLayout ([dependency]).
+     *
+     * [ScrollingViewBehavior] positions [child] below the AppBarLayout, but [child]'s `match_parent` height
+     * causes it to overflow past the parent. The correct margin equals the AppBarLayout's visible portion
+     * minus a small offset ([MARGIN_OFFSET_DP]) to reduce visual flicker during scroll.
      */
-    internal fun correctBottomMarginIfNeeded(child: View, parent: CoordinatorLayout) {
+    internal fun correctBottomMargin(child: View, dependency: View) {
+        if (child.isGone) return
         val lp = child.layoutParams as? CoordinatorLayout.LayoutParams ?: return
-        if (lp.bottomMargin == 0) return
-
-        val childBottom = child.bottom + child.translationY.toInt()
-        val parentBottom = parent.height
-        val diff = childBottom - parentBottom
-        val newMargin = if (diff > 0) diff else 0
+        // the marginOffset subtraction reduces the visual stutter while scrolling down.
+        val newMargin = maxOf(0, dependency.height + dependency.top - marginOffsetPx)
         if (lp.bottomMargin != newMargin) {
             lp.bottomMargin = newMargin
         }
@@ -135,6 +136,8 @@ private fun offsetByBottomElementVisibleHeight(
         false
     }
 }
+private const val MARGIN_OFFSET_DP = 7
+
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 
 private fun View.isBottomOmnibar(): Boolean = this is OmnibarView && this.omnibarType == OmnibarType.SINGLE_BOTTOM
