@@ -77,7 +77,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Impor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImportFile
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ReevalutePromotions
@@ -97,7 +96,6 @@ import com.duckduckgo.savedsites.impl.importing.ImportFromGoogleBookmarksPreImpo
 import com.duckduckgo.savedsites.impl.store.SortingMode
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -174,10 +172,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 }
             }
         }
-
-    private val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        viewModel.userReturnedFromSyncSettings()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -423,7 +417,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
                 is ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
                 is ShowFaviconsPrompt -> showFaviconsPrompt()
-                is LaunchSyncSettings -> launchSyncSettings()
                 is ReevalutePromotions -> configurePromotionsContainer()
                 is ShowBrowserMenu -> showBookmarksPopupMenu(it.buttonsDisabled, it.sortingMode)
                 is LaunchBookmarkImportFile -> launchBookmarkImportChooseFile()
@@ -458,11 +451,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             )
             exportMenuItem?.isEnabled = items.isNotEmpty()
         }.launchIn(lifecycleScope)
-    }
-
-    private fun launchSyncSettings() {
-        val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
-        syncActivityLauncher.launch(intent)
     }
 
     private fun showFaviconsPrompt() {
