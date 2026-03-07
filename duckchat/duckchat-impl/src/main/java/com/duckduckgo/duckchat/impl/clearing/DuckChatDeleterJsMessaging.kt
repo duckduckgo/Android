@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
+package com.duckduckgo.duckchat.impl.clearing
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -33,10 +33,10 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * JsMessaging for the headless chat suggestions WebView.
+ * JsMessaging for the headless chat deleter WebView.
  * Handles the @JavascriptInterface bridge for receiving messages from the injected JS.
  */
-class ChatSuggestionsJsMessaging @Inject constructor(
+class DuckChatDeleterJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
 
@@ -44,7 +44,7 @@ class ChatSuggestionsJsMessaging @Inject constructor(
     override val callbackName: String = "messageCallback"
 
     private val moshi by lazy { Moshi.Builder().add(JSONObjectAdapter()).build() }
-    private val handlers = listOf(DuckAiChatHistoryMessageHandler())
+    private val handlers = listOf(DuckAiDataClearingMessageHandler())
     private lateinit var jsMessageCallback: JsMessageCallback
     private lateinit var webView: WebView
 
@@ -97,17 +97,25 @@ class ChatSuggestionsJsMessaging @Inject constructor(
         }
     }
 
-    class DuckAiChatHistoryMessageHandler : JsMessageHandler {
+    class DuckAiDataClearingMessageHandler : JsMessageHandler {
         override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "duckAiChatHistory"
-        override val methods: List<String> = listOf("duckAiChatsResult")
+        override val featureName: String = FEATURE_NAME
+        override val methods: List<String> = listOf(
+            METHOD_CLEAR_DATA_READY,
+            METHOD_CLEAR_DATA_COMPLETED,
+            METHOD_CLEAR_DATA_FAILED,
+        )
     }
 
     companion object {
-        const val JS_INTERFACE_NAME = "chatSuggestionsInterface"
+        const val JS_INTERFACE_NAME = "chatClearerInterface"
+        const val FEATURE_NAME = "duckAiDataClearing"
+        const val METHOD_CLEAR_DATA_READY = "duckAiClearDataReady"
+        const val METHOD_CLEAR_DATA_COMPLETED = "duckAiClearDataCompleted"
+        const val METHOD_CLEAR_DATA_FAILED = "duckAiClearDataFailed"
     }
 }
