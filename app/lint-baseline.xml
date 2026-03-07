@@ -11161,34 +11161,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_large_dark.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_large_dark.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_large_light.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_large_light.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_small_dark.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_small_dark.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_small_light.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_small_light.png"/>
-    </issue>
-
-    <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
         errorLine1="    &lt;EditText"
