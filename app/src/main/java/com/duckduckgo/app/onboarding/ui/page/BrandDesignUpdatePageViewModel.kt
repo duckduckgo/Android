@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -141,6 +142,8 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
             INPUT_SCREEN -> pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            INPUT_MODE_DEMO -> {
+            }
         }
     }
 
@@ -256,6 +259,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                     _commands.send(Command.Finish)
                 }
             }
+
+            INPUT_MODE_DEMO -> {
+                // no-op
+            }
         }
     }
 
@@ -273,7 +280,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN -> {
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN, INPUT_MODE_DEMO -> {
                 // no-op
             }
         }

@@ -895,6 +895,9 @@
     <string name="preOnboardingInputScreenButton">Next</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
+    <!-- Input Mode Demo Onboarding step -->
+    <string name="preOnboardingInputModeDemoTitle" translatable="false">Ready to get started? Try search or AI chat!</string>
+
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
     <string name="settingsAddressBarPositionHeaderTitle">Address Bar Position</string>

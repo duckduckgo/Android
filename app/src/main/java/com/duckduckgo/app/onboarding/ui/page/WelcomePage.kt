@@ -25,12 +25,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -45,6 +47,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_MODE_DEMO
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
@@ -56,6 +59,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputModeDemoDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
@@ -63,6 +67,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -117,6 +122,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
+                is ShowInputModeDemoDialog -> configureDaxCta(INPUT_MODE_DEMO)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
@@ -465,6 +471,33 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
+
+                INPUT_MODE_DEMO -> {
+                    TransitionManager.beginDelayedTransition(binding.longDescriptionContainer, AutoTransition())
+                    binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.secondaryCta.gone()
+                    binding.daxDialogCta.dialogTextCta.text = ""
+                    binding.daxDialogCta.comparisonChart.root.gone()
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.gone()
+                    binding.daxDialogCta.addressBarPosition.root.gone()
+                    binding.daxDialogCta.duckAiInputScreenToggleContainer.gone()
+                    binding.daxDialogCta.duckAiInputScreenToggleDescription.gone()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.logo.gone()
+
+                    binding.daxDialogCta.cardView.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
+                    binding.daxDialogCta.root.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 20.toPx() }
+
+                    val ctaText = it.getString(R.string.preOnboardingInputModeDemoTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.primaryCta.gone()
+
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
@@ -629,6 +662,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         private const val ANIMATION_DELAY = 1400L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
+        private const val SUGGESTION_ANIMATION_DURATION = 500L
+        private const val SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
 }

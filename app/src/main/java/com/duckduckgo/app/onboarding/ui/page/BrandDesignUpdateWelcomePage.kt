@@ -48,6 +48,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN_PREVIEW
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -509,6 +510,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 INPUT_SCREEN -> {
                     // TODO
                 }
+
+                INPUT_MODE_DEMO -> {
+                    // TODO
+                }
             }
         }
     }
@@ -577,6 +582,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             INPUT_SCREEN -> {
+                // TODO
+            }
+
+            INPUT_MODE_DEMO -> {
                 // TODO
             }
         }
