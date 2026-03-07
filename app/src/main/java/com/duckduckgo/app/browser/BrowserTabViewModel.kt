@@ -2330,11 +2330,15 @@ class BrowserTabViewModel @Inject constructor(
         optOutFailed: Boolean,
         selfTestFailed: Boolean,
         isCosmetic: Boolean?,
+        consentRule: String?,
+        consentReloadLoop: Boolean,
     ) {
         site?.consentManaged = consentManaged
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
         site?.consentCosmeticHide = isCosmetic
+        site?.consentRule = consentRule
+        site?.consentReloadLoop = consentReloadLoop
     }
 
     fun onMaliciousSiteUserAction(

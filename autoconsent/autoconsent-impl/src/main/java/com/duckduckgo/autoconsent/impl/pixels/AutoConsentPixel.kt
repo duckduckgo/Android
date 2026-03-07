@@ -38,5 +38,6 @@ enum class AutoConsentPixel(override val pixelName: String) : Pixel.PixelName {
     AUTOCONSENT_DETECTED_BY_PATTERNS_DAILY("m_autoconsent_detected-by-patterns_daily"),
     AUTOCONSENT_DETECTED_BY_BOTH_DAILY("m_autoconsent_detected-by-both_daily"),
     AUTOCONSENT_DETECTED_ONLY_RULES_DAILY("m_autoconsent_detected-only-rules_daily"),
+    AUTOCONSENT_ERROR_RELOAD_LOOP_DAILY("m_autoconsent_error_reload-loop_daily"),
     AUTOCONSENT_SUMMARY("m_autoconsent_summary"),
 }

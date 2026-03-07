@@ -200,6 +200,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         val optoutFailed: Boolean? = false,
         val configurable: Boolean? = true,
         val cosmetic: Boolean? = false,
+        val consentRule: String? = null,
+        val consentReloadLoop: Boolean = false,
     )
 
     data class RemoteFeatureSettingsViewState(
@@ -428,6 +430,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
                 consentSelfTestFailed = site.consentSelfTestFailed,
+                consentRule = site.consentRule,
+                consentReloadLoop = site.consentReloadLoop,
                 errorCodes = moshi.adapter<List<String>>(
                     Types.newParameterizedType(List::class.java, String::class.java),
                 ).toJson(site.errorCodeEvents.toList()).toString(),
@@ -523,6 +527,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 consentManaged = site.consentManaged,
                 consentOptOutFailed = site.consentOptOutFailed,
                 consentSelfTestFailed = site.consentSelfTestFailed,
+                consentRule = site.consentRule,
+                consentReloadLoop = site.consentReloadLoop,
                 errorCodes = moshi.adapter<List<String>>(
                     Types.newParameterizedType(List::class.java, String::class.java),
                 ).toJson(site.errorCodeEvents.toList()).toString(),

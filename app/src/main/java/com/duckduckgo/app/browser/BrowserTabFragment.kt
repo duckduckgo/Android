@@ -764,8 +764,10 @@ class BrowserTabFragment :
                 optOutFailed: Boolean,
                 selfTestFailed: Boolean,
                 isCosmetic: Boolean?,
+                consentRule: String?,
+                consentReloadLoop: Boolean,
             ) {
-                viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed, isCosmetic)
+                viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed, isCosmetic, consentRule, consentReloadLoop)
             }
         }
 
