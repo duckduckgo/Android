@@ -413,6 +413,12 @@ dependencies {
     playImplementation project(':subscriptions-impl')
     fdroidImplementation project(':subscriptions-dummy-impl')
 
+    implementation project(':persistent-storage-api')
+
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+
     internalImplementation project(':subscriptions-internal')
 
     implementation project(':user-agent-api')

@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace 'com.duckduckgo.persistent.storage.dummy.impl'
+    namespace 'com.duckduckgo.persistentstorage.dummy'
     anvil {
         generateDaggerFactories = true
     }
@@ -41,4 +41,6 @@ dependencies {
     anvil project(path: ':anvil-compiler')
 
     implementation Google.dagger
+    implementation KotlinX.coroutines.core
+    implementation Square.logcat
 }
