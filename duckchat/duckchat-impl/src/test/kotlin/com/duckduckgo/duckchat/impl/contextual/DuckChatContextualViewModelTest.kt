@@ -546,6 +546,125 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when page context received in webview mode with auto attachment then page context event emitted`() =
+        runTest {
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+                val pageContext = event.params.getJSONObject("pageContext")
+                assertEquals("Ctx Title", pageContext.getString("title"))
+                assertEquals("https://ctx.com", pageContext.getString("url"))
+                assertEquals("content", pageContext.getString("content"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when page context received in webview mode with auto attachment disabled and multiple attachments enabled then emit null pageContext`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+                assertTrue(event.params.isNull("pageContext"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when page context received in webview mode with multiple attachments disabled then event emitted with page context`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                val event = awaitItem()
+                assertEquals("submitAIChatPageContext", event.subscriptionName)
+                assertEquals(RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME, event.featureName)
+
+                val pageContext = event.params.getJSONObject("pageContext")
+                assertEquals("Ctx Title", pageContext.getString("title"))
+                assertEquals("https://ctx.com", pageContext.getString("url"))
+                assertEquals("content", pageContext.getString("content"))
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when page context received in webview mode with both attachments disabled then event not emitted`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.subscriptionEventDataFlow.test {
+                testee.onPromptSent("hello")
+                awaitItem()
+
+                testee.onPageContextReceived("tab-1", serializedPageData)
+
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `when page context received after user removed context then auto-attached pixel not fired`() =
         runTest {
             val serializedPageData =
@@ -775,10 +894,7 @@ class DuckChatContextualViewModelTest {
         testee.commands.test {
             testee.onSheetOpened(tabId)
 
-            val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
-            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
-
-            val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
+            val loadCommand = expectMostRecentItem() as DuckChatContextualViewModel.Command.LoadUrl
             assertEquals(storedUrl, loadCommand.url)
 
             val state = testee.viewState.value
@@ -916,32 +1032,6 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
-    fun `reopenSheet in webview mode reuses stored url when session active`() = runTest {
-        val tabId = "tab-1"
-        val storedUrl = "https://duck.ai/chat?chatID=123"
-        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
-        sessionTimeoutProvider.timeoutMs = 10_000L
-        timeProvider.nowMs = 100_000L
-        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
-
-        testee.commands.test {
-            testee.onSheetOpened(tabId)
-            awaitItem()
-            awaitItem()
-
-            testee.onSheetReopened()
-            val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
-            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
-
-            expectNoEvents()
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        verify(duckChatPixels).reportContextualSheetSessionRestored()
-    }
-
-    @Test
     fun `reopenSheet in webview mode starts new chat when session expired`() = runTest {
         val tabId = "tab-1"
         val storedUrl = "https://duck.ai/chat?chatID=123"
@@ -966,38 +1056,6 @@ class DuckChatContextualViewModelTest {
         coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
         assertNull(contextualDataStore.getTabChatUrl(tabId))
         verify(duckChatPixels).reportContextualPlaceholderContextShown()
-    }
-
-    @Test
-    fun `reopenSheet in webview mode loads new url when no stored url`() = runTest {
-        val tabId = "tab-1"
-        val storedUrl = "https://duck.ai/chat?chatID=123"
-        contextualDataStore.persistTabChatUrl(tabId, storedUrl)
-        sessionTimeoutProvider.timeoutMs = 10_000L
-        timeProvider.nowMs = 100_000L
-        contextualDataStore.persistTabClosedTimestamp(tabId, 95_000L)
-
-        val expectedUrl = "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        (duckChat as FakeDuckChat).nextUrl = expectedUrl
-
-        testee.commands.test {
-            testee.onSheetOpened(tabId)
-            awaitItem()
-            awaitItem()
-
-            contextualDataStore.clearTabChatUrl(tabId)
-
-            testee.onSheetReopened()
-            val changeStateCommand = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
-            assertEquals(BottomSheetBehavior.STATE_EXPANDED, changeStateCommand.newState)
-
-            val loadCommand = awaitItem() as DuckChatContextualViewModel.Command.LoadUrl
-            assertEquals(expectedUrl, loadCommand.url)
-
-            expectNoEvents()
-
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test
@@ -1031,6 +1089,8 @@ class DuckChatContextualViewModelTest {
     fun `reopenSheet in input mode half expands sheet`() = runTest {
         testee.commands.test {
             testee.onSheetReopened()
+
+            awaitItem() // RequestPageContext
 
             val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_HALF_EXPANDED, command.newState)

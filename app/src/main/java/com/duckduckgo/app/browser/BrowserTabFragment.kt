@@ -2022,6 +2022,17 @@ class BrowserTabFragment :
             },
         )
 
+        sharedContextualViewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        viewModel.collectPageContext()
+                    }
+
+                    else -> {}
+                }
+            }.launchIn(lifecycleScope)
+
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -3499,7 +3510,6 @@ class BrowserTabFragment :
 
         setupContextualSheetHeightSync()
 
-        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -3509,7 +3519,7 @@ class BrowserTabFragment :
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
 
-        viewModel.collectPageContext()
+        omnibar.setExpanded(false)
     }
 
     private fun createNewContextualFragment(tabId: String) {
