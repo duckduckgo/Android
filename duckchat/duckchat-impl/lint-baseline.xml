@@ -365,28 +365,6 @@
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/rounded_top_corners_bottom_sheet_drawable` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/rounded_top_corners_bottom_sheet_drawable&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="25"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/item_chat_suggestion.xml"
-            line="24"
-            column="5"/>
-    </issue>
-
-    <issue
         id="UselessParent"
         message="This `LinearLayout` layout or its `LinearLayout` parent is unnecessary; transfer the `background` attribute to the other view"
         errorLine1="    &lt;LinearLayout"

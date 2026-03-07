@@ -354,50 +354,6 @@
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/popup_bookmarks_menu.xml"
-            line="22"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="              android:background=&quot;@drawable/popup_menu_bg&quot;>"
-        errorLine2="              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/popup_window_edit_delete_menu.xml"
-            line="22"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/popup_window_edit_favorite_delete_menu.xml"
-            line="22"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/popup_menu_bg` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@drawable/popup_menu_bg&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/popup_window_edit_remove_favorite_delete_menu.xml"
-            line="22"
-            column="5"/>
-    </issue>
-
-    <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;importBookmarksFromGooglePreImportDialogSelectFileButton&quot;>Избери файл с отметки...&lt;/string>"
