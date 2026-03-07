@@ -177,12 +177,18 @@ class RealSavedSitesRepository(
         bookmarks: MutableList<Bookmark>,
         folders: MutableList<BookmarkFolder>,
         folderId: String,
+        visitedFolders: MutableSet<String> = mutableSetOf(),
     ): Pair<List<Bookmark>, List<BookmarkFolder>> {
+        if (folderId in visitedFolders) {
+            return Pair(bookmarks, folders)
+        }
+
+        visitedFolders.add(folderId)
         val folderContent = folderContent(folderId)
         bookmarks.addAll(folderContent.first)
         folders.addAll(folderContent.second)
         folderContent.second.forEach {
-            traverseBranch(bookmarks, folders, it.id)
+            traverseBranch(bookmarks, folders, it.id, visitedFolders)
         }
         return Pair(bookmarks, folders)
     }

@@ -266,10 +266,15 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
-        duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
+        combine(
+            duckAiFeatureState.showInputScreen,
+            duckChat.observeNativeInputFieldUserSettingEnabled(),
+        ) { inputScreenEnabled, nativeInputEnabled ->
+            inputScreenEnabled || nativeInputEnabled
+        }.onEach { showClickCatcher ->
             _viewState.update {
                 it.copy(
-                    showTextInputClickCatcher = inputScreenEnabled,
+                    showTextInputClickCatcher = showClickCatcher,
                 )
             }
         }.launchIn(viewModelScope)
@@ -1074,7 +1079,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckAiHeaderClicked() {
-        if (duckAiFeatureState.showInputScreen.value) {
+        if (viewState.value.showTextInputClickCatcher) {
             onTextInputClickCatcherClicked()
         } else {
             _viewState.update {

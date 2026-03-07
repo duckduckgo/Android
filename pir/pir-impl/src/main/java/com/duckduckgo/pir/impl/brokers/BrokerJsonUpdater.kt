@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -83,7 +84,8 @@ class RealBrokerJsonUpdater @Inject constructor(
             true
         }.getOrElse {
             logcat(ERROR) { "PIR-update: Json update failed to complete due to: $it" }
-            pixelSender.reportDownloadMainConfigFailure()
+            val message = it.asLog().sanitize() ?: it.message ?: "Unknown error"
+            pixelSender.reportDownloadMainConfigFailure(message)
             false
         }
     }
@@ -118,5 +120,25 @@ class RealBrokerJsonUpdater @Inject constructor(
         }
 
         pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
+    }
+
+    private fun String.sanitize(): String? {
+        // if we fail for whatever reason, we don't include the stack trace
+        return runCatching {
+            val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+            val phoneRegex = Regex("\\b(?:\\d[\\s()-]?){6,14}\\b") // This regex matches common phone number formats
+            val phoneRegex2 = Regex("\\b\\+?\\d[- (]*\\d{3}[- )]*\\d{3}[- ]*\\d{4}\\b") // enhanced to redact also other phone number formats
+            val urlRegex = Regex("\\b(?:https?://|www\\.)\\S+\\b")
+            val ipv4Regex = Regex("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")
+
+            var sanitizedStackTrace = this
+            sanitizedStackTrace = sanitizedStackTrace.replace(urlRegex, "[REDACTED_URL]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(emailRegex, "[REDACTED_EMAIL]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex2, "[REDACTED_PHONE]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex, "[REDACTED_PHONE]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(ipv4Regex, "[REDACTED_IPV4]")
+
+            return sanitizedStackTrace
+        }.getOrNull()
     }
 }

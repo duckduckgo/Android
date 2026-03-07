@@ -23,6 +23,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 class RealPirPixelSenderTest {
@@ -39,7 +40,7 @@ class RealPirPixelSenderTest {
         testee.reportManualScanStarted()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender, times(2)).fire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -873,7 +874,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportDownloadMainConfigFailureThenFiresCorrectPixel() = runTest {
-        testee.reportDownloadMainConfigFailure()
+        testee.reportDownloadMainConfigFailure("test")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -883,7 +884,8 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        val params = paramsCaptor.allValues.first()
+        assert(params["error_details"] == "test")
     }
 
     @Test

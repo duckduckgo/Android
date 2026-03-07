@@ -998,7 +998,14 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_details",
+                "description": "Sanitized exception message from client",
+                "type": "string"
+            }
+        ]
     },
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
@@ -1518,5 +1525,12 @@
                 "type": "string"
             }
         ]
+    },
+    "m_dbp_manual_reset": {
+        "description": "Android specific pixel fired whenever the user turns off PIR and resets it",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

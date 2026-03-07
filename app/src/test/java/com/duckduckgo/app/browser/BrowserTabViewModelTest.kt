@@ -9079,6 +9079,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSubscriptionStatusSameButAccessTokenChangesOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        whenever(subscriptions.getAccessToken()).thenReturn("token_plus")
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val firstEvent = awaitItem()
+            assertEquals("authUpdate", firstEvent.subscriptionName)
+
+            whenever(subscriptions.getAccessToken()).thenReturn("token_pro")
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val secondEvent = awaitItem()
+            assertEquals("authUpdate", secondEvent.subscriptionName)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLoadDataWithInitialUrlThenPreviousUrlIsSetToSkipFirstTrackerAnimation() {
         givenDisableTrackerAnimationOnRestartFeature(true)
         val initialUrl = "https://example.com"

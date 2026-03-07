@@ -16,15 +16,20 @@
 
 package com.duckduckgo.app.global.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
+import androidx.webkit.WebStorageCompat
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
@@ -35,9 +40,19 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
 import logcat.logcat
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
+
+sealed class ClearDataResult {
+    data object Success : ClearDataResult()
+    data object FeatureNotSupported : ClearDataResult()
+    data class Error(val exception: Exception) : ClearDataResult()
+}
 
 interface ClearDataAction {
     /**
@@ -71,6 +86,15 @@ interface ClearDataAction {
      * Clears only DuckAi chats.
      */
     suspend fun clearDuckAiChatsOnly()
+
+    /**
+     * Clears browsing data for specific domains via WebStorageCompat.
+     * @param domains set of eTLD+1 domains to clear
+     * @param shouldClearDuckAiData whether to clear DuckAi data for duckduckgo.com and duck.ai
+     * @return [ClearDataResult.Success] if data was cleared, [ClearDataResult.FeatureNotSupported] if WebView doesn't support this feature,
+     *         or [ClearDataResult.Error] if an exception occurred during deletion
+     */
+    suspend fun clearDataForSpecificDomains(domains: Set<String>, shouldClearDuckAiData: Boolean): ClearDataResult
 
     /**
      * Sets the flag indicating whether the app has been used since the last data clear.
@@ -107,6 +131,8 @@ class ClearPersonalDataAction(
     private val navigationHistory: NavigationHistory,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -139,6 +165,7 @@ class ClearPersonalDataAction(
             webTrackersBlockedRepository.deleteAll()
 
             navigationHistory.clearHistory()
+            tabVisitedSitesRepository.clearAll()
         }
 
         clearDataAsync(shouldFireDataClearPixel)
@@ -176,6 +203,7 @@ class ClearPersonalDataAction(
             webTrackersBlockedRepository.deleteAll()
 
             navigationHistory.clearHistory()
+            tabVisitedSitesRepository.clearAll()
         }
 
         clearDataGranularlyAsync(shouldFireDataClearPixel)
@@ -193,6 +221,39 @@ class ClearPersonalDataAction(
             )
 
             logcat(INFO) { "Finished clearing chats" }
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    override suspend fun clearDataForSpecificDomains(
+        domains: Set<String>,
+        shouldClearDuckAiData: Boolean,
+    ): ClearDataResult {
+        if (!webViewCapabilityChecker.isSupported(DeleteBrowsingData)) {
+            logcat(WARN) { "DeleteBrowsingData feature not supported by WebView" }
+            return ClearDataResult.FeatureNotSupported
+        }
+
+        return try {
+            withContext(dispatchers.main()) {
+                val webStorage = createWebStorage()
+                domains
+                    .filter { !DUCKDUCKGO_DOMAINS.contains(it) || shouldClearDuckAiData }
+                    .forEach { domain ->
+                        suspendCancellableCoroutine { continuation ->
+                            WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
+                                continuation.resume(Unit)
+                            }
+                        }
+                    }
+                logcat(INFO) { "Cleared site data for ${domains.size} domains" }
+            }
+            ClearDataResult.Success
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(WARN) { "Failed to clear site data: ${e.message}" }
+            ClearDataResult.Error(e)
         }
     }
 
@@ -240,5 +301,9 @@ class ClearPersonalDataAction(
             settingsDataStore.appUsedSinceLastClear = appUsedSinceLastClear
             logcat { "Set appUsedSinceClear flag to $appUsedSinceLastClear" }
         }
+    }
+
+    companion object {
+        private val DUCKDUCKGO_DOMAINS = setOf("duckduckgo.com", "duck.ai")
     }
 }

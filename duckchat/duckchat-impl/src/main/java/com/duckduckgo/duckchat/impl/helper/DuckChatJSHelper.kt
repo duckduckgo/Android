@@ -224,7 +224,7 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getAIChatNativeConfigValues(
+    private suspend fun getAIChatNativeConfigValues(
         featureName: String,
         method: String,
         id: String,
@@ -236,7 +236,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
-                put(SUPPORTS_NATIVE_CHAT_INPUT, false)
+                put(SUPPORTS_NATIVE_CHAT_INPUT, dataStore.isNativeInputFieldUserSettingEnabled())
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())

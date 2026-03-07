@@ -34,6 +34,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.withContext
@@ -81,6 +82,7 @@ class DuckChatWebViewViewModel @Inject constructor(
 
     private fun observeSubscriptionChanges() {
         subscriptions.getSubscriptionStatusFlow()
+            .map { status -> Pair(status, subscriptions.getAccessToken()) }
             .distinctUntilChanged()
             .onEach { _ ->
                 commandChannel.trySend(Command.SendSubscriptionAuthUpdateEvent)

@@ -1,4 +1,7 @@
 import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
     id 'com.android.application'
@@ -377,6 +380,12 @@ dependencies {
     implementation project(':sync-settings-api')
     implementation project(':sync-settings-impl')
 
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -579,6 +588,17 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Export Android connected test results to Develocity
+afterEvaluate {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_CONNECTED
+        )
+    }
 }
 
 tasks.register('fastlaneVersionCode') {

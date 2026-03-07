@@ -432,13 +432,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    showSingleTabDeletedSnackbar()
+                    showSingleTabClearSnackbar(R.string.singleTabFireDialogSnackbar)
+                }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
+                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
+                }
+                FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
+                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
                 }
             }
         }
     }
 
-    private fun showSingleTabDeletedSnackbar() {
+    private fun showSingleTabClearSnackbar(messageResId: Int) {
         lifecycleScope.launch {
             delay(500)
 
@@ -454,7 +460,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
-                message = getString(R.string.singleTabFireDialogSnackbar),
+                message = getString(messageResId),
                 anchor = anchorView,
             ).show()
         }
