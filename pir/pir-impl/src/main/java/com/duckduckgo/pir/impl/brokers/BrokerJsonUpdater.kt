@@ -24,6 +24,7 @@ import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -72,8 +73,17 @@ class RealBrokerJsonUpdater @Inject constructor(
                     logcat { "PIR-update: Main config is new." }
                     it.body()?.let { config ->
                         logcat { "PIR-update: Main config $config." }
-                        checkUpdatesFromMainConfig(config)
-                        pirRepository.updateMainEtag(config.etag)
+                        try {
+                            checkUpdatesFromMainConfig(config)
+                            pirRepository.updateMainEtag(config.etag)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Throwable) {
+                            logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
+                            val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
+                            pixelSender.reportDownloadBrokerJsonFailure(message)
+                            return@withContext false
+                        }
                     }
                 } else {
                     logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }

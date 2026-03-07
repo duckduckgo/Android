@@ -35,6 +35,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.Response
 
@@ -165,6 +166,8 @@ class RealBrokerJsonUpdaterTest {
         verifyNoInteractions(mockBrokerDataDownloader)
         verify(mockPirRepository, never()).updateMainEtag(any())
         verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockPirPixelSender).reportDownloadMainConfigBEFailure("500")
+        verifyNoMoreInteractions(mockPirPixelSender)
     }
 
     @Test
@@ -200,6 +203,8 @@ class RealBrokerJsonUpdaterTest {
         verifyNoInteractions(mockBrokerDataDownloader)
         verify(mockPirRepository, never()).updateMainEtag(any())
         verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockPirPixelSender).reportDownloadMainConfigFailure(any())
+        verifyNoMoreInteractions(mockPirPixelSender)
     }
 
     @Test
@@ -255,6 +260,8 @@ class RealBrokerJsonUpdaterTest {
         assertFalse(result)
         verifyNoInteractions(mockDbpService)
         verifyNoInteractions(mockBrokerDataDownloader)
+        verify(mockPirPixelSender).reportDownloadMainConfigFailure(any())
+        verifyNoMoreInteractions(mockPirPixelSender)
     }
 
     @Test
@@ -287,10 +294,12 @@ class RealBrokerJsonUpdaterTest {
         // When
         val result = testee.update()
 
-        // Then - etags should NOT be saved when download fails
+        // Then - etags should NOT be saved when download fails, and broker json failure pixel should be emitted
         assertFalse(result)
         verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName2, testFileName3))
         verify(mockPirRepository, never()).updateBrokerJsons(any())
         verify(mockPirRepository, never()).updateMainEtag(any())
+        verify(mockPirPixelSender).reportDownloadBrokerJsonFailure(any())
+        verifyNoMoreInteractions(mockPirPixelSender)
     }
 }
