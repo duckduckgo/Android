@@ -16,14 +16,11 @@ concurrency:
   group: ${{ github.ref }}
 
 jobs:
-  sync:
-    name: Sync Asana PR task
+  pr-sync:
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: ./.github/actions/pr-asana-sync
+      - uses: malmstein/asana-github-sync@v1.0.0
+        if: github.event.pull_request.merged
         with:
           GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
