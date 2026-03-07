@@ -30,6 +30,12 @@
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
     <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo your default</string>
 
+    <!-- Default Assistant -->
+    <string name="onboardingDefaultAssistantTitle">Make DuckDuckGo your AI assistant</string>
+    <string name="onboardingDefaultAssistantDescription">Get private AI answers anytime by pressing and holding the home button.</string>
+    <string name="setAsDefaultAssistant">Set As Default Assistant</string>
+    <string name="defaultAssistantNoThanks">No Thanks</string>
+
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="setAsDefaultBrowser">Set As Default Browser</string>

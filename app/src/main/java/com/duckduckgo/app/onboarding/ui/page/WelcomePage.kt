@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBindin
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.DEFAULT_ASSISTANT
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
@@ -50,6 +51,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Onboar
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultAssistantCta
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultAssistantDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
@@ -111,6 +114,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
+                is ShowDefaultAssistantCta -> configureDaxCta(DEFAULT_ASSISTANT)
+                is ShowDefaultAssistantDialog -> showDefaultAssistantDialog(it.intent)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
@@ -189,6 +194,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             } else {
                 viewModel.onDefaultBrowserNotSet()
             }
+        } else if (requestCode == DEFAULT_ASSISTANT_ROLE_MANAGER_DIALOG) {
+            viewModel.onDefaultAssistantResult()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -414,7 +421,44 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
+
+                DEFAULT_ASSISTANT -> {
+                    binding.daxDialogCta.descriptionCta.show()
+                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.dialogTextCta.text = ""
+                    binding.daxDialogCta.comparisonChart.root.gone()
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.gone()
+                    binding.daxDialogCta.addressBarPosition.root.gone()
+                    binding.daxDialogCta.duckAiInputScreenToggleContainer.gone()
+                    binding.daxDialogCta.duckAiInputScreenToggleDescription.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.daxDialogContentImage.setImageResource(R.drawable.imagetest)
+                    binding.daxDialogCta.daxDialogContentImage.show()
+                    binding.daxDialogCta.daxDialogContentImage.alpha = MIN_ALPHA
+
+                    val ctaText = it.getString(R.string.onboardingDefaultAssistantTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.descriptionCta.text = it.getString(R.string.onboardingDefaultAssistantDescription)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.setAsDefaultAssistant)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(DEFAULT_ASSISTANT) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.defaultAssistantNoThanks)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(DEFAULT_ASSISTANT) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.daxDialogContentImage.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
             }
+
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
         }
@@ -467,6 +511,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     private fun showDefaultBrowserDialog(intent: Intent) {
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+    }
+
+    private fun showDefaultAssistantDialog(intent: Intent) {
+        startActivityForResult(intent, DEFAULT_ASSISTANT_ROLE_MANAGER_DIALOG)
     }
 
     private fun applyFullScreenFlags() {
@@ -579,5 +627,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+        private const val DEFAULT_ASSISTANT_ROLE_MANAGER_DIALOG = 102
     }
 }

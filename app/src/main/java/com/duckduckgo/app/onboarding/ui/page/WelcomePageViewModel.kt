@@ -17,8 +17,12 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.annotation.SuppressLint
+import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -28,6 +32,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.DEFAULT_ASSISTANT
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
@@ -37,6 +42,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Onboar
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultAssistantCta
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultAssistantDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
@@ -97,15 +104,15 @@ class WelcomePageViewModel @Inject constructor(
 
     private var addressBarPositionOption: OmnibarType = OmnibarType.SINGLE_TOP
     private var inputScreenSelected: Boolean = true
-    private var maxPageCount: Int = 2
+    private var maxPageCount: Int = 3
     private var reinstallUser: Boolean = false
 
     init {
         viewModelScope.launch(dispatchers.io()) {
             maxPageCount = if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                3
+                4
             } else {
-                2
+                3
             }
         }
     }
@@ -120,6 +127,12 @@ class WelcomePageViewModel @Inject constructor(
         data object ShowSkipOnboardingOption : Command
 
         data class ShowDefaultBrowserDialog(
+            val intent: Intent,
+        ) : Command
+
+        data object ShowDefaultAssistantCta : Command
+
+        data class ShowDefaultAssistantDialog(
             val intent: Intent,
         ) : Command
 
@@ -207,7 +220,7 @@ class WelcomePageViewModel @Inject constructor(
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog)
                     } else {
-                        _commands.send(Finish)
+                        sendDefaultAssistantOrFinish()
                     }
                 }
             }
@@ -222,7 +235,13 @@ class WelcomePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
-                    _commands.send(Finish)
+                    sendDefaultAssistantOrFinish()
+                }
+            }
+
+            DEFAULT_ASSISTANT -> {
+                viewModelScope.launch {
+                    _commands.send(ShowDefaultAssistantDialog(createDefaultAssistantIntent()))
                 }
             }
         }
@@ -260,7 +279,39 @@ class WelcomePageViewModel @Inject constructor(
             INPUT_SCREEN -> {
                 // no-op
             }
+
+            DEFAULT_ASSISTANT -> {
+                viewModelScope.launch {
+                    _commands.send(Finish)
+                }
+            }
         }
+    }
+
+    fun onDefaultAssistantResult() {
+        viewModelScope.launch {
+            _commands.send(Finish)
+        }
+    }
+
+    private suspend fun sendDefaultAssistantOrFinish() {
+        if (shouldShowDefaultAssistantStep()) {
+            _commands.send(ShowDefaultAssistantCta)
+        } else {
+            _commands.send(Finish)
+        }
+    }
+
+    private fun shouldShowDefaultAssistantStep(): Boolean {
+        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+            val roleManager = context.getSystemService(RoleManager::class.java)
+            return !roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)
+        }
+        return true
+    }
+
+    private fun createDefaultAssistantIntent(): Intent {
+        return Intent(Settings.ACTION_VOICE_INPUT_SETTINGS)
     }
 
     fun onDefaultBrowserSet() {
@@ -311,6 +362,9 @@ class WelcomePageViewModel @Inject constructor(
             }
             INPUT_SCREEN -> {
                 pixel.fire(PREONBOARDING_CHOOSE_SEARCH_EXPERIENCE_IMPRESSIONS_UNIQUE, type = Unique())
+            }
+            DEFAULT_ASSISTANT -> {
+                // no pixel yet
             }
         }
     }

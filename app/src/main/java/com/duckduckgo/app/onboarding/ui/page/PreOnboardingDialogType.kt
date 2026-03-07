@@ -23,4 +23,5 @@ enum class PreOnboardingDialogType {
     COMPARISON_CHART,
     ADDRESS_BAR_POSITION,
     INPUT_SCREEN,
+    DEFAULT_ASSISTANT,
 }

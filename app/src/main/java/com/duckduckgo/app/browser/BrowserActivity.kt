@@ -614,6 +614,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
+        if (intent.action == Intent.ACTION_ASSIST) {
+            viewModel.openDuckChat(duckChatUrl = "duck.ai", duckChatSessionActive = false, withTransition = duckAiShouldAnimate)
+            return
+        }
+
         if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             logcat(INFO) { "launch from default browser" }
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)

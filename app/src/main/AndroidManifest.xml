@@ -227,12 +227,6 @@
             android:launchMode="singleTask"
             android:stateNotNeeded="true">
 
-            <!-- Allow app to be default assistant -->
-            <intent-filter>
-                <action android:name="android.intent.action.ASSIST" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
             <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
             <intent-filter>
                 <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH" />
@@ -328,7 +322,15 @@
             android:exported="true"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden">
+
+            <!-- Allow app to be default assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
