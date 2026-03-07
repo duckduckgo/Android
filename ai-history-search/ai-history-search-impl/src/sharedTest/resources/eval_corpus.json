@@ -1,0 +1,548 @@
+{
+  "entries": [
+    {
+      "url": "https://kotlinlang.org/docs/coroutines",
+      "title": "Kotlin Coroutines Guide"
+    },
+    {
+      "url": "https://developer.android.com/room",
+      "title": "Android Room Database Tutorial"
+    },
+    {
+      "url": "https://pandas.pydata.org/docs",
+      "title": "Python Pandas DataFrame Guide"
+    },
+    {
+      "url": "https://seriouseats.com/pasta-carbonara",
+      "title": "Best Pasta Carbonara Recipe"
+    },
+    {
+      "url": "https://lonelyplanet.com/barcelona",
+      "title": "Barcelona Travel Guide"
+    },
+    {
+      "url": "https://japan-guide.com/cherry-blossom",
+      "title": "Tokyo Cherry Blossom Season"
+    },
+    {
+      "url": "https://theatlantic.com/ev-batteries",
+      "title": "Electric Vehicle Battery Technology"
+    },
+    {
+      "url": "https://spacenews.com/starship-launch",
+      "title": "SpaceX Starship Launch"
+    },
+    {
+      "url": "https://reactjs.org/docs/hooks-intro",
+      "title": "React Hooks Introduction"
+    },
+    {
+      "url": "https://docs.docker.com/get-started",
+      "title": "Docker Getting Started Guide"
+    },
+    {
+      "url": "https://www.typescriptlang.org/docs/handbook/generics",
+      "title": "TypeScript Generics Handbook"
+    },
+    {
+      "url": "https://kubernetes.io/docs/concepts/pods",
+      "title": "Kubernetes Pods"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/guide",
+      "title": "AWS Lambda Developer Guide"
+    },
+    {
+      "url": "https://graphql.org/learn/queries",
+      "title": "GraphQL Queries and Mutations"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/index-types",
+      "title": "PostgreSQL Index Types"
+    },
+    {
+      "url": "https://redis.io/docs/data-types",
+      "title": "Redis Data Types Tutorial"
+    },
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Flexbox",
+      "title": "CSS Flexbox — MDN Web Docs"
+    },
+    {
+      "url": "https://www.investopedia.com/etf-investing-guide",
+      "title": "ETF Investing: A Beginner's Guide"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/type-2-diabetes",
+      "title": "Type 2 Diabetes — NHS"
+    },
+    {
+      "url": "https://www.alltrails.com/trail/yosemite-half-dome",
+      "title": "Half Dome Hiking Trail — Yosemite"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Horse",
+      "title": "Horse — Wikipedia",
+      "description": "Large domesticated ungulate used for transport and sport"
+    },
+    {
+      "url": "https://khanacademy.org/photosynthesis",
+      "title": "Photosynthesis Process"
+    },
+    {
+      "url": "https://kingarthurbaking.com/sourdough",
+      "title": "How to Make Sourdough Bread",
+      "description": "Guide to wild yeast fermentation and long-rise bread"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Greenhouse_effect",
+      "title": "Greenhouse Effect — Wikipedia",
+      "description": "Atmospheric phenomenon where gases trap solar energy, raising Earth's surface temperature over time"
+    },
+    {
+      "url": "https://www.scientificamerican.com/article/immune-system-explainer",
+      "title": "How the Immune System Works",
+      "description": "Overview of how lymphocytes, antibodies, and innate responses protect against bacterial and viral threats"
+    },
+    {
+      "url": "https://www.investopedia.com/terms/compound-interest",
+      "title": "Compound Interest Definition",
+      "description": "Mathematical concept where interest accumulates on principal plus previously earned interest, growing wealth exponentially"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Roman_Empire",
+      "title": "Roman Empire — Wikipedia",
+      "description": "Mediterranean superpower that pioneered written law, concrete architecture, and centralized administration for five centuries"
+    },
+    {
+      "url": "https://www.mayoclinic.org/diseases-conditions/insomnia",
+      "title": "Insomnia — Mayo Clinic",
+      "description": "Persistent sleep disorder affecting ability to initiate or maintain rest, linked to fatigue and cognitive difficulties"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Mitochondria",
+      "title": "Mitochondria — Wikipedia",
+      "description": "Membrane-bound organelle in eukaryotic cells responsible for ATP synthesis through oxidative phosphorylation"
+    },
+    {
+      "url": "https://www.nationalgeographic.com/environment/coral-reefs",
+      "title": "Coral Reefs — National Geographic",
+      "description": "Subaquatic formations built by polyp colonies, harboring extraordinary biodiversity in warm shallow waters"
+    },
+    {
+      "url": "https://www.mayoclinic.org/diseases-conditions/migraines",
+      "title": "Migraines — Mayo Clinic",
+      "description": "Recurring severe headaches often accompanied by nausea, light sensitivity, and visual disturbances lasting hours to days"
+    },
+    {
+      "url": "https://www.nature.com/articles/quantum-computing-milestone",
+      "title": "Quantum Computing Milestone",
+      "description": "Researchers demonstrate error-corrected qubits sustaining coherence beyond the fault-tolerance threshold"
+    },
+    {
+      "url": "https://www.nih.gov/research/intermittent-fasting",
+      "title": "Intermittent Fasting Research — NIH",
+      "description": "Studies on time-restricted eating patterns and their effects on metabolic health and longevity"
+    },
+    {
+      "url": "https://stackoverflow.com/questions/54321/css-grid-vs-flexbox",
+      "title": "CSS Grid vs Flexbox — Stack Overflow"
+    },
+    {
+      "url": "https://reptiles.com/python-care",
+      "title": "Python (Ball Python) Care Guide"
+    },
+    {
+      "url": "https://perfectdailygrind.com/java-coffee",
+      "title": "Java: Indonesian Coffee Origins"
+    },
+    {
+      "url": "https://www.almanac.com/spring-planting-calendar",
+      "title": "Spring Vegetable Planting Calendar"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Taylor_Swift",
+      "title": "Taylor Swift — Wikipedia"
+    },
+    {
+      "url": "https://www.healthline.com/health/swollen-lymph-nodes",
+      "title": "Swollen Lymph Nodes: Causes and Treatment"
+    },
+    {
+      "url": "https://medium.com/p/abc123",
+      "title": "Article",
+      "chunkText": "Android Kotlin Flow and StateFlow patterns for reactive ViewModel architecture and unidirectional data flow in modern Android development"
+    },
+    {
+      "url": "https://reddit.com/r/cooking/xyz",
+      "title": "Thread",
+      "chunkText": "My sourdough starter doubled overnight after feeding with rye flour and water. Here are my notes on maintaining a healthy bread starter culture."
+    },
+    {
+      "url": "https://notion.so/user/notes123",
+      "title": "Notes",
+      "chunkText": "Electric vehicle home charging: Level 2 vs DC fast charging infrastructure. Installation costs and grid capacity considerations for EV owners."
+    },
+    {
+      "url": "https://docs.google.com/document/d/react-perf-notes",
+      "title": "Doc",
+      "chunkText": "React performance patterns: useCallback prevents function recreation on each render, useMemo caches expensive calculations, React.memo wraps components to skip unnecessary re-renders. Use React Profiler to identify bottlenecks before optimizing."
+    },
+    {
+      "url": "https://github.com/user/dev-notes/issues/42",
+      "title": "Issue",
+      "chunkText": "PostgreSQL slow query investigation: EXPLAIN ANALYZE showed sequential scan on 10M row orders table. Added composite index on (customer_id, created_at), query time dropped from 4.2s to 12ms. Also enabled pg_stat_statements for monitoring."
+    },
+    {
+      "url": "https://obsidian.md/vault/user/health-log",
+      "title": "Health log",
+      "chunkText": "Sleep tracking with Oura ring: averaging 6.2 hours total. REM sleep consistently low on evenings with alcohol or late-night screen time. Blue light blocking glasses improved sleep onset time. Aiming for 7.5h target."
+    },
+    {
+      "url": "https://roamresearch.com/daily/2026-01-15",
+      "title": "Daily notes",
+      "chunkText": "Japan trip planning for April: cherry blossom (sakura) peak usually March 25-April 10 in Tokyo and Kyoto. Need to reserve Shinkansen JR Pass. Ryokan vs hotel debate: ryokan more authentic but less central."
+    },
+    {
+      "url": "https://paper.dropbox.com/doc/sourdough-experiments",
+      "title": "Doc",
+      "chunkText": "Sourdough hydration tests: 70% gave open crumb but very sticky dough. 65% more workable. Autolyse 45 min before folding in levain helps gluten development. Bulk ferment at 78F for 5 hours, then overnight cold proof."
+    },
+    {
+      "url": "https://evernote.com/note/running-plan-2026",
+      "title": "Note",
+      "chunkText": "Half marathon training plan: 16-week base building. Weeks 1-4 run 25-30 miles/week at easy pace (zone 2 heart rate). Long run max 12 miles. Strength training 2x/week. Avoid back-to-back long run and tempo days."
+    },
+    {
+      "url": "https://notion.so/team/api-decisions",
+      "title": "API decision log",
+      "chunkText": "Decided to adopt GraphQL for the new dashboard. REST still used for mobile API. GraphQL benefits: client-specified fields, reduces over-fetching, type safety via schema. Using Apollo Server with codegen for type-safe resolvers."
+    },
+    {
+      "url": "https://gist.github.com/user/redis-patterns",
+      "title": "Gist",
+      "chunkText": "Redis caching strategies: cache-aside for read-heavy workloads, write-through for consistency, TTL tuning to prevent stale data. Key eviction: use allkeys-lru for cache-only Redis. Avoid storing large objects over 1MB."
+    },
+    {
+      "url": "https://bear.app/note/typescript-patterns",
+      "title": "Note",
+      "chunkText": "TypeScript generics and utility types: use Generic<T> for reusable functions, Partial<T> and Required<T> for object transformations, Record<K,V> for typed dictionaries, ReturnType<F> to infer function return types."
+    },
+    {
+      "url": "https://nytimes.com/crossword",
+      "title": "NYT Crossword Puzzle"
+    },
+    {
+      "url": "https://chess.com",
+      "title": "Chess.com — Play Chess Online"
+    },
+    {
+      "url": "https://weather.com/forecast",
+      "title": "10-Day Weather Forecast"
+    },
+    {
+      "url": "https://imdb.com/top250",
+      "title": "IMDb Top 250 Movies"
+    },
+    {
+      "url": "https://www.twitch.tv/directory",
+      "title": "Browse — Twitch"
+    },
+    {
+      "url": "https://www.reddit.com/r/aww",
+      "title": "r/aww — Cute Animals"
+    },
+    {
+      "url": "https://www.ticketmaster.com/concerts",
+      "title": "Concerts and Live Events — Ticketmaster"
+    },
+    {
+      "url": "https://www.homedepot.com/c/bathroom-vanities",
+      "title": "Bathroom Vanities — Home Depot"
+    },
+    {
+      "url": "https://www.tripadvisor.com/restaurants",
+      "title": "Restaurants Near Me — TripAdvisor"
+    },
+    {
+      "url": "https://www.zillow.com/homes-for-sale",
+      "title": "Homes For Sale — Zillow"
+    }
+  ],
+  "queries": [
+    {
+      "query": "Kotlin coroutines",
+      "category": "keyword",
+      "relevantUrls": ["https://kotlinlang.org/docs/coroutines"],
+      "referenceAnswer": "Your history includes the Kotlin Coroutines Guide at kotlinlang.org/docs/coroutines, which covers async programming with coroutines in Kotlin."
+    },
+    {
+      "query": "Android database",
+      "category": "keyword",
+      "relevantUrls": ["https://developer.android.com/room"],
+      "referenceAnswer": "You visited the Android Room Database Tutorial at developer.android.com/room, covering local data persistence on Android."
+    },
+    {
+      "query": "Python programming tutorial",
+      "category": "keyword",
+      "relevantUrls": ["https://pandas.pydata.org/docs"],
+      "referenceAnswer": "Your history includes the Python Pandas DataFrame Guide at pandas.pydata.org/docs."
+    },
+    {
+      "query": "pasta carbonara recipe",
+      "category": "keyword",
+      "relevantUrls": ["https://seriouseats.com/pasta-carbonara"],
+      "referenceAnswer": "You have the Best Pasta Carbonara Recipe at seriouseats.com/pasta-carbonara in your history."
+    },
+    {
+      "query": "Barcelona travel tips",
+      "category": "keyword",
+      "relevantUrls": ["https://lonelyplanet.com/barcelona"],
+      "referenceAnswer": "Your history includes the Barcelona Travel Guide at lonelyplanet.com/barcelona."
+    },
+    {
+      "query": "Tokyo cherry blossom",
+      "category": "keyword",
+      "relevantUrls": ["https://japan-guide.com/cherry-blossom"],
+      "referenceAnswer": "You visited the Tokyo Cherry Blossom Season guide at japan-guide.com/cherry-blossom."
+    },
+    {
+      "query": "SpaceX Starship rocket",
+      "category": "keyword",
+      "relevantUrls": ["https://spacenews.com/starship-launch"],
+      "referenceAnswer": "Your history includes a SpaceX Starship Launch article at spacenews.com/starship-launch."
+    },
+    {
+      "query": "React hooks tutorial",
+      "category": "keyword",
+      "relevantUrls": ["https://reactjs.org/docs/hooks-intro"],
+      "referenceAnswer": "You visited the React Hooks Introduction at reactjs.org/docs/hooks-intro."
+    },
+    {
+      "query": "Docker container setup",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.docker.com/get-started"],
+      "referenceAnswer": "Your history includes the Docker Getting Started Guide at docs.docker.com/get-started."
+    },
+    {
+      "query": "TypeScript generics",
+      "category": "keyword",
+      "relevantUrls": [
+        "https://www.typescriptlang.org/docs/handbook/generics",
+        "https://bear.app/note/typescript-patterns"
+      ],
+      "referenceAnswer": "Your history includes the TypeScript Generics Handbook at typescriptlang.org and personal notes on TypeScript generics and utility types at bear.app/note/typescript-patterns."
+    },
+    {
+      "query": "Kubernetes pod deployment",
+      "category": "keyword",
+      "relevantUrls": ["https://kubernetes.io/docs/concepts/pods"],
+      "referenceAnswer": "You visited the Kubernetes Pods documentation at kubernetes.io/docs/concepts/pods."
+    },
+    {
+      "query": "AWS Lambda serverless",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.aws.amazon.com/lambda/guide"],
+      "referenceAnswer": "Your history includes the AWS Lambda Developer Guide at docs.aws.amazon.com/lambda/guide."
+    },
+    {
+      "query": "CSS flexbox layout",
+      "category": "keyword",
+      "relevantUrls": [
+        "https://developer.mozilla.org/en-US/docs/Flexbox",
+        "https://stackoverflow.com/questions/54321/css-grid-vs-flexbox"
+      ],
+      "referenceAnswer": "Your history includes the CSS Flexbox guide on MDN Web Docs and a Stack Overflow discussion comparing CSS Grid vs Flexbox."
+    },
+    {
+      "query": "ETF investing guide",
+      "category": "keyword",
+      "relevantUrls": ["https://www.investopedia.com/etf-investing-guide"],
+      "referenceAnswer": "You visited the ETF Investing: A Beginner's Guide at investopedia.com/etf-investing-guide."
+    },
+    {
+      "query": "intermittent fasting research",
+      "category": "keyword",
+      "relevantUrls": ["https://www.nih.gov/research/intermittent-fasting"],
+      "referenceAnswer": "Your history includes the Intermittent Fasting Research page at nih.gov/research/intermittent-fasting, covering time-restricted eating and metabolic health."
+    },
+    {
+      "query": "four-legged animals",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Horse"],
+      "referenceAnswer": "Your history includes the Horse Wikipedia article at en.wikipedia.org/wiki/Horse, covering domesticated ungulates used for transport and sport."
+    },
+    {
+      "query": "how plants make energy",
+      "category": "semantic",
+      "relevantUrls": ["https://khanacademy.org/photosynthesis"],
+      "referenceAnswer": "You visited the Photosynthesis Process page at khanacademy.org/photosynthesis, explaining how plants convert sunlight into energy."
+    },
+    {
+      "query": "fermenting bread dough",
+      "category": "semantic",
+      "relevantUrls": ["https://kingarthurbaking.com/sourdough"],
+      "referenceAnswer": "Your history includes How to Make Sourdough Bread at kingarthurbaking.com/sourdough, covering wild yeast fermentation and long-rise bread techniques."
+    },
+    {
+      "query": "why is the planet warming up",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Greenhouse_effect"],
+      "referenceAnswer": "You visited the Greenhouse Effect Wikipedia article at en.wikipedia.org/wiki/Greenhouse_effect, which explains how atmospheric gases trap solar energy and raise Earth's temperature."
+    },
+    {
+      "query": "why do I keep catching colds",
+      "category": "semantic",
+      "relevantUrls": ["https://www.scientificamerican.com/article/immune-system-explainer"],
+      "referenceAnswer": "Your history includes How the Immune System Works at scientificamerican.com, covering how lymphocytes and antibodies defend against bacterial and viral infections."
+    },
+    {
+      "query": "making money grow over time",
+      "category": "semantic",
+      "relevantUrls": ["https://www.investopedia.com/terms/compound-interest"],
+      "referenceAnswer": "You visited the Compound Interest Definition at investopedia.com/terms/compound-interest, explaining how interest compounds on principal to grow wealth exponentially."
+    },
+    {
+      "query": "how Rome ruled the ancient world",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Roman_Empire"],
+      "referenceAnswer": "Your history includes the Roman Empire Wikipedia article at en.wikipedia.org/wiki/Roman_Empire, covering five centuries of Mediterranean dominance and Roman law and architecture."
+    },
+    {
+      "query": "trouble falling asleep at night",
+      "category": "semantic",
+      "relevantUrls": ["https://www.mayoclinic.org/diseases-conditions/insomnia"],
+      "referenceAnswer": "You visited the Insomnia page at mayoclinic.org/diseases-conditions/insomnia, which covers causes and treatment of sleep disorders."
+    },
+    {
+      "query": "powerhouse of the cell",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Mitochondria"],
+      "referenceAnswer": "Your history includes the Mitochondria Wikipedia article at en.wikipedia.org/wiki/Mitochondria, covering ATP synthesis and cellular energy production."
+    },
+    {
+      "query": "tiny organisms building ocean structures",
+      "category": "semantic",
+      "relevantUrls": ["https://www.nationalgeographic.com/environment/coral-reefs"],
+      "referenceAnswer": "You visited the Coral Reefs page on National Geographic at nationalgeographic.com/environment/coral-reefs, covering polyp colonies and ocean biodiversity."
+    },
+    {
+      "query": "one-sided head pain with visual disturbance",
+      "category": "semantic",
+      "relevantUrls": ["https://www.mayoclinic.org/diseases-conditions/migraines"],
+      "referenceAnswer": "Your history includes the Migraines page at mayoclinic.org/diseases-conditions/migraines, covering recurring severe headaches with visual disturbances and nausea."
+    },
+    {
+      "query": "computers that use subatomic physics",
+      "category": "semantic",
+      "relevantUrls": ["https://www.nature.com/articles/quantum-computing-milestone"],
+      "referenceAnswer": "You visited the Quantum Computing Milestone article at nature.com, covering error-corrected qubits and fault-tolerance thresholds."
+    },
+    {
+      "query": "Android reactive programming",
+      "category": "body-only",
+      "relevantUrls": ["https://medium.com/p/abc123"],
+      "referenceAnswer": "Your history includes an article at medium.com/p/abc123 covering Android Kotlin Flow, StateFlow, and reactive ViewModel architecture patterns."
+    },
+    {
+      "query": "sourdough bread starter",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://reddit.com/r/cooking/xyz",
+        "https://kingarthurbaking.com/sourdough",
+        "https://paper.dropbox.com/doc/sourdough-experiments"
+      ],
+      "referenceAnswer": "Your history includes sourdough notes at reddit.com/r/cooking/xyz about maintaining a starter culture, the Sourdough Bread guide at kingarthurbaking.com, and sourdough hydration experiments at paper.dropbox.com/doc/sourdough-experiments."
+    },
+    {
+      "query": "EV charging infrastructure",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://notion.so/user/notes123",
+        "https://theatlantic.com/ev-batteries"
+      ],
+      "referenceAnswer": "Your history includes notes at notion.so/user/notes123 about EV home charging (Level 2 vs DC fast charging) and an article at theatlantic.com/ev-batteries on electric vehicle battery technology."
+    },
+    {
+      "query": "React rendering optimization",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://docs.google.com/document/d/react-perf-notes",
+        "https://reactjs.org/docs/hooks-intro"
+      ],
+      "referenceAnswer": "Your history includes React performance notes at docs.google.com covering useCallback, useMemo, and React.memo, and the React Hooks Introduction at reactjs.org/docs/hooks-intro."
+    },
+    {
+      "query": "slow database query optimization",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://github.com/user/dev-notes/issues/42",
+        "https://www.postgresql.org/docs/index-types"
+      ],
+      "referenceAnswer": "Your history includes PostgreSQL investigation notes at github.com/user/dev-notes/issues/42 about adding composite indexes, and the PostgreSQL Index Types documentation at postgresql.org."
+    },
+    {
+      "query": "improving sleep quality",
+      "category": "body-only",
+      "relevantUrls": ["https://obsidian.md/vault/user/health-log"],
+      "referenceAnswer": "Your history includes a health log at obsidian.md/vault/user/health-log tracking sleep quality, REM sleep patterns, and the effect of blue light on sleep."
+    },
+    {
+      "query": "planning Japan trip cherry blossom",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://roamresearch.com/daily/2026-01-15",
+        "https://japan-guide.com/cherry-blossom"
+      ],
+      "referenceAnswer": "Your history includes Japan trip planning notes at roamresearch.com covering sakura season and JR Pass, and the Tokyo Cherry Blossom Season guide at japan-guide.com/cherry-blossom."
+    },
+    {
+      "query": "half marathon training plan",
+      "category": "body-only",
+      "relevantUrls": ["https://evernote.com/note/running-plan-2026"],
+      "referenceAnswer": "Your history includes a running plan note at evernote.com/note/running-plan-2026 with a 16-week half marathon training schedule covering weekly mileage and long runs."
+    },
+    {
+      "query": "GraphQL vs REST API design",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://graphql.org/learn/queries",
+        "https://notion.so/team/api-decisions"
+      ],
+      "referenceAnswer": "Your history includes the GraphQL Queries documentation at graphql.org/learn/queries and an API decision log at notion.so/team/api-decisions about adopting GraphQL with Apollo Server."
+    },
+    {
+      "query": "Redis caching strategies",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://redis.io/docs/data-types",
+        "https://gist.github.com/user/redis-patterns"
+      ],
+      "referenceAnswer": "Your history includes the Redis Data Types Tutorial at redis.io/docs/data-types and personal caching strategy notes at gist.github.com/user/redis-patterns covering cache-aside, write-through, and TTL tuning."
+    },
+    {
+      "query": "PostgreSQL performance tuning",
+      "category": "body-only",
+      "relevantUrls": [
+        "https://www.postgresql.org/docs/index-types",
+        "https://github.com/user/dev-notes/issues/42"
+      ],
+      "referenceAnswer": "Your history includes the PostgreSQL Index Types documentation at postgresql.org and investigation notes at github.com/user/dev-notes/issues/42 about query optimization with composite indexes."
+    },
+    {
+      "query": "vintage motorcycle restoration",
+      "category": "negative",
+      "relevantUrls": []
+    },
+    {
+      "query": "beekeeping honey extraction",
+      "category": "negative",
+      "relevantUrls": []
+    },
+    {
+      "query": "portrait oil painting techniques",
+      "category": "negative",
+      "relevantUrls": []
+    }
+  ]
+}

@@ -65,6 +65,13 @@ internal class EmbeddingScorer(context: Context) {
         return passing.map { (entry, _) -> entry }
     }
 
+    /**
+     * Computes cosine similarity between two arbitrary texts.
+     * Used by eval tests to score answer quality against reference answers.
+     */
+    internal fun cosineSimilarity(text1: String, text2: String): Double =
+        TextEmbedder.cosineSimilarity(embed(text1), embed(text2))
+
     private fun embed(text: String): Embedding =
         embedder.embed(text).embeddingResult().embeddings().first()
 

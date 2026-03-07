@@ -64,4 +64,16 @@ android {
         // genai-prompt:1.0.0-beta1 was compiled with Kotlin 2.2; skip version check for PoC.
         freeCompilerArgs += ["-Xskip-metadata-version-check"]
     }
+    sourceSets {
+        // Shared eval helpers (EvalMetrics, EvalCorpusLoader, eval_corpus.json) are visible to
+        // both JVM unit tests (via classpath resource) and androidTest (via assets).
+        test {
+            java.srcDirs += ['src/sharedTest/java']
+            resources.srcDirs += ['src/sharedTest/resources']
+        }
+        androidTest {
+            java.srcDirs += ['src/sharedTest/java']
+            assets.srcDirs += ['src/sharedTest/resources']
+        }
+    }
 }

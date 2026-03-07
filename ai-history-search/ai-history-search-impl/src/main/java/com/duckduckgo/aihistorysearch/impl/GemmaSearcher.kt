@@ -111,6 +111,21 @@ internal class GemmaSearcher(
         }
     }
 
+    /**
+     * Eval-only entry point: returns the raw LLM response string (or null if model unavailable).
+     * Used by GemmaEvalTest to measure ranking quality without side effects.
+     */
+    internal suspend fun searchForEval(query: String, entries: List<HistoryEntry.VisitedPage>): String? {
+        return try {
+            val model = getOrLoadModel() ?: return null
+            val prompt = buildPrompt(query, entries)
+            withContext(Dispatchers.IO) { model.generateResponse(prompt) }
+        } catch (e: Exception) {
+            logcat { "GemmaSearcher.searchForEval: error — ${e.message}" }
+            null
+        }
+    }
+
     internal fun buildPrompt(query: String, entries: List<HistoryEntry.VisitedPage>): String {
         val formatter = DateTimeFormatter.ofPattern("MMM d")
         val history = entries.take(MAX_ENTRIES).joinToString("\n") { entry ->

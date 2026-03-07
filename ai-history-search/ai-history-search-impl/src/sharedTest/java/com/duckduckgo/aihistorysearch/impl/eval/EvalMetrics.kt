@@ -19,22 +19,21 @@ package com.duckduckgo.aihistorysearch.impl.eval
 import com.duckduckgo.history.api.HistoryEntry
 
 /**
- * Precision@K: fraction of the top-K results that are relevant.
+ * Retrieval quality metrics shared across all eval test variants (JVM, androidTest).
  *
- * For negative queries (empty [relevant] set) the score is 1.0 iff the ranked list returns
- * nothing in the top K — i.e., the ranker correctly abstains rather than surfacing false positives.
+ * Precision@K: fraction of the top-K results that are relevant.
+ *   - For negative queries (empty relevant set): 1.0 if no results surface, 0.0 otherwise.
+ *
+ * MRR (Mean Reciprocal Rank): 1 / rank of the first relevant result.
+ *   - 1.0 at rank 1, 0.5 at rank 2, 0.0 if no relevant result found.
+ *   - For negative queries: always 1.0 (nothing relevant should surface).
  */
+
 fun precisionAtK(ranked: List<HistoryEntry.VisitedPage>, relevant: Set<String>, k: Int): Double {
     if (relevant.isEmpty()) return if (ranked.take(k).isEmpty()) 1.0 else 0.0
     return ranked.take(k).count { it.url.toString() in relevant } / k.toDouble()
 }
 
-/**
- * Mean Reciprocal Rank: 1 / rank of the first relevant result (0 if none found).
- *
- * For negative queries (empty [relevant] set) the score is vacuously 1.0 — the ranker cannot
- * be penalised for failing to surface a result that does not exist.
- */
 fun mrr(ranked: List<HistoryEntry.VisitedPage>, relevant: Set<String>): Double {
     if (relevant.isEmpty()) return 1.0
     val rank = ranked.indexOfFirst { it.url.toString() in relevant }
