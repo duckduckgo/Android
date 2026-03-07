@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.store.RealSecureStorageKeyRepository
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.autofill.store.keys.RealSecureStorageKeyStore
@@ -48,9 +49,18 @@ object SecureStorageModule {
         autofillFeature: AutofillFeature,
         sharedPreferencesProvider: SharedPreferencesProvider,
         pixel: Pixel,
+        autofillServiceFeature: AutofillServiceFeature,
     ): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(
-            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature, sharedPreferencesProvider, pixel),
+            RealSecureStorageKeyStore(
+                context,
+                coroutineScope,
+                dispatcherProvider,
+                autofillFeature,
+                sharedPreferencesProvider,
+                pixel,
+                autofillServiceFeature,
+            ),
         )
 }
 
