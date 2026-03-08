@@ -26,7 +26,6 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.FEATURE_NAME
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_COMPLETED
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_FAILED
@@ -46,6 +45,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
+
+interface DuckChatDeleter {
+    suspend fun deleteChat(chatId: String): Boolean
+}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -529,7 +530,9 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     private fun hasChatId(url: String?): Boolean {
-        return url != null && duckChat.extractChatId(url) != null
+        return url?.toUri()?.getQueryParameter(CHAT_ID_PARAM)
+            .orEmpty()
+            .isNotBlank()
     }
 
     private suspend fun shouldReuseStoredChatUrl(tabId: String): Boolean {
@@ -538,5 +541,9 @@ class DuckChatContextualViewModel @Inject constructor(
         if (timeoutMs <= 0) return false
         val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
         return elapsedMs <= timeoutMs
+    }
+
+    companion object {
+        private const val CHAT_ID_PARAM = "chatID"
     }
 }

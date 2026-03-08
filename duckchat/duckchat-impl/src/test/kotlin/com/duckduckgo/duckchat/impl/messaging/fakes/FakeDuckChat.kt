@@ -66,9 +66,7 @@ class FakeDuckChat(
         return uri.toString().contains("duckchat")
     }
 
-    override fun extractChatId(url: String): String? {
-        return Uri.parse(url)?.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
-    }
+    override suspend fun deleteChat(url: String): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue

@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -68,7 +69,6 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Inject
-import kotlin.text.forEach
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -306,6 +306,7 @@ class RealDuckChat @Inject constructor(
     private val newAddressBarOptionBottomSheetDialogFactory: NewAddressBarOptionBottomSheetDialogFactory,
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
+    private val duckChatDeleter: DuckChatDeleter,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -457,6 +458,11 @@ class RealDuckChat @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(this)
         }
+    }
+
+    override suspend fun deleteChat(url: String): Boolean {
+        val chatId = extractChatId(url) ?: return false
+        return duckChatDeleter.deleteChat(chatId)
     }
 
     override fun observeCloseEvent(
@@ -654,8 +660,8 @@ class RealDuckChat @Inject constructor(
         }.getOrDefault(false)
     }
 
-    override fun extractChatId(url: String): String? {
-        val uri = Uri.parse(url) ?: return null
+    private fun extractChatId(url: String): String? {
+        val uri = url.toUri()
         if (!isDuckChatUrl(uri)) return null
         return uri.getQueryParameter(CHAT_ID_PARAM)?.takeIf { it.isNotBlank() }
     }

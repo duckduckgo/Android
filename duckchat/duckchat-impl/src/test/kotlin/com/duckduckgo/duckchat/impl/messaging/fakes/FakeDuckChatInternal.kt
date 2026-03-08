@@ -61,9 +61,7 @@ class FakeDuckChatInternal(
 
     override fun isDuckChatUrl(uri: Uri): Boolean = false
 
-    override fun extractChatId(url: String): String? {
-        return Uri.parse(url)?.getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
-    }
+    override suspend fun deleteChat(url: String): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean = false
 
