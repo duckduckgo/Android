@@ -57,9 +57,12 @@ interface SecureStorageKeyStore {
     suspend fun getKey(keyName: String): ByteArray?
 
     /**
-     * This method can be used to check if the keystore implementation has for support for encryption
+     * This method can be used to check if the keystore implementation has support for encryption.
      *
-     * @return `true` if all the crypto dependencies needed by keystore is available and `false` otherwise
+     * When the harmony feature is enabled, checks the harmony-backed preferences; otherwise checks
+     * the legacy EncryptedSharedPreferences.
+     *
+     * @return `true` if all the crypto dependencies needed by keystore are available and `false` otherwise
      */
     suspend fun canUseEncryption(): Boolean
 }
