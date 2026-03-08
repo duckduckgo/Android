@@ -20,7 +20,7 @@ This populates `versions.properties` with `## # available=X.Y.Z` comment hints a
 After deciding on versions, strip the noise:
 
 ```bash
-sed -i '' '/^##/d' versions.properties
+sed -i '' '/^## /d' versions.properties
 ```
 
 **IMPORTANT**: The `####` header block at the top of `versions.properties` must never be removed.
