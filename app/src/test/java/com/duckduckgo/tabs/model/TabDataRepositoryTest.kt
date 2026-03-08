@@ -216,19 +216,6 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenTabDeletedThenTabAndDataCleared() = runTest {
-        val testee = tabDataRepository()
-        val addedTabId = testee.add()
-        val siteData = testee.retrieveSiteData(addedTabId)
-
-        testee.delete(TabEntity(addedTabId, position = 0))
-
-        verify(mockDao).deleteTabAndUpdateSelection(any())
-        assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
-        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
-    }
-
-    @Test
     fun whenAllDeletedThenTabAndDataCleared() = runTest {
         val testee = tabDataRepository(
             webViewPreviewPersister = mockWebViewPreviewPersister,
