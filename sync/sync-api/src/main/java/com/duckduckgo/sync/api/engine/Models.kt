@@ -80,6 +80,28 @@ data class SyncDeletionResponse(
     val untilTimestamp: String? = null,
 )
 
+/**
+ * Represents a request to patch (update) entries for a deletable type.
+ * @param type The type of data to patch.
+ * @param jsonString A JSON array string of entries to send (e.g. [{"id":"x","deleted":"..."}]).
+ */
+data class SyncPatchRequest(
+    val type: DeletableType,
+    val jsonString: String,
+) {
+    fun isEmpty(): Boolean = jsonString.isEmpty()
+}
+
+/**
+ * Represents a response to a sync patch request.
+ * @param type The type of data that was patched.
+ * @param entryIds The IDs of entries that were sent, for race-safe cleanup by the caller.
+ */
+data class SyncPatchResponse(
+    val type: DeletableType,
+    val entryIds: List<String>,
+)
+
 data class SyncErrorResponse(
     val type: SyncFeatureType,
     val featureSyncError: FeatureSyncError,
