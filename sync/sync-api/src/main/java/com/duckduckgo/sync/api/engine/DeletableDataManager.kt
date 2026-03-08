@@ -36,4 +36,20 @@ interface DeletableDataManager {
      * Called to notify that the deletion request failed
      */
     fun onError(syncErrorResponse: SyncErrorResponse) {}
+
+    /**
+     * Used by the SyncClient to get patch updates from each deletable feature.
+     * Returns a [SyncPatchRequest] if there are pending updates, or null if none.
+     */
+    fun getPatchUpdates(): SyncPatchRequest? = null
+
+    /**
+     * Called to notify that the patch request was successful.
+     */
+    fun onPatchSuccess(response: SyncPatchResponse) {}
+
+    /**
+     * Called to notify that the patch request failed.
+     */
+    fun onPatchError(syncErrorResponse: SyncErrorResponse) {}
 }
