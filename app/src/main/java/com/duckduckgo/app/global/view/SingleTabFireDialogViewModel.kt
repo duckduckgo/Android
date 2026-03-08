@@ -219,12 +219,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             val result = withContext(dispatcherProvider.io()) {
-                val selectedTab = tabRepository.getSelectedTab()
-                val selectedTabId = selectedTab?.tabId
+                val selectedTabId = tabRepository.getSelectedTab()?.tabId
                 if (selectedTabId != null) {
-                    if (_viewState.value.isDuckAiTab) {
-                        selectedTab.url?.let { duckChat.deleteChat(it) }
-                    }
                     dataClearing.clearSingleTabData(selectedTabId)
                 } else {
                     null
