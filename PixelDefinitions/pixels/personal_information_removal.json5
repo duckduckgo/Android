@@ -990,6 +990,11 @@
                 "key": "error_code",
                 "description": "Error code from BE",
                 "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the submission succeeded",
+                "type": "string"
             }
         ]
     },
@@ -1003,6 +1008,30 @@
             {
                 "key": "error_details",
                 "description": "Sanitized exception message from client",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the submission succeeded",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_download_broker-json_failure": {
+        "description": "Android specific pixel which is fired when downloading broker json files failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_details",
+                "description": "Sanitized exception message from client",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the pixel is fired",
                 "type": "string"
             }
         ]
