@@ -78,6 +78,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val isDuckAiChatsSelected: Boolean = false,
         val isSingleTabEnabled: Boolean = false,
         val isFromTabSwitcher: Boolean = false,
+        val isDuckAiTab: Boolean = false,
         val showDuckAiSubtitle: Boolean = false,
         val showSiteDataSubtitle: Boolean = false,
         val showDownloadsSubtitle: Boolean = false,
@@ -118,6 +119,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 it.copy(
                     isDuckAiChatsSelected = isDuckAiChatsSelected,
                     isSingleTabEnabled = isDeleteBrowsingDataSupported,
+                    isDuckAiTab = isDuckAiTab,
                     showDuckAiSubtitle = isDuckAiTab && !isDuckAiChatsSelected,
                     showSiteDataSubtitle = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                     showDownloadsSubtitle = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
@@ -217,8 +219,12 @@ class SingleTabFireDialogViewModel @Inject constructor(
             }
 
             val result = withContext(dispatcherProvider.io()) {
-                val selectedTabId = tabRepository.getSelectedTab()?.tabId
+                val selectedTab = tabRepository.getSelectedTab()
+                val selectedTabId = selectedTab?.tabId
                 if (selectedTabId != null) {
+                    if (_viewState.value.isDuckAiTab) {
+                        selectedTab.url?.let { duckChat.deleteChat(it) }
+                    }
                     dataClearing.clearSingleTabData(selectedTabId)
                 } else {
                     null
