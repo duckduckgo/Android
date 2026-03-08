@@ -18,9 +18,9 @@ package com.duckduckgo.sync.api.engine
 
 interface DeletableDataManager {
     /**
-     * Used by the SyncClient to get all the deletions from each deletable feature
+     * Used by the SyncClient to get the bulk deletion request from each deletable feature
      */
-    fun getDeletions(): SyncDeletionRequest? = null
+    fun getBulkDeletion(): SyncBulkDeletionRequest? = null
 
     /**
      * Which deletable data type this deletion is for
@@ -28,28 +28,28 @@ interface DeletableDataManager {
     fun getType(): DeletableType
 
     /**
-     * Called to notify that the deletion request was successful
+     * Called to notify that the bulk deletion request was successful
      */
-    fun onSuccess(response: SyncDeletionResponse) {}
+    fun onBulkDeleteSuccess(response: SyncBulkDeletionResponse) {}
 
     /**
-     * Called to notify that the deletion request failed
+     * Called to notify that the bulk deletion request failed
      */
-    fun onError(syncErrorResponse: SyncErrorResponse) {}
+    fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse) {}
 
     /**
-     * Used by the SyncClient to get patch updates from each deletable feature.
-     * Returns a [SyncPatchRequest] if there are pending updates, or null if none.
+     * Used by the SyncClient to get entry updates from each deletable feature.
+     * Returns a [SyncEntryUpdateRequest] if there are pending updates, or null if none.
      */
-    fun getPatchUpdates(): SyncPatchRequest? = null
+    fun getEntryUpdates(): SyncEntryUpdateRequest? = null
 
     /**
-     * Called to notify that the patch request was successful.
+     * Called to notify that the entry update request was successful.
      */
-    fun onPatchSuccess(response: SyncPatchResponse) {}
+    fun onEntryUpdateSuccess(response: SyncEntryUpdateResponse) {}
 
     /**
-     * Called to notify that the patch request failed.
+     * Called to notify that the entry update request failed.
      */
-    fun onPatchError(syncErrorResponse: SyncErrorResponse) {}
+    fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse) {}
 }

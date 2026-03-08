@@ -26,8 +26,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
-import com.duckduckgo.sync.api.engine.SyncDeletionRequest
-import com.duckduckgo.sync.api.engine.SyncDeletionResponse
+import com.duckduckgo.sync.api.engine.SyncBulkDeletionRequest
+import com.duckduckgo.sync.api.engine.SyncBulkDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +49,7 @@ class DuckChatSyncDataManager @Inject constructor(
 
     override fun getType(): DeletableType = DeletableType.DUCK_AI_CHATS
 
-    override fun getDeletions(): SyncDeletionRequest? {
+    override fun getBulkDeletion(): SyncBulkDeletionRequest? {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
 
         return runBlocking(dispatchers.io()) {
@@ -68,7 +68,7 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
-    override fun onSuccess(response: SyncDeletionResponse) {
+    override fun onBulkDeleteSuccess(response: SyncBulkDeletionResponse) {
         logcat { "DuckChat-Sync: Duck AI chats deletion sync successful" }
         response.untilTimestamp?.let { timestamp ->
             appCoroutineScope.launch(dispatchers.io()) {
@@ -77,11 +77,11 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
-    override fun onError(syncErrorResponse: SyncErrorResponse) {
+    override fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse) {
         // no-op, keep timestamp around for next time
     }
 
-    private fun formatRequest(deletionTimestamp: String?): SyncDeletionRequest? {
+    private fun formatRequest(deletionTimestamp: String?): SyncBulkDeletionRequest? {
         if (deletionTimestamp == null) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no need to inform sync of duck ai chat deletion, no timestamp available" }
             return null
@@ -89,7 +89,7 @@ class DuckChatSyncDataManager @Inject constructor(
 
         logcat { "DuckChat-Sync: need to inform sync of duck ai chat deletion with timestamp: $deletionTimestamp" }
 
-        return SyncDeletionRequest(
+        return SyncBulkDeletionRequest(
             type = DeletableType.DUCK_AI_CHATS,
             untilTimestamp = deletionTimestamp,
         )

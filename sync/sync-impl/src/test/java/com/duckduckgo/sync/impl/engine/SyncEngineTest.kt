@@ -632,7 +632,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         // Verify deletion processed
-        verify(syncApiClient).delete(deletionRequest)
+        verify(syncApiClient).bulkDelete(deletionRequest)
         // Verify BOOKMARKS changes processed
         verify(syncApiClient).patch(bookmarksChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -640,28 +640,28 @@ internal class SyncEngineTest {
 
     @Test
     fun whenDeletionSucceedsThenManagerOnSuccessIsCalled() {
-        val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        val deletionRequest = SyncBulkDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         val deletionManager = mock<DeletableDataManager>()
         whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
-        whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
+        whenever(deletionManager.getBulkDeletion()).thenReturn(deletionRequest)
 
-        val deletionResponse = SyncDeletionResponse(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        val deletionResponse = SyncBulkDeletionResponse(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         givenDeletionSuccess(deletionRequest, deletionResponse)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
         givenNoProviders()
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(deletionManager).onSuccess(deletionResponse)
+        verify(deletionManager).onBulkDeleteSuccess(deletionResponse)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test
     fun whenDeletionFailsWithFeatureErrorThenManagerOnErrorIsCalled() {
-        val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
+        val deletionRequest = SyncBulkDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         val deletionManager = mock<DeletableDataManager>()
         whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
-        whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
+        whenever(deletionManager.getBulkDeletion()).thenReturn(deletionRequest)
 
         givenDeletionError(deletionRequest, API_CODE.COUNT_LIMIT.code)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
@@ -669,7 +669,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(deletionManager).onError(SyncErrorResponse(DUCK_AI_CHATS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+        verify(deletionManager).onBulkDeleteError(SyncErrorResponse(DUCK_AI_CHATS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -682,7 +682,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         // Verify no deletion calls
-        verify(syncApiClient, times(0)).delete(any())
+        verify(syncApiClient, times(0)).bulkDelete(any())
         // Verify normal sync continues
         verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -861,20 +861,20 @@ internal class SyncEngineTest {
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
-    private fun givenDeletions(type: DeletableType, untilTimestamp: String): SyncDeletionRequest {
-        val deletionRequest = SyncDeletionRequest(type, untilTimestamp)
+    private fun givenDeletions(type: DeletableType, untilTimestamp: String): SyncBulkDeletionRequest {
+        val deletionRequest = SyncBulkDeletionRequest(type, untilTimestamp)
         val deletionManager = FakeDeletableDataManager(type, deletionRequest)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(deletionManager))
         return deletionRequest
     }
 
-    private fun givenDeletionSuccess(deletionRequest: SyncDeletionRequest, response: SyncDeletionResponse? = null) {
-        val deletionResponse = response ?: SyncDeletionResponse(deletionRequest.type, deletionRequest.untilTimestamp)
-        whenever(syncApiClient.delete(deletionRequest)).thenReturn(Success(deletionResponse))
+    private fun givenDeletionSuccess(deletionRequest: SyncBulkDeletionRequest, response: SyncBulkDeletionResponse? = null) {
+        val deletionResponse = response ?: SyncBulkDeletionResponse(deletionRequest.type, deletionRequest.untilTimestamp)
+        whenever(syncApiClient.bulkDelete(deletionRequest)).thenReturn(Success(deletionResponse))
     }
 
-    private fun givenDeletionError(deletionRequest: SyncDeletionRequest, errorCode: Int) {
-        whenever(syncApiClient.delete(deletionRequest)).thenReturn(Result.Error(errorCode, "deletion failed"))
+    private fun givenDeletionError(deletionRequest: SyncBulkDeletionRequest, errorCode: Int) {
+        whenever(syncApiClient.bulkDelete(deletionRequest)).thenReturn(Result.Error(errorCode, "deletion failed"))
     }
 
     private fun givenNoDeletions() {
