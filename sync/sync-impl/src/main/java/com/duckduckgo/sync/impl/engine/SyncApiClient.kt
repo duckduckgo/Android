@@ -31,6 +31,8 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority
 import logcat.logcat
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -162,7 +164,7 @@ class AppSyncApiClient @Inject constructor(
     ): Result<SyncEntryUpdateResponse> {
         logcat { "Sync-Engine: patching duck ai chats" }
 
-        val body = JSONObject().put("ai_chats", org.json.JSONArray(request.jsonString))
+        val body = request.jsonString.toRequestBody("application/json".toMediaType())
 
         return when (val result = syncApi.patchAiChats(token, body)) {
             is Result.Error -> {
