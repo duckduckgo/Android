@@ -112,10 +112,8 @@ class DuckChatSyncDataManager @Inject constructor(
     }
 
     override fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse) {
-        logcat(LogPriority.ERROR) { "DuckChat-Sync: entry update failed with ${syncErrorResponse.featureSyncError}, clearing pending queue" }
-        appCoroutineScope.launch(dispatchers.io()) {
-            duckChatSyncRepository.clearPendingChatDeletions()
-        }
+        logcat(LogPriority.ERROR) { "DuckChat-Sync: entry update failed with ${syncErrorResponse.featureSyncError}" }
+        // Keep pending IDs for retry. Queue is naturally cleared by bulk delete or sync disable.
     }
 
     override fun onSyncDisabled() {
