@@ -87,6 +87,8 @@ class DataClearing @Inject constructor(
         val url = getNewTabUrl(tabUrl)
         tabOperations.replaceTabWithNewTab(tabId, url)
 
+        clearContextualChatDataIfNeeded(tabId)
+
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
     }
