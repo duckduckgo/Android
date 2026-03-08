@@ -241,7 +241,7 @@ class RealSyncEngine @Inject constructor(
         return deletableDataManagerPlugins.getPlugins().mapNotNull { manager ->
             logcat { "Sync-Engine: asking for deletions in ${manager.javaClass}" }
             kotlin.runCatching {
-                manager.getDeletions()?.let { deletionRequest ->
+                manager.getBulkDeletion()?.let { deletionRequest ->
                     PendingDeletion(deletionRequest, manager)
                 }
             }.getOrElse { error ->
@@ -260,15 +260,15 @@ class RealSyncEngine @Inject constructor(
 
         deletions.forEach { (request, manager) ->
             logcat { "Sync-Engine: processing deletion for ${request.type}" }
-            when (val result = syncApiClient.delete(request)) {
+            when (val result = syncApiClient.bulkDelete(request)) {
                 is Error -> {
                     val featureError = result.featureError() ?: return@forEach
-                    manager.onError(SyncErrorResponse(request.type, featureError))
+                    manager.onBulkDeleteError(SyncErrorResponse(request.type, featureError))
                 }
                 is Success -> {
                     logcat { "Sync-Engine: deletion completed successfully for ${request.type}" }
                     kotlin.runCatching {
-                        manager.onSuccess(result.data)
+                        manager.onBulkDeleteSuccess(result.data)
                     }.getOrElse { error ->
                         logcat { "Sync-Engine: error notifying deletable data manager of deletion success: $error" }
                     }
@@ -334,7 +334,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private data class PendingDeletion(
-        val request: SyncDeletionRequest,
+        val request: SyncBulkDeletionRequest,
         val manager: DeletableDataManager,
     )
 }

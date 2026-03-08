@@ -61,31 +61,31 @@ data class SyncChangesResponse(
 }
 
 /**
- * Represents a request to delete a deletable type
+ * Represents a request to bulk-delete all data for a deletable type.
  * @param type The type of deletable data to delete.
  * @param untilTimestamp An optional timestamp to indicate that only items modified before this timestamp should be deleted.
  */
-data class SyncDeletionRequest(
+data class SyncBulkDeletionRequest(
     val type: DeletableType,
     val untilTimestamp: String? = null,
 )
 
 /**
- * Represents a response to a sync deletion request.
+ * Represents a response to a bulk deletion request.
  * @param type The type of deletable data that was deleted.
- * @param untilTimestamp The timestamp provided in @[SyncDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
+ * @param untilTimestamp The timestamp provided in @[SyncBulkDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
  */
-data class SyncDeletionResponse(
+data class SyncBulkDeletionResponse(
     val type: DeletableType,
     val untilTimestamp: String? = null,
 )
 
 /**
- * Represents a request to patch (update) entries for a deletable type.
- * @param type The type of data to patch.
+ * Represents a request to update individual entries for a deletable type.
+ * @param type The type of data to update.
  * @param jsonString A JSON array string of entries to send (e.g. [{"id":"x","deleted":"..."}]).
  */
-data class SyncPatchRequest(
+data class SyncEntryUpdateRequest(
     val type: DeletableType,
     val jsonString: String,
 ) {
@@ -93,11 +93,11 @@ data class SyncPatchRequest(
 }
 
 /**
- * Represents a response to a sync patch request.
- * @param type The type of data that was patched.
+ * Represents a response to an entry update request.
+ * @param type The type of data that was updated.
  * @param entryIds The IDs of entries that were sent, for race-safe cleanup by the caller.
  */
-data class SyncPatchResponse(
+data class SyncEntryUpdateResponse(
     val type: DeletableType,
     val entryIds: List<String>,
 )

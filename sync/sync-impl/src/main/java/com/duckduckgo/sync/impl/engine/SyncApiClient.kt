@@ -41,8 +41,8 @@ interface SyncApiClient {
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse>
-    fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse>
-    fun patchUpdate(request: SyncPatchRequest): Result<SyncPatchResponse>
+    fun bulkDelete(request: SyncBulkDeletionRequest): Result<SyncBulkDeletionResponse>
+    fun patchEntries(request: SyncEntryUpdateRequest): Result<SyncEntryUpdateResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -136,15 +136,15 @@ class AppSyncApiClient @Inject constructor(
         return SyncChangesResponse(type, jsonString)
     }
 
-    override fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse> {
+    override fun bulkDelete(request: SyncBulkDeletionRequest): Result<SyncBulkDeletionResponse> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
-        return when (deletions.type) {
-            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, deletions.untilTimestamp ?: "")
+        return when (request.type) {
+            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, request.untilTimestamp ?: "")
         }
     }
 
-    override fun patchUpdate(request: SyncPatchRequest): Result<SyncPatchResponse> {
+    override fun patchEntries(request: SyncEntryUpdateRequest): Result<SyncEntryUpdateResponse> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
         if (request.isEmpty()) {
@@ -158,8 +158,8 @@ class AppSyncApiClient @Inject constructor(
 
     private fun handleDuckAiChatsPatch(
         token: String,
-        request: SyncPatchRequest,
-    ): Result<SyncPatchResponse> {
+        request: SyncEntryUpdateRequest,
+    ): Result<SyncEntryUpdateResponse> {
         logcat { "Sync-Engine: patching duck ai chats" }
 
         val body = JSONObject().put("ai_chats", org.json.JSONArray(request.jsonString))
@@ -173,7 +173,7 @@ class AppSyncApiClient @Inject constructor(
             is Result.Success -> {
                 logcat(LogPriority.INFO) { "DuckChat-Sync: successfully patched duck ai chats" }
                 val entryIds = extractEntryIds(request.jsonString)
-                Result.Success(SyncPatchResponse(DUCK_AI_CHATS, entryIds))
+                Result.Success(SyncEntryUpdateResponse(DUCK_AI_CHATS, entryIds))
             }
         }
     }
@@ -186,7 +186,7 @@ class AppSyncApiClient @Inject constructor(
     private fun handleDuckAiChatsDeletion(
         token: String,
         until: String,
-    ): Result<SyncDeletionResponse> {
+    ): Result<SyncBulkDeletionResponse> {
         logcat { "Sync-Engine: deleting duck ai chats until $until" }
 
         return when (val result = syncApi.deleteAiChats(token, until)) {
@@ -197,7 +197,7 @@ class AppSyncApiClient @Inject constructor(
             }
             is Result.Success -> {
                 logcat(LogPriority.INFO) { "DuckChat-Sync: successfully informed sync of deleted duck ai chats" }
-                Result.Success(SyncDeletionResponse(DUCK_AI_CHATS, until))
+                Result.Success(SyncBulkDeletionResponse(DUCK_AI_CHATS, until))
             }
         }
     }
