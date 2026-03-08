@@ -318,16 +318,6 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun delete(tab: TabEntity) {
-        databaseExecutor().scheduleDirect {
-            deleteOldPreviewImages(tab.tabId)
-            deleteOldFavicon(tab.tabId)
-            tabsDao.deleteTabAndUpdateSelection(tab)
-        }
-        siteData.remove(tab.tabId)
-        tabVisitedSitesRepository.clearTab(tab.tabId)
-    }
-
     override suspend fun deleteTabs(tabIds: List<String>) {
         databaseExecutor().scheduleDirect {
             tabsDao.deleteTabsAndUpdateSelection(tabIds)

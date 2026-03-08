@@ -80,8 +80,6 @@ interface TabRepository {
      */
     fun retrieveSiteData(tabId: String): MutableLiveData<Site>
 
-    suspend fun delete(tab: TabEntity)
-
     suspend fun markDeletable(tab: TabEntity)
 
     suspend fun markDeletable(tabIds: List<String>)
