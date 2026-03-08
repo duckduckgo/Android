@@ -135,7 +135,7 @@ class RealSyncEngine @Inject constructor(
             processDeletions()
 
             // Process entry updates (DeletableTypes)
-            processPatchUpdates()
+            processEntryUpdates()
 
             // Then process changes (SyncableTypes)
             logcat(INFO) { "Sync-Engine: processing changes" }
@@ -339,7 +339,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getPatchUpdateRequests(): List<PendingEntryUpdate> {
+    private fun getEntryUpdateRequests(): List<PendingEntryUpdate> {
         return deletableDataManagerPlugins.getPlugins().mapNotNull { manager ->
             logcat { "Sync-Engine: asking for entry updates in ${manager.javaClass}" }
             kotlin.runCatching {
@@ -353,8 +353,8 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun processPatchUpdates() {
-        val updates = getPatchUpdateRequests()
+    private fun processEntryUpdates() {
+        val updates = getEntryUpdateRequests()
         if (updates.isEmpty()) {
             return
         }
