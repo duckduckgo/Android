@@ -56,4 +56,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     override fun isPrivacyProUrl(uri: Uri): Boolean = false
 
     override suspend fun isFreeTrialEligible(): Boolean = false
+
+    internal fun isAlwaysTrue(): Boolean = true
 }
