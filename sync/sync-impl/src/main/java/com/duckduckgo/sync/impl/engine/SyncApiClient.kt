@@ -42,6 +42,7 @@ interface SyncApiClient {
         since: String,
     ): Result<SyncChangesResponse>
     fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse>
+    fun patchUpdate(request: SyncPatchRequest): Result<SyncPatchResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -141,6 +142,45 @@ class AppSyncApiClient @Inject constructor(
         return when (deletions.type) {
             DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, deletions.untilTimestamp ?: "")
         }
+    }
+
+    override fun patchUpdate(request: SyncPatchRequest): Result<SyncPatchResponse> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
+
+        if (request.isEmpty()) {
+            return Result.Error(reason = "Patch Updates Empty")
+        }
+
+        return when (request.type) {
+            DUCK_AI_CHATS -> handleDuckAiChatsPatch(token, request)
+        }
+    }
+
+    private fun handleDuckAiChatsPatch(
+        token: String,
+        request: SyncPatchRequest,
+    ): Result<SyncPatchResponse> {
+        logcat { "Sync-Engine: patching duck ai chats" }
+
+        val body = JSONObject().put("ai_chats", org.json.JSONArray(request.jsonString))
+
+        return when (val result = syncApi.patchAiChats(token, body)) {
+            is Result.Error -> {
+                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to patch duck ai chats $result" }
+                syncApiErrorRecorder.record(DUCK_AI_CHATS, result)
+                result
+            }
+            is Result.Success -> {
+                logcat(LogPriority.INFO) { "DuckChat-Sync: successfully patched duck ai chats" }
+                val entryIds = extractEntryIds(request.jsonString)
+                Result.Success(SyncPatchResponse(DUCK_AI_CHATS, entryIds))
+            }
+        }
+    }
+
+    private fun extractEntryIds(jsonArrayString: String): List<String> {
+        val jsonArray = org.json.JSONArray(jsonArrayString)
+        return (0 until jsonArray.length()).map { jsonArray.getJSONObject(it).getString("id") }
     }
 
     private fun handleDuckAiChatsDeletion(
