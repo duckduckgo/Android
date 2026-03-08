@@ -144,7 +144,7 @@ class DuckChatSyncDataManager @Inject constructor(
 
         logcat { "DuckChat-Sync: formatting entry update request for ${pendingIds.size} pending chat deletions" }
 
-        val now = java.net.URLEncoder.encode(DatabaseDateFormatter.iso8601(), "UTF-8")
+        val now = DatabaseDateFormatter.millisIso8601().toString()
         val jsonArray = org.json.JSONArray()
         pendingIds.forEach { chatId ->
             jsonArray.put(
