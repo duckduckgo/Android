@@ -10,7 +10,7 @@ The following rule files contain detailed guidance for specific topics. Read the
 | `.cursor/rules/android-design-system.mdc` | ADS components, buttons, text, inputs, switches, list items, dialogs, bottom sheets, colors, spacing, lint rules |
 | `.cursor/rules/maestro-ui-tests.mdc` | Maestro test setup, organization, tags, running locally and in CI |
 | `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
-| `.cursor/rules/dependency-updates.mdc` | refreshVersions workflow, Kotlin 2.x compatibility checks, safe vs deferred libraries, E2E testing, PR conventions |
+| `.cursor/rules/dependency-updates.mdc` | How to safely update Android library dependencies |
 
 ---
 
