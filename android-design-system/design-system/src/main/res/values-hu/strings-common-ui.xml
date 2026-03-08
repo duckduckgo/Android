@@ -37,4 +37,7 @@
     <string name="alwaysOn">Mindig be van kapcsolva</string>
     <string name="on">Be</string>
     <string name="off">Ki</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">További részletek</string>
 </resources>
