@@ -101,7 +101,7 @@ interface SyncApi {
 
     fun patchAiChats(
         token: String,
-        body: JSONObject,
+        body: okhttp3.RequestBody,
     ): Result<Unit>
 
     /**
@@ -417,7 +417,7 @@ class SyncServiceRemote @Inject constructor(
 
     override fun patchAiChats(
         token: String,
-        body: JSONObject,
+        body: okhttp3.RequestBody,
     ): Result<Unit> {
         logcat(INFO) { "Sync-service: patch ai chats request" }
 
