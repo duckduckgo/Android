@@ -134,6 +134,9 @@ class RealSyncEngine @Inject constructor(
             // Process deletions first (DeletableTypes)
             processDeletions()
 
+            // Process entry updates (DeletableTypes)
+            processPatchUpdates()
+
             // Then process changes (SyncableTypes)
             logcat(INFO) { "Sync-Engine: processing changes" }
             val changes = getChanges()
@@ -333,8 +336,54 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
+    private fun getPatchUpdateRequests(): List<PendingEntryUpdate> {
+        return deletableDataManagerPlugins.getPlugins().mapNotNull { manager ->
+            logcat { "Sync-Engine: asking for entry updates in ${manager.javaClass}" }
+            kotlin.runCatching {
+                manager.getEntryUpdates()?.let { entryUpdateRequest ->
+                    PendingEntryUpdate(entryUpdateRequest, manager)
+                }
+            }.getOrElse { error ->
+                syncOperationErrorRecorder.record(manager.getType().field, DATA_PROVIDER_ERROR)
+                null
+            }
+        }
+    }
+
+    private fun processPatchUpdates() {
+        val updates = getPatchUpdateRequests()
+        if (updates.isEmpty()) {
+            return
+        }
+
+        logcat(INFO) { "Sync-Engine: processing ${updates.size} entry updates" }
+
+        updates.forEach { (request, manager) ->
+            logcat { "Sync-Engine: processing entry update for ${request.type}" }
+            when (val result = syncApiClient.patchEntries(request)) {
+                is Error -> {
+                    val featureError = result.featureError() ?: return@forEach
+                    manager.onEntryUpdateError(SyncErrorResponse(request.type, featureError))
+                }
+                is Success -> {
+                    logcat { "Sync-Engine: entry update completed successfully for ${request.type}" }
+                    kotlin.runCatching {
+                        manager.onEntryUpdateSuccess(result.data)
+                    }.getOrElse { error ->
+                        logcat { "Sync-Engine: error notifying deletable data manager of entry update success: $error" }
+                    }
+                }
+            }
+        }
+    }
+
     private data class PendingDeletion(
         val request: SyncBulkDeletionRequest,
+        val manager: DeletableDataManager,
+    )
+
+    private data class PendingEntryUpdate(
+        val request: SyncEntryUpdateRequest,
         val manager: DeletableDataManager,
     )
 }
