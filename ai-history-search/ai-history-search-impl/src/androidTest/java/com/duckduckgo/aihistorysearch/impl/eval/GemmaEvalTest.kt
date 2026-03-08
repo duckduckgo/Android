@@ -68,9 +68,18 @@ class GemmaEvalTest {
     @Test
     fun gemmaQualityReport() {
         val modelFile = File(context.filesDir, "models/${GemmaSearcher.MODEL_FILENAME}")
+        // Allow pre-staging the model at /data/local/tmp/ (no run-as required) for library
+        // module androidTests where the test APK's filesDir can't be pre-populated via adb.
+        if (!modelFile.exists()) {
+            val staged = File("/data/local/tmp/${GemmaSearcher.MODEL_FILENAME}")
+            if (staged.exists()) {
+                modelFile.parentFile?.mkdirs()
+                staged.copyTo(modelFile)
+            }
+        }
         assumeTrue(
-            "Gemma model not found at ${modelFile.absolutePath} — skipping eval. " +
-                "Push the model and re-run to get quality numbers.",
+            "Gemma model not found at ${modelFile.absolutePath} (also checked /data/local/tmp/) — skipping eval. " +
+                "Push with: adb push gemma3-1b-it-int4.task /data/local/tmp/",
             modelFile.exists() && modelFile.length() > 100 * 1024 * 1024L,
         )
 

@@ -137,15 +137,25 @@ internal class GemmaSearcher(
                 entry.chunkText?.takeIf { it.isNotBlank() }?.let { append("\n  ").append(it.take(300)) }
             }
         }
+        // Gemma 3 IT requires the chat template for proper instruction-following.
+        // Without <start_of_turn> markers the model behaves as a completion model and ignores constraints.
         return """
-            Here are pages from my browser history:
+            <start_of_turn>user
+            You are a browser history search assistant.
+
+            Browser history:
             $history
 
-            Question: $query
+            Search query: $query
 
-            1. List the 3–5 relevant pages (only the relevant pages) in order of relevance, with a one-sentence reason for each.
-            2. Write a 2–3 sentence summary of what these pages suggest about my research on this topic.
-            If nothing is relevant, say so clearly.
+            Which of the above pages are directly relevant to the search query? A page is relevant only if its title, URL, description, or content directly addresses the query topic. Do not include pages about unrelated topics.
+
+            List only the relevant pages, one per line:
+            - [title] — [url]: one sentence explaining why it matches
+
+            If no pages match, respond with exactly: Nothing relevant found.
+            <end_of_turn>
+            <start_of_turn>model
         """.trimIndent()
     }
 
