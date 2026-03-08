@@ -116,6 +116,12 @@ interface SyncService {
         @Query("until") until: String,
     ): Call<JSONObject>
 
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun patchAiChats(
+        @Header("Authorization") token: String,
+        @Body body: JSONObject,
+    ): Call<Void>
+
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")
     fun rescopeToken(
         @Header("Authorization") token: String,
