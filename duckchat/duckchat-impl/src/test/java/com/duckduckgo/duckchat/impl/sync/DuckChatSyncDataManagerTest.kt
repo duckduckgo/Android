@@ -204,7 +204,7 @@ class DuckChatSyncDataManagerTest {
     }
 
     @Test
-    fun whenOnEntryUpdateErrorThenPendingQueueIsCleared() = runTest {
+    fun whenOnEntryUpdateErrorThenPendingQueueIsKept() = runTest {
         val error = SyncErrorResponse(
             type = DeletableType.DUCK_AI_CHATS,
             featureSyncError = FeatureSyncError.INVALID_REQUEST,
@@ -212,7 +212,8 @@ class DuckChatSyncDataManagerTest {
 
         testee.onEntryUpdateError(error)
 
-        verify(duckChatSyncRepository).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).removePendingChatDeletions(org.mockito.kotlin.any())
     }
 
     @Test
