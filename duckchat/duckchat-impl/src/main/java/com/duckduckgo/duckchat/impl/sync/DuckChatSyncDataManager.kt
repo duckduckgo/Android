@@ -115,6 +115,12 @@ class DuckChatSyncDataManager @Inject constructor(
         // no-op, keep pending IDs for retry next cycle
     }
 
+    override fun onSyncDisabled() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            duckChatSyncRepository.clearPendingChatDeletions()
+        }
+    }
+
     private fun formatRequest(deletionTimestamp: String?): SyncBulkDeletionRequest? {
         if (deletionTimestamp == null) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no need to inform sync of duck ai chat deletion, no timestamp available" }
