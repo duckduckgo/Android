@@ -99,6 +99,11 @@ interface SyncApi {
         until: String,
     ): Result<Unit>
 
+    fun patchAiChats(
+        token: String,
+        body: JSONObject,
+    ): Result<Unit>
+
     /**
      * Obtain a new "scoped token" for the sync service
      * A scoped token has a reduced range of capabilities, restricted to only the given scope
@@ -402,6 +407,25 @@ class SyncServiceRemote @Inject constructor(
             deleteCall.execute()
         }.getOrElse { throwable ->
             logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(Unit)
+        }
+    }
+
+    override fun patchAiChats(
+        token: String,
+        body: JSONObject,
+    ): Result<Unit> {
+        logcat(INFO) { "Sync-service: patch ai chats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchAiChats("Bearer $token", body)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patch ai chats error ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
