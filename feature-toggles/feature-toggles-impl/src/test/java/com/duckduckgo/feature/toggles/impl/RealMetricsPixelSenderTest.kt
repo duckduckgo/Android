@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
-import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.codegen.TestTriggerFeature
 import kotlinx.coroutines.test.runTest

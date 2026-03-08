@@ -19,7 +19,6 @@ package com.duckduckgo.feature.toggles.impl
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.METRICS_PIXEL_PREFIX
 import com.duckduckgo.feature.toggles.impl.FeatureTogglesPixelName.EXPERIMENT_ENROLLMENT
 import com.squareup.anvil.annotations.ContributesMultibinding
 
