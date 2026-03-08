@@ -20,12 +20,16 @@ import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.SyncBulkDeletionRequest
+import com.duckduckgo.sync.api.engine.SyncEntryUpdateRequest
 
 class FakeDeletableDataManager(
     private val deletableType: DeletableType = DUCK_AI_CHATS,
     private val fakeDeletion: SyncBulkDeletionRequest? = null,
+    private val patchUpdate: SyncEntryUpdateRequest? = null,
 ) : DeletableDataManager {
     override fun getType(): DeletableType = deletableType
 
     override fun getBulkDeletion(): SyncBulkDeletionRequest? = fakeDeletion
+
+    override fun getEntryUpdates(): SyncEntryUpdateRequest? = patchUpdate
 }
