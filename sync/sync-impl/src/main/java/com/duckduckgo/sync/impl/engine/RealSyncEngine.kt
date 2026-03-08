@@ -322,6 +322,9 @@ class RealSyncEngine @Inject constructor(
         persisterPlugins.getPlugins().map {
             it.onSyncDisabled()
         }
+        deletableDataManagerPlugins.getPlugins().forEach {
+            it.onSyncDisabled()
+        }
         lifecyclePlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }

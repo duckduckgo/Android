@@ -226,4 +226,11 @@ class DuckChatSyncDataManagerTest {
 
         verify(duckChatSyncRepository).clearPendingChatDeletions()
     }
+
+    @Test
+    fun whenOnSyncDisabledThenPendingQueueIsCleared() = runTest {
+        testee.onSyncDisabled()
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
+    }
 }

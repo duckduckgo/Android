@@ -52,4 +52,10 @@ interface DeletableDataManager {
      * Called to notify that the entry update request failed.
      */
     fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse) {}
+
+    /**
+     * Called when sync is disabled (user disconnects or logs out).
+     * Implementations should clear any pending state.
+     */
+    fun onSyncDisabled() {}
 }

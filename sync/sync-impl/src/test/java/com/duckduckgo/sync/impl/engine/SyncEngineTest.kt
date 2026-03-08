@@ -948,7 +948,7 @@ internal class SyncEngineTest {
 
     private fun givenEntryUpdates(type: DeletableType, jsonString: String): SyncEntryUpdateRequest {
         val entryUpdateRequest = SyncEntryUpdateRequest(type, jsonString)
-        val entryUpdateManager = FakeDeletableDataManager(type, patchUpdate = entryUpdateRequest)
+        val entryUpdateManager = FakeDeletableDataManager(type, entryUpdate = entryUpdateRequest)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(entryUpdateManager))
         return entryUpdateRequest
     }
