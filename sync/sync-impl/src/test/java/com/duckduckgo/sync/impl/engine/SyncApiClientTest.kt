@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
+import com.duckduckgo.sync.api.engine.SyncPatchRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.impl.API_CODE
@@ -202,5 +203,48 @@ internal class SyncApiClientTest {
 
         assertTrue(result is Result.Error)
         verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, deleteError)
+    }
+
+    @Test
+    fun whenPatchUpdateAndTokenEmptyThenReturnError() {
+        whenever(syncStore.token).thenReturn("")
+
+        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""))
+
+        assertEquals(result, Result.Error(reason = "Token Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
+    }
+
+    @Test
+    fun whenPatchUpdateAndRequestEmptyThenReturnError() {
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+
+        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, ""))
+
+        assertEquals(result, Result.Error(reason = "Patch Updates Empty"))
+    }
+
+    @Test
+    fun whenPatchUpdateDuckAiChatsAndApiSucceedsThenReturnSuccess() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchAiChats(any(), any())).thenReturn(Result.Success(Unit))
+
+        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, json))
+
+        assertTrue(result is Result.Success)
+    }
+
+    @Test
+    fun whenPatchUpdateDuckAiChatsAndApiFailsThenReturnErrorAndRecordError() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val patchError = Result.Error(-1, "Patch Error")
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchAiChats(any(), any())).thenReturn(patchError)
+
+        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, json))
+
+        assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, patchError)
     }
 }
