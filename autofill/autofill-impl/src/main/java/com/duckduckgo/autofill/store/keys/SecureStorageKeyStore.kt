@@ -49,11 +49,19 @@ import okio.ByteString.Companion.toByteString
  */
 interface SecureStorageKeyStore {
 
+    /**
+     * Stores or removes a key entry by name.
+     *
+     * Pass `null` for [keyValue] to remove the key.
+     */
     suspend fun updateKey(
         keyName: String,
         keyValue: ByteArray?,
     )
 
+    /**
+     * Retrieves a key entry by name, or `null` if not found.
+     */
     suspend fun getKey(keyName: String): ByteArray?
 
     /**
