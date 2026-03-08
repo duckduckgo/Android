@@ -29,6 +29,8 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.engine.SyncEntryUpdateRequest
+import com.duckduckgo.sync.api.engine.SyncEntryUpdateResponse
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
@@ -688,6 +690,69 @@ internal class SyncEngineTest {
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
+    @Test
+    fun whenEntryUpdatesExistThenTheyAreProcessed() {
+        val entryUpdateRequest = givenEntryUpdates(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
+        givenEntryUpdateSuccess(entryUpdateRequest)
+
+        val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patchEntries(entryUpdateRequest)
+        verify(syncApiClient).patch(bookmarksChanges)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenEntryUpdateSucceedsThenManagerOnEntryUpdateSuccessIsCalled() {
+        val entryUpdateRequest = SyncEntryUpdateRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
+        val entryUpdateManager = mock<DeletableDataManager>()
+        whenever(entryUpdateManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(entryUpdateManager.getEntryUpdates()).thenReturn(entryUpdateRequest)
+
+        val entryUpdateResponse = SyncEntryUpdateResponse(DUCK_AI_CHATS, listOf("abc"))
+        givenEntryUpdateSuccess(entryUpdateRequest, entryUpdateResponse)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(entryUpdateManager))
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(entryUpdateManager).onEntryUpdateSuccess(entryUpdateResponse)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenEntryUpdateFailsWithFeatureErrorThenManagerOnEntryUpdateErrorIsCalled() {
+        val entryUpdateRequest = SyncEntryUpdateRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
+        val entryUpdateManager = mock<DeletableDataManager>()
+        whenever(entryUpdateManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(entryUpdateManager.getEntryUpdates()).thenReturn(entryUpdateRequest)
+
+        givenEntryUpdateError(entryUpdateRequest, API_CODE.COUNT_LIMIT.code)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(entryUpdateManager))
+        givenNoProviders()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(entryUpdateManager).onEntryUpdateError(SyncErrorResponse(DUCK_AI_CHATS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenNoEntryUpdatesThenNormalSyncContinues() {
+        givenNoLocalChanges()
+        givenNoDeletions()
+        givenGetSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient, times(0)).patchEntries(any())
+        verify(syncApiClient).get(any(), any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())
@@ -879,6 +944,22 @@ internal class SyncEngineTest {
 
     private fun givenNoDeletions() {
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
+    }
+
+    private fun givenEntryUpdates(type: DeletableType, jsonString: String): SyncEntryUpdateRequest {
+        val entryUpdateRequest = SyncEntryUpdateRequest(type, jsonString)
+        val entryUpdateManager = FakeDeletableDataManager(type, patchUpdate = entryUpdateRequest)
+        whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(listOf(entryUpdateManager))
+        return entryUpdateRequest
+    }
+
+    private fun givenEntryUpdateSuccess(request: SyncEntryUpdateRequest, response: SyncEntryUpdateResponse? = null) {
+        val entryUpdateResponse = response ?: SyncEntryUpdateResponse(request.type, emptyList())
+        whenever(syncApiClient.patchEntries(request)).thenReturn(Success(entryUpdateResponse))
+    }
+
+    private fun givenEntryUpdateError(request: SyncEntryUpdateRequest, errorCode: Int) {
+        whenever(syncApiClient.patchEntries(request)).thenReturn(Result.Error(errorCode, "entry update failed"))
     }
 
     private fun givenChangesForType(
