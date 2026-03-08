@@ -38,10 +38,10 @@ class GemmaSearcherTest {
     }
 
     @Test
-    fun whenPromptBuiltThenIncludesRankingAndSynthesisInstructions() {
+    fun whenPromptBuiltThenIncludesRelevanceInstructions() {
         val prompt = testee.buildPrompt("query", entries(5))
-        assertTrue("Prompt should ask for ranking", prompt.contains("in order of relevance"))
-        assertTrue("Prompt should ask for synthesis", prompt.contains("summary"))
+        assertTrue("Prompt should ask for relevant pages", prompt.contains("relevant"))
+        assertTrue("Prompt should include chat template", prompt.contains("<start_of_turn>"))
     }
 
     private fun entries(count: Int): List<HistoryEntry.VisitedPage> =

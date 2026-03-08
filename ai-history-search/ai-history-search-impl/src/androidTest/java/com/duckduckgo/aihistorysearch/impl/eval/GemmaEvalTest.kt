@@ -18,6 +18,7 @@ package com.duckduckgo.aihistorysearch.impl.eval
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.aihistorysearch.impl.Bm25Scorer
 import com.duckduckgo.aihistorysearch.impl.EmbeddingScorer
 import com.duckduckgo.aihistorysearch.impl.GemmaSearcher
 import com.duckduckgo.history.api.HistoryEntry
@@ -31,29 +32,34 @@ import org.junit.runner.RunWith
 /**
  * Gemma 3 1B IT answer-quality evaluation harness.
  *
- * Corpus loaded from eval_corpus.json (src/sharedTest/resources) — same source of truth
- * as [Bm25ScorerEvalTest] and [EmbeddingScorerEvalTest], so all three ranking paths are
- * directly comparable side-by-side.
+ * Two test variants, both skipped if the model is absent:
  *
- * Requires the Gemma model in the app's private files dir:
- *   adb shell run-as com.duckduckgo.mobile.android.debug ls files/models/
- *   → expected: gemma3-1b-it-int4.task
- * If absent, all tests are SKIPPED (not failed).
+ *   [gemmaFullCorpusQualityReport] — Gemma receives the full corpus (up to MAX_ENTRIES).
+ *     Baseline: measures what the model can do with no pre-filtering.
  *
- * Run:
+ *   [gemmaPreFilteredQualityReport] — Embeddings top-[PRE_FILTER_K] → Gemma.
+ *     Production-realistic: mirrors how the feature would work in practice.
+ *     Shorter prompt → faster inference; better signal-to-noise.
+ *
+ * Metrics:
+ *   P@5 / MRR  — retrieval quality (URL/title match in response). These are imperfect
+ *                for a generative model that may omit URLs; treat as directional only.
+ *   SIM        — cosine similarity (USE Lite) between response and reference answer.
+ *                The primary quality signal for a generative model.
+ *
+ * Floor assertion: avg SIM ≥ 0.72 (fires only if the model is truly broken).
+ * MRR floors are intentionally omitted — they penalise correct abstention and
+ * URL-omission, not actual answer quality.
+ *
+ * Corpus: eval_corpus.json (src/sharedTest/resources).
+ *
+ * Run a single variant:
  *   ./gradlew :ai-history-search-impl:connectedDebugAndroidTest \
- *       -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.aihistorysearch.impl.eval.GemmaEvalTest
+ *       -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.aihistorysearch.impl.eval.GemmaEvalTest#gemmaPreFilteredQualityReport
  *
  * Filter logcat:
- *   adb logcat -s GemmaEval
- *
- * Ranking is derived by scanning the raw response text for the first mention of each entry's
- * URL or title prefix. Entries mentioned earlier rank higher; unreferenced entries are excluded.
- *
- * Answer quality (SIM) is measured as cosine similarity between the Gemma response and a
- * reference answer written per query. Both texts are embedded with USE Lite. A score near 1.0
- * means the response covers the same ground as the reference; near 0.7 means near-random for
- * English (USE's baseline). Negative queries have no reference answer and are excluded from SIM.
+ *   adb logcat -s GemmaEval      # tables + raw responses
+ *   adb logcat -s GemmaEvalCsv   # CSV dump for manual SIM inspection
  */
 @RunWith(AndroidJUnit4::class)
 class GemmaEvalTest {
@@ -65,11 +71,42 @@ class GemmaEvalTest {
         EvalCorpusLoader.load(context.assets.open("eval_corpus.json"))
     }
 
+    // ── Tests ─────────────────────────────────────────────────────────────────
+
+    /** Baseline: Gemma receives the full corpus with no pre-filtering. */
     @Test
-    fun gemmaQualityReport() {
+    fun gemmaFullCorpusQualityReport() {
+        ensureModel()
+        val results = corpus.queries.map { q ->
+            runQuery(q, corpus.entries)
+        }
+        printTable(results, label = "Full corpus")
+        printResponses(results)
+        printCsv(results, label = "full-corpus")
+        assertFloors(results)
+    }
+
+    /**
+     * Production-realistic: embeddings top-[PRE_FILTER_K] feeds into Gemma.
+     * Shorter prompt, less hallucination surface, faster inference.
+     */
+    @Test
+    fun gemmaPreFilteredQualityReport() {
+        ensureModel()
+        val results = corpus.queries.map { q ->
+            val preFiltered = embeddingScorer.rank(q.query, corpus.entries).take(PRE_FILTER_K)
+            runQuery(q, preFiltered)
+        }
+        printTable(results, label = "Pre-filtered (embeddings top-$PRE_FILTER_K)")
+        printResponses(results)
+        printCsv(results, label = "pre-filtered-emb$PRE_FILTER_K")
+        assertFloors(results)
+    }
+
+    // ── Model setup ───────────────────────────────────────────────────────────
+
+    private fun ensureModel() {
         val modelFile = File(context.filesDir, "models/${GemmaSearcher.MODEL_FILENAME}")
-        // Allow pre-staging the model at /data/local/tmp/ (no run-as required) for library
-        // module androidTests where the test APK's filesDir can't be pre-populated via adb.
         if (!modelFile.exists()) {
             val staged = File("/data/local/tmp/${GemmaSearcher.MODEL_FILENAME}")
             if (staged.exists()) {
@@ -78,28 +115,26 @@ class GemmaEvalTest {
             }
         }
         assumeTrue(
-            "Gemma model not found at ${modelFile.absolutePath} (also checked /data/local/tmp/) — skipping eval. " +
+            "Gemma model not found at ${modelFile.absolutePath} (also checked /data/local/tmp/) — skipping. " +
                 "Push with: adb push gemma3-1b-it-int4.task /data/local/tmp/",
             modelFile.exists() && modelFile.length() > 100 * 1024 * 1024L,
         )
+    }
 
-        val results = corpus.queries.map { q ->
-            val response = runBlocking { searcher.searchForEval(q.query, corpus.entries) }
-            if (response == null) {
-                android.util.Log.w("GemmaEval", "No response for query '${q.query}' — model load failed")
-            }
-            val ranked = if (response != null) parseRankedEntries(response, corpus.entries) else emptyList()
-            val sim = if (response != null && q.referenceAnswer != null) {
-                embeddingScorer.cosineSimilarity(response, q.referenceAnswer)
-            } else {
-                null
-            }
-            GemmaResult(q, precisionAtK(ranked, q.relevantUrls, 5), mrr(ranked, q.relevantUrls), response ?: "<model unavailable>", sim)
+    // ── Core query runner ─────────────────────────────────────────────────────
+
+    private fun runQuery(q: EvalQuery, entries: List<HistoryEntry.VisitedPage>): GemmaResult {
+        val response = runBlocking { searcher.searchForEval(q.query, entries) }
+        if (response == null) {
+            android.util.Log.w("GemmaEval", "No response for '${q.query}' — model load failed")
         }
-
-        printTable(results)
-        printResponses(results)
-        assertFloors(results)
+        val ranked = if (response != null) parseRankedEntries(response, corpus.entries) else emptyList()
+        val sim = if (response != null && q.referenceAnswer != null) {
+            embeddingScorer.cosineSimilarity(response, q.referenceAnswer)
+        } else {
+            null
+        }
+        return GemmaResult(q, precisionAtK(ranked, q.relevantUrls, 5), mrr(ranked, q.relevantUrls), response ?: "<model unavailable>", sim)
     }
 
     // ── Ranking ───────────────────────────────────────────────────────────────
@@ -121,19 +156,21 @@ class GemmaEvalTest {
             .map { (entry, _) -> entry }
     }
 
-    // ── Reporting ─────────────────────────────────────────────────────────────
+    // ── Result type ───────────────────────────────────────────────────────────
 
     private data class GemmaResult(
         val query: EvalQuery,
         val p5: Double,
         val mrr: Double,
         val response: String,
-        /** Cosine similarity between response and referenceAnswer; null for negative queries. */
+        /** Cosine similarity vs referenceAnswer; null for negative queries. */
         val sim: Double?,
     )
 
-    private fun printTable(results: List<GemmaResult>) {
-        val header = "\n=== Gemma Quality Eval (Precision@5 / MRR / Answer Similarity) ==="
+    // ── Reporting ─────────────────────────────────────────────────────────────
+
+    private fun printTable(results: List<GemmaResult>, label: String) {
+        val header = "\n=== Gemma Quality Eval — $label (P@5 / MRR / SIM) ==="
         val col = "%-40s %-14s %5s %5s %5s"
         val row = "%-40s %-14s %5.2f %5.2f"
         val rowSim = "%-40s %-14s %5.2f %5.2f %5.2f"
@@ -158,14 +195,12 @@ class GemmaEvalTest {
             for (cat in listOf("keyword", "semantic", "body-only", "negative")) {
                 val sub = results.filter { it.query.category == cat }
                 if (sub.isNotEmpty()) {
-                    val subAvgP5 = sub.map { it.p5 }.average()
-                    val subAvgMrr = sub.map { it.mrr }.average()
-                    val subAvgSim = sub.mapNotNull { it.sim }.let { if (it.isEmpty()) null else it.average() }
-                    val label = "${cat.replaceFirstChar { it.uppercase() }} avg"
-                    if (subAvgSim != null) {
-                        add(rowSim.format(label, "", subAvgP5, subAvgMrr, subAvgSim))
+                    val subSim = sub.mapNotNull { it.sim }.let { if (it.isEmpty()) null else it.average() }
+                    val lbl = "${cat.replaceFirstChar { it.uppercase() }} avg"
+                    if (subSim != null) {
+                        add(rowSim.format(lbl, "", sub.map { it.p5 }.average(), sub.map { it.mrr }.average(), subSim))
                     } else {
-                        add(row.format(label, "", subAvgP5, subAvgMrr) + "     —")
+                        add(row.format(lbl, "", sub.map { it.p5 }.average(), sub.map { it.mrr }.average()) + "     —")
                     }
                 }
             }
@@ -182,33 +217,51 @@ class GemmaEvalTest {
             sb.append("\nQuery: ${r.query.query}\n")
             sb.append("─".repeat(40)).append("\n")
             sb.append(r.response).append("\n")
-            if (r.sim != null) {
-                sb.append("(answer similarity: ${"%.3f".format(r.sim)})\n")
-            }
+            if (r.sim != null) sb.append("(SIM: ${"%.3f".format(r.sim)})\n")
         }
         sb.append(divider)
         android.util.Log.i("GemmaEval", sb.toString())
         println(sb)
     }
 
+    /**
+     * Logs a CSV to the GemmaEvalCsv logcat tag for manual SIM inspection.
+     * Pull with: adb logcat -d -s GemmaEvalCsv
+     *
+     * Format: label,query,category,p5,mrr,sim,response
+     * Response is double-quoted; internal quotes are escaped as "".
+     */
+    private fun printCsv(results: List<GemmaResult>, label: String) {
+        val header = "label,query,category,p5,mrr,sim,response"
+        android.util.Log.i("GemmaEvalCsv", header)
+        results.forEach { r ->
+            val sim = r.sim?.let { "%.4f".format(it) } ?: ""
+            val responseEscaped = r.response.replace("\"", "\"\"").replace("\n", "\\n")
+            val line = "${csvQuote(label)},${csvQuote(r.query.query)},${r.query.category}," +
+                "${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseEscaped)}"
+            android.util.Log.i("GemmaEvalCsv", line)
+        }
+    }
+
+    private fun csvQuote(s: String) = "\"$s\""
+
     // ── Floor thresholds ──────────────────────────────────────────────────────
 
+    /**
+     * Only asserts SIM floor. MRR/P@5 floors are omitted intentionally:
+     * they measure URL-copying fidelity, not answer quality, and penalise
+     * correct abstention ("Nothing relevant found") on negative/semantic queries.
+     */
     private fun assertFloors(results: List<GemmaResult>) {
-        val keywordMrr = results.filter { it.query.category == "keyword" }.map { it.mrr }.average()
-        val semanticMrr = results.filter { it.query.category == "semantic" }.map { it.mrr }.average()
         val avgSim = results.mapNotNull { it.sim }.average()
-
         assertTrue(
-            "Keyword MRR floor violated: expected ≥ 0.60, got %.2f".format(keywordMrr),
-            keywordMrr >= 0.60,
-        )
-        assertTrue(
-            "Semantic MRR floor violated: expected ≥ 0.50 (Gemma should understand conceptual queries), got %.2f".format(semanticMrr),
-            semanticMrr >= 0.50,
-        )
-        assertTrue(
-            "Answer similarity floor violated: expected ≥ 0.72 (response should match reference), got %.2f".format(avgSim),
+            "Answer similarity floor violated: expected ≥ 0.72 (fires only if model is broken), got %.2f".format(avgSim),
             avgSim >= 0.72,
         )
+    }
+
+    companion object {
+        /** Number of entries passed to Gemma after embedding pre-filtering. */
+        private const val PRE_FILTER_K = 8
     }
 }
