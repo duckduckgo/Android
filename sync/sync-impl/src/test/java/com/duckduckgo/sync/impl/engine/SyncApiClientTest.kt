@@ -20,9 +20,9 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
+import com.duckduckgo.sync.api.engine.SyncBulkDeletionRequest
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncDeletionRequest
-import com.duckduckgo.sync.api.engine.SyncPatchRequest
+import com.duckduckgo.sync.api.engine.SyncEntryUpdateRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.impl.API_CODE
@@ -174,7 +174,7 @@ internal class SyncApiClientTest {
     fun whenDeleteAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, "timestamp"))
+        val result = apiClient.bulkDelete(SyncBulkDeletionRequest(DUCK_AI_CHATS, "timestamp"))
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
         verifyNoInteractions(syncApiErrorRecorder)
@@ -186,7 +186,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.deleteAiChats(any(), any())).thenReturn(Result.Success(Unit))
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+        val result = apiClient.bulkDelete(SyncBulkDeletionRequest(DUCK_AI_CHATS, timestamp))
 
         assertTrue(result is Result.Success)
         verifyNoInteractions(syncApiErrorRecorder)
@@ -199,7 +199,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.deleteAiChats(any(), any())).thenReturn(deleteError)
 
-        val result = apiClient.delete(SyncDeletionRequest(DUCK_AI_CHATS, timestamp))
+        val result = apiClient.bulkDelete(SyncBulkDeletionRequest(DUCK_AI_CHATS, timestamp))
 
         assertTrue(result is Result.Error)
         verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, deleteError)
@@ -209,7 +209,7 @@ internal class SyncApiClientTest {
     fun whenPatchUpdateAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""))
+        val result = apiClient.patchEntries(SyncEntryUpdateRequest(DUCK_AI_CHATS, """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""))
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
         verifyNoInteractions(syncApiErrorRecorder)
@@ -219,7 +219,7 @@ internal class SyncApiClientTest {
     fun whenPatchUpdateAndRequestEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
 
-        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, ""))
+        val result = apiClient.patchEntries(SyncEntryUpdateRequest(DUCK_AI_CHATS, ""))
 
         assertEquals(result, Result.Error(reason = "Patch Updates Empty"))
     }
@@ -230,7 +230,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patchAiChats(any(), any())).thenReturn(Result.Success(Unit))
 
-        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, json))
+        val result = apiClient.patchEntries(SyncEntryUpdateRequest(DUCK_AI_CHATS, json))
 
         assertTrue(result is Result.Success)
     }
@@ -242,7 +242,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patchAiChats(any(), any())).thenReturn(patchError)
 
-        val result = apiClient.patchUpdate(SyncPatchRequest(DUCK_AI_CHATS, json))
+        val result = apiClient.patchEntries(SyncEntryUpdateRequest(DUCK_AI_CHATS, json))
 
         assertTrue(result is Result.Error)
         verify(syncApiErrorRecorder).record(DUCK_AI_CHATS, patchError)
