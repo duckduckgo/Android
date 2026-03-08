@@ -26,10 +26,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.SyncBulkDeletionResponse
+import com.duckduckgo.sync.api.engine.SyncEntryUpdateResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -144,5 +147,83 @@ class DuckChatSyncDataManagerTest {
         testee.onBulkDeleteError(error)
 
         verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenGetEntryUpdatesAndFeatureDisabledThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.getEntryUpdates()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetEntryUpdatesAndChatHistoryDisabledThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(false)
+
+        val result = testee.getEntryUpdates()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetEntryUpdatesAndNoPendingDeletionsThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+
+        val result = testee.getEntryUpdates()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetEntryUpdatesAndPendingDeletionsExistThenReturnsRequest() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("chat1", "chat2"))
+
+        val result = testee.getEntryUpdates()
+
+        assertNotNull(result)
+        assertEquals(DeletableType.DUCK_AI_CHATS, result?.type)
+        assertTrue(result?.jsonString?.contains("chat1") == true)
+        assertTrue(result?.jsonString?.contains("chat2") == true)
+    }
+
+    @Test
+    fun whenOnEntryUpdateSuccessThenRemovesOnlySentIds() = runTest {
+        val response = SyncEntryUpdateResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            entryIds = listOf("chat1", "chat2"),
+        )
+
+        testee.onEntryUpdateSuccess(response)
+
+        verify(duckChatSyncRepository).removePendingChatDeletions(setOf("chat1", "chat2"))
+    }
+
+    @Test
+    fun whenOnEntryUpdateErrorThenRepositoryIsNotCalled() = runTest {
+        val error = SyncErrorResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            featureSyncError = FeatureSyncError.INVALID_REQUEST,
+        )
+
+        testee.onEntryUpdateError(error)
+
+        verify(duckChatSyncRepository, never()).removePendingChatDeletions(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenOnBulkDeleteSuccessThenPendingQueueIsCleared() = runTest {
+        val response = SyncBulkDeletionResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            untilTimestamp = "2025-01-01T12:00:00Z",
+        )
+
+        testee.onBulkDeleteSuccess(response)
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
     }
 }
