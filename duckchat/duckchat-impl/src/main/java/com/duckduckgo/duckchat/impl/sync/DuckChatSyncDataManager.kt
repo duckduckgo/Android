@@ -21,7 +21,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
-import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -144,13 +143,12 @@ class DuckChatSyncDataManager @Inject constructor(
 
         logcat { "DuckChat-Sync: formatting entry update request for ${pendingIds.size} pending chat deletions" }
 
-        val now = DatabaseDateFormatter.millisIso8601().toString()
         val jsonArray = org.json.JSONArray()
         pendingIds.forEach { chatId ->
             jsonArray.put(
                 org.json.JSONObject().apply {
                     put("id", chatId)
-                    put("deleted", now)
+                    put("deleted", "true")
                 },
             )
         }
