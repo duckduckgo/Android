@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -100,6 +101,7 @@ class RealDuckChatTest {
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
     private val mockDuckChatDeleter: DuckChatDeleter = mock()
+    private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -137,6 +139,7 @@ class RealDuckChatTest {
                 mockDeviceSyncState,
                 cookiesManager,
                 mockDuckChatDeleter,
+                mockDuckChatSyncRepository,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1351,6 +1354,7 @@ class RealDuckChatTest {
 
         assertTrue(result)
         verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository).recordSingleChatDeletion("abc-123")
     }
 
     @Test
@@ -1395,6 +1399,7 @@ class RealDuckChatTest {
 
         assertFalse(result)
         verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository, never()).recordSingleChatDeletion(any())
     }
 
     companion object {

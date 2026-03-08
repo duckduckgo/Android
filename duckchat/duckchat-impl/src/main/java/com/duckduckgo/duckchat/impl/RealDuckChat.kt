@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -308,6 +309,7 @@ class RealDuckChat @Inject constructor(
     private val deviceSyncState: DeviceSyncState,
     private val cookiesManager: CookieManagerProvider,
     private val duckChatDeleter: DuckChatDeleter,
+    private val duckChatSyncRepository: DuckChatSyncRepository,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -463,7 +465,11 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun deleteChat(url: String): Boolean {
         val chatId = extractChatId(url) ?: return false
-        return duckChatDeleter.deleteChat(chatId)
+        val deleted = duckChatDeleter.deleteChat(chatId)
+        if (deleted) {
+            duckChatSyncRepository.recordSingleChatDeletion(chatId)
+        }
+        return deleted
     }
 
     override fun observeCloseEvent(
