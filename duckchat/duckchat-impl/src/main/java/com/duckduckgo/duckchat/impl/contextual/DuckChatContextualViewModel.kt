@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
@@ -541,9 +542,5 @@ class DuckChatContextualViewModel @Inject constructor(
         if (timeoutMs <= 0) return false
         val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
         return elapsedMs <= timeoutMs
-    }
-
-    companion object {
-        private const val CHAT_ID_PARAM = "chatID"
     }
 }

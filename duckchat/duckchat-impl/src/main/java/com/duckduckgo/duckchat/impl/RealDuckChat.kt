@@ -36,6 +36,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -850,7 +851,6 @@ class RealDuckChat @Inject constructor(
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
-        private const val CHAT_ID_PARAM = "chatID"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }

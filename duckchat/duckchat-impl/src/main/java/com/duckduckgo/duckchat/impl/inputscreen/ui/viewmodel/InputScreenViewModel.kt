@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -803,7 +804,6 @@ class InputScreenViewModel @AssistedInject constructor(
     companion object {
         const val DUCK_SCHEME = "duck"
         private const val CHAT_SUGGESTIONS_DEBOUNCE_MS = 150L
-        private const val CHAT_ID_PARAM = "chatID"
     }
 }
 
