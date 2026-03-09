@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.store.keys
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -46,6 +47,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi") // fake toggle store
 class RealSecureStorageKeyStoreTest {
 
     @get:Rule
