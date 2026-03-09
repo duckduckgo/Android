@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -29,8 +30,9 @@ import android.view.View
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.animation.doOnEnd
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -48,6 +50,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -76,6 +79,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var introAnimatorSet: AnimatorSet? = null
     private var outroAnimatorSet: AnimatorSet? = null
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
+    private var walkingDaxAnimatorSet: AnimatorSet? = null
+    private var walkingDaxDelayedRunnable: Runnable? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
 
@@ -279,9 +284,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
-    private fun playOutroAnimation(nextStep: OnboardingBackgroundStep) {
+    private fun playOutroAnimation(
+        nextStep: OnboardingBackgroundStep,
+        onAnimationStart: () -> Unit,
+        onAnimationEnd: () -> Unit,
+    ) {
         outroAnimatorSet = buildOutroAnimatorSet().apply { start() }
-        backgroundAnimator?.transitionTo(nextStep)
+        backgroundAnimator?.transitionTo(step = nextStep, onAnimationStarted = onAnimationStart, onAnimationEnd = onAnimationEnd)
     }
 
     override fun onViewCreated(
@@ -309,7 +318,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 when {
                     !state.hasPlayedIntroAnimation -> binding.root.doOnLayout { playIntroAnimation() }
                     state.hasPlayedIntroAnimation && state.currentDialog == null -> snapToIntroEndState()
-                    else -> configureDaxCta(state.currentDialog!!, state.showSplitOption)
+                    else -> {
+                        val dialog = state.currentDialog ?: return@onEach
+                        configureDaxCta(dialog, state.showSplitOption)
+                    }
                 }
                 // TODO: react to state.selectedAddressBarPosition for address bar toggle UI
             }
@@ -334,8 +346,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         introAnimatorSet?.cancel()
         outroAnimatorSet?.cancel()
         backgroundIntroAnimatorSet?.cancel()
+        walkingDaxAnimatorSet?.cancel()
+        walkingDaxAnimatorSet = null
+        walkingDaxDelayedRunnable?.let { binding.welcomeScreenWalkingDax.removeCallbacks(it) }
+        walkingDaxDelayedRunnable = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
+
+        binding.daxDialogCta.daxCtaContainer.animate().cancel()
 
         binding.logoAnimation.apply {
             removeAllAnimatorListeners()
@@ -343,6 +361,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             cancelAnimation()
         }
         binding.backgroundPrimary.cancelAnimation()
+        binding.welcomeScreenWalkingDax.cancelAnimation()
     }
 
     override fun onActivityResult(
@@ -376,13 +395,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean = false,
     ) {
         context?.let {
-            // var afterAnimation: () -> Unit = {}
             when (onboardingDialogType) {
-                INITIAL -> {
-                    playOutroAnimation(OnboardingBackgroundStep.Welcome)
-                }
-                INITIAL_REINSTALL_USER -> {
-                    playOutroAnimation(OnboardingBackgroundStep.Welcome)
+                INITIAL, INITIAL_REINSTALL_USER -> {
+                    val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
+                    playOutroAnimation(
+                        nextStep = OnboardingBackgroundStep.Welcome,
+                        onAnimationStart = {
+                            playWalkingDaxAnimation()
+                        },
+                        onAnimationEnd = {
+                            fadeInDialog {
+                                val animators = mutableListOf<Animator>(
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.root, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                )
+                                if (showSecondaryCta) {
+                                    animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                }
+                                AnimatorSet().apply {
+                                    playTogether(animators)
+                                    start()
+                                }
+                            }
+                        },
+                    )
                 }
 
                 SYNC_RESTORE -> {
@@ -406,6 +445,103 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
             }
         }
+    }
+
+    private fun showDialogWithoutAnimation(
+        onboardingDialogType: PreOnboardingDialogType,
+        showSplitOption: Boolean = false,
+    ) {
+        snapToIntroEndState()
+
+        when (onboardingDialogType) {
+            INITIAL, INITIAL_REINSTALL_USER -> {
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+
+                val showWalkingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = binding.welcomeScreenWalkingDax,
+                )
+                if (showWalkingDax) {
+                    with(binding.welcomeScreenWalkingDax) {
+                        cancelAnimation()
+                        progress = 1f
+                        alpha = 1f
+                        translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
+                    }
+                } else {
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
+                binding.daxDialogCta.welcomeContent.root.alpha = 1f
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                if (onboardingDialogType == INITIAL_REINSTALL_USER) {
+                    binding.daxDialogCta.secondaryCta.alpha = 1f
+                }
+            }
+
+            SYNC_RESTORE -> {
+                // TODO - SyncRestore: add dialog UI
+            }
+
+            COMPARISON_CHART -> {
+                // TODO
+            }
+
+            SKIP_ONBOARDING_OPTION -> {
+                // TODO
+            }
+
+            ADDRESS_BAR_POSITION -> {
+                // TODO
+            }
+
+            INPUT_SCREEN -> {
+                // TODO
+            }
+        }
+    }
+
+    private fun playWalkingDaxAnimation() {
+        walkingDaxDelayedRunnable = binding.welcomeScreenWalkingDax.postDelayed(WALKING_DAX_DELAY) {
+            walkingDaxAnimatorSet = AnimatorSet().apply {
+                interpolator = WELCOME_DAX_INTERPOLATOR
+                playTogether(
+                    ObjectAnimator.ofFloat(binding.welcomeScreenWalkingDax, View.ALPHA, 0f, 1f)
+                        .setDuration(WALKING_DAX_FADE_DURATION),
+                    ObjectAnimator.ofFloat(
+                        binding.welcomeScreenWalkingDax,
+                        View.TRANSLATION_X,
+                        -WALKING_DAX_START_X_DP.toPx().toFloat(),
+                        -WALKING_DAX_FINAL_X_DP.toPx().toFloat(),
+                    ).setDuration(WALKING_DAX_SLIDE_DURATION),
+                )
+                start()
+            }
+            binding.welcomeScreenWalkingDax.playAnimation()
+        }
+    }
+
+    private fun fadeInDialog(onAnimationEnd: () -> Unit) {
+        binding.daxDialogCta.root.isVisible = true
+        binding.daxDialogCta.daxCtaContainer.animate()
+            .alpha(1f)
+            .setDuration(DIALOG_FADE_IN_DURATION)
+            .setStartDelay(200L)
+            .withEndAction {
+                onAnimationEnd()
+            }
+            .start()
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
@@ -492,6 +628,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         private const val OUTRO_FADE_DURATION = 300L
 
+        private const val DIALOG_FADE_IN_DURATION = 400L
+        private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+
+        private const val WALKING_DAX_DELAY = 400L
+        private const val WALKING_DAX_FADE_DURATION = 100L
+        private const val WALKING_DAX_SLIDE_DURATION = 600L
+        private const val WALKING_DAX_START_X_DP = 48
+        private const val WALKING_DAX_FINAL_X_DP = 22
+
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+
+        private val WELCOME_DAX_INTERPOLATOR = PathInterpolator(0.33f, 0f, 0.67f, 1f)
     }
 }
