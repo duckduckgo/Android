@@ -258,19 +258,19 @@ class GemmaEvalTest {
         }
         val csv = sb.toString()
 
-        // 1. Write to filesDir, then copy to /data/local/tmp/ via UiAutomation shell (runs as
-        //    shell user which has write access). /data/local/tmp/ is world-readable and survives
-        //    APK uninstall — pull with: adb pull /data/local/tmp/<csvName> /tmp/
+        // 1. Write to filesDir, then copy to /sdcard/Download/ via UiAutomation shell (runs as
+        //    shell user). /sdcard/Download/ is world-readable, survives APK uninstall, and is
+        //    not cleaned by Gradle — pull with: adb pull /sdcard/Download/<csvName> /tmp/
         val appFile = File(context.filesDir, csvName)
         appFile.writeText(csv)
-        val dst = "/data/local/tmp/$csvName"
+        val dst = "/sdcard/Download/$csvName"
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("cp ${appFile.absolutePath} $dst").close()
             android.util.Log.i("GemmaEval", "CSV written: $dst")
             android.util.Log.i("GemmaEval", "Pull: adb pull $dst /tmp/$csvName")
         } catch (e: Exception) {
-            android.util.Log.w("GemmaEval", "Could not copy to /data/local/tmp (${e.message})")
+            android.util.Log.w("GemmaEval", "Could not copy to /sdcard/Download/ (${e.message})")
             android.util.Log.w("GemmaEval", "Pull (requires APK still installed): adb shell run-as ${context.packageName} cat files/$csvName > /tmp/$csvName")
         }
 
