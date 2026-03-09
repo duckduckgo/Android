@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowCo
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
@@ -53,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -82,6 +84,7 @@ class WelcomePageViewModelTest {
     )
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
+    private val mockDeviceInfo: DeviceInfo = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -96,6 +99,7 @@ class WelcomePageViewModelTest {
             mockAndroidBrowserConfigFeature,
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
+            mockDeviceInfo,
         )
     }
 
@@ -112,6 +116,7 @@ class WelcomePageViewModelTest {
             mockAndroidBrowserConfigFeature,
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
+            mockDeviceInfo,
         )
     }
 
@@ -370,6 +375,82 @@ class WelcomePageViewModelTest {
         }
 
     @Test
+    fun whenLoadingInitialDaxDialogAndDuckAiCopyEligibleThenShowInitialDialogWithDuckAiCopyEnabled() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockDeviceInfo.language).thenReturn("en")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInitialDialog(showDuckAiCopy = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenLoadingInitialDaxDialogAndDuckAiCopyNotEligibleThenShowInitialDialogWithDuckAiCopyDisabled() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(mockDeviceInfo.language).thenReturn("pl")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInitialDialog(showDuckAiCopy = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenLoadingInitialDaxDialogForReinstallAndDuckAiCopyEligibleThenShowReinstallDialogWithDuckAiCopyEnabled() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockDeviceInfo.language).thenReturn("en")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInitialReinstallUserDialog(showDuckAiCopy = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenLoadingInitialDaxDialogForReinstallAndDuckAiCopyNotEligibleThenShowReinstallDialogWithDuckAiCopyDisabled() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(mockDeviceInfo.language).thenReturn("pl")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.loadDaxDialog()
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInitialReinstallUserDialog(showDuckAiCopy = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenLoadingComparisonChartAndDuckAiCopyEligibleThenShowComparisonChartWithDuckAiCopyEnabled() = runTest {
+        whenever(mockDeviceInfo.language).thenReturn("en")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowComparisonChart(showDuckAiCopy = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenLoadingComparisonChartAndDuckAiCopyNotEligibleThenShowComparisonChartWithDuckAiCopyDisabled() = runTest {
+        whenever(mockDeviceInfo.language).thenReturn("pl")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.INITIAL)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowComparisonChart(showDuckAiCopy = false), awaitItem())
+        }
+    }
+
+    @Test
     fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenShowOnboardingSkippedAndSendPixel() =
         runTest {
             testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
@@ -379,6 +460,13 @@ class WelcomePageViewModelTest {
                 Assert.assertTrue(command is OnboardingSkipped)
             }
             verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+        }
+
+    @Test
+    fun givenSkipOnboardingDialogWhenOnPrimaryCtaClickedThenInputScreenEnabledByDefault() =
+        runTest {
+            testee.onPrimaryCtaClicked(PreOnboardingDialogType.SKIP_ONBOARDING_OPTION)
+            verify(mockDuckChat).setInputScreenUserSetting(true)
         }
 
     @Test
@@ -455,6 +543,32 @@ class WelcomePageViewModelTest {
 
             Assert.assertEquals(2, viewModel.getMaxPageCount())
         }
+
+    @Test
+    fun whenShowingInputScreenDialogAndDuckAiCopyEligibleThenShowInputScreenDialogWithDuckAiCopyEnabled() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDeviceInfo.language).thenReturn("en")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInputScreenDialog(showDuckAiCopy = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowingInputScreenDialogAndDuckAiCopyNotEligibleThenShowInputScreenDialogWithDuckAiCopyDisabled() = runTest {
+        mockAndroidBrowserConfigFeature.showInputScreenOnboarding().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockDeviceInfo.language).thenReturn("pl")
+        mockAndroidBrowserConfigFeature.onboardingDuckAiCopyUpdatesFeb26().setRawStoredState(Toggle.State(enable = true))
+
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        testee.commands.test {
+            Assert.assertEquals(ShowInputScreenDialog(showDuckAiCopy = false), awaitItem())
+        }
+    }
 
     @Test
     fun whenInputScreenDialogIsShownThenFireChooseSearchExperienceImpressionsUniquePixel() {

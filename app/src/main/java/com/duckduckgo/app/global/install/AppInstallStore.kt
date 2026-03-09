@@ -22,8 +22,12 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import logcat.LogPriority.INFO
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import logcat.LogPriority
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -44,7 +48,11 @@ fun AppInstallStore.daysInstalled(): Long {
     return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp)
 }
 
-class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
+class AppInstallSharedPreferences @Inject constructor(
+    private val context: Context,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : AppInstallStore {
     override var installTimestamp: Long
         get() = preferences.getLong(KEY_TIMESTAMP_UTC, 0L)
         set(timestamp) = preferences.edit { putLong(KEY_TIMESTAMP_UTC, timestamp) }
@@ -67,9 +75,11 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
-        logcat(INFO) { "recording installation timestamp" }
-        if (!hasInstallTimestampRecorded()) {
-            installTimestamp = System.currentTimeMillis()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            logcat(LogPriority.INFO) { "recording installation timestamp" }
+            if (!hasInstallTimestampRecorded()) {
+                installTimestamp = System.currentTimeMillis()
+            }
         }
     }
 

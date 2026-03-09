@@ -159,6 +159,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
             CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED.pixelName to PixelParameter.removeAtb(),
             CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED.pixelName to PixelParameter.removeAtb(),
+            CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
@@ -169,6 +171,15 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISMATCH.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISSING.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_KEY_MISSING.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
+            AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_INSTALL_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_UPDATE_VERIFIED_INSTALL.pixelName to PixelParameter.removeAtb(),
             DataStorePixelNames.DATA_STORE_MIGRATE_ENCRYPTED_GET_PREFERENCES_ORIGIN_FAILED.pixelName to PixelParameter.removeAtb(),
@@ -190,6 +201,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.GET_DESKTOP_BROWSER_DISMISSED.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

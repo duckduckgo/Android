@@ -164,6 +164,90 @@ class FreeTrialConversionWideEventTest {
     }
 
     @Test
+    fun `onDuckAiPaidPromptSubmitted records step and fires pixel when within first day`() = runTest {
+        val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(12)
+        val subscription = createSubscription(
+            startedAt = subscriptionStartedAt,
+            activeOffers = listOf(ActiveOfferType.TRIAL),
+        )
+
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
+        whenever(authRepository.getSubscription()).thenReturn(subscription)
+        whenever(authRepository.isFreeTrialActive()).thenReturn(true)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
+
+        freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+
+        verify(pixelSender).reportFreeTrialDuckAiPaidUsed("d1", "google")
+        verify(wideEventClient).flowStep(
+            wideEventId = 123L,
+            stepName = "duck_ai_paid_used",
+            success = true,
+        )
+    }
+
+    @Test
+    fun `onDuckAiPaidPromptSubmitted records step and fires pixel when after first day`() = runTest {
+        val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3)
+        val subscription = createSubscription(
+            startedAt = subscriptionStartedAt,
+            activeOffers = listOf(ActiveOfferType.TRIAL),
+        )
+
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
+        whenever(authRepository.getSubscription()).thenReturn(subscription)
+        whenever(authRepository.isFreeTrialActive()).thenReturn(true)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
+
+        freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+
+        verify(pixelSender).reportFreeTrialDuckAiPaidUsed("d2_to_d7", "google")
+        verify(wideEventClient).flowStep(
+            wideEventId = 123L,
+            stepName = "duck_ai_paid_used",
+            success = true,
+        )
+    }
+
+    @Test
+    fun `onDuckAiPaidPromptSubmitted does not record step or fire pixel if not in free trial`() = runTest {
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
+        whenever(authRepository.getSubscription()).thenReturn(createSubscription())
+        whenever(authRepository.isFreeTrialActive()).thenReturn(false)
+
+        freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+
+        verify(pixelSender, never()).reportFreeTrialDuckAiPaidUsed(any(), any())
+        verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `onDuckAiPaidPromptSubmitted only records wide event step once per flow but fires pixel each time`() = runTest {
+        val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(6)
+        val subscription = createSubscription(
+            startedAt = subscriptionStartedAt,
+            activeOffers = listOf(ActiveOfferType.TRIAL),
+        )
+
+        whenever(wideEventClient.getFlowIds(any())).thenReturn(Result.success(listOf(123L)))
+        whenever(authRepository.getSubscription()).thenReturn(subscription)
+        whenever(authRepository.isFreeTrialActive()).thenReturn(true)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(System.currentTimeMillis())
+
+        freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+        freeTrialConversionWideEvent.onDuckAiPaidPromptSubmitted()
+
+        verify(pixelSender, times(2)).reportFreeTrialDuckAiPaidUsed("d1", "google")
+        verify(wideEventClient).flowStep(
+            wideEventId = 123L,
+            stepName = "duck_ai_paid_used",
+            success = true,
+        )
+        verify(wideEventClient).getFlowIds(any())
+        verifyNoMoreInteractions(wideEventClient)
+    }
+
+    @Test
     fun `onVpnActivatedSuccessfully only records wide event step once per flow but fires pixel each time`() = runTest {
         val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(6)
         val subscription = createSubscription(

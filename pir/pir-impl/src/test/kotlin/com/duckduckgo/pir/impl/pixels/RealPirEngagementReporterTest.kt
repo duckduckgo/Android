@@ -18,11 +18,9 @@ package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.PirUserUtils
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.store.PirRepository
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +43,7 @@ class RealPirEngagementReporterTest {
     private lateinit var testee: RealPirEngagementReporter
 
     private val mockDispatcherProvider = coroutineRule.testDispatcherProvider
-    private val mockPirWorkHandler: PirWorkHandler = mock()
+    private val mockPirUserUtils: PirUserUtils = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirPixelSender: PirPixelSender = mock()
@@ -84,10 +82,10 @@ class RealPirEngagementReporterTest {
     fun setUp() {
         testee = RealPirEngagementReporter(
             dispatcherProvider = mockDispatcherProvider,
-            pirWorkHandler = mockPirWorkHandler,
             pirRepository = mockPirRepository,
             currentTimeProvider = mockCurrentTimeProvider,
             pirPixelSender = mockPirPixelSender,
+            pirUserUtils = mockPirUserUtils,
         )
     }
 
@@ -95,7 +93,7 @@ class RealPirEngagementReporterTest {
 
     @Test
     fun whenNotActiveUserThenDoesNotFireDauPixel() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(false))
+        whenever(mockPirUserUtils.isActiveUser()).thenReturn(false)
 
         testee.attemptFirePixel()
 
@@ -284,18 +282,8 @@ class RealPirEngagementReporterTest {
 
     @Test
     fun whenActiveUserAndNoProfileQueriesThenDoesNotFirePixels() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(true))
+        whenever(mockPirUserUtils.isActiveUser()).thenReturn(false)
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
-        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(oneDayLaterMs)
-
-        testee.attemptFirePixel()
-
-        verifyNoInteractions(mockPirPixelSender)
-    }
-
-    @Test
-    fun whenActiveUserAndPirWorkHandlerReturnsNullThenDoesNotFirePixels() = runTest {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(emptyFlow())
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(oneDayLaterMs)
 
         testee.attemptFirePixel()
@@ -376,7 +364,7 @@ class RealPirEngagementReporterTest {
     }
 
     private suspend fun setupActiveUser() {
-        whenever(mockPirWorkHandler.canRunPir()).thenReturn(flowOf(true))
+        whenever(mockPirUserUtils.isActiveUser()).thenReturn(true)
         whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(listOf(testProfileQuery))
     }
 }

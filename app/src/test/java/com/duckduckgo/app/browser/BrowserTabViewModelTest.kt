@@ -3130,6 +3130,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedAddWidgetOnboardingExperimentCtaButtonThenLaunchAddWidgetOnboardingExperimentCommand() {
+        val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
+    }
+
+    @Test
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
@@ -9066,6 +9074,27 @@ class BrowserTabViewModelTest {
             val event = awaitItem()
             assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
             assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionStatusSameButAccessTokenChangesOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        whenever(subscriptions.getAccessToken()).thenReturn("token_plus")
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val firstEvent = awaitItem()
+            assertEquals("authUpdate", firstEvent.subscriptionName)
+
+            whenever(subscriptions.getAccessToken()).thenReturn("token_pro")
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val secondEvent = awaitItem()
+            assertEquals("authUpdate", secondEvent.subscriptionName)
+
             cancelAndIgnoreRemainingEvents()
         }
     }

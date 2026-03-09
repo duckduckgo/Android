@@ -67,7 +67,7 @@ class StubStatisticsModule {
             override fun refreshSearchRetentionAtb() {
             }
 
-            override fun refreshDuckAiRetentionAtb() {
+            override fun refreshDuckAiRetentionAtb(metadata: Map<String, String?>) {
             }
         }
     }

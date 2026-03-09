@@ -16,26 +16,33 @@
 
 package com.duckduckgo.autofill.store.keys
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISMATCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_KEY_MISSING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
+import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -64,36 +71,35 @@ interface SecureStorageKeyStore {
     suspend fun canUseEncryption(): Boolean
 }
 
-class RealSecureStorageKeyStore constructor(
-    private val context: Context,
+class RealSecureStorageKeyStore(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
+    private val encryptedPreferencesFactory: EncryptedPreferencesFactory,
 ) : SecureStorageKeyStore {
 
     private val mutex: Mutex = Mutex()
     private val harmonyMutex: Mutex = Mutex()
+
+    private var initialUseHarmonyValue: Boolean? = null
+
+    private fun useHarmony(): Boolean = autofillFeature.useHarmony().isEnabled()
+
+    private fun readFromHarmony(): Boolean = autofillFeature.useHarmony().isEnabled() && autofillFeature.readFromHarmony().isEnabled()
+
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
             try {
                 mutex.withLock {
-                    EncryptedSharedPreferences.create(
-                        context,
-                        FILENAME,
-                        MasterKey.Builder(context)
-                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                            .build(),
-                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-                    )
+                    encryptedPreferencesFactory.create(FILENAME)
                 }
             } catch (e: Exception) {
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.error()),
+                    getPixelParams(throwable = e),
                     type = Daily(),
                 )
                 null
@@ -105,21 +111,29 @@ class RealSecureStorageKeyStore constructor(
         coroutineScope.async(dispatcherProvider.io()) {
             try {
                 harmonyMutex.withLock {
-                    if (autofillFeature.useHarmony().isEnabled()) {
-                        sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(FILENAME).also {
-                            if (it == null) {
-                                logcat { "autofill harmony preferences retrieval returned null" }
+                    useHarmony().let { useHarmony ->
+                        initialUseHarmonyValue = useHarmony
+                        if (useHarmony) {
+                            getEncryptedPreferences()?.let { legacyPreferences ->
+                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(legacyPreferences, FILENAME_V2).also {
+                                    if (it == null) {
+                                        logcat { "autofill harmony preferences retrieval returned null" }
+                                    }
+                                }
+                            } ?: run {
+                                logcat { "autofill legacy preferences retrieval returned null. Harmony will also return null" }
+                                null
                             }
+                        } else {
+                            null
                         }
-                    } else {
-                        null
                     }
                 }
             } catch (e: Exception) {
                 coroutineContext.ensureActive()
                 pixel.fire(
                     AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                    mapOf("error" to e.error()),
+                    getPixelParams(throwable = e),
                     type = Daily(),
                 )
                 logcat { "autofill harmony preferences retrieval failed: $e" }
@@ -141,8 +155,47 @@ class RealSecureStorageKeyStore constructor(
         keyValue: ByteArray?,
     ) {
         withContext(dispatcherProvider.io()) {
+            val legacyPrefs = getEncryptedPreferences().also {
+                if (it == null) {
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
+                    )
+                    throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                }
+            }
+
+            val harmonyPrefs = if (!useHarmony()) {
+                null
+            } else {
+                getHarmonyEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on write")
+                    }
+                }
+            }
+
+            // Guard: encryption keys are write-once. If we're trying to write a non-null value
+            // for a key that already exists in either store, something upstream read null
+            // incorrectly and is about to overwrite a valid key — block the write to prevent
+            // irreversible corruption.
+            if (keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName)) {
+                pixel.fire(
+                    AUTOFILL_STORE_KEY_ALREADY_EXISTS,
+                    getPixelParams(keyName = keyName),
+                    type = Daily(),
+                )
+                throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+            }
+
             runCatching {
-                getEncryptedPreferences()?.edit(commit = true) {
+                legacyPrefs?.edit(commit = true) {
                     if (keyValue == null) {
                         remove(keyName)
                     } else {
@@ -153,15 +206,15 @@ class RealSecureStorageKeyStore constructor(
                 ensureActive()
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    mapOf("error" to it.error()),
+                    getPixelParams(keyName = keyName, throwable = it),
                     type = Daily(),
                 )
-                throw it
+                throw SecureStorageException.InternalSecureStorageException("Error writing to legacy preferences", it)
             }
 
-            if (autofillFeature.useHarmony().isEnabled()) {
+            if (useHarmony()) {
                 runCatching {
-                    getHarmonyEncryptedPreferences()?.edit(commit = true) {
+                    harmonyPrefs?.edit(commit = true) {
                         if (keyValue == null) {
                             remove(keyName)
                         } else {
@@ -170,52 +223,177 @@ class RealSecureStorageKeyStore constructor(
                     }
                 }.getOrElse {
                     ensureActive()
+                    // Rollback legacy write so we don't cause a corrupted state with out of sync files
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                        mapOf("error" to it.error()),
+                        getPixelParams(keyName = keyName, throwable = it),
                         type = Daily(),
                     )
-                    throw it
+                    if (keyValue != null) {
+                        runCatching {
+                            legacyPrefs?.edit(commit = true) { remove(keyName) }
+                        }.onFailure { rollbackError ->
+                            pixel.fire(
+                                AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                                getPixelParams(keyName = keyName, throwable = rollbackError),
+                                type = Daily(),
+                            )
+                        }
+                    }
+                    throw SecureStorageException.InternalSecureStorageException("Error writing to harmony preferences", it)
                 }
             }
         }
+    }
+
+    /**
+     * Checks if the key already exists in either legacy or Harmony preferences.
+     * Used as a write guard to prevent overwriting write-once encryption keys.
+     */
+    private suspend fun keyAlreadyExists(legacyPrefs: SharedPreferences?, harmonyPrefs: SharedPreferences?, keyName: String): Boolean {
+        val legacyExists = try {
+            legacyPrefs?.getString(keyName, null) != null
+        } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            false
+        }
+        if (legacyExists) return true
+
+        if (useHarmony()) {
+            val harmonyExists = try {
+                harmonyPrefs?.getString(keyName, null) != null
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                false
+            }
+            if (harmonyExists) return true
+        }
+
+        return false
     }
 
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
-            val useHarmony = autofillFeature.useHarmony().isEnabled()
-            val preferences = if (useHarmony) {
-                getHarmonyEncryptedPreferences()
-            } else {
-                getEncryptedPreferences()
+            // Always read from legacy — source of truth
+
+            val legacyPrefs = getEncryptedPreferences().also {
+                if (it == null) {
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
+                        getPixelParams(keyName = keyName),
+                        type = Daily(),
+                    )
+                    if (readFromHarmony()) {
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
+                    }
+                }
             }
-            return@withContext runCatching {
-                preferences?.getString(keyName, null)?.run {
+
+            val harmonyPrefs = if (!useHarmony()) {
+                null
+            } else {
+                getHarmonyEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        if (readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony Preferences file is null on read")
+                        }
+                    }
+                }
+            }
+
+            val legacyValue: ByteArray? = runCatching {
+                legacyPrefs?.getString(keyName, null)?.run {
                     this.decodeBase64()?.toByteArray()
                 }
             }.getOrElse {
                 ensureActive()
-                val pixelName = if (useHarmony) {
-                    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED
-                } else {
-                    AUTOFILL_PREFERENCES_GET_KEY_FAILED
-                }
                 pixel.fire(
-                    pixelName,
-                    mapOf("error" to it.error()),
+                    AUTOFILL_PREFERENCES_GET_KEY_FAILED,
+                    getPixelParams(keyName = keyName, throwable = it),
                     type = Daily(),
                 )
                 throw it
             }
+
+            // When useHarmony is ON, read Harmony and compare for diagnostic pixels
+            if (useHarmony()) {
+                val harmonyValue = runCatching {
+                    harmonyPrefs?.getString(keyName, null)?.run {
+                        this.decodeBase64()?.toByteArray()
+                    }
+                }.getOrElse {
+                    ensureActive()
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED,
+                        getPixelParams(keyName = keyName, throwable = it),
+                        type = Daily(),
+                    )
+                    if (readFromHarmony()) {
+                        throw SecureStorageException.InternalSecureStorageException("Harmony preferences getKey failed")
+                    }
+                    null
+                }
+
+                when {
+                    harmonyPrefs != null && harmonyValue == null && legacyValue != null -> {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_KEY_MISSING,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        if (readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
+                        }
+                    }
+                    legacyPrefs != null && harmonyValue != null && legacyValue == null -> {
+                        pixel.fire(
+                            AUTOFILL_PREFERENCES_KEY_MISSING,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        if (readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Legacy key missing")
+                        }
+                    }
+                    harmonyValue != null && legacyValue != null && !harmonyValue.contentEquals(legacyValue) -> {
+                        pixel.fire(
+                            AUTOFILL_HARMONY_KEY_MISMATCH,
+                            getPixelParams(keyName = keyName),
+                            type = Daily(),
+                        )
+                        if (readFromHarmony()) {
+                            throw SecureStorageException.InternalSecureStorageException("Harmony key mismatch")
+                        }
+                    }
+                    readFromHarmony() -> {
+                        return@withContext harmonyValue
+                    }
+                }
+            }
+
+            return@withContext legacyValue
         }
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        if (autofillFeature.useHarmony().isEnabled()) {
-            getHarmonyEncryptedPreferences() != null
+        if (useHarmony()) {
+            getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
         } else {
             getEncryptedPreferences() != null
         }
+    }
+
+    private fun getPixelParams(keyName: String? = null, throwable: Throwable? = null) = buildMap {
+        keyName?.let { put("key", it) }
+        put("useHarmony", useHarmony().toString())
+        put("initialHarmonyValue", initialUseHarmonyValue.toString())
+        put("readFromHarmony", readFromHarmony().toString())
+        throwable?.error()?.let { put("error", it) }
     }
 
     private fun Throwable.error(): String {
@@ -227,6 +405,12 @@ class RealSecureStorageKeyStore constructor(
     }
 
     companion object {
+        /*
+         * Legacy EncryptedSharedPreferences file. Always used as the source of truth for reads.
+         * The original Harmony file with this name might be corrupted, which is why
+         * FILENAME_V2 is used as the Harmony destination instead.
+         */
         const val FILENAME = "com.duckduckgo.securestorage.store"
+        private const val FILENAME_V2 = "${FILENAME}_v2"
     }
 }

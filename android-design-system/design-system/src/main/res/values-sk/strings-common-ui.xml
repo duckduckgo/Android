@@ -37,4 +37,7 @@
     <string name="alwaysOn">Vždy zapnuté</string>
     <string name="on">Zapnuté</string>
     <string name="off">Vypnuté</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Zistite viac</string>
 </resources>

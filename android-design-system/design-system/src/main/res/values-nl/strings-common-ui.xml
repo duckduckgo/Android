@@ -37,4 +37,7 @@
     <string name="alwaysOn">Altijd aan</string>
     <string name="on">Aan</string>
     <string name="off">Uit</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Meer informatie</string>
 </resources>

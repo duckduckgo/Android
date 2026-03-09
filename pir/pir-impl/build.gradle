@@ -37,8 +37,10 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
+    implementation project(':remote-messaging-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
+    implementation project(':user-agent-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"

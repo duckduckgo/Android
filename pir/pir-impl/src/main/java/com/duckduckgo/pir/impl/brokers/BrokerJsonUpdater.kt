@@ -24,8 +24,10 @@ import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
@@ -71,8 +73,17 @@ class RealBrokerJsonUpdater @Inject constructor(
                     logcat { "PIR-update: Main config is new." }
                     it.body()?.let { config ->
                         logcat { "PIR-update: Main config $config." }
-                        checkUpdatesFromMainConfig(config)
-                        pirRepository.updateMainEtag(config.etag)
+                        try {
+                            checkUpdatesFromMainConfig(config)
+                            pirRepository.updateMainEtag(config.etag)
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Throwable) {
+                            logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
+                            val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
+                            pixelSender.reportDownloadBrokerJsonFailure(message)
+                            return@withContext false
+                        }
                     }
                 } else {
                     logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }
@@ -83,7 +94,8 @@ class RealBrokerJsonUpdater @Inject constructor(
             true
         }.getOrElse {
             logcat(ERROR) { "PIR-update: Json update failed to complete due to: $it" }
-            pixelSender.reportDownloadMainConfigFailure()
+            val message = it.asLog().sanitize() ?: it.message ?: "Unknown error"
+            pixelSender.reportDownloadMainConfigFailure(message)
             false
         }
     }
@@ -110,13 +122,33 @@ class RealBrokerJsonUpdater @Inject constructor(
 
         val updatedJsons = jsonEtagsFromConfig.toSet() - existingEtags.toSet()
 
-        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
-
         if (updatedJsons.isNotEmpty()) {
             logcat { "PIR-update: Downloading updated broker json files: $updatedJsons" }
             brokerDataDownloader.downloadBrokerData(updatedJsons.map { it.fileName })
         } else {
             logcat { "PIR-update: No broker json files to update." }
         }
+
+        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
+    }
+
+    private fun String.sanitize(): String? {
+        // if we fail for whatever reason, we don't include the stack trace
+        return runCatching {
+            val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+            val phoneRegex = Regex("\\b(?:\\d[\\s()-]?){6,14}\\b") // This regex matches common phone number formats
+            val phoneRegex2 = Regex("\\b\\+?\\d[- (]*\\d{3}[- )]*\\d{3}[- ]*\\d{4}\\b") // enhanced to redact also other phone number formats
+            val urlRegex = Regex("\\b(?:https?://|www\\.)\\S+\\b")
+            val ipv4Regex = Regex("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")
+
+            var sanitizedStackTrace = this
+            sanitizedStackTrace = sanitizedStackTrace.replace(urlRegex, "[REDACTED_URL]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(emailRegex, "[REDACTED_EMAIL]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex2, "[REDACTED_PHONE]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex, "[REDACTED_PHONE]")
+            sanitizedStackTrace = sanitizedStackTrace.replace(ipv4Regex, "[REDACTED_IPV4]")
+
+            return sanitizedStackTrace
+        }.getOrNull()
     }
 }

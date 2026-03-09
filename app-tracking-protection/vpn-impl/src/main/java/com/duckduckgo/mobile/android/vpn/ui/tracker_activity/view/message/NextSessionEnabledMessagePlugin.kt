@@ -35,6 +35,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_NEXT_SESSION,
+    featureName = "pluginNextSessionEnabledMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class NextSessionEnabledMessagePlugin @Inject constructor(
     private val vpnStore: VpnStore,

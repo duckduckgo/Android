@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
@@ -151,11 +152,12 @@ class RealDuckChatJSHelper @Inject constructor(
                 }
 
             REPORT_METRIC -> {
-                ReportMetric
-                    .fromValue(data?.optString("metricName"))
-                    ?.let { reportMetric ->
-                        duckChatPixels.sendReportMetricPixel(reportMetric)
-                    }
+                val reportMetric = ReportMetric.fromValue(data?.optString("metricName"))
+                val modelTier = ModelTier.fromValue(data?.optString("modelTier"))
+
+                reportMetric?.let {
+                    duckChatPixels.sendReportMetricPixel(it, modelTier)
+                }
                 null
             }
 
@@ -222,7 +224,7 @@ class RealDuckChatJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
-    private fun getAIChatNativeConfigValues(
+    private suspend fun getAIChatNativeConfigValues(
         featureName: String,
         method: String,
         id: String,
@@ -234,7 +236,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
-                put(SUPPORTS_NATIVE_CHAT_INPUT, false)
+                put(SUPPORTS_NATIVE_CHAT_INPUT, dataStore.isNativeInputFieldUserSettingEnabled())
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())

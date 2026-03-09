@@ -92,6 +92,11 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.syncDownloads()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.downloads_activity_menu, menu)
         return true
