@@ -910,6 +910,29 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `onConfigChanged clears dedup state when feature disabled`() {
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(state)
+
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+
+        // Disable feature — should clear dedup state
+        configureFeature(enabled = false)
+        manager.onConfigChanged()
+
+        // Re-enable and re-create state
+        org.mockito.Mockito.reset(repository)
+        configureFeature()
+        val freshState = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
+        stubPixelStates(freshState)
+
+        // Same tab + same source — must NOT be deduplicated (dedup was cleared)
+        manager.handleWebEvent(webEventData("test"), "tab1")
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
     fun `onConfigChanged does not re-register existing pixel`() {
         val existingState = pixelState("webTelemetry_testPixel1", mapOf("count" to 3))
         stubPixelStates(existingState)

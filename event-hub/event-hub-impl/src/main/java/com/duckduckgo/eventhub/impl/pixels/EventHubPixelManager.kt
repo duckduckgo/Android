@@ -195,6 +195,8 @@ class RealEventHubPixelManager @Inject constructor(
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 schedulerJob.cancel()
                 repository.deleteAllPixelStates()
+                dedupSeen.clear()
+                webViewCurrentUrl.clear()
                 return@launch
             }
 
