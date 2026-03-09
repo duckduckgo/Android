@@ -51,6 +51,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_MODE_
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.InputMode.*
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -475,6 +476,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 INPUT_MODE_DEMO -> {
                     TransitionManager.beginDelayedTransition(binding.longDescriptionContainer, AutoTransition())
                     binding.daxDialogCta.descriptionCta.gone()
+                    binding.daxDialogCta.primaryCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
                     binding.daxDialogCta.dialogTextCta.text = ""
                     binding.daxDialogCta.comparisonChart.root.gone()
@@ -491,16 +493,50 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     val ctaText = it.getString(R.string.preOnboardingInputModeDemoTitle)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.primaryCta.gone()
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.inputModeDemo.root.show()
+                    binding.daxDialogCta.inputModeDemo.root.alpha = MIN_ALPHA
+
+                    configureInputModeDemoField(inputMode = SEARCH)
+                    binding.daxDialogCta.inputModeDemo.inputModeDemoSwitch.addOnTabSelectedListener(
+                        object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+                            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                                TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                                configureInputModeDemoField(inputMode = if (tab.position == 0) SEARCH else CHAT)
+                            }
+                            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
+                        },
+                    )
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.inputModeDemo.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
             }
             binding.sceneBg.setOnClickListener { afterAnimation() }
             binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
+        }
+    }
+
+    private fun configureInputModeDemoField(inputMode: InputMode) {
+        val demoBinding = binding.daxDialogCta.inputModeDemo
+
+        when (inputMode) {
+            SEARCH -> {
+                demoBinding.inputText.minLines = 1
+                demoBinding.inputText.maxLines = 1
+                demoBinding.inputText.setHint(R.string.preOnboardingInputModeDemoSearchHint)
+                demoBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_find_search_24)
+            }
+            CHAT -> {
+                demoBinding.inputText.minLines = 3
+                demoBinding.inputText.maxLines = 3
+                demoBinding.inputText.setHint(R.string.preOnboardingInputModeDemoChatHint)
+                demoBinding.inputModeDemoActionIcon.setImageResource(CommonR.drawable.ic_arrow_right_24)
+            }
         }
     }
 
@@ -654,6 +690,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 }
         }
     }
+
+    private enum class InputMode { SEARCH, CHAT }
 
     companion object {
         private const val MIN_ALPHA = 0f
