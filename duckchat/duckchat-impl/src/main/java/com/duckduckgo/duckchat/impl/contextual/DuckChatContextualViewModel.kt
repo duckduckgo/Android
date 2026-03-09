@@ -270,7 +270,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
@@ -612,8 +611,8 @@ class DuckChatContextualViewModel @Inject constructor(
         val currentState = _viewState.value
         if (currentState.sheetMode != SheetMode.INPUT) return
 
-        if (duckChatInternal.isAutomaticContextAttachmentEnabled()){
-            viewModelScope.launch (dispatchers.main()) {
+        if (duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            viewModelScope.launch(dispatchers.main()) {
                 logcat { "Duck.ai: requesting page context after main browser page change" }
                 commandChannel.trySend(Command.RequestPageContext)
             }
