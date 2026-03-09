@@ -21,7 +21,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground">
+    android:background="?attr/selectableItemBackground"
+    tools:ignore="Overdraw">
 
     <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.MultiAppsIcon
         android:id="@+id/activity_apps_image"
