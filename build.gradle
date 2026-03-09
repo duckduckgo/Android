@@ -175,6 +175,18 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+// Develocity test retry configuration to detect flaky tests
+def isCI = System.getenv('CI') != null
+subprojects {
+    tasks.withType(Test).configureEach {
+        develocity.testRetry {
+            maxRetries = isCI ? 1 : 0
+            maxFailures = 5
+            failOnPassedAfterRetry = true
+        }
+    }
+}
+
 fladle {
     configs {
         serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
@@ -193,6 +205,8 @@ fladle {
                     ["model": "Pixel2.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
+            // retry once, if it succeeds it will be reported as a flaky test
+            flakyTestAttempts.set(1)
         }
     }
 }
