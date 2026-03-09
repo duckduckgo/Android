@@ -146,6 +146,8 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri = request.url
+        val documentUrlString = documentUri.toString()
+        val urlString = url.toString()
 
         if (!checkMaliciousAfterHttpsUpgrade) {
             maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
@@ -155,14 +157,14 @@ class WebViewRequestInterceptor(
             }
         }
 
-        if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
+        if (requestFilterer.shouldFilterOutRequest(request, documentUrlString)) return WebResourceResponse(null, null, null)
 
-        adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
+        adClickManager.detectAdClick(urlString, request.isForMainFrame)
 
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(urlString, getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -196,7 +198,7 @@ class WebViewRequestInterceptor(
         if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(urlString, getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -211,9 +213,9 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString())) {
-            val isContentBlockingException = contentBlocking.isAnException(documentUri.toString())
-            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUri.toString(), url.toString())
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUrlString, urlString)) {
+            val isContentBlockingException = contentBlocking.isAnException(documentUrlString)
+            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
             val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)
 
             if (!isContentBlockingException && !isInTrackerAllowList && !isUserAllowlisted) {
