@@ -16,10 +16,12 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.eventhub.impl.EventHubFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -50,10 +52,14 @@ class RealEventHubPixelManagerTest {
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
     private val foregroundState = FakeAppForegroundStateProvider()
-    private val eventHubFeature: EventHubFeature = mock()
-    private val selfToggle: Toggle = mock()
+    private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
+
+    @SuppressLint("DenyListedApi")
+    private fun configureFeature(enabled: Boolean = true, settings: String? = fullConfig) {
+        eventHubFeature.self().setRawStoredState(Toggle.State(enable = enabled, settings = settings))
+    }
 
     private lateinit var manager: RealEventHubPixelManager
 
@@ -89,9 +95,7 @@ class RealEventHubPixelManagerTest {
 
     @Before
     fun setup() {
-        whenever(eventHubFeature.self()).thenReturn(selfToggle)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        configureFeature()
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
@@ -196,7 +200,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(singleBucketConfig)
+        configureFeature(settings = singleBucketConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -242,7 +246,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent ignores events when feature disabled`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         manager.handleWebEvent(webEventData("test"), "")
 
@@ -359,7 +363,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
+        configureFeature(settings = twoSourceConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -391,7 +395,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -594,7 +598,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(twoSourceConfig)
+        configureFeature(settings = twoSourceConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -734,7 +738,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(configWithGap)
+        configureFeature(settings = configWithGap)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -815,7 +819,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(disabledConfig)
+        configureFeature(settings = disabledConfig)
 
         manager.checkPixels()
 
@@ -855,7 +859,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
+        configureFeature(settings = disabledPixelConfig)
 
         manager.checkPixels()
 
@@ -873,7 +877,7 @@ class RealEventHubPixelManagerTest {
         stubPixelStates(state)
         timeProvider.time = 3000L
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         manager.checkPixels()
 
@@ -897,7 +901,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged deletes all when feature disabled`() {
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         manager.onConfigChanged()
 
@@ -933,7 +937,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(disabledPixelConfig)
+        configureFeature(settings = disabledPixelConfig)
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
@@ -947,7 +951,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged treats absent feature as disabled`() {
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         manager.onConfigChanged()
 
@@ -956,7 +960,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `onConfigChanged with null settings does not register any pixels`() {
-        whenever(selfToggle.getSettings()).thenReturn(null)
+        configureFeature(settings = null)
 
         manager.onConfigChanged()
 
@@ -1001,7 +1005,7 @@ class RealEventHubPixelManagerTest {
         coroutineTestRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
         manager.onConfigChanged()
 
         verify(repository).deleteAllPixelStates()
@@ -1043,7 +1047,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `handleWebEvent uses stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1058,7 +1062,7 @@ class RealEventHubPixelManagerTest {
 
         // Change live config to different buckets
         val changedConfig = configWithBuckets(*changedBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(changedConfig)
+        configureFeature(settings = changedConfig)
 
         manager.handleWebEvent(webEventData("evt"), "")
 
@@ -1072,7 +1076,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `handleWebEvent uses stored config source, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1102,7 +1106,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(changedSourceConfig)
+        configureFeature(settings = changedSourceConfig)
 
         // Event matches stored source ("evt"), not live source ("different_source")
         manager.handleWebEvent(webEventData("evt"), "")
@@ -1115,7 +1119,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `handleWebEvent ignores event matching only live config source`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1145,7 +1149,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(changedSourceConfig)
+        configureFeature(settings = changedSourceConfig)
 
         // "new_source" matches live config but NOT stored config — should be ignored
         manager.handleWebEvent(webEventData("new_source"), "")
@@ -1156,7 +1160,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `checkPixels fires pixel using stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1180,7 +1184,7 @@ class RealEventHubPixelManagerTest {
 
         // Change live config to different buckets before firing
         val changedConfig = configWithBuckets(*changedBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(changedConfig)
+        configureFeature(settings = changedConfig)
 
         manager.checkPixels()
 
@@ -1201,7 +1205,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1240,7 +1244,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
+        configureFeature(settings = changedPeriodConfig)
 
         manager.checkPixels()
 
@@ -1261,7 +1265,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `new period after firing uses latest config, not stored config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1300,7 +1304,7 @@ class RealEventHubPixelManagerTest {
                 }
             }
         """.trimIndent()
-        whenever(selfToggle.getSettings()).thenReturn(changedPeriodConfig)
+        configureFeature(settings = changedPeriodConfig)
 
         manager.checkPixels()
 
@@ -1372,7 +1376,7 @@ class RealEventHubPixelManagerTest {
 
         // Step 1: config [1] loads — both pixels registered with 60s/120s periods
         val config1 = twoPixelConfig(60, 120, buckets)
-        whenever(selfToggle.getSettings()).thenReturn(config1)
+        configureFeature(settings = config1)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1395,7 +1399,7 @@ class RealEventHubPixelManagerTest {
         // Step 2: config [2] loads — pixels A and B still use config [1]
         org.mockito.Mockito.reset(repository, pixel)
         val config2 = twoPixelConfig(90, 180, buckets)
-        whenever(selfToggle.getSettings()).thenReturn(config2)
+        configureFeature(settings = config2)
 
         // Simulate accumulated state on both pixels
         val stateA1WithCount = stateA1.copy(params = mutableMapOf("count" to ParamState(2)))
@@ -1440,7 +1444,7 @@ class RealEventHubPixelManagerTest {
         // Step 4: config [3] loads — pixel A on [2], pixel B still on [1]
         org.mockito.Mockito.reset(repository, pixel)
         val config3 = twoPixelConfig(45, 300, buckets)
-        whenever(selfToggle.getSettings()).thenReturn(config3)
+        configureFeature(settings = config3)
         stubPixelStates(newStateA2, updatedB)
         manager.onConfigChanged()
         org.mockito.Mockito.reset(repository, pixel)
@@ -1636,14 +1640,13 @@ class RealEventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
         manager.handleWebEvent(webEventData("test"), "tab1")
         verify(repository, never()).savePixelState(any())
 
         org.mockito.Mockito.reset(repository)
         stubPixelStates(state)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        configureFeature()
         manager.onConfigChanged()
 
         manager.handleWebEvent(webEventData("test"), "tab1")
@@ -1749,7 +1752,7 @@ class RealEventHubPixelManagerTest {
     fun `config state persists across fire button`() {
         // Pixel was registered with specific config snapshot — fire button must not erase it
         val originalConfig = configWithBuckets(*originalBuckets)
-        whenever(selfToggle.getSettings()).thenReturn(originalConfig)
+        configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1773,7 +1776,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `multi-pixel state all persists across fire button`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1945,7 +1948,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `onConfigChanged cancels all timers when feature disabled - no pixel fires after delay`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -1959,7 +1962,7 @@ class RealEventHubPixelManagerTest {
 
         verify(repository, times(2)).savePixelState(any())
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
         manager.onConfigChanged()
 
         org.mockito.Mockito.reset(pixel)
@@ -2016,7 +2019,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `checkPixels does not reschedule timers when feature disabled`() {
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         manager.checkPixels()
 
@@ -2082,7 +2085,7 @@ class RealEventHubPixelManagerTest {
     @Test
     fun `multi-pixel timers are scheduled independently with correct delays`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
-        whenever(selfToggle.getSettings()).thenReturn(twoPixelConf)
+        configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
@@ -2109,7 +2112,7 @@ class RealEventHubPixelManagerTest {
         manager.onConfigChanged()
         coroutineTestRule.testScope.testScheduler.runCurrent()
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         coroutineTestRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
@@ -2145,14 +2148,13 @@ class RealEventHubPixelManagerTest {
         coroutineTestRule.testScope.testScheduler.runCurrent()
         verify(repository).savePixelState(any())
 
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
         manager.onConfigChanged()
         coroutineTestRule.testScope.testScheduler.runCurrent()
         verify(repository).deleteAllPixelStates()
 
         org.mockito.Mockito.reset(repository)
-        whenever(selfToggle.isEnabled()).thenReturn(true)
-        whenever(selfToggle.getSettings()).thenReturn(fullConfig)
+        configureFeature()
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
         manager.onConfigChanged()
@@ -2231,7 +2233,7 @@ class RealEventHubPixelManagerTest {
         verify(repository).savePixelState(any())
 
         // Disable feature before timer fires
-        whenever(selfToggle.isEnabled()).thenReturn(false)
+        configureFeature(enabled = false)
         manager.onConfigChanged()
         coroutineTestRule.testScope.testScheduler.runCurrent()
 
