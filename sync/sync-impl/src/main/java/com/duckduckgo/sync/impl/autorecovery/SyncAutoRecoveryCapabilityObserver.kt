@@ -19,16 +19,18 @@ package com.duckduckgo.sync.impl.autorecovery
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.FDROID
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.persistent.storage.api.PersistentStorage
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability.AvailableEncrypted
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability.AvailableUnencrypted
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability.BuildTypeUnsupported
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability.Unavailable
+import com.duckduckgo.persistentstorage.api.PersistentStorage
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability.Available
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability.Unavailable
+import com.duckduckgo.persistentstorage.api.PersistentStorageKey
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.autorecovery.SyncPersistentStorageKeys.DeriskTest
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -52,12 +54,16 @@ import javax.inject.Inject
 class SyncAutoRecoveryCapabilityObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
     private val syncFeature: SyncFeature,
     private val persistentStorage: PersistentStorage,
     private val pixel: Pixel,
 ) : PrivacyConfigCallbackPlugin {
 
     override fun onPrivacyConfigDownloaded() {
+        // Block Store de-risking not relevant for F-Droid (no Play Services)
+        if (appBuildConfig.flavor == FDROID) return
+
         appCoroutineScope.launch(dispatcherProvider.io()) {
             runCapabilityDetection()
         }
@@ -77,12 +83,6 @@ class SyncAutoRecoveryCapabilityObserver @Inject constructor(
 
         // Now check availability (this touches Block Store API)
         val availability = checkAvailability() ?: return
-
-        // For unsupported build types (e.g., F-Droid), exit without any pixels
-        if (availability is BuildTypeUnsupported) {
-            logcat { "Sync-Recovery: build type does not support persistent storage, skipping" }
-            return
-        }
 
         // Fire the availability pixel
         fireAvailabilityPixel(availability)
@@ -122,21 +122,18 @@ class SyncAutoRecoveryCapabilityObserver @Inject constructor(
 
     private fun fireAvailabilityPixel(availability: PersistentStorageAvailability) {
         when (availability) {
-            is AvailableEncrypted -> {
-                logcat { "Sync-Recovery: persistent storage available with E2E encryption" }
-                pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY, type = Daily())
-            }
-            is AvailableUnencrypted -> {
-                logcat { "Sync-Recovery: persistent storage available without E2E encryption" }
-                pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_UNENCRYPTED_DAILY, type = Daily())
+            is Available -> {
+                if (availability.isEndToEndEncryptionSupported) {
+                    logcat { "Sync-Recovery: persistent storage available with E2E encryption" }
+                    pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY, type = Daily())
+                } else {
+                    logcat { "Sync-Recovery: persistent storage available without E2E encryption" }
+                    pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_UNENCRYPTED_DAILY, type = Daily())
+                }
             }
             is Unavailable -> {
                 logcat { "Sync-Recovery: persistent storage unavailable" }
                 pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_UNAVAILABLE_DAILY, type = Daily())
-            }
-            is BuildTypeUnsupported -> {
-                // No pixel for unsupported build type - this code path shouldn't be reached
-                // as we return early in runCapabilityDetection()
             }
         }
     }
@@ -144,9 +141,9 @@ class SyncAutoRecoveryCapabilityObserver @Inject constructor(
     private suspend fun write() {
         try {
             logcat { "Sync-Recovery: attempting to write to persistent storage..." }
-            val testValue = "${TEST_VALUE_PREFIX}${System.currentTimeMillis()}"
+            val testValue = "$TEST_VALUE_PREFIX${System.currentTimeMillis()}"
 
-            persistentStorage.write(TEST_KEY, testValue)
+            persistentStorage.store(DeriskTest, testValue.toByteArray(Charsets.UTF_8))
                 .onSuccess {
                     logcat { "Sync-Recovery: write success" }
                     pixel.fire(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_WRITE_SUCCESS_DAILY, type = Daily())
@@ -166,8 +163,10 @@ class SyncAutoRecoveryCapabilityObserver @Inject constructor(
         try {
             logcat { "Sync-Recovery: attempting to read from persistent storage..." }
 
-            persistentStorage.read(TEST_KEY)
-                .onSuccess { readValue ->
+            persistentStorage.retrieve(DeriskTest)
+                .onSuccess { readBytes ->
+                    val readValue = readBytes?.toString(Charsets.UTF_8)
+
                     val isValid = readValue == null || readValue.startsWith(TEST_VALUE_PREFIX)
                     if (isValid) {
                         logcat { "Sync-Recovery: read success (value=${if (readValue != null) "${readValue.length} chars" else "null"})" }
@@ -189,7 +188,14 @@ class SyncAutoRecoveryCapabilityObserver @Inject constructor(
     }
 
     companion object {
-        private const val TEST_KEY = "com.duckduckgo.sync.derisk.test"
         private const val TEST_VALUE_PREFIX = "derisk_test_"
     }
+}
+
+object SyncPersistentStorageKeys {
+
+    object DeriskTest : PersistentStorageKey(
+        key = "com.duckduckgo.sync.derisk.test",
+        shouldBackupToCloud = false,
+    )
 }

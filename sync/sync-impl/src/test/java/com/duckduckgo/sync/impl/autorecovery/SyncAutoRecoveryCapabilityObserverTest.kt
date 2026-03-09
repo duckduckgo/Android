@@ -18,11 +18,13 @@ package com.duckduckgo.sync.impl.autorecovery
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.persistent.storage.api.PersistentStorage
-import com.duckduckgo.persistent.storage.api.PersistentStorageAvailability
+import com.duckduckgo.persistentstorage.api.PersistentStorage
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import kotlinx.coroutines.runBlocking
@@ -43,6 +45,9 @@ class SyncAutoRecoveryCapabilityObserverTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    private val appBuildConfig: AppBuildConfig = mock {
+        on { flavor }.thenReturn(BuildFlavor.PLAY)
+    }
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val persistentStorage: PersistentStorage = mock()
     private val pixel: Pixel = mock()
@@ -54,25 +59,11 @@ class SyncAutoRecoveryCapabilityObserverTest {
         testee = SyncAutoRecoveryCapabilityObserver(
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appBuildConfig = appBuildConfig,
             syncFeature = syncFeature,
             persistentStorage = persistentStorage,
             pixel = pixel,
         )
-    }
-
-    @Test
-    fun whenBuildTypeUnsupportedThenSkipsEverythingAndFiresNoPixels() = runTest {
-        configureAvailability(PersistentStorageAvailability.BuildTypeUnsupported)
-        configureWriteFlagEnabled(true)
-        configureReadFlagEnabled(true)
-
-        testee.onPrivacyConfigDownloaded()
-        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-
-        verify(persistentStorage).checkAvailability()
-        verify(persistentStorage, never()).write(any(), any())
-        verify(persistentStorage, never()).read(any())
-        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -91,15 +82,15 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenWriteFlagEnabledAndReadDisabledThenChecksAvailabilityAndWritesButSkipsRead() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(persistentStorage).checkAvailability()
-        verify(persistentStorage).write(any(), any())
-        verify(persistentStorage, never()).read(any())
+        verify(persistentStorage).store(any(), any())
+        verify(persistentStorage, never()).retrieve(any())
         verify(pixel).fire(
             eq(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY),
             any(),
@@ -118,15 +109,15 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadFlagEnabledAndWriteDisabledThenChecksAvailabilityAndReadsButSkipsWrite() = runTest {
         configureWriteFlagEnabled(false)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadSuccess("derisk_test_123")
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveSuccess("derisk_test_123")
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(persistentStorage).checkAvailability()
-        verify(persistentStorage, never()).write(any(), any())
-        verify(persistentStorage).read(any())
+        verify(persistentStorage, never()).store(any(), any())
+        verify(persistentStorage).retrieve(any())
         verify(pixel).fire(
             eq(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY),
             any(),
@@ -145,24 +136,24 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenBothFlagsEnabledThenExecutesFullFlow() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
-        configureReadSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
+        configureRetrieveSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(persistentStorage).checkAvailability()
-        verify(persistentStorage).write(any(), any())
-        verify(persistentStorage).read(any())
+        verify(persistentStorage).store(any(), any())
+        verify(persistentStorage).retrieve(any())
     }
 
     @Test
     fun whenBlockStoreAvailableEncryptedThenFiresEncryptedPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -179,8 +170,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenBlockStoreAvailableUnencryptedThenFiresUnencryptedPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableUnencrypted)
-        configureWriteSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = false))
+        configureStoreSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -208,8 +199,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
             any(),
             eq(Pixel.PixelType.Daily()),
         )
-        verify(persistentStorage, never()).write(any(), any())
-        verify(persistentStorage, never()).read(any())
+        verify(persistentStorage, never()).store(any(), any())
+        verify(persistentStorage, never()).retrieve(any())
     }
 
     @Test
@@ -227,16 +218,16 @@ class SyncAutoRecoveryCapabilityObserverTest {
             any(),
             eq(Pixel.PixelType.Daily()),
         )
-        verify(persistentStorage, never()).write(any(), any())
-        verify(persistentStorage, never()).read(any())
+        verify(persistentStorage, never()).store(any(), any())
+        verify(persistentStorage, never()).retrieve(any())
     }
 
     @Test
     fun whenWriteSucceedsThenFiresWriteSuccessPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -253,8 +244,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenWriteFailsThenFiresWriteErrorPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteFailure()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreFailure()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -271,8 +262,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenWriteThrowsExceptionThenFiresWriteErrorPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(false)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteThrows()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreThrows()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -289,9 +280,9 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadSucceedsWithInvalidPrefixThenFiresReadMismatchPixel() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
-        configureReadSuccess("unexpected_value") // Value without expected prefix
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
+        configureRetrieveSuccess("unexpected_value") // Value without expected prefix
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -308,8 +299,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadSucceedsWithNullValueAndNoWriteThenFiresReadSuccessPixel() = runTest {
         configureWriteFlagEnabled(false)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -326,8 +317,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadSucceedsWithValidPrefixThenFiresReadSuccessPixel() = runTest {
         configureWriteFlagEnabled(false)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadSuccess("derisk_test_1234567890")
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveSuccess("derisk_test_1234567890")
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -344,8 +335,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadFailsThenFiresReadErrorPixel() = runTest {
         configureWriteFlagEnabled(false)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadFailure()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveFailure()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -362,8 +353,8 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadThrowsExceptionThenFiresReadErrorPixel() = runTest {
         configureWriteFlagEnabled(false)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadThrows()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveThrows()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -380,9 +371,9 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenWriteSucceedsButReadFailsThenFiresBothWriteSuccessAndReadErrorPixels() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureWriteSuccess()
-        configureReadFailure()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureStoreSuccess()
+        configureRetrieveFailure()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -405,15 +396,15 @@ class SyncAutoRecoveryCapabilityObserverTest {
     fun whenReadFailsThenWriteStillAttemptedIfWriteFlagEnabled() = runTest {
         configureWriteFlagEnabled(true)
         configureReadFlagEnabled(true)
-        configureAvailability(PersistentStorageAvailability.AvailableEncrypted)
-        configureReadFailure()
-        configureWriteSuccess()
+        configureAvailability(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
+        configureRetrieveFailure()
+        configureStoreSuccess()
 
         testee.onPrivacyConfigDownloaded()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(persistentStorage).read(any())
-        verify(persistentStorage).write(any(), any())
+        verify(persistentStorage).retrieve(any())
+        verify(persistentStorage).store(any(), any())
         verify(pixel).fire(
             eq(SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_ERROR_DAILY),
             any(),
@@ -444,27 +435,28 @@ class SyncAutoRecoveryCapabilityObserverTest {
         whenever(persistentStorage.checkAvailability()).thenThrow(RuntimeException("Availability check failed"))
     }
 
-    private fun configureWriteSuccess() = runBlocking {
-        whenever(persistentStorage.write(any(), any())).thenReturn(Result.success(Unit))
+    private fun configureStoreSuccess() = runBlocking {
+        whenever(persistentStorage.store(any(), any())).thenReturn(Result.success(Unit))
     }
 
-    private fun configureWriteFailure() = runBlocking {
-        whenever(persistentStorage.write(any(), any())).thenReturn(Result.failure(RuntimeException("Write failed")))
+    private fun configureStoreFailure() = runBlocking {
+        whenever(persistentStorage.store(any(), any())).thenReturn(Result.failure(RuntimeException("Store failed")))
     }
 
-    private fun configureWriteThrows() = runBlocking {
-        whenever(persistentStorage.write(any(), any())).thenThrow(RuntimeException("Write failed"))
+    private fun configureStoreThrows() = runBlocking {
+        whenever(persistentStorage.store(any(), any())).thenThrow(RuntimeException("Store failed"))
     }
 
-    private fun configureReadSuccess(value: String? = null) = runBlocking {
-        whenever(persistentStorage.read(any())).thenReturn(Result.success(value))
+    private fun configureRetrieveSuccess(value: String? = null) = runBlocking {
+        val bytes = value?.toByteArray(Charsets.UTF_8)
+        whenever(persistentStorage.retrieve(any())).thenReturn(Result.success(bytes))
     }
 
-    private fun configureReadFailure() = runBlocking {
-        whenever(persistentStorage.read(any())).thenReturn(Result.failure(RuntimeException("Read failed")))
+    private fun configureRetrieveFailure() = runBlocking {
+        whenever(persistentStorage.retrieve(any())).thenReturn(Result.failure(RuntimeException("Retrieve failed")))
     }
 
-    private fun configureReadThrows() = runBlocking {
-        whenever(persistentStorage.read(any())).thenThrow(RuntimeException("Read failed"))
+    private fun configureRetrieveThrows() = runBlocking {
+        whenever(persistentStorage.retrieve(any())).thenThrow(RuntimeException("Retrieve failed"))
     }
 }

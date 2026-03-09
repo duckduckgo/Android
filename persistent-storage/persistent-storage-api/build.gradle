@@ -22,9 +22,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace 'com.duckduckgo.persistent.storage.api'
+    namespace 'com.duckduckgo.persistentstorage.api'
 }
 
 dependencies {
-    // Pure API module - no dependencies needed
 }
