@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -1841,6 +1842,103 @@ class SubscriptionWebViewViewModelTest {
             // Should have no products - Pro is excluded due to feature flag (kill switch)
             assertNotNull(params?.products)
             assertEquals(0, params?.products?.size)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndSubscriptionExpiredThenRouteToSubscriptionSelected() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = EXPIRED,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+
+        val json = """{"id":"targetPlanId"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertTrue(result is Command.SubscriptionSelected)
+            assertEquals("targetPlanId", (result as Command.SubscriptionSelected).id)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndSubscriptionInactiveThenRouteToSubscriptionSelected() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = INACTIVE,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+
+        val json = """{"id":"targetPlanId"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertTrue(result is Command.SubscriptionSelected)
+            assertEquals("targetPlanId", (result as Command.SubscriptionSelected).id)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndNoSubscriptionThenRouteToSubscriptionSelected() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(null)
+
+        val json = """{"id":"targetPlanId"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertTrue(result is Command.SubscriptionSelected)
+            assertEquals("targetPlanId", (result as Command.SubscriptionSelected).id)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndSubscriptionActiveThenRouteToSubscriptionChangeSelected() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+
+        val json = """{"id":"${SubscriptionsConstants.YEARLY_PLAN_US}"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem()
+            assertTrue(result is Command.SubscriptionChangeSelected)
+            assertEquals(SubscriptionsConstants.YEARLY_PLAN_US, (result as Command.SubscriptionChangeSelected).planId)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndFetchingSubscriptionFailsThenReturnFailure() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenThrow(RuntimeException())
+
+        val json = """{"id":"targetPlanId"}"""
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
