@@ -44,15 +44,15 @@ abstract class ComponentFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_component_list, container, false)
     }
 
+    @Suppress("DenyListedApi")
     override fun onViewCreated(
         view: View,
         savedInstanceBundle: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceBundle)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-
         val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
+        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         val adapter = ComponentAdapter(isDarkTheme = isDarkTheme)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
