@@ -36,6 +36,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -87,6 +88,7 @@ class RealDuckChatDeleter @Inject constructor(
                     }
                     allSucceeded
                 } catch (e: Exception) {
+                    coroutineContext.ensureActive()
                     logcat { "DuckChatDeleter: deleteChat failed with ${e.message}" }
                     false
                 } finally {
