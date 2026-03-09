@@ -25,6 +25,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -99,7 +100,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
     }
 
@@ -203,7 +204,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = singleBucketConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val state = pixelState("test", mapOf("count" to 0))
@@ -366,7 +367,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoSourceConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
@@ -398,7 +399,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
@@ -601,7 +602,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoSourceConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
@@ -741,7 +742,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = configWithGap)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val testPixelConfig = EventHubConfigParser.parseTelemetry(configWithGap).first()
@@ -941,7 +942,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         manager.onConfigChanged()
@@ -1050,7 +1051,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1079,7 +1080,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1122,7 +1123,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1163,7 +1164,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1208,7 +1209,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1268,7 +1269,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1379,7 +1380,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = config1)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         timeProvider.time = 10_000L
@@ -1755,7 +1756,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = originalConfig)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
@@ -1779,7 +1780,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         val stateA = pixelState("pixel_a", mapOf("count" to 2))
@@ -1951,7 +1952,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         timeProvider.time = 1000L
@@ -2088,7 +2089,7 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = twoPixelConf)
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
-            coroutineTestRule.testDispatcherProvider, foregroundState, eventHubFeature,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
         )
 
         timeProvider.time = 1000L

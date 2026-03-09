@@ -19,11 +19,12 @@ package com.duckduckgo.eventhub.impl.pixels
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
+import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -67,12 +68,11 @@ class RealEventHubPixelManager @Inject constructor(
     private val pixel: Pixel,
     private val timeProvider: TimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val foregroundStateProvider: AppForegroundStateProvider,
     private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
 
-    @Volatile
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
@@ -102,9 +102,9 @@ class RealEventHubPixelManager @Inject constructor(
 
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
+        appCoroutineScope.launch(pixelDispatcher) {
+            val nowMillis = timeProvider.currentTimeMillis()
 
-        synchronized(this) {
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis > pixelState.periodEndMillis) continue
 
@@ -150,7 +150,7 @@ class RealEventHubPixelManager @Inject constructor(
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        synchronized(this) {
+        appCoroutineScope.launch(pixelDispatcher) {
             val nextDeadline = processPixelStates()
             val configDeadline = initMissingPixels()
             scheduleNextCheck(minOf(nextDeadline, configDeadline))
@@ -189,13 +189,13 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onConfigChanged() {
-        synchronized(this) {
+        appCoroutineScope.launch(pixelDispatcher) {
             cachedTelemetryConfigs = null
             if (!isFeatureEnabled()) {
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 schedulerJob.cancel()
                 repository.deleteAllPixelStates()
-                return
+                return@launch
             }
 
             val telemetry = getTelemetryConfigs()
@@ -226,18 +226,14 @@ class RealEventHubPixelManager @Inject constructor(
         val delayMillis = (deadlineMillis - nowMillis).coerceAtLeast(0)
 
         logcat(VERBOSE) { "EventHub: scheduling next check in ${delayMillis}ms" }
-        schedulerJob += appCoroutineScope.launch(dispatcherProvider.io()) {
+        schedulerJob += appCoroutineScope.launch(pixelDispatcher) {
             delay(delayMillis)
             ensureActive()
 
             if (!isFeatureEnabled()) return@launch
 
-            synchronized(this@RealEventHubPixelManager) {
-                ensureActive()
-
-                val nextDeadline = processPixelStates()
-                scheduleNextCheck(nextDeadline)
-            }
+            val nextDeadline = processPixelStates()
+            scheduleNextCheck(nextDeadline)
         }
     }
 

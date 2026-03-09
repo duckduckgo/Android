@@ -26,6 +26,14 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
+import java.util.concurrent.Executors
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EventHubDispatcher
 
 @Module
 @ContributesTo(AppScope::class)
@@ -44,5 +52,12 @@ object EventHubModule {
     @Provides
     fun provideEventHubPixelStateDao(database: EventHubPixelStateDatabase): EventHubPixelStateDao {
         return database.pixelStateDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @EventHubDispatcher
+    @Provides
+    fun provideEventHubDispatcher(): CoroutineDispatcher {
+        return Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     }
 }
