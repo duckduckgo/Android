@@ -29,6 +29,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -256,8 +257,8 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            // Privacy Pro
-            canShowPrivacyProCta() -> {
+            // Privacy Pro onboarding OR Privacy Pro for returning users who skipped onboarding
+            canShowPrivacyProCta() || canShowPrivacyProCtaForSkippedOnboarding() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
                 val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
                 val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
@@ -265,7 +266,6 @@ class CtaViewModel @Inject constructor(
                 } else {
                     R.string.onboardingPrivacyProDaxDialogOkButton
                 }
-
                 DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
             }
 
@@ -302,6 +302,13 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun canShowPrivacyProCta(): Boolean =
         daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && isPrivacyProCtaAvailable()
+
+    @WorkerThread
+    private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
+        hideTips() &&
+            appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogPrivacyProShown() &&
+            isPrivacyProCtaAvailable()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -487,5 +494,6 @@ class CtaViewModel @Inject constructor(
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
+        private const val PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS = 7L
     }
 }
