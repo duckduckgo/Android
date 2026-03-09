@@ -70,7 +70,7 @@ These libraries look like safe minor/patch bumps but are not — always check Ko
 
 ### Generally safe to update
 - AndroidX libraries (`androidx.*`) — backward compatible, Java/Kotlin mixed
-- Pure Java libraries (`rxjava`, `rxandroid`, `zxing`, `org.json`, `robolectric`, `desugar_jdk_libs`)
+- Pure Java libraries (`zxing`, `org.json`, `robolectric`, `desugar_jdk_libs`)
 
 ### Needs Kotlin version check
 - Any Kotlin-first library (Square, Cash App, JetBrains, etc.)
@@ -84,6 +84,7 @@ These libraries look like safe minor/patch bumps but are not — always check Ko
 - Coil
 - Compose compiler
 - `kotlinx.collections.immutable`
+- RxJava (`rxjava2.rxjava`, `rxjava2.rxandroid`) — kept at current versions intentionally
 
 ---
 
