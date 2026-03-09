@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 interface WebEventsDataStore {
     fun getWebEventsConfigJson(): String
-    fun setWebEventsConfigJson(value: String)
+    suspend fun setWebEventsConfigJson(value: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -60,11 +60,9 @@ class SharedPreferencesWebEventsDataStore @Inject constructor(
 
     override fun getWebEventsConfigJson(): String = cachedWebEventsJson
 
-    override fun setWebEventsConfigJson(value: String) {
+    override suspend fun setWebEventsConfigJson(value: String) {
         cachedWebEventsJson = value
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            store.edit { prefs -> prefs[Keys.WEB_EVENTS_RC] = value }
-        }
+        store.edit { prefs -> prefs[Keys.WEB_EVENTS_RC] = value }
     }
 
     companion object {
