@@ -69,6 +69,16 @@ interface PirRepository {
      */
     suspend fun isRepositoryAvailable(): Boolean
 
+    /**
+     * Returns the time in ms when the feature was first allowed to be run on the user's device. If the feature is not allowed to be run, we get 0L.
+     */
+    suspend fun getFeatureReceivedMs(): Long
+
+    /**
+     * Set the time in ms when the feature was first allowed to be run on the user's device
+     */
+    suspend fun setFeatureReceivedMs(long: Long)
+
     suspend fun getCurrentMainEtag(): String?
 
     suspend fun updateMainEtag(etag: String?)
@@ -293,6 +303,16 @@ class RealPirRepository(
     private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
 
     override suspend fun isRepositoryAvailable(): Boolean = database.await() != null
+
+    override suspend fun getFeatureReceivedMs(): Long = withContext(dispatcherProvider.io()) {
+        pirDataStore.featureReceivedMs
+    }
+
+    override suspend fun setFeatureReceivedMs(long: Long) {
+        withContext(dispatcherProvider.io()) {
+            pirDataStore.featureReceivedMs = long
+        }
+    }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
