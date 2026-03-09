@@ -246,9 +246,8 @@ class GemmaEvalTest {
     private fun printCsv(results: List<GemmaResult>, label: String) {
         val header = "label,query,category,p5,mrr,sim,response"
         val safeLabel = label.replace(' ', '_')
+        val csvName = "gemma_eval_$safeLabel.csv"
 
-        // 1. Write full CSV to file
-        val csvFile = File(context.filesDir, "gemma_eval_$safeLabel.csv")
         val sb = StringBuilder(header).append("\n")
         results.forEach { r ->
             val sim = r.sim?.let { "%.4f".format(it) } ?: ""
@@ -257,9 +256,22 @@ class GemmaEvalTest {
                 .append("${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseEscaped)}")
                 .append("\n")
         }
-        csvFile.writeText(sb.toString())
-        android.util.Log.i("GemmaEval", "CSV file: ${csvFile.absolutePath}")
-        android.util.Log.i("GemmaEval", "Pull: adb shell run-as ${context.packageName} cat ${csvFile.name.let { "files/$it" }} > /tmp/gemma_eval.csv")
+        val csv = sb.toString()
+
+        // 1. Write to /data/local/tmp/ — world-readable, survives APK uninstall, no run-as needed.
+        //    Pull with: adb pull /data/local/tmp/<csvName> /tmp/
+        val tmpFile = File("/data/local/tmp", csvName)
+        try {
+            tmpFile.writeText(csv)
+            android.util.Log.i("GemmaEval", "CSV written: ${tmpFile.absolutePath}")
+            android.util.Log.i("GemmaEval", "Pull: adb pull ${tmpFile.absolutePath} /tmp/$csvName")
+        } catch (e: Exception) {
+            // Fallback: app-private filesDir (requires run-as to pull)
+            val fallback = File(context.filesDir, csvName)
+            fallback.writeText(csv)
+            android.util.Log.w("GemmaEval", "Could not write to /data/local/tmp (${e.message}); wrote to ${fallback.absolutePath}")
+            android.util.Log.w("GemmaEval", "Pull: adb shell run-as ${context.packageName} cat files/$csvName > /tmp/$csvName")
+        }
 
         // 2. Also log to logcat with response capped to avoid line-length truncation
         android.util.Log.i("GemmaEvalCsv", header)
