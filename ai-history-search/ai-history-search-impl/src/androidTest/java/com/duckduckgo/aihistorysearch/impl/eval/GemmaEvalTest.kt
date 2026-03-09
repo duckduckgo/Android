@@ -58,8 +58,11 @@ import org.junit.runner.RunWith
  *       -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.aihistorysearch.impl.eval.GemmaEvalTest#gemmaPreFilteredQualityReport
  *
  * Filter logcat:
- *   adb logcat -s GemmaEval      # tables + raw responses
- *   adb logcat -s GemmaEvalCsv   # CSV dump for manual SIM inspection
+ *   adb logcat -d -s GemmaEval      # tables + raw responses
+ *   adb logcat -d -s GemmaEvalCsv   # chunked CSV; reconstruct with:
+ *     adb logcat -d -s GemmaEvalCsv | grep -oP '(?<=\] )[0-9]+:.*' \
+ *       | sort -t: -k1,1n | sed 's/^[0-9]*://' | tr -d '\n' | tr '|' '\n' \
+ *       > /tmp/gemma_eval.csv
  */
 @RunWith(AndroidJUnit4::class)
 class GemmaEvalTest {
@@ -248,41 +251,28 @@ class GemmaEvalTest {
         val safeLabel = label.replace(' ', '_')
         val csvName = "gemma_eval_$safeLabel.csv"
 
-        val sb = StringBuilder(header).append("\n")
+        // Emit full CSV to logcat in 3000-char chunks under the tag GemmaEvalCsv.
+        // Reconstruct on host:
+        //   adb logcat -d -s GemmaEvalCsv | grep -oP '(?<=\] ).*' | python3 -c \
+        //     "import sys; print(''.join(l.rstrip('\n') for l in sys.stdin))" \
+        //     | tr '|' '\n' > /tmp/gemma_eval.csv
+        // (each chunk ends with | as a line separator marker)
+        val sb = StringBuilder(header).append("|")
         results.forEach { r ->
             val sim = r.sim?.let { "%.4f".format(it) } ?: ""
             val responseEscaped = r.response.replace("\"", "\"\"").replace("\n", "\\n")
             sb.append("${csvQuote(label)},${csvQuote(r.query.query)},${r.query.category},")
                 .append("${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseEscaped)}")
-                .append("\n")
+                .append("|")
         }
         val csv = sb.toString()
-
-        // 1. Write to filesDir, then copy to /sdcard/Download/ via UiAutomation shell (runs as
-        //    shell user). /sdcard/Download/ is world-readable, survives APK uninstall, and is
-        //    not cleaned by Gradle — pull with: adb pull /sdcard/Download/<csvName> /tmp/
-        val appFile = File(context.filesDir, csvName)
-        appFile.writeText(csv)
-        val dst = "/sdcard/Download/$csvName"
-        try {
-            InstrumentationRegistry.getInstrumentation().uiAutomation
-                .executeShellCommand("cp ${appFile.absolutePath} $dst").close()
-            android.util.Log.i("GemmaEval", "CSV written: $dst")
-            android.util.Log.i("GemmaEval", "Pull: adb pull $dst /tmp/$csvName")
-        } catch (e: Exception) {
-            android.util.Log.w("GemmaEval", "Could not copy to /sdcard/Download/ (${e.message})")
-            android.util.Log.w("GemmaEval", "Pull (requires APK still installed): adb shell run-as ${context.packageName} cat files/$csvName > /tmp/$csvName")
+        var offset = 0
+        var chunk = 0
+        while (offset < csv.length) {
+            android.util.Log.i("GemmaEvalCsv", "${chunk++}:${csv.substring(offset, minOf(offset + LOGCAT_CHUNK, csv.length))}")
+            offset += LOGCAT_CHUNK
         }
-
-        // 2. Also log to logcat with response capped to avoid line-length truncation
-        android.util.Log.i("GemmaEvalCsv", header)
-        results.forEach { r ->
-            val sim = r.sim?.let { "%.4f".format(it) } ?: ""
-            val responseForLog = r.response.replace("\n", "\\n").take(500)
-            val line = "${csvQuote(label)},${csvQuote(r.query.query)},${r.query.category}," +
-                "${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseForLog)}"
-            android.util.Log.i("GemmaEvalCsv", line)
-        }
+        android.util.Log.i("GemmaEvalCsv", "END chunks=$chunk label=$safeLabel")
     }
 
     private fun csvQuote(s: String) = "\"$s\""
@@ -305,5 +295,7 @@ class GemmaEvalTest {
     companion object {
         /** Number of entries passed to Gemma after embedding pre-filtering. */
         private const val PRE_FILTER_K = 8
+        /** Max chars per logcat line for chunked CSV output (logcat limit is ~4096 bytes). */
+        private const val LOGCAT_CHUNK = 3000
     }
 }
