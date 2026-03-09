@@ -294,8 +294,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             val subscription = subscriptionResult.getOrNull()
+
             // Expired/inactive subscriptions can't be switched — route to a new purchase instead
-            if (subscription == null || subscription.status.isExpired()) {
+            val canHandleExpiredState = privacyProFeature.handleExpiredStateWhenSubscriptionChangeSelected().isEnabled()
+            if (canHandleExpiredState && (subscription == null || subscription.status.isExpired())) {
                 val offerId = runCatching { data?.getString("offerId") }.getOrNull()
                 val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
                 val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
@@ -305,7 +307,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 return@launch
             }
 
-            val currentTier = SubscriptionTier.fromPlanId(subscription.productId)
+            val currentTier = subscription?.productId?.let { SubscriptionTier.fromPlanId(it) } ?: SubscriptionTier.UNKNOWN
             val targetTier = SubscriptionTier.fromPlanId(targetPlanId)
 
             // Fail if either tier is UNKNOWN - this indicates invalid plan IDs
@@ -344,7 +346,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             logcat {
-                "SubscriptionWebViewViewModel: subscriptionChangeSelected - currentPlanId/Tier: ${subscription.productId}/$currentTier, " +
+                "SubscriptionWebViewViewModel: subscriptionChangeSelected - currentPlanId/Tier: ${subscription?.productId}/$currentTier, " +
                     "targetPlanId/targetTier: $targetPlanId/$targetTier, replacementMode: $replacementMode"
             }
 
