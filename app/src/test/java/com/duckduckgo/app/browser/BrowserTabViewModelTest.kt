@@ -6801,13 +6801,13 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenBrowserMenuHasNoOptionThenUseBottomSheetMenuFalse() =
+    fun whenBrowserMenuIsEnabledThenUseBottomSheetMenuTrueRegardlessOfHasOption() =
         runTest {
-            // Given - Even if isEnabled is true, if hasOption is false (feature flag off), should be false
+            // Given - hasOption only controls the Settings toggle visibility, not menu activation
             browserMenuStateFlow.emit(BrowserMenuDisplayState(hasOption = false, isEnabled = true))
 
-            // Then
-            assertFalse(browserViewState().useBottomSheetMenu)
+            // Then - isEnabled alone drives useBottomSheetMenu
+            assertTrue(browserViewState().useBottomSheetMenu)
         }
 
     private fun givenTabManagerData() =
