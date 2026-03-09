@@ -90,35 +90,53 @@
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/onboarding_launch_screen_background"
-        tools:lottie_progress="1" />
+        tools:lottie_progress="1"
+        tools:visibility="gone" />
 
     <ImageView
         android:id="@+id/backgroundSecondary"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
-        app:layout_constraintVertical_bias="1"
-        android:visibility="invisible"
         android:scaleType="centerCrop"
-        tools:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
+        app:layout_constraintVertical_bias="1"
+        tools:layout_constraintHeight_max="404dp"
         tools:src="@drawable/onboarding_welcome_screen_background"
-        app:layout_constraintTop_toTopOf="@id/backgroundGuideline" />
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/daxDialogCta"
         layout="@layout/pre_onboarding_dax_dialog_cta_brand_design_update"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:alpha="0"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp" />
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintWidth_max="600dp"
+        tools:alpha="1"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/welcomeScreenWalkingDax"
+        android:layout_width="217dp"
+        android:layout_height="275dp"
+        android:layout_marginBottom="112dp"
+        android:alpha="0"
+        android:translationX="-48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
+        tools:alpha="1"
+        tools:lottie_progress="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
