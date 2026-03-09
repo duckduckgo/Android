@@ -2006,7 +2006,7 @@ class BrowserTabViewModel @Inject constructor(
                     if (shouldShowLocationPermissionMessage(domain)) {
                         logcat { "Location Permission: Show location permission for $domain" }
                         withContext(dispatchers.main()) {
-                            command.postValue(ShowDomainHasPermissionMessage(domain))
+                            command.value = ShowDomainHasPermissionMessage(domain)
                         }
                     }
                 }
