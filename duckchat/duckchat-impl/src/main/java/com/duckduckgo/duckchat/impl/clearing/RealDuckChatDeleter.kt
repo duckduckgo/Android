@@ -72,6 +72,8 @@ class RealDuckChatDeleter @Inject constructor(
     private var cachedScript: String? = null
 
     override suspend fun deleteChat(chatId: String): Boolean {
+        if (!duckAiDataClearingFeature.self().isEnabled()) return false
+
         return mutex.withLock {
             withContext(dispatchers.main()) {
                 try {
