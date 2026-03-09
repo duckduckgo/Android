@@ -74,6 +74,7 @@ dependencies {
     }
 
     // Testing dependencies
+    testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation "org.json:json:_"
