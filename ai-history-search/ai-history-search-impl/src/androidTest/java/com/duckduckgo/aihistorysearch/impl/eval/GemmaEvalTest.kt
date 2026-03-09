@@ -89,6 +89,10 @@ class GemmaEvalTest {
     /**
      * Production-realistic: embeddings top-[PRE_FILTER_K] feeds into Gemma.
      * Shorter prompt, less hallucination surface, faster inference.
+     *
+     * Corpus embeddings are pre-computed once (60 embed calls) and reused across all
+     * 41 queries — avoids the 41×60 = 2,460 redundant embed calls of naively calling
+     * rank() per query.
      */
     @Test
     fun gemmaPreFilteredQualityReport() {
@@ -225,20 +229,45 @@ class GemmaEvalTest {
     }
 
     /**
-     * Logs a CSV to the GemmaEvalCsv logcat tag for manual SIM inspection.
-     * Pull with: adb logcat -d -s GemmaEvalCsv
+     * Writes a CSV for manual SIM inspection.
+     *
+     * Two outputs:
+     *  1. File — full response, no truncation.
+     *     Written to context.filesDir; pull while the test APK is still installed:
+     *       adb shell run-as <package> cat files/gemma_eval_<label>.csv > /tmp/gemma_eval.csv
+     *     The pull command is logged to GemmaEval at the end of the test.
+     *  2. Logcat (GemmaEvalCsv tag) — response capped at 500 chars to stay under
+     *     logcat's 4096-byte line limit. Capture both tags in one shot:
+     *       adb logcat -d -s GemmaEval GemmaEvalCsv > eval_out.txt
      *
      * Format: label,query,category,p5,mrr,sim,response
-     * Response is double-quoted; internal quotes are escaped as "".
+     * Response is double-quoted; internal quotes escaped as "".
      */
     private fun printCsv(results: List<GemmaResult>, label: String) {
         val header = "label,query,category,p5,mrr,sim,response"
-        android.util.Log.i("GemmaEvalCsv", header)
+        val safeLabel = label.replace(' ', '_')
+
+        // 1. Write full CSV to file
+        val csvFile = File(context.filesDir, "gemma_eval_$safeLabel.csv")
+        val sb = StringBuilder(header).append("\n")
         results.forEach { r ->
             val sim = r.sim?.let { "%.4f".format(it) } ?: ""
             val responseEscaped = r.response.replace("\"", "\"\"").replace("\n", "\\n")
+            sb.append("${csvQuote(label)},${csvQuote(r.query.query)},${r.query.category},")
+                .append("${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseEscaped)}")
+                .append("\n")
+        }
+        csvFile.writeText(sb.toString())
+        android.util.Log.i("GemmaEval", "CSV file: ${csvFile.absolutePath}")
+        android.util.Log.i("GemmaEval", "Pull: adb shell run-as ${context.packageName} cat ${csvFile.name.let { "files/$it" }} > /tmp/gemma_eval.csv")
+
+        // 2. Also log to logcat with response capped to avoid line-length truncation
+        android.util.Log.i("GemmaEvalCsv", header)
+        results.forEach { r ->
+            val sim = r.sim?.let { "%.4f".format(it) } ?: ""
+            val responseForLog = r.response.replace("\n", "\\n").take(500)
             val line = "${csvQuote(label)},${csvQuote(r.query.query)},${r.query.category}," +
-                "${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseEscaped)}"
+                "${"%.4f".format(r.p5)},${"%.4f".format(r.mrr)},$sim,${csvQuote(responseForLog)}"
             android.util.Log.i("GemmaEvalCsv", line)
         }
     }
