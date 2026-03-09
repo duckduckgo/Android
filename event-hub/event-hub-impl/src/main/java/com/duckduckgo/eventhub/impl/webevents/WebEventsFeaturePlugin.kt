@@ -16,19 +16,27 @@
 
 package com.duckduckgo.eventhub.impl.webevents
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class WebEventsFeaturePlugin @Inject constructor(
     private val webEventsDataStore: WebEventsDataStore,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         if (featureName == this.featureName) {
-            webEventsDataStore.setWebEventsConfigJson(jsonString)
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                webEventsDataStore.setWebEventsConfigJson(jsonString)
+            }
             return true
         }
         return false
