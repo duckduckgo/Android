@@ -77,7 +77,9 @@ class RealEventHubPixelManager @Inject constructor(
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
-    private val scheduledTimers = ConcurrentHashMap<String, Job>()
+
+    @Volatile
+    private var schedulerJob: Job? = null
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
@@ -150,23 +152,42 @@ class RealEventHubPixelManager @Inject constructor(
     override fun checkPixels() {
         if (!isFeatureEnabled()) return
 
-        val nowMillis = timeProvider.currentTimeMillis()
-
         synchronized(this) {
-            for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis >= pixelState.periodEndMillis) {
-                    fireTelemetry(pixelState)
-                } else {
-                    scheduleFireTelemetry(pixelState.pixelName, pixelState.periodEndMillis - nowMillis)
-                }
-            }
+            val nextDeadline = processPixelStates()
+            val configDeadline = initMissingPixels()
+            scheduleNextCheck(minOf(nextDeadline, configDeadline))
+        }
+    }
 
-            for (pixelConfig in getTelemetryConfigs()) {
-                if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+    private fun processPixelStates(): Long {
+        val nowMillis = timeProvider.currentTimeMillis()
+        var nextDeadline = Long.MAX_VALUE
+
+        for (pixelState in repository.getAllPixelStates()) {
+            if (nowMillis >= pixelState.periodEndMillis) {
+                val newDeadline = fireTelemetry(pixelState)
+                if (newDeadline != null) {
+                    nextDeadline = minOf(nextDeadline, newDeadline)
+                }
+            } else {
+                nextDeadline = minOf(nextDeadline, pixelState.periodEndMillis)
+            }
+        }
+
+        return nextDeadline
+    }
+
+    private fun initMissingPixels(): Long {
+        var nextDeadline = Long.MAX_VALUE
+        for (pixelConfig in getTelemetryConfigs()) {
+            if (repository.getPixelState(pixelConfig.name) == null) {
+                val deadline = startNewPeriod(pixelConfig)
+                if (deadline != null) {
+                    nextDeadline = minOf(nextDeadline, deadline)
                 }
             }
         }
+        return nextDeadline
     }
 
     override fun onConfigChanged() {
@@ -174,72 +195,67 @@ class RealEventHubPixelManager @Inject constructor(
             cachedTelemetryConfigs = null
             if (!isFeatureEnabled()) {
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-                cancelAllTimers()
+                cancelScheduler()
                 repository.deleteAllPixelStates()
                 return
             }
 
             val telemetry = getTelemetryConfigs()
             logcat(DEBUG) { "EventHub: onConfigChanged — feature enabled, ${telemetry.size} telemetry pixel(s) in config" }
+
+            var nextDeadline = Long.MAX_VALUE
+            for (pixelState in repository.getAllPixelStates()) {
+                nextDeadline = minOf(nextDeadline, pixelState.periodEndMillis)
+            }
             for (pixelConfig in telemetry) {
                 if (repository.getPixelState(pixelConfig.name) == null) {
-                    startNewPeriod(pixelConfig)
+                    val deadline = startNewPeriod(pixelConfig)
+                    if (deadline != null) {
+                        nextDeadline = minOf(nextDeadline, deadline)
+                    }
                 }
             }
+
+            scheduleNextCheck(nextDeadline)
         }
     }
 
-    private fun scheduleFireTelemetry(pixelName: String, delayMillis: Long) {
-        if (scheduledTimers.containsKey(pixelName)) {
-            logcat(VERBOSE) { "EventHub: timer already scheduled for $pixelName, skipping" }
-            return
-        }
+    private fun scheduleNextCheck(deadlineMillis: Long) {
+        cancelScheduler()
+        if (deadlineMillis == Long.MAX_VALUE) return
 
-        logcat(VERBOSE) { "EventHub: scheduling fire for $pixelName in ${delayMillis}ms" }
+        val nowMillis = timeProvider.currentTimeMillis()
+        val delayMillis = (deadlineMillis - nowMillis).coerceAtLeast(0)
+
+        logcat(VERBOSE) { "EventHub: scheduling next check in ${delayMillis}ms" }
         val job = appCoroutineScope.launch(dispatcherProvider.io()) {
             delay(delayMillis)
             ensureActive()
 
             if (!isFeatureEnabled()) {
-                scheduledTimers.remove(pixelName)
+                schedulerJob = null
                 return@launch
             }
 
             synchronized(this@RealEventHubPixelManager) {
-                // Guard against stale timer: if checkPixels or fireTelemetry already replaced
-                // this job with a new one, this coroutine is stale and must not fire.
-                if (scheduledTimers[pixelName] !== coroutineContext[Job]) {
-                    return@launch
-                }
-                val pixelState = repository.getPixelState(pixelName)
-                if (pixelState == null) {
-                    scheduledTimers.remove(pixelName)
-                    return@launch
-                }
-                fireTelemetry(pixelState)
+                if (schedulerJob !== coroutineContext[Job]) return@launch
+
+                val nextDeadline = processPixelStates()
+                scheduleNextCheck(nextDeadline)
             }
         }
-        scheduledTimers[pixelName] = job
+        schedulerJob = job
     }
 
-    private fun cancelScheduledFire(pixelName: String) {
-        scheduledTimers.remove(pixelName)?.let { job ->
+    private fun cancelScheduler() {
+        schedulerJob?.let { job ->
             job.cancel()
-            logcat(VERBOSE) { "EventHub: cancelled scheduled fire for $pixelName" }
+            logcat(VERBOSE) { "EventHub: cancelled scheduler" }
         }
+        schedulerJob = null
     }
 
-    private fun cancelAllTimers() {
-        scheduledTimers.forEach { (name, job) ->
-            job.cancel()
-            logcat(VERBOSE) { "EventHub: cancelled timer for $name" }
-        }
-        scheduledTimers.clear()
-    }
-
-    private fun fireTelemetry(pixelState: PixelState) {
-        cancelScheduledFire(pixelState.pixelName)
-
+    private fun fireTelemetry(pixelState: PixelState): Long? {
         val pixelData = buildPixel(pixelState)
 
         if (pixelData.isNotEmpty()) {
@@ -262,31 +278,30 @@ class RealEventHubPixelManager @Inject constructor(
         repository.deletePixelState(pixelState.pixelName)
 
         val latestPixelConfig = getTelemetryConfigs().find { it.name == pixelState.pixelName }
-        if (latestPixelConfig != null) {
-            startNewPeriod(latestPixelConfig)
-        }
+        return if (latestPixelConfig != null) startNewPeriod(latestPixelConfig) else null
     }
 
-    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig) {
+    private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
         if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
-            return
+            return null
         }
         val nowMillis = timeProvider.currentTimeMillis()
         val periodMillis = pixelConfig.trigger.period.periodSeconds * 1000
+        val periodEndMillis = nowMillis + periodMillis
 
-        logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=${nowMillis + periodMillis}" }
+        logcat(VERBOSE) { "EventHub: startNewPeriod ${pixelConfig.name} start=$nowMillis end=$periodEndMillis" }
         repository.savePixelState(
             PixelState(
                 pixelName = pixelConfig.name,
                 periodStartMillis = nowMillis,
-                periodEndMillis = nowMillis + periodMillis,
+                periodEndMillis = periodEndMillis,
                 config = pixelConfig,
                 params = pixelConfig.parameters.keys.associateWith { ParamState(0) }.toMutableMap(),
             ),
         )
 
-        scheduleFireTelemetry(pixelConfig.name, periodMillis)
+        return periodEndMillis
     }
 
     private fun buildPixel(pixelState: PixelState): Map<String, String> {

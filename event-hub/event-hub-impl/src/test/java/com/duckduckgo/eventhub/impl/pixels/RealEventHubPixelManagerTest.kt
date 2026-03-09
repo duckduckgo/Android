@@ -1915,7 +1915,7 @@ class RealEventHubPixelManagerTest {
         assertEquals(1767373200L, result)
     }
 
-    // --- scheduled firing (scheduleFireTelemetry / timer management) ---
+    // --- scheduled firing (centralized scheduler) ---
 
     @Test
     fun `startNewPeriod schedules a timer that fires the pixel`() {
@@ -2177,7 +2177,7 @@ class RealEventHubPixelManagerTest {
         val initialState = initCaptor.firstValue
 
         org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
         timeProvider.time = initialState.periodEndMillis + 1
@@ -2185,11 +2185,17 @@ class RealEventHubPixelManagerTest {
         manager.checkPixels()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
+        // checkPixels fired the expired pixel and started a new period;
+        // update mock so the centralized scheduler sees the fresh (unexpired) state
+        val newCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(newCaptor.capture())
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(newCaptor.firstValue))
+
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         coroutineTestRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
         coroutineTestRule.testScope.testScheduler.runCurrent()
 
-        // Still only 1 fire — the stale timer coroutine must not double-fire
+        // Still only 1 fire — the old scheduler was cancelled by the centralized check
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
     }
 
@@ -2255,24 +2261,25 @@ class RealEventHubPixelManagerTest {
         verify(repository).savePixelState(initCaptor.capture())
         val initialState = initCaptor.firstValue
 
-        // Simulate: timer delay elapses, but checkPixels runs first and fires + restarts
         org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
         timeProvider.time = initialState.periodEndMillis + 1
         manager.checkPixels()
 
-        // checkPixels fired once
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
-        // Now the old timer's delay completes — it should NOT fire the new period
+        // Update mock so the centralized scheduler sees the new (unexpired) state
+        val newCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(newCaptor.capture())
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(newCaptor.firstValue))
+
         val periodMillis = java.util.concurrent.TimeUnit.DAYS.toMillis(1)
         org.mockito.Mockito.reset(pixel)
         coroutineTestRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
         coroutineTestRule.testScope.testScheduler.runCurrent()
 
-        // Stale timer must not have fired
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
 
@@ -2288,16 +2295,19 @@ class RealEventHubPixelManagerTest {
         val initialState = initCaptor.firstValue
 
         org.mockito.Mockito.reset(repository, pixel)
-        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState, null)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
-        // checkPixels fires the expired pixel and starts a new period (with a new timer)
         timeProvider.time = initialState.periodEndMillis + 1
         manager.checkPixels()
         coroutineTestRule.testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
-        // Now advance past the OLD timer's original delay — it should be a no-op
+        // Update mock so the centralized scheduler sees the new (unexpired) state
+        val newCaptor = argumentCaptor<PixelState>()
+        verify(repository).savePixelState(newCaptor.capture())
+        whenever(repository.getAllPixelStates()).thenReturn(listOf(newCaptor.firstValue))
+
         org.mockito.Mockito.reset(pixel)
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         coroutineTestRule.testScope.testScheduler.advanceTimeBy(periodMillis + 1)
