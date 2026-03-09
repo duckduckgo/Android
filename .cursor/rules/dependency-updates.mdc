@@ -113,5 +113,9 @@ Runtime ~1h30m. Uses `appId: com.duckduckgo.mobile.android` (release build).
 
 ## Asana
 
-- Each dep update task should be a subtask of **[Doc] Update dependencies** (GID: `1202236475215890`)
-- Document updated libraries, deferred libraries, and the Kotlin version blockers in the task notes
+Before starting a dependency update, read the canonical process task:
+- **Task**: https://app.asana.com/1/137249556945/project/1202552961248957/task/1199899332680683?focus=true
+- Use the Asana MCP to fetch task GID `1199899332680683` for the full checklist and process notes
+
+Each dep update task should be a subtask of **[Doc] Update dependencies** (GID: `1202236475215890`).
+Document updated libraries, deferred libraries, and Kotlin version blockers in the task notes.
