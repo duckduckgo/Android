@@ -824,7 +824,9 @@ sealed class DaxBubbleCta(
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+        override val markAsReadOnShow: Boolean = false
+    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
