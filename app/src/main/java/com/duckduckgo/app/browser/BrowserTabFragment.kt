@@ -1277,7 +1277,7 @@ class BrowserTabFragment :
             onMenuTapped = {
                 launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
             },
-            onStopClicked = {
+            onStopTapped = {
                 contentScopeScripts.sendSubscriptionEvent(
                     SubscriptionEventData(
                         featureName = "aiChat",

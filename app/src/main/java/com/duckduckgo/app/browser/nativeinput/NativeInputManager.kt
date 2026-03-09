@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.net.toUri
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -42,19 +41,13 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
-import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
-import com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
+import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface NativeInputManager {
@@ -76,7 +69,7 @@ interface NativeInputManager {
         onFireButtonTapped: () -> Unit,
         onTabSwitcherTapped: () -> Unit,
         onMenuTapped: () -> Unit,
-        onStopClicked: () -> Unit,
+        onStopTapped: () -> Unit,
     )
     fun hideNativeInput(
         rootView: ViewGroup,
@@ -92,22 +85,15 @@ interface NativeInputManager {
 @ContributesBinding(AppScope::class, boundType = NativeInputManager::class)
 class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
-    private val chatSuggestionsReader: ChatSuggestionsReader,
 ) : NativeInputManager {
     private data class Padding(val left: Int, val top: Int, val right: Int, val bottom: Int)
 
     private var isNativeInputFieldEnabled: Boolean = false
 
-    private var autoCompleteAdapter: RecyclerView.Adapter<*>? = null
-
-    private var chatSuggestionsUserEnabled: Boolean = true
-    private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
-    private var chatSuggestionsJob: Job? = null
-
     private fun View.snapshotPadding() = Padding(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
-    private fun widgetFrom(widgetView: View): NativeInputModeWidget? {
-        return widgetView.findViewById(R.id.inputModeWidget)
+    private fun widgetFrom(widgetView: View): NativeInputWidget? {
+        return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
     }
 
     override fun start(lifecycleOwner: LifecycleOwner, onDisabled: () -> Unit) {
@@ -115,12 +101,6 @@ class RealNativeInputManager @Inject constructor(
             .onEach { isEnabled ->
                 if (isNativeInputFieldEnabled && !isEnabled) onDisabled()
                 isNativeInputFieldEnabled = isEnabled
-            }
-            .launchIn(lifecycleOwner.lifecycleScope)
-
-        duckChat.observeChatSuggestionsUserSettingEnabled()
-            .onEach { enabled ->
-                chatSuggestionsUserEnabled = enabled
             }
             .launchIn(lifecycleOwner.lifecycleScope)
     }
@@ -139,7 +119,7 @@ class RealNativeInputManager @Inject constructor(
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
         if (omnibar.viewMode is Omnibar.ViewMode.Browser) {
-            rootView.findViewById<View?>(R.id.webViewContainer)?.show()
+            hideNtp(rootView)
         }
         restoreOmnibar(omnibar, rootView)
         omnibar.show()
@@ -168,7 +148,7 @@ class RealNativeInputManager @Inject constructor(
 
         val widget = widgetFrom(rootView) ?: return
         val focusedView = rootView.findFocus()
-        val focusWithinWidget = focusedView?.let { isDescendantOf(widget, it) } ?: false
+        val focusWithinWidget = focusedView?.let { isDescendantOf(widget.asView(), it) } ?: false
         if (widget.hasInputFocus() || !focusWithinWidget) {
             widget.clearInputFocus()
         } else {
@@ -192,7 +172,7 @@ class RealNativeInputManager @Inject constructor(
         onFireButtonTapped: () -> Unit,
         onTabSwitcherTapped: () -> Unit,
         onMenuTapped: () -> Unit,
-        onStopClicked: () -> Unit,
+        onStopTapped: () -> Unit,
     ) {
         if (!isNativeInputFieldEnabled) return
 
@@ -221,7 +201,7 @@ class RealNativeInputManager @Inject constructor(
             onFireButtonTapped = onFireButtonTapped,
             onTabSwitcherTapped = onTabSwitcherTapped,
             onMenuTapped = onMenuTapped,
-            onStopClicked = onStopClicked,
+            onStopTapped = onStopTapped,
         )
         if (omnibar.viewMode != DuckAI && prefillText.isNotEmpty()) {
             widgetFrom(widgetView)?.text = prefillText
@@ -229,7 +209,7 @@ class RealNativeInputManager @Inject constructor(
         attachWidget(widgetView, rootView, omnibar)
         if (omnibar.viewMode != DuckAI) {
             omnibar.hide()
-            rootView.findViewById<View?>(R.id.webViewContainer)?.gone()
+            showNtp(rootView)
         }
     }
 
@@ -267,7 +247,7 @@ class RealNativeInputManager @Inject constructor(
         onDuckAiChatSubmitted: (String) -> Unit,
     ) {
         val widget = widgetFrom(widgetView) ?: return
-        widget.bindSearchCallbacks(
+        widget.bindInputEvents(
             onSearchTextChanged = onSearchTextChanged,
             onSearchSubmitted = { query ->
                 if (omnibar.viewMode == DuckAI) {
@@ -281,7 +261,7 @@ class RealNativeInputManager @Inject constructor(
             },
             onChatSubmitted = { query ->
                 if (omnibar.viewMode == DuckAI) {
-                    (widget.context as? Activity)?.hideKeyboard(widget.inputField)
+                    widget.hideKeyboard()
                     onDuckAiChatSubmitted(query)
                 } else {
                     hideNativeInput(rootView, omnibar)
@@ -301,6 +281,19 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun showNtp(rootView: ViewGroup) {
+        rootView.findViewById<View?>(R.id.browserLayout)?.gone()
+        rootView.findViewById<View?>(R.id.includeNewBrowserTab)?.show()
+        rootView.findViewById<View?>(R.id.newTabContainerLayout)?.show()
+    }
+
+    private fun hideNtp(rootView: ViewGroup) {
+        rootView.findViewById<View?>(R.id.includeNewBrowserTab)?.gone()
+        rootView.findViewById<View?>(R.id.newTabContainerLayout)?.gone()
+        rootView.findViewById<View?>(R.id.browserLayout)?.show()
+        rootView.findViewById<View?>(R.id.webViewContainer)?.show()
+    }
+
     private fun removeWidget(rootView: ViewGroup): Boolean {
         var removed = false
         rootView.findViewById<View?>(R.id.inputModeTopRoot)?.let {
@@ -311,9 +304,6 @@ class RealNativeInputManager @Inject constructor(
             rootView.removeView(it)
             removed = true
         }
-        restoreAutoCompleteAdapter(rootView)
-        chatSuggestionsAdapter = null
-        autoCompleteAdapter = null
         return removed
     }
 
@@ -454,10 +444,10 @@ class RealNativeInputManager @Inject constructor(
         onFireButtonTapped: () -> Unit,
         onTabSwitcherTapped: () -> Unit,
         onMenuTapped: () -> Unit,
-        onStopClicked: () -> Unit,
+        onStopTapped: () -> Unit,
     ) {
         bindMainButtons(widgetView, onFireButtonTapped, onTabSwitcherTapped, onMenuTapped)
-        widgetFrom(widgetView)?.onStopClicked = onStopClicked
+        widgetFrom(widgetView)?.onStopTapped = onStopTapped
         bindTabCount(widgetView, lifecycleOwner, tabs)
         bindSearchCallbacks(
             widgetView,
@@ -527,7 +517,7 @@ class RealNativeInputManager @Inject constructor(
         widgetView: View,
         omnibar: Omnibar,
     ) {
-        widgetFrom(widgetView)?.setMainButtonsAllowed(omnibar.viewMode != DuckAI)
+        widgetFrom(widgetView)?.setMainButtonsVisibility(omnibar.viewMode != DuckAI)
     }
 
     private fun attachWidget(
@@ -580,111 +570,30 @@ class RealNativeInputManager @Inject constructor(
         val autoCompleteList =
             rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
-        val adapter = ChatSuggestionsAdapter { suggestion ->
-            onChatSuggestionSelected(buildChatUrl(suggestion))
-        }.also { chatSuggestionsAdapter = it }
-
-        fun showChatSuggestions(query: String) {
-            if (!chatSuggestionsUserEnabled) {
-                hideChatSuggestions(autoCompleteList, focusedView, hideList = true)
-                return
-            }
-            autoCompleteAdapter = autoCompleteAdapter ?: autoCompleteList.adapter
-            autoCompleteList.adapter = adapter
-            autoCompleteList.itemAnimator = null
-            fetchChatSuggestions(
-                lifecycleOwner = lifecycleOwner,
-                query = query,
-                autoCompleteList = autoCompleteList,
-                focusedView = focusedView,
-                adapter = adapter,
-            )
-        }
-
-        fun clearChatSuggestions(hideList: Boolean) {
-            hideChatSuggestions(autoCompleteList, focusedView, hideList = hideList)
-            if (!hideList) {
-                restoreAutoCompleteAdapter(rootView)
-            }
-        }
-
-        val previousOnSearchSelected = widget.onSearchSelected
-        widget.onSearchSelected = {
-            clearChatSuggestions(hideList = false)
-            previousOnSearchSelected?.invoke()
-        }
-
-        val previousOnChatSelected = widget.onChatSelected
-        widget.onChatSelected = {
-            previousOnChatSelected?.invoke()
-            omnibar.hide()
-            showChatSuggestions(widget.text)
-        }
-
-        widget.onChatTextChanged = { text ->
-            if (autoCompleteList.adapter == adapter) {
-                fetchChatSuggestions(
-                    lifecycleOwner = lifecycleOwner,
-                    query = text,
-                    autoCompleteList = autoCompleteList,
-                    focusedView = focusedView,
-                    adapter = adapter,
-                )
-            }
-        }
-    }
-
-    private fun fetchChatSuggestions(
-        lifecycleOwner: LifecycleOwner,
-        query: String,
-        autoCompleteList: RecyclerView,
-        focusedView: View?,
-        adapter: ChatSuggestionsAdapter,
-    ) {
-        chatSuggestionsJob?.cancel()
-        chatSuggestionsJob =
-            lifecycleOwner.lifecycleScope.launch {
-                val suggestions = runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
-                adapter.submitList(suggestions)
-                if (suggestions.isNotEmpty()) {
-                    autoCompleteList.show()
-                    focusedView?.gone()
-                } else {
-                    autoCompleteList.gone()
+        var adapter: RecyclerView.Adapter<*>? = null
+        widget.bindChatSuggestions(
+            lifecycleOwner = lifecycleOwner,
+            onChatSuggestionSelected = onChatSuggestionSelected,
+            onChatTabSelected = { omnibar.hide() },
+            onShowSuggestions = { chatAdapter ->
+                adapter = adapter ?: autoCompleteList.adapter
+                autoCompleteList.adapter = chatAdapter
+                autoCompleteList.itemAnimator = null
+                autoCompleteList.show()
+                focusedView?.gone()
+            },
+            onClearSuggestions = { hideList ->
+                adapter?.let { adapter ->
+                    if (autoCompleteList.adapter != adapter) {
+                        autoCompleteList.adapter = adapter
+                    }
                 }
-            }
-    }
-
-    private fun hideChatSuggestions(
-        autoCompleteList: RecyclerView,
-        focusedView: View?,
-        hideList: Boolean,
-    ) {
-        chatSuggestionsJob?.cancel()
-        chatSuggestionsAdapter?.submitList(emptyList())
-        if (hideList) {
-            autoCompleteList.gone()
-            focusedView?.gone()
-        }
-        chatSuggestionsReader.tearDown()
-    }
-
-    private fun restoreAutoCompleteAdapter(rootView: ViewGroup) {
-        val autoCompleteList = rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList) ?: return
-        autoCompleteAdapter?.let { adapter ->
-            if (autoCompleteList.adapter != adapter) {
-                autoCompleteList.adapter = adapter
-            }
-        }
-    }
-
-    private fun buildChatUrl(suggestion: ChatSuggestion): String {
-        return duckChat.getDuckChatUrl("", false)
-            .toUri()
-            .buildUpon()
-            .appendQueryParameter(CHAT_ID_PARAM, suggestion.chatId)
-            .build()
-            .toString()
+                if (hideList) {
+                    autoCompleteList.gone()
+                    focusedView?.gone()
+                }
+            },
+        )
     }
 
     private fun configureAutocompleteLayout(
@@ -871,9 +780,5 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
-    }
-
-    companion object {
-        private const val CHAT_ID_PARAM = "chatID"
     }
 }
