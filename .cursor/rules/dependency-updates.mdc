@@ -1,5 +1,5 @@
 ---
-alwaysApply: true
+globs: ["versions.properties"]
 ---
 # Dependency Update Rules
 
