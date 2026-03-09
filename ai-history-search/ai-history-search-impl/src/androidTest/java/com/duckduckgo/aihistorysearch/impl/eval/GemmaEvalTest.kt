@@ -258,19 +258,20 @@ class GemmaEvalTest {
         }
         val csv = sb.toString()
 
-        // 1. Write to /data/local/tmp/ — world-readable, survives APK uninstall, no run-as needed.
-        //    Pull with: adb pull /data/local/tmp/<csvName> /tmp/
-        val tmpFile = File("/data/local/tmp", csvName)
+        // 1. Write to filesDir, then copy to /data/local/tmp/ via UiAutomation shell (runs as
+        //    shell user which has write access). /data/local/tmp/ is world-readable and survives
+        //    APK uninstall — pull with: adb pull /data/local/tmp/<csvName> /tmp/
+        val appFile = File(context.filesDir, csvName)
+        appFile.writeText(csv)
+        val dst = "/data/local/tmp/$csvName"
         try {
-            tmpFile.writeText(csv)
-            android.util.Log.i("GemmaEval", "CSV written: ${tmpFile.absolutePath}")
-            android.util.Log.i("GemmaEval", "Pull: adb pull ${tmpFile.absolutePath} /tmp/$csvName")
+            InstrumentationRegistry.getInstrumentation().uiAutomation
+                .executeShellCommand("cp ${appFile.absolutePath} $dst").close()
+            android.util.Log.i("GemmaEval", "CSV written: $dst")
+            android.util.Log.i("GemmaEval", "Pull: adb pull $dst /tmp/$csvName")
         } catch (e: Exception) {
-            // Fallback: app-private filesDir (requires run-as to pull)
-            val fallback = File(context.filesDir, csvName)
-            fallback.writeText(csv)
-            android.util.Log.w("GemmaEval", "Could not write to /data/local/tmp (${e.message}); wrote to ${fallback.absolutePath}")
-            android.util.Log.w("GemmaEval", "Pull: adb shell run-as ${context.packageName} cat files/$csvName > /tmp/$csvName")
+            android.util.Log.w("GemmaEval", "Could not copy to /data/local/tmp (${e.message})")
+            android.util.Log.w("GemmaEval", "Pull (requires APK still installed): adb shell run-as ${context.packageName} cat files/$csvName > /tmp/$csvName")
         }
 
         // 2. Also log to logcat with response capped to avoid line-length truncation
