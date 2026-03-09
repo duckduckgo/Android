@@ -26,6 +26,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.espresso.privacy.preparationsForPrivacyTest
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -53,6 +54,8 @@ class RequestBlocklistTest {
 
     @Test
     fun whenRequestBlocklistIsEnabledRequestsAreHandledCorrectly() {
+        preparationsForPrivacyTest()
+
         var webView: WebView? = null
         activityScenarioRule.scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
