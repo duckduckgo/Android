@@ -47,6 +47,7 @@ class RealRequestBlocklist @Inject constructor(
 ) : RequestBlocklist, PrivacyConfigCallbackPlugin {
 
     private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
+    private var exceptions = listOf<String>()
 
     private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
         moshi.adapter(RequestBlocklistSettings::class.java)
@@ -66,6 +67,7 @@ class RealRequestBlocklist @Inject constructor(
         requestUrl: String,
     ): Boolean {
         if (!requestBlocklistFeature.self().isEnabled()) return false
+        if (isAnException(documentUrl)) return false
 
         val httpUrl = requestUrl.toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
@@ -104,6 +106,13 @@ class RealRequestBlocklist @Inject constructor(
 
             blockedRequests.clear()
             blockedRequests.putAll(newBlockedRequests)
+            exceptions = requestBlocklistFeature.self().getExceptions().map { it.domain }
+        }
+    }
+
+    private fun isAnException(documentUrl: String): Boolean {
+        return exceptions.any { exception ->
+            UriString.sameOrSubdomain(documentUrl, exception)
         }
     }
 
