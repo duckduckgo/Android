@@ -1,4 +1,5 @@
 ---
+description: "How to safely update Android library dependencies using refreshVersions"
 globs: ["versions.properties"]
 ---
 # Dependency Update Rules
