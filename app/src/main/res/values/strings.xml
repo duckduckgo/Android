@@ -897,6 +897,8 @@
 
     <!-- Input Mode Demo Onboarding step -->
     <string name="preOnboardingInputModeDemoTitle" translatable="false">Ready to get started? Try search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoSearchHint" translatable="false">Search privately</string>
+    <string name="preOnboardingInputModeDemoChatHint" translatable="false">Ask privately</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>

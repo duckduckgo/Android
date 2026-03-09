@@ -246,6 +246,11 @@
                     app:textType="secondary"
                     app:typography="caption" />
 
+                <include
+                    android:id="@+id/input_mode_demo"
+                    layout="@layout/pre_onboarding_input_mode_demo"
+                    android:visibility="gone" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
