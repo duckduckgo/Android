@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.MetricsPixelExtensionProvider
-import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -35,6 +34,7 @@ import okio.ByteString.Companion.encode
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -101,6 +101,36 @@ class RealMetricsPixelSender @Inject constructor(
         val localDate = LocalDate.parse(date)
         val zoneDateTime = localDate.atStartOfDay(ZoneId.of("America/New_York"))
         return ChronoUnit.DAYS.between(zoneDateTime, today)
+    }
+}
+
+internal const val METRICS_PIXEL_PREFIX = "experiment_metrics"
+
+internal fun MetricsPixel.getPixelDefinitions(): List<PixelDefinition> {
+    val cohort = toggle.getRawStoredState()?.assignedCohort?.name.orEmpty()
+    val enrollmentDateET = toggle.getRawStoredState()?.assignedCohort?.enrollmentDateET?.let {
+        ZonedDateTime.parse(it).truncatedTo(ChronoUnit.DAYS).format(DateTimeFormatter.ISO_LOCAL_DATE)
+    }.orEmpty()
+    if (cohort.isEmpty() || enrollmentDateET.isEmpty()) {
+        return emptyList()
+    }
+
+    val pixelName = "${METRICS_PIXEL_PREFIX}_${toggle.featureName().name}_$cohort"
+
+    return conversionWindow.map { window ->
+        val params = mutableMapOf<String, String>()
+        val conversionWindowDays = if (window.lowerWindow == window.upperWindow) {
+            "${window.lowerWindow}"
+        } else {
+            "${window.lowerWindow}-${window.upperWindow}"
+        }
+
+        params["metric"] = metric
+        params["value"] = value
+        params["enrollmentDate"] = enrollmentDateET
+        params["conversionWindowDays"] = conversionWindowDays
+
+        PixelDefinition(pixelName = pixelName, params = params)
     }
 }
 
