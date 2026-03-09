@@ -24,7 +24,6 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.net.toUri
 import androidx.core.view.updateLayoutParams
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -66,13 +65,7 @@ interface NativeInputWidget {
     fun hideKeyboard()
     fun selectChatTab()
     fun isChatTabSelected(): Boolean
-    fun setMainButtonsVisibility(isVisible: Boolean)
-
-    fun bindMainButtons(
-        onFireButtonTapped: () -> Unit,
-        onTabSwitcherTapped: () -> Unit,
-        onMenuTapped: () -> Unit,
-    )
+    fun hideMainButtons()
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -88,7 +81,6 @@ interface NativeInputWidget {
     fun bindChatSuggestions(
         lifecycleOwner: LifecycleOwner,
         onChatSuggestionSelected: (String) -> Unit,
-        onChatTabSelected: () -> Unit,
         onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     )
@@ -111,7 +103,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
-    private var showMainButtons: Boolean = true
     private var submitButtons: InputScreenButtons? = null
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
@@ -234,22 +225,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun configureMainButtonsVisibility() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        updateMainButtonsVisibility()
         updateDuckAiSubmitButton()
         toggle.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
-                    updateMainButtonsVisibility()
                     updateDuckAiSubmitButton()
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
-                    updateMainButtonsVisibility()
                     updateDuckAiSubmitButton()
                 }
             },
         )
-        inputField.doAfterTextChanged { updateMainButtonsVisibility() }
     }
 
     override fun focusInput(activity: Activity?) {
@@ -276,28 +263,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    override fun setMainButtonsVisibility(isVisible: Boolean) {
-        showMainButtons = isVisible
-        updateMainButtonsVisibility()
-    }
-
-    override fun bindMainButtons(
-        onFireButtonTapped: () -> Unit,
-        onTabSwitcherTapped: () -> Unit,
-        onMenuTapped: () -> Unit,
-    ) {
-        this.onFireButtonTapped = {
-            focusMainButton(R.id.inputFieldFireButton)
-            onFireButtonTapped()
-        }
-        this.onTabSwitcherTapped = {
-            focusMainButton(R.id.inputFieldTabsMenu)
-            onTabSwitcherTapped()
-        }
-        this.onMenuTapped = {
-            focusMainButton(R.id.inputFieldBrowserMenu)
-            onMenuTapped()
-        }
+    override fun hideMainButtons() {
+        setMainButtonsVisible(false)
     }
 
     override fun bindInputEvents(
@@ -332,7 +299,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun bindChatSuggestions(
         lifecycleOwner: LifecycleOwner,
         onChatSuggestionSelected: (String) -> Unit,
-        onChatTabSelected: () -> Unit,
         onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     ) {
@@ -360,7 +326,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val previousOnChatSelected = this.onChatSelected
         this.onChatSelected = {
             previousOnChatSelected?.invoke()
-            onChatTabSelected()
             showSuggestions(text)
         }
 
@@ -428,13 +393,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    private fun updateMainButtonsVisibility() {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        val isSearchTab = toggle.selectedTabPosition == 0
-        val hasText = inputField.text?.isNotBlank() == true
-        setMainButtonsVisible(showMainButtons && isSearchTab && !hasText)
-    }
-
     private fun updateDuckAiSubmitButton() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
@@ -465,14 +423,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         container.addView(buttons)
         submitButtons = buttons
-    }
-
-    private fun focusMainButton(id: Int) {
-        findViewById<View?>(id)?.let { button ->
-            button.isFocusableInTouchMode = true
-            button.requestFocus()
-            button.isFocusableInTouchMode = false
-        }
     }
 
     companion object {

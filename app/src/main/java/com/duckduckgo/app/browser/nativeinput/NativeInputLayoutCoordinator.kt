@@ -54,6 +54,18 @@ class NativeInputLayoutCoordinator(
                 .setBottomLeftCornerSize(0f)
                 .setBottomRightCornerSize(0f)
                 .build()
+        card.useCompatPadding = false
+    }
+
+    fun applyRoundedCardShape(widgetView: View) {
+        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
+        val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
+        card.shapeAppearanceModel =
+            card.shapeAppearanceModel
+                .toBuilder()
+                .setAllCornerSizes(radius)
+                .build()
+        card.useCompatPadding = true
     }
 
     fun configureAutocompleteLayout(widgetView: View) {
