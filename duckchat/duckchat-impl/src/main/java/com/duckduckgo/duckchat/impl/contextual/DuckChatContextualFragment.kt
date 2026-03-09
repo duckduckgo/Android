@@ -245,8 +245,10 @@ class DuckChatContextualFragment :
 
         simpleWebview.let {
             it.webViewClient = webViewClient
-            webViewClient.onPageFinishedListener = { url ->
+            webViewClient.
+            onPageFinishedListener = { url ->
                 viewModel.onChatPageLoaded(url)
+
             }
             it.webChromeClient = object : WebChromeClient() {
                 override fun onCreateWindow(
@@ -571,6 +573,10 @@ class DuckChatContextualFragment :
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
                         viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                    }
+
+                    DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
+                        viewModel.onMainBrowserPageFinished()
                     }
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {

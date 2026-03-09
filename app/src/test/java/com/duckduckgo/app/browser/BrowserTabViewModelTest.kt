@@ -8785,7 +8785,7 @@ class BrowserTabViewModelTest {
 
         val commands = commandCaptor.allValues
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.DuckAIFullScreenDisabled })
     }
 
     @Test
@@ -8801,7 +8801,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -8816,7 +8816,7 @@ class BrowserTabViewModelTest {
 
         val commands = commandCaptor.allValues
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
     }
 
     @Test
@@ -8829,7 +8829,7 @@ class BrowserTabViewModelTest {
         testee.pageFinished(mockWebView, webViewNavState, nonDdgUrl)
 
         val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -8849,7 +8849,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertTrue(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -8869,7 +8869,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val commands = commandCaptor.allValues
-        assertTrue(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertTrue(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -8887,7 +8887,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 
@@ -8905,7 +8905,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val commands = commandCaptor.allValues
-        assertFalse(commands.any { it is Command.DisableDuckAIFullScreen })
+        assertFalse(commands.any { it is Command.DuckAIFullScreenDisabled })
         assertFalse(commands.any { it is Command.EnableDuckAIFullScreen })
     }
 

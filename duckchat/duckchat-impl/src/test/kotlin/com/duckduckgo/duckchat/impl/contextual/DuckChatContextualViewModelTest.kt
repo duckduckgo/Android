@@ -1128,6 +1128,52 @@ class DuckChatContextualViewModelTest {
             verify(duckChatPixels).reportContextualPlaceholderContextShown()
         }
 
+    @Test
+    fun `when main browser page finished in input mode with auto context enabled then request page context`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        testee.commands.test {
+            testee.onMainBrowserPageFinished()
+
+            val command = awaitItem()
+            assertTrue(command is DuckChatContextualViewModel.Command.RequestPageContext)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when main browser page finished in input mode with auto context disabled then no command emitted`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+
+        testee.commands.test {
+            testee.onMainBrowserPageFinished()
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when main browser page finished in webview mode then no command emitted`() = runTest {
+        testee.onSheetOpened("tab-1")
+        testee.onPromptSent("hello")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(DuckChatContextualViewModel.SheetMode.WEBVIEW, testee.viewState.value.sheetMode)
+
+        // drain any pending commands from onSheetOpened / onPromptSent
+        testee.commands.test {
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands.test {
+            testee.onMainBrowserPageFinished()
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)

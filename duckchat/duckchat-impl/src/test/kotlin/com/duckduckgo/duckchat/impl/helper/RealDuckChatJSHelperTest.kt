@@ -720,6 +720,7 @@ class RealDuckChatJSHelperTest {
         whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
         whenever(mockDuckChat.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
 
         val result = testee.processJsCallbackMessage(
             featureName,
@@ -1084,6 +1085,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())

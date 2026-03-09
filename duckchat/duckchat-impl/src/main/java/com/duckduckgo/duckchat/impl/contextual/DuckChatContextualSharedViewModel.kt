@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import logcat.logcat
 
 class DuckChatContextualSharedViewModel() : ViewModel() {
 
@@ -37,6 +38,11 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         _command.trySend(Command.CollectPageContext)
     }
 
+    fun onMainBrowserPageFinished(url: String?) {
+        logcat { "Duck.ai: onMainBrowserPageFinished $url" }
+        _command.trySend(Command.MainBrowserPageFinished)
+    }
+
     sealed class Command {
         data class PageContextAttached(
             val tabId: String,
@@ -46,5 +52,7 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         data object OpenSheet : Command()
 
         data object CollectPageContext : Command()
+
+        data object MainBrowserPageFinished : Command()
     }
 }

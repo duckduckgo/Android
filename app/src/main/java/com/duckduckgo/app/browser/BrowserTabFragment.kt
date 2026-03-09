@@ -2778,9 +2778,10 @@ class BrowserTabFragment :
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
-            is Command.DisableDuckAIFullScreen -> {
+            is Command.DuckAIFullScreenDisabled -> {
                 omnibar.setViewMode(Browser(it.url))
                 nativeInputManager.hideNativeInput()
+                sharedContextualViewModel.onMainBrowserPageFinished(it.url)
             }
 
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)

@@ -2183,7 +2183,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
-                    command.value = Command.DisableDuckAIFullScreen(url)
+                    command.value = Command.DuckAIFullScreenDisabled(url)
                 }
             }
         }

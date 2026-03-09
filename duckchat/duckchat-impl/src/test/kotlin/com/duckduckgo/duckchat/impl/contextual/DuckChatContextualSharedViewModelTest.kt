@@ -72,4 +72,26 @@ class DuckChatContextualSharedViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenMainBrowserPageFinishedThenCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onMainBrowserPageFinished("https://example.com")
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenMainBrowserPageFinishedWithNullUrlThenCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onMainBrowserPageFinished(null)
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }

@@ -233,7 +233,6 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val contextPrompt = generateContextPrompt(prompt)
             withContext(dispatchers.main()) {
-                logcat { "Duck.ai: pageContext prompt $contextPrompt" }
                 _viewState.value =
                     _viewState.value.copy(
                         sheetMode = SheetMode.WEBVIEW,
@@ -271,6 +270,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
+
     }
 
     private fun generateContextPrompt(prompt: String): SubscriptionEventData {
@@ -539,7 +539,6 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
                 if (duckChatInternal.isAutomaticContextAttachmentEnabled() || duckChatInternal.areMultipleContentAttachmentsEnabled()) {
                     val pageContext = generatePageContextEventData()
-                    logcat { "Duck.ai: attaching new context to Duck.ai $pageContext" }
                     viewModelScope.launch(dispatchers.main()) {
                         _subscriptionEventDataChannel.trySend(pageContext)
                     }
@@ -606,5 +605,18 @@ class DuckChatContextualViewModel @Inject constructor(
         if (timeoutMs <= 0) return false
         val elapsedMs = timeProvider.currentTimeMillis() - lastClosedTimestamp
         return elapsedMs <= timeoutMs
+    }
+
+    fun onMainBrowserPageFinished() {
+        logcat { "Duck.ai: onMainBrowserPageFinished" }
+        val currentState = _viewState.value
+        if (currentState.sheetMode != SheetMode.INPUT) return
+
+        if (duckChatInternal.isAutomaticContextAttachmentEnabled()){
+            viewModelScope.launch (dispatchers.main()) {
+                logcat { "Duck.ai: requesting page context after main browser page change" }
+                commandChannel.trySend(Command.RequestPageContext)
+            }
+        }
     }
 }
