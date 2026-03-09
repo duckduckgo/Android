@@ -22,6 +22,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.net.toUri
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.LifecycleOwner
@@ -36,6 +37,9 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
 import com.google.android.material.card.MaterialCardView
@@ -44,35 +48,93 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+interface NativeInputWidget {
+
+    var text: String
+    var onSearchSelected: (() -> Unit)?
+    var onChatSelected: (() -> Unit)?
+    var onClearTextTapped: (() -> Unit)?
+    var onStopTapped: (() -> Unit)?
+
+    fun focusInput(activity: Activity?)
+    fun hasInputFocus(): Boolean
+    fun clearInputFocus()
+    fun requestInputFocus()
+    fun hideKeyboard()
+    fun selectChatTab()
+    fun isChatTabSelected(): Boolean
+    fun setMainButtonsVisibility(isVisible: Boolean)
+
+    fun bindMainButtons(
+        onFireButtonTapped: () -> Unit,
+        onTabSwitcherTapped: () -> Unit,
+        onMenuTapped: () -> Unit,
+    )
+
+    fun bindInputEvents(
+        onSearchTextChanged: (String) -> Unit,
+        onSearchSubmitted: (String) -> Unit,
+        onChatSubmitted: (String) -> Unit,
+    )
+
+    fun bindTabCount(
+        lifecycleOwner: LifecycleOwner,
+        tabCount: LiveData<Int>,
+    )
+
+    fun bindChatSuggestions(
+        lifecycleOwner: LifecycleOwner,
+        onChatSuggestionSelected: (String) -> Unit,
+        onChatTabSelected: () -> Unit,
+        onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
+        onClearSuggestions: (Boolean) -> Unit,
+    )
+
+    fun asView(): View
+}
 
 @InjectWith(ViewScope::class)
 class NativeInputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : InputModeWidget(context, attrs, defStyle) {
+) : InputModeWidget(context, attrs, defStyle), NativeInputWidget {
 
     @Inject
     lateinit var duckChatInternal: DuckChatInternal
 
+    @Inject
+    lateinit var chatSuggestionsReader: ChatSuggestionsReader
+
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
-    private var allowMainButtons: Boolean = true
+    private var showMainButtons: Boolean = true
     private var submitButtons: InputScreenButtons? = null
     private var chatStateJob: Job? = null
-    var onStopClicked: (() -> Unit)? = null
+    private var chatSuggestionsSettingJob: Job? = null
+    private var chatSuggestionsJob: Job? = null
+    private var chatSuggestionsUserEnabled: Boolean = true
+    private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
+    private var onClearSuggestions: ((Boolean) -> Unit)? = null
+    override var onStopTapped: (() -> Unit)? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         applyNativeStyling()
         observeChatState()
+        observeChatSuggestionsEnabled()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         chatStateJob?.cancel()
         chatStateJob = null
+        chatSuggestionsSettingJob?.cancel()
+        chatSuggestionsSettingJob = null
+        tearDownChatSuggestions()
     }
 
     private fun observeChatState() {
@@ -190,7 +252,36 @@ class NativeInputModeWidget @JvmOverloads constructor(
         inputField.doAfterTextChanged { updateMainButtonsVisibility() }
     }
 
-    fun bindMainButtons(
+    override fun focusInput(activity: Activity?) {
+        inputField.requestFocus()
+        activity?.showKeyboard(inputField)
+    }
+
+    override fun hasInputFocus(): Boolean = inputField.hasFocus()
+
+    override fun requestInputFocus() {
+        if (!inputField.hasFocus()) {
+            inputField.requestFocus()
+        }
+    }
+
+    override fun hideKeyboard() {
+        (context as? Activity)?.hideKeyboard(inputField)
+    }
+
+    override fun selectChatTab() {
+        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
+        if (toggle.selectedTabPosition != 1) {
+            toggle.getTabAt(1)?.select()
+        }
+    }
+
+    override fun setMainButtonsVisibility(isVisible: Boolean) {
+        showMainButtons = isVisible
+        updateMainButtonsVisibility()
+    }
+
+    override fun bindMainButtons(
         onFireButtonTapped: () -> Unit,
         onTabSwitcherTapped: () -> Unit,
         onMenuTapped: () -> Unit,
@@ -209,7 +300,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun bindSearchCallbacks(
+    override fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
         onChatSubmitted: (String) -> Unit,
@@ -222,16 +313,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         this.onChatSent = onChatSubmitted
     }
 
-    fun setTabCount(count: Int) {
-        tabSwitcherButton.count = count
-    }
-
-    fun setMainButtonsAllowed(allowed: Boolean) {
-        allowMainButtons = allowed
-        updateMainButtonsVisibility()
-    }
-
-    fun bindTabCount(
+    override fun bindTabCount(
         lifecycleOwner: LifecycleOwner,
         tabCount: LiveData<Int>,
     ) {
@@ -247,18 +329,110 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setTabCount(tabCount.value ?: 0)
     }
 
-    fun focusInput(activity: Activity?) {
-        inputField.requestFocus()
-        activity?.showKeyboard(inputField)
+    override fun bindChatSuggestions(
+        lifecycleOwner: LifecycleOwner,
+        onChatSuggestionSelected: (String) -> Unit,
+        onChatTabSelected: () -> Unit,
+        onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
+        onClearSuggestions: (Boolean) -> Unit,
+    ) {
+        this.onClearSuggestions = onClearSuggestions
+
+        val adapter = ChatSuggestionsAdapter { suggestion ->
+            onChatSuggestionSelected(buildChatUrl(suggestion))
+        }.also { chatSuggestionsAdapter = it }
+
+        fun showSuggestions(query: String) {
+            if (!chatSuggestionsUserEnabled) {
+                hideChatSuggestions(hideList = true)
+                return
+            }
+            onShowSuggestions(adapter)
+            fetchChatSuggestions(lifecycleOwner, query, adapter)
+        }
+
+        val previousOnSearchSelected = this.onSearchSelected
+        this.onSearchSelected = {
+            hideChatSuggestions(hideList = false)
+            previousOnSearchSelected?.invoke()
+        }
+
+        val previousOnChatSelected = this.onChatSelected
+        this.onChatSelected = {
+            previousOnChatSelected?.invoke()
+            onChatTabSelected()
+            showSuggestions(text)
+        }
+
+        this.onChatTextChanged = { text ->
+            showSuggestions(text)
+        }
     }
 
-    fun hasInputFocus(): Boolean = inputField.hasFocus()
+    private fun tearDownChatSuggestions() {
+        hideChatSuggestions(hideList = true)
+        chatSuggestionsAdapter = null
+        onClearSuggestions = null
+    }
+
+    override fun asView(): View = this
+
+    fun setTabCount(count: Int) {
+        tabSwitcherButton.count = count
+    }
+
+    private fun observeChatSuggestionsEnabled() {
+        chatSuggestionsSettingJob?.cancel()
+        chatSuggestionsSettingJob = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
+            .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun fetchChatSuggestions(
+        lifecycleOwner: LifecycleOwner,
+        query: String,
+        adapter: ChatSuggestionsAdapter,
+    ) {
+        chatSuggestionsJob?.cancel()
+        chatSuggestionsJob = lifecycleOwner.lifecycleScope.launch {
+            val suggestions = runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
+            adapter.submitList(suggestions)
+            if (suggestions.isEmpty()) {
+                onClearSuggestions?.invoke(true)
+            }
+        }
+    }
+
+    private fun hideChatSuggestions(hideList: Boolean) {
+        chatSuggestionsJob?.cancel()
+        chatSuggestionsAdapter?.submitList(emptyList())
+        chatSuggestionsReader.tearDown()
+        onClearSuggestions?.invoke(hideList)
+    }
+
+    private fun buildChatUrl(suggestion: ChatSuggestion): String {
+        return duckChatInternal.getDuckChatUrl("", false)
+            .toUri()
+            .buildUpon()
+            .appendQueryParameter(CHAT_ID_PARAM, suggestion.chatId)
+            .build()
+            .toString()
+    }
+
+    private fun setChatStreaming(streaming: Boolean) {
+        ensureSubmitButtons()
+        if (streaming) {
+            submitButtons?.setStopButton()
+        } else {
+            submitButtons?.clearStopButton(com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24)
+        }
+    }
 
     private fun updateMainButtonsVisibility() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isSearchTab = toggle.selectedTabPosition == 0
         val hasText = inputField.text?.isNotBlank() == true
-        setMainButtonsVisible(allowMainButtons && isSearchTab && !hasText)
+        setMainButtonsVisible(showMainButtons && isSearchTab && !hasText)
     }
 
     private fun updateDuckAiSubmitButton() {
@@ -284,7 +458,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val container = findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return
         val buttons = InputScreenButtons(context, useTopBar = false).apply {
             onSendClick = { submitMessage() }
-            onStopClick = { this@NativeInputModeWidget.onStopClicked?.invoke() }
+            onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
             setSendButtonVisible(false)
             setNewLineButtonVisible(false)
             setVoiceButtonVisible(false)
@@ -301,25 +475,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun requestInputFocus() {
-        if (!inputField.hasFocus()) {
-            inputField.requestFocus()
-        }
-    }
-
-    fun selectChatTab() {
-        val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
-        if (toggle.selectedTabPosition != 1) {
-            toggle.getTabAt(1)?.select()
-        }
-    }
-
-    fun setChatStreaming(streaming: Boolean) {
-        ensureSubmitButtons()
-        if (streaming) {
-            submitButtons?.setStopButton()
-        } else {
-            submitButtons?.clearStopButton(com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24)
-        }
+    companion object {
+        private const val CHAT_ID_PARAM = "chatID"
     }
 }
