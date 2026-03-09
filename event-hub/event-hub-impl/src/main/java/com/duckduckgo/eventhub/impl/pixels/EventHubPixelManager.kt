@@ -18,13 +18,13 @@ package com.duckduckgo.eventhub.impl.pixels
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -77,9 +77,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
-
-    @Volatile
-    private var schedulerJob: Job? = null
+    private val schedulerJob = ConflatedJob()
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
@@ -195,7 +193,7 @@ class RealEventHubPixelManager @Inject constructor(
             cachedTelemetryConfigs = null
             if (!isFeatureEnabled()) {
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
-                cancelScheduler()
+                schedulerJob.cancel()
                 repository.deleteAllPixelStates()
                 return
             }
@@ -221,38 +219,26 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun scheduleNextCheck(deadlineMillis: Long) {
-        cancelScheduler()
+        schedulerJob.cancel()
         if (deadlineMillis == Long.MAX_VALUE) return
 
         val nowMillis = timeProvider.currentTimeMillis()
         val delayMillis = (deadlineMillis - nowMillis).coerceAtLeast(0)
 
         logcat(VERBOSE) { "EventHub: scheduling next check in ${delayMillis}ms" }
-        val job = appCoroutineScope.launch(dispatcherProvider.io()) {
+        schedulerJob += appCoroutineScope.launch(dispatcherProvider.io()) {
             delay(delayMillis)
             ensureActive()
 
-            if (!isFeatureEnabled()) {
-                schedulerJob = null
-                return@launch
-            }
+            if (!isFeatureEnabled()) return@launch
 
             synchronized(this@RealEventHubPixelManager) {
-                if (schedulerJob !== coroutineContext[Job]) return@launch
+                ensureActive()
 
                 val nextDeadline = processPixelStates()
                 scheduleNextCheck(nextDeadline)
             }
         }
-        schedulerJob = job
-    }
-
-    private fun cancelScheduler() {
-        schedulerJob?.let { job ->
-            job.cancel()
-            logcat(VERBOSE) { "EventHub: cancelled scheduler" }
-        }
-        schedulerJob = null
     }
 
     private fun fireTelemetry(pixelState: PixelState): Long? {
