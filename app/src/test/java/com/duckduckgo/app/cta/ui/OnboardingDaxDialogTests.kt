@@ -46,6 +46,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -252,5 +253,62 @@ class OnboardingDaxDialogTests {
 
         val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
         assertTrue(inContextDaxDialogsComplete)
+    }
+
+    @Test
+    fun whenHideTipsAndSevenDaysSinceInstallAndPrivacyProNotShownThenRefreshCtaReturnsPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertNotNull(result)
+        assertTrue(result is DaxBubbleCta.DaxPrivacyProCta)
+    }
+
+    @Test
+    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 3 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertFalse(result is DaxBubbleCta.DaxPrivacyProCta)
+    }
+
+    @Test
+    fun whenHideTipsAndSevenDaysButPrivacyProAlreadyDismissedThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertFalse(result is DaxBubbleCta.DaxPrivacyProCta)
     }
 }
