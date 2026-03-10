@@ -19,9 +19,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/keyline_4"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:paddingHorizontal="8dp"
+    android:paddingBottom="8dp"
     android:visibility="gone"
     tools:visibility="visible">
 
@@ -49,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
-        app:cardElevation="0dp"
+        app:cardElevation="4dp"
         app:strokeColor="?attr/daxColorAccentBlue"
         app:strokeWidth="@dimen/omnibarOutlineWidth">
 
