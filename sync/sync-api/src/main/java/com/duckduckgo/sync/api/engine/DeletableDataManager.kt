@@ -33,9 +33,9 @@ interface DeletableDataManager {
     fun onBulkDeleteSuccess(response: SyncBulkDeletionResponse)
 
     /**
-     * Called to notify that the bulk deletion request failed
+     * Called to notify that the request failed
      */
-    fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse)
+    fun onError(syncErrorResponse: SyncErrorResponse)
 
     /**
      * Used by the SyncClient to get entry updates from each deletable feature.
@@ -47,11 +47,6 @@ interface DeletableDataManager {
      * Called to notify that the entry update request was successful.
      */
     fun onEntryUpdateSuccess(response: SyncEntryUpdateResponse)
-
-    /**
-     * Called to notify that the entry update request failed.
-     */
-    fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse)
 
     /**
      * Called when sync is disabled (user disconnects or logs out).
