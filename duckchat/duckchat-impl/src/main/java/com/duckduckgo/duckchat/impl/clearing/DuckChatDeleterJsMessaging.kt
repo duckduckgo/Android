@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.clearing
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.JSONObjectAdapter
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -49,7 +51,7 @@ class DuckChatDeleterJsMessaging @Inject constructor(
     private lateinit var webView: WebView
 
     override val context: String = "contentScopeScripts"
-    override val allowedDomains: List<String> = emptyList()
+    override val allowedDomains: List<String> = listOf(AppUrl.Url.HOST, HOST_DUCK_AI)
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw IllegalArgumentException("Callback cannot be null")
@@ -102,7 +104,7 @@ class DuckChatDeleterJsMessaging @Inject constructor(
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = emptyList()
+        override val allowedDomains: List<String> = listOf(AppUrl.Url.HOST, HOST_DUCK_AI)
         override val featureName: String = FEATURE_NAME
         override val methods: List<String> = listOf(
             METHOD_CLEAR_DATA_READY,
