@@ -21,6 +21,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.persistentstorage.api.PersistentStorage
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -30,7 +32,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import com.duckduckgo.sync.impl.Result as SyncResult
 
 @SuppressLint("DenyListedApi")
 class RealSyncAutoRestoreTest {
@@ -40,6 +45,7 @@ class RealSyncAutoRestoreTest {
 
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val persistentStorage: PersistentStorage = mock()
+    private val syncAccountRepository: SyncAccountRepository = mock()
 
     private lateinit var testee: RealSyncAutoRestore
 
@@ -48,6 +54,7 @@ class RealSyncAutoRestoreTest {
         testee = RealSyncAutoRestore(
             persistentStorage = persistentStorage,
             syncFeature = syncFeature,
+            syncAccountRepository = syncAccountRepository,
             appScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
@@ -84,6 +91,58 @@ class RealSyncAutoRestoreTest {
         assertFalse(testee.canRestore())
     }
 
+    @Test
+    fun whenRestoreSyncAccountCalledThenRetrievesKeyAndCallsProcessCode() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(value = recoveryCodeString)
+        configureProcessCodeResult(SyncResult.Success(true))
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository).parseSyncAuthCode(recoveryCodeString)
+        verify(syncAccountRepository).processCode(any())
+    }
+
+    @Test
+    fun whenRestoreSyncAccountCalledButNoStoredKeyThenDoesNotCallProcessCode() = runTest {
+        configureRetrieveSuccess(value = null)
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository, never()).processCode(any())
+    }
+
+    @Test
+    fun whenRestoreSyncAccountCalledButStorageFailsThenDoesNotCallProcessCode() = runTest {
+        configureRetrieveFailure()
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository, never()).processCode(any())
+    }
+
+    @Test
+    fun whenProcessCodeFailsThenRestoreSyncAccountDoesNotThrow() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(value = recoveryCodeString)
+        configureProcessCodeResult(SyncResult.Error(code = 52, reason = "Login failed"))
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository).processCode(any())
+    }
+
+    @Test
+    fun whenParseSyncAuthCodeThrowsThenRestoreSyncAccountDoesNotCrash() = runTest {
+        val recoveryCodeString = "invalid_not_base64"
+        configureRetrieveSuccess(value = recoveryCodeString)
+        whenever(syncAccountRepository.parseSyncAuthCode(recoveryCodeString)).thenThrow(RuntimeException("Parse error"))
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository, never()).processCode(any())
+    }
+
     private fun configureAutoRestoreEnabled(enabled: Boolean) {
         syncFeature.syncAutoRestore().setRawStoredState(State(enable = enabled))
     }
@@ -91,6 +150,12 @@ class RealSyncAutoRestoreTest {
     private suspend fun configureRetrieveSuccess(value: String?) {
         val bytes = value?.toByteArray(Charsets.UTF_8)
         whenever(persistentStorage.retrieve(any())).thenReturn(Result.success(bytes))
+    }
+
+    private fun configureProcessCodeResult(result: SyncResult<Boolean>) {
+        val mockParsedCode = mock<SyncAuthCode.Recovery>()
+        whenever(syncAccountRepository.parseSyncAuthCode(any())).thenReturn(mockParsedCode)
+        whenever(syncAccountRepository.processCode(mockParsedCode)).thenReturn(result)
     }
 
     private suspend fun configureRetrieveFailure() {
