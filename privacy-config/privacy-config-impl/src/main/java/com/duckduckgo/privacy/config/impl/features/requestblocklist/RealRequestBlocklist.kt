@@ -49,7 +49,6 @@ class RealRequestBlocklist @Inject constructor(
 ) : RequestBlocklist, PrivacyConfigCallbackPlugin {
 
     private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
-    private var exceptions = listOf<String>()
 
     @Volatile
     private var exceptions = listOf<Domain>()
@@ -72,7 +71,6 @@ class RealRequestBlocklist @Inject constructor(
         requestUrl: String,
     ): Boolean {
         if (!requestBlocklistFeature.self().isEnabled()) return false
-        if (isAnException(documentUrl)) return false
 
         val documentDomain = Domain(documentUrl.extractDomain().orEmpty())
         if (isAnException(documentDomain)) return false
