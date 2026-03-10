@@ -108,30 +108,30 @@ class RealEventHubPixelManager @Inject constructor(
             for (pixelState in repository.getAllPixelStates()) {
                 if (nowMillis > pixelState.periodEndMillis) continue
 
-                val params = pixelState.params
+                val updatedParams = pixelState.params.toMutableMap()
                 var changed = false
 
                 for ((paramName, paramConfig) in pixelState.config.parameters) {
                     if (paramConfig.isCounter && paramConfig.source == eventType) {
-                        val paramState = params[paramName] ?: ParamState(0)
+                        val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
                         if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
                         changed = true
                         if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
-                            params[paramName] = paramState.copy(stopCounting = true)
+                            updatedParams[paramName] = paramState.copy(stopCounting = true)
                             logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
                             continue
                         }
 
                         val newValue = paramState.value + 1
-                        params[paramName] = paramState.copy(value = newValue)
+                        updatedParams[paramName] = paramState.copy(value = newValue)
                         logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
                     }
                 }
 
                 if (changed) {
-                    repository.savePixelState(pixelState)
+                    repository.savePixelState(pixelState.copy(params = updatedParams))
                 }
             }
         }
@@ -281,7 +281,7 @@ class RealEventHubPixelManager @Inject constructor(
                 periodStartMillis = nowMillis,
                 periodEndMillis = periodEndMillis,
                 config = pixelConfig,
-                params = pixelConfig.parameters.keys.associateWith { ParamState(0) }.toMutableMap(),
+                params = pixelConfig.parameters.keys.associateWith { ParamState(0) },
             ),
         )
 

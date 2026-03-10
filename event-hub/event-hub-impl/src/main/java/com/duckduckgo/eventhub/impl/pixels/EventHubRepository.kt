@@ -80,11 +80,11 @@ class RealEventHubRepository @Inject constructor(
         private val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
         private val paramsAdapter = moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
 
-        fun parseParamsJson(json: String): MutableMap<String, ParamState> {
+        fun parseParamsJson(json: String): Map<String, ParamState> {
             return try {
-                paramsAdapter.fromJson(json)?.toMutableMap() ?: mutableMapOf()
+                paramsAdapter.fromJson(json) ?: emptyMap()
             } catch (e: Exception) {
-                mutableMapOf()
+                emptyMap()
             }
         }
 

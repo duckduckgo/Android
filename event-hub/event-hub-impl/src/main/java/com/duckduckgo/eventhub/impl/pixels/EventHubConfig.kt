@@ -59,5 +59,5 @@ data class PixelState(
     val periodStartMillis: Long,
     val periodEndMillis: Long,
     val config: TelemetryPixelConfig,
-    val params: MutableMap<String, ParamState>,
+    val params: Map<String, ParamState>,
 )

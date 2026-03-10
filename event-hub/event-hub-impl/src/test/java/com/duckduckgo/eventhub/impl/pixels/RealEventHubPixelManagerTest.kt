@@ -676,7 +676,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(15)),
+            params = mapOf("count" to ParamState(15)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -706,7 +706,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(5)),
+            params = mapOf("count" to ParamState(5)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -750,7 +750,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "test",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(2)),
+            params = mapOf("count" to ParamState(2)),
             config = testPixelConfig,
         )
         stubPixelStates(state)
@@ -770,7 +770,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(5)),
+            params = mapOf("count" to ParamState(5)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -797,7 +797,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "test_pixel",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(2)),
+            params = mapOf("count" to ParamState(2)),
             config = originalPixelConfig,
         )
         stubPixelStates(state)
@@ -1201,7 +1201,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "test_pixel",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(4)),
+            params = mapOf("count" to ParamState(4)),
             config = originalPixelConfig,
         )
         stubPixelStates(state)
@@ -1245,7 +1245,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "test_pixel",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(1)),
+            params = mapOf("count" to ParamState(1)),
             config = originalPixelConfig,
         )
         stubPixelStates(state)
@@ -1305,7 +1305,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "test_pixel",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(1)),
+            params = mapOf("count" to ParamState(1)),
             config = originalPixelConfig,
         )
         stubPixelStates(state)
@@ -1426,8 +1426,8 @@ class RealEventHubPixelManagerTest {
         configureFeature(settings = config2)
 
         // Simulate accumulated state on both pixels
-        val stateA1WithCount = stateA1.copy(params = mutableMapOf("count" to ParamState(2)))
-        val stateB1WithCount = stateB1.copy(params = mutableMapOf("count" to ParamState(3)))
+        val stateA1WithCount = stateA1.copy(params = mapOf("count" to ParamState(2)))
+        val stateB1WithCount = stateB1.copy(params = mapOf("count" to ParamState(3)))
         stubPixelStates(stateA1WithCount, stateB1WithCount)
         manager.onConfigChanged()
         org.mockito.Mockito.reset(repository, pixel)
@@ -1626,7 +1626,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(8)),
+            params = mapOf("count" to ParamState(8)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -1741,7 +1741,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(12)),
+            params = mapOf("count" to ParamState(12)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -1897,7 +1897,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(5)),
+            params = mapOf("count" to ParamState(5)),
             config = dayPixelConfig,
         )
         stubPixelStates(finalState)
@@ -2354,7 +2354,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(5)),
+            params = mapOf("count" to ParamState(5)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -2383,7 +2383,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(5)),
+            params = mapOf("count" to ParamState(5)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -2458,7 +2458,7 @@ class RealEventHubPixelManagerTest {
             pixelName = "webTelemetry_testPixel1",
             periodStartMillis = periodStart,
             periodEndMillis = periodEnd,
-            params = mutableMapOf("count" to ParamState(7)),
+            params = mapOf("count" to ParamState(7)),
             config = dayPixelConfig,
         )
         stubPixelStates(state)
@@ -2504,7 +2504,7 @@ class RealEventHubPixelManagerTest {
         }
         val paramStates = params.mapValues { (key, value) ->
             ParamState(value = value, stopCounting = key in stopCounting)
-        }.toMutableMap()
+        }
         return PixelState(
             pixelName = name,
             periodStartMillis = periodStart,
