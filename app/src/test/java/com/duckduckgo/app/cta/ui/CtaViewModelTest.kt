@@ -77,7 +77,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import java.util.concurrent.TimeUnit
 
-// @Config(sdk = [34])
 @FlowPreview
 @RunWith(AndroidJUnit4::class)
 class CtaViewModelTest {
