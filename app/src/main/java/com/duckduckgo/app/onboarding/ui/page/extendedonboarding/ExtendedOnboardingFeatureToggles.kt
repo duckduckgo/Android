@@ -28,14 +28,17 @@ import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 )
 interface ExtendedOnboardingFeatureToggles {
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun noBrowserCtas(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun privacyProCta(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun privacyProCtaSkippedOnboarding(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
