@@ -93,7 +93,7 @@ data class SyncPatchRequest(
 }
 
 /**
- * Represents a response to an entry update request.
+ * Represents a response to a patch request.
  * @param type The type of data that was updated.
  * @param entryIds The IDs of entries that were sent, for race-safe cleanup by the caller.
  */
