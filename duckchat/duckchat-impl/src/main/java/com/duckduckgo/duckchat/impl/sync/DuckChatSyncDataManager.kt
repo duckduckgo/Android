@@ -91,22 +91,22 @@ class DuckChatSyncDataManager @Inject constructor(
 
         return runBlocking(dispatchers.io()) {
             if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
-                logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping entry updates" }
+                logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping patches" }
                 return@runBlocking null
             }
 
             if (!duckChatFeatureRepository.isAIChatHistoryEnabled()) {
-                logcat { "DuckChat-Sync: Chat history disabled, skipping entry updates" }
+                logcat { "DuckChat-Sync: Chat history disabled, skipping patches" }
                 return@runBlocking null
             }
 
             val pendingIds = duckChatSyncRepository.getPendingChatDeletions()
-            formatEntryUpdateRequest(pendingIds)
+            formatPatchRequest(pendingIds)
         }
     }
 
     override fun onPatchSuccess(response: SyncPatchResponse) {
-        logcat { "DuckChat-Sync: entry update successful for ${response.entryIds.size} entries" }
+        logcat { "DuckChat-Sync: patch successful for ${response.entryIds.size} entries" }
         appCoroutineScope.launch(dispatchers.io()) {
             duckChatSyncRepository.removePendingChatDeletions(response.entryIds.toSet())
         }
@@ -137,13 +137,13 @@ class DuckChatSyncDataManager @Inject constructor(
         )
     }
 
-    private fun formatEntryUpdateRequest(pendingIds: Set<String>): SyncPatchRequest? {
+    private fun formatPatchRequest(pendingIds: Set<String>): SyncPatchRequest? {
         if (pendingIds.isEmpty()) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat deletions to patch" }
             return null
         }
 
-        logcat { "DuckChat-Sync: formatting entry update request for ${pendingIds.size} pending chat deletions" }
+        logcat { "DuckChat-Sync: formatting patch request for ${pendingIds.size} pending chat deletions" }
 
         val jsonArray = org.json.JSONArray()
         pendingIds.forEach { chatId ->
