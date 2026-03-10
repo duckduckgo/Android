@@ -258,6 +258,22 @@
         <item quantity="other">Verwijder van %1$d websites. Je kan worden uitgelogd bij accounts.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabbladen en sitegegevens verwijderen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabbladen, sitegegevens en chats verwijderen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
+    <string name="singleTabFireDialogDeleteThisChat">Deze chat verwijderen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Als je \'Alles verwijderen\' kiest, wordt je Duck.ai-chatgeschiedenis niet verwijderd.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d tabblad en bijbehorende gegevens zijn verwijderd</item>
+        <item quantity="other">%1$d tabbladen en bijbehorende gegevens zijn verwijderd</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>
 
