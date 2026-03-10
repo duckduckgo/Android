@@ -82,7 +82,7 @@ interface SyncService {
     ): Call<Void>
 
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
-    fun patch(
+    fun patchData(
         @Header("Authorization") token: String,
         @Body request: JSONObject,
     ): Call<JSONObject>
