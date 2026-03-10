@@ -280,7 +280,6 @@ jobs:
           maestro_test_name: omnibar_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
-          maestro_api_level: 30
           maestro_include_tags: omnibarTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
