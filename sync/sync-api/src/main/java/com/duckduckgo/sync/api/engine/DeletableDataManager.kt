@@ -30,12 +30,12 @@ interface DeletableDataManager {
     /**
      * Called to notify that the bulk deletion request was successful
      */
-    fun onBulkDeleteSuccess(response: SyncBulkDeletionResponse) {}
+    fun onBulkDeleteSuccess(response: SyncBulkDeletionResponse)
 
     /**
      * Called to notify that the bulk deletion request failed
      */
-    fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse) {}
+    fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse)
 
     /**
      * Used by the SyncClient to get entry updates from each deletable feature.
@@ -46,16 +46,16 @@ interface DeletableDataManager {
     /**
      * Called to notify that the entry update request was successful.
      */
-    fun onEntryUpdateSuccess(response: SyncEntryUpdateResponse) {}
+    fun onEntryUpdateSuccess(response: SyncEntryUpdateResponse)
 
     /**
      * Called to notify that the entry update request failed.
      */
-    fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse) {}
+    fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse)
 
     /**
      * Called when sync is disabled (user disconnects or logs out).
      * Implementations should clear any pending state.
      */
-    fun onSyncDisabled() {}
+    fun onSyncDisabled()
 }
