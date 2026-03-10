@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -67,6 +68,7 @@ class RequestBlocklistTest {
         WebViewIdlingResource(webView!!).track()
 
         onView(withId(R.id.omnibarTextInput)).perform(
+            clearText(),
             typeText("https://privacy-test-pages.site/privacy-protections/request-blocklist/"),
             pressImeActionButton(),
         )
