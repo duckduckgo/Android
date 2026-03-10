@@ -41,7 +41,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAd
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.app.pixels.AppPixelName
@@ -403,7 +402,7 @@ class WelcomePageViewModel @Inject constructor(
                 _commands.send(ShowSyncRestoreDialog)
             } else {
                 if (reinstallUser) {
-                    _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
+                    _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                 } else {
                     _commands.send(ShowInitialDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                 }
