@@ -80,8 +80,10 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
-    override fun onBulkDeleteError(syncErrorResponse: SyncErrorResponse) {
-        // no-op, keep timestamp around for next time
+    override fun onError(syncErrorResponse: SyncErrorResponse) {
+        logcat(LogPriority.ERROR) { "DuckChat-Sync: request failed with ${syncErrorResponse.featureSyncError}" }
+        // For deletion: no-op, keep timestamp around for next time
+        // For entry updates: no-op, keep pending IDs for retry. Queue is naturally cleared by bulk delete or sync disable.
     }
 
     override fun getEntryUpdates(): SyncEntryUpdateRequest? {
@@ -108,11 +110,6 @@ class DuckChatSyncDataManager @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             duckChatSyncRepository.removePendingChatDeletions(response.entryIds.toSet())
         }
-    }
-
-    override fun onEntryUpdateError(syncErrorResponse: SyncErrorResponse) {
-        logcat(LogPriority.ERROR) { "DuckChat-Sync: entry update failed with ${syncErrorResponse.featureSyncError}" }
-        // Keep pending IDs for retry. Queue is naturally cleared by bulk delete or sync disable.
     }
 
     override fun onSyncDisabled() {
