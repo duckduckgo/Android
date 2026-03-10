@@ -103,6 +103,8 @@ import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -324,7 +326,15 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             return
         }
 
-        val credentialCount = autofillStore.getCredentialCount().firstOrNull()
+        val credentialCount = runCatching {
+            autofillStore.getCredentialCount().firstOrNull()
+        }.getOrElse {
+            currentCoroutineContext().ensureActive()
+            logcat { "Error accessing secure storage so can't offer autofill functionality" }
+            deviceUnsupported()
+            return
+        }
+
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
             logcat(VERBOSE) { "No credentials; can skip showing device auth" }
@@ -433,17 +443,23 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 prioritizeDomainMatchesOnSearch = autofillFeature.prioritizeDomainMatchesOnSearch().isEnabled(),
             )
 
-            val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
-            val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
-                credentialListFilter.filter(credentials, filter)
-            }
-            combined.collect { credentials ->
-                val updatedBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = isBreakageReportingAllowed())
-                _viewState.value = _viewState.value.copy(
-                    logins = credentials,
-                    reportBreakageState = updatedBreakageState,
-                )
-                showPromotionIfEligible()
+            runCatching {
+                val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
+                val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
+                    credentialListFilter.filter(credentials, filter)
+                }
+                combined.collect { credentials ->
+                    val updatedBreakageState = _viewState.value.reportBreakageState.copy(allowBreakageReporting = isBreakageReportingAllowed())
+                    _viewState.value = _viewState.value.copy(
+                        logins = credentials,
+                        reportBreakageState = updatedBreakageState,
+                    )
+                    showPromotionIfEligible()
+                }
+            }.getOrElse {
+                logcat { "Error accessing secure storage so can't offer autofill functionality" }
+                deviceUnsupported()
+                return@launch
             }
         }
 
@@ -681,10 +697,17 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             logcat(VERBOSE) { "Opened autofill management screen from from $launchSource" }
 
             val source = launchSource.asString()
-            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
-            pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
-            pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
-            pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+            runCatching {
+                val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+                pixel.fire(
+                    AUTOFILL_MANAGEMENT_SCREEN_OPENED,
+                    mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()),
+                )
+                pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+                pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
+            }.getOrElse {
+                logcat { "Couldn't get credential count" }
+            }
         }
     }
 
