@@ -102,6 +102,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onNavigationStarted(webViewId: String, url: String) {
+        if (!isFeatureEnabled()) return
         if (webViewId.isEmpty() || url.isEmpty()) return
         val previousUrl = webViewCurrentUrl.put(webViewId, url)
         if (previousUrl != null && previousUrl != url) {
