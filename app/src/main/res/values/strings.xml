@@ -896,7 +896,7 @@
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI features are private and optional. You can make changes in <b>Settings > AI Features</b>.]]></string>
 
     <!-- Input Mode Demo Onboarding step -->
-    <string name="preOnboardingInputModeDemoTitle" translatable="false">Ready to get started? Try search or AI chat!</string>
+    <string name="preOnboardingInputModeDemoTitle" translatable="false">Ready to get started?&lt;br/&gt;Try search or AI chat!</string>
     <string name="preOnboardingInputModeDemoSearchHint" translatable="false">Search privately</string>
     <string name="preOnboardingInputModeDemoChatHint" translatable="false">Ask privately</string>
 
