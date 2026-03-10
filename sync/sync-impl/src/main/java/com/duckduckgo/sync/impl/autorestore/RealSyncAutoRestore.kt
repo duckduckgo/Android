@@ -21,12 +21,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.sync.api.SyncAutoRestore
+import com.duckduckgo.sync.impl.Result
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -35,6 +39,7 @@ import javax.inject.Inject
 class RealSyncAutoRestore @Inject constructor(
     private val persistentStorage: PersistentStorage,
     private val syncFeature: SyncFeature,
+    private val syncAccountRepository: SyncAccountRepository,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SyncAutoRestore {
@@ -48,7 +53,27 @@ class RealSyncAutoRestore @Inject constructor(
 
     override fun restoreSyncAccount() {
         appScope.launch(dispatcherProvider.io()) {
-            logcat { "Sync-Recovery: restoreSyncAccount called, not yet implemented" }
+            try {
+                logcat { "Sync-Recovery: restoreSyncAccount called" }
+
+                val recoveryBytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
+                if (recoveryBytes == null) {
+                    logcat(LogPriority.WARN) { "Sync-Recovery: no recovery key found in persistent storage" }
+                    return@launch
+                }
+
+                val recoveryCodeString = String(recoveryBytes, Charsets.UTF_8)
+                logcat { "Sync-Recovery: recovery key retrieved, attempting login" }
+
+                val parsedCode = syncAccountRepository.parseSyncAuthCode(recoveryCodeString)
+                when (val result = syncAccountRepository.processCode(parsedCode)) {
+                    is Result.Success -> logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
+                    is Result.Error -> logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
+                }
+            } catch (t: Throwable) {
+                coroutineContext.ensureActive()
+                logcat(LogPriority.ERROR) { "Sync-Recovery: unexpected error during restore - ${t.message}" }
+            }
         }
     }
 }
