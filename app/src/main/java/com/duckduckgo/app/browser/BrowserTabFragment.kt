@@ -5134,12 +5134,6 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 lastSeenCtaViewState = viewState
                 when {
-                    viewState.cta is DaxBubbleCta -> {
-                        hideNewTab()
-                        showCta(viewState.cta)
-                        this@BrowserTabFragment.hideKeyboard()
-                    }
-
                     viewState.cta != null -> {
                         hideNewTab()
                         showCta(viewState.cta)
