@@ -101,4 +101,40 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/suggestion1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_5"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        app:daxButtonSize="small"
+        app:icon="@drawable/ic_find_search_16"
+        tools:alpha="1"
+        tools:text="how to say duck in spanish" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/suggestion2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-4dp"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        app:daxButtonSize="small"
+        app:icon="@drawable/ic_find_search_16"
+        tools:alpha="1"
+        tools:text="mighty ducks cast" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+        android:id="@+id/suggestion3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-4dp"
+        android:alpha="0"
+        android:gravity="start|center_vertical"
+        app:daxButtonSize="small"
+        app:icon="@drawable/ic_wand_16"
+        tools:alpha="1"
+        tools:text="Surprise me!" />
+
 </LinearLayout>
