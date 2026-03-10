@@ -43,6 +43,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -123,7 +124,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
                 is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
-                is ShowInputModeDemoDialog -> configureDaxCta(INPUT_MODE_DEMO)
+                is ShowInputModeDemoDialog -> configureDaxCta(
+                    INPUT_MODE_DEMO,
+                    searchSuggestions = it.searchSuggestions,
+                    chatSuggestions = it.chatSuggestions,
+                )
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
@@ -217,7 +222,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false, showDuckAiCopy: Boolean = false) {
+    private fun configureDaxCta(
+        onboardingDialogType: PreOnboardingDialogType,
+        showSplitOption: Boolean = false,
+        showDuckAiCopy: Boolean = false,
+        searchSuggestions: List<DaxDialogIntroOption> = emptyList(),
+        chatSuggestions: List<DaxDialogIntroOption> = emptyList(),
+    ) {
         context?.let {
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
@@ -497,12 +508,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.inputModeDemo.root.show()
                     binding.daxDialogCta.inputModeDemo.root.alpha = MIN_ALPHA
 
-                    configureInputModeDemoField(inputMode = SEARCH)
+                    configureInputModeDemoField(SEARCH, searchSuggestions)
                     binding.daxDialogCta.inputModeDemo.inputModeDemoSwitch.addOnTabSelectedListener(
                         object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
                             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) {
                                 TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                                configureInputModeDemoField(inputMode = if (tab.position == 0) SEARCH else CHAT)
+
+                                if (tab.position == 0) {
+                                    configureInputModeDemoField(SEARCH, searchSuggestions)
+                                } else {
+                                    configureInputModeDemoField(CHAT, chatSuggestions)
+                                }
                             }
                             override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
                             override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {}
@@ -512,6 +528,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.inputModeDemo.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        val demoBinding = binding.daxDialogCta.inputModeDemo
+                        listOf(demoBinding.suggestion1, demoBinding.suggestion2, demoBinding.suggestion3).forEach { button ->
+                            button.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        }
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
@@ -521,8 +541,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureInputModeDemoField(inputMode: InputMode) {
+    private fun configureInputModeDemoField(
+        inputMode: InputMode,
+        suggestions: List<DaxDialogIntroOption>,
+    ) {
         val demoBinding = binding.daxDialogCta.inputModeDemo
+
+        listOf(demoBinding.suggestion1, demoBinding.suggestion2, demoBinding.suggestion3)
+            .forEachIndexed { index, button -> suggestions[index].setOptionView(button) }
 
         when (inputMode) {
             SEARCH -> {

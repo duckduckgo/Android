@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -155,7 +156,10 @@ class WelcomePageViewModel @Inject constructor(
 
         data class ShowInputScreenDialog(val showDuckAiCopy: Boolean) : Command
 
-        data object ShowInputModeDemoDialog : Command
+        data class ShowInputModeDemoDialog(
+            val searchSuggestions: List<DaxDialogIntroOption>,
+            val chatSuggestions: List<DaxDialogIntroOption>,
+        ) : Command
 
         data object Finish : Command
 
@@ -243,7 +247,7 @@ class WelcomePageViewModel @Inject constructor(
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
                         _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                     } else {
-                        _commands.send(Command.ShowInputModeDemoDialog)
+                        _commands.send(buildShowInputModeDemoCommand())
                     }
                 }
             }
@@ -258,7 +262,7 @@ class WelcomePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
-                    _commands.send(Command.ShowInputModeDemoDialog)
+                    _commands.send(buildShowInputModeDemoCommand())
                 }
             }
 
@@ -424,6 +428,11 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    private fun buildShowInputModeDemoCommand() = Command.ShowInputModeDemoDialog(
+        searchSuggestions = onboardingStore.getSearchOptions(),
+        chatSuggestions = onboardingStore.getChatSuggestions(),
+    )
 
     private fun isSplitOmnibarEnabled(): Boolean =
         androidBrowserConfigFeature.splitOmnibar().isEnabled() &&
