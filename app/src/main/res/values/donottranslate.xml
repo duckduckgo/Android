@@ -98,4 +98,6 @@
     <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
+    <!-- Onboarding -->
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Did you know?</string>
 </resources>

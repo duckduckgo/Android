@@ -257,9 +257,21 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            // Privacy Pro onboarding OR Privacy Pro for returning users who skipped onboarding
-            canShowPrivacyProCta() || canShowPrivacyProCtaForSkippedOnboarding() -> {
+            // Privacy Pro onboarding
+            canShowPrivacyProCta() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
+                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
+                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
+                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogOkButton
+                }
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
+            }
+
+            // Privacy Pro onboarding for returning users who skipped onboarding
+            canShowPrivacyProCtaForSkippedOnboarding() -> {
+                val titleRes: Int = R.string.onboardingSkippedPrivacyProDaxDialogTitle
                 val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
                 val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
                     R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
