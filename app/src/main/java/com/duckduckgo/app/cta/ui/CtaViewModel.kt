@@ -485,12 +485,23 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    @Deprecated("New users won't have this option available since extended onboarding")
     private fun hideTips() = settingsDataStore.hideTips
 
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
+
+    suspend fun getPrivacyProOnboardingOrigin(): String =
+        withContext(dispatchers.io()) {
+            val skippedOnboarding = hideTips()
+            val isFreeTrialCopy = freeTrialCopyAvailable()
+            when {
+                skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_reinstall_tryfreecopy"
+                skippedOnboarding && !isFreeTrialCopy -> "funnel_onboarding_android_reinstall_subscribecopy"
+                !skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_newinstall_tryfreecopy"
+                else -> "funnel_onboarding_android_newinstall_subscribecopy"
+            }
+        }
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
