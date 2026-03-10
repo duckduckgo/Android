@@ -108,10 +108,12 @@
         android:layout_marginTop="@dimen/keyline_5"
         android:alpha="0"
         android:gravity="start|center_vertical"
+        android:visibility="gone"
         app:daxButtonSize="small"
         app:icon="@drawable/ic_find_search_16"
         tools:alpha="1"
-        tools:text="how to say duck in spanish" />
+        tools:text="how to say duck in spanish"
+        tools:visibility="visible" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/suggestion2"
@@ -120,10 +122,12 @@
         android:layout_marginTop="-4dp"
         android:alpha="0"
         android:gravity="start|center_vertical"
+        android:visibility="gone"
         app:daxButtonSize="small"
         app:icon="@drawable/ic_find_search_16"
         tools:alpha="1"
-        tools:text="mighty ducks cast" />
+        tools:text="mighty ducks cast"
+        tools:visibility="visible" />
 
     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/suggestion3"
@@ -132,9 +136,11 @@
         android:layout_marginTop="-4dp"
         android:alpha="0"
         android:gravity="start|center_vertical"
+        android:visibility="gone"
         app:daxButtonSize="small"
         app:icon="@drawable/ic_wand_16"
         tools:alpha="1"
-        tools:text="Surprise me!" />
+        tools:text="Surprise me!"
+        tools:visibility="visible" />
 
 </LinearLayout>

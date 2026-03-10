@@ -74,8 +74,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
@@ -527,10 +529,41 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.inputModeDemo.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        val demoBinding = binding.daxDialogCta.inputModeDemo
-                        listOf(demoBinding.suggestion1, demoBinding.suggestion2, demoBinding.suggestion3).forEach { button ->
-                            button.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        if (binding.daxDialogCta.inputModeDemo.root.alpha == 0f) {
+                            binding.daxDialogCta.inputModeDemo.root.animate()
+                                .alpha(MAX_ALPHA)
+                                .setDuration(ANIMATION_DURATION)
+                                .withEndAction {
+                                    val buttons = listOf(
+                                        binding.daxDialogCta.inputModeDemo.suggestion1,
+                                        binding.daxDialogCta.inputModeDemo.suggestion2,
+                                        binding.daxDialogCta.inputModeDemo.suggestion3,
+                                    )
+
+                                    fun animateButton(index: Int) {
+                                        if (index < buttons.size) {
+                                            buttons[index].alpha = MIN_ALPHA
+                                            buttons[index].isVisible = true
+
+                                            TransitionManager.beginDelayedTransition(
+                                                binding.daxDialogCta.cardView,
+                                                AutoTransition(),
+                                            )
+
+                                            buttons[index].animate()
+                                                .alpha(MAX_ALPHA)
+                                                .setDuration(SUGGESTION_ANIMATION_DURATION)
+                                                .withEndAction { animateButton(index + 1) }
+                                                .start()
+                                        }
+                                    }
+
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        delay(SUGGESTIONS_ANIMATION_DELAY)
+                                        animateButton(0)
+                                    }
+                                }
+                                .start()
                         }
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
@@ -726,6 +759,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         private const val ANIMATION_DELAY = 1400L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
+        private const val SUGGESTION_ANIMATION_DURATION = 1000L
+        private const val SUGGESTIONS_ANIMATION_DELAY = 2000L
         private const val SUGGESTION_ANIMATION_DURATION = 500L
         private const val SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
