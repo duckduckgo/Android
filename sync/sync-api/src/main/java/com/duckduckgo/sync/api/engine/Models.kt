@@ -65,7 +65,7 @@ data class SyncChangesResponse(
  * @param type The type of deletable data to delete.
  * @param untilTimestamp An optional timestamp to indicate that only items modified before this timestamp should be deleted.
  */
-data class SyncBulkDeletionRequest(
+data class SyncDeletionRequest(
     val type: DeletableType,
     val untilTimestamp: String? = null,
 )
@@ -73,9 +73,9 @@ data class SyncBulkDeletionRequest(
 /**
  * Represents a response to a bulk deletion request.
  * @param type The type of deletable data that was deleted.
- * @param untilTimestamp The timestamp provided in @[SyncBulkDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
+ * @param untilTimestamp The timestamp provided in @[SyncDeletionRequest] indicating the last modified timestamp up until which deletions should be performed.
  */
-data class SyncBulkDeletionResponse(
+data class SyncDeletionResponse(
     val type: DeletableType,
     val untilTimestamp: String? = null,
 )
@@ -85,7 +85,7 @@ data class SyncBulkDeletionResponse(
  * @param type The type of data to update.
  * @param jsonString A JSON array string of entries to send (e.g. [{"id":"x","deleted":"..."}]).
  */
-data class SyncEntryUpdateRequest(
+data class SyncPatchRequest(
     val type: DeletableType,
     val jsonString: String,
 ) {
@@ -97,7 +97,7 @@ data class SyncEntryUpdateRequest(
  * @param type The type of data that was updated.
  * @param entryIds The IDs of entries that were sent, for race-safe cleanup by the caller.
  */
-data class SyncEntryUpdateResponse(
+data class SyncPatchResponse(
     val type: DeletableType,
     val entryIds: List<String>,
 )

@@ -16,22 +16,24 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
-import com.duckduckgo.sync.api.engine.SyncDeletionRequest
-import com.duckduckgo.sync.api.engine.SyncDeletionResponse
+import com.duckduckgo.sync.api.engine.PatchableDataManager
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
+import com.duckduckgo.sync.api.engine.SyncPatchRequest
+import com.duckduckgo.sync.api.engine.SyncPatchResponse
 
-class FakeDeletableDataManager(
-    private val deletableType: DeletableType = DUCK_AI_CHATS,
-    private val fakeDeletion: SyncDeletionRequest? = null,
-) : DeletableDataManager {
-    override fun getType(): DeletableType = deletableType
+class FakePatchableDataManager(
+    private val patchableType: DeletableType = DUCK_AI_CHATS,
+    private val fakePatch: SyncPatchRequest? = null,
+) : PatchableDataManager {
+    override fun getType(): DeletableType = patchableType
 
-    override fun getDeletions(): SyncDeletionRequest? = fakeDeletion
+    override fun getPatches(): SyncPatchRequest? = fakePatch
 
-    override fun onDeleteSuccess(response: SyncDeletionResponse) {}
+    override fun onPatchSuccess(response: SyncPatchResponse) {}
 
-    override fun onDeleteError(syncErrorResponse: SyncErrorResponse) {}
+    override fun onPatchError(syncErrorResponse: SyncErrorResponse) {}
+
+    override fun onSyncDisabled() {}
 }
