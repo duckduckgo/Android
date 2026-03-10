@@ -3216,7 +3216,10 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
-                is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
+                is DaxBubbleCta -> {
+                    onDaxBubbleCtaOkButtonClicked(cta)
+                    null
+                }
                 is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
                 else -> null
             }
@@ -4513,23 +4516,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
+    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
-        return when (cta) {
+        when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> {
-                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_onboarding_android".toUri())
+                viewModelScope.launch {
+                    val origin = ctaViewModel.getPrivacyProOnboardingOrigin()
+                    command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
+                }
             }
-
             is DaxBubbleCta.DaxEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
                     showOrHideKeyboard(updatedCta)
                 }
-                null
             }
-
-            else -> null
+            else -> { }
         }
     }
 
