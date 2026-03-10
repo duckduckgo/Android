@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.impl.features.requestblocklist
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertFalse
@@ -45,9 +46,11 @@ class RealRequestBlocklistTest {
         settings: String? = null,
         isMainProcess: Boolean = true,
         featureEnabled: Boolean = true,
+        exceptions: List<FeatureException> = emptyList(),
     ): RealRequestBlocklist {
         whenever(mockToggle.getSettings()).thenReturn(settings)
         whenever(mockToggle.isEnabled()).thenReturn(featureEnabled)
+        whenever(mockToggle.getExceptions()).thenReturn(exceptions)
         return RealRequestBlocklist(
             requestBlocklistFeature = mockFeature,
             dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -391,6 +394,26 @@ class RealRequestBlocklistTest {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/IMAGE.js", domains = listOf("example.com")))
 
         assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/IMAGE.js"))
+    }
+
+    @Test
+    fun whenDocumentDomainIsInExceptionsThenReturnFalse() {
+        val testee = createTestee(
+            settings = settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("<all>")),
+            exceptions = listOf(FeatureException("example.com", "test exception")),
+        )
+
+        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+    }
+
+    @Test
+    fun whenDocumentSubdomainMatchesExceptionThenReturnFalse() {
+        val testee = createTestee(
+            settings = settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("<all>")),
+            exceptions = listOf(FeatureException("example.com", "test exception")),
+        )
+
+        assertFalse(testee.containedInBlocklist("https://sub.example.com", "https://testing.com/image.jpg"))
     }
 
     private fun settingsWithRule(
