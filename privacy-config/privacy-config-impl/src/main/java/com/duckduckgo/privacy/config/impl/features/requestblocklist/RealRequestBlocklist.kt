@@ -49,6 +49,8 @@ class RealRequestBlocklist @Inject constructor(
 ) : RequestBlocklist, PrivacyConfigCallbackPlugin {
 
     private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
+
+    @Volatile
     private var exceptions = listOf<Domain>()
 
     private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
