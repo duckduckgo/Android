@@ -27,7 +27,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class EventHubNavigationPlugin @Inject constructor(
+class EventHubJsInjectorPlugin @Inject constructor(
     private val pixelManager: EventHubPixelManager,
 ) : JsInjectorPlugin {
 

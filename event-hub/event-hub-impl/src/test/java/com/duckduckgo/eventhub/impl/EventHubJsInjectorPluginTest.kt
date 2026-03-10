@@ -25,12 +25,12 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-class EventHubNavigationPluginTest {
+class EventHubJsInjectorPluginTest {
 
     private val pixelManager: EventHubPixelManager = mock()
     private val webView: WebView = mock()
 
-    private val plugin = EventHubNavigationPlugin(pixelManager = pixelManager)
+    private val plugin = EventHubJsInjectorPlugin(pixelManager = pixelManager)
 
     @Test
     fun `onPageStarted calls onNavigationStarted with webView identity hash and url`() {
