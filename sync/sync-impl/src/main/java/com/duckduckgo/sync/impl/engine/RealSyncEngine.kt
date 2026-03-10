@@ -359,7 +359,7 @@ class RealSyncEngine @Inject constructor(
             return
         }
 
-        logcat(INFO) { "Sync-Engine: processing ${updates.size} entry updates" }
+        logcat(INFO) { "Sync-Engine: processing ${updates.size} patches" }
 
         updates.forEach { (request, manager) ->
             logcat { "Sync-Engine: processing patch for ${request.type}" }

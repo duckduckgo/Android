@@ -695,29 +695,29 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenEntryUpdatesExistThenTheyAreProcessed() {
-        val entryUpdateRequest = givenEntryUpdates(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
-        givenEntryUpdateSuccess(entryUpdateRequest)
+    fun whenPatchesExistThenTheyAreProcessed() {
+        val patchRequest = givenPendingPatches(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
+        givenPatchDeletableEntriesSuccess(patchRequest)
 
         val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         givenPatchSuccess()
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchDeletableEntries(entryUpdateRequest)
+        verify(syncApiClient).patchDeletableEntries(patchRequest)
         verify(syncApiClient).patchData(bookmarksChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test
-    fun whenEntryUpdateSucceedsThenManagerOnPatchSuccessIsCalled() {
+    fun whenPatchSucceedsThenManagerOnPatchSuccessIsCalled() {
         val patchRequest = SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
         val patchManager = mock<PatchableDataManager>()
         whenever(patchManager.getType()).thenReturn(DUCK_AI_CHATS)
         whenever(patchManager.getPatches()).thenReturn(patchRequest)
 
         val patchResponse = SyncPatchResponse(DUCK_AI_CHATS, listOf("abc"))
-        givenEntryUpdateSuccess(patchRequest, patchResponse)
+        givenPatchDeletableEntriesSuccess(patchRequest, patchResponse)
         whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
         givenNoProviders()
 
@@ -728,13 +728,13 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenEntryUpdateFailsWithFeatureErrorThenManagerOnPatchErrorIsCalled() {
+    fun whenPatchFailsWithFeatureErrorThenManagerOnPatchErrorIsCalled() {
         val patchRequest = SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
         val patchManager = mock<PatchableDataManager>()
         whenever(patchManager.getType()).thenReturn(DUCK_AI_CHATS)
         whenever(patchManager.getPatches()).thenReturn(patchRequest)
 
-        givenEntryUpdateError(patchRequest, API_CODE.COUNT_LIMIT.code)
+        givenPatchDeletableEntriesError(patchRequest, API_CODE.COUNT_LIMIT.code)
         whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
         givenNoProviders()
 
@@ -745,7 +745,7 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenNoEntryUpdatesThenNormalSyncContinues() {
+    fun whenNoPatchesThenNormalSyncContinues() {
         givenNoLocalChanges()
         givenNoDeletions()
         givenGetSuccess()
@@ -950,20 +950,20 @@ internal class SyncEngineTest {
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
     }
 
-    private fun givenEntryUpdates(type: DeletableType, jsonString: String): SyncPatchRequest {
+    private fun givenPendingPatches(type: DeletableType, jsonString: String): SyncPatchRequest {
         val patchRequest = SyncPatchRequest(type, jsonString)
         val patchManager = FakePatchableDataManager(type, patchRequest)
         whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
         return patchRequest
     }
 
-    private fun givenEntryUpdateSuccess(request: SyncPatchRequest, response: SyncPatchResponse? = null) {
-        val entryUpdateResponse = response ?: SyncPatchResponse(request.type, emptyList())
-        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Success(entryUpdateResponse))
+    private fun givenPatchDeletableEntriesSuccess(request: SyncPatchRequest, response: SyncPatchResponse? = null) {
+        val patchResponse = response ?: SyncPatchResponse(request.type, emptyList())
+        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Success(patchResponse))
     }
 
-    private fun givenEntryUpdateError(request: SyncPatchRequest, errorCode: Int) {
-        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Result.Error(errorCode, "entry update failed"))
+    private fun givenPatchDeletableEntriesError(request: SyncPatchRequest, errorCode: Int) {
+        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Result.Error(errorCode, "patch failed"))
     }
 
     private fun givenChangesForType(
