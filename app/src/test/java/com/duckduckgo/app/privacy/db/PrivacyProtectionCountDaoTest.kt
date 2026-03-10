@@ -17,6 +17,7 @@
 package com.duckduckgo.app.privacy.db
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
@@ -24,7 +25,9 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class PrivacyProtectionCountDaoTest {
 
     private lateinit var db: AppDatabase
