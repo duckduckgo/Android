@@ -90,6 +90,7 @@ class DataClearing @Inject constructor(
             clearDuckAiChatIfNeeded(contextualTabChatUrl)
 
             contextualDataStore.clearTabChatUrl(tabId)
+            contextualDataStore.clearTabClosedTimestamp(tabId)
         }
     }
 
