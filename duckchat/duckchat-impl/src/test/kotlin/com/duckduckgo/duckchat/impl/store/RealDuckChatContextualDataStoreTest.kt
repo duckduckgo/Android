@@ -24,6 +24,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChatContextualDataStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
