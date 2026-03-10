@@ -19,6 +19,7 @@ package com.duckduckgo.eventhub.impl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
+import com.duckduckgo.eventhub.impl.webevents.WebEventsFeatureName
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -28,8 +29,6 @@ import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
-
-private const val WEB_EVENTS_FEATURE_NAME = "webEvents"
 
 @ContributesMultibinding(AppScope::class)
 class EventHubContentScopeJsMessageHandler @Inject constructor(
@@ -55,7 +54,7 @@ class EventHubContentScopeJsMessageHandler @Inject constructor(
         }
 
         override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = WEB_EVENTS_FEATURE_NAME
+        override val featureName: String = WebEventsFeatureName.WebEvents.value
         override val methods: List<String> = listOf("webEvent")
     }
 }
