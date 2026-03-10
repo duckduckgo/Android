@@ -37,7 +37,7 @@ interface WebEventsDataStore {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class SharedPreferencesWebEventsDataStore @Inject constructor(
+class RealWebEventsDataStore @Inject constructor(
     @WebEventsPrefs private val store: DataStore<Preferences>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
