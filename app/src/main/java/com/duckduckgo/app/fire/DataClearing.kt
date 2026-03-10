@@ -84,12 +84,12 @@ class DataClearing @Inject constructor(
     private suspend fun clearContextualChatDataIfNeeded(tabId: String) {
         val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
             .contains(FireClearOption.DUCKAI_CHATS)
+
         if (isDuckAiChatHistoryClearingEnabled) {
-            val tabUrl = contextualDataStore.getTabChatUrl(tabId)
-            clearDuckAiChatIfNeeded(tabUrl)
+            val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            clearDuckAiChatIfNeeded(contextualTabChatUrl)
 
             contextualDataStore.clearTabChatUrl(tabId)
-            contextualDataStore.clearTabClosedTimestamp(tabId)
         }
     }
 
