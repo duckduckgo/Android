@@ -17,9 +17,12 @@
 package com.duckduckgo.espresso
 
 import android.webkit.WebView
-import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.action.ViewActions.pressImeActionButton
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.model.Atoms
 import androidx.test.espresso.web.sugar.Web
 import androidx.test.ext.junit.rules.activityScenarioRule
@@ -41,15 +44,15 @@ class RequestBlocklistTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.site/privacy-protections/request-blocklist/",
+            queryExtra = "https://privacy-test-pages.site/privacy-protections",
         ),
     )
 
+    private val registeredResources = mutableListOf<IdlingResource>()
+
     @After
     fun tearDown() {
-        IdlingRegistry.getInstance().resources.toList().forEach { resource ->
-            IdlingRegistry.getInstance().unregister(resource)
-        }
+        registeredResources.forEach { IdlingRegistry.getInstance().unregister(it) }
     }
 
     @Test
@@ -61,20 +64,17 @@ class RequestBlocklistTest {
             webView = it.findViewById(R.id.browserWebView)
         }
 
-        // Wait for privacy config to download and populate the request blocklist
-        Espresso.onView(ViewMatchers.isRoot()).perform(waitFor(10000))
+        WebViewIdlingResource(webView!!).track()
 
-        // Reload the page so requests are intercepted with the now-loaded blocklist
-        activityScenarioRule.scenario.onActivity {
-            webView?.reload()
-        }
+        onView(withId(R.id.omnibarTextInput)).perform(
+            typeText("https://privacy-test-pages.site/privacy-protections/request-blocklist/"),
+            pressImeActionButton(),
+        )
 
-        // Small delay to ensure reload has started and old JS context is cleared
-        Espresso.onView(ViewMatchers.isRoot()).perform(waitFor(1000))
+        WebViewIdlingResource(webView!!).track()
 
         // Now register — window.results won't exist until the new page's finished() fires
-        val idlingResourceForResults = JsObjectIdlingResource(webView!!, "window.results")
-        IdlingRegistry.getInstance().register(idlingResourceForResults)
+        JsObjectIdlingResource(webView!!, "window.results").track()
 
         val results = Web.onWebView()
             .perform(Atoms.script(SCRIPT))
@@ -101,13 +101,26 @@ class RequestBlocklistTest {
         return jsonAdapter.fromJson(jsonString)
     }
 
+    private fun IdlingResource.track() = apply {
+        registeredResources += this
+        IdlingRegistry.getInstance().register(this)
+    }
+
     companion object {
         const val SCRIPT = "return window.results;"
         const val SUCCESS = "success"
     }
 
-    data class TestJson(val status: Int, val value: ResultsWrapper)
-    data class ResultsWrapper(val status: String, val results: List<RequestBlocklistResult>)
+    data class TestJson(
+        val status: Int,
+        val value: ResultsWrapper,
+    )
+
+    data class ResultsWrapper(
+        val status: String,
+        val results: List<RequestBlocklistResult>,
+    )
+
     data class RequestBlocklistResult(
         val expected: String,
         val description: String,
