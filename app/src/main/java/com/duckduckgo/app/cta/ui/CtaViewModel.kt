@@ -504,6 +504,11 @@ class CtaViewModel @Inject constructor(
             }
         }
 
+    suspend fun isPromoOnboardingDialogShowing(): Boolean =
+        withContext(dispatchers.io()) {
+            canShowPrivacyProCtaForSkippedOnboarding()
+        }
+
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
         private const val PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS = 7L

@@ -151,6 +151,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_TRACKERS_FOUND
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
+import com.duckduckgo.app.cta.model.CtaId.DAX_INTRO_PRIVACY_PRO
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.Cta
@@ -8186,6 +8187,45 @@ class BrowserTabViewModelTest {
             val commands = commandCaptor.allValues
             assertFalse(
                 "LaunchInputScreen command should be suppressed when Duck.ai is opened",
+                commands.any { it is Command.LaunchInputScreen },
+            )
+        }
+
+    @Test
+    fun whenInputScreenEnabledAndPrivacyProSkippedOnboardingDialogShowingThenLaunchInputScreenCommandSuppressed() =
+        runTest {
+            val initialTabId = "initial-tab"
+            val initialTab =
+                TabEntity(
+                    tabId = initialTabId,
+                    url = "https://example.com",
+                    title = "EX",
+                    skipHome = false,
+                    viewed = true,
+                    position = 0,
+                )
+            val ntpTabId = "ntp-tab"
+            val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+            whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+            whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+            flowSelectedTab.emit(initialTab)
+
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+            whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+            whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+            whenever(subscriptions.isEligible()).thenReturn(true)
+
+            testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
+            mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
+
+            flowSelectedTab.emit(ntpTab)
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val commands = commandCaptor.allValues
+            assertFalse(
+                "LaunchInputScreen command should be suppressed when Privacy Pro skipped-onboarding dialog is showing",
                 commands.any { it is Command.LaunchInputScreen },
             )
         }

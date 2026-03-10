@@ -846,8 +846,14 @@ class BrowserTabViewModel @Inject constructor(
                 val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
                 val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
                 if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
-                    // whenever an event fires, so the user switched to a new tab page, launch the input screen
-                    command.value = LaunchInputScreen
+                    viewModelScope.launch {
+                        // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                        // unless an onboarding promo message is displayed
+                        val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
+                        if (!hasPendingOnboardingPromo) {
+                            command.value = LaunchInputScreen
+                        }
+                    }
                 }
             }.launchIn(viewModelScope)
 
