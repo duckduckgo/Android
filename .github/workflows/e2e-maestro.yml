@@ -34,6 +34,11 @@ on:
         required: false
         type: string
         default: 'play'
+      maestro_api_level:
+        description: 'Android API level to run tests on (e.g. 30, 33, 34)'
+        required: false
+        type: string
+        default: '30'
   workflow_dispatch:
     inputs:
       tags:
@@ -59,6 +64,11 @@ on:
         required: false
         type: string
         default: 'play'
+      maestro_api_level:
+        description: 'Android API level to run tests on (e.g. 30, 33, 34)'
+        required: false
+        type: string
+        default: '30'
 
 concurrency:
   group: ${{ github.workflow_ref }}-${{ github.ref }}
@@ -97,6 +107,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ inputs.binary_id }}
           maestro_app_file: ${{ inputs.app_flavour == 'internal' && steps.assemble.outputs.internal_apk_path || steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: ${{ inputs.maestro_api_level }}
           maestro_include_tags: ${{ inputs.tags }}
           test_suite_name: ${{ inputs.test_name }}
           is_release_blocker: ${{ inputs.release_blocker }}
