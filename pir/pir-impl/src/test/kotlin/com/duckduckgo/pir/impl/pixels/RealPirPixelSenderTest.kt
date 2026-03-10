@@ -17,21 +17,25 @@
 package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class RealPirPixelSenderTest {
     private lateinit var testee: RealPirPixelSender
     private val mockPixelSender: Pixel = mock()
+    private val mockNetworkProtectionState: NetworkProtectionState = mock()
 
     @Before
     fun setUp() {
-        testee = RealPirPixelSender(mockPixelSender)
+        testee = RealPirPixelSender(mockPixelSender, mockNetworkProtectionState)
     }
 
     @Test
@@ -39,7 +43,7 @@ class RealPirPixelSenderTest {
         testee.reportManualScanStarted()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender, times(2)).fire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -145,13 +149,13 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportOptOutSubmittedThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         testee.reportOptOutSubmitted(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = "pattern-abc",
-            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -179,7 +183,6 @@ class RealPirPixelSenderTest {
             durationMs = 5000L,
             optOutAttemptCount = 2,
             emailPattern = null,
-            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -195,6 +198,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportOptOutFailedThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
         testee.reportOptOutFailed(
             brokerUrl = "https://broker.com",
             parent = "parent-broker",
@@ -205,7 +209,6 @@ class RealPirPixelSenderTest {
             emailPattern = "pattern-xyz",
             actionId = "action-1",
             actionType = "fillform",
-            isVpnRunning = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -652,13 +655,13 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScanMatchesThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         testee.reportScanMatches(
             brokerUrl = "https://broker.com",
             totalMatches = 3,
             durationMs = 5000L,
             inManualStarted = true,
             parentUrl = "https://parent.com",
-            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -680,6 +683,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScanNoMatchThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
         testee.reportScanNoMatch(
             brokerUrl = "https://broker.com",
             brokerVersion = "3.0",
@@ -688,7 +692,6 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-2",
             actionType = "extract",
-            isVpnRunning = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -712,6 +715,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScanErrorThenFiresPixelWithAllParameters() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         testee.reportScanError(
             brokerUrl = "https://broker.com",
             brokerVersion = "3.0",
@@ -722,7 +726,6 @@ class RealPirPixelSenderTest {
             parentUrl = "https://parent.com",
             actionId = "action-scan-3",
             actionType = "navigate",
-            isVpnRunning = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -858,6 +861,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportDownloadMainConfigBEFailureThenFiresPixelWithErrorCode() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
         testee.reportDownloadMainConfigBEFailure("404")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -868,22 +872,27 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue["error_code"] == "404")
+        val params = paramsCaptor.firstValue
+        assert(params["error_code"] == "404")
+        assert(params["vpn_connection_state"] == "disconnected")
     }
 
     @Test
     fun whenReportDownloadMainConfigFailureThenFiresCorrectPixel() = runTest {
-        testee.reportDownloadMainConfigFailure()
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(true)
+        testee.reportDownloadMainConfigFailure("test")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender, times(2)).fire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        val params = paramsCaptor.allValues.first()
+        assert(params["error_details"] == "test")
+        assert(params["vpn_connection_state"] == "connected")
     }
 
     @Test

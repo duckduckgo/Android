@@ -298,6 +298,9 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun vpnReminderNotification(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

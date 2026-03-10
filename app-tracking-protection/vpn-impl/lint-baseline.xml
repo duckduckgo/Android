@@ -1736,83 +1736,6 @@
     </issue>
 
     <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_report_breakage_app_list.xml"
-            line="23"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="        android:background=&quot;?attr/daxColorSurface&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_report_breakage_category_single_choice.xml"
-            line="26"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/daxColorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="    android:background=&quot;?attr/daxColorSurface&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_vpn_onboarding.xml"
-            line="26"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_activity_apps.xml"
-            line="24"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_activity_entry.xml"
-            line="24"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:windowBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="    android:background=&quot;?android:windowBackground&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_activity_entry_header.xml"
-            line="24"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.DuckDuckGo.App`)"
-        errorLine1="        android:background=&quot;?selectableItemBackground&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_report_app_breakage_entry.xml"
-            line="27"
-            column="9"/>
-    </issue>
-
-    <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;atp_OnNoTrackersNotificationHeader&quot;>&quot;Escaneando actividad de rastreo... pi... pi...&quot;&lt;/string>"
@@ -1975,69 +1898,6 @@
             file="src/main/res/values-sk/strings-vpn.xml"
             line="273"
             column="48"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/device_shield_onboarding_page_three_header.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/device_shield_onboarding_page_three_header.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/device_shield_onboarding_page_three_header_dark_transparent.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/device_shield_onboarding_page_three_header_dark_transparent.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/device_shield_onboarding_page_three_header_transparent.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/device_shield_onboarding_page_three_header_transparent.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/device_shield_onboarding_permission_dialog.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/device_shield_onboarding_permission_dialog.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/device_shield_onboarding_report.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/device_shield_onboarding_report.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_active_dot.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_active_dot.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_inactive_dot.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_inactive_dot.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/tracking_profile_info_graph.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/tracking_profile_info_graph.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/tracking_profile_info_header.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/tracking_profile_info_header.png"/>
     </issue>
 
     <issue
@@ -2276,17 +2136,6 @@
         message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
         <location
             file="src/main/AndroidManifest.xml"/>
-    </issue>
-
-    <issue
-        id="IgnoreWithoutReason"
-        message="Test is ignored without giving any explanation"
-        errorLine1="    @Ignore"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/mobile/android/vpn/ui/tracker_activity/AppTPCompanyTrackersViewModelTest.kt"
-            line="74"
-            column="5"/>
     </issue>
 
     <issue

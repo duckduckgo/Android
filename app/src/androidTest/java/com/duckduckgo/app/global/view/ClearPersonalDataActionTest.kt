@@ -20,11 +20,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DeleteBrowsingData
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
@@ -34,6 +37,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -61,6 +65,8 @@ class ClearPersonalDataActionTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
     private val mockNavigationHistory: NavigationHistory = mock()
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
+    private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
+    private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -81,6 +87,8 @@ class ClearPersonalDataActionTest {
             sitePermissionsManager = mockSitePermissionsManager,
             navigationHistory = mockNavigationHistory,
             webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
+            tabVisitedSitesRepository = mockTabVisitedSitesRepository,
+            webViewCapabilityChecker = mockWebViewCapabilityChecker,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
@@ -154,6 +162,12 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearTabsAndAllDataAsyncCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
+    }
+
+    @Test
     fun whenClearTabsAndAllDataAsyncCalledThenCookieManagerFlushed() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockCookieManager).flush()
@@ -194,6 +208,7 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
         verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
     }
 
@@ -259,6 +274,12 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
+    fun whenClearBrowserDataOnlyCalledThenTabVisitedSitesCleared() = runTest {
+        testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
+        verify(mockTabVisitedSitesRepository).clearAll()
+    }
+
+    @Test
     fun whenClearBrowserDataOnlyCalledThenTabsNotCleared() = runTest {
         testee.clearBrowserDataOnly(shouldFireDataClearPixel = false)
         verify(mockTabRepository, never()).deleteAll()
@@ -280,7 +301,30 @@ class ClearPersonalDataActionTest {
         verifyNoInteractions(mockThirdPartyCookieManager)
         verifyNoInteractions(mockSitePermissionsManager)
         verifyNoInteractions(mockNavigationHistory)
+        verifyNoInteractions(mockWebTrackersBlockedRepository)
+        verifyNoInteractions(mockTabVisitedSitesRepository)
         verifyNoInteractions(mockClearingUnsentForgetAllPixelStore)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenReturnsFeatureNotSupported() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("example.com"), shouldClearDuckAiData = false)
+        assertTrue(result is ClearDataResult.FeatureNotSupported)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithEmptyDomainsAndFeatureSupportedThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        val result = testee.clearDataForSpecificDomains(domains = emptySet(), shouldClearDuckAiData = false)
+        assertTrue(result is ClearDataResult.Success)
+    }
+
+    @Test
+    fun whenClearDataForSpecificDomainsCalledWithDuckDuckGoDomainsAndShouldNotClearDuckAiThenReturnsSuccess() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai"), shouldClearDuckAiData = false)
+        assertTrue(result is ClearDataResult.Success)
     }
 
     @Test

@@ -19,6 +19,7 @@ package com.duckduckgo.feature.toggles.impl.metrics
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.MetricsPixelPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,6 +33,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
             listOf(
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "1",
                     toggle = toggle,
                     conversionWindow = (0..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
@@ -43,6 +45,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                 ),
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "4",
                     toggle = toggle,
                     conversionWindow = listOf(
@@ -52,6 +55,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                 ),
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "6",
                     toggle = toggle,
                     conversionWindow = (0..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
@@ -64,6 +68,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                 ),
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "11",
                     toggle = toggle,
                     conversionWindow = (0..14).map { ConversionWindow(lowerWindow = it, upperWindow = it) } +
@@ -76,6 +81,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                 ),
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "21",
                     toggle = toggle,
                     conversionWindow = listOf(
@@ -85,6 +91,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                 ),
                 MetricsPixel(
                     metric = "search",
+                    type = MetricType.COUNT_WHEN_IN_WINDOW,
                     value = "30",
                     toggle = toggle,
                     conversionWindow = listOf(

@@ -125,6 +125,21 @@ class DuckChatWebViewViewModelTest {
     }
 
     @Test
+    fun whenSubscriptionStatusSameButAccessTokenChangesThenCommandSent() = runTest {
+        viewModel.commands.test {
+            whenever(subscriptions.getAccessToken()).thenReturn("token_plus")
+            subscriptionStatusFlow.emit(AUTO_RENEWABLE)
+            val firstCommand = awaitItem()
+            assertTrue(firstCommand is Command.SendSubscriptionAuthUpdateEvent)
+
+            whenever(subscriptions.getAccessToken()).thenReturn("token_pro")
+            subscriptionStatusFlow.emit(AUTO_RENEWABLE)
+            val secondCommand = awaitItem()
+            assertTrue(secondCommand is Command.SendSubscriptionAuthUpdateEvent)
+        }
+    }
+
+    @Test
     fun whenSubscriptionStatusChangesTwiceToDifferentValuesThenTwoCommandsSent() = runTest {
         viewModel.commands.test {
             subscriptionStatusFlow.emit(AUTO_RENEWABLE)

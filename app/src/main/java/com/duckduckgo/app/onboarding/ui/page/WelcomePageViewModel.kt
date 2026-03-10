@@ -127,7 +127,7 @@ class WelcomePageViewModel @Inject constructor(
             val showSplitOption: Boolean,
         ) : Command
 
-        data object ShowInputScreenDialog : Command
+        data class ShowInputScreenDialog(val showDuckAiCopy: Boolean) : Command
 
         data object Finish : Command
 
@@ -179,6 +179,7 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
                     pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                    duckChat.setInputScreenUserSetting(true)
                 }
             }
 
@@ -204,7 +205,7 @@ class WelcomePageViewModel @Inject constructor(
                         }
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog)
+                        _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                     } else {
                         _commands.send(Finish)
                     }

@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 @Dao
@@ -30,6 +31,10 @@ interface HistoryDao {
     @Transaction
     @Query("SELECT * FROM history_entries")
     suspend fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
+
+    @Transaction
+    @Query("SELECT * FROM history_entries")
+    fun getHistoryEntriesWithVisitsFlow(): Flow<List<HistoryEntryWithVisits>>
 
     @Query("UPDATE history_entries SET title = :title WHERE id = :id")
     suspend fun updateTitle(id: Long, title: String)
@@ -103,11 +108,8 @@ interface HistoryDao {
     @Query("DELETE FROM visits_list WHERE tabId = :tabId")
     suspend fun deleteVisitsByTabId(tabId: String)
 
-    @Transaction
-    suspend fun deleteHistoryForTab(tabId: String) {
-        deleteVisitsByTabId(tabId)
-        deleteEntriesWithNoVisits()
-    }
+    @Query("DELETE FROM history_entries WHERE id IN (SELECT DISTINCT historyEntryId FROM visits_list WHERE tabId = :tabId)")
+    suspend fun deleteHistoryForTab(tabId: String)
 
     @Transaction
     suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime) {

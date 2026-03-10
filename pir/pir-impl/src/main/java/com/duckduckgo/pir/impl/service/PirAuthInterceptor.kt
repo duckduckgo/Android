@@ -26,6 +26,7 @@ import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -40,9 +41,21 @@ class PirAuthInterceptor @Inject constructor(
     override fun intercept(chain: Chain): Response {
         val request = chain.request()
 
-        val authRequired = request.tag(Invocation::class.java)
+        val invocation = request.tag(Invocation::class.java)
+
+        val authRequired = invocation
             ?.method()
             ?.isAnnotationPresent(PirAuthRequired::class.java) == true
+
+        val hasExtendedTimeout = invocation
+            ?.method()
+            ?.isAnnotationPresent(PirExtendedReadTimeout::class.java) == true
+
+        val timeoutAdjustedChain = if (hasExtendedTimeout) {
+            chain.withReadTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        } else {
+            chain
+        }
 
         return if (authRequired) {
             val accessToken = runBlocking { subscriptions.getAccessToken() }
@@ -52,13 +65,21 @@ class PirAuthInterceptor @Inject constructor(
                 .header("Authorization", "bearer $accessToken")
                 .build()
 
-            chain.proceed(authenticatedRequest)
+            timeoutAdjustedChain.proceed(authenticatedRequest)
         } else {
-            chain.proceed(request)
+            timeoutAdjustedChain.proceed(request)
         }
+    }
+
+    companion object {
+        private const val READ_TIMEOUT_SECONDS = 30
     }
 }
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PirAuthRequired
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PirExtendedReadTimeout

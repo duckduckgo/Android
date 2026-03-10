@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page
+package com.duckduckgo.app.startup
 
-import android.content.Intent
+/**
+ * Classification of app startup type for performance analysis.
+ */
+enum class StartupType {
+    /**
+     * Full app launch from terminated state.
+     */
+    COLD,
 
-object WelcomePageView {
-    sealed class Event {
-        data object OnPrimaryCtaClicked : Event()
-        data object OnDefaultBrowserSet : Event()
-        data object OnDefaultBrowserNotSet : Event()
-    }
+    /**
+     * App process existed in background, activities recreated.
+     */
+    WARM,
 
-    sealed class State {
-        data object Idle : State()
-        data class ShowDefaultBrowserDialog(val intent: Intent) : State()
-        data object Finish : State()
-    }
+    /**
+     * App in memory, activity already created.
+     */
+    HOT,
+
+    /**
+     * Unable to classify startup type reliably.
+     */
+    UNKNOWN,
 }

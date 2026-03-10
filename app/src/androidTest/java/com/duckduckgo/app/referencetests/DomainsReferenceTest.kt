@@ -63,6 +63,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -103,6 +104,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
+    private val mockRequestBlocklist: RequestBlocklist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
@@ -180,8 +182,12 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = CloakedCnameDetectorImpl(tdsCnameEntityDao, mockTrackerAllowlist, mockUserAllowListRepository),
             requestFilterer = mockRequestFilterer,
-            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
+            requestBlocklist = mockRequestBlocklist,
+            contentBlocking = mockContentBlocking,
+            trackerAllowlist = mockTrackerAllowlist,
+            userAllowListRepository = mockUserAllowListRepository,
             duckPlayer = mockDuckPlayer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,

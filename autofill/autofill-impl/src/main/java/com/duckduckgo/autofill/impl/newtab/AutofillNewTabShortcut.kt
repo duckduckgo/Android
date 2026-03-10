@@ -34,6 +34,8 @@ import javax.inject.Inject
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
     priority = NewTabPageShortcutPlugin.PRIORITY_AUTOFILL,
+    featureName = "pluginAutofillNewTabShortcutPlugin",
+    parentFeatureName = "pluginPointNewTabPageShortcutPlugin",
 )
 class AutofillNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

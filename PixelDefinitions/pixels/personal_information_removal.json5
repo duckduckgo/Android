@@ -990,6 +990,11 @@
                 "key": "error_code",
                 "description": "Error code from BE",
                 "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the submission succeeded",
+                "type": "string"
             }
         ]
     },
@@ -998,7 +1003,38 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_details",
+                "description": "Sanitized exception message from client",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the submission succeeded",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_download_broker-json_failure": {
+        "description": "Android specific pixel which is fired when downloading broker json files failed.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_details",
+                "description": "Sanitized exception message from client",
+                "type": "string"
+            },
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the pixel is fired",
+                "type": "string"
+            }
+        ]
     },
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
@@ -1518,5 +1554,12 @@
                 "type": "string"
             }
         ]
+    },
+    "m_dbp_manual_reset": {
+        "description": "Android specific pixel fired whenever the user turns off PIR and resets it",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

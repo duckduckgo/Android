@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
 
@@ -200,6 +202,19 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
     )
+}
+
+afterEvaluate {
+    // Export Firebase Test Lab (Flank) tests to Develocity
+    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_FIREBASE
+        ).configure {
+            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+        }
+    }
 }
 
 apply plugin: 'android-reporting'

@@ -246,15 +246,6 @@ interface AndroidBrowserConfigFeature {
     fun onboardingDuckAiCopyUpdatesFeb26(): Toggle
 
     /**
-     * Controls default URL display for new users only.
-     * @return `true` when the remote config has the global "shorterUrlDefault" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun shorterUrlDefault(): Toggle
-
-    /**
      * Controls the automatic data clearing options, which allows to specify granular automatic clearing options.
      * @return `true` when the remote config has the global "improvedDataClearingOptions" androidBrowserConfig
      * sub-feature flag enabled

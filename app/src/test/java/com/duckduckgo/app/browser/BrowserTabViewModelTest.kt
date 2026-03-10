@@ -3632,6 +3632,54 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenUserVisitsDuckDuckGoUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
+        runTest {
+            val domain = "https://duckduckgo.com/"
+
+            whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION))
+                .thenReturn(true)
+            whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(domain)).thenReturn(true)
+
+            givenCurrentSite(domain)
+
+            loadUrl("https://duckduckgo.com", isBrowserShowing = true)
+
+            assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+        }
+
+    @Test
+    fun whenUserVisitsDuckChatUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
+        runTest {
+            val domain = "https://duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+
+            whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION))
+                .thenReturn(true)
+            whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+            givenCurrentSite(domain)
+
+            loadUrl("https://duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5", isBrowserShowing = true)
+
+            assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+        }
+
+    @Test
+    fun whenUserVisitsSDDGUrlWithPermanentLocationPermissionThenMessageIsNotShown() =
+        runTest {
+            val domain = "https://duckduckgo.com/"
+
+            whenever(mockSitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION))
+                .thenReturn(true)
+            whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+            givenCurrentSite(domain)
+
+            loadUrl("https://duckduckgo.com/", isBrowserShowing = true)
+
+            assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+        }
+
+    @Test
     fun whenPrefetchFaviconThenFetchFaviconForCurrentTab() =
         runTest {
             val url = "https://www.example.com/"
@@ -9074,6 +9122,27 @@ class BrowserTabViewModelTest {
             val event = awaitItem()
             assertEquals(SUBSCRIPTIONS_FEATURE_NAME, event.featureName)
             assertEquals("authUpdate", event.subscriptionName)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionStatusSameButAccessTokenChangesOnDuckAiThenAuthUpdateEventSent() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        loadUrl(duckAiUrl, title = "Duck.ai")
+
+        whenever(subscriptions.getAccessToken()).thenReturn("token_plus")
+        testee.subscriptionEventDataFlow.test {
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val firstEvent = awaitItem()
+            assertEquals("authUpdate", firstEvent.subscriptionName)
+
+            whenever(subscriptions.getAccessToken()).thenReturn("token_pro")
+            subscriptionStatusFlow.emit(SubscriptionStatus.AUTO_RENEWABLE)
+            val secondEvent = awaitItem()
+            assertEquals("authUpdate", secondEvent.subscriptionName)
+
             cancelAndIgnoreRemainingEvents()
         }
     }

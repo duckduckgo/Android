@@ -1300,20 +1300,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_chrome_comparison_chart.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_chrome_comparison_chart.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_ddg_comparison_chart.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_ddg_comparison_chart.png"/>
-    </issue>
-
-    <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
         errorLine1="    &lt;ImageView"

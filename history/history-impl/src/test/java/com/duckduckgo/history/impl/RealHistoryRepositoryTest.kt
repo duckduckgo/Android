@@ -24,6 +24,7 @@ import com.duckduckgo.history.impl.store.HistoryEntryEntity
 import com.duckduckgo.history.impl.store.HistoryEntryWithVisits
 import com.duckduckgo.history.impl.store.VisitEntity
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -58,6 +59,7 @@ class RealHistoryRepositoryTest {
 
     @Before
     fun setup() = runTest {
+        whenever(mockHistoryDao.getHistoryEntriesWithVisitsFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockHistoryDao.getHistoryEntriesWithVisits()).thenReturn(emptyList())
     }
 
@@ -149,10 +151,12 @@ class RealHistoryRepositoryTest {
 
     @Test
     fun whenGetHistoryThenReturnsEntriesFromDao() = runTest {
-        whenever(mockHistoryDao.getHistoryEntriesWithVisits()).thenReturn(
-            listOf(
-                historyEntryWithVisits("https://example.com", "Example"),
-                historyEntryWithVisits("https://other.com", "Other", id = 2),
+        whenever(mockHistoryDao.getHistoryEntriesWithVisitsFlow()).thenReturn(
+            flowOf(
+                listOf(
+                    historyEntryWithVisits("https://example.com", "Example"),
+                    historyEntryWithVisits("https://other.com", "Other", id = 2),
+                ),
             ),
         )
 
@@ -163,10 +167,12 @@ class RealHistoryRepositoryTest {
 
     @Test
     fun whenGetHistoryWithBlankUrlThenEntryIsFilteredOut() = runTest {
-        whenever(mockHistoryDao.getHistoryEntriesWithVisits()).thenReturn(
-            listOf(
-                historyEntryWithVisits("https://example.com", "Example"),
-                historyEntryWithVisits("", "Blank"),
+        whenever(mockHistoryDao.getHistoryEntriesWithVisitsFlow()).thenReturn(
+            flowOf(
+                listOf(
+                    historyEntryWithVisits("https://example.com", "Example"),
+                    historyEntryWithVisits("", "Blank"),
+                ),
             ),
         )
 
