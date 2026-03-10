@@ -871,6 +871,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Did you know?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Want easy access to private AI chat?</string>
