@@ -17,6 +17,7 @@
 package com.duckduckgo.app.cta.db
 
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -26,7 +27,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class DismissedCtaDaoTest {
 
     private lateinit var db: AppDatabase
@@ -34,7 +37,9 @@ class DismissedCtaDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
         dao = db.dismissedCtaDao()
     }
 
