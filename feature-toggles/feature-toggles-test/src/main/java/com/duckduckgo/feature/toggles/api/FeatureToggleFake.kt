@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
-
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+package com.duckduckgo.feature.toggles.api
 
 class FeatureToggleFake : FeatureToggle {
     override fun isFeatureEnabled(
