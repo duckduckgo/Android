@@ -815,7 +815,6 @@ class DataClearingTest {
 
         verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-123")
         verify(mockContextualDataStore).clearTabChatUrl("tab1")
-        verify(mockContextualDataStore).clearTabClosedTimestamp("tab1")
     }
 
     @Test
@@ -828,7 +827,6 @@ class DataClearingTest {
 
         verify(mockContextualDataStore, never()).getTabChatUrl(any())
         verify(mockContextualDataStore, never()).clearTabChatUrl(any())
-        verify(mockContextualDataStore, never()).clearTabClosedTimestamp(any())
     }
 
     @Test
@@ -841,7 +839,6 @@ class DataClearingTest {
         testee.clearSingleTabData("tab1")
 
         verify(mockContextualDataStore).clearTabChatUrl("tab1")
-        verify(mockContextualDataStore).clearTabClosedTimestamp("tab1")
     }
 
     @Test
