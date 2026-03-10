@@ -139,6 +139,7 @@ import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -1058,8 +1059,8 @@ class BrowserTabFragment :
             omnibarType = settingsDataStore.omnibarType,
             binding = binding,
         )
-        nativeInputManager.start(viewLifecycleOwner) {
-            nativeInputManager.hideNativeInput(binding.rootView, omnibar)
+        nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner) {
+            nativeInputManager.hideNativeInput()
         }
 
         webViewContainer = binding.webViewContainer
@@ -1233,59 +1234,59 @@ class BrowserTabFragment :
 
     private fun showNativeInput(query: String = "") {
         nativeInputManager.showNativeInput(
-            omnibar = omnibar,
             layoutInflater = layoutInflater,
-            rootView = binding.rootView,
             lifecycleOwner = viewLifecycleOwner,
             tabs = viewModel.tabs,
             query = query,
-            onSearchTextChanged = { text -> onUserEnteredText(text) },
-            onClearAutocomplete = {
-                if (binding.autoCompleteSuggestionsList.isVisible) {
-                    viewModel.autoCompleteSuggestionsGone()
-                }
-                viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
-                binding.autoCompleteSuggestionsList.gone()
-                binding.focusedView.gone()
-            },
-            onSearchSubmitted = { query -> onUserSubmittedText(query) },
-            onChatSubmitted = { query ->
-                val url = duckChat.getDuckChatUrl(query, true)
-                browserActivity?.launchNewTab(query = url, skipHome = true)
-            },
-            onDuckAiChatSubmitted = { query ->
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = "aiChat",
-                        subscriptionName = "submitAIChatNativePrompt",
-                        params = JSONObject().apply {
-                            put("platform", "android")
-                            put(
-                                "query",
-                                JSONObject().apply {
-                                    put("prompt", query)
-                                    put("autoSubmit", true)
-                                },
-                            )
-                        },
-                    ),
-                )
-            },
-            onChatSuggestionSelected = { query -> userEnteredQuery(query) },
-            onFireButtonTapped = { onFireButtonPressed() },
-            onTabSwitcherTapped = { launchTabSwitcher() },
-            onMenuTapped = {
-                launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
-            },
-            onStopTapped = {
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = "aiChat",
-                        subscriptionName = "submitPromptInterruption",
-                        params = JSONObject("{}"),
-                    ),
-                )
-            },
+            callbacks = NativeInputCallbacks(
+                onSearchTextChanged = { text -> onUserEnteredText(text) },
+                onClearAutocomplete = {
+                    if (binding.autoCompleteSuggestionsList.isVisible) {
+                        viewModel.autoCompleteSuggestionsGone()
+                    }
+                    viewModel.triggerAutocomplete("", hasFocus = false, hasQueryChanged = true)
+                    binding.autoCompleteSuggestionsList.gone()
+                    binding.focusedView.gone()
+                },
+                onSearchSubmitted = { query -> onUserSubmittedText(query) },
+                onBrowserChatSubmitted = { query ->
+                    val url = duckChat.getDuckChatUrl(query, true)
+                    browserActivity?.launchNewTab(query = url, skipHome = true)
+                },
+                onDuckAiChatSubmitted = { query ->
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitAIChatNativePrompt",
+                            params = JSONObject().apply {
+                                put("platform", "android")
+                                put(
+                                    "query",
+                                    JSONObject().apply {
+                                        put("prompt", query)
+                                        put("autoSubmit", true)
+                                    },
+                                )
+                            },
+                        ),
+                    )
+                },
+                onChatSuggestionSelected = { query -> userEnteredQuery(query) },
+                onFireButtonTapped = { onFireButtonPressed() },
+                onTabSwitcherTapped = { launchTabSwitcher() },
+                onMenuTapped = {
+                    launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
+                },
+                onStopTapped = {
+                    contentScopeScripts.sendSubscriptionEvent(
+                        SubscriptionEventData(
+                            featureName = "aiChat",
+                            subscriptionName = "submitPromptInterruption",
+                            params = JSONObject("{}"),
+                        ),
+                    )
+                },
+            ),
         )
     }
 
@@ -2768,7 +2769,7 @@ class BrowserTabFragment :
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DisableDuckAIFullScreen -> {
                 omnibar.setViewMode(Browser(it.url))
-                nativeInputManager.hideNativeInput(binding.rootView, omnibar)
+                nativeInputManager.hideNativeInput()
             }
 
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
@@ -4507,7 +4508,7 @@ class BrowserTabFragment :
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
-        if (nativeInputManager.hideNativeInput(binding.rootView, omnibar)) return true
+        if (nativeInputManager.hideNativeInput()) return true
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
@@ -5486,7 +5487,7 @@ class BrowserTabFragment :
                 if (isVisible) {
                     viewModel.sendKeyboardFocusedPixel()
                 }
-                nativeInputManager.onKeyboardVisibilityChanged(isVisible, binding.rootView, omnibar)
+                nativeInputManager.onKeyboardVisibilityChanged(isVisible)
             }
             .launchIn(lifecycleScope)
     }

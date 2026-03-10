@@ -16,10 +16,12 @@
 
 package com.duckduckgo.privacy.config.impl.features.requestblocklist
 
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.RequestBlocklist
@@ -49,6 +51,9 @@ class RealRequestBlocklist @Inject constructor(
     private val blockedRequests = ConcurrentHashMap<String, List<BlocklistRuleEntity>>()
     private var exceptions = listOf<String>()
 
+    @Volatile
+    private var exceptions = listOf<Domain>()
+
     private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
         moshi.adapter(RequestBlocklistSettings::class.java)
 
@@ -69,6 +74,9 @@ class RealRequestBlocklist @Inject constructor(
         if (!requestBlocklistFeature.self().isEnabled()) return false
         if (isAnException(documentUrl)) return false
 
+        val documentDomain = Domain(documentUrl.extractDomain().orEmpty())
+        if (isAnException(documentDomain)) return false
+
         val httpUrl = requestUrl.toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
 
@@ -77,7 +85,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentUrl, rule.domains)
+            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentDomain, rule)
         }
     }
 
@@ -106,22 +114,22 @@ class RealRequestBlocklist @Inject constructor(
 
             blockedRequests.clear()
             blockedRequests.putAll(newBlockedRequests)
-            exceptions = requestBlocklistFeature.self().getExceptions().map { it.domain }
+            exceptions = requestBlocklistFeature.self().getExceptions().map { Domain(it.domain) }
         }
     }
 
-    private fun isAnException(documentUrl: String): Boolean {
+    private fun isAnException(documentDomain: Domain): Boolean {
         return exceptions.any { exception ->
-            UriString.sameOrSubdomain(documentUrl, exception)
+            UriString.sameOrSubdomain(documentDomain, exception)
         }
     }
 
     private fun domainMatches(
-        documentUrl: String?,
-        domains: List<String>,
+        documentDomain: Domain,
+        rule: BlocklistRuleEntity,
     ): Boolean {
-        if (documentUrl == null) return false
-        if (domains.contains("<all>")) return true
-        return domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) }
+        if (documentDomain.value.isEmpty()) return false
+        if (rule.applyToAllDomains) return true
+        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentDomain, domain) }
     }
 }

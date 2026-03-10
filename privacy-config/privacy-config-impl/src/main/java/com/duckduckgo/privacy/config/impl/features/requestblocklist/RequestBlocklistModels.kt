@@ -16,13 +16,16 @@
 
 package com.duckduckgo.privacy.config.impl.features.requestblocklist
 
+import com.duckduckgo.app.browser.Domain
+
 data class BlockedRequestEntry(
     val rules: List<Map<String, @JvmSuppressWildcards Any>>?,
 )
 
 class BlocklistRuleEntity(
     val rule: Regex,
-    val domains: List<String>,
+    val applyToAllDomains: Boolean,
+    val domains: List<Domain>,
     val reason: String?,
 ) {
     companion object {
@@ -37,7 +40,7 @@ class BlocklistRuleEntity(
             if (map.keys.any { it !in KNOWN_PROPERTIES }) return null
 
             val ruleString = map[PROPERTY_RULE] as? String ?: return null
-            val domains = map[PROPERTY_DOMAINS] as? List<String> ?: return null
+            val domainsString = map[PROPERTY_DOMAINS] as? List<String> ?: return null
             val reason = map[PROPERTY_REASON] as? String
 
             val rule = buildString {
@@ -50,7 +53,14 @@ class BlocklistRuleEntity(
                 }
             }.toRegex()
 
-            return BlocklistRuleEntity(rule = rule, domains = domains, reason = reason)
+            return BlocklistRuleEntity(
+                rule = rule,
+                applyToAllDomains = domainsString.contains(ALL_DOMAINS_RULE),
+                domains = domainsString.filter { it != ALL_DOMAINS_RULE }.map { Domain(it) },
+                reason = reason,
+            )
         }
     }
 }
+
+private const val ALL_DOMAINS_RULE = "<all>"

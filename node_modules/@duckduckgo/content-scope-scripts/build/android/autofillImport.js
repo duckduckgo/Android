@@ -2779,6 +2779,8 @@
      * Sends message to the webkit layer (fire and forget)
      * @param {String} handler
      * @param {*} data
+     * @returns {*}
+     * @throws {MissingHandler}
      * @internal
      */
     wkSend(handler, data2 = {}) {
@@ -2850,9 +2852,10 @@
     }
     /**
      * @param {import('../index.js').NotificationMessage} msg
+     * @returns {Promise<void>}
      */
-    notify(msg) {
-      this.wkSend(msg.context, msg);
+    async notify(msg) {
+      await this.wkSend(msg.context, msg);
     }
     /**
      * @param {import('../index.js').RequestMessage} msg
@@ -3493,19 +3496,19 @@
      * @param {Record<string, any>} [data]
      */
     notify(name, data2 = {}) {
-      const message = new NotificationMessage({
-        context: this.messagingContext.context,
-        featureName: this.messagingContext.featureName,
-        method: name,
-        params: data2
-      });
       try {
-        this.transport.notify(message);
-      } catch (e) {
-        if (this.messagingContext.env === "development") {
-          console.error("[Messaging] Failed to send notification:", e);
-          console.error("[Messaging] Message details:", { name, data: data2 });
+        const message = new NotificationMessage({
+          context: this.messagingContext.context,
+          featureName: this.messagingContext.featureName,
+          method: name,
+          params: data2
+        });
+        const maybeAsyncResult = this.transport.notify(message);
+        if (isPromiseLike(maybeAsyncResult)) {
+          void handleAsyncNotificationResult(maybeAsyncResult, this.messagingContext.env, name, data2);
         }
+      } catch (e) {
+        logNotificationError(this.messagingContext.env, name, data2, e);
       }
     }
     /**
@@ -3591,6 +3594,26 @@
       return new TestTransport(config, messagingContext);
     }
     throw new Error("unreachable");
+  }
+  function isPromiseLike(value) {
+    return value !== null && value !== void 0 && typeof /** @type {{then?: unknown}} */
+    value.then === "function";
+  }
+  async function handleAsyncNotificationResult(result, env, name, data2) {
+    try {
+      await result;
+    } catch (error) {
+      logNotificationError(env, name, data2, error);
+    }
+  }
+  function logNotificationError(env, name, data2, error) {
+    if (env === "development") {
+      try {
+        console.error("[Messaging] Failed to send notification:", error);
+        console.error("[Messaging] Message details:", { name, data: data2 });
+      } catch {
+      }
+    }
   }
   var MissingHandler = class extends Error {
     /**
@@ -9499,7 +9522,7 @@
     /**
      * Observes the removal of an element from the DOM.
      * @param {HTMLElement|Element} element
-     * @param {any} onRemoveCallback
+     * @param {() => void} onRemoveCallback
      */
     observeElementRemoval(element, onRemoveCallback) {
       const observer = new MutationObserver((mutations) => {
@@ -9834,7 +9857,7 @@
       return await this.runWithRetry(() => this.findExportId(), maxAttempts, interval, "linear");
     }
     urlChanged() {
-      this.handleLocation(window.location);
+      void this.handleLocation(window.location);
     }
     init() {
       if (isBeingFramed()) {
