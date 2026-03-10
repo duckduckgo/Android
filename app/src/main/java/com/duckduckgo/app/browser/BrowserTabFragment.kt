@@ -2158,7 +2158,6 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
-
         browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
@@ -5061,6 +5060,7 @@ class BrowserTabFragment :
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
+                    logcat { "Hatch: selected tab $tabId browserShowing $browserShowing" }
                     if (browserShowing) {
                         showBrowser()
                     } else {

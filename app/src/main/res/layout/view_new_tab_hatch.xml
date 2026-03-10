@@ -14,52 +14,83 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/deviceShieldCtaLayout"
     style="@style/Widget.DuckDuckGo.MessageCta"
+    android:id="@+id/returnHatchRoot"
     android:clipChildren="false"
-    tools:visibility="visible"
     android:visibility="gone">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
         android:orientation="horizontal">
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/deviceShieldCtaHeader"
+        <ImageView
+            android:id="@+id/returnHatchFavicon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_dax_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="22dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaImage"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:typography="body2"
-            tools:text="App Tracking Protection is enabled and blocking tracking attempts across your apps" />
+            app:layout_constraintStart_toEndOf="@id/returnHatchFavicon"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchCTA"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="caption"
+                android:text="Return to..." />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchSiteTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:typography="body1"
+                tools:text="Site Title" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchSiteURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body1"
+                tools:text="www.url.com" />
+
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/deviceShieldCtaImage"
+            android:id="@+id/returnHatchCTA"
+            android:layout_marginStart="@dimen/keyline_2"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_apptp_default"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_return_16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

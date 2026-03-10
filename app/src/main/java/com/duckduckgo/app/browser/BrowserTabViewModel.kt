@@ -884,7 +884,7 @@ class BrowserTabViewModel @Inject constructor(
         skipHome: Boolean,
         isExternal: Boolean,
     ) {
-        logcat { "loadData tabId=$tabId, initialUrl=$initialUrl, skipHome=$skipHome, isExternal=$isExternal" }
+        logcat { "Hatch: loadData tabId=$tabId, initialUrl=$initialUrl, skipHome=$skipHome, isExternal=$isExternal" }
         this.tabId = tabId
         this.skipHome = skipHome
         siteLiveData = tabRepository.retrieveSiteData(tabId)

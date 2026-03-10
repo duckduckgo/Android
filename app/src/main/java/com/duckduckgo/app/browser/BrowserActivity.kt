@@ -419,6 +419,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                     launch {
                         viewModel.selectedTabIndex.collectLatest {
+                            logcat { "Hatch: selectedTabIndex $it" }
                             onMoveToTabRequested(it)
                         }
                     }
@@ -1481,6 +1482,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
+        logcat { "Hatch: onTabsUpdated" }
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
 

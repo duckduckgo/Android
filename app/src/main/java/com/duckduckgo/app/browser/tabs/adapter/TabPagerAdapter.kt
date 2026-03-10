@@ -69,7 +69,7 @@ class TabPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         val tab = tabs[position]
         val isExternal = activity.consumeExternalLaunchForTab(tab.tabId)
-        logcat { "createFragment position=$position, tabId=${tab.tabId}, url=${tab.url}, isExternal=$isExternal" }
+        logcat { "Hatch: createFragment position=$position, tabId=${tab.tabId}, url=${tab.url}, isExternal=$isExternal" }
 
         // Check if there's a message specifically for this tab's source tab ID
         val pendingMessage = pendingMessages.remove(tab.sourceTabId)
