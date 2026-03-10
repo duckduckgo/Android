@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -51,7 +52,7 @@ class RealEventHubPixelManagerTest {
 
     private val repository: EventHubRepository = mock()
     private val pixel: Pixel = mock()
-    private val timeProvider = FakeTimeProvider()
+    private val timeProvider = FakeCurrentTimeProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
@@ -2474,8 +2475,10 @@ class RealEventHubPixelManagerTest {
         }
     }
 
-    private class FakeTimeProvider : TimeProvider {
+    private class FakeCurrentTimeProvider : CurrentTimeProvider {
         var time: Long = 0L
         override fun currentTimeMillis(): Long = time
+        override fun elapsedRealtime(): Long = time
+        override fun localDateTimeNow(): java.time.LocalDateTime = java.time.LocalDateTime.now()
     }
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.eventhub.impl.pixels
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.EventHubFeature
 import com.duckduckgo.eventhub.impl.di.EventHubDispatcher
@@ -70,7 +71,7 @@ interface EventHubPixelManager {
 class RealEventHubPixelManager @Inject constructor(
     private val repository: EventHubRepository,
     private val pixel: Pixel,
-    private val timeProvider: TimeProvider,
+    private val timeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
     private val eventHubFeature: EventHubFeature,
@@ -331,14 +332,4 @@ class RealEventHubPixelManager @Inject constructor(
             return (epochSeconds / periodSeconds) * periodSeconds
         }
     }
-}
-
-interface TimeProvider {
-    fun currentTimeMillis(): Long
-}
-
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealTimeProvider @Inject constructor() : TimeProvider {
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
