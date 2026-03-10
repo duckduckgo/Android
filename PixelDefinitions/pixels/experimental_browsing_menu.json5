@@ -72,5 +72,45 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
         "expires": "2026-03-31"
+    },
+    "m_sheet-menu_aichat": {
+        "description": "Fires when the user taps the Duck.ai (New AI Chat) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_passwords": {
+        "description": "Fires when the user taps the Password Manager (Autofill) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_new-duck-address": {
+        "description": "Fires when the user taps the Email Protection (New Duck Address) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_settings": {
+        "description": "Fires when the user taps the Settings item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
+    },
+    "m_sheet-menu_vpn": {
+        "description": "Fires when the user taps the VPN item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-03-31"
     }
 }
