@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
     <string name="input_screen_chat_hint">Ρωτήστε ιδιωτικά</string>
     <string name="input_screen_user_pref_without_ai">Αναζήτηση μόνο</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Αναζήτηση και Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Δοκιμάστε την καινούργια επιλογή μας για να ρωτήσετε το Duck.ai απευθείας από τη Γραμμή διευθύνσεων. <annotation type="share_feedback">Κοινοποίηση σχολίων</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Ενεργοποίηση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Διαχείριση στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης</string>
     <string name="duck_ai_paid_settings_manage_secondary">Διαμόρφωση του Duck.ai στις Ρυθμίσεις λειτουργιών τεχνητής νοημοσύνης.</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Συνοψίστε αυτήν τη σελίδα</string>
