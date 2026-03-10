@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface InBrowserImportPromo {
@@ -73,7 +74,12 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if ((autofillStore.getCredentialCount().firstOrNull() ?: 0) >= MAX_CREDENTIALS_FOR_PROMO) {
+            runCatching {
+                if ((autofillStore.getCredentialCount().firstOrNull() ?: 0) >= MAX_CREDENTIALS_FOR_PROMO) {
+                    return@withContext false
+                }
+            }.getOrElse {
+                logcat { "InSettingsPasswordImportPromoRules - Couldn't retrieve credentials count" }
                 return@withContext false
             }
 
