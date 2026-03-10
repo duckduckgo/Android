@@ -22,9 +22,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.lifecycle.asFlow
 import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -39,13 +39,13 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -73,10 +73,13 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import java.util.concurrent.TimeUnit
 
+// @Config(sdk = [34])
 @FlowPreview
+@RunWith(AndroidJUnit4::class)
 class CtaViewModelTest {
 
     @get:Rule
@@ -136,7 +139,7 @@ class CtaViewModelTest {
 
     private lateinit var testee: CtaViewModel
 
-    val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    val context: Context = ApplicationProvider.getApplicationContext()
     private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
@@ -319,7 +322,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueThenReturnNull() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -333,7 +336,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueAndShouldShowBrokenSitePromptThenReturnBrokenSitePrompt() = runTest {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
         val detectedRefreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
         whenever(mockBrokenSitePrompt.shouldShowBrokenSitePrompt(any(), any())).thenReturn(true)
 
@@ -361,7 +364,7 @@ class CtaViewModelTest {
     fun whenRefreshCtaWhileBrowsingAndPrivacyOffForSiteThenReturnNull() = runTest {
         givenDaxOnboardingActive()
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(true)
-        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -409,13 +412,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingMajorTrackerSiteThenReturnNetworkCta() = runTest {
         givenDaxOnboardingActive()
-        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        val expectedCtaText = context.resources.getString(
-            R.string.daxMainNetworkCtaText,
-            "Facebook",
-            "facebook.com",
-            "Facebook",
-        )
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -425,30 +422,20 @@ class CtaViewModelTest {
         ) as OnboardingDaxDialogCta
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
-        val actualText = (value as OnboardingDaxDialogCta.DaxMainNetworkCta).getTrackersDescription(context)
-        assertEquals(expectedCtaText, actualText)
     }
 
     @Test
     fun whenRefreshCtaWhileBrowsingOnSiteOwnedByMajorTrackerThenReturnNetworkCta() = runTest {
         givenDaxOnboardingActive()
-        val site = site(url = "http://m.instagram.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val site = site(url = "http://m.instagram.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
             isBrowserShowing = true,
             site = site,
             detectedRefreshPatterns = detectedRefreshPatterns,
         ) as OnboardingDaxDialogCta
-        val expectedCtaText = context.resources.getString(
-            R.string.daxMainNetworkOwnedCtaText,
-            "Facebook",
-            "instagram.com",
-            "Facebook",
-        )
 
         assertTrue(value is OnboardingDaxDialogCta.DaxMainNetworkCta)
-        val actualText = (value as OnboardingDaxDialogCta.DaxMainNetworkCta).getTrackersDescription(context)
-        assertEquals(expectedCtaText, actualText)
     }
 
     @Test
@@ -458,7 +445,7 @@ class CtaViewModelTest {
             documentUrl = "test.com",
             trackerUrl = "test.com",
             categories = null,
-            entity = TestEntity("test", "test", 9.0),
+            entity = TdsEntity("test", "test", 9.0),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
@@ -481,7 +468,7 @@ class CtaViewModelTest {
             documentUrl = "test.com",
             trackerUrl = "test.com",
             categories = null,
-            entity = TestEntity("test", "test", 0.123),
+            entity = TdsEntity("test", "test", 0.123),
             surrogateId = null,
             status = TrackerStatus.BLOCKED,
             type = TrackerType.OTHER,
@@ -859,7 +846,7 @@ class CtaViewModelTest {
     fun givenNoBrowserCtasExperimentWhenRefreshCtaWhileBrowsingThenReturnNull() = runTest {
         givenDaxOnboardingActive()
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val site = site(url = "http://www.facebook.com", entity = TdsEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,

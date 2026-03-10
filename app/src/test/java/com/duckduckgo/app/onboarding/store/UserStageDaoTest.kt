@@ -35,7 +35,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class AppUserStageStoreTest {
+class UserStageDaoTest {
     private lateinit var userStageDao: UserStageDao
     private lateinit var db: AppDatabase
 
@@ -45,7 +45,7 @@ class AppUserStageStoreTest {
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).allowMainThreadQueries().build()
         userStageDao = db.userStageDao()
     }
 
