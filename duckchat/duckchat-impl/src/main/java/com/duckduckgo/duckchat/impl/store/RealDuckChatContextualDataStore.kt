@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChatContextualDataStore
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -34,16 +35,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-interface DuckChatContextualDataStore {
-    suspend fun persistTabChatUrl(tabId: String, url: String)
-    suspend fun getTabChatUrl(tabId: String): String?
-    suspend fun persistTabClosedTimestamp(tabId: String, timestampMs: Long)
-    suspend fun getTabClosedTimestamp(tabId: String): Long?
-    fun clearTabChatUrl(tabId: String)
-    fun clearTabClosedTimestamp(tabId: String)
-    fun clearAll()
-}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
