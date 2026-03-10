@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':statistics-api')
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.lifecycle.common
 

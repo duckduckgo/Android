@@ -16,8 +16,8 @@
 
 package com.duckduckgo.eventhub.impl.di
 
-import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.store.ALL_MIGRATIONS
 import com.duckduckgo.eventhub.impl.pixels.store.EventHubPixelStateDao
@@ -41,12 +41,16 @@ object EventHubModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideEventHubPixelStateDatabase(context: Context): EventHubPixelStateDatabase {
-        return Room.databaseBuilder(context, EventHubPixelStateDatabase::class.java, "event_hub_pixel_state.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideEventHubPixelStateDatabase(databaseProvider: DatabaseProvider): EventHubPixelStateDatabase {
+        return databaseProvider.buildRoomDatabase(
+            EventHubPixelStateDatabase::class.java,
+            "event_hub_pixel_state.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                migrations = ALL_MIGRATIONS.toList(),
+            ),
+        )
     }
 
     @Provides
