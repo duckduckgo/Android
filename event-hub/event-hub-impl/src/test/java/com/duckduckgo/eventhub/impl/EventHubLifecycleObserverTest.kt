@@ -17,34 +17,32 @@
 package com.duckduckgo.eventhub.impl
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class EventHubLifecycleObserverTest {
-
-    @get:Rule
-    val coroutineTestRule = CoroutineTestRule(UnconfinedTestDispatcher())
 
     private val pixelManager: EventHubPixelManager = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private val observer = EventHubLifecycleObserver(
         pixelManager = pixelManager,
-        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-        appCoroutineScope = coroutineTestRule.testScope,
     )
 
     @Test
-    fun `onStart calls checkPixels`() {
+    fun `onStart calls onAppForegrounded and checkPixels`() {
         observer.onStart(lifecycleOwner)
 
+        verify(pixelManager).onAppForegrounded()
         verify(pixelManager).checkPixels()
+    }
+
+    @Test
+    fun `onStop calls onAppBackgrounded`() {
+        observer.onStop(lifecycleOwner)
+
+        verify(pixelManager).onAppBackgrounded()
     }
 }

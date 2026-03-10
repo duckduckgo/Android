@@ -59,6 +59,10 @@ interface EventHubPixelManager {
      * Notify that the remote feature config has changed.
      */
     fun onConfigChanged()
+
+    fun onAppForegrounded()
+
+    fun onAppBackgrounded()
 }
 
 @ContributesBinding(AppScope::class)
@@ -69,7 +73,6 @@ class RealEventHubPixelManager @Inject constructor(
     private val timeProvider: TimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
-    private val foregroundStateProvider: AppForegroundStateProvider,
     private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
 
@@ -79,7 +82,18 @@ class RealEventHubPixelManager @Inject constructor(
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
     private val schedulerJob = ConflatedJob()
 
+    @Volatile
+    private var isInForeground: Boolean = false
+
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
+
+    override fun onAppForegrounded() {
+        isInForeground = true
+    }
+
+    override fun onAppBackgrounded() {
+        isInForeground = false
+    }
 
     private fun getTelemetryConfigs(): List<TelemetryPixelConfig> {
         cachedTelemetryConfigs?.let { return it }
@@ -266,7 +280,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
-        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+        if (!isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
         }

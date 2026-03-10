@@ -52,7 +52,6 @@ class RealEventHubPixelManagerTest {
     private val repository: EventHubRepository = mock()
     private val pixel: Pixel = mock()
     private val timeProvider = FakeTimeProvider()
-    private val foregroundState = FakeAppForegroundStateProvider()
     private val eventHubFeature: EventHubFeature = FakeFeatureToggleFactory.create(EventHubFeature::class.java)
 
     private fun webEventData(type: String) = JSONObject().put("type", type)
@@ -63,6 +62,14 @@ class RealEventHubPixelManagerTest {
     }
 
     private lateinit var manager: RealEventHubPixelManager
+
+    private fun createManager() {
+        manager = RealEventHubPixelManager(
+            repository, pixel, timeProvider, coroutineTestRule.testScope,
+            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
+        )
+        manager.onAppForegrounded()
+    }
 
     private val dayPixelConfig: TelemetryPixelConfig by lazy {
         EventHubConfigParser.parseTelemetry(fullConfig).first { it.name == "webTelemetry_testPixel1" }
@@ -98,10 +105,7 @@ class RealEventHubPixelManagerTest {
     fun setup() {
         configureFeature()
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
     }
 
     // --- handleWebEvent ---
@@ -202,10 +206,7 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         configureFeature(settings = singleBucketConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val state = pixelState("test", mapOf("count" to 0))
         stubPixelStates(state)
@@ -365,10 +366,7 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         configureFeature(settings = twoSourceConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
@@ -397,10 +395,7 @@ class RealEventHubPixelManagerTest {
     fun `dedup is per-pixel - same source and page deduped independently across pixels`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         configureFeature(settings = twoPixelConf)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val stateA = pixelState("pixel_a", mapOf("count" to 0))
         val stateB = pixelState("pixel_b", mapOf("count" to 0))
@@ -600,10 +595,7 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         configureFeature(settings = twoSourceConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val state = pixelState("test", mapOf("testCount" to 0, "trackerCount" to 0))
         stubPixelStates(state)
@@ -740,10 +732,7 @@ class RealEventHubPixelManagerTest {
             }
         """.trimIndent()
         configureFeature(settings = configWithGap)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val testPixelConfig = EventHubConfigParser.parseTelemetry(configWithGap).first()
         val state = PixelState(
@@ -963,10 +952,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         configureFeature(settings = disabledPixelConfig)
         whenever(repository.getPixelState("test_pixel")).thenReturn(null)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         manager.onConfigChanged()
 
@@ -1072,10 +1058,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent uses stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1101,10 +1084,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent uses stored config source, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1144,10 +1124,7 @@ class RealEventHubPixelManagerTest {
     fun `handleWebEvent ignores event matching only live config source`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1185,10 +1162,7 @@ class RealEventHubPixelManagerTest {
     fun `checkPixels fires pixel using stored config buckets, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1230,10 +1204,7 @@ class RealEventHubPixelManagerTest {
     fun `checkPixels uses stored config period for attributionPeriod, not live config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1290,10 +1261,7 @@ class RealEventHubPixelManagerTest {
     fun `new period after firing uses latest config, not stored config`() {
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
 
@@ -1401,10 +1369,7 @@ class RealEventHubPixelManagerTest {
         // Step 1: config [1] loads — both pixels registered with 60s/120s periods
         val config1 = twoPixelConfig(60, 120, buckets)
         configureFeature(settings = config1)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         timeProvider.time = 10_000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -1777,10 +1742,7 @@ class RealEventHubPixelManagerTest {
         // Pixel was registered with specific config snapshot — fire button must not erase it
         val originalConfig = configWithBuckets(*originalBuckets)
         configureFeature(settings = originalConfig)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val originalPixelConfig = EventHubConfigParser.parseTelemetry(originalConfig).first()
         val storedConfigJson = EventHubConfigParser.serializePixelConfig(originalPixelConfig)
@@ -1801,10 +1763,7 @@ class RealEventHubPixelManagerTest {
     fun `multi-pixel state all persists across fire button`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         configureFeature(settings = twoPixelConf)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         val stateA = pixelState("pixel_a", mapOf("count" to 2))
         val stateB = pixelState("pixel_b", mapOf("count" to 3))
@@ -1973,10 +1932,7 @@ class RealEventHubPixelManagerTest {
     fun `onConfigChanged cancels all timers when feature disabled - no pixel fires after delay`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         configureFeature(settings = twoPixelConf)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         timeProvider.time = 1000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -2110,10 +2066,7 @@ class RealEventHubPixelManagerTest {
     fun `multi-pixel timers are scheduled independently with correct delays`() {
         val twoPixelConf = twoPixelConfig(60, 120, """"0-4": {"gte": 0, "lt": 5}, "5+": {"gte": 5}""")
         configureFeature(settings = twoPixelConf)
-        manager = RealEventHubPixelManager(
-            repository, pixel, timeProvider, coroutineTestRule.testScope,
-            UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), foregroundState, eventHubFeature,
-        )
+        createManager()
 
         timeProvider.time = 1000L
         whenever(repository.getPixelState("pixel_a")).thenReturn(null)
@@ -2344,7 +2297,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `timer fires while backgrounded - pixel enqueued but no new period started`() {
-        foregroundState.isInForeground = false
+        manager.onAppBackgrounded()
 
         val periodStart = 1000L
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
@@ -2373,7 +2326,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `timer fires while foregrounded - pixel enqueued and new period starts immediately`() {
-        foregroundState.isInForeground = true
+        manager.onAppForegrounded()
 
         val periodStart = 1000L
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
@@ -2399,7 +2352,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `checkPixels on foreground starts new period after background fire`() {
-        foregroundState.isInForeground = true
+        manager.onAppForegrounded()
 
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
@@ -2415,7 +2368,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `scheduled timer does not start new period when backgrounded`() {
-        foregroundState.isInForeground = true
+        manager.onAppForegrounded()
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
@@ -2429,7 +2382,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(initialState)
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
-        foregroundState.isInForeground = false
+        manager.onAppBackgrounded()
 
         val periodMillis = TimeUnit.DAYS.toMillis(1)
         timeProvider.time = 1000L + periodMillis
@@ -2448,7 +2401,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `full background-foreground lifecycle - fire in background, recover on foreground`() {
-        foregroundState.isInForeground = false
+        manager.onAppBackgrounded()
 
         val periodStart = 1000L
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
@@ -2473,7 +2426,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
 
-        foregroundState.isInForeground = true
+        manager.onAppForegrounded()
         timeProvider.time = periodEnd + 5000L
 
         manager.checkPixels()
@@ -2524,9 +2477,5 @@ class RealEventHubPixelManagerTest {
     private class FakeTimeProvider : TimeProvider {
         var time: Long = 0L
         override fun currentTimeMillis(): Long = time
-    }
-
-    private class FakeAppForegroundStateProvider : AppForegroundStateProvider {
-        override var isInForeground: Boolean = true
     }
 }
