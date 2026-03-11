@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.api
+package com.duckduckgo.duckchat.impl
 
-/**
- * Provides an optional host override for Duck.ai, used by internal dev settings
- * to point Duck.ai at a custom URL for testing.
- */
-interface DuckAiUrlOverride {
-    /** Returns the custom Duck.ai host, or `null` if no override is set. */
-    fun getCustomHost(): String?
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+
+@Module
+@ContributesTo(AppScope::class)
+class DuckAiHostProviderModule {
+    @Provides
+    fun provideDuckAiHostProvider(): DuckAiHostProvider {
+        return object : DuckAiHostProvider {
+            override fun getCustomHost(): String? = null
+        }
+    }
 }

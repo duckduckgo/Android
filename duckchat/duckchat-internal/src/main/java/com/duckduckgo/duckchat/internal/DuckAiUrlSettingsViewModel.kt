@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DuckAiUrlSettingsViewModel @Inject constructor(
-    private val devDuckAiUrlOverride: DevDuckAiUrlOverride,
+    private val devDuckAiHostProvider: DevDuckAiHostProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -51,7 +51,7 @@ class DuckAiUrlSettingsViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             _viewState.emit(
-                ViewState(customUrl = devDuckAiUrlOverride.getCustomUrl().orEmpty()),
+                ViewState(customUrl = devDuckAiHostProvider.getCustomUrl().orEmpty()),
             )
         }
     }
@@ -59,16 +59,16 @@ class DuckAiUrlSettingsViewModel @Inject constructor(
     fun onSaveClicked(url: String) {
         val trimmed = url.trim()
         if (trimmed.isNotBlank()) {
-            devDuckAiUrlOverride.setCustomUrl(trimmed)
+            devDuckAiHostProvider.setCustomUrl(trimmed)
             sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlSet))
         } else {
-            devDuckAiUrlOverride.setCustomUrl(null)
+            devDuckAiHostProvider.setCustomUrl(null)
             sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlCleared))
         }
     }
 
     fun onResetClicked() {
-        devDuckAiUrlOverride.setCustomUrl(null)
+        devDuckAiHostProvider.setCustomUrl(null)
         viewModelScope.launch {
             _viewState.emit(ViewState(customUrl = ""))
         }
