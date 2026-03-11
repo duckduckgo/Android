@@ -266,6 +266,19 @@
         <item quantity="other">Odstrániť z %1$d webov. Môže ťa to odhlásiť z účtov.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Odstrániť karty a údaje stránok?</string>
+    <string name="singleTabFireDialogTitleWithChats">Odstrániť karty, údaje stránok a chaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Odstrániť všetko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Vymazať túto záložku</string>
+    <string name="singleTabFireDialogDeleteThisChat">Zmazať tento čet</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Možnosť „Odstrániť všetko“ neodstráni tvoju históriu četu na Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
+    <string name="singleTabFireDialogSnackbar">Bola odstránená 1 karta a jej údaje</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
 
