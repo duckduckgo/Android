@@ -266,6 +266,19 @@
         <item quantity="other">Данные будут удалены с сайтов (%1$d). Операция может сопровождаться выходом из учетных записей.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Удалить вкладки и данные сайтов?</string>
+    <string name="singleTabFireDialogTitleWithChats">Удалить вкладки, данные сайта и чаты?</string>
+    <string name="singleTabFireDialogDeleteAll">Удалить все</string>
+    <string name="singleTabFireDialogDeleteThisTab">Удалить эту вкладку</string>
+    <string name="singleTabFireDialogDeleteThisChat">Удалить этот чат</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Функция «Удалить все» не стирает историю чатов с Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
+    <string name="singleTabFireDialogSnackbar">Удалена 1 вкладка и ее данные</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
 
