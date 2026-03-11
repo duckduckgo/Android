@@ -258,6 +258,19 @@
         <item quantity="other">Eliminar de %1$d sites. Podes terminar a tua sessão nas contas.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Eliminar separadores e dados do site?</string>
+    <string name="singleTabFireDialogTitleWithChats">Eliminar separadores, dados do site e chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Eliminar tudo</string>
+    <string name="singleTabFireDialogDeleteThisTab">Eliminar este separador</string>
+    <string name="singleTabFireDialogDeleteThisChat">Eliminar esta conversa</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">“Apagar tudo” não apagará o histórico de conversas do Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Eliminar dados do site pode terminar a tua sessão nas contas.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Esta ação vai cancelar as transferências em curso.</string>
+    <string name="singleTabFireDialogSnackbar">1 separador e respetivos dados eliminados</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Não foi possível apagar os dados do site. Atualiza o WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Não foi possível apagar os dados do site devido a um erro.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissões</string>
 
