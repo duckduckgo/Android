@@ -55,6 +55,7 @@ class WebViewCookieManagerTest {
     @Before
     fun setup() {
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(cookieManager.setCookie(any(), any(), any())).then {
             (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
         }
