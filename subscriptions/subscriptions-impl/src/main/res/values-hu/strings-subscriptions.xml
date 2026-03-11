@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Előfizetések</string>
     <string name="activitySubscriptionSettings">Előfizetési beállítások</string>
     <string name="activityActivateSubscription">Van előfizetésem</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>

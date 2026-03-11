@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnements</string>
     <string name="activitySubscriptionSettings">Abonnementeinstellungen</string>
     <string name="activityActivateSubscription">Ich habe ein Abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Rückmeldung senden</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenten erhalten unser VPN und fortschrittliche KI-Modelle in Duck.ai, Personal Information Removal und Identity Theft Restoration.</string>

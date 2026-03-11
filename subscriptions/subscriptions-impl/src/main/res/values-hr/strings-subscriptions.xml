@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Pretplate</string>
     <string name="activitySubscriptionSettings">Postavke pretplate</string>
     <string name="activityActivateSubscription">Imam pretplatu</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Pretplatnici dobivaju naš VPN, napredne AI modele u usluzi Duck.ai, uslugu Personal Information Removal (uklanjanje osobnih podataka) te uslugu Identity Theft Restoration (oporavak od krađe identiteta).</string>

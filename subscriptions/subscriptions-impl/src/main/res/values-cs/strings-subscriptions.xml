@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Předplatné</string>
     <string name="activitySubscriptionSettings">Nastavení předplatného</string>
     <string name="activityActivateSubscription">Mám předplatné</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>

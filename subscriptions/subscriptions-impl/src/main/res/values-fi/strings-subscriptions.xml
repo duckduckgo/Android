@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Tilaukset</string>
     <string name="activitySubscriptionSettings">Tilauksen asetukset</string>
     <string name="activityActivateSubscription">Minulla on tilaus</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>

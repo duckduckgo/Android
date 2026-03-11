@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Абонаменти</string>
     <string name="activitySubscriptionSettings">Настройки на абонамент</string>
     <string name="activityActivateSubscription">Имам абонамент</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Изпратете отзив</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Абонатите получават VPN и усъвършенствани AI модели в Duck.ai. Personal Information Removal и Identity Theft Restoration.</string>

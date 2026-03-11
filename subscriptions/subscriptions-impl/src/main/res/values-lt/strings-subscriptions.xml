@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Prenumeratos</string>
     <string name="activitySubscriptionSettings">Prenumeratos nustatymai</string>
     <string name="activityActivateSubscription">Turiu prenumeratą</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>

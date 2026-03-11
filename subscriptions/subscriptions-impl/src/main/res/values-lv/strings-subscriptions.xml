@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonementi</string>
     <string name="activitySubscriptionSettings">Abonementa iestatījumi</string>
     <string name="activityActivateSubscription">Man ir abonements</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonenti saņem mūsu VPN un uzlabotus mākslīgā intelekta modeļus Duck.ai. Personal Information Removal un Identity Theft Restoration.</string>

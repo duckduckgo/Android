@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnemang</string>
     <string name="activitySubscriptionSettings">Abonnemangsinställningar</string>
     <string name="activityActivateSubscription">Jag har ett abonnemang</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Skicka återkoppling</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vårt VPN och avancerade AI-modeller i Duck.ai, Personal Information Removal och Identity Theft Restoration.</string>

@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Подписки</string>
     <string name="activitySubscriptionSettings">Настройки подписки</string>
     <string name="activityActivateSubscription">У меня уже есть подписка</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai, а также функциям удаления личной информации и восстановления после кражи данных.</string>

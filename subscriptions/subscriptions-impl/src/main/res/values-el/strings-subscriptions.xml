@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Συνδρομές</string>
     <string name="activitySubscriptionSettings">Ρυθμίσεις συνδρομής</string>
     <string name="activityActivateSubscription">Έχω συνδρομή</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Οι συνδρομητές αποκτούν το VPN μας, προηγμένα μοντέλα τεχνητής νοημοσύνης στο Duck.ai, το Personal Information Removal και το Identity Theft Restoration.</string>

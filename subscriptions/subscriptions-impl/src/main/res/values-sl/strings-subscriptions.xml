@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Naročnine</string>
     <string name="activitySubscriptionSettings">Nastavitve naročnine</string>
     <string name="activityActivateSubscription">Imam naročnino</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošljite povratne informacije</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>

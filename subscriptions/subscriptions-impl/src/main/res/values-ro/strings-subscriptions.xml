@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonamente</string>
     <string name="activitySubscriptionSettings">Setări pentru abonament</string>
     <string name="activityActivateSubscription">Am un abonament</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Trimite feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonații beneficiază de VPN, modele avansate de IA în Duck.ai, Personal Information Removal și Identity Theft Restoration.</string>
