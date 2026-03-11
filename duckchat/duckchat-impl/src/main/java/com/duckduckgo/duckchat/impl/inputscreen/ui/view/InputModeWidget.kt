@@ -315,10 +315,8 @@ open class InputModeWidget @JvmOverloads constructor(
             doAfterTextChanged { text ->
                 text?.let {
                     removeFormatting(text)
-                    if (tabAttachmentsEnabled) {
-                        if (!isDeletingTag) {
-                            removeCorruptedTags(text)
-                        }
+                    if (tabAttachmentsEnabled && !isDeletingTag) {
+                        removeCorruptedTags(text)
                         notifyRemovedTags(text)
                     }
                 }

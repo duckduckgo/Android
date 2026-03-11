@@ -60,32 +60,39 @@ class TabAttachmentPopup(
         }
     }
 
-    val isShowing: Boolean
-        get() = popupWindow.isShowing
-
-    fun update(items: List<TabAttachmentItem>) {
-        adapter.submitList(items.take(MAX_VISIBLE_ITEMS))
+    fun update(items: List<TabAttachmentItem>, anchor: View) {
+        adapter.submitList(items.take(MAX_VISIBLE_ITEMS)) {
+            showPopup(anchor)
+        }
     }
 
-    fun show(anchor: View) {
-        if (popupWindow.isShowing) {
-            popupWindow.update()
-            return
-        }
-
+    private fun showPopup(anchor: View) {
         if (useTopBar) {
-            popupWindow.showAsDropDown(anchor)
+            if (popupWindow.isShowing) {
+                popupWindow.update()
+            } else {
+                popupWindow.showAsDropDown(anchor)
+            }
         } else {
-            recyclerView.measure(
-                View.MeasureSpec.makeMeasureSpec(anchor.width, View.MeasureSpec.AT_MOST),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-            )
-            val popupHeight = recyclerView.measuredHeight
+            showAboveAnchor(anchor)
+        }
+    }
 
-            val anchorLocation = IntArray(2)
-            anchor.getLocationOnScreen(anchorLocation)
-            val anchorTop = anchorLocation[1]
+    private fun showAboveAnchor(anchor: View) {
+        recyclerView.measure(
+            View.MeasureSpec.makeMeasureSpec(anchor.width, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        )
+        val popupHeight = recyclerView.measuredHeight
+        if (popupHeight == 0) return
 
+        val anchorLocation = IntArray(2)
+        anchor.getLocationOnScreen(anchorLocation)
+        val anchorTop = anchorLocation[1]
+
+        if (popupWindow.isShowing) {
+            popupWindow.update(0, anchorTop - popupHeight, ViewGroup.LayoutParams.MATCH_PARENT, popupHeight)
+        } else {
             popupWindow.showAtLocation(
                 anchor,
                 Gravity.NO_GRAVITY,

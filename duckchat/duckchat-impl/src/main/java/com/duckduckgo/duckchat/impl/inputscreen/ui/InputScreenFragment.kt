@@ -964,8 +964,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 val token = viewModel.onTabAttachmentSelected(item)
                 inputModeWidget.insertTabTag(token, item.tabId, atIndex.coerceAtLeast(0), cursorPos)
             }.also { tabAttachmentPopup = it }
-            popup.update(state.filteredTabs)
-            popup.show(inputModeWidget.getAnchorView())
+            popup.update(state.filteredTabs, inputModeWidget.getAnchorView())
         } else {
             tabAttachmentPopup?.dismiss()
         }

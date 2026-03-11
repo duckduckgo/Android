@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.duckchat.impl.databinding.ItemTabAttachmentBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class TabAttachmentAdapter(
@@ -50,6 +51,8 @@ class TabAttachmentAdapter(
         private val binding: ItemTabAttachmentBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        private var faviconJob: Job? = null
+
         fun bind(
             item: TabAttachmentItem,
             lifecycleOwner: LifecycleOwner,
@@ -57,7 +60,8 @@ class TabAttachmentAdapter(
             onTabClicked: (TabAttachmentItem) -> Unit,
         ) {
             binding.tabAttachmentTitle.text = item.title
-            lifecycleOwner.lifecycleScope.launch {
+            faviconJob?.cancel()
+            faviconJob = lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(
                     tabId = item.tabId,
                     url = item.url,

@@ -64,7 +64,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
-import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.AttachedTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentItem
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TagDetector
@@ -843,14 +842,13 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onTabAttachmentSelected(item: TabAttachmentItem): String {
-        val attachedTab = AttachedTab(tabId = item.tabId, title = item.title, url = item.url)
         _tabAttachmentState.update { state ->
             val alreadyAttached = state.attachedTabs.any { it.tabId == item.tabId }
             state.copy(
                 popupVisible = false,
                 filteredTabs = emptyList(),
                 activeAtIndex = -1,
-                attachedTabs = if (alreadyAttached) state.attachedTabs else state.attachedTabs + attachedTab,
+                attachedTabs = if (alreadyAttached) state.attachedTabs else state.attachedTabs + item,
             )
         }
         val displayTitle = if (item.title.length > MAX_TAG_TITLE_LENGTH) {
@@ -903,7 +901,7 @@ class InputScreenViewModel @AssistedInject constructor(
         private const val CHAT_SUGGESTIONS_DEBOUNCE_MS = 150L
         private const val MAX_TAG_TITLE_LENGTH = 20
 
-        // TODO we should read this from the privacy configs once the frontend defines it
+        // TODO Read this from the privacy configs once the frontend defines it
         private const val MAX_POPUP_TABS = 5
     }
 }

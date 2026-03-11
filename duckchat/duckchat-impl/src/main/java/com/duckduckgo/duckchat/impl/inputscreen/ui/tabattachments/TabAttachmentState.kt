@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments
 data class TabAttachmentState(
     val popupVisible: Boolean = false,
     val filteredTabs: List<TabAttachmentItem> = emptyList(),
-    val attachedTabs: List<AttachedTab> = emptyList(),
+    val attachedTabs: List<TabAttachmentItem> = emptyList(),
     val activeAtIndex: Int = -1,
 )
 
