@@ -258,6 +258,19 @@
         <item quantity="other">%1$d siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Sekmeleri ve site verilerini silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogTitleWithChats">Sekmeleri, site verilerini ve sohbetleri silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogDeleteAll">Tümünü Sil</string>
+    <string name="singleTabFireDialogDeleteThisTab">Bu Sekmeyi Sil</string>
+    <string name="singleTabFireDialogDeleteThisChat">Bu Sohbeti Sil</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Tümünü Sil\" seçeneği Duck.ai sohbet geçmişini silmeyecek.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
+    <string name="singleTabFireDialogSnackbar">1 sekme ve içerdiği veriler silindi</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
 
