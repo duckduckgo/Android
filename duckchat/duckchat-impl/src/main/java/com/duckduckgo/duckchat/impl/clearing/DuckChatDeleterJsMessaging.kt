@@ -40,7 +40,7 @@ import javax.inject.Inject
  */
 class DuckChatDeleterJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : JsMessaging {
 
     override val secret: String = "duckduckgo-android-messaging-secret"
@@ -50,7 +50,6 @@ class DuckChatDeleterJsMessaging @Inject constructor(
     private val handlers = listOf(DuckAiDataClearingMessageHandler())
     private lateinit var jsMessageCallback: JsMessageCallback
     private lateinit var webView: WebView
-
     private val duckAiDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
 
     override val context: String = "contentScopeScripts"

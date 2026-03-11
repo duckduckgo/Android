@@ -145,8 +145,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         return null
     }
 
-    private val duckDuckGoDomains: List<String>
-        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }
 
 @Module

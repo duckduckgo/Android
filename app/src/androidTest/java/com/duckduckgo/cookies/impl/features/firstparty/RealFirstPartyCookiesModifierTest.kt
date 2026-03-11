@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,7 @@ class RealFirstPartyCookiesModifierTest {
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockFireproofRepository: FireproofRepository = mock()
     private val mockPixel: Pixel = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
     @Before
@@ -339,6 +341,7 @@ class RealFirstPartyCookiesModifierTest {
             mockPixel,
             mockFireproofRepository,
             DefaultDispatcherProvider(),
+            mockDuckAiHostProvider,
         )
     }
 

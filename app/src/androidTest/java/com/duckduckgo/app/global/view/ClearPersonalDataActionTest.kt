@@ -95,7 +95,6 @@ class ClearPersonalDataActionTest {
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
     }
 
     @Test

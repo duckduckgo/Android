@@ -145,6 +145,5 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
         return duckDuckGoDomains.any { sameOrSubdomain(domain, it) }
     }
 
-    private val duckDuckGoDomains: List<String>
-        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

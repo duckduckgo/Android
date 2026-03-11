@@ -170,6 +170,5 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
-    private val audioCapturePermissionDomains: List<String>
-        get() = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
+    private val audioCapturePermissionDomains: List<String> = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
 }

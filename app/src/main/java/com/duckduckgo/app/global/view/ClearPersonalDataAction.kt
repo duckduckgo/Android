@@ -304,6 +304,5 @@ class ClearPersonalDataAction(
         }
     }
 
-    private val duckDuckGoDomains: Set<String>
-        get() = setOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: Set<String> = setOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

@@ -40,6 +40,7 @@ dependencies {
     implementation project(path: ':duckchat-impl')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
+    implementation project(path: ':data-store-api')
     implementation project(path: ':design-system')
 
     implementation KotlinX.coroutines.android

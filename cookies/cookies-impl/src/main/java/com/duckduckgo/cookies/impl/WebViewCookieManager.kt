@@ -91,6 +91,5 @@ class WebViewCookieManager @Inject constructor(
         cookieManager.get()?.flush()
     }
 
-    private val ddgCookieDomains: List<String>
-        get() = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
+    private val ddgCookieDomains: List<String> = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
 }
