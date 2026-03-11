@@ -17,9 +17,9 @@
 package com.duckduckgo.duckchat.internal.di
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
-import com.duckduckgo.duckchat.impl.DuckAiUrlOverrideModule
-import com.duckduckgo.duckchat.internal.DevDuckAiUrlOverride
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.DuckAiHostProviderModule
+import com.duckduckgo.duckchat.internal.DevDuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -28,12 +28,12 @@ import dagger.SingleInstanceIn
 @Module
 @ContributesTo(
     scope = AppScope::class,
-    replaces = [DuckAiUrlOverrideModule::class],
+    replaces = [DuckAiHostProviderModule::class],
 )
-class InternalDuckAiUrlOverrideModule {
+class InternalDuckAiHostProviderModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideDuckAiUrlOverride(
-        devDuckAiUrlOverride: DevDuckAiUrlOverride,
-    ): DuckAiUrlOverride = devDuckAiUrlOverride
+    fun provideDuckAiHostProvider(
+        devDuckAiHostProvider: DevDuckAiHostProvider,
+    ): DuckAiHostProvider = devDuckAiHostProvider
 }

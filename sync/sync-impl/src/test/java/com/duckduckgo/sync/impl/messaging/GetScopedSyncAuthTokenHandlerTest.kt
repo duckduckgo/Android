@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl.messaging
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -52,7 +52,7 @@ class GetScopedSyncAuthTokenHandlerTest {
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val mockSyncPixels: SyncPixels = mock()
     private val mockJsMessaging: JsMessaging = mock()
-    private val mockDuckAiUrlOverride: DuckAiUrlOverride = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     val callbackDataCaptor = argumentCaptor<JsCallbackData>()
 
@@ -60,6 +60,7 @@ class GetScopedSyncAuthTokenHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         handler = GetScopedSyncAuthTokenHandler(
             syncApi = mockSyncApi,
             syncStore = mockSyncStore,
@@ -67,7 +68,7 @@ class GetScopedSyncAuthTokenHandlerTest {
             syncPixels = mockSyncPixels,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            duckAiUrlOverride = mockDuckAiUrlOverride,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 

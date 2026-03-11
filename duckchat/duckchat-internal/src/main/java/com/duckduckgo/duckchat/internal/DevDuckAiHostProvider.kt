@@ -20,8 +20,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
-import com.duckduckgo.duckchat.impl.DuckChatConstants
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.internal.store.DuckAiInternalSettingsDataStore
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -29,25 +28,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class DevDuckAiUrlOverride @Inject constructor(
+class DevDuckAiHostProvider @Inject constructor(
     private val dataStore: DuckAiInternalSettingsDataStore,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : DuckAiUrlOverride {
+) : DuckAiHostProvider {
+
+    @Volatile
+    private var cachedHost: String? = null
 
     init {
         appScope.launch(dispatcherProvider.io()) {
-            DuckChatConstants.hostOverride = dataStore.customUrl?.toUri()?.host
+            cachedHost = dataStore.customUrl?.toUri()?.host
         }
     }
 
-    override fun getCustomHost(): String? = DuckChatConstants.hostOverride
+    override fun getCustomHost(): String? = cachedHost
 
     fun getCustomUrl(): String? = dataStore.customUrl
 
     fun setCustomUrl(url: String?) {
-        val host = url?.toUri()?.host
-        DuckChatConstants.hostOverride = host
+        cachedHost = url?.toUri()?.host
         appScope.launch(dispatcherProvider.io()) {
             dataStore.customUrl = url
         }

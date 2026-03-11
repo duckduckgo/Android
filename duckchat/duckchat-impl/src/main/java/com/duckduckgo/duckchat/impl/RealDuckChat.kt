@@ -34,11 +34,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -313,7 +312,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
-    private val duckAiUrlOverride: DuckAiUrlOverride,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -491,7 +490,11 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun canHandleOnAiWebView(url: String): Boolean {
-        return runCatching { HOST_DUCK_AI == url.toHttpUrl().topPrivateDomain() || url == REVOKE_URL }.getOrElse { false }
+        return runCatching {
+            val duckAiHost = duckAiHostProvider.getHost()
+            val host = url.toHttpUrl().host
+            host == duckAiHost || host.endsWith(".$duckAiHost") || url == REVOKE_URL
+        }.getOrElse { false }
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
@@ -634,7 +637,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun getDuckChatLink(): String {
-        val customHost = duckAiUrlOverride.getCustomHost() ?: return duckChatLink
+        val customHost = duckAiHostProvider.getCustomHost() ?: return duckChatLink
         return duckChatLink.toUri().buildUpon().authority(customHost).build().toString()
     }
 
@@ -668,7 +671,7 @@ class RealDuckChat @Inject constructor(
 
         if (isDuckChatBang(uri)) return true
 
-        if (uri.host == HOST_DUCK_AI || uri.toString() == HOST_DUCK_AI) return true
+        if (uri.host == duckAiHostProvider.getHost() || uri.toString() == duckAiHostProvider.getHost()) return true
         if (uri.host != DUCKDUCKGO_HOST) return false
 
         return runCatching {
