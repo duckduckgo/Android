@@ -258,6 +258,19 @@
         <item quantity="other">Verwijder van %1$d websites. Je kan worden uitgelogd bij accounts.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabbladen en sitegegevens verwijderen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabbladen, sitegegevens en chats verwijderen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
+    <string name="singleTabFireDialogDeleteThisChat">Deze chat verwijderen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Als je \'Alles verwijderen\' kiest, wordt je Duck.ai-chatgeschiedenis niet verwijderd.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
+    <string name="singleTabFireDialogSnackbar">1 tabblad en bijbehorende gegevens zijn verwijderd</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>
 
@@ -809,7 +822,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
     <string name="preOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
@@ -821,6 +836,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
@@ -873,6 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 
