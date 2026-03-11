@@ -2035,7 +2035,7 @@ class BrowserTabFragment :
 
                     else -> {}
                 }
-            }.launchIn(lifecycleScope)
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
@@ -3531,6 +3531,7 @@ class BrowserTabFragment :
     }
 
     private fun createNewContextualFragment(tabId: String) {
+        logcat { "Duck.ai Contextual: createNewContextualFragment" }
         val fragment = DuckChatContextualFragment()
         val args = Bundle()
         args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
@@ -3546,6 +3547,7 @@ class BrowserTabFragment :
     }
 
     private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+        logcat { "Duck.ai Contextual: openExistingContextualFragment" }
         val transaction = childFragmentManager.beginTransaction()
         transaction.show(fragment)
         transaction.commit()
@@ -5333,6 +5335,7 @@ class BrowserTabFragment :
         }
 
         fun showNewTab() {
+            logcat { "New tab: Show new tab" }
             newTabPageProvider
                 .provideNewTabPageVersion()
                 .onEach { newTabPage ->

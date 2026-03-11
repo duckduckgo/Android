@@ -340,7 +340,7 @@ class DuckChatContextualFragment :
                         id: String?,
                         data: JSONObject?,
                     ) {
-                        logcat { "Duck.ai JS Helper: process $featureName $method $id $data" }
+                        logcat { "JS Helper: process $featureName $method $id $data" }
                         when (featureName) {
                             RealDuckChatJSHelper.DUCK_CHAT_FEATURE_NAME -> {
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -354,7 +354,7 @@ class DuckChatContextualFragment :
                                             viewModel.updatedPageContext,
                                             viewModel.sheetTabId,
                                         )?.let { response ->
-                                            logcat { "Duck.ai: response $response" }
+                                            logcat { "JS Helper: response $response" }
                                             withContext(dispatcherProvider.main()) {
                                                 contentScopeScripts.onResponse(response)
                                             }
@@ -579,6 +579,7 @@ class DuckChatContextualFragment :
                     }
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
+                        logcat { "Duck.ai Contextual: OpenSheet" }
                         setupKeyboardVisibilityListener()
                         viewModel.onSheetReopened()
                     }

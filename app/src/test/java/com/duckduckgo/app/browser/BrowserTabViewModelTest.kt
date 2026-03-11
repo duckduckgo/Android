@@ -5421,6 +5421,132 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenPageContextHasUrlAndFaviconExistsThenEnrichedContextIncludesFavicon() =
+        runTest {
+            val serializedContext = """{"title":"Example","url":"https://example.com"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+            whenever(mockFaviconManager.loadFromDisk(any(), eq("https://example.com"))).thenReturn(bitmap)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                val json = JSONObject(pageContext)
+                assertTrue(json.has("favicon"))
+                val faviconArray = json.getJSONArray("favicon")
+                assertEquals(1, faviconArray.length())
+                val faviconObj = faviconArray.getJSONObject(0)
+                assertEquals("icon", faviconObj.getString("rel"))
+                assertTrue(faviconObj.getString("href").startsWith("data:image/png;base64,"))
+            }
+        }
+
+    @Test
+    fun whenPageContextHasUrlButNoFaviconThenContextNotEnriched() =
+        runTest {
+            val serializedContext = """{"title":"Example","url":"https://example.com"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+            whenever(mockFaviconManager.loadFromDisk(any(), eq("https://example.com"))).thenReturn(null)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                val json = JSONObject(pageContext)
+                assertFalse(json.has("favicon"))
+            }
+        }
+
+    @Test
+    fun whenPageContextHasNoUrlThenFaviconNotLoaded() =
+        runTest {
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                val json = JSONObject(pageContext)
+                assertFalse(json.has("favicon"))
+            }
+            verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+        }
+
+    @Test
+    fun whenPageContextHasBlankUrlThenFaviconNotLoaded() =
+        runTest {
+            val serializedContext = """{"title":"Example","url":""}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            assertCommandIssued<Command.PageContextReceived> {
+                val json = JSONObject(pageContext)
+                assertFalse(json.has("favicon"))
+            }
+            verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
