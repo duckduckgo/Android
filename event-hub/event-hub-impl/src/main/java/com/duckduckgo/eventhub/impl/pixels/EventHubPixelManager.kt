@@ -84,15 +84,13 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun isEnabled(): Boolean = eventHubFeature.self().isEnabled()
 
-    private fun isFeatureEnabled(): Boolean = isEnabled()
-
     override fun onAppForegrounded() {
         isInForeground = true
         checkPixels()
     }
 
     private fun checkPixels() {
-        if (!isFeatureEnabled()) return
+        if (!isEnabled()) return
 
         appCoroutineScope.launch(pixelDispatcher) {
             val nextDeadline = processPixelStates()
@@ -112,7 +110,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     override fun onNavigationStarted(webViewId: String, url: String) {
-        if (!isFeatureEnabled()) return
+        if (!isEnabled()) return
         if (webViewId.isEmpty() || url.isEmpty()) return
         val previousUrl = webViewCurrentUrl.put(webViewId, url)
         if (previousUrl != null && previousUrl != url) {
@@ -125,7 +123,7 @@ class RealEventHubPixelManager @Inject constructor(
         val eventType = data.optString("type", "")
         if (eventType.isEmpty()) return
 
-        if (!isFeatureEnabled()) return
+        if (!isEnabled()) return
 
         appCoroutineScope.launch(pixelDispatcher) {
             val nowMillis = timeProvider.currentTimeMillis()
@@ -207,7 +205,7 @@ class RealEventHubPixelManager @Inject constructor(
     override fun onConfigChanged() {
         appCoroutineScope.launch(pixelDispatcher) {
             cachedTelemetryConfigs = null
-            if (!isFeatureEnabled()) {
+            if (!isEnabled()) {
                 logcat(DEBUG) { "EventHub: feature disabled, clearing all pixel states" }
                 schedulerJob.cancel()
                 repository.deleteAllPixelStates()
@@ -248,7 +246,7 @@ class RealEventHubPixelManager @Inject constructor(
             delay(delayMillis)
             ensureActive()
 
-            if (!isFeatureEnabled()) return@launch
+            if (!isEnabled()) return@launch
 
             val nextDeadline = processPixelStates()
             scheduleNextCheck(nextDeadline)
@@ -282,7 +280,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
-        if (!isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+        if (!isInForeground || !isEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
         }
