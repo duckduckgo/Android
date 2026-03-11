@@ -64,6 +64,7 @@ class RealEventHubPixelManagerTest {
 
     private lateinit var manager: RealEventHubPixelManager
 
+    @SuppressLint("DenyListedApi")
     private fun createManager() {
         val savedState = eventHubFeature.self().getRawStoredState()
         eventHubFeature.self().setRawStoredState(Toggle.State(enable = false))
