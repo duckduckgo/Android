@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,19 @@
 
 package com.duckduckgo.duckchat.impl
 
-object DuckChatConstants {
-    @Volatile var hostOverride: String? = null
-    val HOST_DUCK_AI: String get() = hostOverride ?: "duck.ai"
-    const val JS_MESSAGING_FEATURE_NAME = "aiChat"
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 
-    object JsResponseKeys {
-        const val OK = "ok"
-        const val REASON = "reason"
-        const val PAYLOAD = "payload"
-    }
-
-    object StandaloneConstants {
-        const val SERIALIZED_MIGRATION_FILE = "serializedMigrationFile"
-        const val COUNT = "count"
-        const val INDEX = "index"
-        const val OK = "ok"
-        const val REASON = "reason"
+@Module
+@ContributesTo(AppScope::class)
+class DuckAiUrlOverrideModule {
+    @Provides
+    fun provideDuckAiUrlOverride(): DuckAiUrlOverride {
+        return object : DuckAiUrlOverride {
+            override fun getCustomHost(): String? = null
+        }
     }
 }

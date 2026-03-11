@@ -30,6 +30,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -97,6 +98,7 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
+    private val mockDuckAiUrlOverride: DuckAiUrlOverride = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -133,6 +135,7 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDeviceSyncState,
                 cookiesManager,
+                mockDuckAiUrlOverride,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()

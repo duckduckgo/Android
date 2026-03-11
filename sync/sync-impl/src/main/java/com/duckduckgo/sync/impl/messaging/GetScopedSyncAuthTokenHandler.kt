@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -48,6 +49,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
     private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckAiUrlOverride: DuckAiUrlOverride,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -148,7 +150,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
+                    duckAiUrlOverride.getCustomHost() ?: HOST_DUCK_AI,
                 )
 
             override val featureName: String = "aiChat"
