@@ -219,3 +219,7 @@ jobs:
         with:
           name: android-tests-report
           path: android-tests-report.zip
+
+  internal_android_tests:
+    uses: ./.github/workflows/privacy-internal.yml
+    secrets: inherit

@@ -70,7 +70,7 @@ class RealRequestBlocklist @Inject constructor(
         documentUrl: String,
         requestUrl: String,
     ): Boolean {
-        // if (!requestBlocklistFeature.self().isEnabled()) return false
+        if (!requestBlocklistFeature.self().isEnabled()) return false
 
         val documentDomain = Domain(documentUrl.extractDomain().orEmpty())
         if (isAnException(documentDomain)) return false

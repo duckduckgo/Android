@@ -240,6 +240,25 @@ fladle {
             flakyTestAttempts.set(2)
             testShards.set(1)
         }
+        internalPrivacyTests {
+            async.set(false)
+            flankVersion.set("21.+")
+            useOrchestrator.set(true)
+            environmentVariables.set([
+                    "clearPackageData": "true"
+            ])
+            testTargets.set([
+                    "annotation com.duckduckgo.espresso.InternalPrivacyTest"
+            ])
+            debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
+            instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
+            devices.set([
+                    ["model": "MediumPhone.arm", "version": "34"],
+            ])
+            localResultsDir.set("fladleResults")
+            flakyTestAttempts.set(2)
+            testShards.set(1)
+        }
     }
 }
 
@@ -635,6 +654,10 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('internalAndroidTestsBuild') {
+    dependsOn 'assembleInternalDebug', 'assembleInternalDebugAndroidTest'
 }
 
 tasks.register('releaseTestLocal', Exec) {
