@@ -576,6 +576,66 @@ class BrandDesignUpdatePageViewModelTest {
 
     // endregion
 
+    // region hasAnimatedCurrentDialog
+
+    @Test
+    fun whenViewModelCreatedThenHasAnimatedCurrentDialogIsFalse() = runTest {
+        val testee = createViewModel()
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.hasAnimatedCurrentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnDialogAnimationStartedThenHasAnimatedCurrentDialogIsTrue() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem() // INITIAL with hasAnimatedCurrentDialog = false
+            testee.onDialogAnimationStarted()
+            val state = awaitItem()
+            assertTrue(state.hasAnimatedCurrentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCurrentDialogChangesViaSetCurrentDialogThenHasAnimatedCurrentDialogResets() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            awaitItem() // INITIAL
+            testee.onDialogAnimationStarted()
+            awaitItem() // hasAnimatedCurrentDialog = true
+            testee.onPrimaryCtaClicked() // INITIAL -> COMPARISON_CHART via setCurrentDialog
+            val state = awaitItem()
+            assertEquals(PreOnboardingDialogType.COMPARISON_CHART, state.currentDialog)
+            assertFalse(state.hasAnimatedCurrentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoadDaxDialogCalledThenHasAnimatedCurrentDialogIsFalse() = runTest {
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val testee = createViewModel()
+        testee.viewState.test {
+            awaitItem()
+            testee.loadDaxDialog()
+            val state = awaitItem()
+            assertFalse(state.hasAnimatedCurrentDialog)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
     // region Skip onboarding impression pixel
 
     @Test

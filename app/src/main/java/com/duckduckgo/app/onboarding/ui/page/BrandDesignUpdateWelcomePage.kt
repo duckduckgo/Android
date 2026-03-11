@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -82,6 +83,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var walkingDaxDelayedRunnable: Runnable? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
+    private var isAnimating = false
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -242,7 +244,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     backgroundIntroAnimatorSet?.start()
                 }
             }
-            addAnimatorListener(object : android.animation.AnimatorListenerAdapter() {
+            addAnimatorListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     viewModel.onIntroAnimationFinished()
                 }
@@ -317,6 +319,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 when {
                     !state.hasPlayedIntroAnimation -> binding.root.doOnLayout { playIntroAnimation() }
                     state.hasPlayedIntroAnimation && state.currentDialog == null -> snapToIntroEndState()
+                    isAnimating -> { /* animation in progress — ignore re-emissions from onDialogAnimationStarted() */ }
+                    state.hasAnimatedCurrentDialog -> showDialogWithoutAnimation(state.currentDialog!!, state.showSplitOption)
                     else -> configureDaxCta(state.currentDialog!!, state.showSplitOption)
                 }
                 // TODO: react to state.selectedAddressBarPosition for address bar toggle UI
@@ -348,6 +352,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxDelayedRunnable = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
+        isAnimating = false
 
         binding.daxDialogCta.daxCtaContainer.animate().cancel()
 
@@ -391,6 +396,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         showSplitOption: Boolean = false,
     ) {
         context?.let {
+            isAnimating = true
+            viewModel.onDialogAnimationStarted()
             when (onboardingDialogType) {
                 INITIAL, INITIAL_REINSTALL_USER -> {
                     val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
@@ -413,6 +420,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 }
                                 AnimatorSet().apply {
                                     playTogether(animators)
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
+                                        }
+                                    })
                                     start()
                                 }
                             }
@@ -435,6 +447,53 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 INPUT_SCREEN -> {
                     // TODO
                 }
+            }
+        }
+    }
+
+    private fun showDialogWithoutAnimation(
+        onboardingDialogType: PreOnboardingDialogType,
+        showSplitOption: Boolean = false,
+    ) {
+        snapToIntroEndState()
+
+        when (onboardingDialogType) {
+            INITIAL, INITIAL_REINSTALL_USER -> {
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+
+                with(binding.welcomeScreenWalkingDax) {
+                    cancelAnimation()
+                    progress = 1f
+                    alpha = 1f
+                    translationX = -22.toPx().toFloat()
+                }
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
+                binding.daxDialogCta.welcomeContent.root.alpha = 1f
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                if (onboardingDialogType == INITIAL_REINSTALL_USER) {
+                    binding.daxDialogCta.secondaryCta.alpha = 1f
+                }
+            }
+
+            COMPARISON_CHART -> {
+                // TODO
+            }
+
+            SKIP_ONBOARDING_OPTION -> {
+                // TODO
+            }
+
+            ADDRESS_BAR_POSITION -> {
+                // TODO
+            }
+
+            INPUT_SCREEN -> {
+                // TODO
             }
         }
     }
