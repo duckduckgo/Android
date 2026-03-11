@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.accessibility.data
 
+import android.annotation.SuppressLint
 import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -27,15 +29,17 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
+@RunWith(AndroidJUnit4::class)
 class AccessibilitySettingsSharedPreferencesTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context = ApplicationProvider.getApplicationContext<Context>()
 
     private val testee = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -130,6 +134,7 @@ class AccessibilitySettingsSharedPreferencesTest {
 
     private fun systemFontSize() = context.resources.configuration.fontScale * FONT_SIZE_DEFAULT
 
+    @SuppressLint("DenyListedApi")
     private fun clearSharedPrefs() {
         val prefs = context.getSharedPreferences(AccessibilitySettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
         prefs.edit().clear().commit()

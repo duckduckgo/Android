@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.notification
 
+import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
@@ -32,6 +34,7 @@ import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -39,11 +42,12 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class NotificationRegistrarTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context = ApplicationProvider.getApplicationContext<Context>()
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
