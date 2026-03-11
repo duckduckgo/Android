@@ -17,8 +17,11 @@
 package com.duckduckgo.duckchat.api
 
 interface DuckAiHostProvider {
+
+    /** Returns the custom override host or `null` when no override is active. */
     fun getCustomHost(): String?
 
+    /** Returns the custom override if set, otherwise `duck.ai`. */
     fun getHost(): String = getCustomHost() ?: DEFAULT_HOST
 
     private companion object {
