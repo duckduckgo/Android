@@ -60,7 +60,7 @@ class GetScopedSyncAuthTokenHandlerTest {
 
     @Before
     fun setUp() {
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         handler = GetScopedSyncAuthTokenHandler(
             syncApi = mockSyncApi,
             syncStore = mockSyncStore,

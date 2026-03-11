@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser.indexeddb
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -73,7 +73,7 @@ class IndexedDBManagerTest {
     fun setup() {
         File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB").apply { mkdirs() }
 
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(mockFeature.indexedDB()).thenReturn(mockIndexedDBToggle)
         whenever(mockFeature.fireproofedIndexedDB()).thenReturn(mockFireproofToggle)
         runBlocking {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.weblocalstorage.Domains
 import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManager
@@ -29,6 +28,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
 import kotlinx.coroutines.test.runTest
@@ -80,7 +80,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, keysToDelete = keysToDelete, matchingRegex = matchingRegex)
         whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
 
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         testee = DuckDuckGoWebLocalStorageManager(
             mockDatabaseProvider,
             mockAndroidBrowserConfigFeature,
