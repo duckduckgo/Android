@@ -35,11 +35,11 @@ import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import org.json.JSONObject
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 
