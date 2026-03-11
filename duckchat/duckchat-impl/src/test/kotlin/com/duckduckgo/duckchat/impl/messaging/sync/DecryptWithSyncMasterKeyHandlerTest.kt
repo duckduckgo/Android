@@ -55,7 +55,7 @@ class DecryptWithSyncMasterKeyHandlerTest {
 
     @Before
     fun setUp() {
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         handler = DecryptWithSyncMasterKeyHandler(
             crypto = mockCrypto,
             deviceSyncState = mockDeviceSyncState,
@@ -69,7 +69,7 @@ class DecryptWithSyncMasterKeyHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(DuckAiHostProvider.DEFAULT_HOST, domains[1])
+        assertEquals("duck.ai", domains[1])
     }
 
     @Test

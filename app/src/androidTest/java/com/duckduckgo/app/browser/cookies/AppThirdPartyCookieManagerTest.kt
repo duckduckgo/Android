@@ -22,13 +22,13 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -67,8 +67,13 @@ class AppThirdPartyCookieManagerTest {
 
         whenever(thirdPartyCookieNamesMock.hasExcludedCookieName("$USER_ID_COOKIE=test")).thenReturn(true)
 
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
-        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNamesMock, mockDuckAiHostProvider)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        testee = AppThirdPartyCookieManager(
+            cookieManagerProvider,
+            authCookiesAllowedDomainsRepository,
+            thirdPartyCookieNamesMock,
+            mockDuckAiHostProvider,
+        )
     }
 
     @UiThreadTest
@@ -181,7 +186,7 @@ class AppThirdPartyCookieManagerTest {
 
     @Test
     fun whenClearAllDataIfDomainIsInExclusionListThenDomainNotDeletedFromDatabase() = runTest {
-        val excludedDomains = listOf("home.nest.com", DuckAiHostProvider.DEFAULT_HOST, "duckduckgo.com")
+        val excludedDomains = listOf("home.nest.com", "duck.ai", "duckduckgo.com")
         excludedDomains.forEach { domain ->
             givenDomainIsInTheThirdPartyCookieList(domain)
         }

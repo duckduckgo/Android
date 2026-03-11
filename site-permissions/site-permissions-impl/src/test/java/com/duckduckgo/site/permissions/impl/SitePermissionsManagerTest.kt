@@ -58,7 +58,7 @@ class SitePermissionsManagerTest {
     )
 
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
-        whenever(it.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(it.getHost()).thenReturn("duck.ai")
     }
 
     private val testee = SitePermissionsManagerImpl(
