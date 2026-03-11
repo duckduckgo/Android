@@ -30,6 +30,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -104,6 +105,7 @@ class RealDuckChatTest {
     private val mockDuckChatDeleter: DuckChatDeleter = mock()
     private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
     private val mockSyncEngine: SyncEngine = mock()
+    private val mockDuckAiUrlOverride: DuckAiUrlOverride = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -143,6 +145,7 @@ class RealDuckChatTest {
                 mockDuckChatDeleter,
                 mockDuckChatSyncRepository,
                 mockSyncEngine,
+                mockDuckAiUrlOverride,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
