@@ -24,6 +24,7 @@ import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -56,6 +57,10 @@ class SitePermissionsManagerTest {
         MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
 
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
+        whenever(it.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+    }
+
     private val testee = SitePermissionsManagerImpl(
         mockPackageManager,
         mockLocationManager,
@@ -63,6 +68,7 @@ class SitePermissionsManagerTest {
         coroutineRule.testDispatcherProvider,
         mockContext,
         fakeMicrophoneSitePermissionsDomainRecoveryFeature,
+        mockDuckAiHostProvider,
     )
 
     private val url = "https://domain.com/whatever"

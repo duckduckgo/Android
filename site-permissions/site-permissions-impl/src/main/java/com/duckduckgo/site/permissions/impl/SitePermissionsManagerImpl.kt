@@ -26,6 +26,7 @@ import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -45,6 +46,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -72,7 +74,7 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         val sitePermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
             getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
-                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && AUDIO_CAPTURE_PERMISSION_DOMAINS.contains(url.extractDomain())) {
+                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && audioCapturePermissionDomains.contains(url.extractDomain())) {
                     ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED
                 } else {
@@ -168,7 +170,6 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
-    companion object {
-        private val AUDIO_CAPTURE_PERMISSION_DOMAINS = listOf("duck.ai", "duckduckgo.com")
-    }
+    private val audioCapturePermissionDomains: List<String>
+        get() = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
 }

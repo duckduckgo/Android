@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -45,6 +45,7 @@ class EncryptWithSyncMasterKeyHandlerTest {
 
     private val mockCrypto: SyncCrypto = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
 
@@ -54,9 +55,11 @@ class EncryptWithSyncMasterKeyHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         handler = EncryptWithSyncMasterKeyHandler(
             crypto = mockCrypto,
             deviceSyncState = mockDeviceSyncState,
+            duckAiHostProvider = mockDuckAiHostProvider,
             duckChatPixels = mockDuckChatPixels,
         )
     }
@@ -66,7 +69,7 @@ class EncryptWithSyncMasterKeyHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(HOST_DUCK_AI, domains[1])
+        assertEquals(DuckAiHostProvider.DEFAULT_HOST, domains[1])
     }
 
     @Test

@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeJsMessaging
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -34,6 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SetAIChatHistoryEnabledHandlerTest {
@@ -42,6 +43,7 @@ class SetAIChatHistoryEnabledHandlerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockDuckChatFeatureRepository: DuckChatFeatureRepository = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val dispatchers: DispatcherProvider = coroutineTestRule.testDispatcherProvider
     private val appCoroutineScope: CoroutineScope = coroutineTestRule.testScope
     private val fakeJsMessaging = FakeJsMessaging()
@@ -50,8 +52,10 @@ class SetAIChatHistoryEnabledHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         handler = SetAIChatHistoryEnabledHandler(
             duckChatFeatureRepository = mockDuckChatFeatureRepository,
+            duckAiHostProvider = mockDuckAiHostProvider,
             dispatchers = dispatchers,
             appCoroutineScope = appCoroutineScope,
         )
@@ -62,7 +66,7 @@ class SetAIChatHistoryEnabledHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(HOST_DUCK_AI, domains[1])
+        assertEquals(DuckAiHostProvider.DEFAULT_HOST, domains[1])
     }
 
     @Test

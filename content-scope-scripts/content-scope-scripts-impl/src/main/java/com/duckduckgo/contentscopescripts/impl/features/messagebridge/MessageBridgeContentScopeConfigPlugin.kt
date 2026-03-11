@@ -20,14 +20,14 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.MessageBridgeFeatureName.MessageBridge
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class MessageBridgeContentScopeConfigPlugin @Inject constructor(
     private val messageBridgeRepository: MessageBridgeRepository,
-    private val duckAiUrlOverride: DuckAiUrlOverride,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
@@ -42,7 +42,7 @@ class MessageBridgeContentScopeConfigPlugin @Inject constructor(
     }
 
     private fun addOverrideHost(json: String): String {
-        val host = duckAiUrlOverride.getCustomHost() ?: return json
+        val host = duckAiHostProvider.getCustomHost() ?: return json
         return json.replace("\"duck.ai\"", "\"duck.ai\",\"$host\"")
     }
 }

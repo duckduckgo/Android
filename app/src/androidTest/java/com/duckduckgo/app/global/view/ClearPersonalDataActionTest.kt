@@ -31,6 +31,7 @@ import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -67,6 +68,7 @@ class ClearPersonalDataActionTest {
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -89,9 +91,11 @@ class ClearPersonalDataActionTest {
             webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
             tabVisitedSitesRepository = mockTabVisitedSitesRepository,
             webViewCapabilityChecker = mockWebViewCapabilityChecker,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
     }
 
     @Test

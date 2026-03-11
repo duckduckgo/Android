@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl
+package com.duckduckgo.duckchat.api
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiUrlOverride
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+interface DuckAiHostProvider {
+    fun getCustomHost(): String?
 
-@Module
-@ContributesTo(AppScope::class)
-class DuckAiUrlOverrideModule {
-    @Provides
-    fun provideDuckAiUrlOverride(): DuckAiUrlOverride {
-        return object : DuckAiUrlOverride {
-            override fun getCustomHost(): String? = null
-        }
+    fun getHost(): String = getCustomHost() ?: DEFAULT_HOST
+
+    companion object {
+        const val DEFAULT_HOST = "duck.ai"
     }
 }

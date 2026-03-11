@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -64,6 +65,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : IndexedDBManager {
 
     private val jsonAdapter: JsonAdapter<IndexedDBSettings> by lazy {
@@ -140,10 +142,9 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     }
 
     private fun isFromDuckDuckGoDomains(domain: String): Boolean {
-        return DUCKDUCKGO_DOMAINS.any { sameOrSubdomain(domain, it) }
+        return duckDuckGoDomains.any { sameOrSubdomain(domain, it) }
     }
 
-    companion object {
-        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
-    }
+    private val duckDuckGoDomains: List<String>
+        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

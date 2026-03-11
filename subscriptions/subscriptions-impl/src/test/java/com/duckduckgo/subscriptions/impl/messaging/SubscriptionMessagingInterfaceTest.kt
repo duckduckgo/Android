@@ -7,6 +7,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -42,6 +43,8 @@ class SubscriptionMessagingInterfaceTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val privacyProFeature: PrivacyProFeature = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+        .also { whenever(it.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST) }
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,
@@ -49,6 +52,7 @@ class SubscriptionMessagingInterfaceTest {
         coroutineRule.testScope,
         pixelSender,
         subscriptionsChecker,
+        mockDuckAiHostProvider,
         privacyProFeature,
     )
 
