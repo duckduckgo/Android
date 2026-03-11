@@ -17,11 +17,11 @@
 package com.duckduckgo.duckchat.api
 
 interface DuckAiHostProvider {
-    fun getCustomHost(): String?
 
-    fun getHost(): String = getCustomHost() ?: DEFAULT_HOST
+    /** Returns either a custom override or `duck.ai`. */
+    fun getHost(): String = DEFAULT_HOST
 
-    private companion object {
-        const val DEFAULT_HOST = "duck.ai"
+    companion object {
+        private const val DEFAULT_HOST = "duck.ai"
     }
 }

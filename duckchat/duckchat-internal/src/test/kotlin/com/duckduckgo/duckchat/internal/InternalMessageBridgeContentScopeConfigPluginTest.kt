@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,47 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.features.messagebridge
+package com.duckduckgo.duckchat.internal
 
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeEntity
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
-import org.junit.Before
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class MessageBridgeContentScopeConfigPluginTest {
-
-    private lateinit var testee: MessageBridgeContentScopeConfigPlugin
+class InternalMessageBridgeContentScopeConfigPluginTest {
 
     private val mockMessageBridgeRepository: MessageBridgeRepository = mock()
+    private val mockDuckAiHostProvider: InternalDuckAiHostProvider = mock()
 
-    @Before
-    fun before() {
-        testee = MessageBridgeContentScopeConfigPlugin(mockMessageBridgeRepository)
-    }
+    private val testee = InternalMessageBridgeContentScopeConfigPlugin(
+        mockMessageBridgeRepository,
+        mockDuckAiHostProvider,
+    )
 
     @Test
-    fun whenGetConfigThenReturnCorrectlyFormattedJson() {
+    fun whenNoCustomUrlThenConfigIsUnmodified() {
+        whenever(mockDuckAiHostProvider.getCustomUrl()).thenReturn(null)
         whenever(mockMessageBridgeRepository.messageBridgeEntity).thenReturn(
             MessageBridgeEntity(json = CONFIG),
         )
+
         assertEquals("\"messageBridge\":$CONFIG", testee.config())
+    }
+
+    @Test
+    fun whenCustomUrlSetThenConfigIncludesCustomHost() {
+        whenever(mockDuckAiHostProvider.getCustomUrl()).thenReturn("https://staging.duck.ai")
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        whenever(mockMessageBridgeRepository.messageBridgeEntity).thenReturn(
+            MessageBridgeEntity(json = CONFIG_WITH_DUCK_AI),
+        )
+
+        val result = testee.config()
+
+        assertEquals("\"messageBridge\":{\"domains\":[\"duck.ai\",\"staging.duck.ai\"]}", result)
     }
 
     @Test
@@ -51,5 +64,6 @@ class MessageBridgeContentScopeConfigPluginTest {
 
     companion object {
         const val CONFIG = "{\"key\":\"value\"}"
+        const val CONFIG_WITH_DUCK_AI = "{\"domains\":[\"duck.ai\"]}"
     }
 }

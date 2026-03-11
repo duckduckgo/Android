@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class DevDuckAiHostProvider @Inject constructor(
+class InternalDuckAiHostProvider @Inject constructor(
     private val dataStore: DuckAiInternalSettingsDataStore,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -39,18 +39,23 @@ class DevDuckAiHostProvider @Inject constructor(
 
     init {
         appScope.launch(dispatcherProvider.io()) {
-            cachedHost = dataStore.customUrl?.toUri()?.host
+            cachedHost = dataStore.customUrl?.extractHost()
         }
     }
 
-    override fun getCustomHost(): String? = cachedHost
+    override fun getHost(): String = cachedHost ?: super.getHost()
 
     fun getCustomUrl(): String? = dataStore.customUrl
 
     fun setCustomUrl(url: String?) {
-        cachedHost = url?.toUri()?.host
+        cachedHost = url?.extractHost()
         appScope.launch(dispatcherProvider.io()) {
             dataStore.customUrl = url
         }
+    }
+
+    private fun String.extractHost(): String? {
+        val withScheme = if ("://" in this) this else "https://$this"
+        return withScheme.toUri().host
     }
 }

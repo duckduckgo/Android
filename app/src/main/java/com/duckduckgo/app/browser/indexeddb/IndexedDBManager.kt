@@ -65,7 +65,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : IndexedDBManager {
 
     private val jsonAdapter: JsonAdapter<IndexedDBSettings> by lazy {
@@ -145,6 +145,5 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
         return duckDuckGoDomains.any { sameOrSubdomain(domain, it) }
     }
 
-    private val duckDuckGoDomains: List<String>
-        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

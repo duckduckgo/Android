@@ -36,7 +36,7 @@ class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
@@ -91,6 +91,5 @@ class WebViewCookieManager @Inject constructor(
         cookieManager.get()?.flush()
     }
 
-    private val ddgCookieDomains: List<String>
-        get() = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
+    private val ddgCookieDomains: List<String> = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
 }

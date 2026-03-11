@@ -16,17 +16,16 @@
 
 package com.duckduckgo.duckchat.impl
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
-@Module
-@ContributesTo(AppScope::class)
-class DuckAiHostProviderModule {
-    @Provides
-    fun provideDuckAiHostProvider(): DuckAiHostProvider {
-        return object : DuckAiHostProvider {}
+class DuckAiHostProviderModuleTest {
+
+    private val module = DuckAiHostProviderModule()
+    private val provider = module.provideDuckAiHostProvider()
+
+    @Test
+    fun whenDefaultProviderThenHostIsDuckAi() {
+        assertEquals("duck.ai", provider.getHost())
     }
 }

@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.internal.di
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckAiHostProviderModule
-import com.duckduckgo.duckchat.internal.DevDuckAiHostProvider
+import com.duckduckgo.duckchat.internal.InternalDuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -34,6 +34,6 @@ class InternalDuckAiHostProviderModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideDuckAiHostProvider(
-        devDuckAiHostProvider: DevDuckAiHostProvider,
-    ): DuckAiHostProvider = devDuckAiHostProvider
+        internalDuckAiHostProvider: InternalDuckAiHostProvider,
+    ): DuckAiHostProvider = internalDuckAiHostProvider
 }
