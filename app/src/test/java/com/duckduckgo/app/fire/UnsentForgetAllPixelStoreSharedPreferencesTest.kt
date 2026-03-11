@@ -16,20 +16,27 @@
 
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.core.content.edit
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences.Companion.FILENAME
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class UnsentForgetAllPixelStoreSharedPreferencesTest {
 
     private lateinit var testee: UnsentForgetAllPixelStoreSharedPreferences
 
+    @SuppressLint("DenyListedApi")
     @Before
     fun setup() {
-        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        val context = ApplicationProvider.getApplicationContext<Context>()
         context.getSharedPreferences(FILENAME, 0).edit { clear() }
         testee = UnsentForgetAllPixelStoreSharedPreferences(context)
     }

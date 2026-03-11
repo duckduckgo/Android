@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.location.data
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -31,10 +33,12 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+@RunWith(AndroidJUnit4::class)
 class LocationPermissionsRepositoryImplTest {
 
     @get:Rule
@@ -56,7 +60,7 @@ class LocationPermissionsRepositoryImplTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         dao = db.locationPermissionsDao()
