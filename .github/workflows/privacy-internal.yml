@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   internal_privacy_tests:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'workflow_call' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'workflow_call' || github.event_name == 'pull_request'}}
     name: Internal Privacy Tests
     runs-on: ubuntu-latest
     env:
