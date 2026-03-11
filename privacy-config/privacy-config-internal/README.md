@@ -57,8 +57,6 @@ After applying, the `myFeature` entry becomes:
 }
 ```
 
-This is sufficient for clean installs.
-
 To also patch a sub-feature (nested under `features`), extend the path:
 
 ```json
@@ -71,7 +69,21 @@ To also patch a sub-feature (nested under `features`), extend the path:
 ]
 ```
 
-If you work across app runs where config is already cached, also remove the feature hash and bump the config version to force the app to re-process the config:
+If the sub-feature doesn't exist in the config yet, use `add` instead of `replace`:
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/features/myFeature/features/newSubFeature",
+    "value": { "state": "enabled" }
+  }
+]
+```
+
+The patches above are sufficient for clean installs.
+
+If you work across app runs where config is already cached, also remove the hash of the feature you're modifying and bump the config version to force the app to re-process the config:
 
 ```json
 [
@@ -87,12 +99,35 @@ If you work across app runs where config is already cached, also remove the feat
   {
     "op": "replace",
     "path": "/version",
-    "value": "999999999999999"
+    "value": "90000000000001"
   }
 ]
 ```
 
-Use a version number higher than production (e.g. `999999999999999`) so the app treats it as a newer config and applies it. Without this, a cached config from a previous run may not be overridden.
+Use a version number higher than production (e.g. `90000000000001`) so the app treats it as a newer config and applies it. Without this, a cached config from a previous run may not be overridden.
+
+Each time you modify the patch without clearing the app cache, increment the version number. For example, after changing `state` back to `disabled`, bump the version from `90000000000001` to `90000000000002`:
+
+```json
+[
+  {
+    "op": "replace",
+    "path": "/features/myFeature/state",
+    "value": "disabled"
+  },
+  {
+    "op": "remove",
+    "path": "/features/myFeature/hash"
+  },
+  {
+    "op": "replace",
+    "path": "/version",
+    "value": "90000000000002"
+  }
+]
+```
+
+For more complex operations refer to [JSON Patch format](https://jsonpatch.com/).
 
 ### Verifying a patch was applied
 
