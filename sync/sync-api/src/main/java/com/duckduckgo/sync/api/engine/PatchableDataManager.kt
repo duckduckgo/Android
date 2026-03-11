@@ -16,24 +16,31 @@
 
 package com.duckduckgo.sync.api.engine
 
-interface DeletableDataManager {
+interface PatchableDataManager {
     /**
-     * Which deletable data type this deletion is for
+     * Which deletable data type this patch is for
      */
     fun getType(): DeletableType
 
     /**
-     * Used by the SyncClient to get all the deletions from each deletable feature
+     * Used by the SyncClient to get patches from each patchable feature.
+     * Returns a [SyncPatchRequest] if there are pending updates, or null if none.
      */
-    fun getDeletions(): SyncDeletionRequest? = null
+    fun getPatches(): SyncPatchRequest? = null
 
     /**
-     * Called to notify that the deletion request was successful
+     * Called to notify that the patch request was successful.
      */
-    fun onDeleteSuccess(response: SyncDeletionResponse)
+    fun onPatchSuccess(response: SyncPatchResponse)
 
     /**
-     * Called to notify that the deletion request failed
+     * Called to notify that the patch request failed.
      */
-    fun onDeleteError(syncErrorResponse: SyncErrorResponse)
+    fun onPatchError(syncErrorResponse: SyncErrorResponse)
+
+    /**
+     * Called when sync is disabled (user disconnects or logs out).
+     * Implementations should clear any pending state.
+     */
+    fun onSyncDisabled()
 }
