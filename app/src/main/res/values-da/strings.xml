@@ -258,6 +258,19 @@
         <item quantity="other">Slet fra %1$d websteder. Du kan blive logget ud af konti.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Slet faner og webstedsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Slet faner, webstedsdata og chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Slet alle</string>
+    <string name="singleTabFireDialogDeleteThisTab">Slet denne fane</string>
+    <string name="singleTabFireDialogDeleteThisChat">Slet denne chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Slet alle\" sletter ikke din Duck.ai-chathistorik.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Sletning af webstedsdata kan logge dig ud af konti.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dette annullerer igangværende downloads.</string>
+    <string name="singleTabFireDialogSnackbar">1 fane og dens data slettet</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Webstedsdata kunne ikke slettes. Opdater WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Webstedsdata kunne ikke slettes på grund af en fejl.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tilladelser</string>
 
