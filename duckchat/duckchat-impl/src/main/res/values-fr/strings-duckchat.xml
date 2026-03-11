@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Rechercher ou saisir une adresse</string>
     <string name="input_screen_chat_hint">Demander en privé</string>
     <string name="input_screen_user_pref_without_ai">Recherche uniquement</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Recherche et Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Essayez la nouvelle option pour interroger Duck.ai directement à partir de la barre d\'adresse. <annotation type="share_feedback">Partagez vos commentaires</annotation></string>
 
     <!-- Duck.ai Pro settings -->

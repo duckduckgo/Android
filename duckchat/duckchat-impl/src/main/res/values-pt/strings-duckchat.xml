@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Pesquisar ou inserir endereço</string>
     <string name="input_screen_chat_hint">Perguntar em privado</string>
     <string name="input_screen_user_pref_without_ai">Pesquisar apenas</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Pesquisa e Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Utiliza a nova opção para perguntar diretamente ao Duck.ai na barra de endereço. <annotation type="share_feedback">Partilhar comentários</annotation></string>
 
     <!-- Duck.ai Pro settings -->
