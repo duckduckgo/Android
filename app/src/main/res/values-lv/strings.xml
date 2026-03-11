@@ -262,6 +262,19 @@
         <item quantity="other">Dzēst no %1$d vietnēm. Var izrakstīt tevi no kontiem.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Vai dzēst cilnes un vietņu datus?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vai dzēst cilnes, vietnes datus un tērzēšanas sarunas?</string>
+    <string name="singleTabFireDialogDeleteAll">Dzēst visus</string>
+    <string name="singleTabFireDialogDeleteThisTab">Dzēst šo cilni</string>
+    <string name="singleTabFireDialogDeleteThisChat">Dzēst šo tērzēšanas sarunu</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Dzēst visu\" neizdzēsīs tavu Duck.ai tērzēšanas vēsturi.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
+    <string name="singleTabFireDialogSnackbar">1 cilne un tās dati dzēsti</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Vietnes datus nevarēja izdzēst. Lūdzu, atjaunini WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Vietnes datus nevarēja dzēst kļūdas dēļ.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Atļaujas</string>
 
