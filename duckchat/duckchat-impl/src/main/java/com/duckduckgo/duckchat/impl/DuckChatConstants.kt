@@ -17,8 +17,6 @@
 package com.duckduckgo.duckchat.impl
 
 object DuckChatConstants {
-    @Volatile var hostOverride: String? = null
-    val HOST_DUCK_AI: String get() = hostOverride ?: "duck.ai"
     const val JS_MESSAGING_FEATURE_NAME = "aiChat"
     const val CHAT_ID_PARAM = "chatID"
 

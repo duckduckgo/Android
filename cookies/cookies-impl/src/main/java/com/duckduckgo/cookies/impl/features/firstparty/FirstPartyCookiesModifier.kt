@@ -27,8 +27,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_EXPIRE_ERROR
 import com.duckduckgo.cookies.impl.SQLCookieRemover
-import com.duckduckgo.cookies.impl.WebViewCookieManager.Companion.DDG_COOKIE_DOMAINS
 import com.duckduckgo.cookies.impl.redactStacktraceInBase64
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -51,6 +51,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     private val pixel: Pixel,
     private val fireproofRepository: FireproofRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : FirstPartyCookiesModifier {
 
     private val databaseErrorHandler = DatabaseErrorHandler()
@@ -76,7 +77,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
             userAllowListRepository.domainsInUserAllowList() +
             unprotectedTemporary.unprotectedTemporaryExceptions.map { it.domain } +
             fireproofRepository.fireproofWebsites() +
-            DDG_COOKIE_DOMAINS.map { it.toUri().host!! }
+            listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}").map { it.toUri().host!! }
 
     private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean, excludedSites: List<String>): String {
         val httpOnly = if (isOldDb) "httponly" else "is_httponly"

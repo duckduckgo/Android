@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.messaging
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.StandaloneConstants.COUNT
 import com.duckduckgo.duckchat.impl.DuckChatConstants.StandaloneConstants.INDEX
 import com.duckduckgo.duckchat.impl.DuckChatConstants.StandaloneConstants.OK
@@ -66,6 +66,7 @@ class InMemoryStandaloneStore @Inject constructor() : StandaloneDuckChatStore {
 @ContributesMultibinding(AppScope::class)
 class StoreMigrationDataHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -92,11 +93,10 @@ class StoreMigrationDataHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> =
-                listOf(
-                    AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
-                )
+            override val allowedDomains: List<String> = listOf(
+                AppUrl.Url.HOST,
+                duckAiHostProvider.getHost(),
+            )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("storeMigrationData")
@@ -106,6 +106,7 @@ class StoreMigrationDataHandler @Inject constructor(
 @ContributesMultibinding(AppScope::class)
 class GetMigrationInfoHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -125,11 +126,10 @@ class GetMigrationInfoHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> =
-                listOf(
-                    AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
-                )
+            override val allowedDomains: List<String> = listOf(
+                AppUrl.Url.HOST,
+                duckAiHostProvider.getHost(),
+            )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getMigrationInfo")
@@ -139,6 +139,7 @@ class GetMigrationInfoHandler @Inject constructor(
 @ContributesMultibinding(AppScope::class)
 class GetMigrationDataByIndexHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -163,11 +164,10 @@ class GetMigrationDataByIndexHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> =
-                listOf(
-                    AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
-                )
+            override val allowedDomains: List<String> = listOf(
+                AppUrl.Url.HOST,
+                duckAiHostProvider.getHost(),
+            )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getMigrationDataByIndex")
@@ -177,6 +177,7 @@ class GetMigrationDataByIndexHandler @Inject constructor(
 @ContributesMultibinding(AppScope::class)
 class ClearMigrationDataHandler @Inject constructor(
     private val standaloneDuckChatStore: StandaloneDuckChatStore,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -191,11 +192,10 @@ class ClearMigrationDataHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> =
-                listOf(
-                    AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
-                )
+            override val allowedDomains: List<String> = listOf(
+                AppUrl.Url.HOST,
+                duckAiHostProvider.getHost(),
+            )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("clearMigrationData")

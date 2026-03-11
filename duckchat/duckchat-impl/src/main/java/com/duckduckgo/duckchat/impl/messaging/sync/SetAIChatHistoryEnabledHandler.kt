@@ -22,7 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatConstants
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -38,6 +38,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class SetAIChatHistoryEnabledHandler @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    private val duckAiHostProvider: DuckAiHostProvider,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ContentScopeJsMessageHandlersPlugin {
@@ -68,11 +69,10 @@ class SetAIChatHistoryEnabledHandler @Inject constructor(
                 }
             }
 
-            override val allowedDomains: List<String> =
-                listOf(
-                    AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
-                )
+            override val allowedDomains: List<String> = listOf(
+                AppUrl.Url.HOST,
+                duckAiHostProvider.getHost(),
+            )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("setAIChatHistoryEnabled")

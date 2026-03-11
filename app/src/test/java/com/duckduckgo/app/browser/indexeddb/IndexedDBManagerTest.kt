@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.indexeddb
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.file.FileDeleter
@@ -54,6 +55,7 @@ class IndexedDBManagerTest {
     private val mockFileDeleter: FileDeleter = mock()
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private val testee by lazy {
         DuckDuckGoIndexedDBManager(
@@ -63,6 +65,7 @@ class IndexedDBManagerTest {
             mockFileDeleter,
             moshi,
             dispatcherProvider,
+            mockDuckAiHostProvider,
         )
     }
 
@@ -70,6 +73,7 @@ class IndexedDBManagerTest {
     fun setup() {
         File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB").apply { mkdirs() }
 
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         whenever(mockFeature.indexedDB()).thenReturn(mockIndexedDBToggle)
         whenever(mockFeature.fireproofedIndexedDB()).thenReturn(mockFireproofToggle)
         runBlocking {

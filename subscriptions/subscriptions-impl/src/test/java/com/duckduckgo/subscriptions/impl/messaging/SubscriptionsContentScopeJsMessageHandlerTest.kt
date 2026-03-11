@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.messaging
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import kotlinx.coroutines.test.runTest
@@ -7,9 +8,13 @@ import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class SubscriptionsContentScopeJsMessageHandlerTest {
-    private val handler = SubscriptionsContentScopeJsMessageHandler().getJsMessageHandler()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
+        whenever(it.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+    }
+    private val handler = SubscriptionsContentScopeJsMessageHandler(mockDuckAiHostProvider).getJsMessageHandler()
 
     @Test
     fun `when message sent then callback called`() = runTest {

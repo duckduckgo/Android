@@ -24,6 +24,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -67,6 +68,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
     private val duckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener>,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -110,7 +112,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
                     if (domainForMatchingAllowedKey == null && shouldClearBrowserData) {
                         db.delete(entry.key)
                         logcat { "WebLocalStorageManager: Deleted key: $key" }
-                    } else if (shouldClearDuckAiData && DUCKDUCKGO_DOMAINS.contains(domainForMatchingAllowedKey)) {
+                    } else if (shouldClearDuckAiData && duckDuckGoDomains.contains(domainForMatchingAllowedKey)) {
                         if (keysToDelete.any { key.endsWith(it) }) {
                             db.delete(entry.key)
                             duckAiDataDeleted = true
@@ -143,9 +145,8 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         return null
     }
 
-    companion object {
-        val DUCKDUCKGO_DOMAINS = listOf("duckduckgo.com", "duck.ai")
-    }
+    private val duckDuckGoDomains: List<String>
+        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }
 
 @Module

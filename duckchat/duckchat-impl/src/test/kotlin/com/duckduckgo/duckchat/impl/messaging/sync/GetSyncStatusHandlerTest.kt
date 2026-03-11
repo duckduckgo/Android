@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.messaging.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -44,6 +44,7 @@ class GetSyncStatusHandlerTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockSyncStatusHelper: SyncStatusHelper = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val mockJsMessaging: JsMessaging = mock()
 
     private val callbackDataCaptor = argumentCaptor<JsCallbackData>()
@@ -52,8 +53,10 @@ class GetSyncStatusHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         handler = GetSyncStatusHandler(
             syncStatusHelper = mockSyncStatusHelper,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 
@@ -62,7 +65,7 @@ class GetSyncStatusHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(HOST_DUCK_AI, domains[1])
+        assertEquals(DuckAiHostProvider.DEFAULT_HOST, domains[1])
     }
 
     @Test

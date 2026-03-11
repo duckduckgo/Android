@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.weblocalstorage.Domains
 import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManager
@@ -56,6 +57,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockDuckAiChatDeletionListener: DuckAiChatDeletionListener = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var testee: DuckDuckGoWebLocalStorageManager
 
@@ -78,6 +80,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, keysToDelete = keysToDelete, matchingRegex = matchingRegex)
         whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
 
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
         testee = DuckDuckGoWebLocalStorageManager(
             mockDatabaseProvider,
             mockAndroidBrowserConfigFeature,
@@ -90,6 +93,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
                     return listOf(mockDuckAiChatDeletionListener)
                 }
             },
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 
