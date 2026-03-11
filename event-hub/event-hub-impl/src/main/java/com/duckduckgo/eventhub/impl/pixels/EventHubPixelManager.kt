@@ -44,10 +44,7 @@ interface EventHubPixelManager {
      */
     fun handleWebEvent(data: JSONObject, webViewId: String)
 
-    /**
-     * Signal that a WebView has navigated to a new URL (for example used for
-     * event deduplication)
-     */
+    /** Signal that a WebView has navigated to a new URL. */
     fun onNavigationStarted(webViewId: String, url: String)
 
     /**
