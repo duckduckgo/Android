@@ -258,6 +258,19 @@
         <item quantity="other">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Kas kustutada vahekaardid ja saidi andmed?</string>
+    <string name="singleTabFireDialogTitleWithChats">Kas kustutada vahekaardid, saidi andmed ja vestlused?</string>
+    <string name="singleTabFireDialogDeleteAll">Kustuta kõik</string>
+    <string name="singleTabFireDialogDeleteThisTab">Kustuta see vahekaart</string>
+    <string name="singleTabFireDialogDeleteThisChat">Kustuta see vestlus</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">„Kustuta kõik” ei kustuta su Duck.ai vestlusajalugu.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
+    <string name="singleTabFireDialogSnackbar">1 vahekaart ja selle andmed on kustutatud</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Saidi andmeid ei saanud kustutada. Värskendage WebView\'d.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Saidi andmeid ei saanud vea tõttu kustutada.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Load</string>
 
