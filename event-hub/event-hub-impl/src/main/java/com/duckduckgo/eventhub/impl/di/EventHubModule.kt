@@ -47,7 +47,6 @@ object EventHubModule {
             "event_hub_pixel_state.db",
             config = RoomDatabaseConfig(
                 fallbackToDestructiveMigration = true,
-                enableMultiInstanceInvalidation = true,
                 migrations = ALL_MIGRATIONS.toList(),
             ),
         )
