@@ -66,8 +66,8 @@ class AppThirdPartyCookieManagerTest {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         whenever(thirdPartyCookieNamesMock.hasExcludedCookieName("$USER_ID_COOKIE=test")).thenReturn(true)
-
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+
         testee = AppThirdPartyCookieManager(
             cookieManagerProvider,
             authCookiesAllowedDomainsRepository,

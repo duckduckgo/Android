@@ -70,10 +70,11 @@ class GetSyncStatusHandler @Inject constructor(
                 }
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf("getSyncStatus")

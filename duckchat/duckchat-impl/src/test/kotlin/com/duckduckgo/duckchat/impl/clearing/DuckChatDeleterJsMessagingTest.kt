@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.clearing
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.JS_INTERFACE_NAME
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
@@ -38,6 +39,7 @@ class DuckChatDeleterJsMessagingTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val webView: WebView = mock()
     private val jsMessageCallback: JsMessageCallback = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var messaging: DuckChatDeleterJsMessaging
 
@@ -45,6 +47,7 @@ class DuckChatDeleterJsMessagingTest {
     fun setup() {
         messaging = DuckChatDeleterJsMessaging(
             jsMessageHelper = jsMessageHelper,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
         messaging.register(webView, jsMessageCallback)
     }
@@ -52,7 +55,7 @@ class DuckChatDeleterJsMessagingTest {
     @Test
     fun `when register called then javascript interface is added to webview`() {
         val newWebView: WebView = mock()
-        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper)
+        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper, mockDuckAiHostProvider)
 
         newMessaging.register(newWebView, jsMessageCallback)
 
@@ -61,7 +64,7 @@ class DuckChatDeleterJsMessagingTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `when register called with null callback then throws`() {
-        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper)
+        val newMessaging = DuckChatDeleterJsMessaging(jsMessageHelper, mockDuckAiHostProvider)
         newMessaging.register(webView, null)
     }
 

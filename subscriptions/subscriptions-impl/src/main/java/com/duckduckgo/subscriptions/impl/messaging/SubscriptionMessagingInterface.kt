@@ -59,8 +59,8 @@ class SubscriptionMessagingInterface @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     pixelSender: SubscriptionPixelSender,
     subscriptionsChecker: SubscriptionsChecker,
-    private val duckAiHostProvider: DuckAiHostProvider,
-    private val privacyProFeature: PrivacyProFeature,
+    duckAiHostProvider: DuckAiHostProvider,
+    privacyProFeature: PrivacyProFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 

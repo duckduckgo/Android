@@ -68,7 +68,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
     private val duckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener>,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : WebLocalStorageManager {
 
     private var domains = emptyList<String>()
@@ -145,8 +145,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
         return null
     }
 
-    private val duckDuckGoDomains: List<String>
-        get() = listOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 }
 
 @Module
