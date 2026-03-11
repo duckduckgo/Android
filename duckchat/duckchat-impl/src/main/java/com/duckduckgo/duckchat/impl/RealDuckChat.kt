@@ -34,6 +34,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
@@ -318,6 +319,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
+    private val duckAiUrlOverride: DuckAiUrlOverride,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -571,7 +573,7 @@ class RealDuckChat @Inject constructor(
         sidebar: Boolean,
     ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
-        val url = appendParameters(parameters, duckChatLink)
+        val url = appendParameters(parameters, getDuckChatLink())
         return url
     }
 
@@ -617,7 +619,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
     ) {
-        val url = appendParameters(parameters, duckChatLink)
+        val url = appendParameters(parameters, getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
@@ -644,6 +646,11 @@ class RealDuckChat @Inject constructor(
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
             }
+    }
+
+    private fun getDuckChatLink(): String {
+        val customHost = duckAiUrlOverride.getCustomHost() ?: return duckChatLink
+        return duckChatLink.toUri().buildUpon().authority(customHost).build().toString()
     }
 
     private fun appendParameters(
@@ -676,7 +683,7 @@ class RealDuckChat @Inject constructor(
 
         if (isDuckChatBang(uri)) return true
 
-        if (uri.host == DUCK_AI_HOST || uri.toString() == DUCK_AI_HOST) return true
+        if (uri.host == HOST_DUCK_AI || uri.toString() == HOST_DUCK_AI) return true
         if (uri.host != DUCKDUCKGO_HOST) return false
 
         return runCatching {
@@ -868,7 +875,6 @@ class RealDuckChat @Inject constructor(
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
-        private const val DUCK_AI_HOST = "duck.ai"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"

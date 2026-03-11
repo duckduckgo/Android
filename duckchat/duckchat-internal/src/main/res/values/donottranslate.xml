@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="devSettingsDuckAiUrlHint">Add your custom URL here</string>
+    <string name="devSettingsDuckAiUrlSave">Save</string>
+    <string name="devSettingsDuckAiUrlReset">Reset to default</string>
+    <string name="devSettingsDuckAiUrlSet">Custom Duck.ai URL set</string>
+    <string name="devSettingsDuckAiUrlCleared">Duck.ai URL reset to default</string>
+</resources>
