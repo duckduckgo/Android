@@ -69,6 +69,7 @@ class WebViewDataManagerTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
+    private val mockDuckAiChatDeletionListener: DuckAiChatDeletionListener = mock()
     private val mockDuckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener> = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
@@ -94,6 +95,7 @@ class WebViewDataManagerTest {
     @Before
     fun setup(): Unit = runBlocking {
         whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockDuckAiChatDeletionListeners.getPlugins()).thenReturn(listOf(mockDuckAiChatDeletionListener))
     }
 
     @Test
@@ -560,6 +562,120 @@ class WebViewDataManagerTest {
             verify(mockIndexedDBManager, never()).clearOnlyDuckAiData()
         }
     }
+
+    // region notifyOnDuckChatsDeleted tests
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndClearDuckAiDataEnabledAndIndexedDBEnabledThenNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndClearDuckAiDataDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndIndexedDBDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = false))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndIndexedDBThrowsThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            whenever(mockIndexedDBManager.clearIndexedDB(true)).thenThrow(RuntimeException("test"))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueThenNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataFalseThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueAndIndexedDBDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueAndIndexedDBThrowsThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockIndexedDBManager.clearOnlyDuckAiData()).thenThrow(RuntimeException("test"))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    // endregion
 
     private class TestWebView(context: Context) : WebView(context) {
 
