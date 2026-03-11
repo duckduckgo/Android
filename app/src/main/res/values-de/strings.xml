@@ -258,6 +258,19 @@
         <item quantity="other">Von %1$d Websites löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabs und Seitendaten löschen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabs, Seitendaten und Chats löschen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alle löschen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Diesen Tab löschen</string>
+    <string name="singleTabFireDialogDeleteThisChat">Diesen Chat löschen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Mit „Alle löschen“ wird dein Duck.ai-Chatverlauf nicht gelöscht.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
+    <string name="singleTabFireDialogSnackbar">1 Tab und dessen Daten gelöscht</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Berechtigungen</string>
 
