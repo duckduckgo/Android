@@ -1084,6 +1084,7 @@ class DuckChatContextualViewModelTest {
         ): String = nextUrl
 
         override fun isDuckChatUrl(uri: android.net.Uri): Boolean = false
+        override suspend fun deleteChat(url: String): Boolean = false
         override suspend fun wasOpenedBefore(): Boolean = false
         override fun showNewAddressBarOptionChoiceScreen(
             context: android.content.Context,

@@ -66,6 +66,8 @@ class FakeDuckChat(
         return uri.toString().contains("duckchat")
     }
 
+    override suspend fun deleteChat(url: String): Boolean = false
+
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
     }

@@ -31,6 +31,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -71,6 +72,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -97,6 +99,7 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
+    private val mockDuckChatDeleter: DuckChatDeleter = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -133,6 +136,7 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDeviceSyncState,
                 cookiesManager,
+                mockDuckChatDeleter,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1337,6 +1341,60 @@ class RealDuckChatTest {
         whenever(cookiesManager.get()).thenReturn(null)
 
         assertFalse(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+    }
+
+    @Test
+    fun `when duck ai url without chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when non duck ai url with chatID param then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://example.com/?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when duck ai url with blank chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when legacy duckduckgo duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+    }
+
+    @Test
+    fun `when deleteChat and deleter returns false then deleteChat returns false`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(false)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
     }
 
     companion object {
