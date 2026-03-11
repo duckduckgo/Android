@@ -266,6 +266,19 @@
         <item quantity="other">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Izbrisati kartice i podatke mrežne lokacije?</string>
+    <string name="singleTabFireDialogTitleWithChats">Izbrisati kartice, podatke mrežne lokacije i čavrljanja?</string>
+    <string name="singleTabFireDialogDeleteAll">Izbriši sve</string>
+    <string name="singleTabFireDialogDeleteThisTab">Izbriši ovu karticu</string>
+    <string name="singleTabFireDialogDeleteThisChat">Izbriši ovo čavrljanje</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Izbriši sve\" neće izbrisati tvoju Duck.ai povijest čavrljanja.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
+    <string name="singleTabFireDialogSnackbar">1 kartica i njezini podaci izbrisani su</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
 
