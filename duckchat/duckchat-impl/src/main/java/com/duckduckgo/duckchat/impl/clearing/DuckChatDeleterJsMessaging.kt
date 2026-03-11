@@ -51,10 +51,12 @@ class DuckChatDeleterJsMessaging @Inject constructor(
     private lateinit var jsMessageCallback: JsMessageCallback
     private lateinit var webView: WebView
 
-    private val duckAiDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
+    private val duckAiDomains: List<String>
+        get() = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
 
     override val context: String = "contentScopeScripts"
-    override val allowedDomains: List<String> = duckAiDomains
+    override val allowedDomains: List<String>
+        get() = duckAiDomains
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw IllegalArgumentException("Callback cannot be null")
@@ -107,7 +109,8 @@ class DuckChatDeleterJsMessaging @Inject constructor(
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = duckAiDomains
+        override val allowedDomains: List<String>
+            get() = duckAiDomains
         override val featureName: String = FEATURE_NAME
         override val methods: List<String> = listOf(
             METHOD_CLEAR_DATA_READY,
