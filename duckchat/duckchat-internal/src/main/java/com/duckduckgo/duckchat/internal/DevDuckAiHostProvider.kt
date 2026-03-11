@@ -38,9 +38,7 @@ class DevDuckAiHostProvider @Inject constructor(
     private var cachedHost: String? = null
 
     init {
-        appScope.launch(dispatcherProvider.io()) {
-            cachedHost = dataStore.customUrl?.toUri()?.host
-        }
+        cachedHost = extractHost(dataStore.customUrl)
     }
 
     override fun getCustomHost(): String? = cachedHost
@@ -48,9 +46,14 @@ class DevDuckAiHostProvider @Inject constructor(
     fun getCustomUrl(): String? = dataStore.customUrl
 
     fun setCustomUrl(url: String?) {
-        cachedHost = url?.toUri()?.host
+        cachedHost = extractHost(url)
         appScope.launch(dispatcherProvider.io()) {
             dataStore.customUrl = url
         }
+    }
+
+    private fun extractHost(url: String?): String? {
+        val normalizedUrl = url?.trim().takeUnless { it.isNullOrBlank() } ?: return null
+        return normalizedUrl.toUri().host ?: "https://$normalizedUrl".toUri().host
     }
 }
