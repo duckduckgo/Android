@@ -161,7 +161,7 @@ class RealEventHubPixelManager @Inject constructor(
     private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, webViewId: String): Boolean {
         if (webViewId.isEmpty()) return false
         val key = "$pixelName:$paramName:$source"
-        val perTab = dedupSeen.getOrPut(webViewId) { ConcurrentHashMap.newKeySet() }
+        val perTab = dedupSeen.computeIfAbsent(webViewId) { ConcurrentHashMap.newKeySet() }
         if (!perTab.add(key)) {
             logcat(VERBOSE) { "EventHub: dedup $key:$webViewId (already seen on current page)" }
             return true
