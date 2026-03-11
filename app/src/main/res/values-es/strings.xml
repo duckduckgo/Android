@@ -258,6 +258,19 @@
         <item quantity="other">Eliminar de %1$d sitios. Puede que cierre sesión en tus cuentas.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">¿Eliminar pestañas y datos del sitio?</string>
+    <string name="singleTabFireDialogTitleWithChats">¿Eliminar pestañas, datos del sitio y chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Eliminar todo</string>
+    <string name="singleTabFireDialogDeleteThisTab">Eliminar esta pestaña</string>
+    <string name="singleTabFireDialogDeleteThisChat">Borrar este chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">«Eliminar todo» no borrará tu historial de chat de Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Eliminar datos del sitio puede hacer que cierres sesión en tus cuentas.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Esta acción cancelará las descargas en curso.</string>
+    <string name="singleTabFireDialogSnackbar">1 pestaña y sus datos eliminados</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">No se ha podido borrar los datos del sitio. Actualiza WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Los datos del sitio no se han podido eliminar debido a un error.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisos</string>
 
