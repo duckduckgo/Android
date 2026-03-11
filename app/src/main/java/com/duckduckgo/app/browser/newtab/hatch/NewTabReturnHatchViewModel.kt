@@ -29,13 +29,17 @@ import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -71,20 +75,37 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
+    // val viewState = combine(
+    //     _viewState,
+    //     tabsFlow,
+    //     selectedTabFlow,
+    // ) { state, tabs, selectedTab ->
+    //     val lastTab = tabs.firstOrNull { it.tabId == selectedTab }
+    //     if (lastTab != null){
+    //         state.copy(
+    //             tabTitle = lastTab.title!!, url = lastTab.url!!,
+    //             tabId = lastTab.tabId,
+    //             currentTabId = currentTab.tabId,
+    //             shouldShow = true,
+    //         )
+    //     } else {
+    //
+    //     }
+    //
+    // }.flowOn(dispatchers.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            val tabs = tabRepository.getTabs()
-            logcat { "Hatch: tabs $tabs" }
-            if (tabs.isNotEmpty()) {
-                val lastTab = tabs.first()
-                val currentTab = tabs.last()
+            val lastTab = tabRepository.getSelectedTab()
+            logcat { "Hatch: tabs $lastTab" }
+            if (lastTab != null){
                 if (lastTab.url != null && lastTab.title != null) {
                     _viewState.value = ViewState(
                         tabTitle = lastTab.title!!, url = lastTab.url!!,
                         tabId = lastTab.tabId,
-                        currentTabId = currentTab.tabId,
+                        currentTabId = lastTab.tabId,
                         shouldShow = true,
                     )
                 } else {
@@ -93,11 +114,10 @@ class NewTabReturnHatchViewModel @Inject constructor(
             } else {
                 _viewState.value = ViewState(shouldShow = false)
             }
-
         }
     }
 
-    fun onHatchPressed(){
+    fun onHatchPressed() {
         viewModelScope.launch(dispatchers.io()) {
             val tab = tabRepository.getTab(_viewState.value.currentTabId)
             tabRepository.deleteTabAndSelectSource(_viewState.value.currentTabId)
