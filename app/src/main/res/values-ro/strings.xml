@@ -262,6 +262,19 @@
         <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Dorești să ștergi filele și datele site-ului?</string>
+    <string name="singleTabFireDialogTitleWithChats">Dorești să ștergi filele, datele site-ului și chaturile?</string>
+    <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
+    <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
+    <string name="singleTabFireDialogDeleteThisChat">Șterge acest chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">„Șterge tot” nu va șterge istoricul chaturilor tale Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
+    <string name="singleTabFireDialogSnackbar">1 filă și datele aferente au fost șterse</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>
 
