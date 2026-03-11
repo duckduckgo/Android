@@ -611,6 +611,32 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and url matches custom duck ai subdomain then callback executed`() = runTest {
+        messagingInterface.register(webView, callback)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        whenever(webView.url).thenReturn("https://staging.duck.ai/chat")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"featureSelected","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun `when duck ai host changes then allowed domains reflects latest host`() = runTest {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai", "next.duck.ai")
+
+        val firstDomains = messagingInterface.allowedDomains
+        val secondDomains = messagingInterface.allowedDomains
+
+        assertEquals("staging.duck.ai", firstDomains[1])
+        assertEquals("next.duck.ai", secondDomains[1])
+    }
+
+    @Test
     fun `when process and back to settings activate success if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 

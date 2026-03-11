@@ -240,6 +240,52 @@ class ContentScopeScriptsJsMessagingTest {
         }
 
     @Test
+    fun `when processing message with allowed subdomain host then process message`() =
+        runTest {
+            val subdomainHandlers: PluginPoint<ContentScopeJsMessageHandlersPlugin> =
+                object : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+                    override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> {
+                        return listOf(
+                            object : ContentScopeJsMessageHandlersPlugin {
+                                override fun getJsMessageHandler(): JsMessageHandler =
+                                    object : JsMessageHandler {
+                                        override fun process(
+                                            jsMessage: JsMessage,
+                                            jsMessaging: JsMessaging,
+                                            jsMessageCallback: JsMessageCallback?,
+                                        ) {
+                                            jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                                        }
+
+                                        override val allowedDomains: List<String> = listOf("staging.duck.ai")
+                                        override val featureName: String = "webCompat"
+                                        override val methods: List<String> = listOf("webShare")
+                                    }
+                            },
+                        )
+                    }
+                }
+            val subdomainMessaging =
+                ContentScopeScriptsJsMessaging(
+                    jsMessageHelper,
+                    coroutineRule.testDispatcherProvider,
+                    coreContentScopeScripts,
+                    subdomainHandlers,
+                )
+            subdomainMessaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://staging.duck.ai")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            subdomainMessaging.process(message, subdomainMessaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
     fun `when processing message with null url and handler has allowed domains then do nothing`() =
         runTest {
             contentScopeScriptsJsMessaging.register(mockWebView, callback)
