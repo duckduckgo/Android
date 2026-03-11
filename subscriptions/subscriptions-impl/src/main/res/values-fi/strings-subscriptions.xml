@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivoi Privacy Pro tietokoneella Personal Information Removalin asentamiseksi</string>
-    <string name="pirDescription">Avaa ensin tietokoneen DuckDuckGo-selain, siirry kohtaan <b>Asetukset &gt; Privacy Pro</b> ja klikkaa <b>Minulla on tilaus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

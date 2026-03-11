@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Vaša naročnina je bila kupljena v trgovini Apple App Store. Če želite spremeniti naročnino ali nastavitve obračunavanja, v napravi, ki je prijavljena v isti račun Apple, kot je bil uporabljen za nakup naročnine, odprite Nastavitve &gt; Račun Apple &gt; Naročnine.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivirajte Privacy Pro na namizju, da nastavite Personal Information Removal</string>
-    <string name="pirDescription">Za začetek v brskalniku DuckDuckGo za namizje pojdite na <b>Nastavitve &gt; Privacy Pro</b> in kliknite <b>Imam naročnino</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

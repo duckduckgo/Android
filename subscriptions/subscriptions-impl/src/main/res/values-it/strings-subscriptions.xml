@@ -108,8 +108,6 @@
     <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; Account Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso account Apple utilizzato per acquistare l\'abbonamento.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Attiva Privacy Pro sul desktop per impostare Personal Information Removal</string>
-    <string name="pirDescription">Nel browser DuckDuckGo per desktop, vai su <b>Impostazioni &gt; Privacy Pro</b> e fai clic su <b>Ho un abbonamento</b> per iniziare.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

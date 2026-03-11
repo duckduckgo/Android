@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Η συνδρομή σας αγοράστηκε μέσω του Apple Play Store. Για να αλλάξετε το πρόγραμμα ή τις ρυθμίσεις χρέωσης, μεταβείτε στις επιλογές Ρυθμίσεις &gt; Λογαριασμός Apple &gt; Συνδρομές, σε μια συσκευή που έχει συνδεθεί με τον ίδιο Λογαριασμό Apple που χρησιμοποιήθηκε για την αγορά της συνδρομής σας.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Ενεργοποιήστε το Privacy Pro στην επιφάνεια εργασίας για να ρυθμίσετε το Personal Information Removal</string>
-    <string name="pirDescription">Στο πρόγραμμα περιήγησης DuckDuckGo για υπολογιστές, μεταβείτε στις επιλογές <b>Ρυθμίσεις &gt; Privacy Pro</b> και κάντε κλικ στην επιλογή <b>Έχω συνδρομή</b> για να ξεκινήσετε.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

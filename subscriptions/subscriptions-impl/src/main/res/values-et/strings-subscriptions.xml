@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveerige töölaual Privacy Pro</string>
-    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisesse <b>Seaded &gt; Privacy Pro</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

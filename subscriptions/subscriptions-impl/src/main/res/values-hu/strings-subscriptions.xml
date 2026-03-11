@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve, mint amellyel az előfizetés meg lett vásárolva.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Privacy Pro aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
-    <string name="pirDescription">A kezdéshez a DuckDuckGo böngésző asztali verziójában lépj a <b>Beállítások &gt; Privacy Pro</b> menüpontra, és kattints a <b>Van előfizetésem</b> lehetőségre.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

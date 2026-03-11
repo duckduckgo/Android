@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktyvuokite „Privacy Pro“ darbalaukyje, kad nustatytumėte Asmeninės informacijos pašalinimą.</string>
-    <string name="pirDescription">„DuckDuckGo“ naršyklėje, skirtoje darbalaukiui, eikite į <b>Nustatymai &gt; „Privacy Pro“</b> ir spustelėkite <b>Turiu prenumeratą</b>, kad pradėtumėte.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 

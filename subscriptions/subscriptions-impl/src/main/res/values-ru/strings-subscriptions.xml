@@ -108,8 +108,6 @@
     <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Чтобы включить функцию Personal Information Removal, активируйте подписку Privacy Pro на настольном компьютере</string>
-    <string name="pirDescription">Запустите браузер DuckDuckGo на настольном компьютере, откройте раздел «<b>Настройки &gt; Privacy Pro</b>» и нажмите на ссылку «<b>У меня уже есть подписка</b>».</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
