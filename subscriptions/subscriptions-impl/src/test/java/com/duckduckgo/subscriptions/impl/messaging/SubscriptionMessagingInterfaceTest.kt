@@ -3,11 +3,11 @@ package com.duckduckgo.subscriptions.impl.messaging
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.AuthTokenResult
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -44,7 +44,7 @@ class SubscriptionMessagingInterfaceTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val privacyProFeature: PrivacyProFeature = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
-        .also { whenever(it.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST) }
+        .also { whenever(it.getHost()).thenReturn("duck.ai") }
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,

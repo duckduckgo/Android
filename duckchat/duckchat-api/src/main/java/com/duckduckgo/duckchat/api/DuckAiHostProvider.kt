@@ -21,7 +21,7 @@ interface DuckAiHostProvider {
 
     fun getHost(): String = getCustomHost() ?: DEFAULT_HOST
 
-    companion object {
+    private companion object {
         const val DEFAULT_HOST = "duck.ai"
     }
 }
