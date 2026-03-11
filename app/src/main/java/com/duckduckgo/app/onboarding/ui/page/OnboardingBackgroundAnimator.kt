@@ -120,6 +120,36 @@ class OnboardingBackgroundAnimator(
         activeView = inView
     }
 
+    /**
+     * Immediately sets the background to the given [step] without animation.
+     *
+     * Used to restore the correct background state after configuration changes (e.g., rotation).
+     */
+    fun snapTo(step: OnboardingBackgroundStep) {
+        val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
+        val outView = activeView
+
+        cancel()
+
+        val density = inView.resources.displayMetrics.density
+
+        with(inView) {
+            updateLayoutParams<ConstraintLayout.LayoutParams> {
+                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+            }
+            setImageResource(step.backgroundRes)
+            translationX = 0f
+            alpha = 1f
+            isVisible = true
+        }
+
+        outView.alpha = 0f
+        outView.translationX = 0f
+        outView.isVisible = false
+
+        activeView = inView
+    }
+
     fun cancel() {
         enterExitAnimatorSet?.cancel()
         enterExitAnimatorSet = null
