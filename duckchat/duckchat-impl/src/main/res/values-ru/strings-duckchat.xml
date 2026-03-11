@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Введите поисковый запрос или адрес сайта</string>
     <string name="input_screen_chat_hint">Задать вопрос (конфиденциально)</string>
     <string name="input_screen_user_pref_without_ai">Только поиск</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Поиск и Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Новая функция! Вопрос чат-боту Duck.ai прямо из адресной строки. <annotation type="share_feedback">Оставить отзыв</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Посетить «Настройки функций ИИ»</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Настроить функции ИИ</string>
     <string name="duck_ai_paid_settings_manage_secondary">Параметры Duck.ai можно задать в разделе «Настройки функций ИИ».</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Кратко изложи содержимое страницы</string>
