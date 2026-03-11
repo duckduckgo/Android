@@ -55,6 +55,8 @@ interface EventHubPixelManager {
      */
     fun onConfigChanged()
 
+    fun isEnabled(): Boolean
+
     fun onAppForegrounded()
 
     fun onAppBackgrounded()
@@ -80,7 +82,9 @@ class RealEventHubPixelManager @Inject constructor(
     @Volatile
     private var isInForeground: Boolean = false
 
-    private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
+    override fun isEnabled(): Boolean = eventHubFeature.self().isEnabled()
+
+    private fun isFeatureEnabled(): Boolean = isEnabled()
 
     override fun onAppForegrounded() {
         isInForeground = true

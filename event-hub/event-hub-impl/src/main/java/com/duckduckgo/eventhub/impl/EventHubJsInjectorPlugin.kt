@@ -29,7 +29,6 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class EventHubJsInjectorPlugin @Inject constructor(
     private val pixelManager: EventHubPixelManager,
-    private val eventHubFeature: EventHubFeature,
 ) : JsInjectorPlugin {
 
     @UiThread
@@ -39,7 +38,7 @@ class EventHubJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
-        if (!eventHubFeature.self().isEnabled()) return
+        if (!pixelManager.isEnabled()) return
         val webViewId = System.identityHashCode(webView).toString()
         pixelManager.onNavigationStarted(webViewId, url ?: "")
     }
