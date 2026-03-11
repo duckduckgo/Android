@@ -1,5 +1,6 @@
 package com.duckduckgo.duckchat.impl.messaging
 
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import org.json.JSONObject
@@ -8,7 +9,8 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 class DuckChatContentScopeJsMessageHandlerTest {
-    private val handler = DuckChatContentScopeJsMessageHandler().getJsMessageHandler()
+    private val duckAiHostProvider = object : DuckAiHostProvider {}
+    private val handler = DuckChatContentScopeJsMessageHandler(duckAiHostProvider).getJsMessageHandler()
 
     @Test
     fun `when message sent then callback called`() {

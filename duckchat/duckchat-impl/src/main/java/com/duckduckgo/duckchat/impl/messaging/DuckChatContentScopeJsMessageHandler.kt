@@ -41,10 +41,11 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                 jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> =

@@ -53,13 +53,10 @@ class SitePermissionsManagerTest {
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
     private val mockContext = mock<Context>()
+    private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
     private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
         MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
-
-    private val mockDuckAiHostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
-        whenever(it.getHost()).thenReturn("duck.ai")
-    }
 
     private val testee = SitePermissionsManagerImpl(
         mockPackageManager,

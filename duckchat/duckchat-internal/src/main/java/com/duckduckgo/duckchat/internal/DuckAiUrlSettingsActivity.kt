@@ -19,6 +19,8 @@ package com.duckduckgo.duckchat.internal
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -27,10 +29,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.internal.DuckAiUrlSettingsViewModel.Command.RestartApp
 import com.duckduckgo.duckchat.internal.DuckAiUrlSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.duckchat.internal.databinding.ActivityDuckAiUrlSettingsBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlin.system.exitProcess
 
 @InjectWith(ActivityScope::class)
 class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
@@ -42,6 +46,7 @@ class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        title = getString(R.string.devSettingsDuckAiUrlOverrideTitle)
 
         configureViews()
         viewModel.start()
@@ -73,6 +78,10 @@ class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(command: DuckAiUrlSettingsViewModel.Command) {
         when (command) {
             is ShowMessage -> Toast.makeText(this, getString(command.messageResId), Toast.LENGTH_SHORT).show()
+            is RestartApp -> {
+                Toast.makeText(this, getString(command.messageResId), Toast.LENGTH_SHORT).show()
+                Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, RESTART_DELAY)
+            }
         }
     }
 
@@ -80,5 +89,6 @@ class DuckAiUrlSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, DuckAiUrlSettingsActivity::class.java)
         }
+        private const val RESTART_DELAY = 500L
     }
 }

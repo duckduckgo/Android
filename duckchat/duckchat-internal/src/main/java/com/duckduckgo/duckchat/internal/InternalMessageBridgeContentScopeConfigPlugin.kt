@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,34 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.features.messagebridge
+package com.duckduckgo.duckchat.internal
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.features.messagebridge.MessageBridgeContentScopeConfigPlugin
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.MessageBridgeFeatureName.MessageBridge
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class MessageBridgeContentScopeConfigPlugin @Inject constructor(
+@ContributesMultibinding(AppScope::class, replaces = [MessageBridgeContentScopeConfigPlugin::class])
+class InternalMessageBridgeContentScopeConfigPlugin @Inject constructor(
     private val messageBridgeRepository: MessageBridgeRepository,
+    private val duckAiHostProvider: InternalDuckAiHostProvider,
 ) : ContentScopeConfigPlugin {
 
     override fun config(): String {
         val featureName = MessageBridge.value
-        val config = messageBridgeRepository.messageBridgeEntity.json
+        val config = overrideHost(messageBridgeRepository.messageBridgeEntity.json)
         return "\"$featureName\":$config"
     }
 
     override fun preferences(): String? {
         return null
+    }
+
+    private fun overrideHost(json: String): String {
+        duckAiHostProvider.getCustomUrl() ?: return json
+        return json.replace("\"duck.ai\"", "\"duck.ai\",\"${duckAiHostProvider.getHost()}\"")
     }
 }

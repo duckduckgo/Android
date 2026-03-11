@@ -16,9 +16,9 @@
 
 package com.duckduckgo.duckchat.internal.store
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -29,11 +29,15 @@ interface DuckAiInternalSettingsDataStore {
 
 @ContributesBinding(AppScope::class)
 class DevDuckAiInternalSettingsDataStoreImpl @Inject constructor(
-    private val context: Context,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : DuckAiInternalSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy {
-        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+        sharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = false,
+            migrate = false,
+        )
     }
 
     override var customUrl: String?

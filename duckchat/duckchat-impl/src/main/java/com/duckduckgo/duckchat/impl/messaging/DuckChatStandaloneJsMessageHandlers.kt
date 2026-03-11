@@ -93,10 +93,11 @@ class StoreMigrationDataHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("storeMigrationData")
@@ -126,10 +127,11 @@ class GetMigrationInfoHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getMigrationInfo")
@@ -164,10 +166,11 @@ class GetMigrationDataByIndexHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(payload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getMigrationDataByIndex")
@@ -192,10 +195,11 @@ class ClearMigrationDataHandler @Inject constructor(
                 jsMessaging.onResponse(JsCallbackData(jsonPayload, featureName, jsMessage.method, jsMessage.id!!))
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("clearMigrationData")

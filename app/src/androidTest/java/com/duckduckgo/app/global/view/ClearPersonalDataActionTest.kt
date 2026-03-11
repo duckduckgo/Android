@@ -74,6 +74,7 @@ class ClearPersonalDataActionTest {
 
     @Before
     fun setup() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         testee = ClearPersonalDataAction(
             context = InstrumentationRegistry.getInstrumentation().targetContext,
             dataManager = mockDataManager,
@@ -95,7 +96,6 @@ class ClearPersonalDataActionTest {
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
     }
 
     @Test

@@ -147,10 +147,11 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
                 }
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getScopedSyncAuthToken")

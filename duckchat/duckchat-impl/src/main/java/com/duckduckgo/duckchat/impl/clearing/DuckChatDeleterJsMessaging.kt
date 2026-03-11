@@ -40,7 +40,7 @@ import javax.inject.Inject
  */
 class DuckChatDeleterJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : JsMessaging {
 
     override val secret: String = "duckduckgo-android-messaging-secret"
@@ -50,11 +50,10 @@ class DuckChatDeleterJsMessaging @Inject constructor(
     private val handlers = listOf(DuckAiDataClearingMessageHandler())
     private lateinit var jsMessageCallback: JsMessageCallback
     private lateinit var webView: WebView
-
-    private val duckAiDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
 
     override val context: String = "contentScopeScripts"
-    override val allowedDomains: List<String> = duckAiDomains
+    override val allowedDomains: List<String> = duckDuckGoDomains
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw IllegalArgumentException("Callback cannot be null")
@@ -107,7 +106,7 @@ class DuckChatDeleterJsMessaging @Inject constructor(
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = duckAiDomains
+        override val allowedDomains: List<String> = duckDuckGoDomains
         override val featureName: String = FEATURE_NAME
         override val methods: List<String> = listOf(
             METHOD_CLEAR_DATA_READY,

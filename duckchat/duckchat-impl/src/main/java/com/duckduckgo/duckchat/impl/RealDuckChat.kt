@@ -28,6 +28,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -319,6 +321,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -500,9 +503,9 @@ class RealDuckChat @Inject constructor(
 
     override fun canHandleOnAiWebView(url: String): Boolean {
         return runCatching {
+            val httpUrl = url.toHttpUrl()
             val duckAiHost = duckAiHostProvider.getHost()
-            val host = url.toHttpUrl().host
-            host == duckAiHost || host.endsWith(".$duckAiHost") || url == REVOKE_URL
+            httpUrl.topPrivateDomain() == duckAiHost || httpUrl.host == duckAiHost || url == REVOKE_URL
         }.getOrElse { false }
     }
 
@@ -652,8 +655,10 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun getDuckChatLink(): String {
-        val customHost = duckAiHostProvider.getCustomHost() ?: return duckChatLink
-        return duckChatLink.toUri().buildUpon().authority(customHost).build().toString()
+        if (appBuildConfig.isInternalBuild()) {
+            return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
+        }
+        return duckChatLink
     }
 
     private fun appendParameters(

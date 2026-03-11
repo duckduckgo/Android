@@ -42,7 +42,7 @@ class AppThirdPartyCookieManager(
     private val cookieManagerProvider: CookieManagerProvider,
     private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
     private val thirdPartyCookieNames: ThirdPartyCookieNames,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ThirdPartyCookieManager {
 
@@ -103,8 +103,8 @@ class AppThirdPartyCookieManager(
         } != null
     }
 
-    private val hostsThatAlwaysRequireThirdPartyCookies: List<String>
-        get() = listOf("home.nest.com", duckAiHostProvider.getHost(), "duckduckgo.com")
+    // duck.ai needs third-party cookies for cross-domain migration between duckduckgo.com and duck.ai
+    private val hostsThatAlwaysRequireThirdPartyCookies: List<String> = listOf("home.nest.com", duckAiHostProvider.getHost(), "duckduckgo.com")
 
     // See https://app.asana.com/0/1125189844152671/1200029737431978 for mor context about the below values
     companion object {

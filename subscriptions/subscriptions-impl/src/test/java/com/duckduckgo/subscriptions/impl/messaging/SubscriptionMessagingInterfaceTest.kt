@@ -44,7 +44,6 @@ class SubscriptionMessagingInterfaceTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val privacyProFeature: PrivacyProFeature = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
-        .also { whenever(it.getHost()).thenReturn("duck.ai") }
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,

@@ -46,7 +46,7 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -170,6 +170,5 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
-    private val audioCapturePermissionDomains: List<String>
-        get() = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
+    private val audioCapturePermissionDomains: List<String> = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
 }

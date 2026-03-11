@@ -134,7 +134,7 @@ class ClearPersonalDataAction(
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
-    private val duckAiHostProvider: DuckAiHostProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -304,6 +304,5 @@ class ClearPersonalDataAction(
         }
     }
 
-    private val duckDuckGoDomains: Set<String>
-        get() = setOf("duckduckgo.com", duckAiHostProvider.getHost())
+    private val duckDuckGoDomains: Set<String> = setOf("duckduckgo.com", duckAiHostProvider.getHost())
 }
