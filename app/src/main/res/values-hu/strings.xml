@@ -258,6 +258,19 @@
         <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Törlöd a lapokat és a webhelyadatokat?</string>
+    <string name="singleTabFireDialogTitleWithChats">Törlöd a lapokat, a webhelyadatokat és a csevegéseket?</string>
+    <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
+    <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
+    <string name="singleTabFireDialogDeleteThisChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Az „Összes törlése” lehetőség választása esetén a Duck.ai csevegési előzményei nem törlődnek.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
+    <string name="singleTabFireDialogSnackbar">1 lap és az adatai törölve</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
 
@@ -809,7 +822,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
     <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
     <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
@@ -821,6 +836,7 @@
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
@@ -873,6 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 
