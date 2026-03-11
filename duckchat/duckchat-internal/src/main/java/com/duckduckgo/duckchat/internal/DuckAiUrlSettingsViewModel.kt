@@ -60,9 +60,15 @@ class DuckAiUrlSettingsViewModel @Inject constructor(
         val trimmed = url.trim()
         if (trimmed.isNotBlank()) {
             devDuckAiHostProvider.setCustomUrl(trimmed)
+            viewModelScope.launch {
+                _viewState.emit(ViewState(customUrl = trimmed))
+            }
             sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlSet))
         } else {
             devDuckAiHostProvider.setCustomUrl(null)
+            viewModelScope.launch {
+                _viewState.emit(ViewState(customUrl = ""))
+            }
             sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlCleared))
         }
     }

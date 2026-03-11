@@ -23,6 +23,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONTokener
 
 @ContributesMultibinding(AppScope::class)
 class MessageBridgeContentScopeConfigPlugin @Inject constructor(
@@ -43,6 +46,53 @@ class MessageBridgeContentScopeConfigPlugin @Inject constructor(
 
     private fun addOverrideHost(json: String): String {
         val host = duckAiHostProvider.getCustomHost() ?: return json
-        return json.replace("\"duck.ai\"", "\"duck.ai\",\"$host\"")
+        return runCatching {
+            val parsedJson = JSONTokener(json).nextValue()
+            when (parsedJson) {
+                is JSONObject -> {
+                    addHostToArraysContainingDuckAi(parsedJson, host)
+                    parsedJson.toString()
+                }
+                is JSONArray -> {
+                    addHostToArraysContainingDuckAi(parsedJson, host)
+                    parsedJson.toString()
+                }
+                else -> json
+            }
+        }.getOrElse { json }
+    }
+
+    private fun addHostToArraysContainingDuckAi(jsonObject: JSONObject, host: String) {
+        val keys = jsonObject.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            when (val value = jsonObject.opt(key)) {
+                is JSONObject -> addHostToArraysContainingDuckAi(value, host)
+                is JSONArray -> addHostToArraysContainingDuckAi(value, host)
+            }
+        }
+    }
+
+    private fun addHostToArraysContainingDuckAi(jsonArray: JSONArray, host: String) {
+        var hasDuckAi = false
+        var hasHost = false
+        for (index in 0 until jsonArray.length()) {
+            when (val value = jsonArray.opt(index)) {
+                is JSONObject -> addHostToArraysContainingDuckAi(value, host)
+                is JSONArray -> addHostToArraysContainingDuckAi(value, host)
+                is String -> {
+                    if (value == DEFAULT_DUCK_AI_HOST) hasDuckAi = true
+                    if (value == host) hasHost = true
+                }
+            }
+        }
+
+        if (hasDuckAi && !hasHost) {
+            jsonArray.put(host)
+        }
+    }
+
+    private companion object {
+        const val DEFAULT_DUCK_AI_HOST = "duck.ai"
     }
 }

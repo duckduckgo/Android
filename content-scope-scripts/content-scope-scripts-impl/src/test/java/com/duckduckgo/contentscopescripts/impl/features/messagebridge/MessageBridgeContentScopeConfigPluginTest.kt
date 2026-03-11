@@ -19,8 +19,9 @@ package com.duckduckgo.contentscopescripts.impl.features.messagebridge
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeEntity
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
+import org.json.JSONObject
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -51,7 +52,45 @@ class MessageBridgeContentScopeConfigPluginTest {
         assertNull(testee.preferences())
     }
 
+    @Test
+    fun whenCustomHostExistsThenItIsAddedOnlyToDomainArray() {
+        val customHost = "custom.duck.ai"
+        whenever(mockDuckAiHostProvider.getCustomHost()).thenReturn(customHost)
+        whenever(mockMessageBridgeRepository.messageBridgeEntity).thenReturn(
+            MessageBridgeEntity(json = DOMAIN_CONFIG),
+        )
+
+        val result = JSONObject("{${testee.config()}}").getJSONObject("messageBridge")
+        val domains = result
+            .getJSONObject("settings")
+            .getJSONArray("domains")
+            .getJSONObject(0)
+            .getJSONArray("domain")
+
+        assertEquals("duckduckgo.com", domains.getString(0))
+        assertEquals("duck.ai", domains.getString(1))
+        assertEquals(customHost, domains.getString(2))
+        assertEquals("duck.ai", result.getJSONObject("settings").getString("fallback"))
+    }
+
+    @Test
+    fun whenCustomHostContainsEscapingCharactersThenJsonRemainsValid() {
+        val customHost = "custom\"host\\name"
+        whenever(mockDuckAiHostProvider.getCustomHost()).thenReturn(customHost)
+        whenever(mockMessageBridgeRepository.messageBridgeEntity).thenReturn(
+            MessageBridgeEntity(json = SIMPLE_DOMAIN_CONFIG),
+        )
+
+        val result = JSONObject("{${testee.config()}}").getJSONObject("messageBridge")
+        val domains = result.getJSONArray("domains")
+
+        assertEquals("duck.ai", domains.getString(0))
+        assertEquals(customHost, domains.getString(1))
+    }
+
     companion object {
         const val CONFIG = "{\"key\":\"value\"}"
+        const val DOMAIN_CONFIG = """{"settings":{"domains":[{"domain":["duckduckgo.com","duck.ai"]}],"fallback":"duck.ai"}}"""
+        const val SIMPLE_DOMAIN_CONFIG = """{"domains":["duck.ai"]}"""
     }
 }
