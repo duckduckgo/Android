@@ -258,6 +258,19 @@
         <item quantity="other">Elimina da %1$d siti. Potrebbe disconnetterti dagli account.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Eliminare schede e dati del sito?</string>
+    <string name="singleTabFireDialogTitleWithChats">Eliminare schede, dati del sito e chat?</string>
+    <string name="singleTabFireDialogDeleteAll">Elimina tutto</string>
+    <string name="singleTabFireDialogDeleteThisTab">Elimina questa scheda</string>
+    <string name="singleTabFireDialogDeleteThisChat">Elimina questa chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Elimina tutto\" non elimina la cronologia chat di Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">L\'eliminazione dei dati del sito può comportare la disconnessione dagli account.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Questa operazione annullerà i download in corso.</string>
+    <string name="singleTabFireDialogSnackbar">1 scheda e i relativi dati eliminati</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Impossibile eliminare i dati del sito. Aggiorna WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">I dati del sito non sono stati eliminati a causa di un errore.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Autorizzazioni</string>
 
