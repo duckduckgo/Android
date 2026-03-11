@@ -266,6 +266,19 @@
         <item quantity="other">Izbriši iz %1$d strani. Morda boste odjavljeni iz računov.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Želiš izbrisati zavihke in podatke spletnega mesta?</string>
+    <string name="singleTabFireDialogTitleWithChats">Izbrisati zavihke, podatke spletnega mesta in klepete?</string>
+    <string name="singleTabFireDialogDeleteAll">Izbriši vse</string>
+    <string name="singleTabFireDialogDeleteThisTab">Izbriši ta zavihek</string>
+    <string name="singleTabFireDialogDeleteThisChat">Izbriši ta klepet</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">»Izbriši vse« ne bo izbrisalo vaše zgodovine klepetov na Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
+    <string name="singleTabFireDialogSnackbar">1 zavihek in njegovi podatki so izbrisani</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati. Posodobite WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati zaradi napake.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dovoljenja</string>
 
