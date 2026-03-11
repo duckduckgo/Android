@@ -106,6 +106,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             mock(),
             fireproofRepository,
             DefaultDispatcherProvider(),
+            mock(),
         )
         val host = testCase.siteURL.toUri().host
 

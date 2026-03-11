@@ -94,7 +94,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
 
-        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
+        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider(), mock())
 
         fireproofedSites.map { url ->
             val domain = url.toUri().domain() ?: url

@@ -339,6 +339,7 @@ class RealFirstPartyCookiesModifierTest {
             mockPixel,
             mockFireproofRepository,
             DefaultDispatcherProvider(),
+            mock(),
         )
     }
 
