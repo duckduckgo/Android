@@ -88,9 +88,9 @@ class DataClearing @Inject constructor(
         if (isDuckAiChatHistoryClearingEnabled) {
             val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
             clearDuckAiChatIfNeeded(contextualTabChatUrl)
-
-            contextualDataStore.clearTabChatUrl(tabId)
         }
+
+        contextualDataStore.clearTabChatUrl(tabId)
     }
 
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
