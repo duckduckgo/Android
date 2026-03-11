@@ -266,6 +266,19 @@
         <item quantity="other">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Vymazat karty a data stránek?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vymazat karty, data stránek a chaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Smazat vše</string>
+    <string name="singleTabFireDialogDeleteThisTab">Vymazat tuto kartu</string>
+    <string name="singleTabFireDialogDeleteThisChat">Smazat tento chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Příkaz „Smazat vše“ nesmaže tvoji historii chatu na Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
+    <string name="singleTabFireDialogSnackbar">Došlo ke smazání 1 karty a jejích dat</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Data webu se nepodařilo smazat. Aktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Data webu se nepodařilo smazat kvůli chybě.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnění</string>
 
