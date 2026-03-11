@@ -76,10 +76,11 @@ class SetUpSyncHandler @Inject constructor(
                 return null
             }
 
-            override val allowedDomains: List<String> = listOf(
-                AppUrl.Url.HOST,
-                duckAiHostProvider.getHost(),
-            )
+            override val allowedDomains: List<String> =
+                listOf(
+                    AppUrl.Url.HOST,
+                    duckAiHostProvider.getHost(),
+                )
 
             override val featureName: String = DuckChatConstants.JS_MESSAGING_FEATURE_NAME
             override val methods: List<String> = listOf(METHOD_SYNC_SETTINGS, METHOD_SETUP_SYNC)

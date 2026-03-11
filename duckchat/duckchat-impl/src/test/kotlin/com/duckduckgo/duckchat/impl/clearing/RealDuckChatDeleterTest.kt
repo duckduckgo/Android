@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiDataClearingFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
@@ -32,6 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -44,17 +46,20 @@ class RealDuckChatDeleterTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val messaging: DuckChatDeleterJsMessaging = mock()
     private val duckAiDataClearingFeature = FakeFeatureToggleFactory.create(DuckAiDataClearingFeature::class.java)
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var clearer: RealDuckChatDeleter
 
     @Before
     fun setup() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         clearer = RealDuckChatDeleter(
             context = context,
             dispatchers = coroutineRule.testDispatcherProvider,
             appBuildConfig = appBuildConfig,
             messaging = messaging,
             duckAiDataClearingFeature = duckAiDataClearingFeature,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 

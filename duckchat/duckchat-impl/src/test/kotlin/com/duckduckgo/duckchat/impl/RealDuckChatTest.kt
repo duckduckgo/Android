@@ -121,6 +121,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
@@ -393,6 +394,20 @@ class RealDuckChatTest {
             mockContext,
             hasSessionActive = false,
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
+        whenever(mockDuckAiHostProvider.getCustomHost()).thenReturn("staging.duck.ai")
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://staging.duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }

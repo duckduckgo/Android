@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DuckAiUrlSettingsViewModel @Inject constructor(
-    private val devDuckAiHostProvider: DevDuckAiHostProvider,
+    private val internalDuckAiHostProvider: InternalDuckAiHostProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -46,12 +46,13 @@ class DuckAiUrlSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data class ShowMessage(val messageResId: Int) : Command()
+        data class RestartApp(val messageResId: Int) : Command()
     }
 
     fun start() {
         viewModelScope.launch {
             _viewState.emit(
-                ViewState(customUrl = devDuckAiHostProvider.getCustomUrl().orEmpty()),
+                ViewState(customUrl = internalDuckAiHostProvider.getCustomUrl().orEmpty()),
             )
         }
     }
@@ -59,20 +60,20 @@ class DuckAiUrlSettingsViewModel @Inject constructor(
     fun onSaveClicked(url: String) {
         val trimmed = url.trim()
         if (trimmed.isNotBlank()) {
-            devDuckAiHostProvider.setCustomUrl(trimmed)
-            sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlSet))
+            internalDuckAiHostProvider.setCustomUrl(trimmed)
+            viewModelScope.launch { _viewState.emit(ViewState(customUrl = trimmed)) }
+            sendCommand(Command.RestartApp(R.string.devSettingsDuckAiUrlSet))
         } else {
-            devDuckAiHostProvider.setCustomUrl(null)
-            sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlCleared))
+            sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlEmpty))
         }
     }
 
     fun onResetClicked() {
-        devDuckAiHostProvider.setCustomUrl(null)
+        internalDuckAiHostProvider.setCustomUrl(null)
         viewModelScope.launch {
             _viewState.emit(ViewState(customUrl = ""))
         }
-        sendCommand(Command.ShowMessage(R.string.devSettingsDuckAiUrlCleared))
+        sendCommand(Command.RestartApp(R.string.devSettingsDuckAiUrlCleared))
     }
 
     private fun sendCommand(command: Command) {

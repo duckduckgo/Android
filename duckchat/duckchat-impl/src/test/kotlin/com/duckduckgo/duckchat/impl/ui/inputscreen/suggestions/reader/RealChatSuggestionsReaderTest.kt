@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsJsMessaging
@@ -38,6 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -52,17 +54,20 @@ class RealChatSuggestionsReaderTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val messaging: ChatSuggestionsJsMessaging = mock()
     private val duckAiChatHistoryFeature = FakeFeatureToggleFactory.create(DuckAiChatHistoryFeature::class.java)
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var reader: RealChatSuggestionsReader
 
     @Before
     fun setup() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         reader = RealChatSuggestionsReader(
             context = context,
             dispatchers = coroutineRule.testDispatcherProvider,
             appBuildConfig = appBuildConfig,
             messaging = messaging,
             duckAiChatHistoryFeature = duckAiChatHistoryFeature,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 

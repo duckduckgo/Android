@@ -5,4 +5,5 @@
     <string name="devSettingsDuckAiUrlReset">Reset to default</string>
     <string name="devSettingsDuckAiUrlSet">Custom Duck.ai URL set</string>
     <string name="devSettingsDuckAiUrlCleared">Duck.ai URL reset to default</string>
+    <string name="devSettingsDuckAiUrlEmpty">Enter a URL</string>
 </resources>
