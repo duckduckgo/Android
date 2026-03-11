@@ -258,6 +258,19 @@
         <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Törlöd a lapokat és a webhelyadatokat?</string>
+    <string name="singleTabFireDialogTitleWithChats">Törlöd a lapokat, a webhelyadatokat és a csevegéseket?</string>
+    <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
+    <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
+    <string name="singleTabFireDialogDeleteThisChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Az „Összes törlése” lehetőség választása esetén a Duck.ai csevegési előzményei nem törlődnek.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
+    <string name="singleTabFireDialogSnackbar">1 lap és az adatai törölve</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
 
