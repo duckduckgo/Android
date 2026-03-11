@@ -55,10 +55,10 @@ interface EventHubPixelManager {
      */
     fun onConfigChanged()
 
-    /** Whether the eventHub remote feature is enabled. */
+    /** Whether the eventHub feature is enabled. */
     fun isEnabled(): Boolean
 
-    /** Signal that the app has entered the foreground. Reconciles pixel state. */
+    /** Signal that the app has entered the foreground. */
     fun onAppForegrounded()
 
     /** Signal that the app has entered the background. */
