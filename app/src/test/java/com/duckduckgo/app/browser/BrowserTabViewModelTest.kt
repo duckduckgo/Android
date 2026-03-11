@@ -3154,9 +3154,8 @@ class BrowserTabViewModelTest {
             DaxBubbleCta.DaxPrivacyProCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
-                R.string.onboardingPrivacyProDaxDialogTitle,
-                R.string.onboardingPrivacyProDaxDialogDescription,
-                R.string.onboardingPrivacyProDaxDialogOkButton,
+                onboardingSkipped = false,
+                isFreeTrialCopy = false,
             )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)

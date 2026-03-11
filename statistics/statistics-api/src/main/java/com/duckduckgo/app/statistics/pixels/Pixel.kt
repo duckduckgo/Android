@@ -75,6 +75,8 @@ interface Pixel {
         const val DATA_CLEAR_TYPE_TABS = "tabs"
         const val DATA_CLEAR_TYPE_DATA = "data"
         const val DATA_CLEAR_TYPE_CHATS = "chats"
+        const val RU = "ru"
+        const val FREE_TRIAL = "free_trial"
     }
 
     object PixelValues {

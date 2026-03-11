@@ -20,7 +20,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -259,26 +258,22 @@ class CtaViewModel @Inject constructor(
 
             // Privacy Pro onboarding
             canShowPrivacyProCta() -> {
-                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
-                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
-                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
-                } else {
-                    R.string.onboardingPrivacyProDaxDialogOkButton
-                }
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
+                DaxBubbleCta.DaxPrivacyProCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onboardingSkipped = false,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                )
             }
 
             // Privacy Pro onboarding for returning users who skipped onboarding
             canShowPrivacyProCtaForSkippedOnboarding() -> {
-                val titleRes: Int = R.string.onboardingSkippedPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
-                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
-                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
-                } else {
-                    R.string.onboardingPrivacyProDaxDialogOkButton
-                }
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
+                DaxBubbleCta.DaxPrivacyProCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onboardingSkipped = true,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                )
             }
 
             // Add Widget
