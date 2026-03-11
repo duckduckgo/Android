@@ -184,3 +184,27 @@ The `lint-rules` module enforces at compile time:
 | Scheduling | WorkManager |
 | Logging | logcat (Square) |
 | Annotation Processing | KSP |
+
+---
+
+## Contributions
+
+### Creating Pull Requests
+
+All PRs target the `develop` branch. Before opening a PR, run `./gradlew jvm_checks` and fix any failures.
+
+PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
+
+**Task/Issue URL** — Link to the Asana task for this change. If you don't have one, ask the developer to provide it before opening the PR.
+
+**Description** — A short summary of what changed and why.
+
+**Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
+
+**UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
+
+#### Checklist before submitting
+- [ ] `./gradlew jvm_checks` passes (spotless + lint + unit tests)
+- [ ] PR template is fully filled in
+- [ ] Asana task URL is present
+- [ ] UI screenshots included if applicable
