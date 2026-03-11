@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tvoja pretplata kupljena je putem Apple App Storea. Za promjenu postavki plana ili naplate, idi na Postavke &gt; Apple račun &gt; Pretplate na uređaju prijavljenom na isti Apple račun koji je korišten za kupnju pretplate.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktiviraj Privacy Pro na radnoj površini kako bi postavio Personal Information Removal</string>
-    <string name="pirDescription">U pregledniku DuckDuckGo za stolna računala idi na <b>Postavke &gt; Privacy Pro</b> i klikni <b>Imam pretplatu</b> za početak.</string>
+    <string name="pirTitle">Aktiviraj pretplatu DuckDuckGo na radnoj površini kako bi postavio Personal Information Removal</string>
+    <string name="pirDescription">Kako bi počeo s radom, u pregledniku DuckDuckGo za stolna računala idi na <b>Postavke &gt; DuckDuckGo pretplata</b> i klikni <b>Imam pretplatu</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
