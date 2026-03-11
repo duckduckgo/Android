@@ -266,6 +266,19 @@
         <item quantity="other">Usuń z %1$d witryny. Może spowodować wylogowanie z kont.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Usunąć karty i dane witryny?</string>
+    <string name="singleTabFireDialogTitleWithChats">Usunąć karty, dane witryny i czaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Usuń wszystko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Usuń tę kartę</string>
+    <string name="singleTabFireDialogDeleteThisChat">Usuń ten czat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Opcja „Usuń wszystkie” nie usunie Twojej historii czatów Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
+    <string name="singleTabFireDialogSnackbar">1 karta i jej dane zostały usunięte</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>
 
