@@ -266,6 +266,19 @@
         <item quantity="other">Данные будут удалены с сайтов (%1$d). Операция может сопровождаться выходом из учетных записей.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Удалить вкладки и данные сайтов?</string>
+    <string name="singleTabFireDialogTitleWithChats">Удалить вкладки, данные сайта и чаты?</string>
+    <string name="singleTabFireDialogDeleteAll">Удалить все</string>
+    <string name="singleTabFireDialogDeleteThisTab">Удалить эту вкладку</string>
+    <string name="singleTabFireDialogDeleteThisChat">Удалить этот чат</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Функция «Удалить все» не стирает историю чатов с Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
+    <string name="singleTabFireDialogSnackbar">Удалена 1 вкладка и ее данные</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
 
@@ -843,7 +856,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Поехали!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Мы уже это проходили</string>
     <string name="preOnboardingDaxDialog2Title">Защита включена</string>
     <string name="preOnboardingDaxDialog2Button">Выбрать браузер</string>
@@ -855,6 +870,7 @@
     <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
     <string name="preOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="preOnboardingComparisonChartItem5">Стирает данные браузера одним нажатием</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="preOnboardingAddressBarTitle">Где следует разместить адресную строку?</string>
     <string name="preOnboardingAddressBarOkButton">Далее</string>
@@ -911,6 +927,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Далее</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функции на базе ИИ работают конфиденциально и предлагаются дополнительно. Их можно изменить в разделе <b>Настройки > Функции ИИ</b>.]]></string>
 
