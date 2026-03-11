@@ -258,6 +258,19 @@
         <item quantity="other">Ta bort från %1$d webbplatser. Kan logga ut dig från konton.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Ta bort flikar och webbplatsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vill du ta bort flikar, webbplatsdata och chattar?</string>
+    <string name="singleTabFireDialogDeleteAll">Radera allt</string>
+    <string name="singleTabFireDialogDeleteThisTab">Ta bort denna flik</string>
+    <string name="singleTabFireDialogDeleteThisChat">Radera den här chatten</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Din Duck.ai-chatthistorik raderas inte om du väljer Radera alla.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
+    <string name="singleTabFireDialogSnackbar">1 flik och dess data raderades</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Behörigheter</string>
 
@@ -809,7 +822,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
     <string name="preOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
@@ -821,6 +836,7 @@
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
@@ -873,6 +889,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vill du ha enkel tillgång till privat AI-chatt?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 
