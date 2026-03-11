@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.messaging
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiUrlOverride
@@ -148,10 +149,11 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
             }
 
             override val allowedDomains: List<String> =
-                listOf(
+                listOfNotNull(
                     AppUrl.Url.HOST,
-                    duckAiUrlOverride.getCustomHost() ?: HOST_DUCK_AI,
-                )
+                    HOST_DUCK_AI,
+                    duckAiUrlOverride.getCustomHost()?.toTldPlusOne(),
+                ).distinct()
 
             override val featureName: String = "aiChat"
             override val methods: List<String> = listOf("getScopedSyncAuthToken")

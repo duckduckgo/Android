@@ -80,6 +80,29 @@ class GetScopedSyncAuthTokenHandlerTest {
     }
 
     @Test
+    fun `when custom duck ai host is a subdomain then allowed domains still include duck dot ai`() {
+        whenever(mockDuckAiUrlOverride.getCustomHost()).thenReturn("staging.duck.ai")
+
+        val domains = handler.getJsMessageHandler().allowedDomains
+
+        assertEquals(2, domains.size)
+        assertEquals("duckduckgo.com", domains[0])
+        assertEquals("duck.ai", domains[1])
+    }
+
+    @Test
+    fun `when custom duck ai host has different eTld plus one then allowed domains include both default and override`() {
+        whenever(mockDuckAiUrlOverride.getCustomHost()).thenReturn("staging.example.com")
+
+        val domains = handler.getJsMessageHandler().allowedDomains
+
+        assertEquals(3, domains.size)
+        assertEquals("duckduckgo.com", domains[0])
+        assertEquals("duck.ai", domains[1])
+        assertEquals("example.com", domains[2])
+    }
+
+    @Test
     fun `when checking feature name then returns aiChat`() {
         assertEquals(FEATURE_NAME, handler.getJsMessageHandler().featureName)
     }

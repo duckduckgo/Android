@@ -104,6 +104,7 @@ class RealDuckChatTest {
 
     @Before
     fun setup() = runTest {
+        DuckChatConstants.hostOverride = null
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.shouldShowInVoiceSearch()).thenReturn(false)
@@ -1250,6 +1251,21 @@ class RealDuckChatTest {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
         assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
+    @Test
+    fun `when host override is a duck ai subdomain then duck ai urls are still handled by webview`() {
+        DuckChatConstants.hostOverride = "staging.duck.ai"
+
+        assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai/somepath"))
+    }
+
+    @Test
+    fun `when host override is a duck ai subdomain then duck ai host is still detected as duck chat url`() {
+        DuckChatConstants.hostOverride = "staging.duck.ai"
+
+        assertTrue(testee.isDuckChatUrl("https://duck.ai".toUri()))
     }
 
     @Test
