@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl.features.messagebridge
 
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeEntity
 import com.duckduckgo.contentscopescripts.impl.features.messagebridge.store.MessageBridgeRepository
+import com.duckduckgo.duckchat.api.DuckAiUrlOverride
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Before
@@ -30,10 +31,11 @@ class MessageBridgeContentScopeConfigPluginTest {
     private lateinit var testee: MessageBridgeContentScopeConfigPlugin
 
     private val mockMessageBridgeRepository: MessageBridgeRepository = mock()
+    private val mockDuckAiUrlOverride: DuckAiUrlOverride = mock()
 
     @Before
     fun before() {
-        testee = MessageBridgeContentScopeConfigPlugin(mockMessageBridgeRepository)
+        testee = MessageBridgeContentScopeConfigPlugin(mockMessageBridgeRepository, mockDuckAiUrlOverride)
     }
 
     @Test
