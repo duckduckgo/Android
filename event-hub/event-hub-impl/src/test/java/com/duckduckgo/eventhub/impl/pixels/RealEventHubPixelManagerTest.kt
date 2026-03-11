@@ -65,11 +65,14 @@ class RealEventHubPixelManagerTest {
     private lateinit var manager: RealEventHubPixelManager
 
     private fun createManager() {
+        val savedState = eventHubFeature.self().getRawStoredState()
+        eventHubFeature.self().setRawStoredState(Toggle.State(enable = false))
         manager = RealEventHubPixelManager(
             repository, pixel, timeProvider, coroutineTestRule.testScope,
             UnconfinedTestDispatcher(coroutineTestRule.testScope.testScheduler), eventHubFeature,
         )
         manager.onAppForegrounded()
+        eventHubFeature.self().setRawStoredState(savedState ?: Toggle.State(enable = false))
     }
 
     private val dayPixelConfig: TelemetryPixelConfig by lazy {
@@ -674,7 +677,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -704,7 +707,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -745,7 +748,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -765,7 +768,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         val captor = argumentCaptor<PixelState>()
@@ -812,7 +815,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         configureFeature(settings = disabledConfig)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         // Should STILL fire using stored config (per design: "still fire the telemetry, as it was enabled when initialised")
         verify(pixel).enqueueFire(
@@ -852,7 +855,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         configureFeature(settings = disabledPixelConfig)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         // Fires the pixel
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -870,7 +873,7 @@ class RealEventHubPixelManagerTest {
 
         configureFeature(enabled = false)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1002,7 +1005,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(listOf(captor.firstValue))
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(captor.firstValue)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(repository, never()).savePixelState(any())
     }
@@ -1185,7 +1188,7 @@ class RealEventHubPixelManagerTest {
         val changedConfig = configWithBuckets(*changedBuckets)
         configureFeature(settings = changedConfig)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1242,7 +1245,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         configureFeature(settings = changedPeriodConfig)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         // Attribution period must be based on stored 120s period, not live 1hr
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
@@ -1299,7 +1302,7 @@ class RealEventHubPixelManagerTest {
         """.trimIndent()
         configureFeature(settings = changedPeriodConfig)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         // The NEW period should use the latest config (1 hour = 3600s = 3600000ms)
         verify(repository).deletePixelState("test_pixel")
@@ -1418,7 +1421,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = stateA1.periodEndMillis + 1
         stubPixelStates(updatedA, updatedB)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(repository).deletePixelState("pixel_a")
         verify(repository, never()).deletePixelState("pixel_b")
@@ -1456,7 +1459,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = stateB1.periodEndMillis + 1
         stubPixelStates(aAfter3, bAfter3)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(repository).deletePixelState("pixel_b")
         val savedAfterBFire = argumentCaptor<PixelState>()
@@ -1489,7 +1492,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getPixelState(any())).thenReturn(null)
         timeProvider.time = 3000L
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -1597,7 +1600,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1712,7 +1715,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1862,7 +1865,7 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(finalState)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val expectedAttribution = RealEventHubPixelManager.calculateAttributionPeriod(
             periodStart,
@@ -1962,7 +1965,7 @@ class RealEventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 3), periodStart = periodStart, periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
         coroutineTestRule.testScope.testScheduler.runCurrent()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
@@ -1975,7 +1978,7 @@ class RealEventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 5), periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
 
@@ -1993,7 +1996,7 @@ class RealEventHubPixelManagerTest {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd)
         stubPixelStates(state)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
     }
@@ -2002,7 +2005,7 @@ class RealEventHubPixelManagerTest {
     fun `checkPixels does not reschedule timers when feature disabled`() {
         configureFeature(enabled = false)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(repository, never()).getAllPixelStates()
     }
@@ -2160,7 +2163,7 @@ class RealEventHubPixelManagerTest {
 
         timeProvider.time = initialState.periodEndMillis + 1
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         // checkPixels fired the expired pixel and started a new period;
@@ -2195,7 +2198,7 @@ class RealEventHubPixelManagerTest {
         timeProvider.time = initialState.periodEndMillis + 1
 
         // checkPixels fires the pixel, which starts a new period with a new timer
-        manager.checkPixels()
+        manager.onAppForegrounded()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
         // Run any pending continuations — the stale coroutine must not fire again
@@ -2244,7 +2247,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
         timeProvider.time = initialState.periodEndMillis + 1
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
@@ -2277,7 +2280,7 @@ class RealEventHubPixelManagerTest {
         whenever(repository.getAllPixelStates()).thenReturn(listOf(initialState))
 
         timeProvider.time = initialState.periodEndMillis + 1
-        manager.checkPixels()
+        manager.onAppForegrounded()
         coroutineTestRule.testScope.testScheduler.runCurrent()
         verify(pixel, times(1)).enqueueFire(any<String>(), any(), any(), any())
 
@@ -2297,7 +2300,7 @@ class RealEventHubPixelManagerTest {
     // --- foreground-gated cycles ---
 
     @Test
-    fun `timer fires while backgrounded - pixel enqueued but no new period started`() {
+    fun `timer fires while backgrounded - pixel enqueued and new period starts on foreground`() {
         manager.onAppBackgrounded()
 
         val periodStart = 1000L
@@ -2313,7 +2316,9 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state, null)
+
+        manager.onAppForegrounded()
 
         verify(pixel).enqueueFire(
             pixelName = eq("webTelemetry_testPixel1"),
@@ -2322,13 +2327,11 @@ class RealEventHubPixelManagerTest {
             type = eq(Count),
         )
         verify(repository).deletePixelState("webTelemetry_testPixel1")
-        verify(repository, never()).savePixelState(any())
+        verify(repository).savePixelState(any())
     }
 
     @Test
     fun `timer fires while foregrounded - pixel enqueued and new period starts immediately`() {
-        manager.onAppForegrounded()
-
         val periodStart = 1000L
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
         timeProvider.time = periodEnd + 1
@@ -2341,8 +2344,9 @@ class RealEventHubPixelManagerTest {
             config = dayPixelConfig,
         )
         stubPixelStates(state)
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state, null)
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
@@ -2352,14 +2356,12 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
-    fun `checkPixels on foreground starts new period after background fire`() {
-        manager.onAppForegrounded()
-
+    fun `onAppForegrounded starts new period when no pixel state exists`() {
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 50_000L
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
@@ -2369,7 +2371,6 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `scheduled timer does not start new period when backgrounded`() {
-        manager.onAppForegrounded()
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
         timeProvider.time = 1000L
 
@@ -2402,6 +2403,7 @@ class RealEventHubPixelManagerTest {
 
     @Test
     fun `full background-foreground lifecycle - fire in background, recover on foreground`() {
+        // Phase 1: app goes to background with an expired pixel
         manager.onAppBackgrounded()
 
         val periodStart = 1000L
@@ -2417,21 +2419,24 @@ class RealEventHubPixelManagerTest {
         )
         stubPixelStates(state)
 
-        manager.checkPixels()
+        // Scheduled timer fires while backgrounded — pixel enqueued, no new period
+        whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(state)
+        manager.onConfigChanged()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).enqueueFire(any<String>(), any(), any(), any())
         verify(repository).deletePixelState("webTelemetry_testPixel1")
         verify(repository, never()).savePixelState(any())
 
+        // Phase 2: app returns to foreground — new period must start
         org.mockito.Mockito.reset(repository, pixel)
         whenever(repository.getAllPixelStates()).thenReturn(emptyList())
         whenever(repository.getPixelState("webTelemetry_testPixel1")).thenReturn(null)
-
-        manager.onAppForegrounded()
         timeProvider.time = periodEnd + 5000L
 
-        manager.checkPixels()
+        manager.onAppForegrounded()
 
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
         val captor = argumentCaptor<PixelState>()
         verify(repository).savePixelState(captor.capture())
         assertEquals("webTelemetry_testPixel1", captor.firstValue.pixelName)

@@ -51,12 +51,6 @@ interface EventHubPixelManager {
     fun onNavigationStarted(webViewId: String, url: String)
 
     /**
-     * Reconcile pixel state: fire any whose collection period has elapsed
-     * and ensure active configs have scheduled work.
-     */
-    fun checkPixels()
-
-    /**
      * Notify that the remote feature config has changed.
      */
     fun onConfigChanged()
@@ -90,6 +84,17 @@ class RealEventHubPixelManager @Inject constructor(
 
     override fun onAppForegrounded() {
         isInForeground = true
+        checkPixels()
+    }
+
+    private fun checkPixels() {
+        if (!isFeatureEnabled()) return
+
+        appCoroutineScope.launch(pixelDispatcher) {
+            val nextDeadline = processPixelStates()
+            val configDeadline = initMissingPixels()
+            scheduleNextCheck(minOf(nextDeadline, configDeadline))
+        }
     }
 
     override fun onAppBackgrounded() {
@@ -162,16 +167,6 @@ class RealEventHubPixelManager @Inject constructor(
             return true
         }
         return false
-    }
-
-    override fun checkPixels() {
-        if (!isFeatureEnabled()) return
-
-        appCoroutineScope.launch(pixelDispatcher) {
-            val nextDeadline = processPixelStates()
-            val configDeadline = initMissingPixels()
-            scheduleNextCheck(minOf(nextDeadline, configDeadline))
-        }
     }
 
     private fun processPixelStates(): Long {

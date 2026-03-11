@@ -32,11 +32,10 @@ class EventHubLifecycleObserverTest {
     )
 
     @Test
-    fun `onStart calls onAppForegrounded and checkPixels`() {
+    fun `onStart calls onAppForegrounded`() {
         observer.onStart(lifecycleOwner)
 
         verify(pixelManager).onAppForegrounded()
-        verify(pixelManager).checkPixels()
     }
 
     @Test

@@ -36,9 +36,8 @@ class EventHubLifecycleObserver @Inject constructor(
 
     @UiThread
     override fun onStart(owner: LifecycleOwner) {
-        logcat(VERBOSE) { "EventHub: app foregrounded, checking pixels" }
+        logcat(VERBOSE) { "EventHub: app foregrounded" }
         pixelManager.onAppForegrounded()
-        pixelManager.checkPixels()
     }
 
     @UiThread
