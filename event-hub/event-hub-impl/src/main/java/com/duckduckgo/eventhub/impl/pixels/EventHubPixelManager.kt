@@ -79,7 +79,7 @@ class RealEventHubPixelManager @Inject constructor(
 
     private var cachedTelemetryConfigs: List<TelemetryPixelConfig>? = null
 
-    private val dedupSeen: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    private val dedupSeen = ConcurrentHashMap<String, MutableSet<String>>()
     private val webViewCurrentUrl = ConcurrentHashMap<String, String>()
     private val schedulerJob = ConflatedJob()
 
@@ -108,7 +108,7 @@ class RealEventHubPixelManager @Inject constructor(
         val previousUrl = webViewCurrentUrl.put(webViewId, url)
         if (previousUrl != null && previousUrl != url) {
             logcat(VERBOSE) { "EventHub: navigation detected for tab $webViewId ($previousUrl -> $url), clearing dedup" }
-            dedupSeen.removeAll { it.endsWith(":$webViewId") }
+            dedupSeen.remove(webViewId)
         }
     }
 
@@ -155,9 +155,10 @@ class RealEventHubPixelManager @Inject constructor(
 
     private fun isDuplicateEvent(pixelName: String, paramName: String, source: String, webViewId: String): Boolean {
         if (webViewId.isEmpty()) return false
-        val key = "$pixelName:$paramName:$source:$webViewId"
-        if (!dedupSeen.add(key)) {
-            logcat(VERBOSE) { "EventHub: dedup $key (already seen on current page)" }
+        val key = "$pixelName:$paramName:$source"
+        val perTab = dedupSeen.getOrPut(webViewId) { ConcurrentHashMap.newKeySet() }
+        if (!perTab.add(key)) {
+            logcat(VERBOSE) { "EventHub: dedup $key:$webViewId (already seen on current page)" }
             return true
         }
         return false
