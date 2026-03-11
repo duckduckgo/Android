@@ -52,7 +52,7 @@ class SetAIChatHistoryEnabledHandlerTest {
 
     @Before
     fun setUp() {
-        whenever(mockDuckAiHostProvider.getHost()).thenReturn(DuckAiHostProvider.DEFAULT_HOST)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         handler = SetAIChatHistoryEnabledHandler(
             duckChatFeatureRepository = mockDuckChatFeatureRepository,
             duckAiHostProvider = mockDuckAiHostProvider,
@@ -66,7 +66,7 @@ class SetAIChatHistoryEnabledHandlerTest {
         val domains = handler.getJsMessageHandler().allowedDomains
         assertEquals(2, domains.size)
         assertEquals("duckduckgo.com", domains[0])
-        assertEquals(DuckAiHostProvider.DEFAULT_HOST, domains[1])
+        assertEquals("duck.ai", domains[1])
     }
 
     @Test

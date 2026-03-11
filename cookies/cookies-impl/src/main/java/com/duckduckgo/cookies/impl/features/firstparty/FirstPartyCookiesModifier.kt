@@ -28,9 +28,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_EXPIRE_ERROR
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.redactStacktraceInBase64
-import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
