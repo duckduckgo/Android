@@ -27,6 +27,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityLoginSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
@@ -39,11 +40,15 @@ import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract.EnterCodeContractOutput
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SyncLoginActivity : DuckDuckGoActivity() {
     private val binding: ActivityLoginSyncBinding by viewBinding()
     private val viewModel: SyncLoginViewModel by bindViewModel()
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
@@ -55,6 +60,7 @@ class SyncLoginActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
