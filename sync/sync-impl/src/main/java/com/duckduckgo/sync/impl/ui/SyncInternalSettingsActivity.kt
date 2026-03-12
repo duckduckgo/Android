@@ -19,7 +19,10 @@ package com.duckduckgo.sync.impl.ui
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +32,7 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command
@@ -46,11 +50,15 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SyncInternalSettingsActivity : DuckDuckGoActivity() {
     private val binding: ActivityInternalSyncSettingsBinding by viewBinding()
     private val viewModel: SyncInternalSettingsViewModel by bindViewModel()
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val barcodeLauncher = registerForActivityResult(
         ScanContract(),
@@ -75,10 +83,23 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         observeUiEvents()
         configureListeners()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun configureListeners() {
@@ -101,8 +122,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
-        binding.blockStoreWriteButton.setOnClickListener { viewModel.onBlockStoreWriteClicked(binding.blockStoreInput.text) }
-        binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
     }
 
     private fun observeUiEvents() {
@@ -170,29 +189,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
         binding.connectedDevicesList.removeAllViews()
-        binding.blockStoreFeatureFlag.text = if (viewState.syncAutoRestoreEnabled) {
-            "✅ syncAutoRestore flag enabled"
-        } else {
-            "❌ syncAutoRestore flag disabled"
-        }
-        binding.blockStoreAvailability.text = when (viewState.blockStoreAvailable) {
-            null -> "Checking..."
-            true -> "✅ Available"
-            false -> "❌ Unavailable (Play Services missing)"
-        }
-        binding.blockStoreE2eStatus.text = when {
-            viewState.blockStoreAvailable == null -> ""
-            viewState.blockStoreAvailable == false -> ""
-            viewState.blockStoreE2ESupported == true -> "✅ E2E encryption supported"
-            else -> "❌ E2E encryption not supported"
-        }
-        binding.blockStoreCurrentValue.text = when (val value = viewState.blockStoreCurrentValue) {
-            is SyncInternalSettingsViewModel.BlockStoreValue.Loading -> "Loading..."
-            is SyncInternalSettingsViewModel.BlockStoreValue.NotSet -> "(key not set)"
-            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> {
-                if (value.value.isEmpty()) "(empty string)" else value.value
-            }
-        }
 
         binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->
             viewModel.onEnvironmentChanged(enabled)
