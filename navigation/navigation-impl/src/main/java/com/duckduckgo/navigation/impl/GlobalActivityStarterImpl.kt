@@ -85,12 +85,18 @@ class GlobalActivityStarterImpl @Inject constructor(
         context: Context,
         deeplinkActivityParams: DeeplinkActivityParams,
     ): Intent? {
-        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull {
-            it.map(deeplinkActivityParams)
+        return buildIntent(context, deeplinkActivityParams)?.apply {
+            if (context !is Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        return activityParams?.let { startIntent(context, it) }
     }
 
+    private fun buildIntent(context: Context, deeplinkActivityParams: DeeplinkActivityParams): Intent? {
+        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull { it.map(deeplinkActivityParams) }
+        return activityParams?.let { buildIntent(context, it) }
+    }
+
+    // context is used only to construct the Intent — FLAG_ACTIVITY_NEW_TASK is never added,
+    // regardless of context type. Callers should pass the Activity that owns the launcher.
     override fun startForResult(context: Context, params: ActivityParams, launcher: ActivityResultLauncher<Intent>) {
         val intent = buildIntent(context, params)
         if (intent == null) {
@@ -101,8 +107,7 @@ class GlobalActivityStarterImpl @Inject constructor(
     }
 
     override fun startForResult(context: Context, deeplinkActivityParams: DeeplinkActivityParams, launcher: ActivityResultLauncher<Intent>) {
-        val activityParams: ActivityParams? = activityMappers.firstNotNullOfOrNull { it.map(deeplinkActivityParams) }
-        val intent = activityParams?.let { buildIntent(context, it) }
+        val intent = buildIntent(context, deeplinkActivityParams)
         if (intent == null) {
             logcat(ERROR) { "No activity found for params $deeplinkActivityParams" }
             throw IllegalArgumentException("Activity for params $deeplinkActivityParams not found")

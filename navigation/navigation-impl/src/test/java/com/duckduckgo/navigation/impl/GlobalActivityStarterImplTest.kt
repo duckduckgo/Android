@@ -129,6 +129,21 @@ class GlobalActivityStarterImplTest {
         assertEquals(0, intent!!.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
+    @Test
+    fun whenStartIntentDeeplinkWithNonActivityContextThenFlagNewTaskAdded() {
+        val intent = globalActivityStarter.startIntent(context, DeeplinkActivityParams("screenTest"))
+        assertNotNull(intent)
+        assertNotEquals(0, intent!!.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    @Test
+    fun whenStartIntentDeeplinkWithActivityContextThenFlagNewTaskNotAdded() {
+        val activityContext: Context = mock<AppCompatActivity>()
+        val intent = globalActivityStarter.startIntent(activityContext, DeeplinkActivityParams("screenTest"))
+        assertNotNull(intent)
+        assertEquals(0, intent!!.flags and Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
     // Fix 3: ActivityResultLauncher overloads
 
     @Test
