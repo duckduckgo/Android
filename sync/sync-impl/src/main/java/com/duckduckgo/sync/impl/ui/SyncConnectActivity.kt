@@ -22,6 +22,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.addCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +35,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.databinding.IncludeDefaultToolbarBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncFeature
@@ -64,6 +68,9 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private lateinit var binding: ConnectSyncBinding
     private val viewModel: SyncConnectViewModel by bindViewModel()
 
@@ -77,6 +84,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         lifecycleScope.launch {
             withContext(dispatcherProvider.io()) {
@@ -93,6 +101,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
                     setContentView(binding.root)
                     setupToolbar(binding.includeToolbar.toolbar)
+                    setupEdgeToEdge()
 
                     onBackPressedDispatcher.addCallback(this@SyncConnectActivity) {
                         onUserCancelled()
@@ -177,6 +186,17 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.contentContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+    }
+
     private fun showError(it: ShowError) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.sync_dialog_error_title)
@@ -210,6 +230,7 @@ private sealed interface ConnectSyncBinding {
     val qrCodeReader: SyncBarcodeView
     val qrCodeImageView: ImageView
     val copyCodeButton: DaxButtonGhost
+    val contentContainer: View
 
     data class OldBinding(private val binding: ActivityConnectSyncBinding) : ConnectSyncBinding {
         override val root: View get() = binding.root
@@ -217,6 +238,7 @@ private sealed interface ConnectSyncBinding {
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
+        override val contentContainer: View get() = binding.scrollView
     }
 
     data class NewBinding(private val binding: ActivityConnectSyncNewBinding) : ConnectSyncBinding {
@@ -225,5 +247,6 @@ private sealed interface ConnectSyncBinding {
         override val qrCodeReader: SyncBarcodeView get() = binding.qrCodeReader
         override val qrCodeImageView: ImageView get() = binding.qrCodeImageView
         override val copyCodeButton: DaxButtonGhost get() = binding.copyCodeButton
+        override val contentContainer: View get() = binding.contentContainer
     }
 }
