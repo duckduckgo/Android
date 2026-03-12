@@ -20,6 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.addCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -31,6 +34,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
@@ -48,12 +52,16 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityConnectSyncBinding by viewBinding()
     private val viewModel: SyncWithAnotherActivityViewModel by bindViewModel()
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private var deepLinkSetupFragment: Fragment? = null
 
@@ -65,8 +73,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdgeInsets()
 
         extractDeepLinkCode()?.let {
             configureDeepLinkMode(it)
@@ -239,4 +249,15 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     private fun isDeepLinkSetup() = deepLinkSetupFragment != null
+
+    private fun setupEdgeToEdgeInsets() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+    }
 }
