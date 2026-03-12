@@ -29,6 +29,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':common-utils')
     implementation project(':design-system')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
