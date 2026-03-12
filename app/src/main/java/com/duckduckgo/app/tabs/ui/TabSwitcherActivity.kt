@@ -26,8 +26,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -80,12 +86,14 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -97,6 +105,7 @@ import logcat.logcat
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity :
@@ -132,6 +141,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -200,6 +212,26 @@ class TabSwitcherActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (edgeToEdge.isEnabled()) {
+            val toolbarColor = getColorFromAttr(CommonR.attr.daxColorToolbar)
+
+            val statusBarStyle = when (settingsDataStore.omnibarType) {
+                OmnibarType.SPLIT, OmnibarType.SINGLE_TOP -> {
+                    SystemBarStyle.auto(lightScrim = toolbarColor, darkScrim = toolbarColor)
+                }
+
+                OmnibarType.SINGLE_BOTTOM -> if (isDarkThemeEnabled()) {
+                    SystemBarStyle.dark(ColorUtils.setAlphaComponent(toolbarColor, 0x80))
+                } else {
+                    SystemBarStyle.light(
+                        scrim = ColorUtils.setAlphaComponent(toolbarColor, 0xe6),
+                        darkScrim = ColorUtils.setAlphaComponent(toolbarColor, 0x80),
+                    )
+                }
+            }
+
+            enableEdgeToEdge(statusBarStyle = statusBarStyle)
+        }
         setContentView(binding.root)
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
@@ -211,6 +243,7 @@ class TabSwitcherActivity :
         extractIntentExtras()
         configureViewReferences()
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         configureRecycler()
         configureNavigationBar()
 
@@ -221,6 +254,7 @@ class TabSwitcherActivity :
     }
 
     private fun configureNavigationBar() {
+        binding.navigationBar.setEdgeToEdgeEnabled(edgeToEdge.isEnabled())
         if (omnibarRepository.omnibarType == OmnibarType.SPLIT) {
             binding.navigationBar.browserNavigationBarObserver =
                 object : BrowserNavigationBarObserver {
@@ -251,6 +285,49 @@ class TabSwitcherActivity :
 
     private fun extractIntentExtras() {
         selectedTabId = intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+
+        when (omnibarRepository.omnibarType) {
+            OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> {
+                ViewCompat.setOnApplyWindowInsetsListener(binding.tabSwitcherToolbarTop.root) { view, windowInsets ->
+                    val insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+                    )
+                    view.updatePadding(top = insets.top)
+                    windowInsets
+                }
+            }
+
+            OmnibarType.SINGLE_BOTTOM -> {
+                ViewCompat.setOnApplyWindowInsetsListener(binding.tabSwitcherToolbarBottom.root) { view, windowInsets ->
+                    val insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+                    )
+                    view.updatePadding(bottom = insets.bottom)
+                    windowInsets
+                }
+            }
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(tabsRecycler) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            val bottomPadding = when (settingsDataStore.omnibarType) {
+                OmnibarType.SINGLE_TOP -> insets.bottom
+                else -> 0
+            }
+            val topPadding = when (settingsDataStore.omnibarType) {
+                OmnibarType.SINGLE_BOTTOM -> insets.top
+                else -> 0
+            }
+
+            val basePadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+            view.updatePadding(top = topPadding + basePadding, bottom = bottomPadding + basePadding)
+            windowInsets
+        }
     }
 
     private fun configureViewReferences() {
