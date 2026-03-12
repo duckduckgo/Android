@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
@@ -62,6 +63,9 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private lateinit var screen: Screen
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
@@ -72,6 +76,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         screen = if (savedInstanceState != null) {
             savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
         } else {
