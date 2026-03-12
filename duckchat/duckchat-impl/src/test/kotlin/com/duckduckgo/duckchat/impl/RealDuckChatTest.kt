@@ -1278,6 +1278,13 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when custom subdomain host is set then url can be handled by webview`() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai/somepath"))
+    }
+
+    @Test
     fun `when isDuckChatSyncFeatureEnabled returns true then isChatSyncFeatureEnabled returns true`() = runTest {
         whenever(mockDeviceSyncState.isDuckChatSyncFeatureEnabled()).thenReturn(true)
 

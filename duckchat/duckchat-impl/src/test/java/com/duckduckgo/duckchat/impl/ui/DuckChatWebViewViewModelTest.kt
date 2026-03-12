@@ -195,6 +195,23 @@ class DuckChatWebViewViewModelTest {
     }
 
     @Test
+    fun `when should close duck chat and current is custom duck ai host and first is duckduckgo then return true`() {
+        whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(true)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        val history = mock<WebBackForwardList>()
+
+        val currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://staging.duck.ai/somepath"
+        }
+        val firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertTrue(viewModel.shouldCloseDuckChat(history))
+    }
+
+    @Test
     fun `when should close duck chat and current is not duck ai or first is no duckduckgo then return false`() {
         whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(true)
         val history = mock<WebBackForwardList>()
