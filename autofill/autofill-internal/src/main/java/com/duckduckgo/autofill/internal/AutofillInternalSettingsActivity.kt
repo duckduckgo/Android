@@ -24,6 +24,9 @@ import android.webkit.CookieManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
@@ -69,6 +72,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAutofillProviderSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
@@ -142,6 +146,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inBrowserImportPromoPreviousPromptsStore: InternalInBrowserPromoStore
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private var passwordImportWatcher = ConflatedJob()
 
     // used to output duration of import
@@ -214,13 +221,26 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         configureUiEventHandlers()
         refreshInstallationDaySettings()
         refreshDaysSinceInstall()
         refreshRemoteConfigSettings()
         refreshAutofillJsConfigSettings()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun refreshRemoteConfigSettings() {
@@ -304,7 +324,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     val intent =
                         globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
-                    importGooglePasswordsFlowLauncher.launch(intent)
+                    importGooglePasswordsFlowLauncher.launch(intent!!)
                 } else {
                     Toast.makeText(this@AutofillInternalSettingsActivity, "WebView version not supported", Toast.LENGTH_SHORT).show()
                 }

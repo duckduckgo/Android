@@ -56,5 +56,6 @@ dependencies {
     implementation "com.google.android.material:material:_"
     implementation "androidx.constraintlayout:constraintlayout:_"
     implementation project(path: ':design-system')
+    implementation project(':edge-to-edge-api')
 
 }
