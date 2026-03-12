@@ -14,6 +14,16 @@ The following rule files contain detailed guidance for specific topics. Read the
 
 ---
 
+## Dev Setup
+
+Run once after cloning to link shared Claude skills into your local environment:
+
+```bash
+bash scripts/setup-claude.sh
+```
+
+---
+
 ## Project Overview
 
 DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The app provides built-in search, tracker blocking, HTTPS enforcement, and other privacy features.
