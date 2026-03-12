@@ -19,6 +19,10 @@ package com.duckduckgo.sync.impl.ui.setup
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -34,6 +38,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
@@ -62,6 +67,9 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
+    @Inject
     lateinit var storagePermission: PermissionRequest
 
     @Inject
@@ -81,9 +89,33 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setupEdgeToEdgeInsets()
         observeUiEvents()
         configureListeners()
         registerForPermission()
+    }
+
+    private fun setupEdgeToEdgeInsets() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            windowInsets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.footerNextButton) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = insets.bottom
+            }
+            windowInsets
+        }
     }
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
