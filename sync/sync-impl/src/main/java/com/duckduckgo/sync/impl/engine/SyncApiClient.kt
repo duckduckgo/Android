@@ -31,20 +31,17 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority
 import logcat.logcat
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import javax.inject.Inject
 
 interface SyncApiClient {
 
-    fun patchData(changes: SyncChangesRequest): Result<SyncChangesResponse>
+    fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse>
     fun get(
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse>
-    fun delete(request: SyncDeletionRequest): Result<SyncDeletionResponse>
-    fun patchDeletableEntries(request: SyncPatchRequest): Result<SyncPatchResponse>
+    fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -54,7 +51,7 @@ class AppSyncApiClient @Inject constructor(
     private val syncApiErrorRecorder: SyncApiErrorRecorder,
 ) : SyncApiClient {
 
-    override fun patchData(changes: SyncChangesRequest): Result<SyncChangesResponse> {
+    override fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -65,7 +62,7 @@ class AppSyncApiClient @Inject constructor(
 
         val updates = JSONObject(changes.jsonString)
         logcat { "Sync-Engine: patch data generated $updates" }
-        return when (val result = syncApi.patchData(token, updates)) {
+        return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
                 result
@@ -138,51 +135,12 @@ class AppSyncApiClient @Inject constructor(
         return SyncChangesResponse(type, jsonString)
     }
 
-    override fun delete(request: SyncDeletionRequest): Result<SyncDeletionResponse> {
+    override fun delete(deletions: SyncDeletionRequest): Result<SyncDeletionResponse> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
-        return when (request.type) {
-            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, request.untilTimestamp ?: "")
+        return when (deletions.type) {
+            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, deletions.untilTimestamp ?: "")
         }
-    }
-
-    override fun patchDeletableEntries(request: SyncPatchRequest): Result<SyncPatchResponse> {
-        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
-
-        if (request.isEmpty()) {
-            return Result.Error(reason = "Patch Updates Empty")
-        }
-
-        return when (request.type) {
-            DUCK_AI_CHATS -> handleDuckAiChatsPatch(token, request)
-        }
-    }
-
-    private fun handleDuckAiChatsPatch(
-        token: String,
-        request: SyncPatchRequest,
-    ): Result<SyncPatchResponse> {
-        logcat { "Sync-Engine: patching duck ai chats" }
-
-        val body = request.jsonString.toRequestBody("application/json".toMediaType())
-
-        return when (val result = syncApi.patchAiChats(token, body)) {
-            is Result.Error -> {
-                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to patch duck ai chats $result" }
-                syncApiErrorRecorder.record(DUCK_AI_CHATS, result)
-                result
-            }
-            is Result.Success -> {
-                logcat(LogPriority.INFO) { "DuckChat-Sync: successfully patched duck ai chats" }
-                val entryIds = extractEntryIds(request.jsonString)
-                Result.Success(SyncPatchResponse(DUCK_AI_CHATS, entryIds))
-            }
-        }
-    }
-
-    private fun extractEntryIds(jsonArrayString: String): List<String> {
-        val jsonArray = org.json.JSONArray(jsonArrayString)
-        return (0 until jsonArray.length()).map { jsonArray.getJSONObject(it).getString("id") }
     }
 
     private fun handleDuckAiChatsDeletion(

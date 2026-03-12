@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
-import okhttp3.RequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
@@ -82,7 +81,7 @@ interface SyncService {
     ): Call<Void>
 
     @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
-    fun patchData(
+    fun patch(
         @Header("Authorization") token: String,
         @Body request: JSONObject,
     ): Call<JSONObject>
@@ -116,12 +115,6 @@ interface SyncService {
         @Header("Authorization") token: String,
         @Query("until") until: String,
     ): Call<JSONObject>
-
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
-    fun patchAiChats(
-        @Header("Authorization") token: String,
-        @Body body: RequestBody,
-    ): Call<Void>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")
     fun rescopeToken(
