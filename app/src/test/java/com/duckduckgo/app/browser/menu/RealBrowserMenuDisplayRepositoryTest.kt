@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -32,20 +33,18 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@Suppress("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealBrowserMenuDisplayRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
     private val settingsDataStore = mock<SettingsDataStore>()
-    private val browserConfigFeature = mock<AndroidBrowserConfigFeature>()
-    private val experimentalMenuToggle = mock<Toggle>()
+    private val browserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private lateinit var testee: BrowserMenuDisplayRepository
 
     @Before
     fun setup() {
-        whenever(browserConfigFeature.experimentalBrowsingMenu()).thenReturn(experimentalMenuToggle)
-
         testee = RealBrowserMenuDisplayRepository(
             browserMenuStore = settingsDataStore,
             browserConfigFeature = browserConfigFeature,
@@ -56,7 +55,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when feature flag enabled and setting enabled then hasOption true and isEnabled true`() = runTest {
         // Given
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
 
         // When
@@ -74,7 +73,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when feature flag enabled and setting disabled then hasOption true and isEnabled false`() = runTest {
         // Given
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
 
         // When
@@ -90,18 +89,18 @@ class RealBrowserMenuDisplayRepositoryTest {
     }
 
     @Test
-    fun `when feature flag disabled and setting enabled then hasOption false and isEnabled true`() = runTest {
-        // Given: Feature flag disabled but user has preference stored
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(false)
+    fun `when feature flag disabled and setting enabled then hasOption false and isEnabled false`() = runTest {
+        // Given: Experimental flag off — user pref is ignored because isActivate gates it
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
 
         // When
         testee.browserMenuState.test {
             val state = awaitItem()
 
-            // Then: hasOption=false means toggle won't show in settings, but preference persists
+            // Then: hasOption=false (no toggle shown), isEnabled=false (pref ignored when flag is off)
             assertFalse(state.hasOption)
-            assertTrue(state.isEnabled)
+            assertFalse(state.isEnabled)
 
             cancel()
         }
@@ -110,7 +109,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when feature flag disabled and setting disabled then hasOption false and isEnabled false`() = runTest {
         // Given
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(false)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
 
         // When
@@ -128,7 +127,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when setExperimentalMenuEnabled called with true then persist setting and emit new state`() = runTest {
         // Given: Initial state - feature enabled, setting disabled
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
 
         testee.browserMenuState.test {
@@ -154,7 +153,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when setExperimentalMenuEnabled called with false then persist setting and emit new state`() = runTest {
         // Given: Initial state - feature enabled, setting enabled
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
 
         testee.browserMenuState.test {
@@ -180,7 +179,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when same value set multiple times then distinctUntilChanged prevents reemission`() = runTest {
         // Given
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
 
         testee.browserMenuState.test {
@@ -202,7 +201,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when value changed multiple times then flow emits all distinct changes`() = runTest {
         // Given
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
 
         testee.browserMenuState.test {
@@ -235,7 +234,7 @@ class RealBrowserMenuDisplayRepositoryTest {
     @Test
     fun `when flow collected multiple times then each gets cached latest value`() = runTest {
         // Given: Initial state
-        whenever(experimentalMenuToggle.isEnabled()).thenReturn(true)
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
         whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
 
         // When: First collector
@@ -260,6 +259,76 @@ class RealBrowserMenuDisplayRepositoryTest {
             assertTrue(cachedState.isEnabled)
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when rollout flag enabled and user pref false then hasOption false and isEnabled true`() = runTest {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        testee.browserMenuState.test {
+            val state = awaitItem()
+            assertFalse(state.hasOption)
+            assertTrue(state.isEnabled)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when rollout flag enabled and experimental flag enabled then hasOption false and isEnabled true`() = runTest {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        testee.browserMenuState.test {
+            val state = awaitItem()
+            assertFalse(state.hasOption)
+            assertTrue(state.isEnabled)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when rollout flag disabled and experimental flag disabled and user pref true then isEnabled false`() = runTest {
+        // Given: Both flags off — user pref is gated by experimentalBrowsingMenu being on,
+        // so with both flags off the pref alone cannot enable the menu
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
+
+        testee.browserMenuState.test {
+            val state = awaitItem()
+            assertFalse(state.isEnabled)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when rollout flag disabled and experimental flag enabled and user pref true then isEnabled true`() = runTest {
+        // Given: Experimental flag on + user pref on → menu enabled even without rollout
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = true))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(true)
+
+        testee.browserMenuState.test {
+            val state = awaitItem()
+            assertTrue(state.isEnabled)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when rollout flag disabled and user pref false then isEnabled false`() = runTest {
+        browserConfigFeature.experimentalBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        browserConfigFeature.rolloutBrowsingMenu().setRawStoredState(Toggle.State(enable = false))
+        whenever(settingsDataStore.useBottomSheetMenu).thenReturn(false)
+
+        testee.browserMenuState.test {
+            val state = awaitItem()
+            assertFalse(state.isEnabled)
+            cancel()
         }
     }
 }

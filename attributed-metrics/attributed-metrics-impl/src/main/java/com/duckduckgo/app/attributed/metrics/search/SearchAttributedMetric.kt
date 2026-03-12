@@ -37,7 +37,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 /**
  * Search Count 7d avg Attributed Metric
@@ -125,7 +124,7 @@ class SearchAttributedMetric @Inject constructor(
     override suspend fun getMetricParameters(): Map<String, String> {
         val stats = getEventStats()
         val params = mutableMapOf(
-            "count" to getBucketValue(stats.rollingAverage.roundToInt()).toString(),
+            "count" to getBucketValue(stats.rollingAverage).toString(),
             "version" to getBucketConfig().version.toString(),
         )
         if (!hasCompleteDataWindow()) {
@@ -141,7 +140,7 @@ class SearchAttributedMetric @Inject constructor(
             ?: "no-atb" // should not happen, but just in case
     }
 
-    private suspend fun getBucketValue(searches: Int): Int {
+    private suspend fun getBucketValue(searches: Double): Int {
         val buckets = getBucketConfig().buckets
         return buckets.indexOfFirst { bucket -> searches <= bucket }.let { index ->
             if (index == -1) buckets.size else index

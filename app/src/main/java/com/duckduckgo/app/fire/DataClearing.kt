@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -57,22 +58,28 @@ class DataClearing @Inject constructor(
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val tabRepository: TabRepository,
+    private val duckChat: DuckChat,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
-        val shouldClearDuckAiData = fireDataStore.getManualClearOptions()
-            .contains(FireClearOption.DUCKAI_CHATS)
+        val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
 
-        val result = clearDataAction.clearDataForSpecificDomains(visitedSites, shouldClearDuckAiData)
+        val tabUrl = tabRepository.getTab(tabId)?.url
+        clearDuckAiChatIfNeeded(tabUrl)
+
         navigationHistory.removeHistoryForTab(tabId)
-        tabVisitedSitesRepository.clearTab(tabId)
         tabRepository.deleteTabAndSelectSource(tabId)
 
         logcat { "Single tab clear completed for tab: $tabId" }
-        return result
+        return clearDataResult
+    }
+
+    private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
+        if (tabUrl == null) return
+        duckChat.deleteChat(tabUrl)
     }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {

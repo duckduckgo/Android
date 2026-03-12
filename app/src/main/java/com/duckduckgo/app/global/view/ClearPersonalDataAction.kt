@@ -89,12 +89,12 @@ interface ClearDataAction {
 
     /**
      * Clears browsing data for specific domains via WebStorageCompat.
+     * Duck.ai domains (duckduckgo.com, duck.ai) are always excluded — their data is managed separately.
      * @param domains set of eTLD+1 domains to clear
-     * @param shouldClearDuckAiData whether to clear DuckAi data for duckduckgo.com and duck.ai
      * @return [ClearDataResult.Success] if data was cleared, [ClearDataResult.FeatureNotSupported] if WebView doesn't support this feature,
      *         or [ClearDataResult.Error] if an exception occurred during deletion
      */
-    suspend fun clearDataForSpecificDomains(domains: Set<String>, shouldClearDuckAiData: Boolean): ClearDataResult
+    suspend fun clearDataForSpecificDomains(domains: Set<String>): ClearDataResult
 
     /**
      * Sets the flag indicating whether the app has been used since the last data clear.
@@ -227,7 +227,6 @@ class ClearPersonalDataAction(
     @SuppressLint("RequiresFeature")
     override suspend fun clearDataForSpecificDomains(
         domains: Set<String>,
-        shouldClearDuckAiData: Boolean,
     ): ClearDataResult {
         if (!webViewCapabilityChecker.isSupported(DeleteBrowsingData)) {
             logcat(WARN) { "DeleteBrowsingData feature not supported by WebView" }
@@ -238,7 +237,7 @@ class ClearPersonalDataAction(
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
                 domains
-                    .filter { !DUCKDUCKGO_DOMAINS.contains(it) || shouldClearDuckAiData }
+                    .filter { !DUCKDUCKGO_DOMAINS.contains(it) }
                     .forEach { domain ->
                         suspendCancellableCoroutine { continuation ->
                             WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {

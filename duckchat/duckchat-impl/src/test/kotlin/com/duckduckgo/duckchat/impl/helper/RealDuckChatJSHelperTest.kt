@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import android.graphics.Bitmap
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
@@ -58,12 +57,10 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
-    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
-        faviconManager = mockFaviconManager,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -74,7 +71,13 @@ class RealDuckChatJSHelperTest {
                 {
                     "title": "Example Title",
                     "url": "https://example.com",
-                    "content": "Example content"
+                    "content": "Example content",
+                    "favicon": [
+                        {
+                            "rel": "icon",
+                            "href": "data:image/png;base64,..."
+                        }
+                     ]
                 }
                 """.trimIndent()
         }
@@ -252,6 +255,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -263,7 +267,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAndAutomaticEnabledAndUserEnabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAndAutomaticEnabledThenReturnsContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         val result =
             testee.processJsCallbackMessage(
@@ -275,7 +279,10 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
@@ -299,8 +306,6 @@ class RealDuckChatJSHelperTest {
     fun whenGetPageContextUserActionThenReturnsContextRegardlessOfAutoFlag() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(false)
         val tabId = "tab-1"
-        val faviconBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-        whenever(mockFaviconManager.loadFromDisk(tabId, "https://example.com")).thenReturn(faviconBitmap)
 
         val result =
             testee.processJsCallbackMessage(
@@ -316,11 +321,8 @@ class RealDuckChatJSHelperTest {
         assertNotNull(result)
         val context = result!!.params.getJSONObject("pageContext")
         assertEquals("Example Title", context.getString("title"))
-        val faviconArray = context.getJSONArray("favicon")
-        val faviconObject = faviconArray.getJSONObject(0)
-        assertEquals("icon", faviconObject.getString("rel"))
-        val faviconHref = faviconObject.getString("href")
-        assertEquals(true, faviconHref.startsWith("data:image/png;base64,"))
+        assertEquals("https://example.com", context.getString("url"))
+        assertEquals("Example content", context.getString("content"))
         verify(mockDuckChatPixels).reportContextualPageContextManuallyAttachedFrontend()
     }
 
@@ -359,7 +361,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetPageContextInitAutomaticEnabledButUserDisabledThenReturnsNull() = runTest {
+    fun whenGetPageContextInitAutomaticEnabledThenReturnsContext() = runTest {
         whenever(mockDuckChat.isAutomaticContextAttachmentEnabled()).thenReturn(true)
 
         val result =
@@ -372,7 +374,10 @@ class RealDuckChatJSHelperTest {
                 pageContext = viewModel.updatedPageContext,
             )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
@@ -502,6 +507,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -543,6 +549,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -596,7 +603,7 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun `when get AI chat page context for init with automatic attachment then return null`() = runTest {
+    fun `when get AI chat page context for init with automatic attachment then return context`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -611,11 +618,14 @@ class RealDuckChatJSHelperTest {
             pageContext = viewModel.updatedPageContext,
         )
 
-        assertNull(result)
+        assertNotNull(result)
+        val context = result!!.params.getJSONObject("pageContext")
+        assertEquals("Example Title", context.getString("title"))
+        assertEquals("https://example.com", context.getString("url"))
     }
 
     @Test
-    fun `when get AI chat page context for init with automatic attachment but user disabled context then return payload`() = runTest {
+    fun `when get AI chat page context for init with automatic attachment then return payload`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"
         val id = "123"
@@ -634,7 +644,8 @@ class RealDuckChatJSHelperTest {
             put("pageContext", JSONObject(viewModel.updatedPageContext))
         }
 
-        assertNull(result)
+        assertNotNull(result)
+        assertEquals(expectedPayload.toString(), result!!.params.toString())
     }
 
     @Test
@@ -689,6 +700,51 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", true)
             put("supportsAIChatSync", false)
             put("supportsPageContext", true)
+            put("supportsMultipleContexts", false)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result!!.id)
+        assertEquals(expected.method, result.method)
+        assertEquals(expected.featureName, result.featureName)
+        assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesAndContextualModeAndMultipleContextsEnabledThenReturnsSupportsMultipleContexts() = runTest {
+        val featureName = "aiChat"
+        val method = "getAIChatNativeConfigValues"
+        val id = "123"
+
+        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatContextualModeEnabled()).thenReturn(true)
+        whenever(mockDuckChat.areMultipleContentAttachmentsEnabled()).thenReturn(true)
+        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            id,
+            null,
+            Mode.CONTEXTUAL,
+            viewModel.updatedPageContext,
+        )
+
+        val jsonPayload = JSONObject().apply {
+            put("platform", "android")
+            put("isAIChatHandoffEnabled", true)
+            put("supportsClosingAIChat", true)
+            put("supportsOpeningSettings", true)
+            put("supportsNativeChatInput", false)
+            put("supportsURLChatIDRestoration", false)
+            put("supportsImageUpload", false)
+            put("supportsStandaloneMigration", false)
+            put("supportsAIChatFullMode", false)
+            put("supportsAIChatContextualMode", true)
+            put("supportsAIChatSync", false)
+            put("supportsPageContext", true)
+            put("supportsMultipleContexts", true)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -729,6 +785,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -991,6 +1048,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1027,6 +1085,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", false)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
@@ -1064,6 +1123,7 @@ class RealDuckChatJSHelperTest {
             put("supportsAIChatContextualMode", false)
             put("supportsAIChatSync", true)
             put("supportsPageContext", false)
+            put("supportsMultipleContexts", false)
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())

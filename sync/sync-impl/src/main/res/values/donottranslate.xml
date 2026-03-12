@@ -34,4 +34,11 @@
     <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
     <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
 
+    <!-- Block Store -->
+    <string name="sync_internal_block_store_header">Persistent Storage / Block Store</string>
+    <string name="sync_internal_block_store_current_value_label">Current stored value (SyncRecovery key)</string>
+    <string name="sync_internal_block_store_input_hint">Data to store</string>
+    <string name="sync_internal_block_store_write">Write</string>
+    <string name="sync_internal_block_store_clear">Clear</string>
+
 </resources>

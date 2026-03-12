@@ -101,6 +101,8 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
+        binding.blockStoreWriteButton.setOnClickListener { viewModel.onBlockStoreWriteClicked(binding.blockStoreInput.text) }
+        binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
     }
 
     private fun observeUiEvents() {
@@ -168,6 +170,29 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
         binding.connectedDevicesList.removeAllViews()
+        binding.blockStoreFeatureFlag.text = if (viewState.syncAutoRestoreEnabled) {
+            "✅ syncAutoRestore flag enabled"
+        } else {
+            "❌ syncAutoRestore flag disabled"
+        }
+        binding.blockStoreAvailability.text = when (viewState.blockStoreAvailable) {
+            null -> "Checking..."
+            true -> "✅ Available"
+            false -> "❌ Unavailable (Play Services missing)"
+        }
+        binding.blockStoreE2eStatus.text = when {
+            viewState.blockStoreAvailable == null -> ""
+            viewState.blockStoreAvailable == false -> ""
+            viewState.blockStoreE2ESupported == true -> "✅ E2E encryption supported"
+            else -> "❌ E2E encryption not supported"
+        }
+        binding.blockStoreCurrentValue.text = when (val value = viewState.blockStoreCurrentValue) {
+            is SyncInternalSettingsViewModel.BlockStoreValue.Loading -> "Loading..."
+            is SyncInternalSettingsViewModel.BlockStoreValue.NotSet -> "(key not set)"
+            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> {
+                if (value.value.isEmpty()) "(empty string)" else value.value
+            }
+        }
 
         binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->
             viewModel.onEnvironmentChanged(enabled)
