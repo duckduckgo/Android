@@ -304,6 +304,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
@@ -2416,6 +2417,19 @@ class BrowserTabViewModel @Inject constructor(
                         privacyShield = privacyProtection,
                         trackersBlocked = site?.trackerCount ?: 0,
                     )
+                browserViewState.value = currentBrowserViewState().copy(
+                    pageContextHeader = site?.let {
+                        if (duckChat.isDuckChatUrl(it.url.toUri())) {
+                            PageContextHeaderState.DuckAi(tabId = tabId)
+                        } else {
+                            PageContextHeaderState.Visible(
+                                title = it.title,
+                                shortUrl = addressDisplayFormatter.getShortUrl(it.url),
+                                tabId = tabId,
+                            )
+                        }
+                    } ?: PageContextHeaderState.Hidden,
+                )
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)

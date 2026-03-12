@@ -42,8 +42,10 @@ sealed class BrowserMenuViewState {
         val showAutofill: Boolean = false,
         val isSSLError: Boolean = false,
         val canPrintPage: Boolean = false,
+        val pageContextHeader: PageContextHeaderState,
 
     ) : BrowserMenuViewState()
+
     data class CustomTabs(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
@@ -53,18 +55,36 @@ sealed class BrowserMenuViewState {
         val canFindInPage: Boolean = true,
         val canChangePrivacyProtection: Boolean = false,
         val isPrivacyProtectionDisabled: Boolean = false,
+        val pageContextHeader: PageContextHeaderState,
     ) : BrowserMenuViewState()
+
     data class NewTabPage(
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
+
     data class DuckAi(
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
+        val pageContextHeader: PageContextHeaderState,
     ) : BrowserMenuViewState()
+}
+
+sealed class PageContextHeaderState {
+    data object Hidden : PageContextHeaderState()
+
+    data class Visible(
+        val title: String?,
+        val shortUrl: String,
+        val tabId: String,
+    ) : PageContextHeaderState()
+
+    data class DuckAi(
+        val tabId: String,
+    ) : PageContextHeaderState()
 }
 
 sealed class VpnMenuState {

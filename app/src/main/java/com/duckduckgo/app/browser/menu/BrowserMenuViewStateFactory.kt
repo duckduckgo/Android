@@ -69,6 +69,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
+            pageContextHeader = browserViewState.pageContextHeader,
         )
     }
 
@@ -90,6 +91,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
+            pageContextHeader = browserViewState.pageContextHeader,
         )
     }
 
@@ -121,6 +123,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
+            pageContextHeader = browserViewState.pageContextHeader,
         )
     }
 }

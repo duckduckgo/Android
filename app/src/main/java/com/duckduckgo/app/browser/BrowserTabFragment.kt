@@ -1653,6 +1653,7 @@ class BrowserTabFragment :
     private fun createBottomSheetMenu() {
         bottomSheetMenu = BrowserMenuBottomSheet(
             context = requireContext(),
+            faviconManager = faviconManager,
             onDismissListener = {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
             },
