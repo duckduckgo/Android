@@ -22,18 +22,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.dialogs.AddBookmarkFolderDialogFragment
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private lateinit var binding: ActivityBookmarkFoldersBinding
     private lateinit var adapter: BookmarkFolderStructureAdapter
@@ -42,10 +50,12 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         binding = ActivityBookmarkFoldersBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         setupToolbar(binding.appBarLayout.toolbar)
+        setupEdgeToEdge()
         observeViewModel()
         setupAdapter()
 
@@ -56,6 +66,17 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
             intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT,
             currentFolder as BookmarkFolder?,
         )
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bookmarkFolderStructure) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun setupAdapter() {
