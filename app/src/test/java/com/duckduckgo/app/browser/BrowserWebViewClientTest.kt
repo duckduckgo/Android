@@ -1574,8 +1574,6 @@ class BrowserWebViewClientTest {
         verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
 
-    // region handleNonHttpUrlIfNeeded (via onPageStarted and onReceivedError)
-
     @Test
     fun whenOnPageStartedWithIntentUrlThenShouldOverrideDelegatesHandling() {
         val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
@@ -1657,8 +1655,6 @@ class BrowserWebViewClientTest {
         // Should not try to handle via shouldOverride for non-unsupported-scheme errors
         verify(listener, never()).handleNonHttpAppLink(any())
     }
-
-    // endregion
 
     private class TestWebView(
         context: Context,
