@@ -93,6 +93,7 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
     implementation project(path: ':browser-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.core.ktx
 
