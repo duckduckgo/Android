@@ -21,12 +21,17 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.OmnibarView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A [ScrollingViewBehavior] that observes [AppBarLayout] (top omnibar) present in the view hierarchy and applies top offset to the child view
@@ -43,13 +48,44 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
-    private val marginOffsetPx = (MARGIN_OFFSET_DP * context.resources.displayMetrics.density).toInt()
-
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: View,
         dependency: View,
     ): Boolean = dependency.isBrowserNavigationBar() || super.layoutDependsOn(parent, child, dependency)
+
+    /**
+     * Adds the child's bottom margin to the available height before the super measures it.
+     *
+     * [ScrollingViewBehavior] adds the AppBarLayout's [totalScrollRange][AppBarLayout.getTotalScrollRange] to the
+     * available height so the child can extend past the parent while the bar is expanded.
+     * However, the subsequent [measureChildWithMargins][android.view.ViewGroup.measureChildWithMargins] call
+     * subtracts the child's bottom margin, which cancels out the scroll-range addition and leaves the child
+     * too short to reach the parent's bottom when the AppBarLayout is fully collapsed.
+     *
+     * By inflating the parent spec by the bottom margin before handing it to the super, the final
+     * measured height is large enough that `child.top + child.height >= parent.height` at every
+     * scroll position.
+     */
+    override fun onMeasureChild(
+        parent: CoordinatorLayout,
+        child: View,
+        parentWidthMeasureSpec: Int,
+        widthUsed: Int,
+        parentHeightMeasureSpec: Int,
+        heightUsed: Int,
+    ): Boolean {
+        val lp = child.layoutParams as? CoordinatorLayout.LayoutParams
+        val bottomMargin = lp?.bottomMargin ?: 0
+        if (bottomMargin > 0) {
+            val adjustedHeightSpec = View.MeasureSpec.makeMeasureSpec(
+                View.MeasureSpec.getSize(parentHeightMeasureSpec) + bottomMargin,
+                View.MeasureSpec.getMode(parentHeightMeasureSpec),
+            )
+            return super.onMeasureChild(parent, child, parentWidthMeasureSpec, widthUsed, adjustedHeightSpec, heightUsed)
+        }
+        return super.onMeasureChild(parent, child, parentWidthMeasureSpec, widthUsed, parentHeightMeasureSpec, heightUsed)
+    }
 
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
@@ -60,26 +96,37 @@ class TopOmnibarBrowserContainerLayoutBehavior(
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
             val result = super.onDependentViewChanged(parent, child, dependency)
-            correctBottomMargin(child, dependency)
+            adjustBottomPaddingForEdgeToEdge(parent, child, dependency)
             result
         }
 
     /**
-     * Sets `bottomMargin` based on the visible height of the AppBarLayout ([dependency]).
+     * Dynamically adjusts bottom padding for edge-to-edge navigation bar insets.
      *
-     * [ScrollingViewBehavior] positions [child] below the AppBarLayout, but [child]'s `match_parent` height
-     * causes it to overflow past the parent. The correct margin equals the AppBarLayout's visible portion
-     * minus a small offset ([MARGIN_OFFSET_DP]) to reduce visual flicker during scroll.
+     * When the [BrowserNavigationBarView] is gone (SINGLE_TOP mode), the child needs bottom padding
+     * to keep content above the system navigation bar. However, static padding scrolls into view
+     * as the AppBarLayout collapses. This reduces the padding proportionally to the scroll amount,
+     * so it's fully present when expanded and gone when collapsed — preventing any visible artifact
+     * behind the translucent navigation bar during scroll.
      */
-    internal fun correctBottomMargin(child: View, dependency: View) {
+    private fun adjustBottomPaddingForEdgeToEdge(parent: CoordinatorLayout, child: View, dependency: View) {
         if (child.isGone) return
-        val lp = child.layoutParams as? CoordinatorLayout.LayoutParams ?: return
-        val visibleHeight = dependency.height + dependency.top
-        // Only apply the offset during scroll (partially collapsed) to reduce visual stutter.
-        // When fully expanded, use the exact visible height to avoid cutting off content.
-        val newMargin = if (dependency.top < 0) maxOf(0, visibleHeight - marginOffsetPx) else visibleHeight
-        if (lp.bottomMargin != newMargin) {
-            lp.bottomMargin = newMargin
+        // Only apply when there's no BrowserNavigationBarView handling insets
+        val hasVisibleNavBar = parent.getDependencies(child).any { it.isBrowserNavigationBar() && !it.isGone }
+        if (hasVisibleNavBar) return
+
+        val navBarInsets = ViewCompat.getRootWindowInsets(parent)
+            ?.getInsets(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+        if (navBarInsets == 0) return
+
+        val appBarLayout = dependency as? AppBarLayout ?: return
+        val scrollRange = appBarLayout.totalScrollRange
+        val scrollOffset = -dependency.top // how much the AppBarLayout has scrolled (0 = expanded)
+        val fraction = if (scrollRange > 0) min(1f, scrollOffset.toFloat() / scrollRange) else 0f
+        val newPadding = max(0, (navBarInsets * (1f - fraction)).toInt())
+
+        if (child.paddingBottom != newPadding) {
+            child.setPadding(child.paddingLeft, child.paddingTop, child.paddingRight, newPadding)
         }
     }
 }
@@ -128,9 +175,9 @@ private fun offsetByBottomElementVisibleHeight(
         }
     return if (child.paddingBottom != newBottomPadding) {
         child.setPadding(
-            0,
-            0,
-            0,
+            child.paddingLeft,
+            child.paddingTop,
+            child.paddingRight,
             newBottomPadding,
         )
         true
@@ -138,7 +185,6 @@ private fun offsetByBottomElementVisibleHeight(
         false
     }
 }
-private const val MARGIN_OFFSET_DP = 7
 
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
 

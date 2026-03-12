@@ -45,11 +45,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.transition.doOnEnd
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -641,6 +645,17 @@ class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderPosition() {
         if (omnibarType == OmnibarType.SINGLE_TOP || omnibarType == OmnibarType.SPLIT) {
+            val rootContainer = findViewById<View>(R.id.rootContainer)
+            ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+                val insets = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+                )
+                findViewById<ViewGroup>(R.id.toolbarContainer).updatePadding(top = insets.top)
+                rootContainer.minimumHeight = insets.top
+                windowInsets
+            }
+            doOnAttach { ViewCompat.requestApplyInsets(it) }
+
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }
@@ -675,6 +690,17 @@ class OmnibarLayout @JvmOverloads constructor(
             // Try to reduce the bottom omnibar material shadow when not using the custom shadow
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+            }
+
+            // Edge-to-edge: push bottom omnibar above navigation bar and keyboard
+            ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+                val insets = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.navigationBars() or
+                        WindowInsetsCompat.Type.displayCutout() or
+                        WindowInsetsCompat.Type.ime(),
+                )
+                view.updatePadding(bottom = insets.bottom)
+                windowInsets
             }
         }
     }
@@ -1203,6 +1229,7 @@ class OmnibarLayout @JvmOverloads constructor(
 
                     toolbar.background = customTab.toolbarColor.toDrawable()
                     toolbarContainer.background = customTab.toolbarColor.toDrawable()
+                    statusBarForeground = customTab.toolbarColor.toDrawable()
 
                     omniBarContainer.hide()
                     customTabToolbar.show()

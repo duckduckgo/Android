@@ -33,13 +33,19 @@ import android.view.View
 import android.view.View.IMPORTANT_FOR_AUTOFILL_YES
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
+import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -105,6 +111,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.show
@@ -120,6 +127,7 @@ import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -215,6 +223,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val lastActiveTabs = TabList()
 
@@ -350,6 +361,32 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+        if (edgeToEdge.isEnabled()) {
+            val toolbarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
+            // TODO might be better to move this to ViewState but I think it's preferential we set edgetoedge early. Leaving it here and needs testing
+            enableEdgeToEdge(
+                statusBarStyle = if (isDarkThemeEnabled()) {
+                    SystemBarStyle.dark(toolbarColor)
+                } else {
+                    SystemBarStyle.light(
+                        scrim = toolbarColor,
+                        darkScrim = toolbarColor,
+                    )
+                },
+                navigationBarStyle = when (settingsDataStore.omnibarType) {
+                    OmnibarType.SINGLE_TOP, OmnibarType.SINGLE_BOTTOM, OmnibarType.SPLIT -> {
+                        if (isDarkThemeEnabled()) {
+                            SystemBarStyle.dark(ColorUtils.setAlphaComponent(toolbarColor, 0x80))
+                        } else {
+                            SystemBarStyle.light(
+                                scrim = ColorUtils.setAlphaComponent(toolbarColor, 0xe6),
+                                darkScrim = ColorUtils.setAlphaComponent(toolbarColor, 0x80),
+                            )
+                        }
+                    }
+                },
+            )
+        }
 
         bindMockupToolbars()
 
@@ -1599,6 +1636,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     binding.topMockupToolbar.browserMenu.gone()
                     binding.topMockupToolbar.fireIconMenu.gone()
                     binding.navigationBarMockup.root.show()
+
+                    // Edge-to-edge: push mockup navigation bar above system navigation bar
+                    ViewCompat.setOnApplyWindowInsetsListener(binding.navigationBarMockup.root) { view, windowInsets ->
+                        val insets = windowInsets.getInsets(
+                            WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                        )
+                        view.updatePadding(bottom = insets.bottom)
+                        windowInsets
+                    }
+                }
+
+                ViewCompat.setOnApplyWindowInsetsListener(binding.topMockupToolbar.appBarLayoutMockup) { view, windowInsets ->
+                    val insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+                    )
+                    view.updatePadding(top = insets.top)
+                    windowInsets
                 }
             }
 
@@ -1616,6 +1670,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
+                }
+
+                // Edge-to-edge: push bottom mockup toolbar above navigation bar
+                ViewCompat.setOnApplyWindowInsetsListener(binding.bottomMockupToolbar.appBarLayoutMockup) { view, windowInsets ->
+                    val insets = windowInsets.getInsets(
+                        WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+                    )
+                    view.updatePadding(bottom = insets.bottom)
+                    windowInsets
                 }
             }
         }

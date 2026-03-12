@@ -310,6 +310,7 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -613,6 +614,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1354,6 +1358,10 @@ class BrowserTabFragment :
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
+
+        if (omnibarRepository.omnibarType == OmnibarType.SPLIT) {
+            browserNavigationBarIntegration.navigationBarView.setEdgeToEdgeEnabled(edgeToEdge.isEnabled())
+        }
     }
 
     private fun configureEditModeChangeDetection() {

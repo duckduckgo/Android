@@ -25,9 +25,12 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -52,6 +55,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.google.android.material.appbar.AppBarLayout
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -183,6 +187,23 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun setEdgeToEdgeEnabled(enabled: Boolean) {
+        if (enabled) {
+            setupEdgeToEdge()
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        background = binding.root.background
+        ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
@@ -263,7 +284,10 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         ): Boolean {
             if (dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT) {
                 val dependencyOffset = abs(dependency.top)
-                val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
+                // OmnibarLayout (the only OmnibarView implementation) extends AppBarLayout.
+                val scrollRange = (dependency as AppBarLayout).totalScrollRange
+                    .coerceAtLeast(1) // totalScrollRange returns 0 before children are measured; guard against divide-by-zero
+                val offsetPercentage = dependencyOffset.toFloat() / scrollRange.toFloat()
                 val childHeight = child.measuredHeight
                 val childOffset = childHeight * offsetPercentage
                 child.translationY = childOffset

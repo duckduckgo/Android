@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@android:color/transparent"
-        app:layout_scrollFlags="scroll|enterAlways|snap">
+        app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed|snap">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
