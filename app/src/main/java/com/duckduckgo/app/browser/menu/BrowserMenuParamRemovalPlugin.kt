@@ -42,6 +42,11 @@ class BrowserMenuParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlu
             AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_DISPLAYED_ERROR.pixelName to PixelParameter.removeAtb(),
             AppPixelName.EXPERIMENTAL_MENU_DISMISSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SHEET_MENU_AICHAT.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SHEET_MENU_PASSWORDS.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SHEET_MENU_NEW_DUCK_ADDRESS.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SHEET_MENU_VPN.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.SHEET_MENU_SETTINGS.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

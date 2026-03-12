@@ -1711,6 +1711,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                pixel.fire(AppPixelName.SHEET_MENU_SETTINGS)
                 browserActivity?.launchSettings()
             }
             onMenuItemClicked(changeBrowserModeMenuItem) {
@@ -1728,6 +1729,7 @@ class BrowserTabFragment :
                 viewModel.onPinPageToHomeSelected()
             }
             onMenuItemClicked(createAliasMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_NEW_DUCK_ADDRESS)
                 viewModel.consumeAliasAndCopyToClipboard()
             }
             onMenuItemClicked(openInAppMenuItem) {
@@ -1739,6 +1741,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(autofillMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                pixel.fire(AppPixelName.SHEET_MENU_PASSWORDS)
                 viewModel.onAutofillMenuSelected()
             }
             onMenuItemClicked(openInDdgBrowserMenuItem) {
@@ -1748,12 +1751,15 @@ class BrowserTabFragment :
                 }
             }
             onMenuItemClicked(vpnMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_VPN)
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(newDuckChatTabMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(newDuckChatMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 activity?.currentFocus?.let {
                     it.hideKeyboard()
                     it.clearFocus()
