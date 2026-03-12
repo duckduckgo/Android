@@ -31,6 +31,8 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.LogPriority
 import logcat.logcat
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -60,10 +62,10 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val updates = JSONObject(changes.jsonString)
-        logcat { "Sync-Engine: patch data generated $updates" }
+        val body = changes.jsonString.toRequestBody("application/json".toMediaType())
+        logcat { "Sync-Engine: patch data generated $body" }
 
-        return when (val result = syncApi.patch(token, changes.type.endpoint, updates)) {
+        return when (val result = syncApi.patch(token, changes.type.endpoint, body)) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
                 result

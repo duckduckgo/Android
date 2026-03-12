@@ -153,6 +153,12 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
+    private fun getEmptyRequest() = SyncChangesRequest(
+        SyncableType.DUCK_AI_CHATS,
+        "",
+        ModifiedSince.FirstSync,
+    )
+
     private fun formatRequest(deletionTimestamp: String?): SyncDeletionRequest? {
         if (deletionTimestamp == null) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no need to inform sync of duck ai chat deletion, no timestamp available" }
@@ -191,12 +197,6 @@ class DuckChatSyncDataManager @Inject constructor(
             modifiedSince = ModifiedSince.FirstSync,
         )
     }
-
-    private fun getEmptyRequest() = SyncChangesRequest(
-        SyncableType.DUCK_AI_CHATS,
-        "",
-        ModifiedSince.FirstSync,
-    )
 
     private class Adapters {
         companion object {

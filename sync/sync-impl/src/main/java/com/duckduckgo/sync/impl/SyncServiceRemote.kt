@@ -97,7 +97,7 @@ interface SyncApi {
     fun patch(
         token: String,
         endpoint: String,
-        updates: JSONObject,
+        body: okhttp3.RequestBody,
     ): Result<JSONObject>
 
     /**
@@ -393,12 +393,12 @@ class SyncServiceRemote @Inject constructor(
     override fun patch(
         token: String,
         endpoint: String,
-        updates: JSONObject,
+        body: okhttp3.RequestBody,
     ): Result<JSONObject> {
         logcat(INFO) { "Sync-service: patch request" }
 
         val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", endpoint, updates)
+            val patchCall = syncService.patch("Bearer $token", endpoint, body)
             patchCall.execute()
         }.getOrElse { throwable ->
             logcat(INFO) { "Sync-service: patch error ${throwable.localizedMessage}" }
