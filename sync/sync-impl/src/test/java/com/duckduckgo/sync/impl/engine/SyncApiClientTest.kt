@@ -207,7 +207,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchDuckAiChatsAndApiSucceedsThenReturnSuccess() {
-        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val json = """{"ai_chats":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]}"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))
@@ -220,7 +220,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchDuckAiChatsAndApiFailsThenReturnErrorAndRecordError() {
-        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val json = """{"ai_chats":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]}"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any(), any())).thenReturn(patchAllError)
@@ -233,7 +233,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchDuckAiChatsUsesCorrectEndpoint() {
-        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val json = """{"ai_chats":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]}"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))

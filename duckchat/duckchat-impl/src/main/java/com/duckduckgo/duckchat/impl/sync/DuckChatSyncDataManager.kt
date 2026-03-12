@@ -185,9 +185,13 @@ class DuckChatSyncDataManager @Inject constructor(
             )
         }
 
+        val jsonObject = org.json.JSONObject().apply {
+            put(SyncableType.DUCK_AI_CHATS.field, jsonArray)
+        }
+
         return SyncChangesRequest(
             type = SyncableType.DUCK_AI_CHATS,
-            jsonString = jsonArray.toString(),
+            jsonString = jsonObject.toString(),
             modifiedSince = ModifiedSince.FirstSync,
         )
     }
