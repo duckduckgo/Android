@@ -18,15 +18,18 @@ package com.duckduckgo.app.global.install
 
 import android.content.Context
 import androidx.core.content.edit
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
+@RunWith(AndroidJUnit4::class)
 class AppInstallSharedPreferencesTest {
 
     @get:Rule
@@ -34,7 +37,7 @@ class AppInstallSharedPreferencesTest {
 
     private lateinit var testee: AppInstallSharedPreferences
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Before
     fun setup() {

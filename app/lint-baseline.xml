@@ -3602,8 +3602,8 @@
         errorLine1="        context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/global/install/AppInstallSharedPreferencesTest.kt"
-            line="34"
+            file="src/test/java/com/duckduckgo/app/global/install/AppInstallSharedPreferencesTest.kt"
+            line="44"
             column="9"/>
     </issue>
 
