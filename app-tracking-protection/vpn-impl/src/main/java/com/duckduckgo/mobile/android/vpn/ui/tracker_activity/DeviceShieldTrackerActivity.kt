@@ -27,7 +27,10 @@ import android.view.View
 import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,6 +56,7 @@ import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
@@ -117,6 +121,8 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var appTPStateMessagePluginPoint: ActivePluginPoint<AppTPStateMessagePlugin>
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var deviceShieldSwitch: DaxSwitch
@@ -153,6 +159,7 @@ class DeviceShieldTrackerActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         reportBreakage =
             registerForActivityResult(reportBreakageContract.get()) {
@@ -163,12 +170,24 @@ class DeviceShieldTrackerActivity :
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.trackersToolbar)
+        setupEdgeToEdge()
 
         bindViews()
         showDeviceShieldActivity()
         observeViewModel()
 
         deviceShieldPixels.didShowSummaryTrackerActivity()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.root.getChildAt(1)?.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun bindViews() {
