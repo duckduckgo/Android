@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':edge-to-edge-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
     implementation project(path: ':statistics-api')

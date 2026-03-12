@@ -30,8 +30,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.BundleCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -57,6 +61,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.ActivityBookmarksBinding
@@ -135,6 +140,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     @Inject
     lateinit var importFromGoogle: ImportFromGoogle
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private lateinit var bookmarksAdapter: BookmarksAdapter
     private lateinit var searchListener: BookmarksQueryListener
 
@@ -181,9 +189,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
         setContentView(binding.root)
         configureToolbar()
+        setupEdgeToEdge()
 
         setupBookmarksRecycler()
         observeViewModel()
@@ -192,6 +202,20 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         configureImportBookmarksDialog()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bookmarkRootView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.appBarLayoutSorting.updatePadding(top = insets.top)
+            binding.appBarLayout.updatePadding(top = insets.top)
+            contentBookmarksBinding.recycler.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun configureImportBookmarksDialog() {
@@ -462,7 +486,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
     private fun launchSyncSettings() {
         val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
-        syncActivityLauncher.launch(intent)
+        syncActivityLauncher.launch(intent!!)
     }
 
     private fun showFaviconsPrompt() {

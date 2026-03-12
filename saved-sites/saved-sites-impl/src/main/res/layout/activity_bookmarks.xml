@@ -29,6 +29,7 @@
         android:id="@+id/appBarLayoutSorting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/daxColorToolbar"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
@@ -143,6 +144,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/daxColorToolbar"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
