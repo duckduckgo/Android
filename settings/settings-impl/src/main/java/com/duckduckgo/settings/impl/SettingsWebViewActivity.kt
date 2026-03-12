@@ -21,6 +21,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.getActivityParams
@@ -61,6 +65,9 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var serpSettingsFeature: SerpSettingsFeature
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivitySettingsWebviewBinding by viewBinding()
 
     private val toolbar
@@ -69,6 +76,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         val params = intent.getActivityParams(SettingsWebViewScreenWithParams::class.java)
         val url = params?.url
@@ -76,6 +84,7 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
 
         lifecycleScope.launch {
             setupWebView()
@@ -126,6 +135,19 @@ class SettingsWebViewActivity : DuckDuckGoActivity() {
         viewModel.subscriptionEventDataFlow.onEach { subscriptionEventData ->
             contentScopeScripts.sendSubscriptionEvent(subscriptionEventData)
         }.launchIn(lifecycleScope)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.settingsWebView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun exit() {
