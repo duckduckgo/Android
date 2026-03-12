@@ -135,8 +135,11 @@ class SubscriptionMessagingInterface @Inject constructor(
 
     private fun isUrlAllowed(url: String?): Boolean {
         if (allowedDomains.isEmpty()) return true
-        val eTld = url?.toTldPlusOne() ?: return false
-        return (allowedDomains.contains(eTld))
+        val host = url ?: return false
+        val eTld = host.toTldPlusOne()
+        return allowedDomains.any { allowedDomain ->
+            allowedDomain == host || allowedDomain == eTld
+        }
     }
 
     inner class SubscriptionsHandler : JsMessageHandler {

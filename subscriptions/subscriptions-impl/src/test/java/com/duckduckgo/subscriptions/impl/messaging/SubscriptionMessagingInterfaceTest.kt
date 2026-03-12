@@ -610,6 +610,31 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and feature selected message on custom duck ai host then callback called`() = runTest {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        val customMessagingInterface = SubscriptionMessagingInterface(
+            subscriptionsManager,
+            jsMessageHelper,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+            pixelSender,
+            subscriptionsChecker,
+            mockDuckAiHostProvider,
+            privacyProFeature,
+        )
+        customMessagingInterface.register(webView, callback)
+        whenever(webView.url).thenReturn("https://staging.duck.ai/test")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"featureSelected","params":{}}
+        """.trimIndent()
+
+        customMessagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
     fun `when process and back to settings activate success if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
