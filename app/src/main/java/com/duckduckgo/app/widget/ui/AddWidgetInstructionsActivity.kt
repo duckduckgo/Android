@@ -19,6 +19,10 @@ package com.duckduckgo.app.widget.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAddWidgetInstructionsBinding
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
@@ -26,9 +30,14 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowH
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ActivityAddWidgetInstructionsBinding by viewBinding()
 
@@ -39,9 +48,23 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
         configureListeners()
         configureCommandObserver()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(top = insets.top, bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun configureListeners() {
