@@ -19,6 +19,9 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
@@ -56,6 +60,9 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: RestoreSubscriptionViewModel by bindViewModel()
     private val binding: ActivityRestoreSubscriptionBinding by viewBinding()
 
@@ -65,12 +72,14 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         val params = intent.getActivityParams(RestoreSubscriptionScreenWithParams::class.java)
         isOriginWeb = params?.isOriginWeb ?: true
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
 
         viewModel.init()
 
@@ -95,6 +104,17 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+    }
+
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
             viewModel.onSubscriptionRestoredFromEmail()
@@ -108,7 +128,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
                 url = subscriptionsUrlProvider.activateUrl,
             ),
         )
-        startForResultRestore.launch(intent)
+        startForResultRestore.launch(intent!!)
     }
 
     private fun onPurchaseRestored() {
