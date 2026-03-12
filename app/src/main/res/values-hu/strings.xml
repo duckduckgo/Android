@@ -869,6 +869,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Tudtad?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>

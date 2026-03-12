@@ -869,6 +869,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Пробвайте безплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли, че?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>

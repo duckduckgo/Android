@@ -869,6 +869,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wist je dat?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>

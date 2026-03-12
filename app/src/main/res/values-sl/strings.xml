@@ -907,6 +907,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Poskusite brezplačno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Ste vedeli?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želite preprost dostop do zasebnega klepeta z umetno inteligenco?</string>

@@ -869,6 +869,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Το γνωρίζατε;</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Θέλετε εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>

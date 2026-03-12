@@ -869,6 +869,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Biliyor muydunuz?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
