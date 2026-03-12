@@ -51,6 +51,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
     implementation project(':data-store-api')
+    implementation project(':edge-to-edge-api')
 
     implementation Square.moshi
     implementation Square.okHttp3.okHttp
