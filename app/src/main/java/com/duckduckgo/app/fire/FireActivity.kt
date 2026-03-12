@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.common.ui.view.fadeTransitionConfig
 import com.duckduckgo.common.ui.view.noAnimationConfig
 import com.duckduckgo.di.scopes.ActivityScope
-
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
  *
