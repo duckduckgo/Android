@@ -48,6 +48,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.core.ktx
 
