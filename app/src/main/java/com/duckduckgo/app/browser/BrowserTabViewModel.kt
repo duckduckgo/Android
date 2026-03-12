@@ -846,8 +846,14 @@ class BrowserTabViewModel @Inject constructor(
                 val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
                 val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
                 if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
-                    // whenever an event fires, so the user switched to a new tab page, launch the input screen
-                    command.value = LaunchInputScreen
+                    viewModelScope.launch {
+                        // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                        // unless an onboarding promo message is displayed
+                        val hasPendingOnboardingPromo = ctaViewModel.isPromoOnboardingDialogShowing()
+                        if (!hasPendingOnboardingPromo) {
+                            command.value = LaunchInputScreen
+                        }
+                    }
                 }
             }.launchIn(viewModelScope)
 
@@ -3216,7 +3222,10 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
-                is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
+                is DaxBubbleCta -> {
+                    onDaxBubbleCtaOkButtonClicked(cta)
+                    null
+                }
                 is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
                 else -> null
             }
@@ -4513,23 +4522,23 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta): Command? {
+    private fun onDaxBubbleCtaOkButtonClicked(cta: DaxBubbleCta) {
         onUserDismissedCta(cta)
-        return when (cta) {
+        when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> {
-                LaunchPrivacyPro("https://duckduckgo.com/pro?origin=funnel_onboarding_android".toUri())
+                viewModelScope.launch {
+                    val origin = ctaViewModel.getPrivacyProOnboardingOrigin()
+                    command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
+                }
             }
-
             is DaxBubbleCta.DaxEndCta -> {
                 viewModelScope.launch {
                     val updatedCta = refreshCta()
                     ctaViewState.value = currentCtaViewState().copy(cta = updatedCta)
                     showOrHideKeyboard(updatedCta)
                 }
-                null
             }
-
-            else -> null
+            else -> { }
         }
     }
 

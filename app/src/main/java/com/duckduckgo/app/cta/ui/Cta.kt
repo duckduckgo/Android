@@ -810,21 +810,33 @@ sealed class DaxBubbleCta(
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val titleRes: Int,
-        val descriptionRes: Int,
-        val primaryCtaRes: Int,
+        val onboardingSkipped: Boolean,
+        val isFreeTrialCopy: Boolean,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
-        title = titleRes,
-        description = descriptionRes,
+        title = if (onboardingSkipped) R.string.onboardingSkippedPrivacyProDaxDialogTitle else R.string.onboardingPrivacyProDaxDialogTitle,
+        description = R.string.onboardingPrivacyProDaxDialogDescription,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
-        primaryCta = primaryCtaRes,
+        primaryCta = if (isFreeTrialCopy) R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton else R.string.onboardingPrivacyProDaxDialogOkButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+        override val markAsReadOnShow: Boolean = false
+
+        private fun subscriptionOnboardingPixelParams(): Map<String, String> = mapOf(
+            Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam,
+            Pixel.PixelParameter.RU to onboardingSkipped.toString(),
+            Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
+        )
+
+        override fun pixelShownParameters(): Map<String, String> =
+            subscriptionOnboardingPixelParams() + (Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
+
+        override fun pixelOkParameters(): Map<String, String> = subscriptionOnboardingPixelParams()
+    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
