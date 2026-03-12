@@ -30,6 +30,7 @@
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_4"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

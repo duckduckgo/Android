@@ -18,6 +18,9 @@ package com.duckduckgo.site.permissions.impl.ui
 
 import android.os.Bundle
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionsViewModel.Command
@@ -46,6 +50,9 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivitySitePermissionsBinding by viewBinding()
     private lateinit var adapter: SitePermissionsAdapter
@@ -55,11 +62,24 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         setupRecyclerView()
         observeViewModel()
         viewModel.allowedSites()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recycler) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
