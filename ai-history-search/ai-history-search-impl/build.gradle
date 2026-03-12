@@ -57,6 +57,23 @@ android {
     anvil {
         generateDaggerFactories = true
     }
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                abiFilters "arm64-v8a"
+                arguments "-DLLAMA_BUILD_TESTS=OFF",
+                          "-DLLAMA_BUILD_EXAMPLES=OFF",
+                          "-DLLAMA_BUILD_SERVER=OFF"
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }

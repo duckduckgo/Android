@@ -4,3 +4,6 @@
 [submodule "submodules/privacy-grade"]
 	path = submodules/privacy-grade
 	url = https://github.com/duckduckgo/privacy-grade
+[submodule "ai-history-search/llama.cpp"]
+	path = ai-history-search/llama.cpp
+	url = https://github.com/ggml-org/llama.cpp.git
