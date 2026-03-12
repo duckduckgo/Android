@@ -158,7 +158,7 @@ class RealSyncEngine @Inject constructor(
                     logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
                     patchLocalChanges(changes, TIMESTAMP)
                 }
-        }
+            }
     }
 
     private fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
@@ -252,7 +252,7 @@ class RealSyncEngine @Inject constructor(
             }.getOrElse { error ->
                 syncOperationErrorRecorder.record(
                     manager.getDeletableType().field,
-                    DATA_PROVIDER_ERROR
+                    DATA_PROVIDER_ERROR,
                 )
                 null
             }

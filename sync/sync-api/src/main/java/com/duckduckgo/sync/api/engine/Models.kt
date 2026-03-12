@@ -80,7 +80,6 @@ data class SyncDeletionResponse(
     val untilTimestamp: String? = null,
 )
 
-
 data class SyncErrorResponse(
     val type: SyncFeatureType,
     val featureSyncError: FeatureSyncError,
@@ -108,7 +107,7 @@ interface SyncFeatureType {
 enum class SyncableType(
     override val field: String,
     val endpoint: String = "data",
-    val supportsGet: Boolean = true
+    val supportsGet: Boolean = true,
 ) : SyncFeatureType {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),

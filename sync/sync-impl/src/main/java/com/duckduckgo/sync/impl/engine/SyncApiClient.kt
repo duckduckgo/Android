@@ -72,12 +72,8 @@ class AppSyncApiClient @Inject constructor(
             }
 
             is Result.Success -> {
-                if (result.data == null) {
-                    Result.Success(SyncChangesResponse.empty(changes.type))
-                } else {
-                    val remoteChanges = mapResponse(changes.type, result.data)
-                    Result.Success(remoteChanges)
-                }
+                val remoteChanges = mapResponse(changes.type, result.data)
+                Result.Success(remoteChanges)
             }
         }
     }
@@ -102,7 +98,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
-            SyncableType.DUCK_AI_CHATS -> Result.Success(JSONObject())
+            SyncableType.DUCK_AI_CHATS -> throw NotImplementedError()
         }
 
         return when (result) {

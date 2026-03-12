@@ -124,7 +124,7 @@ class DuckChatSyncDataManager @Inject constructor(
 
     override fun onSuccess(
         changes: SyncChangesResponse,
-        conflictResolution: SyncableDataPersister.SyncConflictResolution
+        conflictResolution: SyncableDataPersister.SyncConflictResolution,
     ): SyncMergeResult {
         if (changes.jsonString.isNotEmpty()) {
             val response = runCatching {
