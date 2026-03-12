@@ -1,0 +1,29 @@
+# Contributions
+
+## Branch Naming
+
+```
+<purpose>/<git-username>/<feature-name>
+```
+
+- **purpose**: `feature`, `fix`, `refactor`, `chore`, `poc`, etc.
+- **name**: the author's name or alias
+- **feature-name**: kebab-case description
+
+Examples: `feature/jsmith/duck-ai-url-routing`, `fix/jsmith/bookmark-crash`
+
+## Commit Messages
+
+Use the imperative mood in the subject line (e.g. "Add feature X", not "Added feature X"). Keep the subject under 72 characters. Add a blank line before the body if more context is needed. Reference the Asana task URL in the body.
+
+## PR body
+
+PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
+
+**Task/Issue URL** — Link to the Asana task for this change.
+
+**Description** — A short summary of what changed and why.
+
+**Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
+
+**UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
