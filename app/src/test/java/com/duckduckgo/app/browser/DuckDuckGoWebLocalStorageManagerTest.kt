@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import com.duckduckgo.app.browser.weblocalstorage.Domains
 import com.duckduckgo.app.browser.weblocalstorage.DuckDuckGoWebLocalStorageManager
 import com.duckduckgo.app.browser.weblocalstorage.MatchingRegex
-import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonParser
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -68,8 +67,10 @@ class DuckDuckGoWebLocalStorageManagerTest {
                 "^METAACCESS:https://([a-zA-Z0-9.-]+\\.)?{domain}$",
             ),
         )
-        val keysToDelete = com.duckduckgo.app.browser.weblocalstorage.KeysToDelete(list = listOf("chat-history", "ai-conversations"))
-        val webLocalStorageSettings = WebLocalStorageSettings(domains = domains, keysToDelete = keysToDelete, matchingRegex = matchingRegex)
+        val webLocalStorageSettings = com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettings(
+            domains = domains,
+            matchingRegex = matchingRegex,
+        )
         whenever(mockWebLocalStorageSettingsJsonParser.parseJson("settings")).thenReturn(webLocalStorageSettings)
 
         testee = DuckDuckGoWebLocalStorageManager(
