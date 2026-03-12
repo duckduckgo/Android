@@ -31,6 +31,7 @@ import android.view.View
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -420,10 +421,23 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             when (onboardingDialogType) {
                 INITIAL, INITIAL_REINSTALL_USER -> {
                     val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
+                    val showWalkingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = binding.welcomeScreenWalkingDax,
+                    )
+                    if (!showWalkingDax) {
+                        binding.welcomeScreenWalkingDax.isVisible = false
+                        (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
                     playOutroAnimation(
                         nextStep = OnboardingBackgroundStep.Welcome,
                         onAnimationStart = {
-                            playWalkingDaxAnimation()
+                            if (showWalkingDax) playWalkingDaxAnimation()
                         },
                         onAnimationEnd = {
                             fadeInDialog {
