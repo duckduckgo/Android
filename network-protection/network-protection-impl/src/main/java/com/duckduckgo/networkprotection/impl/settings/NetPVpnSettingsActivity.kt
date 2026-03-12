@@ -21,6 +21,10 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +40,7 @@ import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
@@ -63,13 +68,18 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var vpnRemoteSettings: PluginPoint<VpnSettingPlugin>
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityNetpVpnSettingsBinding by viewBinding()
     private val viewModel: NetPVpnSettingsViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        setupEdgeToEdge()
 
         setupUiElements()
         setupRemoteSettings()
@@ -81,6 +91,21 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.removeObserver(viewModel)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            // Apply top padding to AppBar
+            binding.appBar.updatePadding(top = insets.top)
+            // Apply bottom padding to ScrollView content
+            binding.vpnSettingsContent.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun observeViewModel() {
