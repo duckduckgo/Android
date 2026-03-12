@@ -23,6 +23,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -51,6 +53,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreen
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsPageFeature
@@ -111,17 +114,32 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
 
         observeViewModel()
 
         pixel.fire(DUCK_CHAT_SETTINGS_DISPLAYED)
         inputScreenDiscoveryFunnel.onDuckAiSettingsSeen()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
