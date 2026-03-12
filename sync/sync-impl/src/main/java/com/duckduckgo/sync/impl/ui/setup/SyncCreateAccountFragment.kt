@@ -19,6 +19,10 @@ package com.duckduckgo.sync.impl.ui.setup
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +35,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
@@ -52,6 +57,9 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: FragmentCreateAccountBinding by viewBinding()
 
     private val viewModel: SyncCreateAccountViewModel by lazy {
@@ -66,7 +74,32 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setupEdgeToEdgeInsets()
         observeUiEvents()
+    }
+
+    private fun setupEdgeToEdgeInsets() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            windowInsets
+        }
+
+        val containerMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = containerMargin + insets.bottom
+            }
+            windowInsets
+        }
     }
 
     private fun observeUiEvents() {
