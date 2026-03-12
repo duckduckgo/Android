@@ -22,6 +22,9 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +38,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.quietlySetValue
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.flow.launchIn
@@ -43,11 +47,15 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.text.NumberFormat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "accessibility")
 @ContributeToActivityStarter(HighlightedItem::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
     private val viewModel: AccessibilitySettingsViewModel by bindViewModel()
@@ -73,10 +81,23 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         observeViewModel()
         scrollToHighlightedItem()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun scrollToHighlightedItem() {
