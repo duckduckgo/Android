@@ -494,14 +494,14 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportBrokerCustomStateOptOutSubmitRateThenFiresPixelWithParameters() = runTest {
+    fun whenReportBrokerCustomStateOptOutSubmitRateThenEnqueuesPixelWithParameters() = runTest {
         testee.reportBrokerCustomStateOptOutSubmitRate(
             brokerUrl = "https://broker.com",
             optOutSuccessRate = 0.75,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -514,11 +514,11 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportBrokerOptOutConfirmed7DaysThenFiresPixelWithBrokerUrl() = runTest {
+    fun whenReportBrokerOptOutConfirmed7DaysThenEnqueuesPixelWithBrokerUrl() = runTest {
         testee.reportBrokerOptOutConfirmed7Days("https://broker.com")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -529,11 +529,11 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportBrokerOptOutUnconfirmed7DaysThenFiresPixelWithBrokerUrl() = runTest {
+    fun whenReportBrokerOptOutUnconfirmed7DaysThenEnqueuesPixelWithBrokerUrl() = runTest {
         testee.reportBrokerOptOutUnconfirmed7Days("https://broker.com")
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -544,11 +544,11 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportDAUThenFiresCorrectPixel() = runTest {
+    fun whenReportDAUThenEnqueuesCorrectPixel() = runTest {
         testee.reportDAU()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -559,11 +559,11 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportWAUThenFiresCorrectPixel() = runTest {
+    fun whenReportWAUThenEnqueuesCorrectPixel() = runTest {
         testee.reportWAU()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -574,11 +574,11 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportMAUThenFiresCorrectPixel() = runTest {
+    fun whenReportMAUThenEnqueuesCorrectPixel() = runTest {
         testee.reportMAU()
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
@@ -589,7 +589,7 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportWeeklyChildOrphanedOptOutsThenFiresPixelWithAllParameters() = runTest {
+    fun whenReportWeeklyChildOrphanedOptOutsThenEnqueuesPixelWithAllParameters() = runTest {
         testee.reportWeeklyChildOrphanedOptOuts(
             brokerUrl = "https://child-broker.com",
             childParentRecordDifference = 5,
@@ -597,7 +597,7 @@ class RealPirPixelSenderTest {
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixelSender).fire(
+        verify(mockPixelSender).enqueueFire(
             pixelName = any(),
             parameters = paramsCaptor.capture(),
             encodedParameters = any(),
