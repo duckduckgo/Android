@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -50,8 +51,12 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(R.layout.activity_input_screen)
         inputScreenDiscoveryFunnel.onInputScreenOpened()
         val params =
