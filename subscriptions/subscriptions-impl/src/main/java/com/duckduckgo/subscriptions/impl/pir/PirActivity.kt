@@ -17,12 +17,16 @@
 package com.duckduckgo.subscriptions.impl.pir
 
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
@@ -41,6 +45,9 @@ class PirActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityPirBinding by viewBinding()
 
     private val toolbar
@@ -48,8 +55,10 @@ class PirActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupInternalToolbar()
+        setupEdgeToEdge()
         setupListeners()
         if (appTheme.isLightModeEnabled()) {
             binding.container.setBackgroundResource(R.drawable.gradient_light)
@@ -65,6 +74,17 @@ class PirActivity : DuckDuckGoActivity() {
 
         binding.windowsButton.setOnClickListener {
             globalActivityStarter.start(this, WindowsScreenWithEmptyParams)
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
