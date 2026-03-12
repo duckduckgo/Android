@@ -61,11 +61,9 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
             val fireproofedDomains = fireproofWebsiteRepository.fireproofWebsitesSync().map { it.domain }
 
             val domains = webLocalStorageSettings.domains.list + fireproofedDomains
-            val keysToDelete = webLocalStorageSettings.keysToDelete.list
             val matchingRegex = webLocalStorageSettings.matchingRegex.list
 
             logcat { "WebLocalStorageManager: Allowed domains: $domains" }
-            logcat { "WebLocalStorageManager: Keys to delete: $keysToDelete" }
             logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
             val db = databaseProvider.get()
