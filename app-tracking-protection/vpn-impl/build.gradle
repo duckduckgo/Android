@@ -67,6 +67,7 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':new-tab-page-api')
     implementation project(':subscriptions-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.core.ktx
 

@@ -25,6 +25,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +42,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
@@ -89,6 +93,8 @@ class TrackingProtectionExclusionListActivity :
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -101,6 +107,7 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -110,6 +117,7 @@ class TrackingProtectionExclusionListActivity :
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         setupRecycler()
 
         bindViews()
@@ -125,6 +133,17 @@ class TrackingProtectionExclusionListActivity :
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.removeObserver(viewModel)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.excludedAppsRecycler) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
