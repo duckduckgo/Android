@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(":new-tab-page-api")
+    implementation project(':edge-to-edge-api')
     implementation project(':browser-api')
     implementation project(':common-utils')
     implementation project(':saved-sites-api')
