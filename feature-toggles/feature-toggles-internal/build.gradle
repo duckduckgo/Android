@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 	implementation project(":feature-toggles-api")
 	implementation project(":feature-toggles-impl")
+    implementation project(':edge-to-edge-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')

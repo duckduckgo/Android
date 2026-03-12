@@ -19,7 +19,10 @@ package com.duckduckgo.examplefeature.internal.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -34,6 +37,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -68,6 +72,9 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var moshi: Moshi
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val featureNameFilter = MutableStateFlow("")
     private val allToggles = MutableStateFlow<List<Toggle>?>(null)
 
@@ -92,8 +99,10 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         setupRecyclerView()
         binding.searchName.addTextChangedListener(searchTextWatcher)
 
@@ -102,6 +111,17 @@ class FeatureToggleInventoryActivity : DuckDuckGoActivity() {
                 launch { loadToggles() }
                 launch { observeFilteredToggles() }
             }
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recyclerView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
