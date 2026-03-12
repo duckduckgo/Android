@@ -21,7 +21,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +34,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -58,6 +63,9 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: PirRepository
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private lateinit var optOutAdapter: ArrayAdapter<String>
     private lateinit var dropDownAdapter: ArrayAdapter<String>
     private val binding: ActivityPirInternalOptoutBinding by viewBinding()
@@ -66,10 +74,24 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        setupEdgeToEdge()
         setupViews()
         bindViews()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.appBar.updatePadding(top = insets.top)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun setupViews() {
