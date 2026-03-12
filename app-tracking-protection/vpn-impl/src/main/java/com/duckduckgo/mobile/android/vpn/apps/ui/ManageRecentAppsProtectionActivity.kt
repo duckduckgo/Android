@@ -21,6 +21,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +39,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -76,6 +80,8 @@ class ManageRecentAppsProtectionActivity :
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -88,6 +94,7 @@ class ManageRecentAppsProtectionActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -97,6 +104,7 @@ class ManageRecentAppsProtectionActivity :
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         setupRecycler()
 
         bindViews()
@@ -108,6 +116,17 @@ class ManageRecentAppsProtectionActivity :
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.removeObserver(viewModel)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     @SuppressLint("InlinedApi") // lint doesn't detect appBuildConfig
