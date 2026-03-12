@@ -19,6 +19,9 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.CompoundButton
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +32,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpGeoswitchingBinding
@@ -38,6 +42,7 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoSwitch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetpGeoswitchingScreenNoParams::class)
@@ -46,12 +51,29 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     private val viewModel: NetpGeoSwitchingViewModel by bindViewModel()
     private var lastSelectedButton: CompoundButton? = null
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         observeViewModel()
         lifecycle.addObserver(viewModel)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            // Apply bottom padding to the NestedScrollView's RadioGroup content
+            binding.geoswitchingList.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     override fun onDestroy() {
