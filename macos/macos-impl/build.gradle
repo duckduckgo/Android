@@ -38,6 +38,7 @@ dependencies {
     implementation project(path: ':statistics-api')
     implementation project(path: ':windows-api')
     implementation project(path: ':navigation-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.appCompat
     implementation Google.android.material

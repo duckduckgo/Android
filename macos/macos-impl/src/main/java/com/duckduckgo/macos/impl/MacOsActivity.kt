@@ -21,6 +21,9 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +32,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos.impl.MacOsViewModel.Command
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
@@ -53,18 +57,33 @@ class MacOsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         configureUiEventHandlers()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun configureUiEventHandlers() {
