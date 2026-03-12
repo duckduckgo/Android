@@ -21,7 +21,10 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -29,6 +32,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 import com.duckduckgo.networkprotection.internal.network.NetPInternalExclusionListProvider
@@ -48,13 +52,18 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
     @Inject
     lateinit var networkProtectionState: NetworkProtectionState
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private var initialExclusionList: Int? = null
 
     private val binding: ActivityNetpInternalSystemAppsExclusionBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
 
         binding.progress.isVisible = true
 
@@ -80,6 +89,18 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
             }
             .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(top = insets.top, bottom = insets.bottom)
+            binding.scrollView.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     override fun onResume() {
