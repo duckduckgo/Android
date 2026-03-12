@@ -23,6 +23,9 @@ import android.view.Menu
 import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +45,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
@@ -93,6 +97,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @AppTpBreakageCategories
     lateinit var breakageCategories: List<AppBreakageCategory>
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
 
@@ -110,6 +116,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
             if (!it.isEmpty()) {
@@ -118,6 +125,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         }
 
         setContentView(binding.root)
+        setupEdgeToEdge()
         with(binding.includeToolbar) {
             setupToolbar(defaultToolbar)
             appName.text = getAppName()
@@ -141,6 +149,17 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.activityRecyclerView.adapter = itemsAdapter
 
         pixels.didOpenCompanyTrackersScreen()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.root.getChildAt(1)?.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
