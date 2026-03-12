@@ -51,10 +51,6 @@
                 "reason": "Example rule incorrectly missing domains property"
               },
               {
-                "rule": "request-blocklist.example/missing-reason",
-                "domains": ["<all>"]
-              },
-              {
                 "rule": "request-blocklist.example/extra-prop",
                 "domains": ["<all>"],
                 "unknown": "value",
