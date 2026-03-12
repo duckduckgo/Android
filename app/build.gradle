@@ -229,18 +229,17 @@ def privacyTestDefaults = { config ->
     config.localResultsDir.set("fladleResults")
     config.flakyTestAttempts.set(2)
     config.testShards.set(1)
+    config.flankVersion.set("21.+")
 }
 
 fladle {
     configs {
         privacyTests {
             privacyTestDefaults(it)
-            flankVersion.set("21.+")
             testTargets.set(["annotation com.duckduckgo.espresso.PrivacyTest"])
         }
         internalPrivacyTests {
             privacyTestDefaults(it)
-            flankVersion.set("21.+")
             testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
             debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
             instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/duckduckgo-${buildVersionName()}-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
