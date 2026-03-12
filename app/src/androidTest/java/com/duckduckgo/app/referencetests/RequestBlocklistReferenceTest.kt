@@ -128,6 +128,8 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
     private val mockDuckPlayer: DuckPlayer = mock()
     private val requestBlocklistFeature: RequestBlocklistFeature = FakeFeatureToggleFactory.create(RequestBlocklistFeature::class.java)
     private val fakeUserAgent: UserAgent = UserAgentFake()
+
+    @Suppress("DEPRECATION")
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
