@@ -19,16 +19,6 @@ on:
         description: 'Display name for this test suite (used in Asana failure task)'
         required: true
         type: string
-      release_blocker:
-        description: 'Whether a failure should be added as a release blocker in Asana'
-        required: false
-        type: boolean
-        default: false
-      binary_id:
-        description: 'Pre-uploaded Maestro binary ID. When provided, APK assembly is skipped.'
-        required: false
-        type: string
-        default: ''
       app_flavour:
         description: 'App flavour to build when no binary_id is given (play or internal)'
         required: false
@@ -49,16 +39,6 @@ on:
         description: 'Display name for this test suite (used in Asana failure task)'
         required: true
         type: string
-      release_blocker:
-        description: 'Whether a failure should be added as a release blocker in Asana'
-        required: false
-        type: boolean
-        default: false
-      binary_id:
-        description: 'Pre-uploaded Maestro binary ID. When provided, APK assembly is skipped.'
-        required: false
-        type: string
-        default: ''
       app_flavour:
         description: 'App flavour to build when no binary_id is given (play or internal)'
         required: false
@@ -87,7 +67,6 @@ jobs:
 
       - name: Assemble APKs
         id: assemble
-        if: ${{ inputs.binary_id == '' }}
         uses: ./.github/actions/checkout-and-assemble
         with:
           flavours: ${{ inputs.app_flavour }}
@@ -105,12 +84,12 @@ jobs:
           maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           maestro_test_name: ${{ inputs.test_name }}_${{ github.sha }}
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          maestro_app_binary_id: ${{ inputs.binary_id }}
           maestro_app_file: ${{ inputs.app_flavour == 'internal' && steps.assemble.outputs.internal_apk_path || steps.assemble.outputs.play_apk_path }}
           maestro_api_level: ${{ inputs.maestro_api_level }}
           maestro_include_tags: ${{ inputs.tags }}
           test_suite_name: ${{ inputs.test_name }}
-          is_release_blocker: ${{ inputs.release_blocker }}
+          is_release_blocker: false
+          create_asana_error_task: false
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
