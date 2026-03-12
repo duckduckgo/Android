@@ -23,10 +23,15 @@ import com.duckduckgo.app.browser.databinding.ActivityEmailUnsupportedBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(EmailProtectionUnsupportedScreenNoParams::class)
 class EmailProtectionUnsupportedActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ActivityEmailUnsupportedBinding by viewBinding()
 
@@ -35,7 +40,7 @@ class EmailProtectionUnsupportedActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
     }
