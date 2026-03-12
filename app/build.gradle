@@ -244,6 +244,7 @@ fladle {
             testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
             debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
             instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/app-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
+            additionalTestApks.set([])
         }
     }
 }
