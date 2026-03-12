@@ -129,7 +129,7 @@ class RealEventHubPixelManager @Inject constructor(
             val nowMillis = timeProvider.currentTimeMillis()
 
             for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis > pixelState.periodEndMillis) continue
+                if (nowMillis >= pixelState.periodEndMillis) continue
 
                 val updatedParams = pixelState.params.toMutableMap()
                 var changed = false
@@ -138,15 +138,17 @@ class RealEventHubPixelManager @Inject constructor(
                     if (paramConfig.isCounter && paramConfig.source == eventType) {
                         val paramState = updatedParams[paramName] ?: ParamState(0)
                         if (paramState.stopCounting) continue
-                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
 
-                        changed = true
                         if (BucketCounter.shouldStopCounting(paramState.value, paramConfig.buckets)) {
+                            changed = true
                             updatedParams[paramName] = paramState.copy(stopCounting = true)
                             logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName already at max bucket, stopCounting" }
                             continue
                         }
 
+                        if (isDuplicateEvent(pixelState.pixelName, paramName, eventType, webViewId)) continue
+
+                        changed = true
                         val newValue = paramState.value + 1
                         updatedParams[paramName] = paramState.copy(value = newValue)
                         logcat(VERBOSE) { "EventHub: ${pixelState.pixelName}.$paramName incremented to $newValue" }
