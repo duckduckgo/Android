@@ -9010,17 +9010,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.bool.show_wing_animation` appears to be unused"
-        errorLine1="    &lt;bool name=&quot;show_wing_animation&quot;>false&lt;/bool>"
-        errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="23"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.trackersOverviewEmpty` appears to be unused"
         errorLine1="    &lt;string name=&quot;trackersOverviewEmpty&quot;>No tracking requests were blocked from loading on this page. If a company\&apos;s requests are loaded, it can allow them to profile you.&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
