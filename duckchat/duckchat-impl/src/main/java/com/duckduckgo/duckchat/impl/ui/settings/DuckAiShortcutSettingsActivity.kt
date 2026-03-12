@@ -18,7 +18,10 @@ package com.duckduckgo.duckchat.impl.ui.settings
 
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,11 +31,15 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckAiShortcutSettingsBinding
 import com.duckduckgo.duckchat.impl.ui.settings.DuckAiShortcutSettingsViewModel.ViewState
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: DuckAiShortcutSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckAiShortcutSettingsBinding by viewBinding()
@@ -54,12 +61,24 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
 
         observeViewModel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
