@@ -22,6 +22,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -40,8 +43,10 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(FeedbackActivityWithEmptyParams::class, screenName = "feedback")
@@ -54,6 +59,9 @@ class FeedbackActivity :
     BrokenSiteNegativeFeedbackFragment.BrokenSiteFeedbackListener,
     SubReasonNegativeFeedbackFragment.DisambiguationNegativeFeedbackListener {
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: FeedbackViewModel by bindViewModel()
 
     private val binding: ActivityFragmentWithToolbarBinding by viewBinding()
@@ -63,8 +71,10 @@ class FeedbackActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         configureObservers()
         onBackPressedDispatcher.addCallback(
             this,
@@ -74,6 +84,17 @@ class FeedbackActivity :
                 }
             },
         )
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun configureObservers() {
