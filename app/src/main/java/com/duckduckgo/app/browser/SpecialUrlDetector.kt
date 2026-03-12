@@ -28,6 +28,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.app.browser.applinks.HandleNonHttpAppLinksFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -53,6 +54,7 @@ class SpecialUrlDetectorImpl(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val handleNonHttpAppLinksFeature: HandleNonHttpAppLinksFeature,
 ) : SpecialUrlDetector {
 
     override fun determineType(
@@ -211,7 +213,7 @@ class SpecialUrlDetectorImpl(
                 ) {
                     // If the intent has a fallback URL, still return NonHttpAppLink so the caller can use the fallback
                     val fallbackUrl = intent?.getStringExtra(EXTRA_FALLBACK_URL)
-                    if (intent != null && fallbackUrl != null) {
+                    if (intent != null && fallbackUrl != null && handleNonHttpAppLinksFeature.self().isEnabled()) {
                         if (externalAppIntentFlagsFeature.self().isEnabled()) {
                             intent.addCategory(Intent.CATEGORY_BROWSABLE)
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)

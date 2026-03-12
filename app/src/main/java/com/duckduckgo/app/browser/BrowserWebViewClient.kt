@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
+import com.duckduckgo.app.browser.applinks.HandleNonHttpAppLinksFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -131,6 +132,7 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
+    private val handleNonHttpAppLinksFeature: HandleNonHttpAppLinksFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -528,6 +530,9 @@ class BrowserWebViewClient @Inject constructor(
      * @return true if the URL was handled and loading should stop, false otherwise
      */
     private fun handleNonHttpUrlIfNeeded(webView: WebView?, url: String): Boolean {
+        if (!handleNonHttpAppLinksFeature.self().isEnabled()) {
+            return false
+        }
         logcat { "handleNonHttpUrlIfNeeded: called with url=$url" }
         if (webView == null) {
             return false
