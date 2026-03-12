@@ -200,9 +200,14 @@ class DuckChatSyncDataManagerTest {
 
     @Test
     fun whenOnPatchSuccessThenRemovesOnlySentIds() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("chat1", "chat2"))
+
+        testee.getChanges()
+
         val response = SyncChangesResponse(
             type = SyncableType.DUCK_AI_CHATS,
-            jsonString = """{"type":"DUCK_AI_CHATS","entryIds":["chat1","chat2"]}""",
+            jsonString = "",
         )
 
         testee.onSuccess(response, SyncConflictResolution.DEDUPLICATION)
