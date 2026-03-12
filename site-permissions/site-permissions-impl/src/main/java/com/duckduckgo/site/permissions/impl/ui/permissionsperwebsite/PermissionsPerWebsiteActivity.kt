@@ -21,6 +21,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +33,7 @@ import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.site.permissions.impl.R
 import com.duckduckgo.site.permissions.impl.databinding.ActivityPermissionPerWebsiteBinding
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
@@ -42,6 +46,7 @@ import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePerm
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
@@ -51,13 +56,18 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     private val adapter: PermissionSettingAdapter by lazy { PermissionSettingAdapter(viewModel) }
     private val url: String by lazy { intent.getStringExtra(EXTRA_URL) ?: "" }
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setViews()
+        setupEdgeToEdge()
         observeViewModel()
         viewModel.websitePermissionSettings(url)
     }
@@ -85,6 +95,17 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
             url.websiteFromGeoLocationsApiOrigin(),
         )
         binding.permissionsPerWebsiteRecyclerView.adapter = adapter
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.permissionsPerWebsiteRecyclerView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
