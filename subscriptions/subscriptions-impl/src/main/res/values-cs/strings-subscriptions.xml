@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tvoje předplatné bylo zakoupeno prostřednictvím obchodu Apple App Store. Pokud chceš změnit tarif nebo nastavení fakturace, na zařízení, které je přihlášené ke stejnému účtu Apple, jaké jsi použil(a) k pořízení předplatného, přejdi do Nastavení &gt; Účet Apple &gt; Předplatná.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivuj si na počítači službu Privacy Pro a nastav si v ní funkci Personal Information Removal</string>
-    <string name="pirDescription">Začneš tak, že v prohlížeči DuckDuckGo pro počítače přejdeš do <b>Nastavení &gt; Privacy Pro</b> a klikneš na <b>Mám předplatné</b>.</string>
+    <string name="pirTitle">Aktivuj si na počítači předplatné DuckDuckGo a nastav si v něm funkci Personal Information Removal</string>
+    <string name="pirDescription">Začneš tak, že v prohlížeči DuckDuckGo pro počítače přejdeš do <b>Nastavení &gt; Předplatit si DuckDuckGo</b> a klikneš na <b>Mám předplatné</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
