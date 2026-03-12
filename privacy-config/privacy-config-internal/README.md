@@ -165,3 +165,148 @@ In GitHub Actions, pass the flag via `gradle_flags` on `checkout-and-assemble`:
     maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
     # ... other options
 ```
+
+---
+
+## Patch examples
+
+### Disable a feature (clean install)
+
+Patch:
+```json
+[{ "op": "replace", "path": "/features/myFeature/state", "value": "disabled" }]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "disabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+---
+
+### Disable a feature (cached config)
+
+Patch:
+```json
+[
+  { "op": "replace", "path": "/features/myFeature/state", "value": "disabled" },
+  { "op": "remove",  "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": { "state": "disabled", "exceptions": [], "settings": {} }
+  }
+}
+```
+
+---
+
+### Disable a sub-feature (cached config)
+
+Patch:
+```json
+[
+  { "op": "replace", "path": "/features/myFeature/features/someSubFeature/state", "value": "disabled" },
+  { "op": "remove",  "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": {
+      "state": "enabled",
+      "hash": "abc123",
+      "exceptions": [],
+      "settings": {},
+      "features": {
+        "someSubFeature": { "state": "enabled" }
+      }
+    }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": {
+      "state": "enabled",
+      "exceptions": [],
+      "settings": {},
+      "features": {
+        "someSubFeature": { "state": "disabled" }
+      }
+    }
+  }
+}
+```
+
+---
+
+### Add a sub-feature that doesn't exist in the config
+
+Patch:
+```json
+[
+  { "op": "add", "path": "/features/myFeature/features/newSubFeature", "value": { "state": "enabled" } },
+  { "op": "remove", "path": "/features/myFeature/hash" },
+  { "op": "replace", "path": "/version", "value": "90000000000001" }
+]
+```
+
+Before:
+```json
+{
+  "version": 1773161624296,
+  "features": {
+    "myFeature": { "state": "enabled", "hash": "abc123", "exceptions": [], "settings": {}, "features": {} }
+  }
+}
+```
+
+After:
+```json
+{
+  "version": 90000000000001,
+  "features": {
+    "myFeature": { "state": "enabled", "exceptions": [], "settings": {}, "features": { "newSubFeature": { "state": "enabled" } } }
+  }
+}
+```
