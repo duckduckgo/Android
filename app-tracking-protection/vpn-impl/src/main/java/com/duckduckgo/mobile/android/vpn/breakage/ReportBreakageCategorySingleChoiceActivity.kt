@@ -19,7 +19,11 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +33,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
@@ -51,6 +56,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
 
+    @Inject lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
     private val viewModel: ReportBreakageCategorySingleChoiceViewModel by bindViewModel()
 
@@ -61,6 +68,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         // The value should never be "unknown" we just do this because getParcelableExtra returns
         // nullable
@@ -76,6 +84,21 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         configureObservers()
         setupToolbar(toolbar)
         setupViews()
+        setupEdgeToEdge()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        val buttonMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.ctaNextFormSubmit) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = buttonMargin + insets.bottom
+            }
+            windowInsets
+        }
     }
 
     override fun onStart() {
