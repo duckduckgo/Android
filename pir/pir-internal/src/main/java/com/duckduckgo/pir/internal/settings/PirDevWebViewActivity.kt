@@ -17,6 +17,9 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -24,6 +27,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.impl.email.PirEmailConfirmation
@@ -54,13 +58,18 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirSchedulingRepository: PirSchedulingRepository
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityPirInternalWebviewBinding by viewBinding()
     private val params: PirDevWebViewScreenParams?
         get() = intent.getActivityParams(PirDevWebViewScreenParams::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
 
         when (val screenParams = params) {
             is PirDevWebViewScreenParams.PirDevEmailWebViewScreenParams -> runDebugEmail(screenParams)
@@ -119,6 +128,20 @@ class PirDevWebViewActivity : DuckDuckGoActivity() {
                 logcat { "PIR-DEV: No email confirmation job found for extractedProfileId ${params.extractedProfileId}" }
                 finish()
             }
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.pirDevWebView.updatePadding(
+                top = insets.top,
+                bottom = insets.bottom,
+            )
+            windowInsets
         }
     }
 }
