@@ -19,6 +19,9 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -30,6 +33,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
@@ -48,19 +52,35 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     val syncActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.userReturnedFromSyncSettings()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         configureEventHandlers()
         configureNumberedInstructions()
         if (savedInstanceState == null) {
             viewModel.userLaunchedScreen()
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
@@ -71,7 +91,7 @@ class ImportPasswordsActivity : DuckDuckGoActivity() {
         }
         binding.syncWithDesktopButton.setOnClickListener {
             val intent = globalActivityStarter.startIntent(this, SyncActivityWithEmptyParams)
-            syncActivityLauncher.launch(intent)
+            syncActivityLauncher.launch(intent!!)
             viewModel.onUserClickedSyncWithDesktopButton()
         }
     }
