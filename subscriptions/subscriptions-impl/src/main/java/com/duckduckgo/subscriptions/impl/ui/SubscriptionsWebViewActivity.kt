@@ -32,9 +32,11 @@ import android.webkit.WebView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -61,6 +63,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -189,6 +192,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -204,13 +210,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         params = convertIntoSubscriptionWebViewActivityParams(intent).also {
             logcat { "Subscription Flow: entering with params $it" }
         }
 
         setContentView(binding.root)
-        setupInternalToolbar(toolbar)
+        setupToolbar(toolbar)
+        configureToolbar()
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -281,6 +289,17 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         logcat {
             "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.webview) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+
         binding.webview.loadUrl(params.url)
 
         viewModel.start()
@@ -465,10 +484,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
     }
 
-    private fun setupInternalToolbar(toolbar: Toolbar) {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
+    private fun configureToolbar() {
         toolbar.setNavigationIcon(
             when (params.toolbarConfig) {
                 is CustomTitle -> R.drawable.ic_arrow_left_24
@@ -655,7 +671,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun restoreSubscription() {
-        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true)))
+        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true))!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
