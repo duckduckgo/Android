@@ -115,7 +115,7 @@ interface SyncService {
     fun patch(
         @Header("Authorization") token: String,
         @Path("endpoint") endpoint: String,
-        @Body body: RequestBody,
+        @Body request: JSONObject,
     ): Call<JSONObject>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")

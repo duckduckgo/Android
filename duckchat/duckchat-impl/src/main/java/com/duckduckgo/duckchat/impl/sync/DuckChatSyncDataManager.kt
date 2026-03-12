@@ -72,12 +72,12 @@ class DuckChatSyncDataManager @Inject constructor(
         return runBlocking(dispatchers.io()) {
             if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
                 logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping patches" }
-                return@runBlocking SyncChangesRequest.empty()
+                return@runBlocking getEmptyRequest()
             }
 
             if (!duckChatFeatureRepository.isAIChatHistoryEnabled()) {
                 logcat { "DuckChat-Sync: Chat history disabled, skipping patches" }
-                return@runBlocking SyncChangesRequest.empty()
+                return@runBlocking getEmptyRequest()
             }
 
             val pendingIds = duckChatSyncRepository.getPendingChatDeletions()
@@ -170,7 +170,7 @@ class DuckChatSyncDataManager @Inject constructor(
     private fun formatPatchRequest(pendingIds: Set<String>): SyncChangesRequest {
         if (pendingIds.isEmpty()) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat deletions to patch" }
-            return SyncChangesRequest.empty()
+            return getEmptyRequest()
         }
 
         logcat { "DuckChat-Sync: formatting patch request for ${pendingIds.size} pending chat deletions" }
@@ -191,6 +191,12 @@ class DuckChatSyncDataManager @Inject constructor(
             modifiedSince = ModifiedSince.FirstSync,
         )
     }
+
+    private fun getEmptyRequest() = SyncChangesRequest(
+        SyncableType.DUCK_AI_CHATS,
+        "",
+        ModifiedSince.FirstSync,
+    )
 
     private class Adapters {
         companion object {
