@@ -603,7 +603,7 @@
     ]
   );
   var platformSupport = {
-    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "webInterferenceDetection", "pageContext", "print"],
+    apple: ["webCompat", "duckPlayerNative", ...baseFeatures, "pageContext", "print"],
     "apple-isolated": [
       "contextMenu",
       "duckPlayer",
@@ -616,6 +616,7 @@
       "favicon",
       "webDetection",
       "webEvents",
+      "webInterferenceDetection",
       "pageObserver",
       "hover"
     ],
