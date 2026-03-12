@@ -19,7 +19,12 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +35,7 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityEnterCodeBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
@@ -43,23 +49,48 @@ import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.SwitchAccountSucce
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class EnterCodeActivity : DuckDuckGoActivity() {
     private val binding: ActivityEnterCodeBinding by viewBinding()
     private val viewModel: EnterCodeViewModel by bindViewModel()
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private lateinit var codeType: Code
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         codeType = intent.getSerializableExtra(EXTRA_CODE_TYPE) as? Code ?: Code.RECOVERY_CODE
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
         observeUiEvents()
         configureListeners()
         if (savedInstanceState == null) {
             viewModel.onEnterManualCodeScreenShown(codeType)
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.linearLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            // Consume top inset so toolbar doesn't also apply padding
+            WindowInsetsCompat.Builder(windowInsets)
+                .setInsets(
+                    WindowInsetsCompat.Type.systemBars(),
+                    Insets.of(0, 0, insets.right, insets.bottom),
+                )
+                .build()
         }
     }
 
