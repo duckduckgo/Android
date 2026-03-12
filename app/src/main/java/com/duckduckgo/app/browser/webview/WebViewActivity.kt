@@ -23,6 +23,9 @@ import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -33,6 +36,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
@@ -50,6 +54,9 @@ class WebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityWebviewBinding by viewBinding()
 
     private val toolbar
@@ -58,9 +65,11 @@ class WebViewActivity : DuckDuckGoActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
 
         val params = intent.getActivityParams(WebViewActivityWithParams::class.java)
         val url = params?.url
@@ -106,6 +115,19 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         url?.let {
             binding.simpleWebview.loadUrl(it)
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.simpleWebview) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
