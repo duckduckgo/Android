@@ -23,19 +23,24 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.sync.impl.databinding.ActivityDeviceUnsupportedBinding
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class DeviceUnsupportedActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityDeviceUnsupportedBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
     }
