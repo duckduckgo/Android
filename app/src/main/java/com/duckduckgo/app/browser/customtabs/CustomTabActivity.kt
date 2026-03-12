@@ -35,20 +35,26 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import java.util.UUID
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: CustomTabViewModel by bindViewModel()
     private val binding: ActivityCustomTabBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         viewModel.onShowCustomTab()
 
         setContentView(binding.root)
