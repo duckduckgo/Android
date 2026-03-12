@@ -76,6 +76,7 @@ jobs:
           maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           maestro_app_binary_id: ${{ steps.maestro-upload-release-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: omnibarTest
+          maestro_api_level: 30
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
@@ -109,6 +110,7 @@ jobs:
           maestro_app_binary_id: ${{ steps.maestro-upload-internal-binary.outputs.maestro_app_binary_id }}
           maestro_include_tags: androidDesignSystemTest
           asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          maestro_api_level: 30
           asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Android Design System (Nightly)
