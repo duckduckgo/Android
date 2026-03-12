@@ -301,7 +301,7 @@ open class InputModeWidget @JvmOverloads constructor(
                         onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
                         if (tabAttachmentsEnabled) {
                             onChatTagTextChanged?.invoke(
-                                inputField.text.toString(),
+                                inputField.text.toTagDetectorText(),
                                 inputField.selectionStart,
                             )
                         }
@@ -594,6 +594,24 @@ open class InputModeWidget @JvmOverloads constructor(
         }
         knownTagTabIds.clear()
         knownTagTabIds.addAll(currentTagIds)
+    }
+
+    private fun Editable.toTagDetectorText(): String {
+        val rawText = toString()
+        val tagSpans = getSpans(0, length, TabAttachmentTagSpan::class.java)
+        if (tagSpans.isEmpty()) return rawText
+
+        val maskedText = rawText.toCharArray()
+        tagSpans.forEach { span ->
+            val spanStart = getSpanStart(span).coerceAtLeast(0)
+            val spanEnd = getSpanEnd(span).coerceAtMost(length)
+            for (index in spanStart until spanEnd) {
+                if (maskedText[index] == '@') {
+                    maskedText[index] = ' '
+                }
+            }
+        }
+        return String(maskedText)
     }
 
     // endregion
