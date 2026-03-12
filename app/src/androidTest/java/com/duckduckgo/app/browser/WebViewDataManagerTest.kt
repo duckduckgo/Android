@@ -609,7 +609,7 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenClearDataLegacyAndIndexedDBThrowsThenDoNotNotifyDuckChatsDeleted() = runTest {
+    fun whenClearDataLegacyAndIndexedDBThrowsThenStillNotifyDuckChatsDeleted() = runTest {
         withContext(Dispatchers.Main) {
             feature.indexedDB().setRawStoredState(State(enable = true))
             whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
@@ -618,7 +618,7 @@ class WebViewDataManagerTest {
 
             testee.clearData(webView, mockStorage)
 
-            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
         }
     }
 
