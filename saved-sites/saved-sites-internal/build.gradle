@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':edge-to-edge-api')
     implementation project(path: ':autofill-api')
     implementation project(':internal-features-api')
     implementation project(path: ':browser-api')

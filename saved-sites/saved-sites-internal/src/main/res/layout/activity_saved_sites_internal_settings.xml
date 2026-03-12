@@ -19,7 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".SavedSitesInternalSettingsActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
