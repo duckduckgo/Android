@@ -25,17 +25,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.DaxStatusIndicator
 import com.duckduckgo.common.ui.compose.Status
-import com.duckduckgo.common.ui.compose.StatusIndicator
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -101,12 +104,14 @@ fun DaxPageHeader(
                 )
             }
             if (status != null) {
-                StatusIndicator(status = status)
+                DaxStatusIndicator(status = status)
             }
         }
         if (body != null) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics(mergeDescendants = true) {},
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DaxText(
@@ -121,7 +126,10 @@ fun DaxPageHeader(
                         style = DaxPageHeaderDefaults.bodyTypography,
                         color = DaxPageHeaderDefaults.learnMoreColor,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.clickable(onClick = learnMoreClick),
+                        modifier = Modifier.clickable(
+                            onClick = learnMoreClick,
+                            role = Role.Button,
+                        ),
                     )
                 }
             }
@@ -129,33 +137,39 @@ fun DaxPageHeader(
     }
 }
 
-object DaxPageHeaderDefaults {
+internal object DaxPageHeaderDefaults {
     internal val iconHeaderHeight = 96.dp
     internal val iconHeaderWidth = 128.dp
     internal val containerVerticalSpacing = 8.dp
-    internal val containerPaddingValues: PaddingValues
-        get() = PaddingValues(all = 24.dp)
+    internal val containerPaddingValues: PaddingValues = PaddingValues(all = 24.dp)
     internal val headerVerticalSpacing = 4.dp
     internal val titleTypography: DuckDuckGoTextStyle
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.typography.h2
     internal val subtitleTypography: DuckDuckGoTextStyle
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.typography.caption
     internal val bodyTypography: DuckDuckGoTextStyle
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.typography.body2
     internal val titleColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.text.primary
     internal val subtitleColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.text.secondary
     internal val bodyColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.text.secondary
     internal val learnMoreColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.brand.accentBlue
 }
 
@@ -175,7 +189,7 @@ private fun DaxPageHeaderNoIconPreview() {
             title = "Privacy Protection",
             subtitle = "Your privacy is our priority. We help you stay safe online with built-in tracking protection and private search.",
             body = "Privacy Pro is actively protecting you from trackers on the web and in apps.",
-            status = Status.ALWAYS_ON,
+            status = Status.Always_On,
         )
     }
 }
@@ -202,7 +216,7 @@ private fun DaxPageHeaderPreview() {
             subtitle = "Your privacy is our priority. We help you stay safe online with built-in tracking protection and private search.",
             body = "Privacy Pro is actively protecting you from trackers on the web and in apps.",
             iconHeader = painterResource(R.drawable.ic_privacy_pro_128),
-            status = Status.OFF,
+            status = Status.Off,
             learnMoreClick = { /*TODO*/ },
         )
     }
