@@ -33,14 +33,20 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class FireAnimationActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ActivityFireAnimationBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
 
         val fireAnimationSerializable = IntentCompat.getSerializableExtra(intent, FIRE_ANIMATION_EXTRA, FireAnimation::class.java)
