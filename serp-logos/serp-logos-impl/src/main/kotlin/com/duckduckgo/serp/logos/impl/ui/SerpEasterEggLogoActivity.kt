@@ -23,10 +23,14 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +43,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.impl.R
@@ -47,6 +52,7 @@ import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.Command.Clos
 import com.duckduckgo.serp.logos.impl.ui.SerpEasterEggLogoViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(EasterEggLogoScreen::class, screenName = "easterEggLogo")
@@ -55,12 +61,16 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
     private val viewModel: SerpEasterEggLogoViewModel by bindViewModel()
     private lateinit var binding: ActivitySerpEasterEggLogoBinding
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
+        if (edgeToEdge.isEnabled()) { enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)) }
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_DuckDuckGo_DynamicLogo)
         binding = ActivitySerpEasterEggLogoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupEdgeToEdge()
         supportPostponeEnterTransition()
 
         val params = intent.getActivityParams(EasterEggLogoScreen::class.java)
@@ -158,6 +168,22 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
                 animateBackgroundDimFadeOut()
                 supportFinishAfterTransition()
             }
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        // Critical for API 29 and earlier: Ensure insets dispatch to siblings
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.closeIcon) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            WindowInsetsCompat.CONSUMED
         }
     }
 

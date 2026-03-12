@@ -32,6 +32,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
     implementation project(':serp-logos-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.core
