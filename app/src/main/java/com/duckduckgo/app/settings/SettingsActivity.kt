@@ -21,8 +21,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -89,6 +92,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -132,6 +136,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
@@ -190,9 +197,11 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
 
         configureUiEventHandlers()
         configureInternalFeatures()
@@ -200,6 +209,17 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureCompleteSetupSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.includeSettings.root.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun sortSettingItemsAlphabetically() {
