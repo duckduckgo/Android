@@ -2,7 +2,7 @@
 This module is only available in `internal` build variants of the app. It contains the implementation of some utility functions and dev tools to test, modify, and debug the remote privacy config integration.
 
 ## Local remote config patches
-This module provides options to locally patch the remote config. This is useful for testing purposes, allowing to simulate different configurations without needing to deploy changes to the remote server.
+This module provides options to locally patch the remote config. This is useful for testing purposes, allowing you to simulate different configurations without needing to deploy changes to the remote server.
 
 For example, you can use this to ensure a build of your app always has a specific feature flag state, while otherwise using the production remote configuration.
 
@@ -47,16 +47,6 @@ Example of a remote config looks like this:
 ]
 ```
 
-After applying, the `myFeature` entry becomes:
-
-```json
-"myFeature": {
-  "state": "disabled",
-  "hash": "49f683b023eea75d907b1c4f3eb3be09",
-  ...
-}
-```
-
 To also patch a sub-feature (nested under `features`), extend the path:
 
 ```json
@@ -81,7 +71,9 @@ If the sub-feature doesn't exist in the config yet, use `add` instead of `replac
 ]
 ```
 
-The patches above are sufficient for clean installs.
+For more complex operations, refer to [JSON Patch format](https://jsonpatch.com/).
+
+> **Note:** The patches above are sufficient for clean installs. For subsequent runs where the config is already cached from a previous run, you'll also need to remove the feature hash and bump the version number — see below.
 
 If you work across app runs where config is already cached, also remove the hash of the feature you're modifying and bump the config version to force the app to re-process the config:
 
@@ -106,30 +98,9 @@ If you work across app runs where config is already cached, also remove the hash
 
 Use a version number higher than production (e.g. `90000000000001`) so the app treats it as a newer config and applies it. Without this, a cached config from a previous run may not be overridden.
 
-Each time you modify the patch without clearing the app cache, increment the version number. For example, after changing `state` back to `disabled`, bump the version from `90000000000001` to `90000000000002`:
+Each time you modify the patch without clearing the app cache, increment the version number (e.g. `90000000000001` → `90000000000002`).
 
-```json
-[
-  {
-    "op": "replace",
-    "path": "/features/myFeature/state",
-    "value": "disabled"
-  },
-  {
-    "op": "remove",
-    "path": "/features/myFeature/hash"
-  },
-  {
-    "op": "replace",
-    "path": "/version",
-    "value": "90000000000002"
-  }
-]
-```
-
-**Note:** Keep in mind that remote configuration loads asynchronously. Even after applying a patch, you may need to restart the app a second time — depending on how your feature reads the flag and whether it reacts to config changes at runtime. 
-
-For more complex operations refer to [JSON Patch format](https://jsonpatch.com/).
+> **Note:** Keep in mind that remote configuration loads asynchronously. Even after applying a patch, you may need to restart the app a second time — depending on how your feature reads the flag and whether it reacts to config changes at runtime.
 
 ### Verifying a patch was applied
 
@@ -154,7 +125,7 @@ Successfully applied patch: disable_something.json
 Successfully applied patch: enable_other.json
 ```
 
-In case of failures, for example if you're trying to replace a value that doesn't exist, appropriate message will be printed as well: 
+In case of failures, for example if you're trying to replace a value that doesn't exist, an appropriate message will be printed as well: 
 
 ```
 Failed to apply patch disable_something.json: Missing field "newSubFeature"
@@ -162,9 +133,9 @@ Failed to apply patch disable_something.json: Missing field "newSubFeature"
 
 ### Usage
 
-There are two ways to apply patches, depending on whether you want to commit them (e.g. for Maestro UI tests) or keep them local (e.g. for personal development).
+There are two ways to apply patches, depending on whether you want to keep them local (e.g. for personal development) or commit them (e.g. for Maestro UI tests).
 
-Both methods take a comma-separated list of paths to JSON patch files. The app applies all patches in the order specified.
+Both methods take a comma-separated list of paths to JSON patch files. The app applies all patches in the order specified — if two patches modify the same path, the last one wins. If a patch fails to apply, it is skipped and the remaining patches are still applied.
 
 > **Important:** Each patch file name must be unique, regardless of which directory it lives in.
 
