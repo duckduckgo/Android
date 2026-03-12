@@ -63,6 +63,7 @@ dependencies {
     implementation project(':duckchat-api')
     implementation project(':pir-api')
     implementation project(':attributed-metrics-api')
+    implementation project(':edge-to-edge-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
