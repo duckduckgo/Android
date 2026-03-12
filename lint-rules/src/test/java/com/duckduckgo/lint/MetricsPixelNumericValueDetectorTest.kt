@@ -169,10 +169,10 @@ class MetricsPixelNumericValueDetectorTest {
                         fun doSomething(toggle: Any) {
                             MetricsPixel(
                                 metric = "some_metric",
-                                value = "not_a_number",
+                                type = MetricType.COUNT_ALWAYS,
                                 toggle = toggle as com.duckduckgo.feature.toggles.api.Toggle,
                                 conversionWindow = listOf(ConversionWindow(0, 1)),
-                                type = MetricType.COUNT_ALWAYS,
+                                value = "not_a_number",
                             )
                         }
                     }

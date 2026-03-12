@@ -67,14 +67,10 @@ class MetricsPixelNumericValueDetector : Detector(), SourceCodeScanner {
         val typeText = findArgText(node, "type") ?: return
         if (!typeText.contains("COUNT_WHEN_IN_WINDOW") && !typeText.contains("COUNT_ALWAYS")) return
 
-        val valueText = findArgText(node, "value") ?: return
-        // Strip surrounding quotes from a string literal so we can check if it's an integer.
-        val valueStr = valueText.removeSurrounding("\"")
+        val valueExpr = findArgExpr(node, "value") ?: return
+        val valueStr = valueExpr.evaluate() as? String ?: return
 
         if (valueStr.toIntOrNull() == null) {
-            // Report on the value argument expression; fall back to the call site if the
-            // expression can't be resolved (e.g. UastFacade.convertElement fails in Path 2).
-            val valueExpr: UExpression = findArgExpr(node, "value") ?: node
             context.report(
                 NUMERIC_VALUE_REQUIRED,
                 valueExpr,
