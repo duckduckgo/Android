@@ -24,7 +24,10 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,6 +48,7 @@ import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Com
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckAi
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.Command.OpenDuckChatSettings
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPaidSettingsViewModel.ViewState
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -61,6 +65,8 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var duckChat: DuckChat
+
+    @Inject lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: DuckAiPaidSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckAiPaidSettingsBinding by viewBinding()
@@ -82,13 +88,25 @@ class DuckAiPaidSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
 
         configureUiEventHandlers()
         configureClickableLink()
         observeViewModel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.duckAiPaidSettingsLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun configureUiEventHandlers() {
