@@ -127,6 +127,8 @@ Each time you modify the patch without clearing the app cache, increment the ver
 ]
 ```
 
+**Note:** Keep in mind that remote configuration loads asynchronously. Even after applying a patch, you may need to restart the app a second time — depending on how your feature reads the flag and whether it reacts to config changes at runtime. 
+
 For more complex operations refer to [JSON Patch format](https://jsonpatch.com/).
 
 ### Verifying a patch was applied
@@ -150,6 +152,12 @@ Warning: Config patch file not found: /path/to/disable_something.json
 Applying 2 config patches: [disable_something.json, enable_other.json]
 Successfully applied patch: disable_something.json
 Successfully applied patch: enable_other.json
+```
+
+In case of failures, for example if you're trying to replace a value that doesn't exist, appropriate message will be printed as well: 
+
+```
+Failed to apply patch disable_something.json: Missing field "newSubFeature"
 ```
 
 ### Usage
