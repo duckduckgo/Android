@@ -73,6 +73,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -95,8 +96,12 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         if (deviceAuthenticator.isAuthenticationRequiredForAutofill()) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
