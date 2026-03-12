@@ -22,6 +22,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +41,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
 import kotlinx.coroutines.flow.launchIn
@@ -57,17 +61,33 @@ class PermissionsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: PermissionsViewModel by bindViewModel()
     private val binding: ActivityPermissionsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
 
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.includePermissions.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     override fun onStart() {
