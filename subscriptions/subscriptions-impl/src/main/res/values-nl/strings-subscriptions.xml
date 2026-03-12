@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activeer Privacy Pro op je desktop om Personal Information Removal in te stellen.</string>
-    <string name="pirDescription">Ga in de DuckDuckGo-browser op je desktop naar <b>Instellingen &gt; Privacy Pro</b> en klik op <b>Ik heb een abonnement</b> om te beginnen.</string>
+    <string name="pirTitle">Activeer het DuckDuckGo-abonnement op je desktop om Personal Information Removal in te stellen</string>
+    <string name="pirDescription">Ga in de DuckDuckGo-browser op je desktop naar <b>Instellingen &gt; Abonneren op DuckDuckGo</b> en klik op <b>Ik heb een abonnement</b> om te beginnen.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
