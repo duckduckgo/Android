@@ -96,6 +96,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
+private val WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -474,7 +475,14 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
+        logcat(INFO) { "onPageStarted: webViewUrl=${webView.url} url=$url" }
+
+        // Handle non-HTTP URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
+        if (url != null && handleNonHttpUrlIfNeeded(webView, url)) {
+            logcat(INFO) { "cdr onPageStarted: handleNonHttpUrlIfNeeded returned true, returning early" }
+            return
+        }
+
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
@@ -508,6 +516,47 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    /**
+     * Handles non-HTTP URLs that bypass shouldOverrideUrlLoading().
+     * This can happen when window.open() is used with intent:// or other special URLs,
+     * as the WebViewTransport mechanism loads URLs directly without triggering shouldOverrideUrlLoading().
+     *
+     * Delegates to [shouldOverride] so URL-type dispatch logic is not duplicated.
+     *
+     * @return true if the URL was handled and loading should stop, false otherwise
+     */
+    private fun handleNonHttpUrlIfNeeded(webView: WebView?, url: String): Boolean {
+        logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: called with url=$url" }
+        if (webView == null) {
+            logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: webView is null, returning false" }
+            return false
+        }
+        val uri = url.toUri()
+        val scheme = uri.scheme ?: run {
+            logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: scheme is null, returning false" }
+            return false
+        }
+
+        // Only intercept non-web schemes; web schemes go through the normal loading path
+        if (scheme in WEB_SCHEMES) {
+            logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: scheme '$scheme' is a web scheme, returning false" }
+            return false
+        }
+
+        logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: detected non-http URL scheme '$scheme' for $url" }
+
+        // Reuse the existing URL-type dispatch in shouldOverride
+        val handled = shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        logcat(INFO) { "cdr handleNonHttpUrlIfNeeded: shouldOverride returned $handled" }
+
+        // Only stop loading if the URL was actually handled, to avoid blanking the page
+        // when shouldOverride returns false (e.g., Unknown URL type with no handler)
+        if (handled) {
+            webView.stopLoading()
+        }
+        return handled
     }
 
     private fun handleMediaPlayback(
@@ -739,7 +788,21 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest?,
         error: WebResourceError?,
     ) {
+        logcat(INFO) { "cdr onReceivedError: url=${request?.url} errorCode=${error?.errorCode} description=${error?.description} isForMainFrame=${request?.isForMainFrame}" }
         error?.let { webResourceError ->
+            // Handle unsupported scheme errors for special URLs (e.g., intent://, tel://, mailto://)
+            // This catches cases where shouldOverrideUrlLoading is bypassed (like window.open)
+            if (webResourceError.errorCode == ERROR_UNSUPPORTED_SCHEME &&
+                request?.isForMainFrame == true &&
+                request.url != null
+            ) {
+                logcat(INFO) { "cdr onReceivedError: ERROR_UNSUPPORTED_SCHEME for main frame, calling handleNonHttpUrlIfNeeded" }
+                if (handleNonHttpUrlIfNeeded(view, request.url.toString())) {
+                    logcat(INFO) { "cdr onReceivedError: handleNonHttpUrlIfNeeded returned true, returning early" }
+                    return
+                }
+            }
+
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {

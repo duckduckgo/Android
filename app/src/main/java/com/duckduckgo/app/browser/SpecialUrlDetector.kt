@@ -209,6 +209,21 @@ class SpecialUrlDetectorImpl(
                 if (userInitiated && (intent == null || packageManager.resolveActivity(intent, 0) == null) &&
                     androidBrowserConfigFeature.validateIntentResolution().isEnabled()
                 ) {
+                    // If the intent has a fallback URL, still return NonHttpAppLink so the caller can use the fallback
+                    val fallbackUrl = intent?.getStringExtra(EXTRA_FALLBACK_URL)
+                    if (intent != null && fallbackUrl != null) {
+                        if (externalAppIntentFlagsFeature.self().isEnabled()) {
+                            intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        }
+                        val fallbackIntent = buildFallbackIntent(fallbackUrl)
+                        return UrlType.NonHttpAppLink(
+                            uriString = uriString,
+                            intent = intent,
+                            fallbackUrl = fallbackUrl,
+                            fallbackIntent = fallbackIntent,
+                        )
+                    }
                     return UrlType.Unknown(uriString)
                 }
 

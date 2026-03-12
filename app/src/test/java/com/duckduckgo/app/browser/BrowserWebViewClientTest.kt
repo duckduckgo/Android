@@ -31,6 +31,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient.ERROR_FAILED_SSL_HANDSHAKE
 import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import android.webkit.WebViewClient.ERROR_UNKNOWN
+import android.webkit.WebViewClient.ERROR_UNSUPPORTED_SCHEME
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
@@ -1572,6 +1573,92 @@ class BrowserWebViewClientTest {
 
         verify(mockUriLoadedManager).sendUriLoadedPixels(false)
     }
+
+    // region handleNonHttpUrlIfNeeded (via onPageStarted and onReceivedError)
+
+    @Test
+    fun whenOnPageStartedWithIntentUrlThenShouldOverrideDelegatesHandling() {
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(intentUrl, Intent(), null)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+
+        testee.onPageStarted(webView, intentUrl, null)
+
+        verify(listener).handleNonHttpAppLink(urlType)
+        // Should not proceed to normal page loading
+        verify(requestInterceptor, never()).onPageStarted(any())
+    }
+
+    @Test
+    fun whenOnPageStartedWithHttpUrlThenProceedsNormally() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        // Should proceed to normal page loading, not intercepted
+        verify(requestInterceptor).onPageStarted(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnPageStartedWithTelUrlThenHandledViaShouldOverride() {
+        val telUrl = "tel:+1234567890"
+        val urlType = SpecialUrlDetector.UrlType.Telephone("+1234567890")
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+
+        testee.onPageStarted(webView, telUrl, null)
+
+        verify(listener).dialTelephoneNumberRequested("+1234567890")
+        verify(requestInterceptor, never()).onPageStarted(any())
+    }
+
+    @Test
+    fun whenOnReceivedErrorWithUnsupportedSchemeForMainFrameThenDelegatesToShouldOverride() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(intentUrl, Intent(), null)
+
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNSUPPORTED_SCHEME)
+        whenever(webResourceError.description).thenReturn("net::ERR_UNKNOWN_URL_SCHEME")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(intentUrl.toUri())
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(listener).handleNonHttpAppLink(urlType)
+    }
+
+    @Test
+    fun whenOnReceivedErrorWithUnsupportedSchemeNotMainFrameThenDoesNotIntercept() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val intentUrl = "intent://open/#Intent;scheme=myapp;end"
+
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNSUPPORTED_SCHEME)
+        whenever(webResourceError.description).thenReturn("net::ERR_UNKNOWN_URL_SCHEME")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        whenever(webResourceRequest.url).thenReturn(intentUrl.toUri())
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(specialUrlDetector, never()).determineType(initiatingUrl = any(), uri = any())
+    }
+
+    @Test
+    fun whenOnReceivedErrorWithNonUnsupportedSchemeErrorThenDoesNotIntercept() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn("intent://open".toUri())
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        // Should not try to handle via shouldOverride for non-unsupported-scheme errors
+        verify(listener, never()).handleNonHttpAppLink(any())
+    }
+
+    // endregion
 
     private class TestWebView(
         context: Context,

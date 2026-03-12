@@ -636,6 +636,30 @@ class SpecialUrlDetectorImplTest {
         assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
     }
 
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoButHasFallbackUrlThenReturnNonHttpAppLinkWithFallback() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;S.browser_fallback_url=https%3A%2F%2Fexample.com;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is NonHttpAppLink)
+        val nonHttpAppLink = result as NonHttpAppLink
+        assertEquals("https://example.com", nonHttpAppLink.fallbackUrl)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoAndNoFallbackUrlThenReturnUnknown() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is Unknown)
+    }
+
     private fun randomString(length: Int): String {
         val charList: List<Char> = ('a'..'z') + ('0'..'9')
         return List(length) { charList.random() }.joinToString("")
