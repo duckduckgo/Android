@@ -3177,7 +3177,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             val contextDaxDialogsShown =
                 withContext(dispatchers.io()) {
-                    ctaViewModel.areBubbleDaxDialogsCompleted()
+                    ctaViewModel.areBubbleDaxDialogsCompleted() && !ctaViewModel.isPromoOnboardingDialogShowing()
                 }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value =
