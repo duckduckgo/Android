@@ -205,13 +205,13 @@ class WebViewDataManager @Inject constructor(
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
                 dataClearingWideEvent.stepSuccess(DataClearingFlowStep.INDEXEDDB_CLEAR_SELECTIVE)
-
-                if (shouldClearDuckAiData) {
-                    notifyOnDuckChatsDeleted()
-                }
             }.onFailure { t ->
                 dataClearingWideEvent.stepFailure(DataClearingFlowStep.INDEXEDDB_CLEAR_SELECTIVE, t)
                 logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
+            }
+
+            if (shouldClearDuckAiData) {
+                notifyOnDuckChatsDeleted()
             }
         }
 
