@@ -27,7 +27,9 @@ import android.provider.Settings
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.core.graphics.Insets
 import androidx.core.os.bundleOf
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -258,6 +260,19 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
         context?.let {
             globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
         }
+    }
+
+    /**
+     * Applies window insets padding to the inner ConstraintLayout to avoid triggering
+     * measurement recalculation that can cause text sizing issues.
+     */
+    fun applyWindowInsets(insets: Insets) {
+        // Apply padding to the ConstraintLayout child (first child of this FrameLayout)
+        // to prevent the FrameLayout padding from triggering remeasurement of text views
+        binding.root.updatePadding(
+            top = insets.top,
+            bottom = insets.bottom,
+        )
     }
 
     interface CardsListRemoteMessageListener {

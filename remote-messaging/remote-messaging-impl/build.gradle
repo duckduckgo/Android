@@ -46,6 +46,7 @@ dependencies {
     implementation project(path: ':data-store-api')
     implementation project(path: ':survey-api')
     implementation project(path: ':modal-coordinator-api')
+    implementation project(':edge-to-edge-api')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {

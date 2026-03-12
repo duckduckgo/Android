@@ -18,6 +18,9 @@ package com.duckduckgo.remote.messaging.impl.modal
 
 import android.os.Bundle
 import androidx.activity.addCallback
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,12 +30,14 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.remote.messaging.impl.databinding.ActivityModalSurfaceBinding
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceViewModel.Command
 import com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(ModalSurfaceActivityFromMessageId::class)
@@ -41,9 +46,14 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
     private val viewModel: ModalSurfaceViewModel by bindViewModel()
     private val binding: ActivityModalSurfaceBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
 
         initialise()
         setupObservers()
@@ -91,6 +101,21 @@ class ModalSurfaceActivity : DuckDuckGoActivity(), CardsListRemoteMessageView.Ca
     private fun setupBackNavigationHandler() {
         onBackPressedDispatcher.addCallback(this) {
             viewModel.onBackPressed()
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            // Apply padding to the inner ConstraintLayout to avoid measurement recalculation
+            // that can cause text sizing issues when padding is applied to the FrameLayout
+            binding.cardsListRemoteMessageView.applyWindowInsets(
+                Insets.of(0, insets.top, 0, insets.bottom),
+            )
+            windowInsets
         }
     }
 }
