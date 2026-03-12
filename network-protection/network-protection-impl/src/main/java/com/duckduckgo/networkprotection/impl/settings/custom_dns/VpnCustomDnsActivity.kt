@@ -21,6 +21,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -37,6 +41,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isPrivateDnsStrict
 import com.duckduckgo.common.utils.extensions.launchSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -130,10 +135,30 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var networkProtectionState: NetworkProtectionState
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        setupEdgeToEdge()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            // Apply top padding to AppBar
+            binding.appBar.updatePadding(top = insets.top)
+            // Apply bottom padding to ScrollView's LinearLayout content
+            view.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
