@@ -1272,11 +1272,6 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
-                onFireButtonTapped = { onFireButtonPressed() },
-                onTabSwitcherTapped = { launchTabSwitcher() },
-                onMenuTapped = {
-                    launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
-                },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
