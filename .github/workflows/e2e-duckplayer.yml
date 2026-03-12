@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   duckplayer_tests:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' }}
     name: Duck Player Tests
     runs-on: ubuntu-latest
 
