@@ -1503,7 +1503,7 @@ class RealEventHubPixelManagerTest {
         val configs = EventHubConfigParser.parseTelemetry(fullConfig)
         val pixelConfig = configs.first()
 
-        val serialized = EventHubConfigParser.serializePixelConfig(pixelConfig)
+        val serialized = EventHubConfigParser.serializePixelConfig(pixelConfig)!!
         val restored = EventHubConfigParser.parseSinglePixelConfig(pixelConfig.name, serialized)!!
 
         assertEquals(pixelConfig.name, restored.name)

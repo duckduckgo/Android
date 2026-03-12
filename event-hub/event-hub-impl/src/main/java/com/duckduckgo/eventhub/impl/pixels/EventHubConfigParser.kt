@@ -81,7 +81,7 @@ object EventHubConfigParser {
         }
     }
 
-    fun serializePixelConfig(config: TelemetryPixelConfig): String {
+    fun serializePixelConfig(config: TelemetryPixelConfig): String? {
         val pixelJson = TelemetryPixelJson(
             state = config.state,
             trigger = TelemetryTriggerJson(
@@ -102,7 +102,9 @@ object EventHubConfigParser {
                 )
             },
         )
-        return pixelAdapter.toJson(pixelJson)
+        return runCatching { pixelAdapter.toJson(pixelJson) }
+            .onFailure { logcat(WARN) { "Failed to serialize pixel config ${config.name}: ${it.message}" } }
+            .getOrNull()
     }
 
     private fun toTelemetryPixelConfig(name: String, json: TelemetryPixelJson): TelemetryPixelConfig? {

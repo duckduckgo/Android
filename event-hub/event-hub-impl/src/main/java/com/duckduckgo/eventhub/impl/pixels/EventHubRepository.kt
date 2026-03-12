@@ -50,13 +50,14 @@ class RealEventHubRepository @Inject constructor(
     }
 
     override fun savePixelState(state: PixelState) {
+        val configJson = EventHubConfigParser.serializePixelConfig(state.config) ?: return
         pixelStateDao.insertPixelState(
             EventHubPixelStateEntity(
                 pixelName = state.pixelName,
                 periodStartMillis = state.periodStartMillis,
                 periodEndMillis = state.periodEndMillis,
                 paramsJson = serializeParams(state.params),
-                configJson = EventHubConfigParser.serializePixelConfig(state.config),
+                configJson = configJson,
             ),
         )
     }

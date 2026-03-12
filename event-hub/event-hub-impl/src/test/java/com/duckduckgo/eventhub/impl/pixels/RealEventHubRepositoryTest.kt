@@ -202,4 +202,22 @@ class RealEventHubRepositoryTest {
     fun `parseParamsJson returns empty map for invalid JSON`() {
         assertEquals(emptyMap<String, ParamState>(), RealEventHubRepository.parseParamsJson("not json"))
     }
+
+    @Test
+    fun `savePixelState stores configJson from serializePixelConfig`() {
+        val state = PixelState(
+            pixelName = "testPixel",
+            periodStartMillis = 0L,
+            periodEndMillis = 86400000L,
+            config = sampleConfig,
+            params = mapOf("count" to ParamState(0)),
+        )
+
+        val entityCaptor = argumentCaptor<EventHubPixelStateEntity>()
+        repository.savePixelState(state)
+        verify(dao).insertPixelState(entityCaptor.capture())
+
+        val expectedJson = EventHubConfigParser.serializePixelConfig(sampleConfig)
+        assertEquals(expectedJson, entityCaptor.firstValue.configJson)
+    }
 }

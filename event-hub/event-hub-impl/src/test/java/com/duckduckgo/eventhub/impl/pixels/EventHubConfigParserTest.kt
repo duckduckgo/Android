@@ -17,6 +17,7 @@
 package com.duckduckgo.eventhub.impl.pixels
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -258,6 +259,41 @@ class EventHubConfigParserTest {
     @Test
     fun `parseSinglePixelConfig with empty object returns null`() {
         assertNull(EventHubConfigParser.parseSinglePixelConfig("test", "{}"))
+    }
+
+    @Test
+    fun `serializePixelConfig produces valid JSON that round-trips`() {
+        val configs = EventHubConfigParser.parseTelemetry(settingsJson)
+        val original = configs[0]
+
+        val json = EventHubConfigParser.serializePixelConfig(original)
+        assertNotNull(json)
+
+        val restored = EventHubConfigParser.parseSinglePixelConfig(original.name, json!!)
+        assertNotNull(restored)
+        assertEquals(original.name, restored!!.name)
+        assertEquals(original.state, restored.state)
+        assertEquals(original.trigger.period.periodSeconds, restored.trigger.period.periodSeconds)
+        assertEquals(original.parameters.size, restored.parameters.size)
+        assertEquals(original.parameters["count"]!!.source, restored.parameters["count"]!!.source)
+        assertEquals(original.parameters["count"]!!.buckets.size, restored.parameters["count"]!!.buckets.size)
+    }
+
+    @Test
+    fun `serializePixelConfig returns non-null for valid config`() {
+        val config = TelemetryPixelConfig(
+            name = "test",
+            state = "enabled",
+            trigger = TelemetryTriggerConfig(period = TelemetryPeriodConfig(days = 1)),
+            parameters = mapOf(
+                "c" to TelemetryParameterConfig(
+                    template = "counter",
+                    source = "e",
+                    buckets = linkedMapOf("0+" to BucketConfig(gte = 0, lt = null)),
+                ),
+            ),
+        )
+        assertNotNull(EventHubConfigParser.serializePixelConfig(config))
     }
 
     @Test
