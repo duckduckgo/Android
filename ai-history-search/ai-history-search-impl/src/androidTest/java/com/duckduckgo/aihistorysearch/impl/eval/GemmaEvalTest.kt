@@ -89,6 +89,33 @@ class GemmaEvalTest {
         assertFloors(results)
     }
 
+    /** Pre-filtered observation run on the real-sites corpus — no floor assertions. */
+    @Test
+    fun gemmaPreFilteredRealQualityReport() {
+        ensureModel()
+        val realCorpus = EvalCorpusLoader.load(context.assets.open("eval_corpus_real.json"))
+        val results = realCorpus.queries.map { q ->
+            val preFiltered = embeddingScorer.rank(q.query, realCorpus.entries).take(PRE_FILTER_K)
+            runQuery(q, preFiltered)
+        }
+        printTable(results, label = "Pre-filtered (embeddings top-$PRE_FILTER_K) — real sites")
+        printResponses(results)
+        printCsv(results, label = "pre-filtered-real-emb$PRE_FILTER_K")
+    }
+
+    /** Observation run on the real-sites corpus — no floor assertions. */
+    @Test
+    fun gemmaFullCorpusRealQualityReport() {
+        ensureModel()
+        val realCorpus = EvalCorpusLoader.load(context.assets.open("eval_corpus_real.json"))
+        val results = realCorpus.queries.map { q ->
+            runQuery(q, realCorpus.entries)
+        }
+        printTable(results, label = "Full corpus — real sites")
+        printResponses(results)
+        printCsv(results, label = "full-corpus-real")
+    }
+
     /**
      * Production-realistic: embeddings top-[PRE_FILTER_K] feeds into Gemma.
      * Shorter prompt, less hallucination surface, faster inference.
@@ -135,7 +162,7 @@ class GemmaEvalTest {
         if (response == null) {
             android.util.Log.w("GemmaEval", "No response for '${q.query}' — model load failed")
         }
-        val ranked = if (response != null) parseRankedEntries(response, corpus.entries) else emptyList()
+        val ranked = if (response != null) parseRankedEntries(response, entries) else emptyList()
         val sim = if (response != null && q.referenceAnswer != null) {
             embeddingScorer.cosineSimilarity(response, q.referenceAnswer)
         } else {

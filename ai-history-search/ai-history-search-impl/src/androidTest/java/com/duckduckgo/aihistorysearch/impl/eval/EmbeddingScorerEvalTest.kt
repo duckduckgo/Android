@@ -61,6 +61,17 @@ class EmbeddingScorerEvalTest {
         assertFloors(results)
     }
 
+    /** Observation run on the real-sites corpus — no floor assertions. */
+    @Test
+    fun embeddingQualityReportReal() {
+        val realCorpus = EvalCorpusLoader.load(context.assets.open("eval_corpus_real.json"))
+        val results = realCorpus.queries.map { q ->
+            val ranked = scorer.rank(q.query, realCorpus.entries)
+            Triple(q, precisionAtK(ranked, q.relevantUrls, 5), mrr(ranked, q.relevantUrls))
+        }
+        printTable(results)
+    }
+
     // ── Reporting ─────────────────────────────────────────────────────────────
 
     private fun printTable(results: List<Triple<EvalQuery, Double, Double>>) {

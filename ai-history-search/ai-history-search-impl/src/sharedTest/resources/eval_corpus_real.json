@@ -1,0 +1,537 @@
+{
+  "entries": [
+    {
+      "url": "https://kotlinlang.org/docs/coroutines-basics.html",
+      "title": "Coroutines basics — Kotlin",
+      "chunkText": "Kotlin uses coroutines to create applications that perform multiple tasks concurrently. A coroutine is a suspendable computation that lets you write concurrent code in a clear, sequential style. Coroutines can run concurrently with other coroutines and potentially in parallel. The key advantage of coroutines is that they can suspend their execution instead of blocking a thread. This allows one coroutine to suspend while waiting for data and another coroutine to run on the same thread, ensuring effective resource utilization. The most basic building block is the suspending function, declared with the suspend keyword, which allows a running operation to pause and resume without affecting code structure. Structured concurrency means coroutines form a parent-child hierarchy with linked lifecycles — a parent waits for children to complete, and if a parent is cancelled all child coroutines are recursively cancelled. New coroutines can only be launched inside a CoroutineScope. Dispatchers control which thread coroutines use: Dispatchers.Main for UI, Dispatchers.IO for blocking I/O, Dispatchers.Default for CPU-intensive work."
+    },
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+      "title": "Promise — JavaScript | MDN Web Docs",
+      "chunkText": "The Promise object represents the eventual completion or failure of an asynchronous operation and its resulting value. A Promise is a proxy for a value not necessarily known when the promise is created. It allows you to associate handlers with an asynchronous action's eventual success value or failure reason, letting asynchronous methods return values like synchronous methods. A Promise is in one of these states: pending (initial state, neither fulfilled nor rejected), fulfilled (operation completed successfully), or rejected (operation failed). The eventual state of a pending promise can either be fulfilled with a value or rejected with a reason. When either occurs, the associated handlers queued up by a promise's then method are called. A promise is settled if it is fulfilled or rejected but not pending. The promise methods then(), catch(), and finally() associate further action with a settled promise. The then() method takes up to two arguments: a callback for the fulfilled case and a callback for the rejected case. Promises can be chained, and async/await syntax is syntactic sugar built on top of Promises."
+    },
+    {
+      "url": "https://docs.python.org/3/library/asyncio.html",
+      "title": "asyncio — Asynchronous I/O — Python 3.12",
+      "chunkText": "asyncio is a library to write concurrent code using the async/await syntax. It serves as a foundation for multiple Python asynchronous frameworks providing high-performance network and web-servers, database connection libraries, and distributed task queues. asyncio is often a perfect fit for IO-bound and high-level structured network code. asyncio provides high-level APIs to run Python coroutines concurrently with full control over their execution, perform network IO and IPC, control subprocesses, distribute tasks via queues, and synchronize concurrent code. There are also low-level APIs for library developers to create and manage event loops, implement efficient protocols using transports, and bridge callback-based libraries with async/await syntax. The asyncio event loop drives coroutine execution and handles I/O events. You can experiment with asyncio using the REPL: python -m asyncio allows using await directly in the interactive interpreter."
+    },
+    {
+      "url": "https://docs.docker.com/get-started/docker-overview/",
+      "title": "Docker overview | Docker Docs",
+      "chunkText": "Docker is an open platform for developing, shipping, and running applications. It enables developers to separate applications from infrastructure, allowing faster software delivery. The platform works through containers — a loosely isolated environment where applications run with everything needed for execution included. This approach eliminates dependency issues since containers aren't reliant on what's installed on the host system. Multiple containers can run simultaneously on a single host while remaining isolated from one another. Docker facilitates rapid and consistent application delivery through standardized development environments, supporting continuous integration and deployment workflows. Its portable nature allows workloads to run across developer laptops, data centers, cloud providers, or hybrid setups. Docker is lightweight compared to virtual machines, enabling more efficient server resource utilization. Docker employs a client-server architecture where the Docker client communicates with the Docker daemon through REST APIs. The system manages images (read-only templates), containers (runnable instances), networks, and volumes. Docker leverages Linux kernel namespaces to create isolated workspaces."
+    },
+    {
+      "url": "https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control",
+      "title": "About Version Control — Pro Git",
+      "chunkText": "Version control is a system that records changes to a file or set of files over time so that you can recall specific versions later. A Version Control System allows you to revert selected files or an entire project back to a previous state, compare changes over time, see who last modified something that might be causing a problem, and easily recover if you lose files. Local Version Control Systems like RCS kept patch sets on disk allowing recreation of any file state. Centralized Version Control Systems like CVS, Subversion, and Perforce use a single server, creating a single point of failure. Distributed Version Control Systems like Git, Mercurial, and Darcs allow clients to fully mirror the entire repository including its complete history. If any server dies, any client repository can be copied back to restore it. Every clone is a full backup of all data. Git uses snapshots rather than deltas — it stores a snapshot of all tracked files at each commit, making it extremely fast for branching, merging, and history traversal."
+    },
+    {
+      "url": "https://www.postgresql.org/docs/current/indexes-types.html",
+      "title": "Index Types — PostgreSQL 17",
+      "chunkText": "PostgreSQL provides several index types: B-tree, Hash, GiST, SP-GiST, GIN, BRIN, and the extension bloom. Each index type uses a different algorithm suited to different types of queries. By default, CREATE INDEX creates B-tree indexes, which fit the most common situations. B-tree indexes handle equality and range queries on sortable data using operators like <, <=, =, >=, >. They also support BETWEEN, IN, IS NULL, IS NOT NULL, LIKE and ~ for anchored patterns, and can retrieve data in sorted order without a separate sort step. Hash indexes store a 32-bit hash code and can only handle simple equality comparisons. GiST indexes are an infrastructure supporting many different indexing strategies and are capable of optimizing nearest-neighbor searches. SP-GiST supports non-balanced data structures such as quadtrees, k-d trees, and radix trees. GIN indexes are inverted indexes appropriate for data containing multiple component values, such as arrays and full-text search. BRIN indexes store summaries about values in consecutive physical block ranges, most effective for columns that correlate with physical row order."
+    },
+    {
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+      "title": "Pods | Kubernetes",
+      "chunkText": "Pods are the smallest deployable units in Kubernetes. A Pod is a group of one or more containers with shared storage and network resources, designed to run together as a cohesive unit. A Pod models an application-specific logical host and may run multiple tightly coupled containers sharing Linux namespaces and cgroups. The most common use case is a single-container Pod where Kubernetes manages the Pod rather than the container directly. Pods are designed as relatively ephemeral, disposable entities. When created, a Pod is scheduled to run on a Node in the cluster, remaining there until it finishes execution, is deleted, is evicted for lack of resources, or the node fails. You typically don't create Pods directly. Instead, use workload resources: Deployment (manages replicated stateless applications), StatefulSet (for applications requiring stable identity), Job (for finite batch tasks), or DaemonSet (ensures Pod copies run across cluster nodes). Containers within a Pod communicate via localhost. Pods also provide shared filesystem volumes for data persistence across container restarts."
+    },
+    {
+      "url": "https://react.dev/learn/managing-state",
+      "title": "Managing State — React",
+      "chunkText": "As your application grows, it helps to be more intentional about how state is organized and how data flows between components. Redundant or duplicate state is a common source of bugs. With React, you don't modify the UI directly — instead you describe the UI for different visual states of a component and trigger state changes in response to user input. Structuring state well makes a component pleasant to debug; the most important principle is that state should not contain redundant or duplicated information. To share state between components, remove state from both, move it to their closest common parent, and pass it down via props — this is called lifting state up. For components with many state updates spread across event handlers, you can consolidate all state update logic in a reducer function. Context lets a parent component make information available to any component in the tree below it without passing props through every level — avoiding prop drilling. Combining reducers and context lets you manage state of a complex screen while other components read and update it from anywhere in the tree."
+    },
+    {
+      "url": "https://graphql.org/learn/queries/",
+      "title": "Queries and Mutations — GraphQL",
+      "chunkText": "GraphQL is about asking for specific fields on objects. You start with a root operation type — the Query Object type — as an entry point to the API, then specify a selection set of fields all the way down to their scalar leaf values. The result has the same shape as the query; you always get back what you expect. GraphQL queries can traverse related objects and their fields, letting clients fetch related data in one request instead of multiple roundtrips as in classic REST. Fields can accept arguments, and every field and nested object can get its own set of arguments, making GraphQL a complete replacement for multiple API fetches. Operations should include an explicit operation type (query, mutation, or subscription) and a meaningful operation name that aids debugging. Variables allow you to factor dynamic values out of the query and pass them as a separate dictionary, avoiding string interpolation. Fragments are reusable units that let you construct sets of fields and include them in multiple queries — useful for splitting complex data requirements into smaller chunks. Directives like @include and @skip allow dynamically changing query structure using variables."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/about-github-actions/understanding-github-actions",
+      "title": "Understanding GitHub Actions — GitHub Docs",
+      "chunkText": "GitHub Actions is a continuous integration and continuous delivery platform integrated into GitHub that enables automation of build, test, and deployment processes. A workflow is the automated process, triggered by repository events such as push, pull request creation, or issue creation. Workflows contain jobs that execute on virtual machines called runners, with each job comprised of individual steps. Steps either execute scripts you define or leverage pre-built reusable extensions called actions. Beyond CI/CD, GitHub Actions supports diverse automation scenarios such as automatically labeling issues. GitHub provides hosted runners on Ubuntu Linux, Windows, and macOS; for specialized requirements you can host self-hosted runners. Workflows are defined as YAML files stored in the .github/workflows directory. Multiple workflows per repository can handle different tasks: testing pull requests, deploying releases, or managing repository labels. Jobs can run sequentially or in parallel, steps share data within a job, and jobs can depend on other jobs. Matrix configurations allow running jobs across multiple environments simultaneously."
+    },
+    {
+      "url": "https://nextjs.org/docs/app/getting-started/installation",
+      "title": "Installation — Next.js",
+      "chunkText": "Next.js uses file-system routing, which means routes in your application are determined by how you structure your files. The quickest way to create a new Next.js app is using create-next-app, which sets up everything automatically. The default setup enables TypeScript, Tailwind CSS, ESLint, App Router, and Turbopack. Next.js supports modern browsers including Chrome 111+, Edge 111+, Firefox 111+, and Safari 16.4+. The App Router uses React canary releases with all stable React 19 changes and newer features validated in frameworks. Next.js comes with built-in TypeScript support — rename a file to .ts or .tsx and run next dev. A custom TypeScript plugin and type checker in VS Code provides advanced type-checking and auto-completion. Key development scripts: next dev starts the development server with Turbopack, next build builds for production, next start runs the production server. Next.js has built-in support for path aliases via tsconfig.json, letting you use @/components instead of relative paths. The App Router stores layout, page, and error files inside an app directory."
+    },
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API",
+      "title": "Service Worker API — MDN Web Docs",
+      "chunkText": "Service workers act as proxy servers that sit between web applications, the browser, and the network. They enable effective offline experiences, network request interception, asset caching, push notifications, and background sync. A service worker is an event-driven worker registered against an origin and a path. It takes the form of a JavaScript file that can control the web page it is associated with, intercepting and modifying navigation and resource requests, and caching resources in a granular fashion to control how your app behaves when the network is unavailable. Service workers run in a worker context: they have no DOM access and run on a different thread to the main JavaScript. They are non-blocking and fully asynchronous; synchronous XHR and Web Storage cannot be used inside a service worker. Service workers are only available in secure contexts — HTTPS is required, though browsers also treat http://localhost as secure for local development. The service worker lifecycle consists of registration, installation, activation, and finally controlling clients. Cache API is typically used in service workers to store versioned assets for offline use."
+    },
+    {
+      "url": "https://docs.python.org/3/library/typing.html",
+      "title": "typing — Support for type hints — Python 3.12",
+      "chunkText": "Python's typing module provides runtime support for type hints used to annotate function arguments, return types, and variables. While Python doesn't enforce these annotations at runtime, they enable type checkers, IDEs, and linters to validate code correctness. Type Aliases simplify complex type signatures by creating named references to types using the type statement in Python 3.12+. NewType creates distinct types that prevent logical errors — for example UserId = NewType('UserId', int) helps catch bugs where a plain int is used where a UserId is expected. Generics allow parameterized types for containers and functions. Special types include Any (compatible with all types), Union[X, Y] or X | Y (either X or Y), Optional[X] or X | None (may be None), and Literal (restricts to specific values). Callable annotates functions with parameter and return types. TypeVar declares generic type variables. The typing module supports gradual adoption of type safety — you can annotate incrementally. Tools like mypy, pyright, and pytype use these annotations for static analysis without affecting runtime behavior."
+    },
+    {
+      "url": "https://www.rust-lang.org/learn/get-started",
+      "title": "Getting started — Rust Programming Language",
+      "chunkText": "Rust is a systems programming language focused on safety, performance, and concurrency. Installation uses Rustup, a Rust installer and version management tool that also installs Cargo, the Rust build tool and package manager. Cargo handles building projects, running applications, testing code, generating documentation, and publishing libraries to crates.io. New projects begin with cargo new, generating a Cargo.toml manifest and src/main.rs source file. Rust enforces memory safety without a garbage collector through its ownership and borrowing system, eliminating dangling pointers, data races, and use-after-free errors at compile time. The borrow checker verifies that all references are valid at compile time. Rust's zero-cost abstractions allow high-level code to compile to machine code as efficient as hand-written C. Key memory primitives: Box<T> for heap allocation, Rc<T> for reference-counted single-threaded shared ownership, Arc<T> for thread-safe shared ownership, RefCell<T> for interior mutability. The Clone and Copy traits control how values are duplicated. Crates.io hosts thousands of open-source libraries (crates) that can be added as dependencies in Cargo.toml."
+    },
+    {
+      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout",
+      "title": "CSS grid layout — MDN Web Docs",
+      "chunkText": "CSS Grid Layout is a two-dimensional layout system for the web that enables organizing content into rows and columns with precise control over sizing, placement, and layering. A grid container is created by setting display: grid or display: inline-grid on an element; its children become grid items. Rows and columns are defined with grid-template-rows and grid-template-columns, or the shorthand grid-template. The fr unit represents a fraction of the available space in the grid container. Grid areas can be named using grid-template-areas, allowing items to be placed by area name rather than by line numbers. Items can span multiple rows and columns using grid-column and grid-row. The repeat() function reduces repetition in track definitions, and minmax() sets minimum and maximum track sizes. The auto-placement algorithm positions items into the next available grid cell automatically. Grid is especially powerful for page-level layout where you need to align elements on both axes simultaneously. It complements Flexbox, which excels at distributing items along a single axis."
+    },
+    {
+      "url": "https://tailwindcss.com/docs/responsive-design",
+      "title": "Responsive Design — Tailwind CSS",
+      "chunkText": "Tailwind CSS is a utility-first CSS framework that provides low-level utility classes for building custom designs directly in HTML. Rather than writing custom CSS, you compose designs by combining utilities like flex, pt-4, text-center, and rotate-90. The responsive design system uses a mobile-first breakpoint approach with five default breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px), and 2xl (1536px). Any utility class can be applied conditionally at a breakpoint by prefixing it with the breakpoint name followed by a colon, for example md:flex applies flex only on medium screens and above. Unprefixed utilities apply to all screen sizes while prefixed utilities override at larger sizes, so you style mobile first then progressively enhance for larger screens. Breakpoints can be customized using theme variables in your CSS. Tailwind also supports container queries using the @container directive, allowing responsive styles based on the parent element's size rather than the viewport — useful for reusable components that adapt to their context."
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+      "title": "What is AWS Lambda? — AWS Lambda Developer Guide",
+      "chunkText": "AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. Lambda runs your code on a high-availability compute infrastructure and performs all administration of the compute resources, including server and operating system maintenance, capacity provisioning, automatic scaling, and logging. With Lambda, you can run code for virtually any type of application or backend service. Lambda runs your code only when triggered — events include HTTP requests via Amazon API Gateway, S3 object uploads, DynamoDB stream changes, CloudWatch Events, SNS notifications, and dozens of other AWS services. You pay only for the compute time you consume — there is no charge when your code is not running, making it very cost-effective for variable workloads. Lambda functions are stateless and designed for event-driven architectures. Each function has configurable memory from 128 MB to 10 GB, timeout up to 15 minutes, and can access other AWS services via IAM roles. Lambda supports multiple runtimes including Node.js, Python, Java, Go, Ruby, and .NET. The Lambda execution environment is isolated using Firecracker microVMs."
+    },
+    {
+      "url": "https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/eating-a-balanced-diet/",
+      "title": "Eating a balanced diet — NHS",
+      "chunkText": "Eating a healthy, balanced diet involves consuming a variety of foods in proper proportions. A balanced diet should include at least five portions of fruit and vegetables daily, meals based on higher-fibre starchy foods, dairy or dairy alternatives, protein sources like beans, pulses, fish, and lean meat, and unsaturated oils in small amounts. Fruit and vegetables are a good source of vitamins, minerals, and fibre, and should make up just over a third of what you eat each day. A portion equals 80g of fresh or frozen produce or 150ml of unsweetened juice. Choose wholegrain or wholemeal starchy foods such as brown rice, wholewheat pasta, and brown bread for more fibre. Dairy products support bone health through calcium. Fish consumption should reach at least two portions weekly, with one being oily fish rich in omega-3 fatty acids. Excessive saturated fat, added sugar, and salt increase risks for heart disease, obesity, and tooth decay. Most UK adults consume too many calories and too little fruit, vegetables, and fibre compared to dietary guidelines."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Fermentation",
+      "title": "Fermentation — Wikipedia",
+      "chunkText": "Fermentation is a metabolic process that produces chemical changes in organic substrates through the action of enzymes. In biochemistry it is narrowly defined as the extraction of energy from carbohydrates in the absence of oxygen. In food production, fermentation is used to produce alcohol, acids, and gases. Yeasts are the primary microorganisms responsible for alcoholic fermentation, converting sugars such as glucose and fructose into ethanol and carbon dioxide — the basis for brewing beer, winemaking, and producing spirits. Lactic acid bacteria perform lactic acid fermentation, used to produce yogurt, cheese, sauerkraut, kimchi, and sourdough bread. The fermentation process typically requires an anaerobic environment and a sugar source as substrate. Temperature, pH, and nutrient availability significantly affect fermentation rates and outcomes. Homebrewing exploits these principles to produce beer and wine at home, using malt, hops, water, and yeast for beer, or fruit juice and yeast for wine. Fermentation vessels, airlocks, and temperature control are essential equipment for successful home fermentation."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Neuroplasticity",
+      "title": "Neuroplasticity — Wikipedia",
+      "chunkText": "Neuroplasticity, also known as neural plasticity or brain plasticity, is the ability of neural networks in the brain to change through growth and reorganization. These changes range from individual neuron pathways making new connections to systematic adjustments like cortical remapping. Neuroplasticity may respond to intrinsic factors such as behavior, thinking, and emotions, or to extrinsic factors such as the environment and experience. Traditional views held that the brain was relatively immutable after development, but research over recent decades has shown the brain can change significantly throughout life in response to learning, experience, and injury. Hebbian plasticity describes how synapses strengthen when neurons fire together repeatedly — often summarized as neurons that fire together wire together. Neuroplasticity underlies recovery from stroke and traumatic brain injury, as undamaged brain regions can take over functions previously handled by damaged areas. Learning a new skill, practicing an instrument, or acquiring a second language produce measurable structural changes in the brain's white and grey matter. Neuroplasticity is greatest during early childhood but continues throughout adulthood."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Photovoltaics",
+      "title": "Photovoltaics — Wikipedia",
+      "chunkText": "Photovoltaics (PV) is the conversion of light into electricity using semiconducting materials that exhibit the photovoltaic effect. A photovoltaic cell, commonly called a solar cell, is the technology used to convert solar energy directly into electrical power. The photovoltaic effect was first observed by Edmund Becquerel in 1839. Modern solar cells are made primarily from crystalline silicon — either monocrystalline or polycrystalline — or thin-film technologies such as cadmium telluride (CdTe) or copper indium gallium selenide (CIGS). When photons from sunlight strike a solar cell, they excite electrons in the semiconductor material, creating an electric current. Multiple solar cells are wired together to form a solar panel or module; panels combine into arrays to generate larger amounts of power. Commercial solar panel efficiency typically ranges from 15% to 22%. Photovoltaic systems can operate independently (off-grid) or be connected to the electrical grid (on-grid), feeding surplus electricity back to the grid via an inverter. Solar PV is one of the fastest-growing renewable energy technologies globally."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Inflation",
+      "title": "Inflation — Wikipedia",
+      "chunkText": "Inflation is a general increase in the prices of goods and services in an economy over time. When the general price level rises, each unit of currency buys fewer goods and services; inflation thus corresponds to a reduction in the purchasing power of money. The inflation rate is measured as the percentage change in a price index, typically the consumer price index (CPI) or the personal consumption expenditures price index (PCE). High inflation erodes savings and disproportionately affects those on fixed incomes. Economists distinguish between demand-pull inflation (caused by increased consumer demand outpacing supply), cost-push inflation (caused by rising production costs such as energy or wages), and built-in inflation (driven by wage-price spirals where workers demand higher wages to compensate for rising prices). Central banks use monetary policy — primarily interest rate adjustments — to control inflation. Raising interest rates reduces borrowing and spending, cooling demand and inflation. Most central banks target an annual inflation rate of around 2%, considered optimal for economic growth while preserving price stability."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Sleep_deprivation",
+      "title": "Sleep deprivation — Wikipedia",
+      "chunkText": "Sleep deprivation, also called sleep deficiency or sleep insufficiency, is the condition of not having adequate duration or quality of sleep to support decent alertness, performance, and health. It can result from insufficient sleep duration, disrupted sleep quality such as from sleep apnea, or working shifts that misalign sleep with the circadian rhythm. Symptoms include excessive daytime sleepiness, fatigue, impaired attention and concentration, memory problems, irritability, and reduced immune function. Chronic sleep deprivation is associated with increased risk of obesity, type 2 diabetes, cardiovascular disease, and depression. Causes include voluntary late nights, insomnia disorder, sleep apnea, restless legs syndrome, stress and anxiety, certain medications, and shift work. Most adults need 7–9 hours of sleep per night; adolescents need 8–10 hours. Sleep debt accumulates over time. Microsleeps — brief involuntary episodes of sleep lasting seconds — can occur during sleep deprivation and are particularly dangerous when operating vehicles or machinery. Cognitive performance impairment from extended wakefulness is comparable to legal intoxication levels."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Biodiversity",
+      "title": "Biodiversity — Wikipedia",
+      "chunkText": "Biodiversity, a contraction of biological diversity, refers to the variety and variability of life on Earth. Biodiversity is typically measured at three levels: genetic diversity (variety of genes within a species), species diversity (variety of species within a region), and ecosystem diversity (variety of ecosystems in an area). Current estimates suggest there are approximately 8.7 million eukaryotic species on Earth, though only around 1.5 million have been formally described and classified. Tropical rainforests and coral reefs are among the most biodiverse ecosystems. Biodiversity loss — sometimes called the sixth mass extinction — is occurring at rates far exceeding natural background extinction rates, driven primarily by habitat destruction, overexploitation, invasive species, pollution, and climate change. Biodiversity underpins ecosystem services including food production, clean water, climate regulation, and disease regulation. Conservation biology works to preserve biodiversity through protected areas, species recovery programs, habitat restoration, and reduction of human pressures on natural systems."
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/anxiety/",
+      "title": "Anxiety — NHS",
+      "chunkText": "Generalised anxiety disorder (GAD) is a persistent condition where feelings of stress or worry affect your daily life and are difficult to control. Symptoms include sleep disruption, restlessness, concentration difficulties, fatigue, muscle tension, digestive issues, heart palpitations, dizziness, and low mood. Most people feel anxious sometimes, but clinical anxiety occurs persistently and interferes with everyday functioning. GAD typically lacks a single identifiable trigger. Risk factors include pre-existing anxiety or depression, family history of mental health conditions, past trauma, chronic pain conditions, and substance misuse. The condition is more common in women than men. Medical professionals diagnose GAD when anxiety symptoms persist for most of the time for at least six months, combined with widespread worry patterns and functional impairment. Treatments include cognitive behavioural therapy (CBT), which teaches you to challenge and change anxious thought patterns, and medication such as SSRIs. Relaxation techniques, regular exercise, and limiting caffeine and alcohol can also help manage symptoms."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Compound_interest",
+      "title": "Compound interest — Wikipedia",
+      "chunkText": "Compound interest is interest calculated on the initial principal and also on the accumulated interest from previous periods. This contrasts with simple interest, where interest is not added to the principal. The compounding effect means a small difference in interest rate or starting time can produce dramatically different outcomes over long periods. The formula is A = P(1 + r/n)^(nt), where P is the principal, r is the annual interest rate, n is the number of compounding periods per year, and t is the time in years. The earlier an investment begins, the more powerful the compounding effect, because interest earned in early years itself earns interest for more years. A sum invested at age 25 grows significantly more by retirement than the same sum invested at 35, even if both continue contributing — because of this time compounding. This is why financial advisors consistently emphasize starting retirement savings as early as possible, even with small amounts. Albert Einstein is often (though probably apocryphally) credited with calling compound interest the eighth wonder of the world."
+    },
+    {
+      "url": "https://notion.so/user/dev-notes/b1a2c3d4",
+      "title": "Notes",
+      "chunkText": "Neovim LSP setup with lazy.nvim: installed nvim-lspconfig, mason.nvim for server management, and mason-lspconfig bridge. Configured lua_ls, pyright, tsserver, rust-analyzer. Key bindings: gd (go to definition), gr (references), K (hover docs), leader-rn (rename symbol). Added nvim-cmp for autocompletion with LSP as source, plus luasnip for snippets. Used null-ls for formatting via prettier and eslint. Treesitter for syntax highlighting significantly better than regex-based. The lazy.nvim plugin manager loads plugins on demand — startup time dropped from 400ms to 80ms compared to packer. Issue: rust-analyzer is very memory-heavy on large workspaces, set up memory limit in settings. Added .nvimrc for per-project config overrides. Telescope.nvim for fuzzy finding files, live grep, and LSP symbol search. Still need to configure DAP (debug adapter protocol) for breakpoint debugging in Neovim."
+    },
+    {
+      "url": "https://roamresearch.com/user/daily/2026-02-15",
+      "title": "Daily notes",
+      "chunkText": "Rust ownership and borrowing study notes. Ownership rules: each value has exactly one owner, owner goes out of scope means value is dropped, no garbage collector needed. Borrowing: can have multiple immutable references (&T) or exactly one mutable reference (&mut T) at a time, never both simultaneously. This prevents data races at compile time. Lifetimes: the borrow checker tracks how long references are valid; generic lifetime annotations ('a) required when functions return references derived from inputs. Key memory primitives: Box<T> for heap allocation, Rc<T> for multiple ownership with reference counting (single-threaded only), Arc<T> for thread-safe reference counting shared across threads. Clone vs Copy trait: Copy types are implicitly duplicated on assignment (integers, bools), Clone requires an explicit .clone() call (String, Vec). The Rust book Chapter 4 covers this thoroughly. Once ownership clicks, the borrow checker becomes an invaluable tool rather than an obstacle."
+    },
+    {
+      "url": "https://obsidian.md/vault/user/fitness-log",
+      "title": "Log",
+      "chunkText": "Strength training hypertrophy program week 8. Switched from Starting Strength (3x5 powerlifting focus) to a 4-day upper/lower split targeting hypertrophy with 8-12 rep range. Upper A: bench press, barbell rows, shoulder press, face pulls, bicep curls. Upper B: incline dumbbell press, weighted pullups, lateral raises, tricep pushdowns. Lower A: squats, Romanian deadlifts, leg press, calf raises. Lower B: deadlifts, leg curls, walking lunges. Progressive overload: adding 2.5kg per week to compound lifts when hitting top of rep range. Protein intake target 1.8g per kg bodyweight. Rest periods 90s for isolation movements, 2-3 min for compound lifts. Sleep is the biggest variable — muscle hypertrophy stalls without adequate recovery and high sleep quality. Zone 2 cardio 2x per week at 30 min easy pace for cardiovascular health without impacting strength gains."
+    },
+    {
+      "url": "https://bear.app/note/sourdough-experiments",
+      "title": "Note",
+      "chunkText": "Sourdough hydration experiments: 75% gave great open crumb but very sticky dough, hard to shape without heavily floured hands. 70% is more manageable and still produces a decent ear. Levain: feed 1:5:5 (starter:flour:water), ripe in 4-5h at 24C, should double and show bubbles throughout. Autolyse 45 min before incorporating levain improves gluten development without kneading. Bulk ferment at 78F (25C) for 4.5 hours with 4 stretch-and-fold sets at 30 min intervals in first 2 hours. Shaping: pre-shape, 30 min bench rest, final shape into batard, then overnight cold proof 10-12h at 4C. Bake in Dutch oven: 20 min lid on at 250C for oven spring and crust development, 20 min lid off at 230C for color. Scoring at 45 degree angle with one confident slash. Whole wheat flour at 10-15% of total flour accelerates fermentation and improves flavour complexity. Stiff levain at 50% hydration gives more pronounced tang."
+    },
+    {
+      "url": "https://evernote.com/note/budget-2026",
+      "title": "Budget notes",
+      "chunkText": "Monthly budget 2026 tracking. Fixed expenses: mortgage payment £1,650 (28yr remaining, 25yr fixed at 4.2%), council tax £185, utilities £160 average (gas, electric, water), car insurance £95/mo, contents insurance £30. Variable: groceries £380 target (usually hit), dining out £200 target (regularly overspending to £280), transport £90 Oyster card. Savings rate target: 20% of take-home. Stocks and Shares ISA maxed (£20k annual allowance) invested in Vanguard FTSE All-World index tracker. Pension: employer 5% match, contributing 8% employee side. Emergency fund at 3 months expenses in easy-access savings account. Budget leak identified: subscription creep — cancelled unused gym membership (£45/mo), reviewing streaming services. Goal: overpay mortgage by £200/mo to shorten term by approximately 4 years and save significant interest."
+    },
+    {
+      "url": "https://medium.com/p/ghi789abc",
+      "title": "Article",
+      "chunkText": "GitOps with Kubernetes using Flux CD. Core principle: the Git repository is the single source of truth for cluster state; Flux watches the repo and automatically reconciles the cluster to match. Setup: installed Flux CLI, ran flux bootstrap github with personal access token, created HelmRepository and HelmRelease manifests for each service. Kustomize overlays handle environment-specific config (dev, staging, prod) from a base directory. Key benefit: full audit trail of cluster changes via git history, and easy rollback with git revert. The image automation controller detects new image tags in a registry and opens PRs automatically. Compared Flux vs ArgoCD: Flux is lighter and CLI-driven with a GitOps-first design; ArgoCD has a better web UI and richer features. Multi-tenancy using separate namespaces per team with Kubernetes RBAC. Sealed Secrets (Bitnami) for encrypting secrets before committing to git. Health checks via Flux's built-in health assessment on HelmRelease status conditions."
+    },
+    {
+      "url": "https://gist.github.com/user/docker-compose-patterns",
+      "title": "Gist",
+      "chunkText": "Docker Compose patterns for local development. Services depend_on does not wait for health readiness — use healthcheck combined with condition: service_healthy. Override files: docker-compose.yml for the production-like base, docker-compose.override.yml is auto-loaded for dev and adds volume mounts and debug ports. Networking: all services in the same default network and reference each other by service name as hostname. Use named volumes for databases to persist data across compose down/up cycles. .env file for environment variables referenced as ${VAR_NAME}. Multi-stage Dockerfile: builder stage installs all dependencies, final stage copies only the compiled artifacts for a smaller production image. profiles: feature lets you define optional services (e.g. run only db and cache for backend dev without frontend). Compose watch mode (docker compose watch) enables live reload without volume mounts — better performance on Mac and Windows. Use resource limits with deploy.resources.limits for testing production memory constraints locally."
+    },
+    {
+      "url": "https://docs.google.com/document/d/terraform-state-notes",
+      "title": "Doc",
+      "chunkText": "Terraform state management notes. The state file (terraform.tfstate) tracks real-world resource mappings — never edit manually, always use terraform state commands. Remote backends such as S3 combined with DynamoDB for AWS enable team collaboration and prevent concurrent runs via state locking. State locking uses a DynamoDB table with LockID as the primary key. Commands: terraform state list (see all resources), terraform state show (inspect a resource), terraform state mv (rename without destroy/create), terraform state rm (remove from state without deleting real resource). Prefer separate state files per environment over workspaces for stronger isolation. Import existing resources not yet managed with terraform import. State file contains sensitive data — ensure S3 bucket server-side encryption and strict IAM access controls. Drift detection: terraform plan reveals differences between state and actual infrastructure. Modules are reusable infrastructure components; always pin module versions. terraform output exports values for use by other tools or scripts."
+    },
+    {
+      "url": "https://notion.so/team/sprint-retro-2026-q1",
+      "title": "Sprint notes",
+      "chunkText": "Sprint 14 retrospective notes. Velocity: 42 story points completed vs 47 planned (89% completion rate). What went well: async communication via Slack threads reduced meeting interruptions, pair programming sessions caught two bugs before QA, deployment pipeline now fully automated end-to-end. What didn't go well: two user stories blocked waiting for design mockups (need earlier design involvement at sprint kickoff), a production hotfix mid-sprint consumed 2 days of unplanned capacity, one story had unclear acceptance criteria causing rework and spilling into next sprint. Action items: involve design in sprint planning, add 10% capacity buffer for unplanned work, ensure every story has testable acceptance criteria before planning meeting. Team morale: 4.1 out of 5 (down from 4.4 previous sprint, likely hotfix-related stress). Next sprint capacity: 42 points after accounting for team member leave days 3 and 4."
+    },
+    {
+      "url": "https://reddit.com/r/homebrewing/comments/xyz987",
+      "title": "Thread",
+      "chunkText": "West Coast IPA recipe notes (5 gallon batch). Grain bill: 10lb 2-row pale malt, 0.5lb Crystal 40L for slight body and colour, 0.5lb Crystal 10L for light sweetness. Hops: Magnum at 60 min for bittering (targeting 65 IBU), Centennial and Chinook at 15 min for flavour, heavy Citra and Mosaic dry hop addition (4oz total) added at day 3 of fermentation after krausen drops. Yeast: Wyeast 1056 American Ale fermented at 68F. Original gravity 1.065, final gravity 1.012, estimated ABV 7%. Water profile: sulfate to chloride ratio of 3:1 for hop-forward perception — aim for 200ppm sulfate, 70ppm chloride. Transfer to keg under CO2 to minimise oxidation, the main killer of fresh hoppy beers. Dry hop 3 days, cold crash 48h at 2C, then transfer. Carbonate at 12 PSI for 7 days. Citra and Mosaic gives tropical citrus aroma; next batch will add Strata for passionfruit notes."
+    },
+    {
+      "url": "https://paper.dropbox.com/doc/japan-trip-2026",
+      "title": "Doc",
+      "chunkText": "Japan trip April 2026 planning notes. Flights: booked LHR to NRT on ANA, departing April 2, returning April 16. JR Pass 14-day Ordinary purchased online before departure (significantly cheaper than buying in Japan). Tokyo first 5 nights: Shinjuku hotel booked, planned visits to Shibuya crossing, Senso-ji temple in Asakusa, teamLab Planets (tickets pre-booked as they sell out weeks in advance). Day trip from Tokyo to Nikko for Tosho-gu shrine. Shinkansen bullet train Tokyo to Kyoto takes 2h15m on Nozomi. Kyoto 5 nights: Fushimi Inari torii gates (go before 8am to avoid crowds), Arashiyama bamboo grove, Nishiki Market, day trip to Nara for the deer park and Todai-ji temple. Osaka 3 nights: Dotonbori street food, Osaka Castle, day trip to Hiroshima and Miyajima island. Cherry blossom sakura peak in Tokyo typically April 1-10, Kyoto April 3-12. IC card (Suica or Pasmo) essential for local transit. Cash still important — many restaurants, shrines, and rural areas are cash only."
+    },
+    {
+      "url": "https://notion.so/user/reading-list-philosophy",
+      "title": "Reading list",
+      "chunkText": "Philosophy reading list 2026. Currently reading: Meditations by Marcus Aurelius in the Gregory Hays translation (most readable modern version). Key Stoic themes: virtue as the only true good, living according to nature and reason, memento mori as motivating force rather than cause for despair, dichotomy of control — focus only on what you control (your thoughts, values, actions) and accept what you cannot. Next on list: The Obstacle is the Way by Ryan Holiday (applies Stoic principles to modern setbacks and obstacles), Letters from a Stoic by Seneca (shorter letters easier to read in sessions than full essays). Already read: Enchiridion by Epictetus (dense but foundational, explains Stoic logic at source). Notes: the Stoics were far more practical and action-oriented than the modern word stoic implies. Marcus Aurelius wrote Meditations as a private journal, not for publication. Daily practice: journaling with negative visualisation (premeditatio malorum) and reviewing the day against core Stoic principles."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Python_(genus)",
+      "title": "Python (genus) — Wikipedia",
+      "description": "Genus of large nonvenomous constrictor snakes native to Africa and Asia.",
+      "chunkText": "Pythons are large nonvenomous constrictor snakes constituting the genus Python, native to Africa and Asia. The genus comprises approximately 10 recognised species, including the reticulated python (Python reticulatus), the longest snake species in the world capable of exceeding 6 metres. Pythons are ambush predators that kill prey by constriction, squeezing until the prey suffocates, then swallowing it whole. They are often found near water sources. Ball pythons (Python regius) are popular in the exotic pet trade due to their manageable size and docile temperament. Python skin has historically been used in leather goods, driving significant exploitation. Several python species are listed as threatened or vulnerable on the IUCN Red List due to habitat loss, hunting for skins and bushmeat, and collection for the pet trade. Pythons are oviparous (egg-laying) and females exhibit maternal incubation behaviour, coiling around eggs to regulate temperature."
+    },
+    {
+      "url": "https://www.perfectdailygrind.com/java-coffee-origins",
+      "title": "Java Coffee: History and Origins",
+      "description": "The Indonesian island of Java gave coffee its famous nickname. Dutch colonial plantations established Java's coffee industry in the 17th century.",
+      "chunkText": "Java coffee refers to coffee grown on the Indonesian island of Java, one of the world's earliest major coffee-producing regions. The Dutch colonial government established coffee plantations on Java in the late 17th century, making it one of the first places outside Ethiopia and Yemen to cultivate coffee commercially. The island's volcanic soil and tropical climate produce coffee with a full body and relatively low acidity, often with earthy, chocolatey, and slightly spicy tasting notes. Java Arabica is typically wet-processed (washed), contributing to its cleaner flavour profile compared to naturally processed coffees. The Dutch East India Company (VOC) controlled Java's coffee trade for much of the 18th century. The term Java became synonymous with coffee in English slang. Java coffee is often used in blends, most famously in the classic Mocha-Java blend combining Yemeni Mocha coffee with Javanese beans — one of the oldest known coffee blends."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Grid_computing",
+      "title": "Grid computing — Wikipedia",
+      "description": "Distributed computing infrastructure that pools geographically dispersed resources for large-scale computational tasks.",
+      "chunkText": "Grid computing is a form of distributed computing that coordinates resources distributed across multiple administrative domains to reach a common computational goal. Grids are typically more loosely coupled, heterogeneous, and geographically dispersed than traditional high-performance computing clusters. The grid model connects computers to allow sharing of computational power, databases, and storage across institutional and organisational boundaries. Notable examples include the World Community Grid, SETI@home (which used volunteer home computers to analyse radio telescope data searching for extraterrestrial intelligence), and CERN's Worldwide LHC Computing Grid (WLCG) which processes petabytes of data from the Large Hadron Collider. Grid middleware such as Globus Toolkit provides resource management, security, and data transfer. Grid computing was a significant precursor to modern cloud computing, though clouds offer more standardised on-demand resource provisioning via virtualisation."
+    },
+    {
+      "url": "https://www.rustoleum.com/product-catalog/consumer-brands/stops-rust",
+      "title": "Stops Rust — Rust-Oleum Protective Paint",
+      "description": "Rust-Oleum is a manufacturer of protective paints and coatings, best known for rust-inhibiting primers and topcoats.",
+      "chunkText": "Rust-Oleum is a manufacturer of protective paints, coatings, and finishes founded in 1921. Core product lines include rust-preventative primers and topcoats for metal surfaces, wood stains and deck finishes, floor coatings, spray paints, and automotive refinishing products. The brand is well known for industrial-grade rust-inhibiting primers that penetrate existing rust and prevent further corrosion on metal. Rust-Oleum products are available in spray can and brush-on formulations for both consumer DIY and professional use. The Stops Rust line is the flagship product range for corrosion protection on outdoor metal surfaces including fencing, gates, and garden furniture. Other popular lines include Chalked paint for furniture, Varathane for wood floors, and Universal spray paint that adheres to multiple surfaces without a primer coat. Rust-Oleum is a subsidiary of RPM International and is headquartered in Vernon Hills, Illinois."
+    },
+    {
+      "url": "https://www.reddit.com/r/worldnews/",
+      "title": "World News — Reddit"
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "title": "Never Gonna Give You Up — YouTube"
+    },
+    {
+      "url": "https://www.amazon.com/s?k=mechanical+keyboards",
+      "title": "Mechanical Keyboards — Amazon Search Results"
+    },
+    {
+      "url": "https://x.com/home",
+      "title": "Home / X"
+    },
+    {
+      "url": "https://www.instagram.com/explore/reels/",
+      "title": "Reels — Instagram"
+    },
+    {
+      "url": "https://www.netflix.com/browse",
+      "title": "Home — Netflix"
+    },
+    {
+      "url": "https://news.ycombinator.com",
+      "title": "Hacker News"
+    },
+    {
+      "url": "https://www.nytimes.com/games/wordle/index.html",
+      "title": "Wordle — The New York Times"
+    },
+    {
+      "url": "https://weather.com/en-US/weather/today/l/London+England+United+Kingdom",
+      "title": "London Weather Today — Weather.com"
+    },
+    {
+      "url": "https://www.tripadvisor.com/Restaurants-g186338-London_England.html",
+      "title": "Best Restaurants in London — TripAdvisor"
+    },
+    {
+      "url": "https://www.zillow.com/homes-for-sale/",
+      "title": "Homes For Sale — Zillow"
+    },
+    {
+      "url": "https://www.espn.com/nfl/scoreboard",
+      "title": "NFL Scores & Schedules — ESPN"
+    },
+    {
+      "url": "https://www.twitch.tv/directory/game/League+of+Legends",
+      "title": "League of Legends — Twitch"
+    },
+    {
+      "url": "https://www.chess.com/play/computer",
+      "title": "Play Computer — Chess.com"
+    },
+    {
+      "url": "https://www.booking.com/flights",
+      "title": "Cheap Flights — Booking.com"
+    },
+    {
+      "url": "https://www.ebay.com/b/Cameras-Photo/625/bn_1645332",
+      "title": "Cameras & Photo — eBay"
+    },
+    {
+      "url": "https://www.duolingo.com/learn",
+      "title": "Learn a Language for Free — Duolingo"
+    },
+    {
+      "url": "https://open.spotify.com/playlist/37i9dQZEVXbMDoHDwVN2tF",
+      "title": "Top 50 — Global — Spotify"
+    }
+  ],
+  "queries": [
+    {
+      "query": "Kotlin coroutines structured concurrency",
+      "category": "keyword",
+      "relevantUrls": ["https://kotlinlang.org/docs/coroutines-basics.html"],
+      "referenceAnswer": "Your history includes Coroutines basics on the Kotlin documentation site at kotlinlang.org/docs/coroutines-basics.html, covering suspending functions, structured concurrency, coroutine builders, and dispatchers."
+    },
+    {
+      "query": "JavaScript Promise async await",
+      "category": "keyword",
+      "relevantUrls": ["https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"],
+      "referenceAnswer": "You visited the Promise page on MDN Web Docs at developer.mozilla.org, which explains how Promises represent asynchronous operations, the pending/fulfilled/rejected states, and how to chain them with then(), catch(), and finally()."
+    },
+    {
+      "query": "Python async event loop coroutines",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.python.org/3/library/asyncio.html"],
+      "referenceAnswer": "Your history includes the Python asyncio documentation at docs.python.org/3/library/asyncio.html, covering the async/await syntax, event loops, and high-level APIs for concurrent Python programming."
+    },
+    {
+      "query": "Docker container image deployment",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.docker.com/get-started/docker-overview/"],
+      "referenceAnswer": "You visited the Docker overview page at docs.docker.com, explaining how Docker containers work, the client-server architecture, images versus containers, and how Docker enables portable application deployment."
+    },
+    {
+      "query": "Git repository version control branching",
+      "category": "keyword",
+      "relevantUrls": ["https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control"],
+      "referenceAnswer": "Your history includes the Pro Git book chapter on version control at git-scm.com, covering local, centralised, and distributed version control systems and why Git's distributed model makes every clone a full backup."
+    },
+    {
+      "query": "PostgreSQL B-tree index types query",
+      "category": "keyword",
+      "relevantUrls": ["https://www.postgresql.org/docs/current/indexes-types.html"],
+      "referenceAnswer": "You visited the PostgreSQL Index Types documentation at postgresql.org, covering B-tree, Hash, GiST, SP-GiST, GIN, and BRIN index types and when to use each."
+    },
+    {
+      "query": "Kubernetes pod container orchestration",
+      "category": "keyword",
+      "relevantUrls": ["https://kubernetes.io/docs/concepts/workloads/pods/"],
+      "referenceAnswer": "Your history includes the Kubernetes Pods documentation at kubernetes.io, explaining that Pods are the smallest deployable units, how single and multi-container Pods work, and workload resources like Deployment and StatefulSet."
+    },
+    {
+      "query": "React state management component lifting",
+      "category": "keyword",
+      "relevantUrls": ["https://react.dev/learn/managing-state"],
+      "referenceAnswer": "You visited Managing State in the React documentation at react.dev, covering how to structure state, lift state to common parents, use reducers to consolidate state logic, and share state via Context to avoid prop drilling."
+    },
+    {
+      "query": "GraphQL query fields API",
+      "category": "keyword",
+      "relevantUrls": ["https://graphql.org/learn/queries/"],
+      "referenceAnswer": "Your history includes the GraphQL queries documentation at graphql.org, explaining how to request specific fields, traverse related objects, use variables, fragments, and directives in GraphQL queries."
+    },
+    {
+      "query": "GitHub Actions workflow CI/CD pipeline",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.github.com/en/actions/about-github-actions/understanding-github-actions"],
+      "referenceAnswer": "You visited Understanding GitHub Actions at docs.github.com, covering workflows, jobs, runners, and steps for automating build, test, and deployment pipelines directly in GitHub."
+    },
+    {
+      "query": "Next.js app router TypeScript setup",
+      "category": "keyword",
+      "relevantUrls": ["https://nextjs.org/docs/app/getting-started/installation"],
+      "referenceAnswer": "Your history includes the Next.js installation guide at nextjs.org, covering create-next-app setup, the App Router with file-system routing, TypeScript support, and development scripts."
+    },
+    {
+      "query": "service worker offline cache web app",
+      "category": "keyword",
+      "relevantUrls": ["https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API"],
+      "referenceAnswer": "You visited the Service Worker API on MDN Web Docs at developer.mozilla.org, explaining how service workers act as network proxies to enable offline experiences, request interception, and asset caching."
+    },
+    {
+      "query": "Python type hints static typing annotations",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.python.org/3/library/typing.html"],
+      "referenceAnswer": "Your history includes the Python typing module documentation at docs.python.org, covering type hints, type aliases, NewType, generics, Union, Optional, and how tools like mypy use annotations for static analysis."
+    },
+    {
+      "query": "Rust ownership memory safety programming",
+      "category": "keyword",
+      "relevantUrls": [
+        "https://www.rust-lang.org/learn/get-started",
+        "https://roamresearch.com/user/daily/2026-02-15"
+      ],
+      "referenceAnswer": "Your history includes the Rust getting started guide at rust-lang.org covering the ownership and borrowing system, Cargo package manager, and zero-cost abstractions — and personal study notes at roamresearch.com/user/daily/2026-02-15 about the borrow checker, lifetimes, Box, Rc, and Arc."
+    },
+    {
+      "query": "CSS grid layout rows columns web",
+      "category": "keyword",
+      "relevantUrls": ["https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout"],
+      "referenceAnswer": "You visited the CSS Grid Layout page on MDN Web Docs at developer.mozilla.org, covering grid containers, fr units, grid-template-areas, item placement, and how Grid complements Flexbox for two-dimensional layouts."
+    },
+    {
+      "query": "AWS Lambda serverless functions event trigger",
+      "category": "keyword",
+      "relevantUrls": ["https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"],
+      "referenceAnswer": "Your history includes the AWS Lambda Developer Guide at docs.aws.amazon.com/lambda, explaining serverless compute, event-driven triggers, supported runtimes, and the pay-per-invocation pricing model."
+    },
+    {
+      "query": "making beer or wine at home fermentation",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Fermentation"],
+      "referenceAnswer": "Your history includes the Fermentation Wikipedia article at en.wikipedia.org/wiki/Fermentation, which explains how yeasts convert sugars into ethanol and CO2 in the brewing and winemaking process, and covers the equipment and conditions needed for home fermentation."
+    },
+    {
+      "query": "can the brain rewire itself after injury",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Neuroplasticity"],
+      "referenceAnswer": "You visited the Neuroplasticity Wikipedia article at en.wikipedia.org/wiki/Neuroplasticity, which explains how the brain can reorganize its neural connections throughout life in response to learning, experience, and injury — the scientific basis for recovery after stroke or brain damage."
+    },
+    {
+      "query": "how solar panels convert sunlight to electricity",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Photovoltaics"],
+      "referenceAnswer": "Your history includes the Photovoltaics Wikipedia article at en.wikipedia.org/wiki/Photovoltaics, explaining the photovoltaic effect where photons excite electrons in silicon semiconductors to generate electricity, and covering solar cell types and panel efficiency."
+    },
+    {
+      "query": "why everyday prices keep rising",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Inflation"],
+      "referenceAnswer": "You visited the Inflation Wikipedia article at en.wikipedia.org/wiki/Inflation, which explains how general price increases reduce purchasing power, the causes of inflation (demand-pull, cost-push, built-in), and how central banks use interest rates to control it."
+    },
+    {
+      "query": "always exhausted even after sleeping enough",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Sleep_deprivation"],
+      "referenceAnswer": "Your history includes the Sleep deprivation Wikipedia article at en.wikipedia.org/wiki/Sleep_deprivation, covering how insufficient or disrupted sleep causes fatigue, cognitive impairment, and longer-term health risks, and listing causes from sleep apnea to shift work."
+    },
+    {
+      "query": "variety of plant and animal species on Earth",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Biodiversity"],
+      "referenceAnswer": "You visited the Biodiversity Wikipedia article at en.wikipedia.org/wiki/Biodiversity, which covers genetic, species, and ecosystem diversity, the estimated 8.7 million species on Earth, and the current biodiversity loss driven by habitat destruction and climate change."
+    },
+    {
+      "query": "persistent worry that is hard to control",
+      "category": "semantic",
+      "relevantUrls": ["https://www.nhs.uk/conditions/anxiety/"],
+      "referenceAnswer": "Your history includes the Anxiety page on NHS at nhs.uk/conditions/anxiety, which describes generalised anxiety disorder symptoms (restlessness, fatigue, poor concentration, sleep problems), causes, and treatments including CBT and medication."
+    },
+    {
+      "query": "why saving money early makes such a big difference",
+      "category": "semantic",
+      "relevantUrls": ["https://en.wikipedia.org/wiki/Compound_interest"],
+      "referenceAnswer": "You visited the Compound interest Wikipedia article at en.wikipedia.org/wiki/Compound_interest, explaining how interest earns interest over time — and why starting to save in your 20s produces dramatically more wealth by retirement than starting in your 30s."
+    },
+    {
+      "query": "eating more whole foods less processed junk",
+      "category": "semantic",
+      "relevantUrls": ["https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/eating-a-balanced-diet/"],
+      "referenceAnswer": "Your history includes the NHS balanced diet guide at nhs.uk, covering the recommended proportions of fruit, vegetables, starchy whole grains, protein, and dairy, and warning against excessive saturated fat, sugar, and salt."
+    },
+    {
+      "query": "neovim LSP configuration plugin manager",
+      "category": "body-only",
+      "relevantUrls": ["https://notion.so/user/dev-notes/b1a2c3d4"],
+      "referenceAnswer": "Your history includes development notes at notion.so/user/dev-notes/b1a2c3d4 covering Neovim LSP setup with lazy.nvim, nvim-lspconfig, mason.nvim, nvim-cmp autocompletion, Treesitter, and Telescope configuration."
+    },
+    {
+      "query": "Rust Arc Rc smart pointers borrow checker",
+      "category": "body-only",
+      "relevantUrls": ["https://roamresearch.com/user/daily/2026-02-15"],
+      "referenceAnswer": "Your history includes Rust study notes at roamresearch.com/user/daily/2026-02-15 covering Box<T>, Rc<T>, and Arc<T> smart pointers, ownership rules, the borrow checker, lifetimes, and the distinction between Copy and Clone traits."
+    },
+    {
+      "query": "progressive overload hypertrophy upper lower split",
+      "category": "body-only",
+      "relevantUrls": ["https://obsidian.md/vault/user/fitness-log"],
+      "referenceAnswer": "Your history includes a fitness log at obsidian.md/vault/user/fitness-log describing a 4-day upper/lower hypertrophy split with 8-12 rep ranges, compound and isolation exercises, and progressive overload approach."
+    },
+    {
+      "query": "sourdough levain autolyse cold proof timing",
+      "category": "body-only",
+      "relevantUrls": ["https://bear.app/note/sourdough-experiments"],
+      "referenceAnswer": "Your history includes sourdough baking notes at bear.app/note/sourdough-experiments covering levain ratios, autolyse technique, bulk fermentation timing, hydration percentages, shaping, and Dutch oven baking temperatures."
+    },
+    {
+      "query": "mortgage ISA pension monthly savings budget",
+      "category": "body-only",
+      "relevantUrls": ["https://evernote.com/note/budget-2026"],
+      "referenceAnswer": "Your history includes budget notes at evernote.com/note/budget-2026 tracking monthly expenses including a £1,650 mortgage, ISA investing, pension contributions, and a goal to overpay the mortgage to shorten the term."
+    },
+    {
+      "query": "Flux CD HelmRelease Kustomize GitOps Kubernetes",
+      "category": "body-only",
+      "relevantUrls": ["https://medium.com/p/ghi789abc"],
+      "referenceAnswer": "Your history includes an article at medium.com/p/ghi789abc covering GitOps with Flux CD on Kubernetes, including HelmRelease manifests, Kustomize environment overlays, image automation, and a comparison of Flux vs ArgoCD."
+    },
+    {
+      "query": "Docker Compose healthcheck service dependency override",
+      "category": "body-only",
+      "relevantUrls": ["https://gist.github.com/user/docker-compose-patterns"],
+      "referenceAnswer": "Your history includes Docker Compose patterns at gist.github.com/user/docker-compose-patterns covering healthcheck conditions, override files, named volumes, profiles, multi-stage Dockerfiles, and the Compose watch mode."
+    },
+    {
+      "query": "Terraform S3 remote state backend locking",
+      "category": "body-only",
+      "relevantUrls": ["https://docs.google.com/document/d/terraform-state-notes"],
+      "referenceAnswer": "Your history includes Terraform state management notes at docs.google.com/document/d/terraform-state-notes covering S3 and DynamoDB remote backends, state locking, terraform state commands, drift detection, and module version pinning."
+    },
+    {
+      "query": "sprint retrospective velocity action items agile",
+      "category": "body-only",
+      "relevantUrls": ["https://notion.so/team/sprint-retro-2026-q1"],
+      "referenceAnswer": "Your history includes sprint retrospective notes at notion.so/team/sprint-retro-2026-q1 covering velocity (42 of 47 planned points), blockers from missing design mockups, an unplanned hotfix, and action items for the next sprint."
+    },
+    {
+      "query": "IPA dry hopping Citra Mosaic water profile sulfate",
+      "category": "body-only",
+      "relevantUrls": ["https://reddit.com/r/homebrewing/comments/xyz987"],
+      "referenceAnswer": "Your history includes a homebrewing thread at reddit.com/r/homebrewing/comments/xyz987 with a West Coast IPA recipe covering grain bill, Citra and Mosaic dry hopping, water chemistry sulfate-to-chloride ratios, and kegging technique."
+    },
+    {
+      "query": "Japan trip JR Pass cherry blossom Kyoto Osaka",
+      "category": "body-only",
+      "relevantUrls": ["https://paper.dropbox.com/doc/japan-trip-2026"],
+      "referenceAnswer": "Your history includes Japan trip planning notes at paper.dropbox.com/doc/japan-trip-2026 covering flights, JR Pass, cherry blossom timing, Tokyo and Kyoto itinerary, Shinkansen travel, and practical tips on IC cards and cash."
+    },
+    {
+      "query": "Marcus Aurelius Meditations stoicism Ryan Holiday",
+      "category": "body-only",
+      "relevantUrls": ["https://notion.so/user/reading-list-philosophy"],
+      "referenceAnswer": "Your history includes a philosophy reading list at notion.so/user/reading-list-philosophy covering Meditations by Marcus Aurelius, The Obstacle is the Way by Ryan Holiday, Seneca's Letters, and Epictetus — with notes on the dichotomy of control and daily Stoic practice."
+    },
+    {
+      "query": "vintage motorcycle restoration parts",
+      "category": "negative",
+      "relevantUrls": []
+    },
+    {
+      "query": "portrait oil painting techniques canvas",
+      "category": "negative",
+      "relevantUrls": []
+    },
+    {
+      "query": "competitive chess openings sicilian defense",
+      "category": "negative",
+      "relevantUrls": []
+    },
+    {
+      "query": "beekeeping honey extraction hive management",
+      "category": "negative",
+      "relevantUrls": []
+    }
+  ]
+}

@@ -59,6 +59,21 @@ class Bm25ScorerEvalTest {
         assertFloors(results)
     }
 
+    /** Observation run on the real-sites corpus — no floor assertions. */
+    @Test
+    fun `bm25 quality report real corpus`() {
+        val realCorpus = EvalCorpusLoader.load(
+            checkNotNull(javaClass.getResourceAsStream("/eval_corpus_real.json")) {
+                "eval_corpus_real.json not found"
+            },
+        )
+        val results: List<Triple<EvalQuery, Double, Double>> = realCorpus.queries.map { q ->
+            val ranked: List<HistoryEntry.VisitedPage> = Bm25Scorer.rank(q.query, realCorpus.entries)
+            Triple(q, precisionAtK(ranked, q.relevantUrls, 5), mrr(ranked, q.relevantUrls))
+        }
+        printTable(results)
+    }
+
     // ── Reporting ─────────────────────────────────────────────────────────────
 
     private fun printTable(results: List<Triple<EvalQuery, Double, Double>>) {
