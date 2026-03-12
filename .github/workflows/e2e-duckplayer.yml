@@ -1,4 +1,4 @@
-name: 'End to End Tests - Duck Player (Nightly)'
+name: 'End to End Tests - Duck Player'
 
 on:
   pull_request:
