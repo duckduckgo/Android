@@ -30,10 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -45,48 +42,25 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 import com.duckduckgo.mobile.android.R
 
 /**
- * A status indicator representing one of three states: Always On, On, or Off.
+ * DaxStatusIndicator component is representing one of three states: Always On, On, or Off.
  *
  * @param status The [Status] to represent.
  * @param modifier The [Modifier] to be applied to this status indicator.
  */
 @Composable
-fun StatusIndicator(
+fun DaxStatusIndicator(
     status: Status,
     modifier: Modifier = Modifier,
 ) {
     val (active, label) = when (status) {
-        Status.ALWAYS_ON -> true to stringResource(R.string.alwaysOn)
-        Status.ON -> true to stringResource(R.string.on)
-        Status.OFF -> false to stringResource(R.string.off)
+        Status.Always_On -> true to stringResource(R.string.alwaysOn)
+        Status.On -> true to stringResource(R.string.on)
+        Status.Off -> false to stringResource(R.string.off)
     }
-    StatusIndicator(
-        active = active,
-        label = label,
-        modifier = modifier,
-    )
-}
-
-/**
- * A simple status indicator with a colored dot and a label.
- *
- * @param active Whether the status is active (true) or inactive (false).
- * @param label The label to display next to the dot.
- * @param modifier The [Modifier] to be applied to this status indicator.
- */
-@Composable
-fun StatusIndicator(
-    active: Boolean,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
     Row(
         modifier = modifier
             .heightIn(min = StatusIndicatorDefaults.minHeight)
-            .semantics(mergeDescendants = true) {
-                this.text = AnnotatedString(label)
-                this.selected = active
-            },
+            .semantics(mergeDescendants = true) { },
         horizontalArrangement = Arrangement.spacedBy(space = StatusIndicatorDefaults.spacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -98,7 +72,7 @@ fun StatusIndicator(
                     color = if (active) {
                         StatusIndicatorDefaults.activeDotColor
                     } else {
-                        StatusIndicatorDefaults.disableDotColor
+                        StatusIndicatorDefaults.disabledDotColor
                     },
                     shape = CircleShape,
                 ),
@@ -112,23 +86,23 @@ fun StatusIndicator(
 }
 
 /**
- * The possible statuses for the [StatusIndicator].
+ * The possible statuses for the [DaxStatusIndicator].
  */
 enum class Status {
     /**
      * Indicates that the status is always on.
      */
-    ALWAYS_ON,
+    Always_On,
 
     /**
      * Indicates that the status is on.
      */
-    ON,
+    On,
 
     /**
      * Indicates that the status is off.
      */
-    OFF,
+    Off,
 }
 
 object StatusIndicatorDefaults {
@@ -136,7 +110,7 @@ object StatusIndicatorDefaults {
     internal val spacing = 4.dp
     internal val minHeight = 16.dp
 
-    internal val disableDotColor: Color
+    internal val disabledDotColor: Color
         @Composable
         get() = DisabledColor
 
@@ -155,21 +129,12 @@ object StatusIndicatorDefaults {
 
 @PreviewLightDark
 @Composable
-private fun StatusIndicatorPreview() {
+private fun DaxStatusIndicatorPreview() {
     PreviewBox {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            StatusIndicator(
-                active = true,
-                label = "Always On",
-            )
-            StatusIndicator(
-                active = true,
-                label = "On",
-            )
-            StatusIndicator(
-                active = false,
-                label = "Off",
-            )
+            DaxStatusIndicator(status = Status.Always_On)
+            DaxStatusIndicator(status = Status.On)
+            DaxStatusIndicator(status = Status.Off)
         }
     }
 }
