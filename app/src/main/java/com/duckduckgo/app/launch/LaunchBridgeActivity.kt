@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity.Companion.DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -54,9 +55,13 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         splashScreen.setKeepOnScreenCondition { true }
 
         setContentView(R.layout.activity_launch)
