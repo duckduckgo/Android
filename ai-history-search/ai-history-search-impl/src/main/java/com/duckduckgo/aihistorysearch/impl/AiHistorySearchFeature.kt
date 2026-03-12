@@ -75,6 +75,26 @@ interface AiHistorySearchFeature {
     fun gemmaEnabled(): Toggle
 
     /**
+     * When enabled, llama.cpp (GGUF) runs on-device as a shadow path for full history ranking.
+     * Same prompt as [gemmaEnabled] — results are directly comparable for latency/quality.
+     * Logcat only — Duck.ai always opens normally.
+     * PoC: evaluates whether llama.cpp's ARM NEON kernels beat MediaPipe for on-device LLM.
+     * Defaults to `internal` so it only runs on internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun llamaCppEnabled(): Toggle
+
+    /**
+     * When enabled, llama.cpp runs a query debloating step before BM25/embedding retrieval.
+     * Strips conversational padding from verbose queries to produce compact keyword form.
+     * Caps output at 20 tokens — expected ~1–3 s vs ~10–20 s for full generation.
+     * Logcat only — Duck.ai always opens normally.
+     * Defaults to `internal` so it only runs on internal builds.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun llamaCppDebloatEnabled(): Toggle
+
+    /**
      * When enabled, a JS snippet is injected after each page load to extract the page's
      * og:description / meta description and first h1 text, and write them back to the
      * history entry via [NavigationHistory.updateHistoryMetadata].

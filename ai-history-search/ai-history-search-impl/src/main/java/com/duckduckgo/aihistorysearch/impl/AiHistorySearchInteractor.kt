@@ -46,6 +46,8 @@ class AiHistorySearchInteractor @Inject constructor(
     private val embeddingScorer: EmbeddingScorer by lazy { EmbeddingScorer(context) }
     private val geminiNanoSearcher: GeminiNanoSearcher by lazy { GeminiNanoSearcher() }
     private val gemmaSearcher: GemmaSearcher by lazy { GemmaSearcher(context) }
+    private val llamaCppSearcher: LlamaCppSearcher by lazy { LlamaCppSearcher(context) }
+    private val llamaCppDebloater: LlamaCppDebloater by lazy { LlamaCppDebloater(context) }
 
     /**
      * Builds a [DuckChatContextualResult.Submit] for [query] without opening Duck.ai.
@@ -88,6 +90,9 @@ class AiHistorySearchInteractor @Inject constructor(
         }
         if (feature.gemmaEnabled().isEnabled()) {
             appScope.launch { gemmaSearcher.search(query, timeFiltered) }
+        }
+        if (feature.llamaCppEnabled().isEnabled()) {
+            appScope.launch { llamaCppSearcher.search(query, timeFiltered) }
         }
 
         return when {
