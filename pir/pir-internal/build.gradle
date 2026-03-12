@@ -26,6 +26,7 @@ android {
 dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
+    implementation project(':edge-to-edge-api')
     implementation project(':browser-api')
     implementation project(':design-system')
     implementation project(':common-utils')

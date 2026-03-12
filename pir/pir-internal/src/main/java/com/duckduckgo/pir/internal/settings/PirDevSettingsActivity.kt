@@ -17,6 +17,10 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -24,6 +28,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
@@ -53,15 +58,33 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirNotificationManager: PirNotificationManager
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        setupEdgeToEdge()
         setupViews()
         bindViews()
         pirNotificationManager.createNotificationChannel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.appBar.updatePadding(top = insets.top)
+            binding.scrollView.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     private fun setupViews() {
