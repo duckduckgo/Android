@@ -30,7 +30,9 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordRe
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AutofillImportViaGooglePasswordManagerScreen::class)
@@ -38,9 +40,14 @@ class ImportGooglePasswordsWebFlowActivity : DuckDuckGoActivity() {
 
     val binding: ActivityImportGooglePasswordsWebflowBinding by viewBinding()
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
         configureResultListeners()
         launchImportFragment()
     }
