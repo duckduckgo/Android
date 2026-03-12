@@ -42,6 +42,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
     implementation project(':broken-site-api')
+    implementation project(':edge-to-edge-api')
     api AndroidX.dataStore.preferences
 
     implementation Google.dagger

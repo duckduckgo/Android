@@ -21,6 +21,9 @@ import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +38,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyPar
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -77,6 +81,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
@@ -158,7 +165,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
         configureWebView()
 
         val initialScreen = when (params) {
@@ -261,6 +270,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 url: String?,
             ) {
                 super.onPageFinished(view, url)
+                applyWebViewBackgroundToContainer()
                 configViewStateObserver()
             }
         }
@@ -276,6 +286,41 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     dashboardRenderer.render(it)
                 }
         }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime(),
+            )
+            view.updatePadding(top = insets.top, bottom = insets.bottom)
+            windowInsets
+        }
+    }
+
+    private fun applyWebViewBackgroundToContainer() {
+        webView.evaluateJavascript(
+            "window.getComputedStyle(document.body).backgroundColor",
+        ) { colorResult ->
+            val color = parseRgbColor(colorResult)
+            if (color != null) {
+                binding.root.setBackgroundColor(color)
+            }
+        }
+    }
+
+    private fun parseRgbColor(cssColor: String?): Int? {
+        if (cssColor.isNullOrBlank()) return null
+        val cleaned = cssColor.trim('"').trim()
+
+        val rgbRegex = Regex("""rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)""")
+        val match = rgbRegex.find(cleaned) ?: return null
+
+        val (r, g, b) = match.destructured
+        return android.graphics.Color.rgb(r.toInt(), g.toInt(), b.toInt())
     }
 
     override fun onBackPressed() {
