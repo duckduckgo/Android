@@ -20,6 +20,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -31,6 +34,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
@@ -67,6 +71,9 @@ class SubscriptionFeedbackActivity :
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
     private val binding: ActivityFeedbackBinding by viewBinding()
     private val viewModel: SubscriptionFeedbackViewModel by bindViewModel()
 
@@ -75,8 +82,10 @@ class SubscriptionFeedbackActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(toolbar)
+        setupEdgeToEdge()
         observeViewModel()
         handleInitialState()
         onBackPressedDispatcher.addCallback(
@@ -106,6 +115,17 @@ class SubscriptionFeedbackActivity :
 
         intent.getActivityParams(PrivacyProAppFeedbackScreenWithParams::class.java)?.let {
             viewModel.allowUserToReportAppIssue(it.appName, it.appPackageName)
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.feedbackFragmentContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
