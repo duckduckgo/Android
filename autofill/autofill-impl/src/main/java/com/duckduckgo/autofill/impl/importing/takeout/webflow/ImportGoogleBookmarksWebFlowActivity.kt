@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.journey.ImportGoog
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import logcat.logcat
@@ -53,6 +54,9 @@ class ImportGoogleBookmarksWebFlowActivity :
     @Inject
     lateinit var importJourney: ImportGoogleBookmarksJourney
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     val binding: ActivityImportGoogleBookmarksWebflowBinding by viewBinding()
 
     private var isOverlayCurrentlyShown = false
@@ -60,6 +64,7 @@ class ImportGoogleBookmarksWebFlowActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         configureToolbar()
         configureResultListeners()

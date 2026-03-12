@@ -24,6 +24,9 @@ import android.view.ViewGroup
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
@@ -237,10 +240,23 @@ class ImportGoogleBookmarksWebFlowFragment :
             configureWebViewSettings(webView)
             configureDownloadInterceptor(webView)
             configureAutofill(webView)
+            configureWindowInsets(webView)
 
             lifecycleScope.launch {
                 configureBookmarkImportJavascript(webView)
             }
+        }
+    }
+
+    private fun configureWindowInsets(webView: WebView) {
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
     }
 
