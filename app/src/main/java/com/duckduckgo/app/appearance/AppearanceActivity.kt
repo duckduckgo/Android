@@ -20,7 +20,10 @@ import android.animation.ValueAnimator
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -51,6 +54,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -64,6 +68,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 class AppearanceActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
@@ -119,9 +126,10 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
 
         configureUiEventHandlers()
         observeViewModel()
@@ -335,6 +343,17 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
         splitOmnibarToggleImage.setImageDrawable(ContextCompat.getDrawable(context, split.imageRes))
         splitOmnibarToggleCheck.setImageDrawable(ContextCompat.getDrawable(context, split.checkRes))
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private sealed class InputScreenToggleButton(
