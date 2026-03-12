@@ -17,20 +17,30 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import logcat.logcat
 
 class DuckChatContextualSharedViewModel() : ViewModel() {
 
-    private val _command = Channel<Command>()
-    val commands = _command.receiveAsFlow() // Activity will collect this
+    private val _command = MutableSharedFlow<Command>(extraBufferCapacity = 10)
+    val commands = _command.asSharedFlow()
 
     fun onPageContextReceived(tabId: String, pageContext: String) {
-        _command.trySend(Command.PageContextAttached(tabId, pageContext))
+        _command.tryEmit(Command.PageContextAttached(tabId, pageContext))
     }
 
     fun onOpenRequested() {
-        _command.trySend(Command.OpenSheet)
+        _command.tryEmit(Command.OpenSheet)
+    }
+
+    fun requestPageContext() {
+        _command.tryEmit(Command.CollectPageContext)
+    }
+
+    fun onMainBrowserPageFinished(url: String?) {
+        logcat { "Duck.ai: onMainBrowserPageFinished $url" }
+        _command.tryEmit(Command.MainBrowserPageFinished)
     }
 
     sealed class Command {
@@ -40,5 +50,9 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         ) : Command()
 
         data object OpenSheet : Command()
+
+        data object CollectPageContext : Command()
+
+        data object MainBrowserPageFinished : Command()
     }
 }

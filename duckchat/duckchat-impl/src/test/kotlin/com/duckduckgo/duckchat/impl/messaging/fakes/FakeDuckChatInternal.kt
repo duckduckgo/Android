@@ -41,8 +41,9 @@ class FakeDuckChatInternal(
     private val _showMainButtonsInInputScreen = MutableStateFlow(false)
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
-    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
     private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val areMultipleContentAttachmentsEnabled = MutableStateFlow<Boolean>(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
     private val standaloneMigrationCompleted = MutableStateFlow(false)
 
@@ -84,6 +85,8 @@ class FakeDuckChatInternal(
     override suspend fun isStandaloneMigrationCompleted(): Boolean = standaloneMigrationCompleted.value
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = automaticContextAttachmentUserSettingEnabled.value
+
+    override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled.value
 
     // DuckChatInternal interface methods
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {

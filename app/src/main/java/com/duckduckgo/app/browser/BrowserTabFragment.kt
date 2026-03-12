@@ -2026,6 +2026,17 @@ class BrowserTabFragment :
             },
         )
 
+        sharedContextualViewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        viewModel.collectPageContext()
+                    }
+
+                    else -> {}
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
@@ -2767,9 +2778,10 @@ class BrowserTabFragment :
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
-            is Command.DisableDuckAIFullScreen -> {
+            is Command.DuckAIFullScreenDisabled -> {
                 omnibar.setViewMode(Browser(it.url))
                 nativeInputManager.hideNativeInput()
+                sharedContextualViewModel.onMainBrowserPageFinished(it.url)
             }
 
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
@@ -3506,7 +3518,6 @@ class BrowserTabFragment :
 
         setupContextualSheetHeightSync()
 
-        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -3516,10 +3527,11 @@ class BrowserTabFragment :
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
 
-        viewModel.collectPageContext()
+        omnibar.setExpanded(false)
     }
 
     private fun createNewContextualFragment(tabId: String) {
+        logcat { "Duck.ai Contextual: createNewContextualFragment" }
         val fragment = DuckChatContextualFragment()
         val args = Bundle()
         args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
@@ -3535,6 +3547,7 @@ class BrowserTabFragment :
     }
 
     private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+        logcat { "Duck.ai Contextual: openExistingContextualFragment" }
         val transaction = childFragmentManager.beginTransaction()
         transaction.show(fragment)
         transaction.commit()
@@ -5322,6 +5335,7 @@ class BrowserTabFragment :
         }
 
         fun showNewTab() {
+            logcat { "New tab: Show new tab" }
             newTabPageProvider
                 .provideNewTabPageVersion()
                 .onEach { newTabPage ->

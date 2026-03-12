@@ -306,6 +306,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.ConflatedJob
@@ -2093,7 +2094,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        logcat { "Duck.ai pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
+        logcat { "pageRefreshed URL: $url refreshedUrl $refreshedUrl" }
         if (url == null || refreshedUrl == url) {
             logcat(VERBOSE) { "Page refreshed: $refreshedUrl" }
             pageChanged(refreshedUrl, title)
@@ -2181,7 +2182,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (duckChat.isDuckChatUrl(Uri.parse(it))) {
                     command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
                 } else {
-                    command.value = Command.DisableDuckAIFullScreen(url)
+                    command.value = Command.DuckAIFullScreenDisabled(url)
                 }
             }
         }
@@ -3193,7 +3194,7 @@ class BrowserTabViewModel @Inject constructor(
                 duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark ||
                 (settingsDataStore.omnibarType == OmnibarType.SPLIT && alreadyShownKeyboard)
 
-        logcat { "Duck.ai: shouldHideKeyboard: $shouldHideKeyboard" }
+        logcat { "shouldHideKeyboard: $shouldHideKeyboard" }
 
         command.value = if (shouldHideKeyboard) {
             HideKeyboard
@@ -4208,8 +4209,9 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
+                        val enrichedContext = enrichPageContextIfPossible(pageContext)
                         withContext(dispatchers.main()) {
-                            command.value = Command.PageContextReceived(tabId, pageContext)
+                            command.value = Command.PageContextReceived(tabId, enrichedContext)
                         }
                     }
                 }
@@ -4217,6 +4219,27 @@ class BrowserTabViewModel @Inject constructor(
 
             else -> {}
         }
+    }
+
+    private suspend fun enrichPageContextIfPossible(pageContext: String): String {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                val faviconBase64 = favicon.encodeBitmapToBase64()
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+        return json.toString()
     }
 
     private fun webShare(
@@ -4721,7 +4744,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun collectPageContext() {
         viewModelScope.launch {
-            val subscriptionEvent = pageContextJSHelper.onContextualOpened()
+            val subscriptionEvent = pageContextJSHelper.collectPageContext()
             _subscriptionEventDataChannel.send(subscriptionEvent)
         }
     }

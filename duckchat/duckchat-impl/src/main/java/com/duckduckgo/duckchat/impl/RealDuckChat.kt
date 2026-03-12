@@ -218,6 +218,11 @@ interface DuckChatInternal : DuckChat {
     fun isAutomaticContextAttachmentEnabled(): Boolean
 
     /**
+     * Returns whether Duck.ai in contextual mode should attach more than one content
+     */
+    fun areMultipleContentAttachmentsEnabled(): Boolean
+
+    /**
      * This method takes a [url] and returns `true` or `false`.
      * @return `true` if the given [url] can be handled in the duck ai webview and `false` otherwise.
      */
@@ -359,6 +364,7 @@ class RealDuckChat @Inject constructor(
     private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
+    private var areMultipleContentAttachmentsEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -429,6 +435,8 @@ class RealDuckChat @Inject constructor(
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
+
+    override fun areMultipleContentAttachmentsEnabled(): Boolean = areMultipleContentAttachmentsEnabled
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> = duckChatFeatureRepository.observeDuckChatUserEnabled()
 
@@ -846,6 +854,8 @@ class RealDuckChat @Inject constructor(
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&
                 duckChatFeature.automaticContextAttachment()
                     .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
+
+            areMultipleContentAttachmentsEnabled = isContextualModeEnabled && duckChatFeature.supportsMultipleContexts().isEnabled()
         }
 
     companion object {
