@@ -24,8 +24,12 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.OnApplyWindowInsetsListener
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
@@ -211,6 +215,18 @@ class Omnibar(
         binding.includeNewBrowserTab.newTabLayout.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = BottomOmnibarBrowserContainerLayoutBehavior()
         }
+
+        // Edge-to-edge: in bottom omnibar mode there is no AppBarLayout at the top,
+        // so content draws behind the status bar. Apply top padding to push it below.
+        val topInsetListener = OnApplyWindowInsetsListener { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.browserLayout, topInsetListener)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.includeNewBrowserTab.newTabLayout, topInsetListener)
     }
 
     private fun removeAppBarBehavior(view: View) {

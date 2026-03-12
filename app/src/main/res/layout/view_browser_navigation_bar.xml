@@ -18,13 +18,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/preferredNavigationBarColor">
 
     <LinearLayout
         android:id="@+id/barView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/preferredNavigationBarColor"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/navigationBarPaddingHorizontal"
