@@ -33,8 +33,11 @@ import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
@@ -90,6 +93,7 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenBrowserButtonsConfig
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
@@ -131,6 +135,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -198,6 +205,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(binding.root)
 
@@ -230,6 +238,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 insetDp = 3f,
                 shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
             )
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.content) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
         }
 
         viewModel.setLaunchedFromSearchOnlyWidget(launchedFromSearchOnlyWidget(intent))
