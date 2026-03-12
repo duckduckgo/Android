@@ -99,7 +99,7 @@ jobs:
           test_suite_name: Omnibar (Nightly)
 
       - name: Android Design System
-        id: maestro-omnibar
+        id: maestro-ads
         uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
