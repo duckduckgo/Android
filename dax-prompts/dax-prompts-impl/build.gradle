@@ -30,6 +30,7 @@ dependencies {
     implementation project(':design-system')
     implementation project(':navigation-api')
     implementation project(':app-build-config-api')
+    implementation project(':edge-to-edge-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')

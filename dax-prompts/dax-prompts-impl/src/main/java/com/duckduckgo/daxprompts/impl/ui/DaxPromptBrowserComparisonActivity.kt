@@ -21,14 +21,14 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +41,7 @@ import com.duckduckgo.daxprompts.impl.R
 import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserComparisonBinding
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -69,11 +70,14 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
-
+        setupEdgeToEdge()
         setupListeners()
         setupObservers()
         setupOnBackNavigation()
@@ -84,7 +88,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
-        applyFullScreenFlags()
         markAsShown()
     }
 
@@ -136,21 +139,23 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun applyFullScreenFlags() {
-        window?.apply {
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            WindowCompat.setDecorFitsSystemWindows(this, false)
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.BLACK
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewGroupCompat.installCompatInsetsDispatch(binding.daxPromptBrowserComparisonContainer)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.daxPromptBrowserComparisonContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(top = insets.top, bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
         }
-        ViewCompat.requestApplyInsets(binding.daxPromptBrowserComparisonContainer)
     }
 
     private fun markAsShown() {
         viewModel.markBrowserComparisonPromptAsShown()
     }
 
-    private fun setupOnBackNavigation() { // Added method
+    private fun setupOnBackNavigation() {
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
