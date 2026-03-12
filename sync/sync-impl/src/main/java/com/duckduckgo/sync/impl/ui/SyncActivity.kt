@@ -17,7 +17,10 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +36,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.api.*
@@ -129,6 +133,9 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val syncIntroLauncher = registerForActivityResult(
         SyncIntroContract(),
     ) { resultOk ->
@@ -156,7 +163,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
         setupToolbar(binding.includeToolbar.toolbar)
 
         binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
@@ -175,6 +184,17 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            binding.root.getChildAt(0)?.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+    }
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
