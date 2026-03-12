@@ -81,12 +81,6 @@ interface SyncService {
         @Body request: EncryptedMessage,
     ): Call<Void>
 
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
-    fun patchData(
-        @Header("Authorization") token: String,
-        @Body request: JSONObject,
-    ): Call<JSONObject>
-
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
@@ -117,11 +111,12 @@ interface SyncService {
         @Query("until") until: String,
     ): Call<JSONObject>
 
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
-    fun patchAiChats(
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/{endpoint}")
+    fun patch(
         @Header("Authorization") token: String,
+        @Path("endpoint") endpoint: String,
         @Body body: RequestBody,
-    ): Call<Void>
+    ): Call<JSONObject>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")
     fun rescopeToken(

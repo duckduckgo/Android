@@ -74,11 +74,6 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<List<Device>>
 
-    fun patchData(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject?>
-
     fun getBookmarks(
         token: String,
         since: String,
@@ -99,10 +94,11 @@ interface SyncApi {
         until: String,
     ): Result<Unit>
 
-    fun patchAiChats(
+    fun patch(
         token: String,
+        endpoint: String,
         body: okhttp3.RequestBody,
-    ): Result<Unit>
+    ): Result<JSONObject>
 
     /**
      * Obtain a new "scoped token" for the sync service
@@ -307,27 +303,6 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patchData(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject> {
-        logcat(INFO) { "Sync-service: patch request $updates" }
-
-        val response = runCatching {
-            val patchCall = syncService.patchData("Bearer $token", updates)
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            logcat(INFO) { "Sync-service: patch response: $it" }
-            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
-            Result.Success(data)
-        }
-    }
-
     override fun getBookmarks(
         token: String,
         since: String,
@@ -415,22 +390,25 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patchAiChats(
+    override fun patch(
         token: String,
+        endpoint: String,
         body: okhttp3.RequestBody,
-    ): Result<Unit> {
-        logcat(INFO) { "Sync-service: patch ai chats request" }
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patch request" }
 
         val response = runCatching {
-            val patchCall = syncService.patchAiChats("Bearer $token", body)
+            val patchCall = syncService.patch("Bearer $token", endpoint, body)
             patchCall.execute()
         }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: patch ai chats error ${throwable.localizedMessage}" }
+            logcat(INFO) { "Sync-service: patch error ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Result.Success(Unit)
+            logcat(INFO) { "Sync-service: patch response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
+            Result.Success(data)
         }
     }
 

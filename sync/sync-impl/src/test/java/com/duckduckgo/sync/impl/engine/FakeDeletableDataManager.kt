@@ -27,7 +27,7 @@ class FakeDeletableDataManager(
     private val deletableType: DeletableType = DUCK_AI_CHATS,
     private val fakeDeletion: SyncDeletionRequest? = null,
 ) : DeletableDataManager {
-    override fun getType(): DeletableType = deletableType
+    override fun getDeletableType(): DeletableType = deletableType
 
     override fun getDeletions(): SyncDeletionRequest? = fakeDeletion
 
