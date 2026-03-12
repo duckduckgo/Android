@@ -19,7 +19,13 @@ package com.duckduckgo.common.ui.internal.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -62,6 +68,8 @@ class AppComponentsActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var tabLayout: TabLayout
     private lateinit var darkThemeSwitch: OneLineListItem
+    private lateinit var root: CoordinatorLayout
+    private lateinit var appBar: com.google.android.material.appbar.AppBarLayout
 
     @Suppress("DenyListedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,10 +79,14 @@ class AppComponentsActivity : AppCompatActivity() {
             selectedTheme
         }
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_app_components)
         viewPager = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
         darkThemeSwitch = findViewById(R.id.dark_theme_switch)
+        root = findViewById(R.id.root)
+        appBar = findViewById(R.id.appBar)
+        setupEdgeToEdge()
 
         tabLayout.setupWithViewPager(viewPager)
         val adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
@@ -92,6 +104,18 @@ class AppComponentsActivity : AppCompatActivity() {
                 startActivity(intent(this@AppComponentsActivity))
                 finish()
             }
+        }
+    }
+
+    private fun setupEdgeToEdge() {
+        ViewGroupCompat.installCompatInsetsDispatch(root)
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            appBar.updatePadding(top = insets.top)
+            view.updatePadding(bottom = insets.bottom)
+            WindowInsetsCompat.CONSUMED
         }
     }
 

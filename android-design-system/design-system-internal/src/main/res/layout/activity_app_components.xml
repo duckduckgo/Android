@@ -17,6 +17,7 @@
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                      xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     android:id="@+id/root"
                                                      android:layout_width="match_parent"
                                                      android:layout_height="match_parent">
 
@@ -27,8 +28,10 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/daxColorToolbar"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         android:translationZ="@dimen/keyline_1">
 
@@ -36,7 +39,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            android:background="?attr/daxColorToolbar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
