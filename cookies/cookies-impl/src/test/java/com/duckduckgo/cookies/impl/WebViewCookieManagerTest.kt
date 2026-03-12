@@ -45,12 +45,7 @@ class WebViewCookieManagerTest {
     private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
     private val ddgCookie = Cookie(DDG_HOST, "da=abc")
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
-    private val testee: WebViewCookieManager = WebViewCookieManager(
-        cookieManagerProvider,
-        removeCookieStrategy,
-        coroutineRule.testDispatcherProvider,
-        mockDuckAiHostProvider,
-    )
+    private lateinit var testee: WebViewCookieManager
 
     @Before
     fun setup() {
@@ -59,6 +54,12 @@ class WebViewCookieManagerTest {
             (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
         }
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        testee = WebViewCookieManager(
+            cookieManagerProvider,
+            removeCookieStrategy,
+            coroutineRule.testDispatcherProvider,
+            mockDuckAiHostProvider,
+        )
     }
 
     @Test

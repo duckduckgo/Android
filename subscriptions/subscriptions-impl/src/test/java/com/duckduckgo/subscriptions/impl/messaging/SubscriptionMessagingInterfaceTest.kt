@@ -17,6 +17,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
+import org.junit.Before
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -44,16 +45,7 @@ class SubscriptionMessagingInterfaceTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val privacyProFeature: PrivacyProFeature = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
-    private val messagingInterface = SubscriptionMessagingInterface(
-        subscriptionsManager,
-        jsMessageHelper,
-        coroutineRule.testDispatcherProvider,
-        coroutineRule.testScope,
-        pixelSender,
-        subscriptionsChecker,
-        mockDuckAiHostProvider,
-        privacyProFeature,
-    )
+    private lateinit var messagingInterface: SubscriptionMessagingInterface
 
     private val callback = object : JsMessageCallback() {
         var counter = 0
@@ -63,6 +55,21 @@ class SubscriptionMessagingInterfaceTest {
             this.id = id
             counter++
         }
+    }
+
+    @Before
+    fun setup() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        messagingInterface = SubscriptionMessagingInterface(
+            subscriptionsManager,
+            jsMessageHelper,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+            pixelSender,
+            subscriptionsChecker,
+            mockDuckAiHostProvider,
+            privacyProFeature,
+        )
     }
 
     @Test
