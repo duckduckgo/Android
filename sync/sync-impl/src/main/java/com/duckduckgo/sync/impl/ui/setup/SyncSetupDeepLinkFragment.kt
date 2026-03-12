@@ -20,8 +20,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +38,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_Light
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncFeature
@@ -55,6 +60,9 @@ class SyncSetupDeepLinkFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var syncFeature: SyncFeature
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +94,32 @@ class SyncSetupDeepLinkFragment : DuckDuckGoFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        setupEdgeToEdgeInsets()
         observeUiEvents()
+    }
+
+    private fun setupEdgeToEdgeInsets() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            windowInsets
+        }
+
+        val containerMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = containerMargin + insets.bottom
+            }
+            windowInsets
+        }
     }
 
     private fun observeUiEvents() {
