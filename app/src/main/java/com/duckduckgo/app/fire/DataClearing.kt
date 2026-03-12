@@ -28,7 +28,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.DuckChatContextualDataStore
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
