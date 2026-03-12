@@ -6,7 +6,9 @@ Internal-only module with dev tools for testing the remote privacy config integr
 
 ## Local remote config patches
 
-Patches are JSON files in [JSON Patch format](https://jsonpatch.com/) applied at runtime after the remote config is fetched, overriding values from the server.
+Patches are JSON files in [JSON Patch format](https://jsonpatch.com/) applied at runtime after the remote config is fetched, overriding values from the server. Multiple patches are applied in the order listed — if two patches modify the same path, the last one wins; a failing patch is skipped without aborting the rest.
+
+> **Important:** Each patch file name must be unique, regardless of which directory it lives in.
 
 ### Quick start
 
@@ -111,15 +113,22 @@ Successfully applied patch: enable_other.json
 Failed to apply patch disable_something.json: Missing field "newSubFeature"
 ```
 
-### Maestro / CI usage
+### Using the `-Pconfig_patches` build flag
 
-For Maestro tests, use the `-Pconfig_patches` Gradle flag instead of `local.properties`. This allows patch files to be committed to the repository and applied consistently in CI.
+An alternative to `local.properties` is passing patches directly as a Gradle build flag. This works for local builds too, and is the right choice when patch files need to be committed — for automated tests.
 
-Patches are applied in the order listed — if two patches modify the same path, the last one wins. A patch that fails to apply is skipped; the remaining patches are still applied.
+```bash
+./gradlew installInternalRelease \
+  -Pconfig_patches=path/to/my_patch.json
 
-> **Important:** Each patch file name must be unique, regardless of which directory it lives in.
+# Multiple patches — comma-separated
+./gradlew installInternalRelease \
+  -Pconfig_patches=path/to/patch_a.json,path/to/patch_b.json
+```
 
-Store patch files alongside the Maestro tests that need them:
+#### Automated tests (Maestro / Espresso)
+
+Store patch files alongside the tests that need them and pass them via the flag when building:
 
 ```
 .maestro/
@@ -136,13 +145,6 @@ Build and run:
   -Pconfig_patches=.maestro/my-feature/remote_config_patches/disable_something.json
 
 maestro test .maestro/my-feature/my_test.yaml
-```
-
-Multiple patches can be combined with commas:
-
-```bash
-./gradlew installInternalRelease \
-  -Pconfig_patches=.maestro/feature-a/remote_config_patches/patch_a.json,.maestro/feature-b/remote_config_patches/patch_b.json
 ```
 
 In GitHub Actions, pass the flag via `gradle_flags` on `checkout-and-assemble`:
@@ -165,6 +167,46 @@ In GitHub Actions, pass the flag via `gradle_flags` on `checkout-and-assemble`:
     maestro_app_file: ${{ steps.assemble.outputs.internal_apk_path }}
     # ... other options
 ```
+
+### PR review workflow
+
+If your PR introduces or modifies a feature flag, consider including patch file contents in the PR description so reviewers can verify each state without having to manually enable/disable flags.
+
+Ask reviewers to:
+
+1. Create `privacy-config/privacy-config-internal/local-config-patches/review_patch.json`
+2. Add to `privacy-config/privacy-config-internal/local.properties`:
+   ```
+   config_patches=privacy-config/privacy-config-internal/local-config-patches/review_patch.json
+   ```
+3. Execute verification steps.
+4. Once done, delete or clear `review_patch.json`/`local.properties`, and reinstall to avoid it affecting unrelated work.
+
+For each verification step, provide the content to paste into `review_patch.json` and reinstall the app. Note that the version number must be incremented with each step so the app re-processes the config.
+
+Example steps in a PR description:
+
+> **Step 1 — verify feature enabled**
+>
+> Paste into `review_patch.json` and reinstall:
+> ```json
+> [
+>   { "op": "replace", "path": "/features/myFeature/state", "value": "enabled" },
+>   { "op": "remove",  "path": "/features/myFeature/hash" },
+>   { "op": "replace", "path": "/version", "value": "90000000000001" }
+> ]
+> ```
+
+> **Step 2 — verify feature disabled**
+>
+> Paste into `review_patch.json` and reinstall:
+> ```json
+> [
+>   { "op": "replace", "path": "/features/myFeature/state", "value": "disabled" },
+>   { "op": "remove",  "path": "/features/myFeature/hash" },
+>   { "op": "replace", "path": "/version", "value": "90000000000002" }
+> ]
+> ```
 
 ---
 
