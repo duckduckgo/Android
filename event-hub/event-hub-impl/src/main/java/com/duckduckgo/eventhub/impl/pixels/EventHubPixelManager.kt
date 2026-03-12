@@ -90,9 +90,9 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun checkPixels() {
-        if (!isEnabled()) return
-
         appCoroutineScope.launch(pixelDispatcher) {
+            if (!isEnabled()) return@launch
+
             val nextDeadline = processPixelStates()
             val configDeadline = initMissingPixels()
             scheduleNextCheck(minOf(nextDeadline, configDeadline))
