@@ -20,6 +20,10 @@ import android.app.assist.AssistStructure
 import android.os.Bundle
 import android.view.autofill.AutofillManager
 import androidx.core.content.IntentCompat
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +43,7 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Comm
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.INFO
@@ -60,6 +65,9 @@ class AutofillProviderFillSuggestionActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillServiceActivityHandler: AutofillServiceActivityHandler
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private var assistStructure: AssistStructure? = null
 
     private val credentialId: Long?
@@ -67,6 +75,7 @@ class AutofillProviderFillSuggestionActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         logcat(INFO) { "DDGAutofillService onCreate!" }
 
         assistStructure = IntentCompat.getParcelableExtra(intent, AutofillManager.EXTRA_ASSIST_STRUCTURE, AssistStructure::class.java)
@@ -75,7 +84,23 @@ class AutofillProviderFillSuggestionActivity : DuckDuckGoActivity() {
             finish()
             return
         }
+        setupEdgeToEdge()
         observeViewModel()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { view, windowInsets ->
+            val insets: Insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentContainerView) { view, windowInsets ->
+            val insets: Insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun observeViewModel() {
