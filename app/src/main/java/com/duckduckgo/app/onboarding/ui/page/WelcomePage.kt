@@ -26,6 +26,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
@@ -67,6 +69,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -84,6 +87,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -106,6 +112,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (edgeToEdge.isEnabled()) {
+            requireActivity().apply {
+                enableEdgeToEdge(
+                    navigationBarStyle = SystemBarStyle.dark(Color.BLACK),
+                )
+            }
+        }
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
@@ -521,11 +534,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     }
 
     private fun applyFullScreenFlags() {
-        activity?.window?.apply {
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            WindowCompat.setDecorFitsSystemWindows(this, false)
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.BLACK
+        if (!edgeToEdge.isEnabled()) {
+            activity?.window?.apply {
+                addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                WindowCompat.setDecorFitsSystemWindows(this, false)
+                statusBarColor = Color.TRANSPARENT
+                navigationBarColor = Color.BLACK
+            }
         }
         ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
     }

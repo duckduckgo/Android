@@ -19,6 +19,10 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
@@ -118,6 +122,16 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSkipButton() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.skipOnboardingButton) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
+            windowInsets
+        }
+
         binding.skipOnboardingButton.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.devOnlyFullyCompleteAllOnboarding()
