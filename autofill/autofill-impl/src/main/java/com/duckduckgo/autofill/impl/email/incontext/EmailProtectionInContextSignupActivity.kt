@@ -23,6 +23,9 @@ import android.os.Bundle
 import android.webkit.WebSettings
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -46,6 +49,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.launch
@@ -83,9 +87,14 @@ class EmailProtectionInContextSignupActivity :
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
+        setupEdgeToEdge()
         initialiseToolbar()
         setTitle(R.string.autofillEmailProtectionInContextSignUpDialogFeatureName)
         configureWebView()
@@ -93,6 +102,17 @@ class EmailProtectionInContextSignupActivity :
         observeViewState()
         configureEmailManagerObserver()
         loadFirstWebpage(intent)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.webView) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun loadFirstWebpage(intent: Intent?) {
