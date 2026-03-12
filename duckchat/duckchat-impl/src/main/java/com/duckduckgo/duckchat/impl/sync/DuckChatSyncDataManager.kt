@@ -176,7 +176,7 @@ class DuckChatSyncDataManager @Inject constructor(
     private fun formatPatchRequest(pendingIds: Set<String>): SyncChangesRequest {
         if (pendingIds.isEmpty()) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat deletions to patch" }
-            return SyncChangesRequest.empty()
+            return getEmptyRequest()
         }
 
         logcat { "DuckChat-Sync: formatting patch request for ${pendingIds.size} pending chat deletions" }
