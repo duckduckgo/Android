@@ -72,8 +72,9 @@ class MetricsPixelNumericValueDetector : Detector(), SourceCodeScanner {
         val valueStr = valueText.removeSurrounding("\"")
 
         if (valueStr.toIntOrNull() == null) {
-            // Report on the value argument expression.
-            val valueExpr = findArgExpr(node, "value") ?: return
+            // Report on the value argument expression; fall back to the call site if the
+            // expression can't be resolved (e.g. UastFacade.convertElement fails in Path 2).
+            val valueExpr: UExpression = findArgExpr(node, "value") ?: node
             context.report(
                 NUMERIC_VALUE_REQUIRED,
                 valueExpr,
