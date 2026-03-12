@@ -50,6 +50,7 @@ dependencies {
     implementation project(':library-loader-api')
     implementation project(':saved-sites-api')
     implementation project(':cookies-api')
+    implementation project(':edge-to-edge-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

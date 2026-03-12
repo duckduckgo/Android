@@ -19,7 +19,10 @@ package com.duckduckgo.autofill.impl.ui.settings
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.text.toSpanned
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -51,6 +54,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.collectLatest
@@ -63,6 +67,9 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
 
     val binding: ActivityAutofillSettingsBinding by viewBinding()
     private val viewModel: AutofillSettingsViewModel by bindViewModel()
@@ -88,14 +95,26 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         setTitle(R.string.autofillSettingsActivityTitle)
+        setupEdgeToEdge()
         observeViewModel()
         configureViewListeners()
         configureInfoText()
         sendLaunchPixel(savedInstanceState)
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewSwitcher) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {
