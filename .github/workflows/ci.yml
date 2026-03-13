@@ -93,7 +93,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version-file: .github/.java-version
-          distribution: 'adopt'
+          distribution: 'adoptz'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
