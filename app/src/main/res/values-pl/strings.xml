@@ -120,7 +120,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść karty i dane</string>
+    <string name="fireClearAll">Usuń karty i dane</string>
     <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
@@ -238,8 +238,8 @@
     <string name="dataClearingAutomaticClearingOn">Wł.</string>
     <string name="dataClearingAutomaticClearingOff">Wyłączone</string>
     <string name="dataClearingClearBrowsingData">Wyczyść dane przeglądania</string>
-    <string name="dataClearingAutomaticDataClearing">Automatyczne czyszczenie danych</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne czyszczenie danych</string>
+    <string name="dataClearingAutomaticDataClearing">Automatyczne usuwanie danych</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne usuwanie danych</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zamknij wszystkie otwarte karty</string>
     <string name="dataClearingAutomaticDataOptionDescription">Usuń wszystkie dane witryn, w tym odwiedzone strony. Może nastąpić wylogowanie z kont.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Usuń wszystkie czaty, w tym przypięte</string>
@@ -296,15 +296,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Usuń w terminie…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń w terminie…</string>
+    <string name="settingsAutomaticallyClearWhen">Usuń na...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń na...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Wyłącznie zamknięcie aplikacji</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Zamknięcie aplikacji, brak aktywności przez 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Zamknięcie aplikacji, brak aktywności przez 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Zamknięcie aplikacji, brak aktywności przez 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Zamknięcie aplikacji, brak aktywności przez 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
-    <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Usuń czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
     <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
