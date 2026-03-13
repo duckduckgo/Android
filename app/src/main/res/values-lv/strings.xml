@@ -119,8 +119,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Notīrīt datus</string>
-    <string name="fireClearAll">Notīrīt cilnes un datus</string>
-    <string name="fireClearAllPlusDuckChats">Notīrīt cilnes, datus un Duck.ai tērzēšanas sarunas</string>
+    <string name="fireClearAll">Dzēst cilnes un datus</string>
+    <string name="fireClearAllPlusDuckChats">Dzēst cilnes, datus un Duck.ai tērzēšanas sarunas</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir notīrīti</string>
 
@@ -236,8 +236,8 @@
     <string name="dataClearingAutomaticClearingOn">Ieslēgts</string>
     <string name="dataClearingAutomaticClearingOff">Izslēgts</string>
     <string name="dataClearingClearBrowsingData">Izdzēst pārlūkošanas datus</string>
-    <string name="dataClearingAutomaticDataClearing">Automātiskā datu dzēšana</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automātiski notīrīt datus</string>
+    <string name="dataClearingAutomaticDataClearing">Automātiski dzēst datus</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automātiski dzēst datus</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Aizvērt visas atvērtās cilnes</string>
     <string name="dataClearingAutomaticDataOptionDescription">Dzēs visus vietnes datus, tostarp apmeklētās vietnes. Var izrakstīt tevi no kontiem.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Dzēs visas tērzēšanas sarunas, ieskaitot piespraustās tērzēšanas</string>
@@ -292,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un dati</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Cilnes, dati un Duck.ai tērzēšanas</string>
 
-    <string name="settingsAutomaticallyClearWhen">Notīrīt…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Notīrīt…</string>
+    <string name="settingsAutomaticallyClearWhen">Dzēst…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Dzēst…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tikai iziešana no lietotnes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Iziešana no lietotnes, neaktīva 5 sekundes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Iziešana no lietotnes, neaktīva 5 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Iziešana no lietotnes, neaktīva 15 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, neaktīva 30 minūtes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
-    <string name="settingsClearAiDataTitle">Notīrīt Duck.ai tērzēšanas sarunas</string>
+    <string name="settingsClearAiDataTitle">Dzēst Duck.ai tērzēšanas sarunas</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button izdzēsīs arī Duck.ai vēsturi, ieskaitot piespraustās tērzēšanas.</string>
     <string name="settingsClearDataActionSecondaryText">Notīra visas cilnes un datus par visām vietnēm, kuras neesi iestatījis Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Notīra visas cilnes, Duck.ai tērzēšanas sarunas un datus par visām vietnēm, kurās neesi iestatījis Fireproof.</string>
