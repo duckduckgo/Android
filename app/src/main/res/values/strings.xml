@@ -117,8 +117,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear Tabs and Data</string>
-    <string name="fireClearAllPlusDuckChats">Clear Tabs, Data, and Duck.ai Chats</string>
+    <string name="fireClearAll">Delete Tabs and Data</string>
+    <string name="fireClearAllPlusDuckChats">Delete Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -233,8 +233,8 @@
     <string name="dataClearingAutomaticClearingOn">On</string>
     <string name="dataClearingAutomaticClearingOff">Off</string>
     <string name="dataClearingClearBrowsingData">Clear Browsing Data</string>
-    <string name="dataClearingAutomaticDataClearing">Automatic Data Clearing</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automatically Clear Data</string>
+    <string name="dataClearingAutomaticDataClearing">Automatically Delete Data</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatically Delete Data</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Close all open tabs</string>
     <string name="dataClearingAutomaticDataOptionDescription">Delete all site data, including visited sites. May sign you out of accounts.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Delete all chats, including pinned chats</string>
@@ -287,15 +287,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data, and Duck.ai chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Clear On…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
+    <string name="settingsAutomaticallyClearWhen">Delete On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Delete on…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">App exit only</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App exit, inactive for 5 seconds</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App exit, inactive for 5 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, inactive for 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
-    <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
+    <string name="settingsClearAiDataTitle">Delete Duck.ai Chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
     <string name="settingsClearDataActionSecondaryText">Clears all tabs and data for any sites you haven\'t fireproofed.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Clears all tabs, Duck.ai chats, and data for any sites you haven\'t fireproofed.</string>
