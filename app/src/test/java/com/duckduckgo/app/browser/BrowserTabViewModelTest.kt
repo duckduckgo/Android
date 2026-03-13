@@ -5626,7 +5626,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertTrue(this.locked)
@@ -5644,7 +5644,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": false }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5662,7 +5662,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandNotIssued<Command.UiLockChanged>()
         }
@@ -5678,7 +5678,7 @@ class BrowserTabViewModelTest {
                 null,
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5696,7 +5696,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "other": "value" }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5714,9 +5714,45 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandNotIssued<Command.UiLockChanged>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedFromDuckAiThenSendCommandWithLockedFalse() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "https://duck.ai" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedFromDuckAiSubpageThenSendCommandWithLockedFalse() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "https://duck.ai/some/path" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
         }
 
     @Test
