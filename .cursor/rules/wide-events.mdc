@@ -21,6 +21,7 @@ val flowId: Long = wideEventClient.flowStart(
     flowEntryPoint = origin,              // optional: where the flow was triggered from
     metadata = mapOf("key" to "value"),   // initial data
     cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = true),
+    samplingProbability = 0.1f,           // optional: 0.0–1.0, default 1.0 (keep all)
 ).getOrNull() ?: return
 
 // Record a step
@@ -55,6 +56,16 @@ FlowStatus.Failure(reason = "payment_declined")
 FlowStatus.Cancelled
 FlowStatus.Unknown   // unexpected termination; always pair with a last_step in metadata
 ```
+
+### Sampling
+
+`samplingProbability` controls what fraction of flows are recorded. The decision is made once at `flowStart` time:
+
+- **1.0** (default) — every flow is recorded.
+- **0.1** — roughly 10% of flows are recorded; the rest are dropped.
+- **0.0** — no flows are recorded.
+
+When a flow is sampled out, `flowStart` returns a sentinel ID. All subsequent calls (`flowStep`, `flowFinish`, etc.) with that ID are silent no-ops with zero disk I/O — no special handling needed at the call site. The probability is persisted with the event and sent to the backend so it can weight the data correctly.
 
 ### CleanupPolicy
 
@@ -103,6 +114,7 @@ class MyFeatureWideEventImpl @Inject constructor(
             name = "my-feature-action",
             flowEntryPoint = origin,
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+            samplingProbability = 0.1f,
         ).getOrNull()
     }
 
