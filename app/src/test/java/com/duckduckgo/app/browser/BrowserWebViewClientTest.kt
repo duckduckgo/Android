@@ -41,7 +41,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.Web
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
-import com.duckduckgo.app.browser.applinks.HandleNonHttpAppLinksFeature
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -171,7 +171,7 @@ class BrowserWebViewClientTest {
         )
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
-    private val mockHandleNonHttpAppLinksFeature: HandleNonHttpAppLinksFeature = mock()
+    private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
 
     @Before
     fun setup() =
@@ -181,7 +181,7 @@ class BrowserWebViewClientTest {
             whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
             val enabledToggle: Toggle = mock()
             whenever(enabledToggle.isEnabled()).thenReturn(true)
-            whenever(mockHandleNonHttpAppLinksFeature.self()).thenReturn(enabledToggle)
+            whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(enabledToggle)
             testee =
                 BrowserWebViewClient(
                     webViewHttpAuthStore,
@@ -216,7 +216,7 @@ class BrowserWebViewClientTest {
                     mockAndroidFeaturesHeaderPlugin,
                     mockDuckChat,
                     mockContentScopeExperiments,
-                    mockHandleNonHttpAppLinksFeature,
+                    mockAppSchemeInterceptionFeature,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -1595,10 +1595,10 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenHandleNonHttpAppLinksFeatureDisabledThenAppSchemeUrlNotIntercepted() {
+    fun whenAppSchemeInterceptionFeatureDisabledThenAppSchemeUrlNotIntercepted() {
         val disabledToggle: Toggle = mock()
         whenever(disabledToggle.isEnabled()).thenReturn(false)
-        whenever(mockHandleNonHttpAppLinksFeature.self()).thenReturn(disabledToggle)
+        whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(disabledToggle)
 
         val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
         testee.onPageStarted(webView, intentUrl, null)

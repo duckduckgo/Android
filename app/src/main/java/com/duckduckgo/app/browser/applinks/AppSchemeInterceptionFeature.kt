@@ -22,14 +22,14 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * Kill switch for handling non-HTTP URLs (e.g., intent://, tel://) that bypass shouldOverrideUrlLoading
+ * Kill switch for intercepting app-scheme URLs (e.g., intent://, tel://) that bypass shouldOverrideUrlLoading
  * when loaded via window.open() / WebViewTransport.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "handleNonHttpAppLinks",
+    featureName = "appSchemeInterception",
 )
-interface HandleNonHttpAppLinksFeature {
+interface AppSchemeInterceptionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle

@@ -47,7 +47,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
-import com.duckduckgo.app.browser.applinks.HandleNonHttpAppLinksFeature
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -132,7 +132,7 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
-    private val handleNonHttpAppLinksFeature: HandleNonHttpAppLinksFeature,
+    private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -530,7 +530,7 @@ class BrowserWebViewClient @Inject constructor(
      * @return true if the URL was handled and loading should stop, false otherwise
      */
     private fun interceptAppSchemeUrl(webView: WebView, url: String): Boolean {
-        if (!handleNonHttpAppLinksFeature.self().isEnabled()) {
+        if (!appSchemeInterceptionFeature.self().isEnabled()) {
             return false
         }
         val uri = url.toUri()

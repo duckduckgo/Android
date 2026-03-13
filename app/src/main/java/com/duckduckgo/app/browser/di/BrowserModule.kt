@@ -30,8 +30,8 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
-import com.duckduckgo.app.browser.applinks.HandleNonHttpAppLinksFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -205,7 +205,7 @@ class BrowserModule {
         duckChaFeatureState: DuckAiFeatureState,
         aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-        handleNonHttpAppLinksFeature: HandleNonHttpAppLinksFeature,
+        appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -217,7 +217,7 @@ class BrowserModule {
         duckChaFeatureState,
         aiChatQueryDetectionFeature,
         androidBrowserConfigFeature,
-        handleNonHttpAppLinksFeature,
+        appSchemeInterceptionFeature,
     )
 
     @Provides
