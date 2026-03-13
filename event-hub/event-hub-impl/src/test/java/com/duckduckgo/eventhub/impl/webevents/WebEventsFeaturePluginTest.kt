@@ -39,7 +39,6 @@ class WebEventsFeaturePluginTest {
 
     private val plugin = WebEventsFeaturePlugin(
         webEventsDataStore = dataStore,
-        appCoroutineScope = coroutineTestRule.testScope,
         dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
