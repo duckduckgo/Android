@@ -25,6 +25,7 @@
                 "enum": [
                     "granular_fire_dialog",
                     "nongranular_fire_dialog",
+                    "single_tab_fire_dialog",
                     "app_shortcut",
                     "auto_foreground",
                     "auto_background",
