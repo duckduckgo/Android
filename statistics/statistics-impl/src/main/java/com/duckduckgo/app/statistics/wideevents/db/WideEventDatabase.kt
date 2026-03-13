@@ -39,11 +39,13 @@ abstract class WideEventDatabase : RoomDatabase() {
     abstract fun wideEventDao(): WideEventDao
 
     companion object {
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE wide_events ADD COLUMN sampling_probability REAL NOT NULL DEFAULT 1.0")
             }
         }
+
+        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
     }
 }
 
