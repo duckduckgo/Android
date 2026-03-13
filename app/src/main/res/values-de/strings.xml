@@ -234,7 +234,7 @@
     <string name="dataClearingAutomaticClearingOn">Ein</string>
     <string name="dataClearingAutomaticClearingOff">Aus</string>
     <string name="dataClearingClearBrowsingData">Browserdaten löschen</string>
-    <string name="dataClearingAutomaticDataClearing">Automatische Datenlöschung</string>
+    <string name="dataClearingAutomaticDataClearing">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Alle offenen Tabs schließen</string>
     <string name="dataClearingAutomaticDataOptionDescription">Löschen aller Websitedaten, einschließlich der besuchten Seiten; du wirst möglicherweise von Konten abgemeldet.</string>
@@ -288,8 +288,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Duck.ai-Chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhen">Löschen am …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen am …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>
@@ -885,7 +885,6 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wusstest du das?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
