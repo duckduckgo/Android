@@ -69,13 +69,13 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
         item {
             DaxPageHeader(
                 title = "Private Search",
-                status = Status.Always_On,
+                status = Status.Off,
             )
         }
         item {
             DaxPageHeader(
                 title = "Private Search",
-                status = Status.Always_On,
+                status = Status.On,
                 iconHeader = painterResource(CommonR.drawable.ic_privacy_pro_128),
             )
         }
