@@ -156,7 +156,7 @@ class DuckChatSyncDataManager @Inject constructor(
     private fun getEmptyRequest() = SyncChangesRequest(
         SyncableType.DUCK_AI_CHATS,
         "",
-        ModifiedSince.FirstSync,
+        ModifiedSince.Timestamp(SyncDateProvider.now()),
     )
 
     private fun formatDeletionRequest(deletionTimestamp: String?): SyncDeletionRequest? {
@@ -194,7 +194,7 @@ class DuckChatSyncDataManager @Inject constructor(
         return SyncChangesRequest(
             type = SyncableType.DUCK_AI_CHATS,
             jsonString = jsonArray.toString(),
-            modifiedSince = ModifiedSince.FirstSync,
+            modifiedSince = ModifiedSince.Timestamp(SyncDateProvider.now()),
         )
     }
 
