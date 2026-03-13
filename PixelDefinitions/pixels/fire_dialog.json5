@@ -20,6 +20,13 @@
         "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
         "parameters": ["appVersion"]
     },
+    "m_fire_dialog_clear_pressed_daily": {
+        "description": "The user pressed clear in the fire dialog (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_fire_button_tapped_settings": {
         "description": "The fire button was tapped from settings",
         "owners": ["0nko"],
