@@ -77,9 +77,11 @@ class RealEventHubRepository @Inject constructor(
     }
 
     companion object {
-        private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        private val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
-        private val paramsAdapter = moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
+        private val paramsAdapter by lazy {
+            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+            val paramsType = Types.newParameterizedType(Map::class.java, String::class.java, ParamState::class.java)
+            moshi.adapter<Map<String, ParamState>>(paramsType).lenient()
+        }
 
         fun parseParamsJson(json: String): Map<String, ParamState> {
             return try {
