@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.omnibar.OmnibarType
@@ -84,6 +85,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -92,9 +94,12 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.util.Date
 import kotlin.Boolean
 
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 @SuppressLint("DenyListedApi")
 @OptIn(ExperimentalCoroutinesApi::class)
 class TabSwitcherViewModelTest {

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -37,6 +38,7 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
@@ -596,8 +598,13 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
-        val normalTabs = tabEntities.map {
-            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
+        val normalTabs = tabEntities.map { entity ->
+            val isActive = entity.tabId == activeTab?.tabId
+            if (entity.url != null && duckChat.isDuckChatUrl(Uri.parse(entity.url))) {
+                DuckAiTab(entity, isActive)
+            } else {
+                NormalTab(entity, isActive)
+            }
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
