@@ -132,7 +132,11 @@ class RealBrokerDataDownloader @Inject constructor(
             file.extension == "json" && file.name in brokersToUpdateSet
         }?.forEach { jsonFile ->
             logcat { "PIR-update: Processing data from ${jsonFile.name}" }
-            val broker = runCatching { brokerAdapter.fromJson(jsonFile.source().buffer()) }
+            val broker = runCatching {
+                jsonFile.source().buffer().use { source ->
+                    brokerAdapter.fromJson(source)
+                }
+            }
                 .onFailure { logcat(ERROR) { "PIR-update: Failed to parse ${jsonFile.name}: $it" } }
                 .getOrNull()
             if (broker != null) {
@@ -143,7 +147,9 @@ class RealBrokerDataDownloader @Inject constructor(
                         removedAtMs = broker.removedAt ?: 0L,
                     )
                 } catch (e: Throwable) {
-                    if (e !is CancellationException) {
+                    if (e is CancellationException) {
+                        throw e
+                    } else {
                         pirPixelSender.reportUpdateBrokerJsonFailure(
                             brokerJsonFileName = jsonFile.name,
                             removedAtMs = broker.removedAt ?: 0L,
