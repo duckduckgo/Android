@@ -147,11 +147,12 @@ android {
             ]
         }
         release {
+            applicationIdSuffix ".dev"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [
-                    appIcon     : "@mipmap/ic_launcher_red",
-                    appIconRound: "@mipmap/ic_launcher_red_round"
+                    appIcon     : "@mipmap/ic_launcher_blue",
+                    appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
 
             if (project.hasProperty('useUploadSigning')) {
