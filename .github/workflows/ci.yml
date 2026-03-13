@@ -17,19 +17,31 @@ jobs:
     name: Check Changed Files
     runs-on: ubuntu-24.04
     outputs:
-      should_run: ${{ steps.filter.outputs.code == 'true' || steps.filter.outputs.ci_workflow == 'true' || github.event_name == 'workflow_dispatch' }}
+      should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
         with:
-          filters: |
-            code:
-              - '**'
-              - '!**.md'
-              - '!.github/**'
-            ci_workflow:
-              - '.github/workflows/ci.yml'
+          fetch-depth: 0
+      - name: Check if CI should run
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT; exit 0
+          fi
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.event.after }}"
+          fi
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
+          if echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)' || \
+             echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
 
   code_formatting:
     name: Code Formatting
