@@ -289,7 +289,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Vahekaardid, andmed ja Duck.ai vestlused</string>
 
     <string name="settingsAutomaticallyClearWhen">Kustuta...</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta edasi...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ainult rakendusest väljumisel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Rakendusest väljumisel, 5-sekundilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Rakendusest väljumisel, 5-minutilise passiivsuse järel</string>
