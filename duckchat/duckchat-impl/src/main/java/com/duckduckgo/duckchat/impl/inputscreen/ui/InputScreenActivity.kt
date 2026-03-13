@@ -50,10 +50,6 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
 
-    fun test() {
-
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
