@@ -120,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Valyti duomenis</string>
-    <string name="fireClearAll">Ištrinti skirtukus ir duomenis</string>
-    <string name="fireClearAllPlusDuckChats">Ištrinti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
+    <string name="fireClearAll">Ištrinti korteles ir duomenis</string>
+    <string name="fireClearAllPlusDuckChats">Trinti skirtukus, duomenis ir „Duck.ai“ pokalbius</string>
     <string name="fireCancel">Atšaukti</string>
     <string name="fireDataCleared">Duomenys išvalyti</string>
 
