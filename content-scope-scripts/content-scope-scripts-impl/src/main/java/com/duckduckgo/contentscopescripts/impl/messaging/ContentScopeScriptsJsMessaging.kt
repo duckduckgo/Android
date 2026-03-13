@@ -39,6 +39,7 @@ import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -74,6 +75,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
+                    if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+                        val nativeData = JSONObject()
+                        nativeData.put("webViewId", System.identityHashCode(webView).toString())
+                        jsMessage.params.put("nativeData", nativeData)
+                    }
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
                         jsMessageCallback.process(
