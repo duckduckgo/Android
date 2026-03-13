@@ -56,7 +56,7 @@ class FeedbackViewModel @Inject constructor(
     val updateViewCommand: SingleLiveEvent<UpdateViewCommand> = SingleLiveEvent()
 
     init {
-        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
+        updateViewCommand.value = UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS))
     }
 
     private val currentViewState: UpdateViewCommand
