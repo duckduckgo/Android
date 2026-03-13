@@ -99,9 +99,9 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 
-    remote(develocity.buildCache) {
-        enabled = true
-        def accessKey = System.getenv("DEVELOCITY_ACCESS_KEY")
-        push = isCI && accessKey != null && !accessKey.isEmpty()
-    }
+//    remote(develocity.buildCache) {
+//        enabled = true
+//        def accessKey = System.getenv("DEVELOCITY_ACCESS_KEY")
+//        push = isCI && accessKey != null && !accessKey.isEmpty()
+//    }
 }
