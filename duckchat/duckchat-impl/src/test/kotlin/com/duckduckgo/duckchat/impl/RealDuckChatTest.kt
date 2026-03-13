@@ -404,6 +404,21 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOpenDuckChatCalledInInternalBuildWithoutCustomHostThenDefaultUrlIsUsed() = runTest {
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")

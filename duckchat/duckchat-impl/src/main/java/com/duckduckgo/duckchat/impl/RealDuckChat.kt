@@ -649,7 +649,10 @@ class RealDuckChat @Inject constructor(
 
     private fun getDuckChatLink(): String {
         if (appBuildConfig.isInternalBuild()) {
-            return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
+            val duckAiHost = duckAiHostProvider.getHost()
+            if (!duckAiHost.equals(DEFAULT_DUCK_AI_HOST, ignoreCase = true)) {
+                return duckChatLink.toUri().buildUpon().authority(duckAiHost).build().toString()
+            }
         }
         return duckChatLink
     }
@@ -875,6 +878,7 @@ class RealDuckChat @Inject constructor(
 
     companion object {
         private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DEFAULT_DUCK_AI_HOST = "duck.ai"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
