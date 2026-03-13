@@ -911,6 +911,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun launchFire(launchedFromFocusedNtp: Boolean = false) {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params)
 
         lifecycleScope.launch {
             val dialog = fireDialogProvider.createFireDialog(BROWSER)
