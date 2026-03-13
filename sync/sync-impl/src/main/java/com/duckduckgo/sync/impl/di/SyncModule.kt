@@ -168,7 +168,21 @@ object SyncStoreModule {
     fun provideSyncPromotionsDataStore(context: Context): DataStore<Preferences> {
         return context.dataStore
     }
+
+    private val Context.autoRestoreDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "com.duckduckgo.sync.autorestore",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @SyncAutoRestoreStore
+    fun provideSyncAutoRestoreDataStore(context: Context): DataStore<Preferences> {
+        return context.autoRestoreDataStore
+    }
 }
 
 @Qualifier
 annotation class SyncPromotion
+
+@Qualifier
+annotation class SyncAutoRestoreStore

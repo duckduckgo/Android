@@ -56,6 +56,11 @@ class RealSyncAutoRestore @Inject constructor(
             try {
                 logcat { "Sync-Recovery: restoreSyncAccount called" }
 
+                if (!syncFeature.syncAutoRestore().isEnabled()) {
+                    logcat { "Sync-Recovery: syncAutoRestore feature flag disabled, skipping restore" }
+                    return@launch
+                }
+
                 val recoveryBytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
                 if (recoveryBytes == null) {
                     logcat(LogPriority.WARN) { "Sync-Recovery: no recovery key found in persistent storage" }

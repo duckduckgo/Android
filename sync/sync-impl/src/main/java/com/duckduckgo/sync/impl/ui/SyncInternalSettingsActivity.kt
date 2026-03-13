@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -81,6 +82,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         configureListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
+    }
+
     private fun configureListeners() {
         binding.showQRCode.setOnClickListener {
             viewModel.onShowQRClicked()
@@ -101,8 +107,12 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
+        binding.launchRecoverDataScreenButton.setOnClickListener {
+            viewModel.onLaunchRecoverDataScreen()
+        }
         binding.blockStoreWriteButton.setOnClickListener { viewModel.onBlockStoreWriteClicked(binding.blockStoreInput.text) }
         binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
+        binding.blockStoreWriteRecoveryCodeButton.setOnClickListener { viewModel.onBlockStoreWriteRecoveryCode() }
     }
 
     private fun observeUiEvents() {
@@ -146,6 +156,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
             LoginSuccess -> {
                 Snackbar.make(binding.syncRecoveryCodeCta, "Login Success", Snackbar.LENGTH_SHORT).show()
+            }
+
+            Command.LaunchRecoverDataScreen -> {
+                startActivity(SetupAccountActivity.intent(this, SetupAccountActivity.Companion.Screen.RECOVERY_CODE, null))
             }
         }
     }

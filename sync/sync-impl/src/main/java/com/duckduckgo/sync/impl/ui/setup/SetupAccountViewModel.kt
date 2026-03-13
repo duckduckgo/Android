@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
@@ -45,10 +46,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
-class SetupAccountViewModel @Inject constructor(private val dispatchers: DispatcherProvider) : ViewModel() {
+class SetupAccountViewModel @Inject constructor(
+    private val dispatchers: DispatcherProvider,
+    private val syncFeature: SyncFeature,
+) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
@@ -56,12 +61,14 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
 
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
-            val viewMode = when (screen) {
-                SYNC_SETUP -> CreateAccount
-                SETUP_COMPLETE -> SyncSetupCompleted
-                RECOVERY_CODE -> AskSaveRecoveryCode
-                SYNC_INTRO -> IntroCreateAccount
-                RECOVERY_INTRO -> IntroRecoveryCode
+            val viewMode = withContext(dispatchers.io()) {
+                when (screen) {
+                    SYNC_SETUP -> CreateAccount
+                    SETUP_COMPLETE -> SyncSetupCompleted
+                    RECOVERY_CODE -> AskSaveRecoveryCode(useNewScreen = syncFeature.recoverDataEasilySetupScreen().isEnabled())
+                    SYNC_INTRO -> IntroCreateAccount
+                    RECOVERY_INTRO -> IntroRecoveryCode
+                }
             }
             viewState.emit(ViewState(viewMode))
             initialStateProcessed = true
@@ -76,7 +83,7 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
 
     sealed class ViewMode {
         data object CreateAccount : ViewMode()
-        data object AskSaveRecoveryCode : ViewMode()
+        data class AskSaveRecoveryCode(val useNewScreen: Boolean = false) : ViewMode()
         data object SyncSetupCompleted : ViewMode()
 
         data object IntroCreateAccount : ViewMode()
@@ -121,8 +128,8 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
     }
 
     fun onRecoveryCodePrompt() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
+        viewModelScope.launch(dispatchers.io()) {
+            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode(useNewScreen = syncFeature.recoverDataEasilySetupScreen().isEnabled())))
         }
     }
 
