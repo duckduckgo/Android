@@ -82,7 +82,7 @@ class RealBrokerDataDownloader @Inject constructor(
                     processBrokerJsonFiles(extractFolder, brokersToUpdate)
                 } finally {
                     zipFile.delete()
-                    SYSTEM.deleteRecursively(extractFolder.path.toPath())
+                    SYSTEM.deleteRecursively(extractFolder.path.toPath(), mustExist = false)
                 }
                 logcat { "PIR-update: Done downloading broker data" }
             }
