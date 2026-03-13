@@ -18,6 +18,7 @@ package com.duckduckgo.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
+import com.android.tools.lint.checks.infrastructure.TestMode
 import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
 import org.junit.Test
 
@@ -51,6 +52,7 @@ class MetricsPixelNumericValueDetectorTest {
             )
             .allowCompilationErrors()
             .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
             .run()
             .expectClean()
     }
@@ -82,6 +84,7 @@ class MetricsPixelNumericValueDetectorTest {
             )
             .allowCompilationErrors()
             .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
             .run()
             .expectClean()
     }
@@ -113,6 +116,7 @@ class MetricsPixelNumericValueDetectorTest {
             )
             .allowCompilationErrors()
             .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
             .run()
             .expectClean()
     }
@@ -144,6 +148,7 @@ class MetricsPixelNumericValueDetectorTest {
             )
             .allowCompilationErrors()
             .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
             .run()
             .expectContains("MetricsPixelNumericValue")
     }
@@ -175,10 +180,47 @@ class MetricsPixelNumericValueDetectorTest {
             )
             .allowCompilationErrors()
             .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
             .run()
             .expectContains("MetricsPixelNumericValue")
     }
 
+    @Test
+    fun `COUNT_ALWAYS with non-integer value and out-of-order named args - error reported`() {
+        lint()
+            .files(
+                metricsPixelStub(),
+                kt("""
+                    package com.duckduckgo.somefeature.impl
+
+                    import com.duckduckgo.feature.toggles.api.MetricsPixel
+                    import com.duckduckgo.feature.toggles.api.MetricType
+                    import com.duckduckgo.feature.toggles.api.ConversionWindow
+
+                    class SomeFeature {
+                        fun doSomething(toggle: Any) {
+                            MetricsPixel(
+                                type = MetricType.COUNT_ALWAYS,
+                                metric = "some_metric",
+                                conversionWindow = listOf(ConversionWindow(0, 1)),
+                                value = "not_a_number",
+                                toggle = toggle as com.duckduckgo.feature.toggles.api.Toggle,
+                            )
+                        }
+                    }
+                """).indented(),
+            )
+            .allowCompilationErrors()
+            .issues(NUMERIC_VALUE_REQUIRED)
+            .skipTestModes(TestMode.REORDER_ARGUMENTS)
+            .run()
+            .expectContains("MetricsPixelNumericValue")
+    }
+
+    // Stub matches the real MetricsPixel signature: declaration order is
+    // metric, value, conversionWindow, toggle, type (type has a default value).
+    // Tests pass toggle before conversionWindow (source order ≠ declaration order)
+    // to exercise named-argument lookup rather than positional index mapping.
     private fun metricsPixelStub() = kt("""
         package com.duckduckgo.feature.toggles.api
 
@@ -188,9 +230,9 @@ class MetricsPixelNumericValueDetectorTest {
         data class MetricsPixel(
             val metric: String,
             val value: String,
-            val toggle: Toggle,
             val conversionWindow: List<ConversionWindow>,
-            val type: MetricType,
+            val toggle: Toggle,
+            val type: MetricType = MetricType.NORMAL,
         )
     """).indented()
 }
