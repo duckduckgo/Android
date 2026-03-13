@@ -17,51 +17,19 @@ jobs:
     name: Check Changed Files
     runs-on: ubuntu-24.04
     outputs:
-      should_run: ${{ steps.check.outputs.should_run }}
+      should_run: ${{ steps.filter.outputs.code == 'true' || steps.filter.outputs.ci_workflow == 'true' || github.event_name == 'workflow_dispatch' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          fetch-depth: 0
-
-      - name: Check if CI should run
-        id: check
-        run: |
-          # Always run for manual triggers
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-            HEAD="${{ github.event.pull_request.head.sha }}"
-          else
-            BASE="${{ github.event.before }}"
-            HEAD="${{ github.event.after }}"
-          fi
-
-          # Handle new branches where before SHA is all zeros
-          if [[ "$BASE" == "0000000000000000000000000000000000000000" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
-
-          SHOULD_RUN=false
-          while IFS= read -r file; do
-            [[ -z "$file" ]] && continue
-            if [[ "$file" == ".github/workflows/ci.yml" ]]; then
-              SHOULD_RUN=true
-              break
-            elif [[ "$file" != *.md ]] && [[ "$file" != .github/* ]]; then
-              SHOULD_RUN=true
-              break
-            fi
-          done <<< "$CHANGED"
-
-          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          filters: |
+            code:
+              - '**'
+              - '!**.md'
+              - '!.github/**'
+            ci_workflow:
+              - '.github/workflows/ci.yml'
 
   code_formatting:
     name: Code Formatting
