@@ -1646,6 +1646,29 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageStartedAndOnReceivedErrorBothFireForSameUrlThenHandledOnlyOnce() {
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(intentUrl, Intent(), null)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+
+        // First: onPageStarted intercepts the URL
+        testee.onPageStarted(webView, intentUrl, null)
+
+        // Second: onReceivedError fires for the same URL
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNSUPPORTED_SCHEME)
+        whenever(webResourceError.description).thenReturn("net::ERR_UNKNOWN_URL_SCHEME")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(webResourceRequest.url).thenReturn(intentUrl.toUri())
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        // handleNonHttpAppLink should only be called once despite both callbacks firing
+        verify(listener, times(1)).handleNonHttpAppLink(urlType)
+    }
+
+    @Test
     fun whenOnReceivedErrorWithUnsupportedSchemeNotMainFrameThenDoesNotIntercept() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         val intentUrl = "intent://open/#Intent;scheme=myapp;end"
