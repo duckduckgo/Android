@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
@@ -65,6 +66,7 @@ constructor(
     private val dispatchers: DispatcherProvider,
     private val syncPromotionDataStore: SyncPromotionDataStore,
     private val persistentStorage: PersistentStorage,
+    private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
 ) : ViewModel() {
 
@@ -364,37 +366,44 @@ constructor(
     }
 
     private suspend fun refreshBlockStoreValue() {
-        val result = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
+        val bytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
         val blockStoreValue = when {
-            result == null -> BlockStoreValue.NotSet
-            else -> BlockStoreValue.HasValue(String(result))
+            bytes == null -> BlockStoreValue.NotSet
+            else -> BlockStoreValue.HasValue(String(bytes, Charsets.UTF_8))
         }
         viewState.update { it.copy(blockStoreCurrentValue = blockStoreValue) }
     }
 
-    fun onBlockStoreWriteClicked(data: String) {
+    fun onBlockStoreWriteClicked(recoveryCode: String, deviceId: String?) {
         viewModelScope.launch(dispatchers.io()) {
-            persistentStorage.store(SyncRecoveryPersistentStorageKey, data.toByteArray())
-                .onSuccess {
-                    refreshBlockStoreValue()
-                    command.send(ShowMessage("Stored successfully"))
-                }
-                .onFailure { error ->
-                    command.send(ShowMessage("Store failed: ${error.message}"))
-                }
+            if (recoveryCode.isBlank()) {
+                command.send(ShowMessage("Recovery code is required"))
+                return@launch
+            }
+            val trimmedDeviceId = deviceId?.takeIf { it.isNotBlank() }
+            if (trimmedDeviceId != null && trimmedDeviceId.length !in 8..64) {
+                command.send(ShowMessage("Device ID must be 8–64 chars (or leave blank)"))
+                return@launch
+            }
+            runCatching {
+                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode, deviceId?.takeIf { it.isNotBlank() })
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Stored successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Store failed: ${error.message}"))
+            }
         }
     }
 
     fun onBlockStoreClearClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            persistentStorage.clear(SyncRecoveryPersistentStorageKey)
-                .onSuccess {
-                    refreshBlockStoreValue()
-                    command.send(ShowMessage("Cleared successfully"))
-                }
-                .onFailure { error ->
-                    command.send(ShowMessage("Clear failed: ${error.message}"))
-                }
+            runCatching {
+                syncAutoRestoreManager.clearRecoveryCode()
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Cleared successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Clear failed: ${error.message}"))
+            }
         }
     }
 }

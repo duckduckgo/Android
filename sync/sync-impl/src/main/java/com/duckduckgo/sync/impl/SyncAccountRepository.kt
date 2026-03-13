@@ -66,7 +66,7 @@ interface SyncAccountRepository {
     fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(code: SyncAuthCode): Result<Boolean>
+    fun processCode(code: SyncAuthCode, existingDeviceId: String? = null): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -140,11 +140,11 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(code: SyncAuthCode): Result<Boolean> {
+    override fun processCode(code: SyncAuthCode, existingDeviceId: String?): Result<Boolean> {
         when (code) {
             is Recovery -> {
                 logcat { "Sync: code is a recovery code" }
-                return login(code.b64Code)
+                return login(code.b64Code, existingDeviceId)
             }
 
             is Connect -> {
@@ -287,7 +287,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+    private fun login(recoveryCode: RecoveryCode, existingDeviceId: String? = null): Result<Boolean> {
         var wasUserLogout = false
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
@@ -306,7 +306,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
-        val deviceId = syncDeviceIds.deviceId()
+        val deviceId = existingDeviceId ?: syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
         return performLogin(userId, deviceId, deviceName, primaryKey).onFailure {

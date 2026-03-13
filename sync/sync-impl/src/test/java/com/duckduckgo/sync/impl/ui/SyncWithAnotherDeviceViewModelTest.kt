@@ -63,6 +63,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -222,7 +223,7 @@ class SyncWithAnotherDeviceViewModelTest {
         syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -240,7 +241,7 @@ class SyncWithAnotherDeviceViewModelTest {
         syncFeature.seamlessAccountSwitching().setRawStoredState(State(false))
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -256,7 +257,7 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenUserScansRecoveryCodeButSignedInThenCommandIsAskToSwitchAccount() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -273,7 +274,7 @@ class SyncWithAnotherDeviceViewModelTest {
         configureExchangeKeysSupported()
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -354,7 +355,7 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenSignedInUserScansRecoveryCodeAndLoginSucceedsThenReturnSwitchAccount() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(accountA)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenAnswer {
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenAnswer {
             whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
             Success(true)
         }
@@ -372,7 +373,7 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenSignedOutUserScansRecoveryCodeAndLoginSucceedsThenReturnLoginSuccess() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenAnswer {
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenAnswer {
             whenever(syncRepository.getAccountInfo()).thenReturn(accountB)
             Success(true)
         }
@@ -390,7 +391,7 @@ class SyncWithAnotherDeviceViewModelTest {
     fun whenUserScansRecoveryQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
         whenever(syncRepository.getAccountInfo()).thenReturn(noAccount)
         whenever(syncRepository.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepository.processCode(any())).thenReturn(Result.Error(code = LOGIN_FAILED.code))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = LOGIN_FAILED.code))
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
@@ -424,7 +425,7 @@ class SyncWithAnotherDeviceViewModelTest {
         val authCodeToUse = AuthCode(qrCode = jsonExchangeKey, rawCode = "something else")
         whenever(syncRepository.generateExchangeInvitationCode()).thenReturn(Success(authCodeToUse))
         whenever(qrEncoder.encodeAsBitmap(eq(jsonExchangeKey), any(), any())).thenReturn(bitmap)
-        whenever(syncRepository.processCode(any())).thenReturn(Success(true))
+        whenever(syncRepository.processCode(any(), anyOrNull())).thenReturn(Success(true))
         return Pair(bitmap, authCodeToUse)
     }
 }
