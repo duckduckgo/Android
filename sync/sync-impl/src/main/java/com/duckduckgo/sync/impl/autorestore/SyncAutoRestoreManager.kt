@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.autorestore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.persistentstorage.api.PersistentStorage
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
+import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
@@ -29,18 +31,30 @@ import logcat.logcat
 import javax.inject.Inject
 
 interface SyncAutoRestoreManager {
+    suspend fun isAutoRestoreAvailable(): Boolean
     suspend fun saveRecoveryPayload(recoveryCode: String, deviceId: String?)
     suspend fun retrieveRecoveryPayload(): RestorePayload?
     suspend fun clearRecoveryCode()
+    suspend fun isRestoreOnReinstallEnabled(): Boolean
+    suspend fun setRestoreOnReinstallEnabled(enabled: Boolean)
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncAutoRestoreManager @Inject constructor(
     private val persistentStorage: PersistentStorage,
+    private val dataStore: SyncAutoRestorePreferenceDataStore,
+    private val syncFeature: SyncFeature,
     private val dispatcherProvider: DispatcherProvider,
     private val moshi: Moshi,
 ) : SyncAutoRestoreManager {
+
+    override suspend fun isAutoRestoreAvailable(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            syncFeature.syncAutoRestore().isEnabled() &&
+                persistentStorage.checkAvailability() is PersistentStorageAvailability.Available
+        }
+    }
 
     override suspend fun saveRecoveryPayload(recoveryCode: String, deviceId: String?) {
         withContext(dispatcherProvider.io()) {
@@ -67,6 +81,18 @@ class RealSyncAutoRestoreManager @Inject constructor(
             persistentStorage.clear(SyncRecoveryPersistentStorageKey)
                 .onSuccess { logcat { "Sync-Recovery: recovery code cleared successfully" } }
                 .onFailure { logcat(LogPriority.ERROR) { "Sync-Recovery: failed to clear recovery code - ${it.message}" } }
+        }
+    }
+
+    override suspend fun isRestoreOnReinstallEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            dataStore.isRestoreOnReinstallEnabled()
+        }
+    }
+
+    override suspend fun setRestoreOnReinstallEnabled(enabled: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            dataStore.setRestoreOnReinstallEnabled(enabled)
         }
     }
 }

@@ -156,6 +156,25 @@
                     android:text="@string/sync_internal_block_store_clear" />
 
             </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/blockStoreWriteRecoveryCodeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                app:daxButtonSize="large"
+                android:text="@string/sync_internal_block_store_write_recovery_code" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/launchRecoverDataScreenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                app:daxButtonSize="large"
+                android:text="@string/sync_internal_launch_recover_data_screen"/>
+
         </LinearLayout>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider

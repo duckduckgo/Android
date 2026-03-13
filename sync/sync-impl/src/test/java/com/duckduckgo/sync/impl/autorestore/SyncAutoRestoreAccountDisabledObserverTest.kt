@@ -29,6 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -110,6 +111,6 @@ class SyncAutoRestoreAccountDisabledObserverTest {
         isSignedInFlow.emit(true)
         isSignedInFlow.emit(false)
 
-        verify(syncAutoRestoreManager, org.mockito.kotlin.times(2)).clearRecoveryCode()
+        verify(syncAutoRestoreManager, times(2)).clearRecoveryCode()
     }
 }

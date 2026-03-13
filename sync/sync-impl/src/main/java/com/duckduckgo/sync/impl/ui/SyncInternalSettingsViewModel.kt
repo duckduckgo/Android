@@ -106,6 +106,7 @@ constructor(
         data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
         data object LoginSuccess : Command()
+        data object LaunchRecoverDataScreen : Command()
     }
 
     init {
@@ -114,6 +115,22 @@ constructor(
             checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
+        }
+    }
+
+    fun onResume() {
+        viewModelScope.launch(dispatchers.io()) {
+            refreshBlockStoreValue()
+        }
+    }
+
+    fun onLaunchRecoverDataScreen() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                command.send(Command.LaunchRecoverDataScreen)
+            } else {
+                command.send(Command.ShowMessage("Not signed in — create an account first"))
+            }
         }
     }
 
@@ -372,6 +389,24 @@ constructor(
             else -> BlockStoreValue.HasValue(String(bytes, Charsets.UTF_8))
         }
         viewState.update { it.copy(blockStoreCurrentValue = blockStoreValue) }
+    }
+
+    fun onBlockStoreWriteRecoveryCode() {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()
+            if (recoveryCode == null) {
+                command.send(ShowMessage("No recovery code available"))
+                return@launch
+            }
+            val deviceId = syncAccountRepository.getAccountInfo().deviceId
+            runCatching {
+                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode.rawCode, deviceId)
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Recovery code stored successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Store failed: ${error.message}"))
+            }
+        }
     }
 
     fun onBlockStoreWriteClicked(recoveryCode: String, deviceId: String?) {
