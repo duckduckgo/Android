@@ -120,7 +120,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Počisti podatke</string>
-    <string name="fireClearAll">Počisti zavihke in podatke</string>
+    <string name="fireClearAll">Izbriši zavihke in podatke</string>
     <string name="fireClearAllPlusDuckChats">Počisti zavihke, podatke in klepete Duck.ai</string>
     <string name="fireCancel">Preklic</string>
     <string name="fireDataCleared">Podatki izbrisani</string>
@@ -238,8 +238,8 @@
     <string name="dataClearingAutomaticClearingOn">Vključeno</string>
     <string name="dataClearingAutomaticClearingOff">Izklopljeno</string>
     <string name="dataClearingClearBrowsingData">Čiščenje podatkov o brskanju</string>
-    <string name="dataClearingAutomaticDataClearing">Samodejno čiščenje podatkov</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Samodejno počisti podatke</string>
+    <string name="dataClearingAutomaticDataClearing">Samodejno brisanje podatkov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Samodejno brisanje podatkov</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zaprite vse odprte zavihke</string>
     <string name="dataClearingAutomaticDataOptionDescription">Izbrišite vse podatke o straneh, vključno z obiskanimi stranmi. Morda boste odjavljeni iz računov.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Izbrišite vse klepete, vključno s pripetimi klepeti</string>
@@ -296,15 +296,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Zavihki in podatki</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Zavihki, podatki in klepeti Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Počisti dne …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Počisti dne …</string>
+    <string name="settingsAutomaticallyClearWhen">Izbriši na …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Izbriši na …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izhod iz aplikacije</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izhod iz aplikacije, neaktivnost 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izhod iz aplikacije, neaktivnost 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izhod iz aplikacije, neaktivnost 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izhod iz aplikacije, neaktivnost 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
-    <string name="settingsClearAiDataTitle">Počisti klepete Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Izbriši klepete Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button bo izbrisal tudi zgodovino Duck.ai, vključno s pripetimi klepeti.</string>
     <string name="settingsClearDataActionSecondaryText">Počisti vse zavihke in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Počisti vse zavihke, klepete Duck.ai in podatke za vsa spletna mesta, ki jih niste zaščitili s funkcijo Fireproof.</string>
