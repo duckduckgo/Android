@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Aboneliğiniz Apple App Store üzerinden satın alınmış. Planınızı veya faturalandırma ayarlarınızı değiştirmek için lütfen aboneliğinizi satın alırken kullandığınız Apple Hesabı ile giriş yapmış bir cihazdan Ayarlar &gt; Apple Hesabı &gt; Abonelikler bölümüne gidin.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde Privacy Pro\'yu etkinleştirin</string>
-    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; Privacy Pro</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
+    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde DuckDuckGo aboneliğini etkinleştirin</string>
+    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; DuckDuckGo\'ya Abone Ol</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonelikler</string>
     <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
     <string name="activityActivateSubscription">Aboneliğim Var</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>

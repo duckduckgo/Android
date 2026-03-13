@@ -809,7 +809,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej!<br/><br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vi gör det!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jag har varit här förut</string>
     <string name="preOnboardingDaxDialog2Title">Skydd aktiverat!</string>
     <string name="preOnboardingDaxDialog2Button">Välj din webbläsare</string>
@@ -821,6 +823,7 @@
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="preOnboardingAddressBarTitle">Var ska jag placera adressfältet?</string>
     <string name="preOnboardingAddressBarOkButton">Nästa</string>
@@ -873,6 +876,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vill du ha enkel tillgång till privat AI-chatt?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Nästa</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner är privata och valfria. Du kan göra ändringar i <b>Inställningar > AI-funktioner</b>.]]></string>
 

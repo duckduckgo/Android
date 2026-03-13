@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Votre abonnement a été souscrit via l\'App Store d\'Apple. Pour modifier votre forfait ou vos paramètres de facturation, allez dans Réglages &gt; Compte Apple &gt; Abonnements sur un appareil connecté au même compte Apple que celui utilisé pour souscrire votre abonnement.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activez Privacy Pro sur ordinateur pour configurer Personal Information Removal</string>
-    <string name="pirDescription">Dans le navigateur DuckDuckGo pour ordinateur, accédez à <b>Paramètres &gt; Privacy Pro</b> et cliquez sur <b>J\'ai un abonnement</b> pour commencer.</string>
+    <string name="pirTitle">Activez l\'abonnement DuckDuckGo sur ordinateur pour configurer Personal Information Removal</string>
+    <string name="pirDescription">Dans le navigateur DuckDuckGo pour ordinateur, accédez à <b>Paramètres &gt; S\'abonner à DuckDuckGo</b> et cliquez sur <b>J\'ai un abonnement</b> pour commencer.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnements</string>
     <string name="activitySubscriptionSettings">Paramètres d\'abonnement</string>
     <string name="activityActivateSubscription">J\'ai un abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Envoyer vos remarques</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai, de Personal Information Removal et d\'Identity Theft Restoration.</string>

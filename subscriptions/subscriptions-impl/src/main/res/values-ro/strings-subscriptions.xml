@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Abonamentul tău a fost achiziționat prin Apple App Store. Pentru a-ți modifica planul sau setările de facturare, accesează Setări &gt; Cont Apple &gt; Abonamente pe un dispozitiv conectat la același cont Apple folosit pentru achiziționarea abonamentului.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activează Privacy Pro pe desktop pentru a configura Personal Information Removal</string>
-    <string name="pirDescription">În browserul DuckDuckGo pentru desktop, accesează <b>Setări &gt; Privacy Pro</b> și fă click pe <b>Am un abonament</b> pentru a începe.</string>
+    <string name="pirTitle">Activează abonamentul DuckDuckGo pe desktop pentru a configura Personal Information Removal</string>
+    <string name="pirDescription">În browserul DuckDuckGo pentru desktop, accesează <b>Setări &gt; Abonează-te la DuckDuckGo</b> și dă click pe <b>Am un abonament</b> pentru a începe.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonamente</string>
     <string name="activitySubscriptionSettings">Setări pentru abonament</string>
     <string name="activityActivateSubscription">Am un abonament</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Trimite feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonații beneficiază de VPN, modele avansate de IA în Duck.ai, Personal Information Removal și Identity Theft Restoration.</string>

@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Вашият абонамент е закупен през Apple App Store. За да промените плана или настройките за фактуриране, отидете на Настройки &gt; Apple Account &gt; Абонаменти на устройство, вписано със същия Apple Account, използван за закупуване на абонамента ви.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Активирайте Privacy Pro на настолен компютър, за да настроите Personal Information Removal</string>
-    <string name="pirDescription">В браузъра DuckDuckGo за настолен компютър отворете <b>Настройки &gt; Privacy Pro</b> и изберете <b>Имам абонамент</b>, за да започнете.</string>
+    <string name="pirTitle">Активирайте абонамента за DuckDuckGo на настолен компютър, за да настроите Personal Information Removal</string>
+    <string name="pirDescription">В браузъра DuckDuckGo за настолен компютър отворете <b>Настройки &gt; Абонамент за DuckDuckGo</b> и изберете <b>Имам абонамент</b>, за да започнете.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Абонаменти</string>
     <string name="activitySubscriptionSettings">Настройки на абонамент</string>
     <string name="activityActivateSubscription">Имам абонамент</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Изпратете отзив</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Абонатите получават VPN и усъвършенствани AI модели в Duck.ai. Personal Information Removal и Identity Theft Restoration.</string>

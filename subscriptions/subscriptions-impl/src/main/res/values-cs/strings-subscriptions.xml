@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tvoje předplatné bylo zakoupeno prostřednictvím obchodu Apple App Store. Pokud chceš změnit tarif nebo nastavení fakturace, na zařízení, které je přihlášené ke stejnému účtu Apple, jaké jsi použil(a) k pořízení předplatného, přejdi do Nastavení &gt; Účet Apple &gt; Předplatná.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivuj si na počítači službu Privacy Pro a nastav si v ní funkci Personal Information Removal</string>
-    <string name="pirDescription">Začneš tak, že v prohlížeči DuckDuckGo pro počítače přejdeš do <b>Nastavení &gt; Privacy Pro</b> a klikneš na <b>Mám předplatné</b>.</string>
+    <string name="pirTitle">Pro nastavení služby Personal Information Removal si aktivuj předplatné DuckDuckGo na počítači</string>
+    <string name="pirDescription">V prohlížeči DuckDuckGo pro počítače přejdi do sekce <b>Nastavení &gt; Přihlásit se k odběru DuckDuckGo</b> a začni kliknutím na možnost <b>Mám předplatné</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Předplatné</string>
     <string name="activitySubscriptionSettings">Nastavení předplatného</string>
     <string name="activityActivateSubscription">Mám předplatné</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>

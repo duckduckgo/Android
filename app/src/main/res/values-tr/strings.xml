@@ -809,7 +809,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
     <string name="preOnboardingDaxDialog2Title">Korumalar etkinleştirildi!</string>
     <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
@@ -821,6 +823,7 @@
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
     <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="preOnboardingAddressBarTitle">Adres çubuğu nereye yerleştirilsin?</string>
     <string name="preOnboardingAddressBarOkButton">Sonraki</string>
@@ -873,6 +876,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Gizli AI sohbetine daha kolay erişmek ister misiniz?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Sonraki</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI özellikleri gizli ve isteğe bağlıdır. Değişiklikleri <b>Ayarlar > AI Özellikleri</b> bölümünden yapabilirsiniz.]]></string>
 
