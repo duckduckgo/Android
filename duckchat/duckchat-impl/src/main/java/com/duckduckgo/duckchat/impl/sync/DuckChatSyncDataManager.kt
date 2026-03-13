@@ -100,7 +100,7 @@ class DuckChatSyncDataManager @Inject constructor(
             }
 
             val deletionTimestamp = duckChatSyncRepository.getLastDuckAiChatDeletionTimestamp()
-            formatRequest(deletionTimestamp)
+            formatDeletionRequest(deletionTimestamp)
         }
     }
 
@@ -159,7 +159,7 @@ class DuckChatSyncDataManager @Inject constructor(
         ModifiedSince.FirstSync,
     )
 
-    private fun formatRequest(deletionTimestamp: String?): SyncDeletionRequest? {
+    private fun formatDeletionRequest(deletionTimestamp: String?): SyncDeletionRequest? {
         if (deletionTimestamp == null) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no need to inform sync of duck ai chat deletion, no timestamp available" }
             return null
