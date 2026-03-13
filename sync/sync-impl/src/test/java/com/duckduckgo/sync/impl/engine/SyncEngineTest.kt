@@ -29,6 +29,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
@@ -685,6 +686,91 @@ internal class SyncEngineTest {
         verify(syncApiClient, times(0)).delete(any())
         // Verify normal sync continues
         verify(syncApiClient).get(any(), any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDuckAiChatsChangesExistThenPatchIsCalled() {
+        val json = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProvider = FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges)
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProvider))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty())))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(duckChatChanges)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDuckAiChatsChangesAreEmptyThenGetIsNotCalled() {
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, "", ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProvider = FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges)
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProvider))
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient, times(0)).get(any(), any())
+        verify(syncApiClient, times(0)).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDuckAiChatsFirstSyncThenGetIsSkippedButPatchIsCalled() {
+        val json = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val firstSyncChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, FirstSync)
+        val afterDedupChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, firstSyncChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, afterDedupChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty())))
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        // GET should not be called for DUCK_AI_CHATS (supportsGet=false)
+        verify(syncApiClient, times(0)).get(any(), any())
+        // PATCH should be called for changes after dedup
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDuckAiChatsAndBookmarksChangesExistThenBothArePatched() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val duckChatJson = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, duckChatJson, ModifiedSince.Timestamp("2024-01-01"))
+
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, bookmarksChanges),
+                    FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges),
+                ),
+            )
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, SyncChangesRequest.empty()),
+                    FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty()),
+                ),
+            )
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(bookmarksChanges)
+        verify(syncApiClient).patch(duckChatChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 

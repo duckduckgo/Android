@@ -148,12 +148,12 @@ class RealSyncEngine @Inject constructor(
 
     private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
         regularSyncChanges
-            .filter { it.type.supportsGet }
             .forEach { changes ->
                 if (changes.isEmpty()) {
-                    logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
-
-                    getRemoteChanges(changes, TIMESTAMP)
+                    if (changes.type.supportsGet) {
+                        logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
+                        getRemoteChanges(changes, TIMESTAMP)
+                    }
                 } else {
                     logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
                     patchLocalChanges(changes, TIMESTAMP)
