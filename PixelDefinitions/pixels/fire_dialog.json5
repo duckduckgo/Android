@@ -39,7 +39,7 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "from_focused_ntp"]
+        "parameters": ["appVersion"]
     },
     "m_fire_button_tapped_tab_switcher_daily": {
         "description": "The fire button was tapped from the tab switcher (daily)",
