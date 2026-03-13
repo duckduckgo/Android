@@ -93,6 +93,7 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenRestoreSyncAccountCalledThenRetrievesKeyAndCallsProcessCode() = runTest {
+        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
         configureRetrieveSuccess(value = recoveryCodeString)
         configureProcessCodeResult(SyncResult.Success(true))
@@ -105,6 +106,7 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenRestoreSyncAccountCalledButNoStoredKeyThenDoesNotCallProcessCode() = runTest {
+        configureAutoRestoreEnabled(true)
         configureRetrieveSuccess(value = null)
 
         testee.restoreSyncAccount()
@@ -114,6 +116,7 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenRestoreSyncAccountCalledButStorageFailsThenDoesNotCallProcessCode() = runTest {
+        configureAutoRestoreEnabled(true)
         configureRetrieveFailure()
 
         testee.restoreSyncAccount()
@@ -123,6 +126,7 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenProcessCodeFailsThenRestoreSyncAccountDoesNotThrow() = runTest {
+        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
         configureRetrieveSuccess(value = recoveryCodeString)
         configureProcessCodeResult(SyncResult.Error(code = 52, reason = "Login failed"))
@@ -134,12 +138,23 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenParseSyncAuthCodeThrowsThenRestoreSyncAccountDoesNotCrash() = runTest {
+        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "invalid_not_base64"
         configureRetrieveSuccess(value = recoveryCodeString)
         whenever(syncAccountRepository.parseSyncAuthCode(recoveryCodeString)).thenThrow(RuntimeException("Parse error"))
 
         testee.restoreSyncAccount()
 
+        verify(syncAccountRepository, never()).processCode(any())
+    }
+
+    @Test
+    fun whenRestoreSyncAccountCalledButFFDisabledThenDoesNotAccessStorage() = runTest {
+        configureAutoRestoreEnabled(false)
+
+        testee.restoreSyncAccount()
+
+        verify(persistentStorage, never()).retrieve(any())
         verify(syncAccountRepository, never()).processCode(any())
     }
 
