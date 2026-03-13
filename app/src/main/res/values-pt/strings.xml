@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
-    <string name="fireClearAll">Limpar separadores e dados</string>
-    <string name="fireClearAllPlusDuckChats">Limpar todos os separadores, dados e conversas do Duck.ai</string>
+    <string name="fireClearAll">Eliminar separadores e dados</string>
+    <string name="fireClearAllPlusDuckChats">Eliminar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Ligado</string>
     <string name="dataClearingAutomaticClearingOff">Desligado</string>
     <string name="dataClearingClearBrowsingData">Limpar dados de navegação</string>
-    <string name="dataClearingAutomaticDataClearing">Limpeza automática de dados</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Limpar os dados automaticamente</string>
+    <string name="dataClearingAutomaticDataClearing">Eliminar dados automaticamente</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Eliminar dados automaticamente</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Fechar todos os separadores abertos</string>
     <string name="dataClearingAutomaticDataOptionDescription">Eliminar todos os dados do site, incluindo sites visitados. Pode terminar a tua sessão nas contas.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Eliminar todos os chats, incluindo os fixados</string>
@@ -288,15 +288,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Separadores e dados</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Separadores, dados e conversas do Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Limpar em…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Limpar em…</string>
+    <string name="settingsAutomaticallyClearWhen">Eliminar em…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar em…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Apenas saída da aplicação</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Saída da aplicação, inativa durante 5 segundos</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Saída da aplicação, inativa durante 5 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Saída da aplicação, inativa durante 15 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Saída da aplicação, inativa durante 30 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Saída da aplicação, inativa por 1 hora</string>
-    <string name="settingsClearAiDataTitle">Limpar conversas do Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Eliminar as conversas do Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">O Fire Button também elimina o histórico do Duck.ai, incluindo os chats fixados.</string>
     <string name="settingsClearDataActionSecondaryText">Fecha todas as abas e limpa os dados de quaisquer sites que não tenha protegido com o Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Limpa todos os separadores, chats do Duck.ai e dados de quaisquer sites que não tenhas protegido com o Fireproof.</string>
@@ -885,7 +885,6 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Saiba mais</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Experimenta gratuitamente!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorar</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Sabias?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Queres acesso fácil ao chat privado com IA?</string>
