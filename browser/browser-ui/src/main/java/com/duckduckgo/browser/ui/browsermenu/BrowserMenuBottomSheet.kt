@@ -158,6 +158,9 @@ class BrowserMenuBottomSheet(
     val brokenSiteMenuItem: MenuItemView
         get() = binding.reportBrokenSiteMenuItem
 
+    val fireMenuItem: MenuItemView
+        get() = binding.fireMenuItem
+
     fun render(viewState: BrowserMenuViewState) {
         hideAllMenuItems()
         showCommonItems()
@@ -258,11 +261,14 @@ class BrowserMenuBottomSheet(
         autofillMenuItem.isVisible = viewState.showAutofill
 
         renderPageContextHeader(viewState.pageContextHeader)
-        vpnMenuItem.isVisible = false
+        renderVpnMenu(viewState.vpnMenuState)
+        fireMenuItem.isVisible = viewState.showFireMenuItem
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
-        binding.privacyToolsSectionDivider.isVisible = viewState.canFireproofSite || viewState.isEmailSignedIn
+        val hasMinOnePrivacyItem =
+            viewState.showFireMenuItem || viewState.canFireproofSite || viewState.isEmailSignedIn || viewState.vpnMenuState != VpnMenuState.Hidden
+        binding.privacyToolsSectionDivider.isVisible = hasMinOnePrivacyItem
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
     }
@@ -284,6 +290,7 @@ class BrowserMenuBottomSheet(
         downloadsMenuItem.isVisible = true
         duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
+        createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
