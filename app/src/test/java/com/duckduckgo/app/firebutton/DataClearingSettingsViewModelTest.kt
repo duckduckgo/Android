@@ -359,4 +359,12 @@ internal class DataClearingSettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenOnClearDataActionClickedThenFirePixels() = runTest {
+        testee.onClearDataActionClicked()
+
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY)
+    }
 }

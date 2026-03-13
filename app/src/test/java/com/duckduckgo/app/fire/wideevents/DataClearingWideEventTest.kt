@@ -106,6 +106,23 @@ class DataClearingWideEventTest {
     }
 
     @Test
+    fun `start with single tab fire dialog entry point sends correct flow entry point`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+            .thenReturn(Result.success(124L))
+
+        val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA, FireClearOption.DUCKAI_CHATS)
+        dataClearingWideEvent.start(EntryPoint.SINGLE_TAB_FIRE_DIALOG, clearOptions)
+
+        verify(wideEventClient).flowStart(
+            name = "data-clearing",
+            flowEntryPoint = "single_tab_fire_dialog",
+            metadata = mapOf("clear_options" to "tabs,data,duckai_chats"),
+            cleanupPolicy = OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+        verify(wideEventClient).intervalStart(wideEventId = 124L, key = "total_duration_ms_bucketed")
+    }
+
+    @Test
     fun `start resets existing flow before starting new one`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
             .thenReturn(Result.success(1L))
