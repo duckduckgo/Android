@@ -1276,7 +1276,7 @@ class BrowserTabFragment :
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
-                            subscriptionName = "submitPromptInterruption",
+                            subscriptionName = "submitPromptInterruptionxx",
                             params = JSONObject("{}"),
                         ),
                     )
