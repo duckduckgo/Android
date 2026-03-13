@@ -138,6 +138,7 @@ class BrowserWebViewClient @Inject constructor(
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
+    private var lastInterceptedAppSchemeUrl: String? = null
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
@@ -485,6 +486,8 @@ class BrowserWebViewClient @Inject constructor(
             return
         }
 
+        lastInterceptedAppSchemeUrl = null
+
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
@@ -536,17 +539,20 @@ class BrowserWebViewClient @Inject constructor(
         val uri = url.toUri()
         val scheme = uri.scheme ?: return false
 
-        // Only intercept non-standard schemes; standard web schemes go through the normal loading path
         if (scheme in STANDARD_WEB_SCHEMES) {
             return false
         }
 
+        if (url == lastInterceptedAppSchemeUrl) {
+            return true
+        }
+        lastInterceptedAppSchemeUrl = url
+
         logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
 
-        // Stop loading before dispatching so the WebView doesn't continue with the unsupported scheme.
-        // The Unknown branch in shouldOverride already reloads originalUrl as recovery if needed.
         webView.stopLoading()
-        return shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        return true
     }
 
     private fun handleMediaPlayback(
