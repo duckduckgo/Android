@@ -759,8 +759,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         private const val ANIMATION_DELAY = 1400L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
-        private const val SUGGESTION_ANIMATION_DURATION = 1000L
-        private const val SUGGESTIONS_ANIMATION_DELAY = 2000L
         private const val SUGGESTION_ANIMATION_DURATION = 500L
         private const val SUGGESTIONS_ANIMATION_DELAY = 500L
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
