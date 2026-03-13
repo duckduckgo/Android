@@ -43,6 +43,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
@@ -74,6 +75,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentPopup
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
@@ -121,6 +124,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     @Inject
     lateinit var duckChatFeature: DuckChatFeature
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
     private val viewModel: InputScreenViewModel by lazy {
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         val currentOmnibarText = params?.query ?: ""
@@ -139,6 +145,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private var previousSearchMode: Boolean? = null
     private var autoCompleteTargetVisibility: Boolean = false
     private var chatSuggestionsTargetVisibility: Boolean = false
+    private var tabAttachmentPopup: TabAttachmentPopup? = null
 
     private val pageChangeCallback =
         object : OnPageChangeCallback() {
@@ -312,6 +319,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             view?.viewTreeObserver?.removeOnGlobalLayoutListener(it)
         }
         globalLayoutListener = null
+        tabAttachmentPopup?.dismiss()
+        tabAttachmentPopup = null
         super.onDestroyView()
     }
 
@@ -367,6 +376,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .onEach {
                 inputModeWidget.setInputScreenButtonsVisible(inputScreenConfigResolver.useTopBar() && it)
             }.launchIn(lifecycleScope)
+
+        if (duckChatFeature.chatTabAttachments().isEnabled()) {
+            viewModel.tabAttachmentState
+                .onEach { state -> updateTabAttachmentPopup(state) }
+                .launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -488,6 +503,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             onClearTextTapped = {
                 viewModel.onClearTextTapped()
+            }
+            if (duckChatFeature.chatTabAttachments().isEnabled()) {
+                tabAttachmentsEnabled = true
+                onChatTagTextChanged = { text, cursor ->
+                    viewModel.onChatTagTextChanged(text, cursor)
+                }
+                onTabAttachmentRemoved = { tabId ->
+                    viewModel.onTabAttachmentRemoved(tabId)
+                }
             }
         }
 
@@ -925,6 +949,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 scrollView.translationY = 0f
             }
             .start()
+    }
+
+    private fun updateTabAttachmentPopup(state: TabAttachmentState) {
+        if (state.popupVisible && state.filteredTabs.isNotEmpty()) {
+            val popup = tabAttachmentPopup ?: TabAttachmentPopup(
+                context = requireContext(),
+                useTopBar = inputScreenConfigResolver.useTopBar(),
+                lifecycleOwner = viewLifecycleOwner,
+                faviconManager = faviconManager,
+            ) { item ->
+                val atIndex = viewModel.tabAttachmentState.value.activeAtIndex
+                val cursorPos = inputModeWidget.inputField.selectionStart
+                val token = viewModel.onTabAttachmentSelected(item)
+                inputModeWidget.insertTabTag(token, item.tabId, atIndex.coerceAtLeast(0), cursorPos)
+            }.also { tabAttachmentPopup = it }
+            popup.update(state.filteredTabs, inputModeWidget.getAnchorView())
+        } else {
+            tabAttachmentPopup?.dismiss()
+        }
     }
 
     companion object {

@@ -191,4 +191,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun chatTabAttachments(): Toggle
 }
