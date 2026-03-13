@@ -53,6 +53,7 @@ class RealBrokerDataDownloaderTest {
     @Before
     fun setUp() {
         whenever(mockContext.filesDir).thenReturn(tempFolder.root)
+        whenever(mockContext.cacheDir).thenReturn(tempFolder.root)
 
         testee = RealBrokerDataDownloader(
             dbpService = mockDbpService,
@@ -278,6 +279,42 @@ class RealBrokerDataDownloaderTest {
         testee.downloadBrokerData(brokersToUpdate)
 
         verify(mockPixelSender).reportUpdateBrokerJsonSuccess(eq("broker1.json"), eq(removedAtMs))
+    }
+
+    @Test
+    fun whenDownloadBrokerDataWithZipSlipEntryThenSkipMaliciousEntry() = runTest {
+        val brokersToUpdate = listOf("broker1.json")
+        val broker1Json = """
+            {
+                "name": "Broker One",
+                "url": "https://broker1.com",
+                "version": "1.0",
+                "parent": null,
+                "addedDatetime": 1000,
+                "optOutUrl": "https://broker1.com/optout",
+                "steps": [],
+                "schedulingConfig": {
+                    "retryError": 24,
+                    "confirmOptOutScan": 7,
+                    "maintenanceScan": 30,
+                    "maxAttempts": 3
+                },
+                "removedAt": null
+            }
+        """.trimIndent()
+
+        val zipBytes = createZipWithFiles(
+            mapOf(
+                "data/broker1.json" to broker1Json,
+                "../../malicious.json" to """{ "attack": true }""",
+            ),
+        )
+        whenever(mockDbpService.getBrokerJsonFiles()).thenReturn(zipBytes.toResponseBody())
+
+        testee.downloadBrokerData(brokersToUpdate)
+
+        verify(mockPirRepository).updateBrokerData(eq("broker1.json"), any())
+        verify(mockPirRepository, never()).updateBrokerData(eq("malicious.json"), any())
     }
 
     private fun createZipWithFiles(files: Map<String, String>): ByteArray {

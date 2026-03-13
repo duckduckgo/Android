@@ -26,12 +26,14 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
-import okhttp3.ResponseBody
 import okio.FileSystem.Companion.SYSTEM
 import okio.Path.Companion.toPath
+import okio.buffer
+import okio.source
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
@@ -55,36 +57,59 @@ class RealBrokerDataDownloader @Inject constructor(
     private val context: Context,
     private val pirPixelSender: PirPixelSender,
 ) : BrokerDataDownloader {
+
+    private val brokerAdapter by lazy {
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .add(StepsAsStringAdapter())
+            .build()
+            .adapter(PirJsonBroker::class.java)
+    }
+
     override suspend fun downloadBrokerData(brokersToUpdate: List<String>) {
         withContext(dispatcherProvider.io()) {
             if (brokersToUpdate.isNotEmpty()) {
+                logcat { "PIR-update: Starting to download broker data" }
                 val extractFolder = File(context.filesDir, "unzipped-broker-json")
-                extractJsonFilesFromResponse(dbpService.getBrokerJsonFiles(), extractFolder)
-                processBrokerJsonFiles(extractFolder, brokersToUpdate)
-                SYSTEM.deleteRecursively(extractFolder.path.toPath())
+                val zipFile = File.createTempFile("broker-data", ".zip", context.cacheDir)
+                try {
+                    dbpService.getBrokerJsonFiles().use { body ->
+                        body.byteStream().use { input ->
+                            zipFile.outputStream().use { input.copyTo(it) }
+                        }
+                    }
+                    extractJsonFilesFromZip(zipFile, extractFolder)
+                    processBrokerJsonFiles(extractFolder, brokersToUpdate)
+                } finally {
+                    zipFile.delete()
+                    SYSTEM.deleteRecursively(extractFolder.path.toPath())
+                }
+                logcat { "PIR-update: Done downloading broker data" }
             }
         }
     }
 
-    private fun extractJsonFilesFromResponse(
-        responseBody: ResponseBody,
+    private fun extractJsonFilesFromZip(
+        zipFile: File,
         outputDir: File,
     ) {
-        logcat { "PIR-update: Extracting data from $responseBody" }
-        ZipInputStream(responseBody.byteStream()).use { zipInputStream ->
+        logcat { "PIR-update: Extracting data from $zipFile" }
+        outputDir.mkdirs()
+        val outputDirCanonical = outputDir.canonicalPath
+        ZipInputStream(zipFile.inputStream().buffered()).use { zipInputStream ->
             var entry = zipInputStream.nextEntry
             while (entry != null) {
-                val outputFile = File(outputDir, entry.name)
-
-                if (entry.isDirectory) {
-                    outputFile.mkdirs()
-                } else {
-                    outputFile.parentFile?.mkdirs()
-                    FileOutputStream(outputFile).use { outputStream ->
-                        zipInputStream.copyTo(outputStream)
+                if (!entry.isDirectory && entry.name.endsWith(".json")) {
+                    val outputFile = File(outputDir, entry.name)
+                    if (outputFile.canonicalPath.startsWith(outputDirCanonical + File.separator)) {
+                        outputFile.parentFile?.mkdirs()
+                        FileOutputStream(outputFile).buffered().use { outputStream ->
+                            zipInputStream.copyTo(outputStream)
+                        }
+                    } else {
+                        logcat(ERROR) { "PIR-update: Skipping ZIP entry with invalid path: ${entry.name}" }
                     }
                 }
-
                 zipInputStream.closeEntry()
                 entry = zipInputStream.nextEntry
             }
@@ -102,18 +127,14 @@ class RealBrokerDataDownloader @Inject constructor(
             return
         }
 
-        val adapter = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .add(StepsAsStringAdapter())
-            .build()
-            .adapter(PirJsonBroker::class.java)
-
-        directory.listFiles()?.get(0)?.listFiles { file ->
-            file.extension == "json" && brokersToUpdate.contains(file.name)
+        val brokersToUpdateSet = brokersToUpdate.toHashSet()
+        directory.listFiles()?.firstOrNull()?.listFiles { file ->
+            file.extension == "json" && file.name in brokersToUpdateSet
         }?.forEach { jsonFile ->
             logcat { "PIR-update: Processing data from ${jsonFile.name}" }
-            val content = jsonFile.readText() // Read JSON file as string
-            val broker = runCatching { adapter.fromJson(content) }.getOrNull()
+            val broker = runCatching { brokerAdapter.fromJson(jsonFile.source().buffer()) }
+                .onFailure { logcat(ERROR) { "PIR-update: Failed to parse ${jsonFile.name}: $it" } }
+                .getOrNull()
             if (broker != null) {
                 try {
                     pirRepository.updateBrokerData(jsonFile.name, broker)
@@ -122,10 +143,12 @@ class RealBrokerDataDownloader @Inject constructor(
                         removedAtMs = broker.removedAt ?: 0L,
                     )
                 } catch (e: Throwable) {
-                    pirPixelSender.reportUpdateBrokerJsonFailure(
-                        brokerJsonFileName = jsonFile.name,
-                        removedAtMs = broker.removedAt ?: 0L,
-                    )
+                    if (e !is CancellationException) {
+                        pirPixelSender.reportUpdateBrokerJsonFailure(
+                            brokerJsonFileName = jsonFile.name,
+                            removedAtMs = broker.removedAt ?: 0L,
+                        )
+                    }
                 }
             } else {
                 pirPixelSender.reportUpdateBrokerJsonFailure(
