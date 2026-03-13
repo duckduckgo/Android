@@ -288,8 +288,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Pestañas y datos</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Pestañas, datos y chats de Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Eliminar al…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar al…</string>
+    <string name="settingsAutomaticallyClearWhen">Eliminar el…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar el…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Salir de la aplicación</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Salir de la aplicación (5 segundos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Salir de la aplicación (5 minutos de inactividad)</string>
