@@ -28,7 +28,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_UPDATE_VERIFIED_INSTALL("verified_app_update"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
+    FORGET_ALL_PRESSED_BROWSING_DAILY("m_fire_button_tapped_browser_daily"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
+    FORGET_ALL_PRESSED_TABSWITCHING_DAILY("m_fire_button_tapped_tab_switcher_daily"),
+    FORGET_ALL_PRESSED_SETTINGS("m_fire_button_tapped_settings"),
+    FORGET_ALL_PRESSED_SETTINGS_DAILY("m_fire_button_tapped_settings_daily"),
     FORGET_ALL_EXECUTED("mf"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
@@ -327,6 +331,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
     FIRE_DIALOG_SHOWN("m_fire_dialog_shown"),
+    FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED("m_fire_dialog_single_tab_clear_pressed"),
+    FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY("m_fire_dialog_single_tab_clear_pressed_daily"),
 
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
