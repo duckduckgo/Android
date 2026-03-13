@@ -44,6 +44,8 @@ abstract class WideEventDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE wide_events ADD COLUMN sampling_probability REAL NOT NULL DEFAULT 1.0")
             }
         }
+
+        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
     }
 }
 

@@ -39,7 +39,7 @@ class WideEventDatabaseModule {
                 klass = WideEventDatabase::class.java,
                 name = "wide_events.db",
             )
-            .addMigrations(WideEventDatabase.MIGRATION_1_2)
+            .addMigrations(*WideEventDatabase.ALL_MIGRATIONS)
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
             .addTypeConverter(wideEventEntityTypeConverters)
