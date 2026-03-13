@@ -6,6 +6,9 @@ on:
     branches:
       - main
       - develop
+    paths-ignore:
+      - '**/*.md'
+      - '.github/**'
   pull_request:
 
 concurrency:
@@ -37,7 +40,7 @@ jobs:
           fi
           CHANGED=$(git diff --name-only "$BASE" "$HEAD")
           echo "Changed files:"; echo "$CHANGED"
-          if echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)' || \
+          if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)') || \
              echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
             echo "Code or required CI workflow changes detected — running checks"
             echo "should_run=true" >> $GITHUB_OUTPUT
