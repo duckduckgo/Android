@@ -135,6 +135,7 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHisto
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.menu.BrowserMenuViewStateFactory
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.browser.menu.VpnMenuStore
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -565,6 +566,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
+
+    @Inject
+    lateinit var downloadMenuStateProvider: DownloadMenuStateProvider
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
@@ -2091,6 +2095,7 @@ class BrowserTabFragment :
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
+        downloadMenuStateProvider.onDownloadComplete()
         val downloadSucceededSnackbar =
             view
                 ?.makeSnackbarWithNoBottomInset(

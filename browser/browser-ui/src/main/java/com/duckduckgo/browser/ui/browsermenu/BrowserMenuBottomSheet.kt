@@ -270,6 +270,7 @@ class BrowserMenuBottomSheet(
         renderPageContextHeader(viewState.pageContextHeader)
         renderVpnMenu(viewState.vpnMenuState)
         fireMenuItem.isVisible = viewState.showFireMenuItem
+        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
@@ -295,6 +296,7 @@ class BrowserMenuBottomSheet(
         refreshMenuItem.isVisible = false
         autofillMenuItem.isVisible = viewState.showAutofill
         downloadsMenuItem.isVisible = true
+        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
         duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -370,6 +372,8 @@ class BrowserMenuBottomSheet(
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
+        downloadsMenuItem.isVisible = true
+        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
         renderPageContextHeader(viewState.pageContextHeader)
 
         duckChatHistoryMenuItem.isVisible = true

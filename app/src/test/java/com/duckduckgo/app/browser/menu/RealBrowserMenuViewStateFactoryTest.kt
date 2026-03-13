@@ -48,13 +48,14 @@ class RealBrowserMenuViewStateFactoryTest {
     @Mock
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
+    private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider)
     }
 
     @Test
