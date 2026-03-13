@@ -20,7 +20,7 @@ develocity {
     allowUntrustedServer = false
 
     buildScan {
-        uploadInBackground = !isCI
+//        uploadInBackground = !isCI
         publishing.onlyIf { it.authenticated }
         obfuscation {
             ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0" } }
