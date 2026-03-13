@@ -50,9 +50,9 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -213,7 +213,7 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUrlString, urlString)) {
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri, url)) {
             val isContentBlockingException = contentBlocking.isAnException(documentUrlString)
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
             val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)

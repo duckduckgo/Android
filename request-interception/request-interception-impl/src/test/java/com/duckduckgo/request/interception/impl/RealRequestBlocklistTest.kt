@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.requestblocklist
+package com.duckduckgo.request.interception.impl
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureException
@@ -65,77 +66,77 @@ class RealRequestBlocklistTest {
         val testee =
             createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")), featureEnabled = false)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRequestMatchesRuleAndDomainThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRequestMatchesRuleButDomainDoesNotMatchThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://other.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://other.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRequestDoesNotMatchRuleThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/article.html"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/article.html")))
     }
 
     @Test
     fun whenRequestDomainHasNoRulesThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://other.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://other.com/image.jpg")))
     }
 
     @Test
     fun whenSettingsAreNullThenReturnFalse() {
         val testee = createTestee(settings = null)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRequestUrlIsInvalidThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "not a url"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("not a url")))
     }
 
     @Test
     fun whenDomainsContainsAllMarkerThenReturnTrueForAnyDocument() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("<all>")))
 
-        assertTrue(testee.containedInBlocklist("https://any-site.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://any-site.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenDocumentUrlIsSubdomainOfRuleDomainThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://sub.example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://sub.example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenWildcardMatchesSingleSegmentThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*/image.jpg", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/path/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/image.jpg")))
     }
 
     @Test
     fun whenWildcardDoesNotMatchMultipleSegmentsThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*/image.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/path/to/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/to/image.jpg")))
     }
 
     @Test
@@ -154,7 +155,7 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -172,7 +173,7 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -190,14 +191,14 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenSettingsJsonIsMalformedThenReturnFalse() {
         val testee = createTestee(settings = "not valid json")
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -215,13 +216,13 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://sub.testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://sub.testing.com/image.jpg")))
     }
 
     @Test
     fun whenOnPrivacyConfigDownloadedThenRulesAreReloaded() {
         val testee = createTestee(settings = null)
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
 
         whenever(mockToggle.getSettings()).thenReturn(
             settingsWithRule(
@@ -232,7 +233,7 @@ class RealRequestBlocklistTest {
         )
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -252,21 +253,21 @@ class RealRequestBlocklistTest {
             moshi = moshi,
         )
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenDocumentUrlIsEmptyThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse(""), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenMultipleDomainsInRuleAndOneMatchesThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/*.jpg", domains = listOf("example.com", "test.com")))
 
-        assertTrue(testee.containedInBlocklist("https://test.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://test.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -289,31 +290,31 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertTrue(testee.containedInBlocklist("https://test.com", "https://cdn.com/script.js"))
-        assertFalse(testee.containedInBlocklist("https://test.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://test.com"), Uri.parse("https://cdn.com/script.js")))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://test.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRuleMatchesQueryStringThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/path?hello=1", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/path?hello=1"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path?hello=1")))
     }
 
     @Test
     fun whenRuleMatchesQueryStringButRequestHasNoQueryThenReturnFalse() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/path?hello", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/path"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path")))
     }
 
     @Test
     fun whenRuleContainsDotStarThenDotIsLiteralAndStarIsWildcard() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/path/.*js", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/path/.script.js"))
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/path/script.js"))
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/path/sscript.js"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/.script.js")))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/script.js")))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/sscript.js")))
     }
 
     @Test
@@ -322,7 +323,7 @@ class RealRequestBlocklistTest {
 
         // \* does NOT escape the wildcard — \ is literal and * is still a wildcard
         // so it should NOT match a literal * in the URL
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/path/*"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/path/*")))
     }
 
     @Test
@@ -341,7 +342,7 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -359,7 +360,7 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -378,22 +379,22 @@ class RealRequestBlocklistTest {
         """.trimIndent()
         val testee = createTestee(settings)
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.png"))
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.png")))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
     fun whenRuleHasDifferentCaseThanRequestThenCaseSensitiveMatchFails() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/IMAGE.js", domains = listOf("example.com")))
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.js"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.js")))
     }
 
     @Test
     fun whenRuleAndRequestHaveSameCaseThenReturnTrue() {
         val testee = createTestee(settingsWithRule(entry = "testing.com", rule = "testing.com/IMAGE.js", domains = listOf("example.com")))
 
-        assertTrue(testee.containedInBlocklist("https://example.com", "https://testing.com/IMAGE.js"))
+        assertTrue(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/IMAGE.js")))
     }
 
     @Test
@@ -403,7 +404,7 @@ class RealRequestBlocklistTest {
             exceptions = listOf(FeatureException("example.com", "test exception")),
         )
 
-        assertFalse(testee.containedInBlocklist("https://example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     @Test
@@ -413,7 +414,7 @@ class RealRequestBlocklistTest {
             exceptions = listOf(FeatureException("example.com", "test exception")),
         )
 
-        assertFalse(testee.containedInBlocklist("https://sub.example.com", "https://testing.com/image.jpg"))
+        assertFalse(testee.containedInBlocklist(Uri.parse("https://sub.example.com"), Uri.parse("https://testing.com/image.jpg")))
     }
 
     private fun settingsWithRule(

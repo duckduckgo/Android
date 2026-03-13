@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.requestblocklist
+package com.duckduckgo.request.interception.impl
 
+import android.net.Uri
+import android.util.Log
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.duckduckgo.privacy.config.api.RequestBlocklist
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -53,6 +54,8 @@ class RealRequestBlocklist @Inject constructor(
     @Volatile
     private var exceptions = listOf<Domain>()
 
+    var firstLog = false
+
     private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
         moshi.adapter(RequestBlocklistSettings::class.java)
 
@@ -67,15 +70,22 @@ class RealRequestBlocklist @Inject constructor(
     }
 
     override fun containedInBlocklist(
-        documentUrl: String,
-        requestUrl: String,
+        documentUrl: Uri,
+        requestUrl: Uri,
     ): Boolean {
-        if (!requestBlocklistFeature.self().isEnabled()) return false
+        if (!requestBlocklistFeature.self().isEnabled().also { enabled ->
+                if (!firstLog) {
+                    firstLog = true
+                    Log.d("PageLoadBenchmark", "Loaded: ${blockedRequests.size} is enabled: $enabled")
+                }
+            }
+        ) {
+            return false
+        }
 
-        val documentDomain = Domain(documentUrl.extractDomain().orEmpty())
-        if (isAnException(documentDomain)) return false
+        if (isAnException(documentUrl)) return false
 
-        val httpUrl = requestUrl.toHttpUrlOrNull() ?: return false
+        val httpUrl = requestUrl.toString().toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
 
         val rules = blockedRequests[requestDomain] ?: return false
@@ -83,7 +93,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentDomain, rule)
+            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentUrl, rule)
         }
     }
 
@@ -116,18 +126,17 @@ class RealRequestBlocklist @Inject constructor(
         }
     }
 
-    private fun isAnException(documentDomain: Domain): Boolean {
+    private fun isAnException(documentUrl: Uri): Boolean {
         return exceptions.any { exception ->
-            UriString.sameOrSubdomain(documentDomain, exception)
+            UriString.sameOrSubdomain(documentUrl, exception)
         }
     }
 
     private fun domainMatches(
-        documentDomain: Domain,
+        documentUrl: Uri,
         rule: BlocklistRuleEntity,
     ): Boolean {
-        if (documentDomain.value.isEmpty()) return false
         if (rule.applyToAllDomains) return true
-        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentDomain, domain) }
+        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) }
     }
 }
