@@ -148,6 +148,8 @@ class DataClearingSettingsViewModel @Inject constructor(
     }
 
     fun onClearDataActionClicked() {
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY)
         viewModelScope.launch { _commands.send(Command.LaunchFireDialog) }
     }
 }
