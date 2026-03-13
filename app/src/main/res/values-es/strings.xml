@@ -119,7 +119,7 @@
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
     <string name="fireClearAll">Eliminar pestañas y datos</string>
-    <string name="fireClearAllPlusDuckChats">Borrar pestañas, datos y chats de Duck.ai</string>
+    <string name="fireClearAllPlusDuckChats">Eliminar pestañas, datos y chats de Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
 
