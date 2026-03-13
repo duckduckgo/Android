@@ -97,7 +97,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
-private val WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
+private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -479,9 +479,9 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
 
-        // Handle non-HTTP URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
-        if (url != null && handleNonHttpUrlIfNeeded(webView, url)) {
-            logcat { "onPageStarted: handleNonHttpUrlIfNeeded returned true, returning early" }
+        // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
+        if (url != null && interceptAppSchemeUrl(webView, url)) {
+            logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
             return
         }
 
@@ -521,42 +521,32 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     /**
-     * Handles non-HTTP URLs that bypass shouldOverrideUrlLoading().
-     * This can happen when window.open() is used with intent:// or other special URLs,
-     * as the WebViewTransport mechanism loads URLs directly without triggering shouldOverrideUrlLoading().
+     * Intercepts app-scheme URLs (e.g., intent://, tel://, mailto://) that bypass shouldOverrideUrlLoading().
+     * This can happen when window.open() is used with special URLs, as the WebViewTransport mechanism
+     * loads URLs directly without triggering shouldOverrideUrlLoading().
      *
      * Delegates to [shouldOverride] so URL-type dispatch logic is not duplicated.
      *
      * @return true if the URL was handled and loading should stop, false otherwise
      */
-    private fun handleNonHttpUrlIfNeeded(webView: WebView?, url: String): Boolean {
+    private fun interceptAppSchemeUrl(webView: WebView, url: String): Boolean {
         if (!handleNonHttpAppLinksFeature.self().isEnabled()) {
             return false
         }
-        logcat { "handleNonHttpUrlIfNeeded: called with url=$url" }
-        if (webView == null) {
-            return false
-        }
         val uri = url.toUri()
-        val scheme = uri.scheme ?: run {
+        val scheme = uri.scheme ?: return false
+
+        // Only intercept non-standard schemes; standard web schemes go through the normal loading path
+        if (scheme in STANDARD_WEB_SCHEMES) {
             return false
         }
 
-        // Only intercept non-web schemes; web schemes go through the normal loading path
-        if (scheme in WEB_SCHEMES) {
-            return false
-        }
+        logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
 
-        // Reuse the existing URL-type dispatch in shouldOverride
-        val handled = shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
-        logcat { "handleNonHttpUrlIfNeeded: shouldOverride returned $handled" }
-
-        // Only stop loading if the URL was actually handled, to avoid blanking the page
-        // when shouldOverride returns false (e.g., Unknown URL type with no handler)
-        if (handled) {
-            webView.stopLoading()
-        }
-        return handled
+        // Stop loading before dispatching so the WebView doesn't continue with the unsupported scheme.
+        // The Unknown branch in shouldOverride already reloads originalUrl as recovery if needed.
+        webView.stopLoading()
+        return shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
     }
 
     private fun handleMediaPlayback(
@@ -789,14 +779,15 @@ class BrowserWebViewClient @Inject constructor(
         error: WebResourceError?,
     ) {
         error?.let { webResourceError ->
-            // Handle unsupported scheme errors for special URLs (e.g., intent://, tel://, mailto://)
+            // Handle unsupported scheme errors for app-scheme URLs (e.g., intent://, tel://, mailto://)
             // This catches cases where shouldOverrideUrlLoading is bypassed (like window.open)
             if (webResourceError.errorCode == ERROR_UNSUPPORTED_SCHEME &&
                 request?.isForMainFrame == true &&
-                request.url != null
+                request.url != null &&
+                view != null
             ) {
-                logcat { "onReceivedError: ERROR_UNSUPPORTED_SCHEME for main frame, calling handleNonHttpUrlIfNeeded" }
-                if (handleNonHttpUrlIfNeeded(view, request.url.toString())) {
+                logcat { "interceptAppSchemeUrl: ERROR_UNSUPPORTED_SCHEME for main frame in onReceivedError" }
+                if (interceptAppSchemeUrl(view, request.url.toString())) {
                     return
                 }
             }

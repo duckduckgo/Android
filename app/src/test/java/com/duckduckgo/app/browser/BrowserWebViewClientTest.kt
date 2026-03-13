@@ -1595,7 +1595,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenHandleNonHttpAppLinksFeatureDisabledThenNonHttpUrlNotIntercepted() {
+    fun whenHandleNonHttpAppLinksFeatureDisabledThenAppSchemeUrlNotIntercepted() {
         val disabledToggle: Toggle = mock()
         whenever(disabledToggle.isEnabled()).thenReturn(false)
         whenever(mockHandleNonHttpAppLinksFeature.self()).thenReturn(disabledToggle)
@@ -1603,7 +1603,7 @@ class BrowserWebViewClientTest {
         val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
         testee.onPageStarted(webView, intentUrl, null)
 
-        // Should not attempt to handle the non-HTTP URL
+        // Should not attempt to handle the app-scheme URL
         verify(specialUrlDetector, never()).determineType(initiatingUrl = any(), uri = any())
     }
 

@@ -213,7 +213,7 @@ class SpecialUrlDetectorImpl(
                 ) {
                     // If the intent has a fallback URL, still return NonHttpAppLink so the caller can use the fallback
                     val fallbackUrl = intent?.getStringExtra(EXTRA_FALLBACK_URL)
-                    if (intent != null && fallbackUrl != null && handleNonHttpAppLinksFeature.self().isEnabled()) {
+                    if (fallbackUrl != null && handleNonHttpAppLinksFeature.self().isEnabled()) {
                         if (externalAppIntentFlagsFeature.self().isEnabled()) {
                             intent.addCategory(Intent.CATEGORY_BROWSABLE)
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
