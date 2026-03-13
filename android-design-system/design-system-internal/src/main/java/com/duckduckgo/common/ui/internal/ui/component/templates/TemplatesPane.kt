@@ -20,14 +20,19 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.duckduckgo.common.ui.compose.Status
 import com.duckduckgo.common.ui.compose.template.DaxPageHeader
 import com.duckduckgo.common.ui.compose.text.DaxText
@@ -39,8 +44,11 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val keyline4 = dimensionResource(CommonR.dimen.keyline_4)
     val state = rememberLazyListState()
+    val nestedScrollInterop = rememberNestedScrollInteropConnection()
     LazyColumn(
-        modifier = modifier.background(color = DuckDuckGoTheme.colors.backgrounds.background),
+        modifier = modifier
+            .nestedScroll(nestedScrollInterop)
+            .background(color = DuckDuckGoTheme.colors.backgrounds.background),
         state = state,
         contentPadding = PaddingValues(all = keyline4),
         verticalArrangement = Arrangement.spacedBy(space = keyline4),
@@ -51,6 +59,24 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                 style = DuckDuckGoTheme.typography.h4,
                 color = DuckDuckGoTheme.colors.text.tertiary,
                 modifier = Modifier.padding(vertical = keyline4),
+            )
+        }
+        item {
+            DaxPageHeader(
+                title = "Private Search",
+            )
+        }
+        item {
+            DaxPageHeader(
+                title = "Private Search",
+                status = Status.Always_On,
+            )
+        }
+        item {
+            DaxPageHeader(
+                title = "Private Search",
+                status = Status.Always_On,
+                iconHeader = painterResource(CommonR.drawable.ic_privacy_pro_128),
             )
         }
         item {
@@ -72,6 +98,9 @@ fun TemplatesPane(modifier: Modifier = Modifier) {
                     Toast.makeText(context, "Learn more clicked", Toast.LENGTH_SHORT).show()
                 },
             )
+        }
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
