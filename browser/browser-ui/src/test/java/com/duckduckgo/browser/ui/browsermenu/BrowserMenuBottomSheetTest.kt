@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState.Visible
+import com.duckduckgo.common.ui.view.StatusIndicatorView
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -120,6 +121,70 @@ class BrowserMenuBottomSheetTest {
         assertTrue(menuHeader.isVisible)
         assertEquals("test.com", headerShortUrl.text.toString())
         assertFalse(headerTitle.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithFireMenuItemThenFireMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.Browser(showFireMenuItem = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithoutFireMenuItemThenFireMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.Browser(showFireMenuItem = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuThenFireMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.DuckAi(pageContextHeader = PageContextHeaderState.DuckAi(tabId = "tab1", title = null))
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithVpnMenuItemThenVpnMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.Browser(vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true))
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.vpnMenuItem.isVisible)
+        assertTrue(dialog.vpnMenuItem.findViewById<StatusIndicatorView>(R.id.statusIndicator).isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithVpnMenuHiddenStateThenVpnMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.Browser(vpnMenuState = VpnMenuState.Hidden)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithEmailSignedInThenCreateAliasMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.NewTabPage(isEmailSignedIn = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.createAliasMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithEmailNotSignedInThenCreateAliasMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.NewTabPage(isEmailSignedIn = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.createAliasMenuItem.isVisible)
     }
 
     // region Helpers

@@ -27,8 +27,10 @@ sealed class BrowserMenuViewState {
         val showSelectDefaultBrowserMenuItem: Boolean = false,
         val canSaveSite: Boolean = false,
         val isBookmark: Boolean = false,
+        val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
+        val showFireMenuItem: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
@@ -42,8 +44,7 @@ sealed class BrowserMenuViewState {
         val showAutofill: Boolean = false,
         val isSSLError: Boolean = false,
         val canPrintPage: Boolean = false,
-        val pageContextHeader: PageContextHeaderState,
-
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 
     data class CustomTabs(
@@ -61,6 +62,7 @@ sealed class BrowserMenuViewState {
     data class NewTabPage(
         val canGoForward: Boolean = false,
         val showDuckChatOption: Boolean = false,
+        val isEmailSignedIn: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
     ) : BrowserMenuViewState()
