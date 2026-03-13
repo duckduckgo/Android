@@ -46,7 +46,6 @@ Make sure that you have [gradle-profiler](https://github.com/gradle/gradle-profi
 
 If your Gradle installation is not in `~/.gradle`, provided that as a parameter as well, see `--gradle-user-home PATH` above.
 
-asdasd
 **Run full benchmark locally:**
 ```bash
 python3 build-benchmarks/run-benchmark.py
