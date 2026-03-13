@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,7 +252,7 @@ internal fun resolveBorder(type: DaxButtonType, enabled: Boolean): BorderStroke?
         DaxButtonType.SECONDARY -> BorderStroke(
             width = 1.dp,
             color = if (enabled) {
-                DuckDuckGoTheme.colors.accentBlue
+                DuckDuckGoTheme.colors.brand.accentBlue
             } else {
                 if (DuckDuckGoTheme.colors.isDark) White24 else Black12
             },
@@ -267,7 +267,7 @@ internal fun resolveBorder(type: DaxButtonType, enabled: Boolean): BorderStroke?
 
 @Composable
 private fun primaryColors(): DaxButtonColors = DaxButtonColors(
-    containerColor = DuckDuckGoTheme.colors.accentBlue,
+    containerColor = DuckDuckGoTheme.colors.brand.accentBlue,
     contentColor = if (DuckDuckGoTheme.colors.isDark) Black84 else White,
     disabledContainerColor = if (DuckDuckGoTheme.colors.isDark) White6 else Black6,
     disabledContentColor = DuckDuckGoTheme.textColors.disabled,
@@ -312,7 +312,7 @@ private fun secondaryButtonRippleConfiguration() =
 @Composable
 private fun ghostColors(): DaxButtonColors = DaxButtonColors(
     containerColor = Color.Transparent,
-    contentColor = DuckDuckGoTheme.colors.accentBlue,
+    contentColor = DuckDuckGoTheme.colors.brand.accentBlue,
     disabledContainerColor = Color.Transparent,
     disabledContentColor = DuckDuckGoTheme.textColors.disabled,
     pressedContentColor = if (DuckDuckGoTheme.colors.isDark) Blue20 else Blue70,
@@ -330,9 +330,9 @@ private fun ghostButtonRippleConfiguration() =
 
 @Composable
 private fun destructivePrimaryColors(): DaxButtonColors = DaxButtonColors(
-    containerColor = DuckDuckGoTheme.colors.destructive,
+    containerColor = DuckDuckGoTheme.colors.status.criticalPrimary,
     contentColor = if (DuckDuckGoTheme.colors.isDark) Black84 else White,
-    disabledContainerColor = DuckDuckGoTheme.colors.containerDisabled,
+    disabledContainerColor = DuckDuckGoTheme.colors.backgrounds.containerDisabled,
     disabledContentColor = DuckDuckGoTheme.textColors.disabled,
 )
 
@@ -349,7 +349,7 @@ private fun destructivePrimaryButtonRippleConfiguration() =
 @Composable
 private fun destructiveGhostColors(): DaxButtonColors = DaxButtonColors(
     containerColor = Color.Transparent,
-    contentColor = DuckDuckGoTheme.colors.destructive,
+    contentColor = DuckDuckGoTheme.colors.status.criticalPrimary,
     disabledContainerColor = Color.Transparent,
     disabledContentColor = DuckDuckGoTheme.textColors.disabled,
     pressedContentColor = if (DuckDuckGoTheme.colors.isDark) AlertRedOnDarkTextPressed else AlertRedOnLightTextPressed,
