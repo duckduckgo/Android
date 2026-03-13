@@ -129,7 +129,7 @@ class RealEventHubPixelManager @Inject constructor(
             val nowMillis = timeProvider.currentTimeMillis()
 
             for (pixelState in repository.getAllPixelStates()) {
-                if (nowMillis > pixelState.periodEndMillis) continue
+                if (nowMillis >= pixelState.periodEndMillis) continue
 
                 val updatedParams = pixelState.params.toMutableMap()
                 var changed = false

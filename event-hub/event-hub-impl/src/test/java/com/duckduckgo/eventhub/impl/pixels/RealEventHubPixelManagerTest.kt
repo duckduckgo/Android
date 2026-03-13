@@ -139,6 +139,30 @@ class RealEventHubPixelManagerTest {
     }
 
     @Test
+    fun `handleWebEvent ignores events exactly at periodEnd`() {
+        val periodEnd = 100_000L
+        timeProvider.time = periodEnd
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        manager.handleWebEvent(webEventData("test"), "")
+
+        verify(repository, never()).savePixelState(any())
+    }
+
+    @Test
+    fun `handleWebEvent accepts events one millisecond before periodEnd`() {
+        val periodEnd = 100_000L
+        timeProvider.time = periodEnd - 1
+        val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0), periodEnd = periodEnd)
+        stubPixelStates(state)
+
+        manager.handleWebEvent(webEventData("test"), "")
+
+        verify(repository).savePixelState(any())
+    }
+
+    @Test
     fun `handleWebEvent can increment multiple times below max bucket`() {
         val state = pixelState("webTelemetry_testPixel1", mapOf("count" to 0))
         stubPixelStates(state)
@@ -698,6 +722,46 @@ class RealEventHubPixelManagerTest {
         val periodStart = 1000L
         val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
         timeProvider.time = periodStart + TimeUnit.HOURS.toMillis(12)
+
+        val state = PixelState(
+            pixelName = "webTelemetry_testPixel1",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            params = mapOf("count" to ParamState(5)),
+            config = dayPixelConfig,
+        )
+        stubPixelStates(state)
+
+        manager.onAppForegrounded()
+
+        verify(pixel, never()).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `checkPixels fires pixel exactly at periodEnd`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = periodEnd
+
+        val state = PixelState(
+            pixelName = "webTelemetry_testPixel1",
+            periodStartMillis = periodStart,
+            periodEndMillis = periodEnd,
+            params = mapOf("count" to ParamState(5)),
+            config = dayPixelConfig,
+        )
+        stubPixelStates(state)
+
+        manager.onAppForegrounded()
+
+        verify(pixel).enqueueFire(any<String>(), any(), any(), any())
+    }
+
+    @Test
+    fun `checkPixels does not fire one millisecond before periodEnd`() {
+        val periodStart = 1000L
+        val periodEnd = periodStart + TimeUnit.DAYS.toMillis(1)
+        timeProvider.time = periodEnd - 1
 
         val state = PixelState(
             pixelName = "webTelemetry_testPixel1",
