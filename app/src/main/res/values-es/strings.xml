@@ -118,7 +118,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
-    <string name="fireClearAll">Borrar datos y pestañas</string>
+    <string name="fireClearAll">Eliminar pestañas y datos</string>
     <string name="fireClearAllPlusDuckChats">Borrar pestañas, datos y chats de Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Activado</string>
     <string name="dataClearingAutomaticClearingOff">Desactivado</string>
     <string name="dataClearingClearBrowsingData">Borrar datos de navegación</string>
-    <string name="dataClearingAutomaticDataClearing">Borrado automático de datos</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Borrar datos automáticamente</string>
+    <string name="dataClearingAutomaticDataClearing">Eliminar automáticamente los datos</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Eliminar automáticamente los datos</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Cierra todas las pestañas</string>
     <string name="dataClearingAutomaticDataOptionDescription">Elimina todos los datos del sitio, incluidos los sitios visitados. Puede que cierre sesión en tus cuentas.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Elimina todos los chats, incluidos los chats fijados</string>
@@ -288,15 +288,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Pestañas y datos</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Pestañas, datos y chats de Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Borrar al…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Borrar al…</string>
+    <string name="settingsAutomaticallyClearWhen">Eliminar el…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar el…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Salir de la aplicación</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Salir de la aplicación (5 segundos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Salir de la aplicación (5 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Salir de la aplicación (15 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Salir de la aplicación (30 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salir de la aplicación (1 hora de inactividad)</string>
-    <string name="settingsClearAiDataTitle">Borra chats de Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Elimina los chats de Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button también eliminará el historial de Duck.ai, incluidos los chats anclados.</string>
     <string name="settingsClearDataActionSecondaryText">Borrar todas las pestañas y los datos de los sitios no protegidos con Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Borra todas las pestañas, los chats de Duck.ai y los datos de los sitios que no hayas protegido con Fireproof.</string>
