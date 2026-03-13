@@ -36,6 +36,7 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -82,7 +83,7 @@ internal class SyncApiClientTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Success)
@@ -94,7 +95,7 @@ internal class SyncApiClientTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(patchAllError)
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(patchAllError)
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Error)
@@ -210,7 +211,7 @@ internal class SyncApiClientTest {
         val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
 
         val result = apiClient.patch(changes)
 
@@ -223,7 +224,7 @@ internal class SyncApiClientTest {
         val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(patchAllError)
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(patchAllError)
 
         val result = apiClient.patch(changes)
 
@@ -236,11 +237,11 @@ internal class SyncApiClientTest {
         val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
         val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
 
         apiClient.patch(changes)
 
-        verify(syncApi).patch(any(), org.mockito.kotlin.eq("ai_chats"), any())
+        verify(syncApi).patch(any(), org.mockito.kotlin.eq("ai_chats"), any(), anyOrNull())
     }
 
     @Test
@@ -248,10 +249,10 @@ internal class SyncApiClientTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any(), any())).thenReturn(Result.Success(JSONObject()))
+        whenever(syncApi.patch(any(), any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
 
         apiClient.patch(bookmarksChanges)
 
-        verify(syncApi).patch(any(), org.mockito.kotlin.eq("data"), any())
+        verify(syncApi).patch(any(), org.mockito.kotlin.eq("data"), any(), anyOrNull())
     }
 }

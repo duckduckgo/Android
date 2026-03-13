@@ -38,6 +38,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -134,9 +135,10 @@ class DuckChatSyncDataManager @Inject constructor(
                 return SyncMergeResult.Error(reason = "Error parsing patch response ${it.message}")
             }
 
-            logcat { "DuckChat-Sync: patch successful for ${response.entryIds.size} entries" }
+            val entryIds = response.aiChats.entries.map { it.id }
+            logcat { "DuckChat-Sync: patch successful for ${entryIds.size} entries" }
             appCoroutineScope.launch(dispatchers.io()) {
-                duckChatSyncRepository.removePendingChatDeletions(response.entryIds.toSet())
+                duckChatSyncRepository.removePendingChatDeletions(entryIds.toSet())
             }
         }
         return SyncMergeResult.Success()
@@ -207,8 +209,9 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
-    data class SyncPatchResponse(
-        val type: DeletableType,
-        val entryIds: List<String>,
-    )
+    data class SyncPatchResponse(@property:Json(name = "ai_chats") val aiChats: AiChatsResponse) {
+        data class AiChatsResponse(val entries: List<AiChatEntry>) {
+            data class AiChatEntry(val id: String, val deleted: String? = null)
+        }
+    }
 }

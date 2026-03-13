@@ -63,9 +63,14 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val body = changes.jsonString.toRequestBody("application/json".toMediaType())
+        val since = if (changes.type.sinceAsQueryParam) {
+            (changes.modifiedSince as? ModifiedSince.Timestamp)?.value
+        } else {
+            null
+        }
         logcat { "Sync-Engine: patch data generated $body" }
 
-        return when (val result = syncApi.patch(token, changes.type.endpoint, body)) {
+        return when (val result = syncApi.patch(token, changes.type.endpoint, body, since)) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
                 result

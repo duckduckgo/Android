@@ -116,6 +116,7 @@ interface SyncService {
         @Header("Authorization") token: String,
         @Path("endpoint") endpoint: String,
         @Body body: RequestBody,
+        @Query("since") since: String? = null,
     ): Call<JSONObject>
 
     @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")

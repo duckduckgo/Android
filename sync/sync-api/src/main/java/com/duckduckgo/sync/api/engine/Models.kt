@@ -108,11 +108,12 @@ enum class SyncableType(
     override val field: String,
     val endpoint: String = "data",
     val supportsGet: Boolean = true,
+    val sinceAsQueryParam: Boolean = false,
 ) : SyncFeatureType {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
     SETTINGS("settings"),
-    DUCK_AI_CHATS("ai_chats", "ai_chats", false),
+    DUCK_AI_CHATS("ai_chats", "ai_chats", supportsGet = false, sinceAsQueryParam = true),
 }
 
 /**
