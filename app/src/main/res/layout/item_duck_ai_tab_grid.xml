@@ -38,7 +38,6 @@
             android:src="@drawable/ic_duck_ai_color_24"
             android:contentDescription="@string/duck_ai_tab_icon_content_description"
             android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="4dp"
             android:layout_marginTop="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -87,6 +86,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/duck_ai_tab_label"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="6dp"
             app:typography="h5"
             app:layout_constrainedWidth="true"
