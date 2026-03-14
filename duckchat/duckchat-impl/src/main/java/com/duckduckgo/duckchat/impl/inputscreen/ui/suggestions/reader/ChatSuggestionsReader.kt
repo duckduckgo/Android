@@ -101,7 +101,7 @@ class RealChatSuggestionsReader @Inject constructor(
             val bestResult = results.maxByOrNull { r ->
                 (r.pinnedChats + r.recentChats).maxOfOrNull { it.lastEdit } ?: LocalDateTime.MIN
             } ?: return@withContext emptyList()
-            mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, Int.MAX_VALUE)
+            mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, Int.MAX_VALUE) // no cap — return all chats
         }
     }
 
