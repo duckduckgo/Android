@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
@@ -60,6 +61,8 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -81,6 +84,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -95,6 +99,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import java.time.LocalDateTime
 import java.util.Date
 import kotlin.Boolean
 
@@ -139,6 +144,8 @@ class TabSwitcherViewModelTest {
 
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
+    private val mockChatSuggestionsReader: ChatSuggestionsReader = mock()
+
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
@@ -174,6 +181,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
         whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+        whenever(mockChatSuggestionsReader.fetchAllChats()).thenReturn(emptyList())
 
         initializeMockTabEntitesData()
         initializeViewModel()
@@ -200,6 +208,7 @@ class TabSwitcherViewModelTest {
             savedSitesRepository,
             mockTrackersAnimationInfoPanelPixels,
             mockOmnibarFeatureRepository,
+            mockChatSuggestionsReader,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -1955,6 +1964,51 @@ class TabSwitcherViewModelTest {
 
         assertTrue(items.any { it is NormalTab })
         assertTrue(items.none { it is DuckAiTab })
+    }
+
+    @Test
+    fun `duck ai tab with matching chatId shows resolved chat title`() = runTest {
+        val chatId = "abc-123"
+        val expectedTitle = "Explain quantum entanglement"
+        val duckAiUrl = "https://duck.ai/chat?chatID=$chatId"
+
+        whenever(mockChatSuggestionsReader.fetchAllChats()).thenReturn(
+            listOf(
+                ChatSuggestion(
+                    chatId = chatId,
+                    title = expectedTitle,
+                    lastEdit = LocalDateTime.now(),
+                    pinned = false,
+                )
+            )
+        )
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        tabList = listOf(TabEntity(tabId = "tab1", url = duckAiUrl))
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        advanceUntilIdle()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve()!!
+        val duckAiTab = items.filterIsInstance<DuckAiTab>().first()
+        assertEquals(expectedTitle, duckAiTab.chatTitle)
+    }
+
+    @Test
+    fun `duck ai tab with no matching chatId has null chatTitle`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat?chatID=unknown-id"
+
+        whenever(mockChatSuggestionsReader.fetchAllChats()).thenReturn(emptyList())
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
+        tabList = listOf(TabEntity(tabId = "tab1", url = duckAiUrl))
+        initializeMockTabEntitesData()
+        initializeViewModel()
+
+        advanceUntilIdle()
+
+        val items = testee.tabSwitcherItemsLiveData.blockingObserve()!!
+        val duckAiTab = items.filterIsInstance<DuckAiTab>().first()
+        assertNull(duckAiTab.chatTitle)
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
