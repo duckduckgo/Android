@@ -430,6 +430,20 @@ class RealChatSuggestionsReaderTest {
         assertTrue(result.isEmpty())
     }
 
+    @Test
+    fun `mergeSuggestions with Int MAX_VALUE returns all items without truncation`() {
+        val chats = (1..20).map { i ->
+            ChatSuggestion(
+                chatId = "id$i",
+                title = "Chat $i",
+                lastEdit = LocalDateTime.now().minusHours(i.toLong()),
+                pinned = false,
+            )
+        }
+        val result = reader.mergeSuggestions(emptyList(), chats, Int.MAX_VALUE)
+        assertEquals(20, result.size)
+    }
+
     // endregion
 
     // region tearDown
