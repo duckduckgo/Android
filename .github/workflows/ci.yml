@@ -6,21 +6,50 @@ on:
     branches:
       - main
       - develop
-    paths-ignore:
-      - '**.md'
-      - '.github/**'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - '.github/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  check_changes:
+    name: Check Changed Files
+    runs-on: ubuntu-24.04
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check if checks should run
+        id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Triggered manually — running checks"; echo "should_run=true" >> $GITHUB_OUTPUT; exit 0
+          fi
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.event.after }}"
+          fi
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
+          echo "Changed files:"; echo "$CHANGED"
+          if echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)' || \
+             echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
+            echo "Code or required CI workflow changes detected — running checks"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "Only docs or optional workflow changes detected — skipping checks"
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
   code_formatting:
     name: Code Formatting
+    needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: ubuntu-24.04
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
@@ -48,6 +77,8 @@ jobs:
 
   unit_tests:
     name: Unit tests
+    needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
@@ -85,6 +116,8 @@ jobs:
 
   lint:
     name: Lint
+    needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
     env:
       DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
@@ -126,6 +159,8 @@ jobs:
           path: lint-report.zip
 
   android_tests:
+    needs: [check_changes]
+    if: needs.check_changes.outputs.should_run == 'true'
     runs-on: android-large-runner
     name: Android CI tests
     env:
