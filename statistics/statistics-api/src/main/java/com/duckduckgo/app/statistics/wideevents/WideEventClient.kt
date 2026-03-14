@@ -27,6 +27,10 @@ interface WideEventClient {
      * @param flowEntryPoint Optional identifier of the flow entry point (e.g., "app_settings")
      * @param metadata Optional metadata (e.g., "free_trial_eligible=true").
      * @param cleanupPolicy Strategy for dealing with abandoned events, see [CleanupPolicy] for details.
+     * @param samplingProbability Probability in [0.0, 1.0] that this event will be recorded.
+     *   E.g., 0.1 means ~10 % of events are kept and the rest are silently dropped.
+     *   When an event is sampled out, [SAMPLED_OUT_FLOW_ID] is returned and all subsequent
+     *   operations on that ID become no-ops.
      * @return Wide event ID used for subsequent calls.
      */
     suspend fun flowStart(
@@ -34,6 +38,7 @@ interface WideEventClient {
         flowEntryPoint: String? = null,
         metadata: Map<String, String> = emptyMap(),
         cleanupPolicy: CleanupPolicy = OnTimeout(duration = Duration.ofDays(7)),
+        samplingProbability: Float = 1.0f,
     ): Result<Long>
 
     /**
@@ -111,6 +116,14 @@ interface WideEventClient {
         wideEventId: Long,
         key: String,
     ): Result<Duration>
+
+    companion object {
+        /**
+         * Sentinel ID returned by [flowStart] when the event is sampled out.
+         * All subsequent operations on this ID are silent no-ops with zero disk I/O.
+         */
+        const val SAMPLED_OUT_FLOW_ID = -1L
+    }
 }
 
 /** Represents the final outcome status of a wide event. */

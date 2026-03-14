@@ -25,7 +25,6 @@ import kotlin.random.Random
 @Module
 @ContributesTo(AppScope::class)
 object RandomModule {
-
     @Provides
-    fun provideRandom(): Random = Random.Default
+    fun provideRandom(): Random = Random
 }
