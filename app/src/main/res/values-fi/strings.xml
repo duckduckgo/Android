@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
-    <string name="fireClearAll">Tyhjennä välilehdet ja tiedot</string>
-    <string name="fireClearAllPlusDuckChats">Tyhjennä välilehdet, tiedot ja Duck.ai-keskustelut</string>
+    <string name="fireClearAll">Poista välilehdet ja tiedot</string>
+    <string name="fireClearAllPlusDuckChats">Poista välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Päällä</string>
     <string name="dataClearingAutomaticClearingOff">Pois</string>
     <string name="dataClearingClearBrowsingData">Poista selaustiedot</string>
-    <string name="dataClearingAutomaticDataClearing">Automaattinen tietojen tyhjennys</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Tyhjennä tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticDataClearing">Poista tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Poista tiedot automaattisesti</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Sulje kaikki avoimet välilehdet</string>
     <string name="dataClearingAutomaticDataOptionDescription">Poista kaikki sivuston tiedot, mukaan lukien vieraillut sivustot. Saattaa kirjata sinut ulos tileiltä.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Poista kaikki keskustelut, myös kiinnitetyt keskustelut</string>
@@ -288,15 +288,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Välilehdet ja tiedot</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Välilehdet, tiedot ja Duck.ai-keskustelut</string>
 
-    <string name="settingsAutomaticallyClearWhen">Tyhjennä…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Tyhjennä…</string>
+    <string name="settingsAutomaticallyClearWhen">Poistopäivä…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Poistopäivä…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Vain sovelluksesta poistuttaessa</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Sovelluksesta poistuttaessa, 5 sekunnin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Sovelluksesta poistuttaessa, 5 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Sovelluksesta poistuttaessa, 15 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
-    <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
+    <string name="settingsClearAiDataTitle">Poista Duck.ai-keskustelut</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button poistaa myös Duck.ai-historian, mukaan lukien kiinnitetyt keskustelut.</string>
     <string name="settingsClearDataActionSecondaryText">Tyhjentää kaikki välilehdet ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tyhjentää kaikki välilehdet, Duck.ai-keskustelut ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
@@ -885,7 +885,6 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kokeile ilmaiseksi!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Tiesitkö?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Haluatko helpon pääsyn yksityiseen tekoälychattiin?</string>
