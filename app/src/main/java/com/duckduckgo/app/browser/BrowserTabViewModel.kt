@@ -4169,7 +4169,11 @@ class BrowserTabViewModel @Inject constructor(
             BROWSER_UI_LOCK_FEATURE_NAME -> {
                 when (method) {
                     "uiLockChanged" -> {
-                        val locked = data?.optBoolean("locked", false) ?: false
+                        val host = getWebViewUrl()?.toUri()?.host
+                        var locked = data?.optBoolean("locked", false) ?: false
+                        if (host?.endsWith("duck.ai") == true) {
+                            locked = false
+                        }
                         uiLockChanged(locked)
                     }
                 }
