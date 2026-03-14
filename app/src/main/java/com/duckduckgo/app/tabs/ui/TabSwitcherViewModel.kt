@@ -108,7 +108,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val _chatTitles = MutableStateFlow<Map<String, String>>(emptyMap())
 
     init {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch(dispatcherProvider.main()) {
             val titles = chatSuggestionsReader.fetchAllChats()
                 .associate { it.chatId to it.title }
             _chatTitles.value = titles
@@ -610,12 +610,13 @@ class TabSwitcherViewModel @Inject constructor(
         activeTab: TabEntity?,
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
-        chatTitles: Map<String, String> = emptyMap(),
+        chatTitles: Map<String, String>,
     ): List<TabSwitcherItem> {
         val normalTabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
-            if (entity.url != null && duckChat.isDuckChatUrl(Uri.parse(entity.url))) {
-                val chatId = Uri.parse(entity.url).getQueryParameter("chatID")
+            val uri = entity.url?.let { Uri.parse(it) }
+            if (uri != null && duckChat.isDuckChatUrl(uri)) {
+                val chatId = uri.getQueryParameter("chatID")
                 val resolvedTitle = chatId?.let { chatTitles[it] }
                 DuckAiTab(entity, isActive, resolvedTitle)
             } else {
