@@ -54,6 +54,7 @@ import logcat.logcat
 import java.time.Duration
 import java.time.OffsetDateTime
 import javax.inject.Inject
+import kotlin.collections.mapNotNull
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
@@ -66,7 +67,6 @@ class RealSyncEngine @Inject constructor(
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
     private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager>,
-    private val patchableDataManagerPlugins: PluginPoint<PatchableDataManager>,
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
@@ -135,9 +135,6 @@ class RealSyncEngine @Inject constructor(
             // Process deletions first (DeletableTypes)
             processDeletions()
 
-            // Process patches (DeletableTypes)
-            processPatches()
-
             // Then process changes (SyncableTypes)
             logcat(INFO) { "Sync-Engine: processing changes" }
             val changes = getChanges()
@@ -150,24 +147,29 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
-        regularSyncChanges.forEach { changes ->
-            if (changes.isEmpty()) {
-                logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
-                getRemoteChanges(changes, TIMESTAMP)
-            } else {
-                logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
-                patchLocalChanges(changes, TIMESTAMP)
+        regularSyncChanges
+            .forEach { changes ->
+                if (changes.isEmpty()) {
+                    if (changes.type.supportsGet) {
+                        logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
+                        getRemoteChanges(changes, TIMESTAMP)
+                    }
+                } else {
+                    logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
+                    patchLocalChanges(changes, TIMESTAMP)
+                }
             }
-        }
     }
 
     private fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
         val types = firstSyncChanges.map { it.type }
 
-        firstSyncChanges.forEach { changes ->
-            logcat(INFO) { "Sync-Engine: first sync for ${changes.type}, asking for remote changes" }
-            getRemoteChanges(changes, DEDUPLICATION)
-        }
+        firstSyncChanges
+            .filter { it.type.supportsGet }
+            .forEach { changes ->
+                logcat(INFO) { "Sync-Engine: first sync for ${changes.type}, asking for remote changes" }
+                getRemoteChanges(changes, DEDUPLICATION)
+            }
 
         // give a chance to send changes after dedup
         getChanges().filter { it.type in types }.forEach { changes ->
@@ -200,7 +202,7 @@ class RealSyncEngine @Inject constructor(
         changes: SyncChangesRequest,
         conflictResolution: SyncConflictResolution,
     ) {
-        return when (val result = syncApiClient.patchData(changes)) {
+        return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 val featureError = result.featureError() ?: return
                 persisterPlugins.getPlugins().forEach {
@@ -248,7 +250,10 @@ class RealSyncEngine @Inject constructor(
                     PendingDeletion(deletionRequest, manager)
                 }
             }.getOrElse { error ->
-                syncOperationErrorRecorder.record(manager.getType().field, DATA_PROVIDER_ERROR)
+                syncOperationErrorRecorder.record(
+                    manager.getDeletableType().field,
+                    DATA_PROVIDER_ERROR,
+                )
                 null
             }
         }
@@ -322,9 +327,6 @@ class RealSyncEngine @Inject constructor(
         persisterPlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
-        patchableDataManagerPlugins.getPlugins().forEach {
-            it.onSyncDisabled()
-        }
         lifecyclePlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
@@ -339,54 +341,8 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getPatchRequests(): List<PendingPatch> {
-        return patchableDataManagerPlugins.getPlugins().mapNotNull { manager ->
-            logcat { "Sync-Engine: asking for patches in ${manager.javaClass}" }
-            kotlin.runCatching {
-                manager.getPatches()?.let { patchRequest ->
-                    PendingPatch(patchRequest, manager)
-                }
-            }.getOrElse { error ->
-                syncOperationErrorRecorder.record(manager.getType().field, DATA_PROVIDER_ERROR)
-                null
-            }
-        }
-    }
-
-    private fun processPatches() {
-        val updates = getPatchRequests()
-        if (updates.isEmpty()) {
-            return
-        }
-
-        logcat(INFO) { "Sync-Engine: processing ${updates.size} patches" }
-
-        updates.forEach { (request, manager) ->
-            logcat { "Sync-Engine: processing patch for ${request.type}" }
-            when (val result = syncApiClient.patchDeletableEntries(request)) {
-                is Error -> {
-                    val featureError = result.featureError() ?: return@forEach
-                    manager.onPatchError(SyncErrorResponse(request.type, featureError))
-                }
-                is Success -> {
-                    logcat { "Sync-Engine: patch completed successfully for ${request.type}" }
-                    kotlin.runCatching {
-                        manager.onPatchSuccess(result.data)
-                    }.getOrElse { error ->
-                        logcat { "Sync-Engine: error notifying patchable data manager of patch success: $error" }
-                    }
-                }
-            }
-        }
-    }
-
     private data class PendingDeletion(
         val request: SyncDeletionRequest,
         val manager: DeletableDataManager,
-    )
-
-    private data class PendingPatch(
-        val request: SyncPatchRequest,
-        val manager: PatchableDataManager,
     )
 }
