@@ -36,6 +36,7 @@ import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -133,6 +134,7 @@ class ClearPersonalDataAction(
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : ClearDataAction {
 
     override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
@@ -237,7 +239,7 @@ class ClearPersonalDataAction(
             withContext(dispatchers.main()) {
                 val webStorage = createWebStorage()
                 domains
-                    .filter { !DUCKDUCKGO_DOMAINS.contains(it) }
+                    .filter { !duckDuckGoDomains.contains(it) }
                     .forEach { domain ->
                         suspendCancellableCoroutine { continuation ->
                             WebStorageCompat.deleteBrowsingDataForSite(webStorage, domain) {
@@ -302,7 +304,5 @@ class ClearPersonalDataAction(
         }
     }
 
-    companion object {
-        private val DUCKDUCKGO_DOMAINS = setOf("duckduckgo.com", "duck.ai")
-    }
+    private val duckDuckGoDomains: Set<String> = setOf("duckduckgo.com", duckAiHostProvider.getHost())
 }

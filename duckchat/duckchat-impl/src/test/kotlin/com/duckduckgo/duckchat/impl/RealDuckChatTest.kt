@@ -27,9 +27,12 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -104,6 +107,8 @@ class RealDuckChatTest {
     private val mockDuckChatDeleter: DuckChatDeleter = mock()
     private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
     private val mockSyncEngine: SyncEngine = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -119,6 +124,8 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
@@ -143,6 +150,8 @@ class RealDuckChatTest {
                 mockDuckChatDeleter,
                 mockDuckChatSyncRepository,
                 mockSyncEngine,
+                mockDuckAiHostProvider,
+                mockAppBuildConfig,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -390,6 +399,21 @@ class RealDuckChatTest {
             mockContext,
             hasSessionActive = false,
             duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://staging.duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -1257,6 +1281,16 @@ class RealDuckChatTest {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
         assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
+    @Test
+    fun `when custom subdomain host is set then canHandleOnAiWebView matches custom host`() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai/somepath"))
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai"))
+        assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+        assertFalse(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
+        assertFalse(testee.canHandleOnAiWebView("https://other.duck.ai/somepath"))
     }
 
     @Test
