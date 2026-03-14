@@ -1979,8 +1979,8 @@ class TabSwitcherViewModelTest {
                     title = expectedTitle,
                     lastEdit = LocalDateTime.now(),
                     pinned = false,
-                )
-            )
+                ),
+            ),
         )
         whenever(duckChatMock.isDuckChatUrl(Uri.parse(duckAiUrl))).thenReturn(true)
         tabList = listOf(TabEntity(tabId = "tab1", url = duckAiUrl))
