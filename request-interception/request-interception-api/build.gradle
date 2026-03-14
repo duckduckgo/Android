@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
-interface RequestBlocklist {
-    /**
-     * Checks whether a request is contained in the blocklist rules
-     * from the Privacy Configuration.
-     *
-     * @param documentUrl the URL of the page making the request
-     * @param requestUrl the URL being requested
-     * @return true if the request matches a blocklist rule
-     */
-    fun containedInBlocklist(documentUrl: String, requestUrl: String): Boolean
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    namespace 'com.duckduckgo.request.interception.api'
 }

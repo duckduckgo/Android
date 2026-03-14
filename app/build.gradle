@@ -314,6 +314,8 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')

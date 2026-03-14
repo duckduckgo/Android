@@ -65,8 +65,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
-import com.duckduckgo.privacy.config.impl.features.requestblocklist.RealRequestBlocklist
-import com.duckduckgo.privacy.config.impl.features.requestblocklist.RequestBlocklistFeature
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistFeature
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
@@ -75,6 +73,8 @@ import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlock
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.impl.RealRequestBlocklist
+import com.duckduckgo.request.interception.impl.RequestBlocklistFeature
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent

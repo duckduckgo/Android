@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.requestblocklist
+package com.duckduckgo.request.interception.impl
 
 import com.duckduckgo.app.browser.Domain
 
