@@ -59,6 +59,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -96,12 +97,23 @@ class TabSwitcherViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
     private val omnibarRepository: OmnibarRepository,
+    private val chatSuggestionsReader: ChatSuggestionsReader,
 ) : ViewModel() {
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    private val _chatTitles = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    init {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val titles = chatSuggestionsReader.fetchAllChats()
+                .associate { it.chatId to it.title }
+            _chatTitles.value = titles
+        }
+    }
 
     private val tabSwitcherItemsFlow = tabRepository.flowTabs
         .debounce(100.milliseconds)
@@ -111,8 +123,9 @@ class TabSwitcherViewModel @Inject constructor(
                 tabRepository.flowSelectedTab,
                 _viewState,
                 tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
-            ) { activeTab, viewState, isAnimationTileDismissed ->
-                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+                _chatTitles,
+            ) { activeTab, viewState, isAnimationTileDismissed, chatTitles ->
+                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode, chatTitles)
             }
         }
 
@@ -597,11 +610,14 @@ class TabSwitcherViewModel @Inject constructor(
         activeTab: TabEntity?,
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
+        chatTitles: Map<String, String> = emptyMap(),
     ): List<TabSwitcherItem> {
         val normalTabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
             if (entity.url != null && duckChat.isDuckChatUrl(Uri.parse(entity.url))) {
-                DuckAiTab(entity, isActive)
+                val chatId = Uri.parse(entity.url).getQueryParameter("chatID")
+                val resolvedTitle = chatId?.let { chatTitles[it] }
+                DuckAiTab(entity, isActive, resolvedTitle)
             } else {
                 NormalTab(entity, isActive)
             }
