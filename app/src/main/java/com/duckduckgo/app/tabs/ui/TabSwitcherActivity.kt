@@ -87,6 +87,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -129,6 +130,9 @@ class TabSwitcherActivity :
     lateinit var trackerCountAnimator: TrackerCountAnimator
 
     @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
@@ -144,6 +148,7 @@ class TabSwitcherActivity :
             faviconManager = faviconManager,
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
+            duckChat = duckChat,
         )
     }
 
@@ -653,7 +658,9 @@ class TabSwitcherActivity :
                 is NormalTab -> {
                     viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
-                is DuckAiTab -> Unit
+                is DuckAiTab -> {
+                    viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
+                }
                 is TrackersAnimationInfoPanel -> Unit
                 is SelectableTab -> Unit
             }

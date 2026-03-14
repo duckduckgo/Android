@@ -18,6 +18,7 @@ package com.duckduckgo.app.tabs.ui
 
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -37,9 +38,11 @@ import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class TabSwitcherAdapterTest {
 
     private val itemClickListener: TabSwitcherListener = mock()
