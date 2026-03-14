@@ -35,10 +35,10 @@
             android:id="@+id/favicon"
             android:layout_width="@dimen/listItemImageSmallSize"
             android:layout_height="@dimen/listItemImageSmallSize"
-            android:src="@drawable/ic_duck_ai_24_daynight"
+            android:src="@drawable/ic_duck_ai_color_24"
             android:contentDescription="@string/duck_ai_tab_icon_content_description"
             android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="6dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginTop="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
