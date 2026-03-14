@@ -242,7 +242,7 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
                     .add(
                         """
                             return kotlin.runCatching {
-                                moshi.adapter(clazz).fromJson(deeplinkActivityParams.jsonArguments)
+                                moshi.adapter(clazz).fromJson(deeplinkActivityParams.jsonArguments.ifEmpty { "{}" })
                             }.getOrNull()
                         """.trimIndent(),
                     ).build(),
