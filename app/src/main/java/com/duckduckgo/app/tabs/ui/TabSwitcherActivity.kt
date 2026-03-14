@@ -55,6 +55,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
@@ -86,6 +87,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
@@ -128,6 +130,9 @@ class TabSwitcherActivity :
     lateinit var trackerCountAnimator: TrackerCountAnimator
 
     @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
@@ -143,6 +148,7 @@ class TabSwitcherActivity :
             faviconManager = faviconManager,
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
+            duckChat = duckChat,
         )
     }
 
@@ -650,6 +656,9 @@ class TabSwitcherActivity :
         tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
             when (tab) {
                 is NormalTab -> {
+                    viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
+                }
+                is DuckAiTab -> {
                     viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
                 is TrackersAnimationInfoPanel -> Unit

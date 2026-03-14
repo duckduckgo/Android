@@ -30,6 +30,12 @@ sealed class TabSwitcherItem(val id: String) {
             val isSelected: Boolean,
         ) : Tab(entity)
 
+        data class DuckAiTab(
+            private val entity: TabEntity,
+            val isActive: Boolean,
+            val chatTitle: String? = null,
+        ) : Tab(entity)
+
         val isNewTabPage: Boolean
             get() = tabEntity.url.isNullOrBlank()
 

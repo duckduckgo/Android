@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
@@ -44,7 +45,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
-                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
+                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
+                    (if (oldItem is DuckAiTab && newItem is DuckAiTab) oldItem.chatTitle == newItem.chatTitle else true)
             }
             else -> false
         }
@@ -58,8 +60,10 @@ class TabSwitcherItemDiffCallback(
 
         when {
             oldItem is TabSwitcherItem.Tab && newItem is TabSwitcherItem.Tab -> {
-                if (oldItem.tabEntity.title != newItem.tabEntity.title) {
-                    diffBundle.putString(DIFF_KEY_TITLE, newItem.tabEntity.title)
+                val oldTitle = if (oldItem is DuckAiTab) oldItem.chatTitle ?: oldItem.tabEntity.title else oldItem.tabEntity.title
+                val newTitle = if (newItem is DuckAiTab) newItem.chatTitle ?: newItem.tabEntity.title else newItem.tabEntity.title
+                if (oldTitle != newTitle) {
+                    diffBundle.putString(DIFF_KEY_TITLE, newTitle)
                 }
 
                 if (oldItem.tabEntity.url != newItem.tabEntity.url) {
