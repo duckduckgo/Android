@@ -45,6 +45,7 @@ import javax.inject.Inject
 
 interface ChatSuggestionsReader {
     suspend fun fetchSuggestions(query: String = ""): List<ChatSuggestion>
+    suspend fun fetchAllChats(): List<ChatSuggestion>
     fun tearDown()
 }
 
@@ -70,10 +71,11 @@ class RealChatSuggestionsReader @Inject constructor(
             val maxSuggestions = getMaxHistoryCount()
             val script = getScript()
             val wv = getOrCreateWebView(script)
+            val params = buildFetchParams(query, maxSuggestions)
 
             val results = mutableListOf<DomainResult>()
             for (domain in DOMAINS) {
-                val result = fetchFromDomain(wv, domain, query, maxSuggestions)
+                val result = fetchFromDomain(wv, domain, params)
                 if (result != null) {
                     results.add(result)
                 }
@@ -83,6 +85,23 @@ class RealChatSuggestionsReader @Inject constructor(
                 (result.pinnedChats + result.recentChats).maxOfOrNull { it.lastEdit } ?: LocalDateTime.MIN
             } ?: return@withContext emptyList()
             mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, maxSuggestions)
+        }
+    }
+
+    override suspend fun fetchAllChats(): List<ChatSuggestion> {
+        return withContext(dispatchers.main()) {
+            val script = getScript()
+            val webView = getOrCreateWebView(script)
+            val params = JSONObject().apply {
+                put("max_chats", 1000) // no 'since' filter, no 'query' filter
+            }
+            val results = DOMAINS.mapNotNull { domain ->
+                fetchFromDomain(webView, domain, params)
+            }
+            val bestResult = results.maxByOrNull { r ->
+                (r.pinnedChats + r.recentChats).maxOfOrNull { it.lastEdit } ?: LocalDateTime.MIN
+            } ?: return@withContext emptyList()
+            mergeSuggestions(bestResult.pinnedChats, bestResult.recentChats, Int.MAX_VALUE)
         }
     }
 
@@ -208,13 +227,12 @@ class RealChatSuggestionsReader @Inject constructor(
 
     // region Fetching
 
-    private suspend fun fetchFromDomain(webView: WebView, domain: String, query: String, maxSuggestions: Int): DomainResult? {
+    private suspend fun fetchFromDomain(webView: WebView, domain: String, params: JSONObject): DomainResult? {
         pageLoadDeferred = CompletableDeferred()
         webView.loadDataWithBaseURL(domain, EMPTY_HTML, "text/html", "utf-8", null)
         withTimeoutOrNull(FETCH_TIMEOUT_MS) { pageLoadDeferred?.await() } ?: return null
 
         chatsResultDeferred = CompletableDeferred()
-        val params = buildFetchParams(query, maxSuggestions)
         messaging.sendSubscriptionEvent(
             SubscriptionEventData(
                 FEATURE_NAME,
