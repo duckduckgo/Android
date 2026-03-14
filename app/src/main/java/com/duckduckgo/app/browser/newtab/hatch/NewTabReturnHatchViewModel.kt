@@ -99,7 +99,8 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val lastTab = tabRepository.getSelectedTab()
-            logcat { "Hatch: tabs $lastTab" }
+            val tabs = tabRepository.getTabs().toString()
+            logcat { "Hatch: tabs $tabs" }
             if (lastTab != null){
                 if (lastTab.url != null && lastTab.title != null) {
                     _viewState.value = ViewState(
