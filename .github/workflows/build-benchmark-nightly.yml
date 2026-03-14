@@ -52,7 +52,7 @@ jobs:
       - name: Install Gradle Profiler
         run: |
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install gradleprofiler
+          sdk install gradleprofiler 0.23.0
           gradle-profiler --version
 
       - name: Run Build Benchmarks and Process Results
