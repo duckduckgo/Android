@@ -319,6 +319,10 @@
 
     <!-- Home Screen Shortcuts -->
 
+    <string name="addToHomeShortcutDialogTitle">Add to Home Screen</string>
+    <string name="addToHomeShortcutDialogHint">Shortcut name</string>
+    <string name="addToHomeShortcutDialogAdd">Add</string>
+    <string name="addToHomeShortcutDialogCancel">Cancel</string>
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Success! %1$s has been added to your home screen.</string>
 
     <!-- User Survey -->
