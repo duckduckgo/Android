@@ -37,8 +37,10 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.plugin.DataClearingParams
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
+import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -70,7 +72,7 @@ class TabDataRepository @Inject constructor(
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val duckChatContextualDataStore: DuckChatContextualDataStore,
+    private val dataClearingTrigger: DataClearingTrigger,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
 ) : TabRepository, TabAtomicOperations {
 
@@ -354,7 +356,11 @@ class TabDataRepository @Inject constructor(
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
-            duckChatContextualDataStore.clearTabChatUrl(tabId)
+        }
+        appCoroutineScope.launch(dispatchers.io()) {
+            tabIds.forEach { tabId ->
+                dataClearingTrigger.clearData(DataClearingParams(setOf(DataType.Tabs.Single(tabId))))
+            }
         }
     }
 
@@ -430,7 +436,7 @@ class TabDataRepository @Inject constructor(
         adClickManager.clearAll()
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
-        duckChatContextualDataStore.clearAll()
+        dataClearingTrigger.clearData(DataClearingParams(setOf(DataType.Tabs.All)))
         tabVisitedSitesRepository.clearAll()
     }
 

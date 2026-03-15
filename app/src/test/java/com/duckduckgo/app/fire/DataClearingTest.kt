@@ -34,9 +34,10 @@ import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.dataclearing.api.plugin.DataClearingParams
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
+import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -51,6 +52,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -100,7 +102,7 @@ class DataClearingTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockContextualDataStore: DuckChatContextualDataStore
+    private lateinit var mockDataClearingTrigger: DataClearingTrigger
 
     @Mock
     private lateinit var mockShowOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore
@@ -131,8 +133,8 @@ class DataClearingTest {
             tabOperations = mockTabOperations,
             tabRepository = mockTabRepository,
             duckChat = mockDuckChat,
-            contextualDataStore = mockContextualDataStore,
             showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
+            dataClearingTrigger = mockDataClearingTrigger,
         )
     }
 
@@ -773,107 +775,60 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataWithDuckAiChatTab_thenDeleteChat() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=abc-123")
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithNonDuckAiTab_thenDeleteChatStillCalled() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockDuckChat).deleteChat("https://example.com")
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfManualOptions() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
-        configureManualOptions(emptySet())
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=abc-123")
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfFeatureFlag() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
-        showClearDuckAIChatHistoryFlow.value = false
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=abc-123")
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithNullTabUrl_thenDoNotDeleteChat() = runTest {
+    fun whenClearSingleTabData_thenTriggerContainsTabSingle() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckChat, never()).deleteChat(any())
+        val captor = argumentCaptor<DataClearingParams>()
+        verify(mockDataClearingTrigger).clearData(captor.capture())
+        val types = captor.firstValue.types
+        assertTrue(types.any { it is DataType.Tabs.Single && it.tabId == "tab1" })
     }
 
-    // --- clearContextualChatDataIfNeeded tests ---
-
     @Test
-    fun whenClearSingleTabDataWithContextualChatAndDuckAiChatsEnabled_thenDeleteContextualChat() = runTest {
+    fun whenClearSingleTabDataWithDuckAiChatsEnabledAndNullUrl_thenTriggerIncludesForTabOnly() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
         configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
-        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai/chat?chatID=contextual-123")
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-123")
-        verify(mockContextualDataStore).clearTabChatUrl("tab1")
+        val captor = argumentCaptor<DataClearingParams>()
+        verify(mockDataClearingTrigger).clearData(captor.capture())
+        val types = captor.firstValue.types
+        assertTrue(types.any { it is DataType.DuckChats.Contextual && it.tabId == "tab1" })
+        assertFalse(types.any { it is DataType.DuckChats.Single })
     }
 
     @Test
-    fun whenClearSingleTabDataWithContextualChatAndDuckAiChatsDisabled_thenDoNotDeleteContextualChat() = runTest {
+    fun whenClearSingleTabDataWithDuckAiChatsEnabledAndTabUrl_thenTriggerIncludesSingleAndForTab() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+
+        testee.clearSingleTabData("tab1")
+
+        val captor = argumentCaptor<DataClearingParams>()
+        verify(mockDataClearingTrigger).clearData(captor.capture())
+        val types = captor.firstValue.types
+        assertTrue(types.any { it is DataType.DuckChats.Single && it.chatUrl == "https://duck.ai/chat?chatID=abc-123" })
+        assertTrue(types.any { it is DataType.DuckChats.Contextual && it.tabId == "tab1" })
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckAiChatsDisabled_thenTriggerDoesNotIncludeDuckAiChats() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
         configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockContextualDataStore, never()).getTabChatUrl(any())
-        verify(mockContextualDataStore, never()).clearTabChatUrl(any())
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithNoContextualChatUrlAndDuckAiChatsEnabled_thenStillClearStoreEntries() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
-        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
-        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn(null)
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockContextualDataStore).clearTabChatUrl("tab1")
-    }
-
-    @Test
-    fun whenClearSingleTabDataWithDuckAiTabAndContextualChat_thenDeleteBothChats() = runTest {
-        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=tab-chat", position = 0))
-        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
-        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai/chat?chatID=contextual-456")
-
-        testee.clearSingleTabData("tab1")
-
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=tab-chat")
-        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-456")
+        val captor = argumentCaptor<DataClearingParams>()
+        verify(mockDataClearingTrigger).clearData(captor.capture())
+        val types = captor.firstValue.types
+        assertFalse(types.any { it is DataType.DuckChats })
     }
 
     // --- getNewTabUrl tests (via clearSingleTabData) ---
