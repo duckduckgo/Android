@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.dataclearing.api.plugin
+
+/**
+ * Describes the kind of data being cleaned up.
+ *
+ * Each sealed subclass represents a category of data. Nested subclasses
+ * express scope within that category (e.g., all tabs vs. a single tab).
+ */
+sealed class DataType {
+
+    /** Browser data: cookies, cache, web storage, etc. */
+    sealed class BrowserData : DataType() {
+        data object All : BrowserData()
+        data class ForDomains(val domains: Set<String>) : BrowserData()
+    }
+
+    /** Tab data. */
+    sealed class Tabs : DataType() {
+        data object All : Tabs()
+        data class Single(val tabId: String) : Tabs()
+    }
+
+    /** Duck AI chats. */
+    sealed class DuckChats : DataType() {
+        data object All : DuckChats()
+        data class Single(val chatUrl: String) : DuckChats()
+        data class Contextual(val tabId: String) : DuckChats()
+    }
+}
