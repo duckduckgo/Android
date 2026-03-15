@@ -1946,6 +1946,19 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when user switches from chat to search mode without changing input then search mode is enabled`() =
+        runTest {
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.searchMode)
+
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
     fun `when user switches from chat to search mode with non-empty text then mainButtonsVisible is true because search text is empty`() =
         runTest {
             whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)

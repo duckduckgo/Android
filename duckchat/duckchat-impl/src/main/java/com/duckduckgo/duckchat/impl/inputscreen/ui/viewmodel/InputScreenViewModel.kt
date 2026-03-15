@@ -575,7 +575,7 @@ class InputScreenViewModel @AssistedInject constructor(
         userSelectedMode = SEARCH
         viewModelScope.launch {
             _visibilityState.update {
-                it.copy(newLineButtonVisible = false, mainButtonsVisible = canShowMainButtons())
+                it.copy(newLineButtonVisible = false, searchMode = true, mainButtonsVisible = canShowMainButtons())
             }
         }
     }
