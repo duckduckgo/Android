@@ -120,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
-    <string name="fireClearAll">Vymazat karty a data</string>
-    <string name="fireClearAllPlusDuckChats">Vymazat karty, data a chaty Duck.ai</string>
+    <string name="fireClearAll">Mazání karet a dat</string>
+    <string name="fireClearAllPlusDuckChats">Smazat karty, data a chaty Duck.ai</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
 
@@ -239,7 +239,7 @@
     <string name="dataClearingAutomaticClearingOff">Vypnout</string>
     <string name="dataClearingClearBrowsingData">Vymazat údaje o prohlížení</string>
     <string name="dataClearingAutomaticDataClearing">Automatické mazání dat</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automaticky vymazat data</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatické mazání dat</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zavře všechny otevřené karty</string>
     <string name="dataClearingAutomaticDataOptionDescription">Smažou se všechna data webů včetně navštívených webů. Může tě to odhlásit z účtů.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Smažou se všechny chaty včetně připnutých</string>
@@ -296,15 +296,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, data a chaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhen">Smazat…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Smazat…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihned po ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
-    <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Mazání chatů Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Tlačítko Fire Button taky smaže historii Duck.ai, včetně připnutých chatů.</string>
     <string name="settingsClearDataActionSecondaryText">Vymaže všechny karty a data všech webů, které nechrání funkce Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Vymaže všechny karty, chaty Duck.ai a data všech webů, které nechrání funkce Fireproof.</string>
@@ -923,7 +923,6 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Víš, že…?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
