@@ -288,8 +288,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Duck.ai-Chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Löschen am …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen am …</string>
+    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>

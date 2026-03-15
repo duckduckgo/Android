@@ -296,8 +296,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Kartice, podaci i razgovori s Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Izbriši dana…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Izbriši dana…</string>
+    <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Očisti na…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izlaz iz aplikacije</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izlaz iz aplikacije, neaktivna 5 sekundi</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izlaz iz aplikacije, neaktivna 5 minuta</string>
