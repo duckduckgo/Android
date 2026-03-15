@@ -171,6 +171,8 @@ class FakeDuckChatInternal(
 
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
 
+    override fun openVoiceDuckChat() { }
+
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled
     }
