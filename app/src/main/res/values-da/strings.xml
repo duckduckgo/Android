@@ -885,6 +885,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vidste du?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>

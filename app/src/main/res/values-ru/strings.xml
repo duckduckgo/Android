@@ -923,6 +923,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ознакомление бесплатное!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли вы?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Нужен удобный доступ к приватному чату с ИИ?</string>
