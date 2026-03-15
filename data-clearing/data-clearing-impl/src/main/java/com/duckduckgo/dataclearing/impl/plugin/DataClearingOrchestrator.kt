@@ -18,7 +18,6 @@ package com.duckduckgo.dataclearing.impl.plugin
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
-import com.duckduckgo.dataclearing.api.plugin.DataClearingParams
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.dataclearing.api.plugin.DataType
@@ -39,8 +38,8 @@ class DataClearingOrchestrator @Inject constructor(
     private val plugins: PluginPoint<DataClearingPlugin>,
 ) : DataClearingTrigger {
 
-    override suspend fun clearData(params: DataClearingParams) {
-        var currentTypes = params.types
+    override suspend fun clearData(types: Set<DataType>) {
+        var currentTypes = types
         val processedTypes = mutableSetOf<DataType>()
         var round = 0
 
@@ -52,7 +51,7 @@ class DataClearingOrchestrator @Inject constructor(
 
             plugins.getPlugins().forEach { plugin ->
                 val result = try {
-                    plugin.onClearData(DataClearingParams(currentTypes))
+                    plugin.onClearData(currentTypes)
                 } catch (e: Exception) {
                     currentCoroutineContext().ensureActive()
                     ClearResult.Failure(e)

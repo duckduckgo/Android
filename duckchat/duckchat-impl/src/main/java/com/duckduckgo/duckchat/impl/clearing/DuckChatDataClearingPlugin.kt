@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
-import com.duckduckgo.dataclearing.api.plugin.DataClearingParams
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
@@ -32,8 +31,8 @@ class DuckChatDataClearingPlugin @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
 ) : DataClearingPlugin {
 
-    override suspend fun onClearData(params: DataClearingParams): ClearResult {
-        for (type in params.types) {
+    override suspend fun onClearData(types: Set<DataType>): ClearResult {
+        for (type in types) {
             when (type) {
                 is DataType.Tabs.Single -> {
                     contextualDataStore.clearTabChatUrl(type.tabId)

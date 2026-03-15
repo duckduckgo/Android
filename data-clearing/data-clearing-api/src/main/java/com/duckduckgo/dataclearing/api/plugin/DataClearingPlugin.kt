@@ -21,14 +21,14 @@ package com.duckduckgo.dataclearing.api.plugin
  *
  * Any module can implement this interface to participate in data clearing.
  * The orchestrator calls all registered plugins whenever data needs to be removed.
- * Each plugin inspects the [DataClearingParams.types] to decide what action to take.
+ * Each plugin inspects the [types] set to decide what action to take.
  *
  * Implement this interface and annotate with `@ContributesMultibinding(AppScope::class)`
  * to register a plugin.
  */
 interface DataClearingPlugin {
-    /** Called when data should be cleared. Inspect [params] to decide what to do. */
-    suspend fun onClearData(params: DataClearingParams): ClearResult
+    /** Called when data should be cleared. Inspect [types] to decide what to do. */
+    suspend fun onClearData(types: Set<DataType>): ClearResult
 }
 
 sealed class ClearResult {

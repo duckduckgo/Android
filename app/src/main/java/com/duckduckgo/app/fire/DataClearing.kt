@@ -32,7 +32,6 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.dataclearing.api.plugin.DataClearingParams
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
@@ -93,7 +92,7 @@ class DataClearing @Inject constructor(
                 add(DataType.DuckChats.Contextual(tabId))
             }
         }
-        dataClearingTrigger.clearData(DataClearingParams(types))
+        dataClearingTrigger.clearData(types)
 
         val url = getNewTabUrl(tabUrl)
         tabOperations.replaceTabWithNewTab(tabId, url)
