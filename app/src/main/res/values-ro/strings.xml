@@ -236,7 +236,7 @@
     <string name="dataClearingAutomaticClearingOn">Activat</string>
     <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
     <string name="dataClearingClearBrowsingData">Șterge datele de navigare</string>
-    <string name="dataClearingAutomaticDataClearing">Ștergerea automată a datelor</string>
+    <string name="dataClearingAutomaticDataClearing">Șterge automat datele</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Șterge automat datele</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Închide toate filele deschise</string>
     <string name="dataClearingAutomaticDataOptionDescription">Șterge toate datele privind site-urile, inclusiv site-urile vizitate. S-ar putea să fii deconectat de la conturi.</string>
@@ -292,8 +292,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
+    <string name="settingsAutomaticallyClearWhen">Șterge pe...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge pe…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar la ieșirea din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ieșire din aplicație, inactiv timp de 5 minute</string>
