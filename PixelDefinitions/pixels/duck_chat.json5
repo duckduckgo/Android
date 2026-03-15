@@ -357,5 +357,12 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_voice_entry_tapped": {
+        "description": "User tapped the voice entry point button on the duck.ai tab in the input screen",
+        "owners": ["aitor"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

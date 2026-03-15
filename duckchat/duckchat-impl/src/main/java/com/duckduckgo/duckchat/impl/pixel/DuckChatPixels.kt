@@ -463,6 +463,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
+    DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED("m_aichat_voice_entry_tapped"),
 
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 }
