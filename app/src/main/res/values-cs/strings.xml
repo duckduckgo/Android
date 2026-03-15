@@ -923,6 +923,7 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Víš, že…?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
