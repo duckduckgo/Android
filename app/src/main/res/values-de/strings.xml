@@ -234,7 +234,7 @@
     <string name="dataClearingAutomaticClearingOn">Ein</string>
     <string name="dataClearingAutomaticClearingOff">Aus</string>
     <string name="dataClearingClearBrowsingData">Browserdaten löschen</string>
-    <string name="dataClearingAutomaticDataClearing">Automatische Datenlöschung</string>
+    <string name="dataClearingAutomaticDataClearing">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Alle offenen Tabs schließen</string>
     <string name="dataClearingAutomaticDataOptionDescription">Löschen aller Websitedaten, einschließlich der besuchten Seiten; du wirst möglicherweise von Konten abgemeldet.</string>
@@ -258,6 +258,19 @@
         <item quantity="other">Von %1$d Websites löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabs und Seitendaten löschen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabs, Seitendaten und Chats löschen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alle löschen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Diesen Tab löschen</string>
+    <string name="singleTabFireDialogDeleteThisChat">Diesen Chat löschen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Mit „Alle löschen“ wird dein Duck.ai-Chatverlauf nicht gelöscht.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
+    <string name="singleTabFireDialogSnackbar">1 Tab und dessen Daten gelöscht</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Berechtigungen</string>
 
@@ -275,8 +288,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Duck.ai-Chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhen">Löschen am …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen am …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>
@@ -809,7 +822,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="preOnboardingDaxDialog2Button">Wähle deinen Browser</string>
@@ -821,6 +836,7 @@
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
     <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
     <string name="preOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
     <string name="preOnboardingAddressBarOkButton">Weiter</string>
@@ -869,10 +885,10 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wusstest du das?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 

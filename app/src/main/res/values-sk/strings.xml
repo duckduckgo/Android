@@ -120,7 +120,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazať údaje</string>
-    <string name="fireClearAll">Vymazať karty a údaje</string>
+    <string name="fireClearAll">Odstrániť karty a údaje</string>
     <string name="fireClearAllPlusDuckChats">Vymazať karty, údaje a chaty Duck.ai</string>
     <string name="fireCancel">Zrušiť</string>
     <string name="fireDataCleared">Údaje boli vymazané</string>
@@ -238,8 +238,8 @@
     <string name="dataClearingAutomaticClearingOn">Zapnuté</string>
     <string name="dataClearingAutomaticClearingOff">Vypnuté</string>
     <string name="dataClearingClearBrowsingData">Vymaž údaje o prehliadaní</string>
-    <string name="dataClearingAutomaticDataClearing">Automatické vymazávanie údajov</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automaticky vymazať údaje</string>
+    <string name="dataClearingAutomaticDataClearing">Automatické odstránenie údajov</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatické odstránenie údajov</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zatvor všetky otvorené karty</string>
     <string name="dataClearingAutomaticDataOptionDescription">Odstráň všetky údaje stránok vrátane navštívených stránok. Môže ťa to odhlásiť z účtov.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Odstráň všetky čety vrátane pripnutých četov</string>
@@ -266,6 +266,19 @@
         <item quantity="other">Odstrániť z %1$d webov. Môže ťa to odhlásiť z účtov.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Odstrániť karty a údaje stránok?</string>
+    <string name="singleTabFireDialogTitleWithChats">Odstrániť karty, údaje stránok a chaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Odstrániť všetko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Vymazať túto záložku</string>
+    <string name="singleTabFireDialogDeleteThisChat">Zmazať tento čet</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Možnosť „Odstrániť všetko“ neodstráni tvoju históriu četu na Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
+    <string name="singleTabFireDialogSnackbar">Bola odstránená 1 karta a jej údaje</string>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnenia</string>
 
@@ -283,15 +296,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, údaje a chaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazať po…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať po…</string>
+    <string name="settingsAutomaticallyClearWhen">Odstrániť…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikácie, neaktívnej po dobu 5 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikácie, neaktívnej po dobu 15 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikácie, neaktívnej po dobu 30 minút</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikácie, neaktívnej po dobu 1 hodiny</string>
-    <string name="settingsClearAiDataTitle">Vymazať chaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Odstrániť chaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button tiež vymaže históriu Duck.ai vrátane pripnutých rozhovorov.</string>
     <string name="settingsClearDataActionSecondaryText">Vymaže všetky karty a údaje pre všetky stránky, ktoré si neochránil/-a ochranou Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Zatvorí všetky karty, chaty Duck.ai a vymaže údaje zo všetkých stránok, ktoré si neochránil/-a ochranou Fireproof.</string>
@@ -843,7 +856,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Dobrý deň.<br/><br/>Si pripravený/-á na rýchlejší prehliadač, ktorý ťa ochráni?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Poďme na to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Bol/-a som tu už predtým</string>
     <string name="preOnboardingDaxDialog2Title">Ochrany boli aktivované!</string>
     <string name="preOnboardingDaxDialog2Button">Vyberte si prehliadač</string>
@@ -855,6 +870,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umiestniť váš riadok s adresou?</string>
     <string name="preOnboardingAddressBarOkButton">Ďalšie</string>
@@ -907,10 +923,10 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyskúšaj zadarmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
-    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vieš o tomto?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš jednoduchší prístup k súkromnému AI chatu?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Ďalšie</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcie AI sú súkromné a voliteľné. Môžeš urobiť zmeny v&nbsp;<b>Nastaveniach >&nbsp;Funkcie AI</b>.]]></string>
 
