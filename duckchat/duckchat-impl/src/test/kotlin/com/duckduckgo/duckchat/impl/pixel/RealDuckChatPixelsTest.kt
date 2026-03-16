@@ -390,12 +390,12 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS then delegates to handler`() = runTest {
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS then delegates to handler and fires pixel`() = runTest {
         testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
 
         advanceUntilIdle()
 
         verify(mockTermsOfServiceHandler).userAcceptedTerms()
-        verifyNoInteractions(mockPixel)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
     }
 }
