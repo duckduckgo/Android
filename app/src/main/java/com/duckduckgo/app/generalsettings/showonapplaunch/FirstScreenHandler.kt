@@ -78,5 +78,4 @@ class FirstScreenHandlerImpl @Inject constructor(
             JSONObject(settings).getLong("timeoutMinutes") * 60 * 1000
         }.getOrNull()
     }
-
 }
