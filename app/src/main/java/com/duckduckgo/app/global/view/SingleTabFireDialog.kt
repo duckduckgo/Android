@@ -95,6 +95,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private var animationEnabled = false
     private var canFinish = false
+    private var pendingFragmentResultEvent: String? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -205,15 +206,15 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 }
             }
             is Command.OnSingleTabClearComplete -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearFeatureNotSupported -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearError -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
         }
@@ -334,9 +335,22 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             if (viewModel.viewState.value.shouldRestartAfterClearing) {
                 clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
             } else {
-                dismiss()
+                dismissSingleTabClear()
             }
         }
+    }
+
+    private fun dismissSingleTabClear() {
+        _binding?.fireAnimationView?.removeAllAnimatorListeners()
+        _binding?.fireAnimationView?.removeUpdateListener(accelerateAnimatorUpdateListener)
+        _binding?.fireAnimationView?.cancelAnimation()
+        _binding?.fireAnimationView?.gone()
+
+        pendingFragmentResultEvent?.let { sendFragmentResult(it) }
+        pendingFragmentResultEvent = null
+
+        isCancelable = true
+        dismissAllowingStateLoss()
     }
 
     private sealed class ClearAllEvent {
