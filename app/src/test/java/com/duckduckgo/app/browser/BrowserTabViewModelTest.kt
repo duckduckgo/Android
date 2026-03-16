@@ -1764,6 +1764,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnSiteChangedWithErrorThenPageContextHeaderIsError() = runTest {
+        val errorUrl = "https://www.example.com/"
+        givenCurrentSite(errorUrl)
+        testee.onReceivedError(BAD_URL, errorUrl)
+        loadUrl(errorUrl)
+
+        assertTrue(browserViewState().pageContextHeader is PageContextHeaderState.Error)
+        assertEquals("example.com", (browserViewState().pageContextHeader as PageContextHeaderState.Error).shortUrl)
+    }
+
+    @Test
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()

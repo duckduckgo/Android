@@ -2425,19 +2425,30 @@ class BrowserTabViewModel @Inject constructor(
                         privacyShield = privacyProtection,
                         trackersBlocked = site?.trackerCount ?: 0,
                     )
-                browserViewState.value = currentBrowserViewState().copy(
-                    pageContextHeader = site?.let {
-                        if (duckChat.isDuckChatUrl(it.url.toUri())) {
-                            PageContextHeaderState.DuckAi(tabId = tabId)
-                        } else {
-                            PageContextHeaderState.Visible(
-                                title = it.title,
-                                shortUrl = addressDisplayFormatter.getShortUrl(it.url),
-                                tabId = tabId,
-                            )
-                        }
-                    } ?: PageContextHeaderState.Hidden,
-                )
+                val isErrorMode = browserViewState.value?.browserError != null && browserViewState.value?.browserError != OMITTED
+                val currentSite = site
+                val pageContextHeader = if (currentSite != null) {
+                    val shortUrl = addressDisplayFormatter.getShortUrl(currentSite.url)
+                    if (isErrorMode) {
+                        PageContextHeaderState.Error(shortUrl)
+                    } else if (duckChat.isDuckChatUrl(currentSite.url.toUri())) {
+                        PageContextHeaderState.DuckAi(tabId = tabId)
+                    } else {
+                        PageContextHeaderState.Visible(
+                            title = currentSite.title,
+                            shortUrl = shortUrl,
+                            tabId = tabId,
+                        )
+                    }
+                } else {
+                    val omnibarText = currentOmnibarViewState().omnibarText
+                    if (isErrorMode && omnibarText.isNotEmpty()) {
+                        PageContextHeaderState.Error(omnibarText)
+                    } else {
+                        PageContextHeaderState.Hidden
+                    }
+                }
+                browserViewState.value = currentBrowserViewState().copy(pageContextHeader = pageContextHeader)
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)

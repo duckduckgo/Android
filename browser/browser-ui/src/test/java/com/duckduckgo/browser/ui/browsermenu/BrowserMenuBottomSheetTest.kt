@@ -108,6 +108,19 @@ class BrowserMenuBottomSheetTest {
         assertFalse(headerShortUrl.isVisible)
     }
 
+    @Test
+    fun whenRenderErrorModeThenMenuHeadIsShownWithShortUrlAndNoTitle() {
+        val viewState = BrowserMenuViewState.Browser(
+            pageContextHeader = PageContextHeaderState.Error(shortUrl = "test.com"),
+        )
+
+        dialog.render(viewState)
+
+        assertTrue(menuHeader.isVisible)
+        assertEquals("test.com", headerShortUrl.text.toString())
+        assertFalse(headerTitle.isVisible)
+    }
+
     // region Helpers
 
     private val menuHeader: View

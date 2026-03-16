@@ -85,6 +85,10 @@ sealed class PageContextHeaderState {
     data class DuckAi(
         val tabId: String,
     ) : PageContextHeaderState()
+
+    data class Error(
+        val shortUrl: String,
+    ) : PageContextHeaderState()
 }
 
 sealed class VpnMenuState {
