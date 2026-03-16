@@ -205,6 +205,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -592,6 +593,7 @@ class BrowserTabViewModelTest {
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
+    private val mockTabPageContextRepository: TabPageContextRepository = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -922,6 +924,7 @@ class BrowserTabViewModelTest {
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
+                tabPageContextRepository = mockTabPageContextRepository,
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
@@ -5572,6 +5575,62 @@ class BrowserTabViewModelTest {
                 assertFalse(json.has("favicon"))
             }
             verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+        }
+
+    @Test
+    fun whenPageContextReceivedAndStorePageContextEnabledThenCacheInRepository() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            val serializedContext = """{"title":"Example","url":"https://example.com"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            verify(mockTabPageContextRepository).storePageContext(
+                eq("abc"),
+                eq("https://example.com"),
+                eq(serializedContext),
+            )
+        }
+
+    @Test
+    fun whenPageContextReceivedAndStorePageContextDisabledThenDoNotCache() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = false))
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            verify(mockTabPageContextRepository, never()).storePageContext(anyString(), anyString(), anyString())
         }
 
     @Test
