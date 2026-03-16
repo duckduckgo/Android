@@ -21,6 +21,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import javax.inject.Inject
 
 interface DuckChatTermsOfServiceHandler {
@@ -35,7 +36,9 @@ class RealDuckChatTermsOfServiceHandler @Inject constructor(
 ) : DuckChatTermsOfServiceHandler {
 
     override suspend fun userAcceptedTerms() {
+        logcat { "Duck.ai: userAcceptedTerms" }
         if (dataStore.hasUserAcceptedTerms()) {
+            logcat { "Duck.ai: userAcceptedTerms DUPLICATE" }
             val isSyncEnabled = duckChat.isChatSyncFeatureEnabled()
             duckChatPixels.reportTermsOfServiceReAccepted(isSyncEnabled)
         }

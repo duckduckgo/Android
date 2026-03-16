@@ -103,6 +103,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SU
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES
+import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -148,10 +149,16 @@ class RealDuckChatPixels @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
     private val duckAiMetricCollector: DuckAiMetricCollector,
+    private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
 ) : DuckChatPixels {
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (reportMetric == ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS) {
+                termsOfServiceHandler.userAcceptedTerms()
+                return@launch
+            }
+
             var refreshAtb = false
             val sessionParams = mapOf(
                 DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to duckChatFeatureRepository.sessionDeltaInMinutes().toString(),
@@ -169,6 +176,7 @@ class RealDuckChatPixels @Inject constructor(
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
                 USER_DID_TAP_KEYBOARD_RETURN_KEY -> DUCK_CHAT_KEYBOARD_RETURN_PRESSED to emptyMap()
+                ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS -> error("Handled above")
             }
 
             withContext(dispatcherProvider.main()) {

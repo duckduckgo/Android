@@ -25,6 +25,8 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
+import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
@@ -83,6 +85,7 @@ class RealDuckChatPixelsTest {
 
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
+    private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -97,6 +100,7 @@ class RealDuckChatPixelsTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             statisticsUpdater = statisticsUpdater,
             duckAiMetricCollector = duckAiMetricCollector,
+            termsOfServiceHandler = mockTermsOfServiceHandler,
         )
     }
 
@@ -383,5 +387,15 @@ class RealDuckChatPixelsTest {
         advanceUntilIdle()
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS then delegates to handler`() = runTest {
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
+
+        advanceUntilIdle()
+
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
+        verifyNoInteractions(mockPixel)
     }
 }

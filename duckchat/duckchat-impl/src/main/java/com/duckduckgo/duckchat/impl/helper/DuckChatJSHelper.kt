@@ -70,7 +70,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -191,11 +190,6 @@ class RealDuckChatJSHelper @Inject constructor(
                         duckChatPixels.reportContextualPageContextRemovedFrontend()
                     }
                 }
-                null
-            }
-
-            METHOD_ACCEPT_TERMS_AND_CONDITIONS -> {
-                termsOfServiceHandler.userAcceptedTerms()
                 null
             }
 
