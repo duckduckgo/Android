@@ -380,4 +380,15 @@ class SharedPreferencesDuckChatDataStoreTest {
 
         assertEquals(listOf(false, true), results)
     }
+
+    @Test
+    fun `when hasUserAcceptedTerms default then return false`() = runTest {
+        assertFalse(testee.hasUserAcceptedTerms())
+    }
+
+    @Test
+    fun `when setUserAcceptedTerms then hasUserAcceptedTerms returns true`() = runTest {
+        testee.setUserAcceptedTerms()
+        assertTrue(testee.hasUserAcceptedTerms())
+    }
 }
