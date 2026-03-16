@@ -64,7 +64,7 @@ class SubscriptionSwitchWideEventTest {
 
     @Test
     fun `onSwitchFlowStarted starts flow with correct metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
@@ -90,7 +90,7 @@ class SubscriptionSwitchWideEventTest {
 
     @Test
     fun `onSwitchFlowStarted with Plus yearly to Plus monthly has tier_change_type crossgrade and downgrade billing cycle`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
@@ -115,7 +115,7 @@ class SubscriptionSwitchWideEventTest {
 
     @Test
     fun `onSwitchFlowStarted with Pro monthly to Pro yearly has tier_change_type crossgrade and upgrade billing cycle`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
@@ -140,7 +140,7 @@ class SubscriptionSwitchWideEventTest {
 
     @Test
     fun `onSwitchFlowStarted with Plus to Pro has tier_change_type upgrade and none as billing cycle switch type`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
@@ -165,7 +165,7 @@ class SubscriptionSwitchWideEventTest {
 
     @Test
     fun `onSwitchFlowStarted with Pro to Plus has tier_change_type downgrade`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any())).thenReturn(Result.success(123L))
 
         subscriptionSwitchWideEvent.onSwitchFlowStarted(
             context = "subscription_settings",
@@ -437,7 +437,7 @@ class SubscriptionSwitchWideEventTest {
         subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
         subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
 
-        verify(wideEventClient, never()).flowStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).flowStart(any(), any(), any(), any(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }

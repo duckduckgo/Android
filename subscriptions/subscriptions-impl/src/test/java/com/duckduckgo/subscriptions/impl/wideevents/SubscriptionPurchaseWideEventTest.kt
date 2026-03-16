@@ -59,7 +59,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onPurchaseFlowStarted starts a new flow`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")

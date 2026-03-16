@@ -59,7 +59,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start starts a new flow with entry point and clear options`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
         val clearOptions = setOf(FireClearOption.TABS, FireClearOption.DATA)
@@ -76,7 +76,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with empty clear options sets empty metadata value`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(456L))
 
         dataClearingWideEvent.start(EntryPoint.APP_SHORTCUT, emptySet())
@@ -91,7 +91,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start with duckai chats option includes duckai_chats in metadata`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(789L))
 
         val clearOptions = setOf(FireClearOption.DUCKAI_CHATS)
@@ -107,7 +107,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `start resets existing flow before starting new one`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
@@ -119,7 +119,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `startLegacy with CLEAR_NONE results in empty options`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(100L))
 
         dataClearingWideEvent.startLegacy(EntryPoint.LEGACY_FIRE_DIALOG, ClearWhatOption.CLEAR_NONE, clearDuckAiData = false)
@@ -134,7 +134,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `startLegacy with CLEAR_TABS_ONLY results in tabs option`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(200L))
 
         dataClearingWideEvent.startLegacy(EntryPoint.LEGACY_APP_SHORTCUT, ClearWhatOption.CLEAR_TABS_ONLY, clearDuckAiData = false)
@@ -149,7 +149,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `startLegacy with CLEAR_TABS_AND_DATA results in tabs and data options`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(300L))
 
         dataClearingWideEvent.startLegacy(EntryPoint.LEGACY_AUTO_FOREGROUND, ClearWhatOption.CLEAR_TABS_AND_DATA, clearDuckAiData = false)
@@ -164,7 +164,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `startLegacy with clearDuckAiData adds duckai_chats option`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(400L))
 
         dataClearingWideEvent.startLegacy(EntryPoint.LEGACY_AUTO_BACKGROUND, ClearWhatOption.CLEAR_TABS_ONLY, clearDuckAiData = true)
@@ -179,7 +179,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepSuccess sends successful step`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(500L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -194,7 +194,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepSuccess with different steps sends correct step names`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(501L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -209,7 +209,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `stepFailure sends failed step with error class`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(600L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.DATA))
@@ -225,7 +225,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishSuccess ends interval and finishes flow with success`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(700L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -237,7 +237,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishSuccess clears cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(701L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -255,7 +255,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishFailure ends interval and finishes flow with failure`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(800L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -270,7 +270,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `finishFailure clears cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(801L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
@@ -288,7 +288,7 @@ class DataClearingWideEventTest {
 
     @Test
     fun `getCurrentFlowId returns cached flow id`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(900L))
 
         dataClearingWideEvent.start(EntryPoint.GRANULAR_FIRE_DIALOG, setOf(FireClearOption.TABS))
