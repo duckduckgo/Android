@@ -1360,5 +1360,4 @@ class RealDuckChatJSHelperTest {
 
         verify(mockDuckChatPixels, times(1)).reportOpen()
     }
-
 }
