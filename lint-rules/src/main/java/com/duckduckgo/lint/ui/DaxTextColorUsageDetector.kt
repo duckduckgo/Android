@@ -87,7 +87,7 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
         private fun containsSemanticThemeColorPath(source: String): Boolean {
             return source.contains("DuckDuckGoTheme.textColors") || // legacy
                 source.contains(".textColors.") ||
-                source.contains("DuckDuckGoTheme.colors.text") || // preferred
+                source.contains("DuckDuckGoTheme.colors.text.") || // preferred
                 source.contains(".colors.text.")
         }
 
