@@ -100,6 +100,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.autofill.impl.ui.credential.management.removeFragment
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -339,6 +340,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
     private var setAsDefaultBrowserDialog: DefaultBrowserBottomSheetDialog? = null
+    private var pendingSnackbarResId: Int = 0
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -355,6 +357,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         bindMockupToolbars()
 
         setContentView(binding.root)
+
+        // set the pending snackbar flag before initializing tabs so that
+        // the ViewModel flow sees it and doesn't launch the input screen
+        savedInstanceState?.getInt(KEY_PENDING_SNACKBAR, 0)?.takeIf { it != 0 }?.let {
+            pendingSnackbarResId = it
+            externalIntentProcessingState.onIntentRequestToShowSnackbar()
+        }
 
         initializeTabs(savedInstanceState)
 
@@ -379,11 +388,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
+
+        if (pendingSnackbarResId != 0) {
+            showSnackbar(pendingSnackbarResId)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
+        if (pendingSnackbarResId != 0) {
+            outState.putInt(KEY_PENDING_SNACKBAR, pendingSnackbarResId)
+        }
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
@@ -430,23 +445,29 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     removeObservers()
                 }
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
-                    externalIntentProcessingState.onSingleTabBurnInProgress()
+                    externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    // This will be added in a subsequent PR #8000
+                    prepareSnackbarAndRecreateActivity()
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
+                    showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
+                    showSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
                 }
             }
         }
     }
 
-    private fun showSingleTabClearSnackbar(messageResId: Int) {
+    private fun prepareSnackbarAndRecreateActivity() {
+        supportFragmentManager.removeFragment("fire_dialog")
+        pendingSnackbarResId = R.string.singleTabFireDialogSnackbar
+        recreate()
+    }
+
+    private fun showSnackbar(messageResId: Int) {
         lifecycleScope.launch {
             delay(500)
 
@@ -465,6 +486,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 message = getString(messageResId),
                 anchor = anchorView,
             ).show()
+
+            pendingSnackbarResId = 0
+            externalIntentProcessingState.onPendingSnackbarDisplayed()
         }
     }
 
@@ -1228,6 +1252,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val DISABLE_SWIPING_DELAY = 1000L
 
         private const val DUCK_AI_ANIM_READY_DELAY_MS = 300L
+        private const val KEY_PENDING_SNACKBAR = "pendingSnackbar"
     }
 
     inner class BrowserStateRenderer {

@@ -22,25 +22,20 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 interface ExternalIntentProcessingState {
-    val hasPendingTabLaunch: StateFlow<Boolean>
-    val hasPendingDuckAiOpen: StateFlow<Boolean>
-    val wasSingleTabBurnInProgress: StateFlow<Boolean>
+    val hasPendingTabLaunch: Boolean
+    val hasPendingDuckAiOpen: Boolean
+    val hasPendingSnackbar: Boolean
     fun onIntentRequestToChangeTab()
     fun onIntentRequestToOpenDuckAi()
+    fun onIntentRequestToShowSnackbar()
+    fun onPendingSnackbarDisplayed()
     fun onDuckAiClosed()
-    fun onSingleTabBurnInProgress()
-
-    fun resetSingleTabBurnInProgress()
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,41 +44,41 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
     tabRepository: TabRepository,
 ) : ExternalIntentProcessingState {
-    private val _hasPendingTabLaunch = MutableStateFlow(false)
-    override val hasPendingTabLaunch: StateFlow<Boolean> = _hasPendingTabLaunch.asStateFlow()
+    override var hasPendingTabLaunch: Boolean = false
+        private set
 
-    private val _hasPendingDuckAiOpen = MutableStateFlow(false)
-    override val hasPendingDuckAiOpen: StateFlow<Boolean> = _hasPendingDuckAiOpen.asStateFlow()
+    override var hasPendingDuckAiOpen: Boolean = false
+        private set
 
-    private val _wasSingleTabBurnInProgress = MutableStateFlow(false)
-    override val wasSingleTabBurnInProgress: StateFlow<Boolean> = _wasSingleTabBurnInProgress.asStateFlow()
+    override var hasPendingSnackbar: Boolean = false
+        private set
 
     init {
         tabRepository.flowSelectedTab.filterNotNull().onEach { tab ->
             // if we are switching to a tab that already has a URL, consider tab launch processing complete
             if (!tab.url.isNullOrBlank()) {
-                _hasPendingTabLaunch.value = false
+                hasPendingTabLaunch = false
             }
         }.launchIn(coroutineScope)
     }
 
     override fun onIntentRequestToChangeTab() {
-        _hasPendingTabLaunch.value = true
+        hasPendingTabLaunch = true
     }
 
     override fun onIntentRequestToOpenDuckAi() {
-        _hasPendingDuckAiOpen.value = true
+        hasPendingDuckAiOpen = true
     }
 
     override fun onDuckAiClosed() {
-        _hasPendingDuckAiOpen.value = false
+        hasPendingDuckAiOpen = false
     }
 
-    override fun onSingleTabBurnInProgress() {
-        _wasSingleTabBurnInProgress.update { true }
+    override fun onIntentRequestToShowSnackbar() {
+        hasPendingSnackbar = true
     }
 
-    override fun resetSingleTabBurnInProgress() {
-        _wasSingleTabBurnInProgress.update { false }
+    override fun onPendingSnackbarDisplayed() {
+        hasPendingSnackbar = false
     }
 }
