@@ -50,8 +50,11 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.repository.isActive
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -517,6 +520,13 @@ class CtaViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             canShowPrivacyProCtaForSkippedOnboarding()
         }
+
+    fun SubscriptionStatus.isActive(): Boolean {
+        return when (this) {
+            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> true
+            else -> false
+        }
+    }
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
