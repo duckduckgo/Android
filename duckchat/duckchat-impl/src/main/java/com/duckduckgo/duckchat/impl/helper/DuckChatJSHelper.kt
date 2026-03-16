@@ -356,6 +356,5 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
         private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
-        private const val METHOD_ACCEPT_TERMS_AND_CONDITIONS = "userDidAcceptTermsAndConditions"
     }
 }
