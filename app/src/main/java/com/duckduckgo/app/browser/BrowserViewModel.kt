@@ -37,7 +37,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.FirstScreenHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -102,7 +101,6 @@ class BrowserViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
-    private val firstScreenHandler: FirstScreenHandler,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
@@ -411,12 +409,6 @@ class BrowserViewModel @Inject constructor(
     fun onTabSelected(tabId: String) {
         launch(dispatchers.io()) {
             tabRepository.select(tabId)
-        }
-    }
-
-    fun handleShowOnAppLaunchOption() {
-        viewModelScope.launch {
-            firstScreenHandler.handleFirstScreen()
         }
     }
 

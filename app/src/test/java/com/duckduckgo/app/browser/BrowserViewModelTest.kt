@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.FirstScreenHandler
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -86,8 +85,6 @@ class BrowserViewModelTest {
     @Mock private lateinit var mockPixel: Pixel
 
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
-
-    @Mock private lateinit var firstScreenHandler: FirstScreenHandler
 
     private val additionalDefaultBrowserPromptsCommandsFlow = Channel<AdditionalDefaultBrowserPrompts.Command>(capacity = Channel.CONFLATED)
 
@@ -335,22 +332,6 @@ class BrowserViewModelTest {
         testee.onTabSelected(tabId)
 
         verify(mockTabRepository).select(tabId)
-    }
-
-    @Test
-    fun whenHandleShowOnAppLaunchCalledThenNoTabIsAddedByDefault() = runTest {
-        testee.handleShowOnAppLaunchOption()
-
-        verify(mockTabRepository, never()).add()
-        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
-        verify(mockTabRepository, never()).addDefaultTab()
-    }
-
-    @Test
-    fun whenHandleShowOnAppLaunchOptionThenFirstScreenHandlerCalled() = runTest {
-        testee.handleShowOnAppLaunchOption()
-
-        verify(firstScreenHandler).handleFirstScreen()
     }
 
     @Test
@@ -651,7 +632,6 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            firstScreenHandler = firstScreenHandler,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
@@ -673,7 +653,6 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            firstScreenHandler = firstScreenHandler,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,

@@ -20,6 +20,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -38,6 +39,7 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
+    private val testScope = TestScope()
 
     private lateinit var testee: FirstScreenHandlerImpl
 
@@ -52,6 +54,7 @@ class FirstScreenHandlerImplTest {
             settingsDataStore = settingsDataStore,
             tabRepository = tabRepository,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            appCoroutineScope = testScope,
         )
     }
 
@@ -60,7 +63,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
         verify(tabRepository, never()).add()
@@ -71,7 +75,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(false)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(false)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
         verify(tabRepository, never()).add()
@@ -84,7 +89,8 @@ class FirstScreenHandlerImplTest {
         val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository).add()
         verify(showOnAppLaunchOptionHandler, never()).handleAppLaunchOption()
@@ -98,7 +104,8 @@ class FirstScreenHandlerImplTest {
         val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
@@ -110,7 +117,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository).add()
     }
@@ -121,7 +129,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn(null)
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
@@ -133,7 +142,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("not json")
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
@@ -145,7 +155,8 @@ class FirstScreenHandlerImplTest {
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"otherKey": 30}""")
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
@@ -158,7 +169,8 @@ class FirstScreenHandlerImplTest {
         val exactlyThirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(exactlyThirtyMinutesAgo)
 
-        testee.handleFirstScreen()
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
 
         verify(tabRepository).add()
         verify(showOnAppLaunchOptionHandler, never()).handleAppLaunchOption()

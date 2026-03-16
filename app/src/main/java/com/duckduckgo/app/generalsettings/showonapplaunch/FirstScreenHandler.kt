@@ -16,22 +16,19 @@
 
 package com.duckduckgo.app.generalsettings.showonapplaunch
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
 
-interface FirstScreenHandler {
-    suspend fun handleFirstScreen()
-}
-
-@ContributesBinding(AppScope::class, boundType = FirstScreenHandler::class)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = BrowserLifecycleObserver::class,
@@ -43,9 +40,16 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val tabRepository: TabRepository,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-) : FirstScreenHandler, BrowserLifecycleObserver {
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : BrowserLifecycleObserver {
 
-    override suspend fun handleFirstScreen() {
+    override fun onOpen(isFreshLaunch: Boolean) {
+        appCoroutineScope.launch {
+            handleFirstScreen()
+        }
+    }
+
+    private suspend fun handleFirstScreen() {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             val timeoutMs = getTimeoutMs()
             if (timeoutMs != null) {
@@ -68,9 +72,11 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private fun getTimeoutMs(): Long? {
-        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings() ?: return null
+        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
+            ?: return null
         return runCatching {
             JSONObject(settings).getLong("timeoutMinutes") * 60 * 1000
         }.getOrNull()
     }
+
 }
