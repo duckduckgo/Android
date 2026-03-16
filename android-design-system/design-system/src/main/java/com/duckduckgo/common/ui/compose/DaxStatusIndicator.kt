@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +54,7 @@ fun DaxStatusIndicator(
     modifier: Modifier = Modifier,
 ) {
     val (active, label) = when (status) {
-        Status.Always_On -> true to stringResource(R.string.alwaysOn)
+        Status.AlwaysOn -> true to stringResource(R.string.alwaysOn)
         Status.On -> true to stringResource(R.string.on)
         Status.Off -> false to stringResource(R.string.off)
     }
@@ -92,7 +93,7 @@ enum class Status {
     /**
      * Indicates that the status is always on.
      */
-    Always_On,
+    AlwaysOn,
 
     /**
      * Indicates that the status is on.
@@ -112,18 +113,22 @@ object StatusIndicatorDefaults {
 
     internal val disabledDotColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = Gray50
 
     internal val activeDotColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = AlertGreen
 
     internal val contentColor: Color
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.colors.text.secondary
 
     internal val typography: DuckDuckGoTextStyle
         @Composable
+        @ReadOnlyComposable
         get() = DuckDuckGoTheme.typography.caption
 }
 
@@ -132,7 +137,7 @@ object StatusIndicatorDefaults {
 private fun DaxStatusIndicatorPreview() {
     PreviewBox {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            DaxStatusIndicator(status = Status.Always_On)
+            DaxStatusIndicator(status = Status.AlwaysOn)
             DaxStatusIndicator(status = Status.On)
             DaxStatusIndicator(status = Status.Off)
         }
