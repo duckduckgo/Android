@@ -38,6 +38,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimation
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -50,6 +51,9 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val viewModel: DataClearingSettingsViewModel by bindViewModel()
     private val binding: ActivityDataClearingSettingsBinding by viewBinding()
 
@@ -61,6 +65,7 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         supportActionBar?.setTitle(R.string.dataClearingActivityTitle)
