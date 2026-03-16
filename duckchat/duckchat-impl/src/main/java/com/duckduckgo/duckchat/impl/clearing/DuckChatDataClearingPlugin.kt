@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
-import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
@@ -31,24 +31,24 @@ class DuckChatDataClearingPlugin @Inject constructor(
     private val contextualDataStore: DuckChatContextualDataStore,
 ) : DataClearingPlugin {
 
-    override suspend fun onClearData(types: Set<DataType>): ClearResult {
+    override suspend fun onClearData(types: Set<ClearableData>): ClearResult {
         for (type in types) {
             when (type) {
-                is DataType.Tabs.Single -> {
+                is ClearableData.Tabs.Single -> {
                     contextualDataStore.clearTabChatUrl(type.tabId)
                 }
-                is DataType.DuckChats.Contextual -> {
+                is ClearableData.DuckChats.Contextual -> {
                     contextualDataStore.getTabChatUrl(type.tabId)?.let { contextualChatUrl ->
                         duckChat.deleteChat(contextualChatUrl)
                     }
                 }
-                is DataType.Tabs.All -> {
+                is ClearableData.Tabs.All -> {
                     contextualDataStore.clearAll()
                 }
-                is DataType.DuckChats.Single -> {
+                is ClearableData.DuckChats.Single -> {
                     duckChat.deleteChat(type.chatUrl)
                 }
-                is DataType.DuckChats.All -> {
+                is ClearableData.DuckChats.All -> {
                     // Full chat content is cleared via WebDataManager (BrowserData path).
                     // Contextual metadata is cleaned up via Tabs.All.
                 }

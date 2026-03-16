@@ -28,13 +28,10 @@ package com.duckduckgo.dataclearing.api.plugin
  */
 interface DataClearingPlugin {
     /** Called when data should be cleared. Inspect [types] to decide what to do. */
-    suspend fun onClearData(types: Set<DataType>): ClearResult
+    suspend fun onClearData(types: Set<ClearableData>): ClearResult
 }
 
 sealed class ClearResult {
     data object Success : ClearResult()
     data class Failure(val error: Throwable) : ClearResult()
-
-    /** Return additional [DataType]s that should be cleared as a consequence of this plugin's work. */
-    data class Chain(val additionalTypes: Set<DataType>) : ClearResult()
 }

@@ -37,8 +37,8 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
-import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
@@ -358,7 +358,7 @@ class TabDataRepository @Inject constructor(
         }
         appCoroutineScope.launch(dispatchers.io()) {
             tabIds.forEach { tabId ->
-                dataClearingTrigger.clearData(setOf(DataType.Tabs.Single(tabId)))
+                dataClearingTrigger.clearData(setOf(ClearableData.Tabs.Single(tabId)))
             }
         }
     }
@@ -435,7 +435,7 @@ class TabDataRepository @Inject constructor(
         adClickManager.clearAll()
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
-        dataClearingTrigger.clearData(setOf(DataType.Tabs.All))
+        dataClearingTrigger.clearData(setOf(ClearableData.Tabs.All))
         tabVisitedSitesRepository.clearAll()
     }
 

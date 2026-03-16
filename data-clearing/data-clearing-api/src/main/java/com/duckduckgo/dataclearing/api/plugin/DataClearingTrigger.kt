@@ -24,5 +24,5 @@ package com.duckduckgo.dataclearing.api.plugin
  */
 interface DataClearingTrigger {
     /** Execute all registered data clearing plugins for the given [types]. */
-    suspend fun clearData(types: Set<DataType>)
+    suspend fun clearData(types: Set<ClearableData>)
 }

@@ -18,16 +18,15 @@ package com.duckduckgo.dataclearing.impl.plugin
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
-import com.duckduckgo.dataclearing.api.plugin.DataType
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import logcat.LogPriority.ERROR
-import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
@@ -38,45 +37,17 @@ class DataClearingOrchestrator @Inject constructor(
     private val plugins: PluginPoint<DataClearingPlugin>,
 ) : DataClearingTrigger {
 
-    override suspend fun clearData(types: Set<DataType>) {
-        var currentTypes = types
-        val processedTypes = mutableSetOf<DataType>()
-        var round = 0
-
-        while (currentTypes.isNotEmpty() && round < MAX_CHAIN_ROUNDS) {
-            round++
-            processedTypes.addAll(currentTypes)
-
-            val chainedTypes = mutableSetOf<DataType>()
-
-            plugins.getPlugins().forEach { plugin ->
-                val result = try {
-                    plugin.onClearData(currentTypes)
-                } catch (e: Exception) {
-                    currentCoroutineContext().ensureActive()
-                    ClearResult.Failure(e)
-                }
-                when (result) {
-                    is ClearResult.Failure -> {
-                        logcat(ERROR) { "Plugin ${plugin::class.simpleName} failed: ${result.error.asLog()}" }
-                    }
-                    is ClearResult.Chain -> {
-                        chainedTypes.addAll(result.additionalTypes)
-                    }
-                    is ClearResult.Success -> { /* done */ }
-                }
+    override suspend fun clearData(types: Set<ClearableData>) {
+        plugins.getPlugins().forEach { plugin ->
+            val result = try {
+                plugin.onClearData(types)
+            } catch (e: Exception) {
+                currentCoroutineContext().ensureActive()
+                ClearResult.Failure(e)
             }
-
-            // Only process types that haven't been seen before to prevent infinite loops
-            currentTypes = chainedTypes - processedTypes
+            if (result is ClearResult.Failure) {
+                logcat(ERROR) { "Plugin ${plugin::class.simpleName} failed: ${result.error.asLog()}" }
+            }
         }
-
-        if (round >= MAX_CHAIN_ROUNDS && currentTypes.isNotEmpty()) {
-            logcat(WARN) { "Data clearing chain reached max rounds ($MAX_CHAIN_ROUNDS), stopping with unprocessed types: $currentTypes" }
-        }
-    }
-
-    companion object {
-        private const val MAX_CHAIN_ROUNDS = 5
     }
 }

@@ -18,8 +18,8 @@ package com.duckduckgo.dataclearing.impl.plugin
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
-import com.duckduckgo.dataclearing.api.plugin.DataType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,12 +29,12 @@ class DataClearingOrchestratorTest {
 
     @Test
     fun whenClearDataCalledThenAllPluginsReceiveTypes() = runTest {
-        val receivedTypes = mutableListOf<Set<DataType>>()
+        val receivedTypes = mutableListOf<Set<ClearableData>>()
         val plugin1 = recordingPlugin(receivedTypes)
         val plugin2 = recordingPlugin(receivedTypes)
         val orchestrator = createOrchestrator(plugin1, plugin2)
 
-        val types = setOf<DataType>(DataType.Tabs.All)
+        val types = setOf<ClearableData>(ClearableData.Tabs.All)
         orchestrator.clearData(types)
 
         assertEquals(2, receivedTypes.size)
@@ -43,120 +43,35 @@ class DataClearingOrchestratorTest {
 
     @Test
     fun whenPluginFailsThenOtherPluginsStillExecute() = runTest {
-        val receivedTypes = mutableListOf<Set<DataType>>()
+        val receivedTypes = mutableListOf<Set<ClearableData>>()
         val failingPlugin = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
+            override suspend fun onClearData(types: Set<ClearableData>): ClearResult {
                 throw RuntimeException("boom")
             }
         }
         val successPlugin = recordingPlugin(receivedTypes)
         val orchestrator = createOrchestrator(failingPlugin, successPlugin)
 
-        orchestrator.clearData(setOf(DataType.Tabs.All))
+        orchestrator.clearData(setOf(ClearableData.Tabs.All))
 
         assertEquals(1, receivedTypes.size)
     }
 
     @Test
-    fun whenPluginReturnsChainThenAdditionalTypesAreProcessed() = runTest {
-        val allReceivedTypes = mutableListOf<Set<DataType>>()
-        val chainingPlugin = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
-                allReceivedTypes.add(types)
-                return if (types.any { it is DataType.Tabs.Single }) {
-                    ClearResult.Chain(setOf(DataType.BrowserData.ForDomains(setOf("example.com"))))
-                } else {
-                    ClearResult.Success
-                }
-            }
-        }
-        val orchestrator = createOrchestrator(chainingPlugin)
+    fun whenMultipleTypesProvidedThenAllPluginsReceiveFullSet() = runTest {
+        val receivedTypes = mutableListOf<Set<ClearableData>>()
+        val plugin = recordingPlugin(receivedTypes)
+        val orchestrator = createOrchestrator(plugin)
 
-        orchestrator.clearData(setOf(DataType.Tabs.Single("tab1")))
+        val types = setOf<ClearableData>(ClearableData.Tabs.Single("tab1"), ClearableData.DuckChats.Single("url"))
+        orchestrator.clearData(types)
 
-        assertEquals(2, allReceivedTypes.size)
-        assertTrue(allReceivedTypes[0].any { it is DataType.Tabs.Single })
-        assertTrue(allReceivedTypes[1].any { it is DataType.BrowserData.ForDomains })
+        assertEquals(1, receivedTypes.size)
+        assertEquals(types, receivedTypes[0])
     }
 
-    @Test
-    fun whenChainProducesSameTypeThenItIsNotReprocessed() = runTest {
-        var callCount = 0
-        val loopingPlugin = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
-                callCount++
-                return ClearResult.Chain(setOf(DataType.Tabs.All))
-            }
-        }
-        val orchestrator = createOrchestrator(loopingPlugin)
-
-        orchestrator.clearData(setOf(DataType.Tabs.All))
-
-        // Round 1: processes Tabs.All, chains Tabs.All
-        // Round 2: Tabs.All already processed, stops
-        assertEquals(1, callCount)
-    }
-
-    @Test
-    fun whenMultiplePluginsChainDifferentParamsForSameTypeThenBothAreProcessed() = runTest {
-        val allReceivedTypes = mutableListOf<Set<DataType>>()
-        val plugin1 = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
-                allReceivedTypes.add(types)
-                return if (types.any { it is DataType.Tabs.Single }) {
-                    ClearResult.Chain(setOf(DataType.BrowserData.ForDomains(setOf("a.com"))))
-                } else {
-                    ClearResult.Success
-                }
-            }
-        }
-        val plugin2 = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
-                allReceivedTypes.add(types)
-                return if (types.any { it is DataType.Tabs.Single }) {
-                    ClearResult.Chain(setOf(DataType.BrowserData.ForDomains(setOf("b.com"))))
-                } else {
-                    ClearResult.Success
-                }
-            }
-        }
-        val orchestrator = createOrchestrator(plugin1, plugin2)
-
-        orchestrator.clearData(setOf(DataType.Tabs.Single("tab1")))
-
-        // Round 1: both plugins get Tabs.Single, chain ForDomains(a.com) and ForDomains(b.com)
-        // Round 2: both plugins get {ForDomains(a.com), ForDomains(b.com)}
-        val round2Types = allReceivedTypes[2]
-        assertTrue(round2Types.contains(DataType.BrowserData.ForDomains(setOf("a.com"))))
-        assertTrue(round2Types.contains(DataType.BrowserData.ForDomains(setOf("b.com"))))
-    }
-
-    @Test
-    fun whenMultiplePluginsChainSameTypeAndParamsThenOnlyProcessedOnce() = runTest {
-        var round2Count = 0
-        val plugin = object : DataClearingPlugin {
-            override suspend fun onClearData(types: Set<DataType>): ClearResult {
-                if (types.any { it is DataType.BrowserData.ForDomains }) {
-                    round2Count++
-                }
-                return if (types.any { it is DataType.Tabs.Single }) {
-                    ClearResult.Chain(setOf(DataType.BrowserData.ForDomains(setOf("same.com"))))
-                } else {
-                    ClearResult.Success
-                }
-            }
-        }
-        // Two plugins both chain the exact same ForDomains
-        val orchestrator = createOrchestrator(plugin, plugin)
-
-        orchestrator.clearData(setOf(DataType.Tabs.Single("tab1")))
-
-        // ForDomains(same.com) deduped in set, processed once in round 2, both plugins called
-        assertEquals(2, round2Count)
-    }
-
-    private fun recordingPlugin(list: MutableList<Set<DataType>>) = object : DataClearingPlugin {
-        override suspend fun onClearData(types: Set<DataType>): ClearResult {
+    private fun recordingPlugin(list: MutableList<Set<ClearableData>>) = object : DataClearingPlugin {
+        override suspend fun onClearData(types: Set<ClearableData>): ClearResult {
             list.add(types)
             return ClearResult.Success
         }

@@ -22,22 +22,22 @@ package com.duckduckgo.dataclearing.api.plugin
  * Each sealed subclass represents a category of data. Nested subclasses
  * express scope within that category (e.g., all tabs vs. a single tab).
  */
-sealed class DataType {
+sealed class ClearableData {
 
     /** Browser data: cookies, cache, web storage, etc. */
-    sealed class BrowserData : DataType() {
+    sealed class BrowserData : ClearableData() {
         data object All : BrowserData()
         data class ForDomains(val domains: Set<String>) : BrowserData()
     }
 
     /** Tab data. */
-    sealed class Tabs : DataType() {
+    sealed class Tabs : ClearableData() {
         data object All : Tabs()
         data class Single(val tabId: String) : Tabs()
     }
 
     /** Duck AI chats. */
-    sealed class DuckChats : DataType() {
+    sealed class DuckChats : ClearableData() {
         data object All : DuckChats()
         data class Single(val chatUrl: String) : DuckChats()
         data class Contextual(val tabId: String) : DuckChats()

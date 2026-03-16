@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.dataclearing.api.plugin.ClearResult
-import com.duckduckgo.dataclearing.api.plugin.DataType
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import kotlinx.coroutines.runBlocking
@@ -51,7 +51,7 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun whenTabsSingleThenClearContextualMapping() = runTest {
-        plugin.onClearData(setOf(DataType.Tabs.Single("tab1")))
+        plugin.onClearData(setOf(ClearableData.Tabs.Single("tab1")))
 
         verify(mockContextualDataStore).clearTabChatUrl("tab1")
         verify(mockDuckChat, never()).deleteChat(any())
@@ -59,14 +59,14 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun whenTabsAllThenClearAllContextualData() = runTest {
-        plugin.onClearData(setOf(DataType.Tabs.All))
+        plugin.onClearData(setOf(ClearableData.Tabs.All))
 
         verify(mockContextualDataStore).clearAll()
     }
 
     @Test
     fun whenDuckChatsSingleThenDeleteChat() = runTest {
-        plugin.onClearData(setOf(DataType.DuckChats.Single("https://duck.ai/chat?chatID=abc")))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=abc")))
 
         verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=abc")
     }
@@ -75,7 +75,7 @@ class DuckChatDataClearingPluginTest {
     fun whenDuckChatsContextualWithExistingUrlThenDeleteChat() = runTest {
         whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai/chat?chatID=ctx-123")
 
-        plugin.onClearData(setOf(DataType.DuckChats.Contextual("tab1")))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Contextual("tab1")))
 
         verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=ctx-123")
     }
@@ -84,14 +84,14 @@ class DuckChatDataClearingPluginTest {
     fun whenDuckChatsContextualWithNoUrlThenDoNotDeleteChat() = runTest {
         whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn(null)
 
-        plugin.onClearData(setOf(DataType.DuckChats.Contextual("tab1")))
+        plugin.onClearData(setOf(ClearableData.DuckChats.Contextual("tab1")))
 
         verify(mockDuckChat, never()).deleteChat(any())
     }
 
     @Test
     fun whenDuckChatsAllThenNoDirectAction() = runTest {
-        plugin.onClearData(setOf(DataType.DuckChats.All))
+        plugin.onClearData(setOf(ClearableData.DuckChats.All))
 
         verify(mockDuckChat, never()).deleteChat(any())
         verify(mockContextualDataStore, never()).clearAll()
@@ -100,7 +100,7 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun whenBrowserDataThenNoAction() = runTest {
-        plugin.onClearData(setOf(DataType.BrowserData.All))
+        plugin.onClearData(setOf(ClearableData.BrowserData.All))
 
         verify(mockDuckChat, never()).deleteChat(any())
         verify(mockContextualDataStore, never()).clearAll()
@@ -113,9 +113,9 @@ class DuckChatDataClearingPluginTest {
 
         plugin.onClearData(
             setOf(
-                DataType.Tabs.Single("tab1"),
-                DataType.DuckChats.Single("https://duck.ai/chat?chatID=main"),
-                DataType.DuckChats.Contextual("tab1"),
+                ClearableData.Tabs.Single("tab1"),
+                ClearableData.DuckChats.Single("https://duck.ai/chat?chatID=main"),
+                ClearableData.DuckChats.Contextual("tab1"),
             ),
         )
 
@@ -126,7 +126,7 @@ class DuckChatDataClearingPluginTest {
 
     @Test
     fun whenOnClearDataThenReturnsSuccess() = runTest {
-        val result = plugin.onClearData(setOf(DataType.Tabs.Single("tab1")))
+        val result = plugin.onClearData(setOf(ClearableData.Tabs.Single("tab1")))
 
         assertTrue(result is ClearResult.Success)
     }
