@@ -2228,7 +2228,9 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
-        command.value = ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request)
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request)
+        }
     }
 
     private fun sameEffectiveTldPlusOne(
@@ -3509,7 +3511,9 @@ class BrowserTabViewModel @Inject constructor(
             if (isBlobDownloadWebViewFeatureEnabled) {
                 postMessageToConvertBlobToDataUri(webView, url)
             } else {
-                command.value = ConvertBlobToDataUri(url, mimeType)
+                viewModelScope.launch(dispatchers.main()) {
+                    command.value = ConvertBlobToDataUri(url, mimeType)
+                }
             }
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
@@ -3522,7 +3526,9 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
-        command.value = RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation)
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
     }
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
@@ -3557,8 +3563,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun showEmailProtectionChooseEmailPrompt() {
-        emailManager.getEmailAddress()?.let {
-            command.value = ShowEmailProtectionChooseEmailPrompt(it)
+        viewModelScope.launch(dispatchers.main()) {
+            emailManager.getEmailAddress()?.let {
+                command.value = ShowEmailProtectionChooseEmailPrompt(it)
+            }
         }
     }
 
@@ -3725,7 +3733,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun returnNoCredentialsWithPage(originalUrl: String) {
-        command.value = CancelIncomingAutofillRequest(originalUrl)
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = CancelIncomingAutofillRequest(originalUrl)
+        }
     }
 
     fun onConfigurationChanged() {
@@ -4141,19 +4151,21 @@ class BrowserTabViewModel @Inject constructor(
 
             "initialPing" -> {
                 if (id != null) {
-                    command.value = SendResponseToJs(
-                        JsCallbackData(
-                            params = JSONObject(
-                                mapOf(
-                                    "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                    viewModelScope.launch(dispatchers.main()) {
+                        command.value = SendResponseToJs(
+                            JsCallbackData(
+                                params = JSONObject(
+                                    mapOf(
+                                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                                    ),
                                 ),
+                                featureName = featureName,
+                                method = method,
+                                id = id,
                             ),
-                            featureName = featureName,
-                            method = method,
-                            id = id,
-                        ),
-                    )
+                        )
+                    }
                 }
             }
 
