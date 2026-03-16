@@ -97,16 +97,7 @@ class FooViewModel @Inject constructor(...) : ViewModel()
 // Plugin contribution (multibinding)
 @ContributesMultibinding(AppScope::class)
 class MyPlugin @Inject constructor(...) : SomePlugin
-
-// Remote feature flag
-@ContributesRemoteFeature(scope = AppScope::class, featureName = "myFeature")
-interface MyFeature : Feature {
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun myToggle(): Toggle
-}
 ```
-
-`DefaultFeatureValue.INTERNAL` = enabled only in internal/debug builds.
 
 ### Activity Context
 
