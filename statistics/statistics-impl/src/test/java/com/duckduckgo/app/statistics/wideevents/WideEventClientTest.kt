@@ -572,7 +572,7 @@ class WideEventClientTest {
             val result = wideEventClient.intervalEnd(SAMPLED_OUT_FLOW_ID, "timer")
 
             assertTrue(result.isSuccess)
-            assertEquals(Duration.ZERO, result.getOrNull())
+            assertEquals(kotlin.time.Duration.ZERO, result.getOrNull())
             verifyNoInteractions(wideEventRepository)
         }
 }

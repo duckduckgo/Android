@@ -62,7 +62,7 @@ class SyncSetupWideEventImplTest {
 
     @Test
     fun `onFlowStarted starts a new flow with correct parameters`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted()
@@ -76,7 +76,7 @@ class SyncSetupWideEventImplTest {
 
     @Test
     fun `onFlowStarted passes source as flowEntryPoint`() = runTest {
-        whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted(source = "settings")

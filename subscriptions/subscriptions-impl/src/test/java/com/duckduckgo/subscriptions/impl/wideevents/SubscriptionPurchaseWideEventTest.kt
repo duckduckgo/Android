@@ -61,7 +61,7 @@ class SubscriptionPurchaseWideEventTest {
     fun `onPurchaseFlowStarted includes use_query_purchases true when feature flag enabled`() =
         runTest {
             subscriptionsFeature.useQueryPurchases().setRawStoredState(Toggle.State(true))
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(321L))
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
@@ -81,7 +81,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onPurchaseFlowStarted starts a new flow`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
@@ -204,7 +204,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure without failureContext sends empty-metadata flowStep`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
@@ -229,7 +229,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure with failureContext and empty loadedProductIds emits no_products_loaded reason`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
@@ -270,7 +270,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure with failureContext where requestedProductId not in loadedProductIds emits product_id_not_found reason`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
@@ -306,7 +306,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure with failureContext where requestedProductId is in loadedProductIds emits offer_not_found reason`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
@@ -342,7 +342,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure serializes lastLoadProductsOutcome Failure to failure_BILLING_UNAVAILABLE`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
@@ -378,7 +378,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `onBillingFlowInitFailure forwards non-null offerId verbatim`() =
         runTest {
-            whenever(wideEventClient.flowStart(any(), any(), any(), any()))
+            whenever(wideEventClient.flowStart(any(), any(), any(), any(), any()))
                 .thenReturn(Result.success(123L))
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("sub_id", true, "app_settings")
 
