@@ -24,7 +24,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -46,9 +45,8 @@ class RealSyncAutoRestoreManager @Inject constructor(
             val payload = RestorePayload(recoveryCode = recoveryCode, deviceId = deviceId)
             val payloadJson = moshi.adapter(RestorePayload::class.java).toJson(payload)
             logcat { "Sync-Recovery: storing recovery code and device ID ($deviceId) to Block Store" }
-            persistentStorage.store(SyncRecoveryPersistentStorageKey, payloadJson.toByteArray(Charsets.UTF_8))
-                .onSuccess { logcat { "Sync-Recovery: payload stored successfully" } }
-                .onFailure { logcat(LogPriority.ERROR) { "Sync-Recovery: failed to store payload - ${it.message}" } }
+            persistentStorage.store(SyncRecoveryPersistentStorageKey, payloadJson.toByteArray(Charsets.UTF_8)).getOrThrow()
+            logcat { "Sync-Recovery: payload stored successfully" }
         }
     }
 
@@ -63,9 +61,8 @@ class RealSyncAutoRestoreManager @Inject constructor(
     override suspend fun clearRecoveryCode() {
         withContext(dispatcherProvider.io()) {
             logcat { "Sync-Recovery: clearing recovery code from Block Store" }
-            persistentStorage.clear(SyncRecoveryPersistentStorageKey)
-                .onSuccess { logcat { "Sync-Recovery: recovery code cleared successfully" } }
-                .onFailure { logcat(LogPriority.ERROR) { "Sync-Recovery: failed to clear recovery code - ${it.message}" } }
+            persistentStorage.clear(SyncRecoveryPersistentStorageKey).getOrThrow()
+            logcat { "Sync-Recovery: recovery code cleared successfully" }
         }
     }
 

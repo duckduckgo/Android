@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority
 import logcat.logcat
 import javax.inject.Inject
 
@@ -57,7 +58,8 @@ class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
             .filter { syncFeature.syncAutoRestore().isEnabled() }
             .onEach {
                 logcat { "Sync-Recovery: sync disabled, clearing recovery code from Block Store" }
-                syncAutoRestoreManager.clearRecoveryCode()
+                runCatching { syncAutoRestoreManager.clearRecoveryCode() }
+                    .onFailure { logcat(LogPriority.ERROR) { "Sync-Recovery: failed to clear recovery code on sign-out - ${it.message}" } }
             }
             .flowOn(dispatcherProvider.io())
             .launchIn(appCoroutineScope)
