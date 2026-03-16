@@ -21,7 +21,10 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -29,6 +32,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.brokers.StepsAsStringAdapter
@@ -50,6 +54,9 @@ import javax.inject.Inject
 class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
 
     @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
+    @Inject
     lateinit var repository: PirRepository
 
     @Inject
@@ -65,10 +72,12 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         setupViews()
         loadBrokers()
+        setupEdgeToEdge()
     }
 
     private fun setupViews() {
@@ -216,6 +225,17 @@ class PirDevBrokerConfigActivity : DuckDuckGoActivity() {
     private fun showError(message: String) {
         binding.statusText.text = message
         binding.statusText.isVisible = true
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 }
 
