@@ -21,7 +21,10 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -29,6 +32,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationJobsRunner
@@ -59,6 +63,9 @@ class PirDevEmailActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityPirInternalEmailBinding by viewBinding()
 
     private lateinit var spinnerAdapter: ArrayAdapter<String>
@@ -67,10 +74,12 @@ class PirDevEmailActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         setupViews()
         loadEmailJobs()
+        setupEdgeToEdge()
     }
 
     private fun setupViews() {
@@ -226,6 +235,17 @@ class PirDevEmailActivity : DuckDuckGoActivity() {
 
         // Navigate to WebView activity for debug execution
         globalActivityStarter.start(this, PirDevWebViewScreenParams.PirDevEmailWebViewScreenParams(job.extractedProfileId))
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private data class EmailJobDisplayItem(
