@@ -136,6 +136,8 @@ interface DuckChatPixels {
     fun reportContextualPageContextInvalidNoContent()
 
     fun reportChatSyncActive()
+
+    fun reportTermsOfServiceReAccepted(isSyncEnabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -337,6 +339,16 @@ class RealDuckChatPixels @Inject constructor(
     override fun reportChatSyncActive() {
         pixel.fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
     }
+
+    override fun reportTermsOfServiceReAccepted(isSyncEnabled: Boolean) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (isSyncEnabled) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+            }
+        }
+    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -465,6 +477,9 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
 
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
+
+    DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON("m_aichat_terms_accepted_duplicate_sync_on"),
+    DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF("m_aichat_terms_accepted_duplicate_sync_off"),
 }
 
 object DuckChatPixelParameters {

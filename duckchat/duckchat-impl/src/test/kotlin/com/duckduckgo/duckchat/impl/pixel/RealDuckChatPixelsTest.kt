@@ -366,4 +366,22 @@ class RealDuckChatPixelsTest {
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_DAILY, type = Pixel.PixelType.Daily())
     }
+
+    @Test
+    fun `when reportTermsOfServiceReAccepted with sync enabled then fires sync on pixel`() = runTest {
+        testee.reportTermsOfServiceReAccepted(isSyncEnabled = true)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+    }
+
+    @Test
+    fun `when reportTermsOfServiceReAccepted with sync disabled then fires sync off pixel`() = runTest {
+        testee.reportTermsOfServiceReAccepted(isSyncEnabled = false)
+
+        advanceUntilIdle()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+    }
 }

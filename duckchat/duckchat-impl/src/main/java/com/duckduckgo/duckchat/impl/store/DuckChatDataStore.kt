@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_TERMS_ACCEPTED
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_NATIVE_INPUT_FIELD_SETTING
@@ -133,6 +134,10 @@ interface DuckChatDataStore {
     suspend fun isNativeInputFieldUserSettingEnabled(): Boolean
 
     suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    suspend fun hasUserAcceptedTerms(): Boolean
+
+    suspend fun setUserAcceptedTerms()
 }
 
 @ContributesBinding(AppScope::class)
@@ -160,6 +165,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT = booleanPreferencesKey(name = "DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT")
         val DUCK_AI_NATIVE_INPUT_FIELD_SETTING = booleanPreferencesKey(name = "DUCK_AI_NATIVE_INPUT_FIELD_SETTING")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
+        val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -372,5 +378,11 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
 
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         store.edit { prefs -> prefs[DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING] = enabled }
+    }
+
+    override suspend fun hasUserAcceptedTerms(): Boolean = store.data.firstOrNull()?.let { it[DUCK_AI_TERMS_ACCEPTED] } ?: false
+
+    override suspend fun setUserAcceptedTerms() {
+        store.edit { prefs -> prefs[DUCK_AI_TERMS_ACCEPTED] = true }
     }
 }

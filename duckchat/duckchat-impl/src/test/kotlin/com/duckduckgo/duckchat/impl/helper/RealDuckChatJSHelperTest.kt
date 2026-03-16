@@ -57,10 +57,12 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
+        termsOfServiceHandler = mockTermsOfServiceHandler,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
@@ -1359,5 +1361,22 @@ class RealDuckChatJSHelperTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckChatPixels, times(1)).reportOpen()
+    }
+
+    @Test
+    fun whenAcceptTermsAndConditionsThenDelegateToHandler() = runTest {
+        val featureName = "aiChat"
+        val method = "userDidAcceptTermsAndConditions"
+
+        val result = testee.processJsCallbackMessage(
+            featureName,
+            method,
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
     }
 }
