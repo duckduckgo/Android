@@ -165,8 +165,9 @@ class DaxTextColorUsageDetector : Detector(), SourceCodeScanner {
             identifier: String,
         ): Boolean {
             if (fileText.isBlank()) return false
+            val escapedThemePackage = Regex.escape(COLOR_THEME_PACKAGE)
             val escapedIdentifier = Regex.escape(identifier)
-            val importRegex = Regex("""import\s+$COLOR_THEME_PACKAGE\.$escapedIdentifier(\s+as\s+\w+)?""")
+            val importRegex = Regex("""import\s+$escapedThemePackage\.$escapedIdentifier(\s+as\s+\w+)?""")
             return importRegex.containsMatchIn(fileText)
         }
 
