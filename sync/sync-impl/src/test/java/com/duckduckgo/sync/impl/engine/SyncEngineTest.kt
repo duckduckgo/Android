@@ -736,7 +736,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        // GET should not be called for DUCK_AI_CHATS (supportsGet=false)
+        // GET should not be called for DUCK_AI_CHATS (does not support GET)
         verify(syncApiClient, times(0)).get(any(), any())
         // PATCH should be called for changes after dedup
         verify(syncApiClient).patch(any())

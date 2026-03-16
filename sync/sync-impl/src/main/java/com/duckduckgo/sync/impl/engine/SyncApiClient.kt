@@ -107,7 +107,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
-            DUCK_AI_CHATS -> error("Chats don't support the GET operation")
+            DUCK_AI_CHATS -> error("DUCK_AI_CHATS does not support GET")
         }
 
         return when (result) {
@@ -161,7 +161,7 @@ class AppSyncApiClient @Inject constructor(
         return when (val result = syncApi.deleteAiChats(token, until)) {
             is Result.Error -> {
                 logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to inform sync of of deleted duck ai chats $result" }
-                syncApiErrorRecorder.record(DUCK_AI_CHATS, result)
+                syncApiErrorRecorder.record(DeletableType.DUCK_AI_CHATS, result)
                 result
             }
             is Result.Success -> {

@@ -19,9 +19,11 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.DeletableType
+import com.duckduckgo.sync.api.engine.ModifiedSince
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
@@ -254,5 +256,53 @@ internal class SyncApiClientTest {
         apiClient.patch(bookmarksChanges)
 
         verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchCredentialsThenPatchDataIsCalled() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val credentialsChanges = SyncChangesRequest(CREDENTIALS, updatesJSON, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(credentialsChanges)
+
+        verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchSettingsThenPatchDataIsCalled() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val settingsChanges = SyncChangesRequest(SyncableType.SETTINGS, updatesJSON, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchData(any(), any())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(settingsChanges)
+
+        verify(syncApi).patchData(any(), any())
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsWithTimestampThenSinceIsPassedToPatchChats() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2026-01-01"))
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(changes)
+
+        verify(syncApi).patchChats(any(), any(), org.mockito.kotlin.eq("2026-01-01"))
+    }
+
+    @Test
+    fun whenPatchDuckAiChatsWithFirstSyncThenSinceIsNull() {
+        val json = """[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"}]"""
+        val changes = SyncChangesRequest(DUCK_AI_CHATS, json, FirstSync)
+        whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
+        whenever(syncApi.patchChats(any(), any(), anyOrNull())).thenReturn(Result.Success(JSONObject()))
+
+        apiClient.patch(changes)
+
+        verify(syncApi).patchChats(any(), any(), org.mockito.kotlin.isNull())
     }
 }
