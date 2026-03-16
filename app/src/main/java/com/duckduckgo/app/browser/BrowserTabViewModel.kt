@@ -2264,7 +2264,10 @@ class BrowserTabViewModel @Inject constructor(
     @AnyThread
     override fun sendEmailRequested(emailAddress: String) {
         viewModelScope.launch(dispatchers.main()) {
-            command.value = SendEmail(emailAddress)
+            logcat(tag = "RadoiuC") {
+                "Send email requested"
+            }
+            command.postValue(SendEmail(emailAddress))
         }
     }
 
