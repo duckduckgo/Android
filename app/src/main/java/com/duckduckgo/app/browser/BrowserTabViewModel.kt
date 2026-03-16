@@ -848,7 +848,13 @@ class BrowserTabViewModel @Inject constructor(
             .onEach {
                 val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
                 val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                val wasSingleTabBurnInProgress = externalIntentProcessingState.wasSingleTabBurnInProgress.value
+                if (wasSingleTabBurnInProgress) {
+                    // after a single tab burn, skip the input screen for the newly created tab
+                    externalIntentProcessingState.resetSingleTabBurnInProgress()
+                }
+
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !wasSingleTabBurnInProgress) {
                     viewModelScope.launch {
                         // whenever an event fires, so the user switched to a new tab page, launch the input screen
                         // unless an onboarding promo message is displayed

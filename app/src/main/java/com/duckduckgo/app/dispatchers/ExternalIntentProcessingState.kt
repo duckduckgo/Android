@@ -28,14 +28,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 interface ExternalIntentProcessingState {
     val hasPendingTabLaunch: StateFlow<Boolean>
     val hasPendingDuckAiOpen: StateFlow<Boolean>
+    val wasSingleTabBurnInProgress: StateFlow<Boolean>
     fun onIntentRequestToChangeTab()
     fun onIntentRequestToOpenDuckAi()
     fun onDuckAiClosed()
+    fun onSingleTabBurnInProgress()
+
+    fun resetSingleTabBurnInProgress()
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,6 +54,9 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
 
     private val _hasPendingDuckAiOpen = MutableStateFlow(false)
     override val hasPendingDuckAiOpen: StateFlow<Boolean> = _hasPendingDuckAiOpen.asStateFlow()
+
+    private val _wasSingleTabBurnInProgress = MutableStateFlow(false)
+    override val wasSingleTabBurnInProgress: StateFlow<Boolean> = _wasSingleTabBurnInProgress.asStateFlow()
 
     init {
         tabRepository.flowSelectedTab.filterNotNull().onEach { tab ->
@@ -69,5 +77,13 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
 
     override fun onDuckAiClosed() {
         _hasPendingDuckAiOpen.value = false
+    }
+
+    override fun onSingleTabBurnInProgress() {
+        _wasSingleTabBurnInProgress.update { true }
+    }
+
+    override fun resetSingleTabBurnInProgress() {
+        _wasSingleTabBurnInProgress.update { false }
     }
 }

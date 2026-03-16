@@ -430,6 +430,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     removeObservers()
                 }
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
+                    externalIntentProcessingState.onSingleTabBurnInProgress()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
