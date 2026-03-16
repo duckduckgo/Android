@@ -19,10 +19,10 @@ package com.duckduckgo.sync.impl.engine
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
-import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -64,7 +64,7 @@ class AppSyncApiClient @Inject constructor(
 
         logcat { "Sync-Engine: patch data generated for ${changes.type}" }
         val result = when (changes.type) {
-            SyncableType.DUCK_AI_CHATS -> {
+            DUCK_AI_CHATS -> {
                 val body = changes.jsonString.toRequestBody("application/json".toMediaType())
                 val since = (changes.modifiedSince as? ModifiedSince.Timestamp)?.value
                 syncApi.patchChats(token, body, since)
@@ -107,7 +107,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
-            SyncableType.DUCK_AI_CHATS -> throw NotImplementedError()
+            DUCK_AI_CHATS -> error("Chats don't support the GET operation")
         }
 
         return when (result) {
@@ -148,7 +148,7 @@ class AppSyncApiClient @Inject constructor(
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
 
         return when (request.type) {
-            DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, request.untilTimestamp ?: "")
+            DeletableType.DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, request.untilTimestamp ?: "")
         }
     }
 
@@ -166,7 +166,7 @@ class AppSyncApiClient @Inject constructor(
             }
             is Result.Success -> {
                 logcat(LogPriority.INFO) { "DuckChat-Sync: successfully informed sync of deleted duck ai chats" }
-                Result.Success(SyncDeletionResponse(DUCK_AI_CHATS, until))
+                Result.Success(SyncDeletionResponse(DeletableType.DUCK_AI_CHATS, until))
             }
         }
     }

@@ -150,11 +150,11 @@ class RealSyncEngine @Inject constructor(
         regularSyncChanges
             .forEach { changes ->
                 if (changes.isEmpty()) {
-                    if (changes.type.supportsGet) {
+                    if (changes.type.supports(SyncHttpMethod.GET)) {
                         logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
                         getRemoteChanges(changes, TIMESTAMP)
                     }
-                } else {
+                } else if (changes.type.supports(SyncHttpMethod.PATCH)) {
                     logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
                     patchLocalChanges(changes, TIMESTAMP)
                 }
@@ -165,7 +165,7 @@ class RealSyncEngine @Inject constructor(
         val types = firstSyncChanges.map { it.type }
 
         firstSyncChanges
-            .filter { it.type.supportsGet }
+            .filter { it.type.supports(SyncHttpMethod.GET) }
             .forEach { changes ->
                 logcat(INFO) { "Sync-Engine: first sync for ${changes.type}, asking for remote changes" }
                 getRemoteChanges(changes, DEDUPLICATION)
@@ -175,7 +175,7 @@ class RealSyncEngine @Inject constructor(
         getChanges().filter { it.type in types }.forEach { changes ->
             if (changes.isEmpty()) {
                 logcat { "Sync-Engine: no changes to sync for $changes" }
-            } else {
+            } else if (changes.type.supports(SyncHttpMethod.PATCH)) {
                 logcat { "Sync-Engine: $changes changes to update $changes" }
                 patchLocalChanges(changes, LOCAL_WINS)
             }

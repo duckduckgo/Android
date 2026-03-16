@@ -102,16 +102,15 @@ interface SyncFeatureType {
 }
 
 /**
- * Features that support bidirectional sync (PATCH/GET operations).
+ * Features that support sync operations (PATCH/GET).
  */
 enum class SyncableType(
     override val field: String,
-    val supportsGet: Boolean = true,
 ) : SyncFeatureType {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
     SETTINGS("settings"),
-    DUCK_AI_CHATS("ai_chats", supportsGet = false),
+    DUCK_AI_CHATS("ai_chats"),
 }
 
 /**
