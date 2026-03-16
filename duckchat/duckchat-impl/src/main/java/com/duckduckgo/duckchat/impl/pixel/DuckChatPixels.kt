@@ -137,8 +137,6 @@ interface DuckChatPixels {
     fun reportContextualPageContextInvalidNoContent()
 
     fun reportChatSyncActive()
-
-    fun reportTermsOfServiceReAccepted(isSyncEnabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -154,11 +152,6 @@ class RealDuckChatPixels @Inject constructor(
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (reportMetric == ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS) {
-                termsOfServiceHandler.userAcceptedTerms()
-                return@launch
-            }
-
             var refreshAtb = false
             val sessionParams = mapOf(
                 DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to duckChatFeatureRepository.sessionDeltaInMinutes().toString(),
@@ -176,7 +169,17 @@ class RealDuckChatPixels @Inject constructor(
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
                 USER_DID_TAP_KEYBOARD_RETURN_KEY -> DUCK_CHAT_KEYBOARD_RETURN_PRESSED to emptyMap()
-                ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS -> error("Handled above")
+                ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS -> {
+                    val result = termsOfServiceHandler.userAcceptedTerms()
+                    if (result.isDuplicate) {
+                        if (result.isSyncEnabled) {
+                            pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+                        } else {
+                            pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+                        }
+                    }
+                    DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS to emptyMap()
+                }
             }
 
             withContext(dispatcherProvider.main()) {
@@ -348,15 +351,6 @@ class RealDuckChatPixels @Inject constructor(
         pixel.fire(DuckChatPixelName.SYNC_AI_CHAT_ACTIVE, type = Pixel.PixelType.Daily())
     }
 
-    override fun reportTermsOfServiceReAccepted(isSyncEnabled: Boolean) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (isSyncEnabled) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
-            }
-        }
-    }
 }
 
 enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
@@ -418,6 +412,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED("m_aichat_experimental_omnibar_floating_return_pressed"),
     DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED("m_aichat_legacy_omnibar_back_button_pressed"),
     DUCK_CHAT_KEYBOARD_RETURN_PRESSED("m_aichat_duckai_keyboard_return_pressed"),
+    DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS("m_aichat_duckai_accepted_terms_and_conditions"),
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION("m_aichat_experimental_omnibar_daily_retention"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED("m_aichat_new_address_bar_picker_displayed"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED("m_aichat_new_address_bar_picker_confirmed"),

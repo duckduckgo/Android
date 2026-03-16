@@ -17,55 +17,55 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealDuckChatTermsOfServiceHandlerTest {
 
     private val mockDataStore: DuckChatDataStore = mock()
-    private val mockPixels: DuckChatPixels = mock()
     private val mockDuckChat: DuckChatInternal = mock()
     private val testee = RealDuckChatTermsOfServiceHandler(
         dataStore = mockDataStore,
-        duckChatPixels = mockPixels,
         duckChat = mockDuckChat,
     )
 
     @Test
-    fun whenUserAcceptsTermsForFirstTimeThenNoPixelFired() = runTest {
+    fun whenUserAcceptsTermsForFirstTimeThenResultIsNotDuplicate() = runTest {
         whenever(mockDataStore.hasUserAcceptedTerms()).thenReturn(false)
+        whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(false)
 
-        testee.userAcceptedTerms()
+        val result = testee.userAcceptedTerms()
 
-        verifyNoInteractions(mockPixels)
+        assertEquals(false, result.isDuplicate)
         verify(mockDataStore).setUserAcceptedTerms()
     }
 
     @Test
-    fun whenUserReAcceptsTermsAndSyncEnabledThenSyncOnPixelFired() = runTest {
+    fun whenUserReAcceptsTermsAndSyncEnabledThenResultIsDuplicateWithSyncOn() = runTest {
         whenever(mockDataStore.hasUserAcceptedTerms()).thenReturn(true)
         whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(true)
 
-        testee.userAcceptedTerms()
+        val result = testee.userAcceptedTerms()
 
-        verify(mockPixels).reportTermsOfServiceReAccepted(true)
+        assertEquals(true, result.isDuplicate)
+        assertEquals(true, result.isSyncEnabled)
         verify(mockDataStore).setUserAcceptedTerms()
     }
 
     @Test
-    fun whenUserReAcceptsTermsAndSyncDisabledThenSyncOffPixelFired() = runTest {
+    fun whenUserReAcceptsTermsAndSyncDisabledThenResultIsDuplicateWithSyncOff() = runTest {
         whenever(mockDataStore.hasUserAcceptedTerms()).thenReturn(true)
         whenever(mockDuckChat.isChatSyncFeatureEnabled()).thenReturn(false)
 
-        testee.userAcceptedTerms()
+        val result = testee.userAcceptedTerms()
 
-        verify(mockPixels).reportTermsOfServiceReAccepted(false)
+        assertEquals(true, result.isDuplicate)
+        assertEquals(false, result.isSyncEnabled)
         verify(mockDataStore).setUserAcceptedTerms()
     }
 }

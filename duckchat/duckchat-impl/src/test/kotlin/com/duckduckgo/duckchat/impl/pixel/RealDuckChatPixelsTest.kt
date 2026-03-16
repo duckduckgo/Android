@@ -27,6 +27,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
+import com.duckduckgo.duckchat.impl.helper.TermsAcceptanceResult
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
@@ -372,25 +373,35 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
-    fun `when reportTermsOfServiceReAccepted with sync enabled then fires sync on pixel`() = runTest {
-        testee.reportTermsOfServiceReAccepted(isSyncEnabled = true)
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and duplicate with sync on then fires both pixels`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = true, isSyncEnabled = true))
+
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
 
         advanceUntilIdle()
 
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
     }
 
     @Test
-    fun `when reportTermsOfServiceReAccepted with sync disabled then fires sync off pixel`() = runTest {
-        testee.reportTermsOfServiceReAccepted(isSyncEnabled = false)
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and duplicate with sync off then fires both pixels`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = true, isSyncEnabled = false))
+
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
 
         advanceUntilIdle()
 
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
     }
 
     @Test
-    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS then delegates to handler and fires pixel`() = runTest {
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and not duplicate then fires only base pixel`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = false, isSyncEnabled = false))
+
         testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
 
         advanceUntilIdle()

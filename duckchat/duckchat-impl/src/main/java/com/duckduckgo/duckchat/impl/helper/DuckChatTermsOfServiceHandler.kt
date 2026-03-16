@@ -18,30 +18,34 @@ package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
+data class TermsAcceptanceResult(
+    val isDuplicate: Boolean,
+    val isSyncEnabled: Boolean,
+)
+
 interface DuckChatTermsOfServiceHandler {
-    suspend fun userAcceptedTerms()
+    suspend fun userAcceptedTerms(): TermsAcceptanceResult
 }
 
 @ContributesBinding(AppScope::class)
 class RealDuckChatTermsOfServiceHandler @Inject constructor(
     private val dataStore: DuckChatDataStore,
-    private val duckChatPixels: DuckChatPixels,
     private val duckChat: DuckChatInternal,
 ) : DuckChatTermsOfServiceHandler {
 
-    override suspend fun userAcceptedTerms() {
+    override suspend fun userAcceptedTerms(): TermsAcceptanceResult {
         logcat { "Duck.ai: userAcceptedTerms" }
-        if (dataStore.hasUserAcceptedTerms()) {
+        val alreadyAccepted = dataStore.hasUserAcceptedTerms()
+        val isSyncEnabled = duckChat.isChatSyncFeatureEnabled()
+        if (alreadyAccepted) {
             logcat { "Duck.ai: userAcceptedTerms DUPLICATE" }
-            val isSyncEnabled = duckChat.isChatSyncFeatureEnabled()
-            duckChatPixels.reportTermsOfServiceReAccepted(isSyncEnabled)
         }
         dataStore.setUserAcceptedTerms()
+        return TermsAcceptanceResult(isDuplicate = alreadyAccepted, isSyncEnabled = isSyncEnabled)
     }
 }
