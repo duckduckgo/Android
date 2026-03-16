@@ -27,6 +27,14 @@ inputs:
     description: 'Develocity access key for Gradle remote caching'
     required: false
     default: ''
+  ducksans_package_auth_user:
+    description: 'GitHub username for DuckSans font package authentication'
+    required: false
+    default: ''
+  ducksans_package_auth_token:
+    description: 'GitHub token for DuckSans font package authentication'
+    required: false
+    default: ''
 
 outputs:
   play_apk_path:
@@ -79,6 +87,8 @@ runs:
       shell: bash
       env:
         DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
+        DUCKSANS_PACKAGE_AUTH_USER: ${{ inputs.ducksans_package_auth_user }}
+        DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ inputs.ducksans_package_auth_token }}
       run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Play APK
@@ -91,6 +101,8 @@ runs:
       shell: bash
       env:
         DEVELOCITY_ACCESS_KEY: ${{ inputs.develocity_access_key }}
+        DUCKSANS_PACKAGE_AUTH_USER: ${{ inputs.ducksans_package_auth_user }}
+        DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ inputs.ducksans_package_auth_token }}
       run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding -x lint ${{ inputs.gradle_flags }}
 
     - name: Move Internal APK
