@@ -24,6 +24,8 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/daxColorToolbar"
+        android:fitsSystemWindows="true"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
