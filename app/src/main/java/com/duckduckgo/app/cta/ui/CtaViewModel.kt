@@ -51,6 +51,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -103,7 +104,8 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun isPrivacyProCtaAvailable(): Boolean =
-        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+        subscriptions.isEligible() && !subscriptions.getSubscriptionStatus().isActive() && extendedOnboardingFeatureToggles.privacyProCta()
+            .isEnabled()
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
