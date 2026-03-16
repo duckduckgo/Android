@@ -27,8 +27,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
+import com.duckduckgo.app.generalsettings.showonapplaunch.FirstScreenHandler
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -88,7 +87,7 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
-    @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
+    @Mock private lateinit var firstScreenHandler: FirstScreenHandler
 
     private val additionalDefaultBrowserPromptsCommandsFlow = Channel<AdditionalDefaultBrowserPrompts.Command>(capacity = Channel.CONFLATED)
 
@@ -96,8 +95,6 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
-
-    private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
     private lateinit var testee: BrowserViewModel
 
@@ -350,12 +347,10 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenShowOnAppLaunchFeatureToggleIsOnThenShowOnAppLaunchHandled() = runTest {
-        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = true))
-
+    fun whenHandleShowOnAppLaunchOptionThenFirstScreenHandlerCalled() = runTest {
         testee.handleShowOnAppLaunchOption()
 
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+        verify(firstScreenHandler).handleFirstScreen()
     }
 
     @Test
@@ -656,8 +651,7 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
-            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            firstScreenHandler = firstScreenHandler,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,
@@ -679,8 +673,7 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
-            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            firstScreenHandler = firstScreenHandler,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             duckAiFeatureState = mockDuckAIFeatureState,

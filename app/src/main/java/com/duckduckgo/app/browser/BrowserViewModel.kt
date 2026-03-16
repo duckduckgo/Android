@@ -37,8 +37,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
+import com.duckduckgo.app.generalsettings.showonapplaunch.FirstScreenHandler
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -103,8 +102,7 @@ class BrowserViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
-    private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
-    private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val firstScreenHandler: FirstScreenHandler,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckAiFeatureState: DuckAiFeatureState,
@@ -417,10 +415,8 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun handleShowOnAppLaunchOption() {
-        if (showOnAppLaunchFeature.self().isEnabled()) {
-            viewModelScope.launch {
-                showOnAppLaunchOptionHandler.handleAppLaunchOption()
-            }
+        viewModelScope.launch {
+            firstScreenHandler.handleFirstScreen()
         }
     }
 
