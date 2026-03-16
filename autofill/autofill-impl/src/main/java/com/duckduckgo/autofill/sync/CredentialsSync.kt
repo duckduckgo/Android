@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.SyncDateProvider
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat

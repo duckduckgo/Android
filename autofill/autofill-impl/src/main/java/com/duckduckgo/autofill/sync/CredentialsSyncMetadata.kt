@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.sync
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncDateProvider
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import logcat.LogPriority.INFO

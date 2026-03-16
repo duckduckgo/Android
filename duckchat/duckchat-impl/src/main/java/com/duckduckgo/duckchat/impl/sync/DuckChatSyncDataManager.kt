@@ -36,6 +36,7 @@ import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
+import com.duckduckgo.sync.api.engine.SyncDateProvider
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Json
