@@ -111,10 +111,15 @@ interface SyncService {
         @Query("until") until: String,
     ): Call<JSONObject>
 
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/{endpoint}")
-    fun patch(
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
+    fun patchData(
         @Header("Authorization") token: String,
-        @Path("endpoint") endpoint: String,
+        @Body body: JSONObject,
+    ): Call<JSONObject>
+
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun patchChats(
+        @Header("Authorization") token: String,
         @Body body: RequestBody,
         @Query("since") since: String? = null,
     ): Call<JSONObject>

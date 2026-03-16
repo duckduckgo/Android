@@ -94,9 +94,13 @@ interface SyncApi {
         until: String,
     ): Result<Unit>
 
-    fun patch(
+    fun patchData(
         token: String,
-        endpoint: String,
+        updates: JSONObject,
+    ): Result<JSONObject>
+
+    fun patchChats(
+        token: String,
         body: okhttp3.RequestBody,
         since: String? = null,
     ): Result<JSONObject>
@@ -391,25 +395,45 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patch(
+    override fun patchData(
         token: String,
-        endpoint: String,
-        body: okhttp3.RequestBody,
-        since: String?,
+        updates: JSONObject,
     ): Result<JSONObject> {
-        logcat(INFO) { "Sync-service: patch request" }
+        logcat(INFO) { "Sync-service: patchData request" }
 
         val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", endpoint, body, since)
+            val patchCall = syncService.patchData("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: patch error ${throwable.localizedMessage}" }
+            logcat(INFO) { "Sync-service: patchData error ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            logcat(INFO) { "Sync-service: patch response: $it" }
-            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
+            logcat(INFO) { "Sync-service: patchData response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchData: empty Body")
+            Result.Success(data)
+        }
+    }
+
+    override fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String?,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchChats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchChats("Bearer $token", body, since)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchChats error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchChats response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchChats: empty Body")
             Result.Success(data)
         }
     }

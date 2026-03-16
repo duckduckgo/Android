@@ -62,15 +62,19 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val body = changes.jsonString.toRequestBody("application/json".toMediaType())
-        val since = if (changes.type.sinceAsQueryParam) {
-            (changes.modifiedSince as? ModifiedSince.Timestamp)?.value
-        } else {
-            null
+        logcat { "Sync-Engine: patch data generated for ${changes.type}" }
+        val result = when (changes.type) {
+            SyncableType.DUCK_AI_CHATS -> {
+                val body = changes.jsonString.toRequestBody("application/json".toMediaType())
+                val since = (changes.modifiedSince as? ModifiedSince.Timestamp)?.value
+                syncApi.patchChats(token, body, since)
+            }
+            else -> {
+                val updates = JSONObject(changes.jsonString)
+                syncApi.patchData(token, updates)
+            }
         }
-        logcat { "Sync-Engine: patch data generated $body" }
-
-        return when (val result = syncApi.patch(token, changes.type.endpoint, body, since)) {
+        return when (result) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
                 result
