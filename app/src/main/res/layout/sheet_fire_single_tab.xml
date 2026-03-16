@@ -97,7 +97,6 @@
                     android:id="@+id/deleteThisTabButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
                     app:daxButtonSize="large"
                     android:text="@string/singleTabFireDialogDeleteThisTab" />
 
