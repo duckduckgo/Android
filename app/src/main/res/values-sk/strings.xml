@@ -296,7 +296,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a údaje</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, údaje a chaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Odstrániť…</string>
+    <string name="settingsAutomaticallyClearWhen">Vymazať…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazať…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihneď po ukončení aplikácie</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikácie, neaktívnej po dobu 5 sekúnd</string>
