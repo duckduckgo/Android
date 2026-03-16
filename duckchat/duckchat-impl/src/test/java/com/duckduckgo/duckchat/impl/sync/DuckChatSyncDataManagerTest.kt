@@ -202,7 +202,12 @@ class DuckChatSyncDataManagerTest {
     fun whenOnPatchSuccessThenRemovesOnlySentIds() = runTest {
         val response = SyncChangesResponse(
             type = SyncableType.DUCK_AI_CHATS,
-            jsonString = """{"ai_chats":{"entries":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z","last_modified":"2026-01-01T00:00:00Z"},{"id":"chat2","deleted":"2026-01-01T00:00:00Z","last_modified":"2026-01-01T00:00:00Z"}],"last_modified":"2026-01-01T00:00:00Z"}}""",
+            jsonString = """{"ai_chats":{"entries":[{"id":"chat1","deleted":"2026-01-01T00:00:00Z"
+                |,"last_modified":"2026-01-01T00:00:00Z"},
+                |{"id":"chat2","deleted":"2026-01-01T00:00:00Z",
+                |"last_modified":"2026-01-01T00:00:00Z"}],
+                |"last_modified":"2026-01-01T00:00:00Z"}}
+            """.trimMargin(),
         )
 
         testee.onSuccess(response, SyncConflictResolution.DEDUPLICATION)
