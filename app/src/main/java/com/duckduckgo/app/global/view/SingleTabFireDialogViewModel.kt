@@ -48,10 +48,12 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -225,10 +227,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 command.send(Command.PlayAnimation)
             }
 
+            val originalTabId = withContext(dispatcherProvider.io()) {
+                tabRepository.getSelectedTab()?.tabId
+            }
+
             val result = withContext(dispatcherProvider.io()) {
-                val selectedTabId = tabRepository.getSelectedTab()?.tabId
-                if (selectedTabId != null) {
-                    dataClearing.clearSingleTabData(selectedTabId)
+                if (originalTabId != null) {
+                    dataClearing.clearSingleTabData(originalTabId)
                 } else {
                     null
                 }
@@ -236,7 +241,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             when (result) {
                 is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
-                is ClearDataResult.Success -> command.send(Command.OnSingleTabClearComplete)
+                is ClearDataResult.Success -> {
+                    // wait for the tab selection to change before signaling completion so that
+                    // the tab changes have time to settle
+                    tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
+                    delay(500)
+                    command.send(Command.OnSingleTabClearComplete)
+                }
                 else -> command.send(Command.OnSingleTabClearError)
             }
         }

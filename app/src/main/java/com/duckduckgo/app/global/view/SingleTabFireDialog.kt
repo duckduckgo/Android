@@ -335,6 +335,9 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             if (viewModel.viewState.value.shouldRestartAfterClearing) {
                 clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
             } else {
+                pendingFragmentResultEvent?.let { sendFragmentResult(it) }
+                pendingFragmentResultEvent = null
+
                 dismissSingleTabClear()
             }
         }
@@ -345,10 +348,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         _binding?.fireAnimationView?.removeUpdateListener(accelerateAnimatorUpdateListener)
         _binding?.fireAnimationView?.cancelAnimation()
         _binding?.fireAnimationView?.gone()
-
-        pendingFragmentResultEvent?.let { sendFragmentResult(it) }
-        pendingFragmentResultEvent = null
-
         isCancelable = true
         dismissAllowingStateLoss()
     }

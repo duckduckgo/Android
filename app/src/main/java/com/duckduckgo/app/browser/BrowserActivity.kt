@@ -100,7 +100,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
-import com.duckduckgo.autofill.impl.ui.credential.management.removeFragment
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -449,7 +448,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    prepareSnackbarAndRecreateActivity()
+                    showSnackbar(R.string.singleTabFireDialogSnackbar)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
@@ -459,12 +458,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
         }
-    }
-
-    private fun prepareSnackbarAndRecreateActivity() {
-        supportFragmentManager.removeFragment("fire_dialog")
-        pendingSnackbarResId = R.string.singleTabFireDialogSnackbar
-        recreate()
     }
 
     private fun showSnackbar(messageResId: Int) {
