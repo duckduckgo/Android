@@ -21,8 +21,6 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.squareup.moshi.Moshi
-import java.time.Duration
-import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -30,6 +28,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Duration
+import java.time.Instant
 import kotlin.math.abs
 
 @RunWith(AndroidJUnit4::class)
@@ -53,8 +53,10 @@ class WideEventDatabaseMigrationTest {
     fun whenMigratingFromV1ToV2ThenExistingEventsGetDefaultSamplingProbability() = runTest {
         testHelper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
-                """INSERT INTO wide_events (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
-                   VALUES ('test-event', 1700000000000, NULL, '[]', '[]', NULL, '{"type":"OnTimeout","duration":604800000,"status":"unknown","metadata":{}}', '[]')""",
+                """INSERT INTO wide_events
+                   (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
+                   VALUES ('test-event', 1700000000000, NULL, '[]', '[]', NULL,
+                   '{"type":"OnTimeout","duration":604800000,"status":"unknown","metadata":{}}', '[]')""",
             )
             close()
         }
@@ -69,12 +71,17 @@ class WideEventDatabaseMigrationTest {
     fun whenMigratingFromV1ToV2ThenExistingEventsArePreserved() = runTest {
         testHelper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
-                """INSERT INTO wide_events (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
-                   VALUES ('event-1', 1700000000000, 'settings', '[{"key":"k1","value":"v1"}]', '[]', NULL, '{"type":"OnTimeout","duration":604800000,"status":"unknown","metadata":{}}', '[]')""",
+                """INSERT INTO wide_events
+                   (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
+                   VALUES ('event-1', 1700000000000, 'settings', '[{"key":"k1","value":"v1"}]', '[]', NULL,
+                   '{"type":"OnTimeout","duration":604800000,"status":"unknown","metadata":{}}', '[]')""",
             )
             execSQL(
-                """INSERT INTO wide_events (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
-                   VALUES ('event-2', 1700000001000, NULL, '[]', '[{"name":"step_a","success":true}]', 'success', '{"type":"OnProcessStart","ignore_if_interval_timeout_present":false,"status":"unknown","metadata":{}}', '[]')""",
+                """INSERT INTO wide_events
+                   (name, created_at, flow_entry_point, metadata, steps, status, cleanup_policy, active_intervals)
+                   VALUES ('event-2', 1700000001000, NULL, '[]', '[{"name":"step_a","success":true}]', 'success',
+                   '{"type":"OnProcessStart","ignore_if_interval_timeout_present":false,"status":"unknown","metadata":{}}',
+                   '[]')""",
             )
             close()
         }
