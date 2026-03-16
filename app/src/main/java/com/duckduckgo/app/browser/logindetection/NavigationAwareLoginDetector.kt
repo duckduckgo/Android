@@ -169,6 +169,8 @@ class NextPageLoginDetection constructor(
                 }
                 return
             }
+            is WebNavigationStateChange.TitleUpdated -> {
+            }
             is WebNavigationStateChange.PageNavigationCleared -> discardLoginAttempt()
             is WebNavigationStateChange.Unchanged -> {
             }
