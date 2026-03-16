@@ -262,7 +262,13 @@ class WelcomePageViewModel @Inject constructor(
                     }
                     duckChat.setCosmeticInputScreenUserSetting(inputScreenSelected)
                     onboardingStore.storeInputScreenSelection(inputScreenSelected)
-                    _commands.send(buildShowInputModeDemoCommand())
+                    val command = if (inputScreenSelected) {
+                        // TODO: experiment enrollment
+                        buildShowInputModeDemoCommand()
+                    } else {
+                        Finish
+                    }
+                    _commands.send(command)
                 }
             }
 
