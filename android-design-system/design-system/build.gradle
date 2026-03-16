@@ -46,6 +46,12 @@ android {
 
 dependencies {
 
+    if (rootProject.ext.proprietaryFontAvailable) {
+        implementation "com.duckduckgo:ddg-proprietary-fonts:1.0.2"
+    } else {
+        implementation project(':fonts')
+    }
+
     implementation project(path: ':common-utils')
 
     implementation project(path: ':di')
