@@ -275,6 +275,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -505,6 +506,7 @@ class BrowserTabViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
+    private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
@@ -4222,6 +4224,14 @@ class BrowserTabViewModel @Inject constructor(
                 viewModelScope.launch(dispatchers.io()) {
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
+                        if (androidBrowserConfig.storePageContext().isEnabled()) {
+                            tabPageContextRepository.storePageContext(
+                                tabId = tabId,
+                                url = url.orEmpty(),
+                                serializedPageContext = pageContext,
+                            )
+                        }
+
                         val enrichedContext = enrichPageContextIfPossible(pageContext)
                         withContext(dispatchers.main()) {
                             command.value = Command.PageContextReceived(tabId, enrichedContext)
