@@ -183,6 +183,11 @@ class RealDuckChatJSHelper @Inject constructor(
                 }
             }
 
+            METHOD_ACCEPT_TERMS_AND_CONDITIONS -> {
+                duckChatPixels.sendReportMetricPixel(ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
+                null
+            }
+
             METHOD_TOGGLE_PAGE_CONTEXT -> {
                 val isEnabled = data?.optBoolean(ENABLED)
                 if (isEnabled != null) {
