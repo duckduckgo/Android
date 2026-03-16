@@ -410,6 +410,33 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOpenVoiceDuckChatCalledThenOpenDuckChatWithVoiceModeUrl() = runTest {
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?mode=voice-mode&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenVoiceDuckChatCalledWithActiveSessionThenHasSessionActiveIsFalse() = runTest {
+        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
+
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duckduckgo.com/?mode=voice-mode&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithQueryThenDuckChatOpenedWithQuery() = runTest {
         testee.openDuckChatWithPrefill(query = "example")
 
