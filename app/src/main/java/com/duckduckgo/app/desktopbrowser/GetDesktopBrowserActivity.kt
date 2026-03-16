@@ -21,7 +21,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.addCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +37,7 @@ import com.duckduckgo.app.browser.databinding.ActivityGetDesktopBrowserBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.edgetoedge.api.EdgeToEdge
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
@@ -50,6 +54,9 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var getDesktopBrowserViewModelFactory: GetDesktopBrowserViewModel.Factory
 
+    @Inject
+    lateinit var edgeToEdge: EdgeToEdge
+
     private val binding: ActivityGetDesktopBrowserBinding by viewBinding()
 
     private val viewModel by lazy {
@@ -60,12 +67,14 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        edgeToEdge.enableIfToggled(this)
         setContentView(binding.root)
 
         setupObservers()
         setupBackNavigationHandler()
         setupClickListeners()
         setupToolbar(binding.includeToolbar.toolbar)
+        setupEdgeToEdge()
     }
 
     private fun setupObservers() {
@@ -151,6 +160,17 @@ class GetDesktopBrowserActivity : DuckDuckGoActivity() {
 
     private fun showCopiedNotification() {
         Snackbar.make(binding.root, R.string.getDesktopBrowserUrlLinkCopied, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun setupEdgeToEdge() {
+        if (!edgeToEdge.isEnabled()) return
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
     }
 
     private fun getDesktopBrowserViewModel(params: GetDesktopBrowserActivityParams): GetDesktopBrowserViewModel = ViewModelProvider.create(
