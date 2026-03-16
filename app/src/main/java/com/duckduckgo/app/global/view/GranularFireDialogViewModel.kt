@@ -34,6 +34,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -172,7 +173,7 @@ class GranularFireDialogViewModel @Inject constructor(
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
-            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             pixel.enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,
