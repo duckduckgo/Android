@@ -110,26 +110,30 @@
 
     <style name="Typography.DuckDuckGo.Onboarding" />
 
-    <!--TODO add ducksans-->
+    <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
+        <item name="android:textSize">44sp</item>
+        <item name="android:textColor">?attr/onboardingTextPrimary</item>
+        <item name="android:lineSpacingExtra">-10sp</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_medium</item>
+    </style>
+
     <style name="Typography.DuckDuckGo.Onboarding.Title">
         <item name="android:textSize">24sp</item>
         <item name="android:lineSpacingExtra">-1sp</item>
-        <item name="fontWeight">700</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/ducksansdisplay_bold</item>
     </style>
 
-    <!--TODO add ducksans-->
     <style name="Typography.DuckDuckGo.Onboarding.Body">
         <item name="android:textSize">18sp</item>
         <item name="android:lineSpacingExtra">0sp</item>
-        <item name="fontWeight">400</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
     <style name="Typography.DuckDuckGo.Onboarding.Button">
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">normal</item>
-        <item name="fontWeight">400</item>
+        <item name="android:fontFamily">@font/ducksansproduct_regular</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding" parent="Widget.MaterialComponents.Button.TextButton">
