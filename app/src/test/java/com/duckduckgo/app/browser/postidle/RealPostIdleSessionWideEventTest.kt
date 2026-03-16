@@ -65,7 +65,7 @@ class RealPostIdleSessionWideEventTest {
         whenever(duckChatInputModeState.displayedMode).thenReturn(displayedModeFlow)
         androidBrowserConfigFeature.sendPostIdleSessionWideEvent().setRawStoredState(Toggle.State(true))
 
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any())).thenReturn(Result.success(123L))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
@@ -96,6 +96,7 @@ class RealPostIdleSessionWideEventTest {
                     flowStatus = FlowStatus.Unknown,
                 ),
             ),
+            samplingProbability = any(),
         )
         verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull())
         verify(wideEventClient).intervalStart(eq(123L), eq("time_to_first_interaction_ms_bucketed"), anyOrNull(), anyOrNull())
@@ -104,7 +105,7 @@ class RealPostIdleSessionWideEventTest {
 
     @Test
     fun `when onSurfaceShown called twice then prior flow is aborted before new flowStart`() = runTest {
-        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any()))
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any()))
             .thenReturn(Result.success(1L))
             .thenReturn(Result.success(2L))
 
@@ -119,6 +120,7 @@ class RealPostIdleSessionWideEventTest {
             flowEntryPoint = isNull(),
             metadata = eq(mapOf("surface" to "lut")),
             cleanupPolicy = any(),
+            samplingProbability = any(),
         )
     }
 
