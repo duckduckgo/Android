@@ -106,7 +106,7 @@ enum class Status {
     Off,
 }
 
-object StatusIndicatorDefaults {
+internal object StatusIndicatorDefaults {
     internal val iconSize = 8.dp
     internal val spacing = 4.dp
     internal val minHeight = 16.dp
