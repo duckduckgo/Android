@@ -31,14 +31,13 @@ jobs:
           if [[ "${{ github.event_name }}" == "push" ]]; then
             echo "Direct push to branch — running checks"; echo "should_run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-            HEAD="${{ github.event.pull_request.head.sha }}"
-          else
-            BASE="${{ github.event.before }}"
-            HEAD="${{ github.event.after }}"
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          if ! CHANGED=$(git diff --name-only "$BASE" "$HEAD"); then
+            echo "git diff failed — running checks as fallback"
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
           echo "Changed files:"; echo "$CHANGED"
           if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/)') || \
              echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
