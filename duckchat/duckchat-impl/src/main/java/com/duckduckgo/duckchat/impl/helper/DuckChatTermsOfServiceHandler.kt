@@ -40,8 +40,6 @@ class RealDuckChatTermsOfServiceHandler @Inject constructor(
     override suspend fun userAcceptedTerms(): TermsAcceptanceResult {
         val alreadyAccepted = dataStore.hasUserAcceptedTerms()
         val isSyncEnabled = duckChat.isChatSyncFeatureEnabled()
-        if (alreadyAccepted) {
-        }
         dataStore.setUserAcceptedTerms()
         return TermsAcceptanceResult(isDuplicate = alreadyAccepted, isSyncEnabled = isSyncEnabled)
     }
