@@ -1,0 +1,33 @@
+---
+description: "Testing remote feature toggles with FakeFeatureToggleFactory"
+globs:
+  - "**/*Feature*Test*.kt"
+  - "**/*Toggle*Test*.kt"
+---
+
+# Feature Toggle Testing
+
+Always use `FakeFeatureToggleFactory` — never mocks or custom fakes.
+
+```kotlin
+private val fakeFeature = FakeFeatureToggleFactory.create(MyFeature::class.java)
+
+@SuppressLint("DenyListedApi")
+@Test
+fun `when enabled`() {
+    fakeFeature.self().setRawStoredState(Toggle.State(enable = true))
+    // assert enabled behavior
+}
+
+@SuppressLint("DenyListedApi")
+@Test
+fun `when disabled`() {
+    fakeFeature.self().setRawStoredState(Toggle.State(enable = false))
+    // assert disabled behavior
+}
+```
+
+- Test both enabled and disabled states
+- For sub-features: also test with the main feature (`self()`) disabled
+- Set sub-feature state: `fakeFeature.enableFilters().setRawStoredState(Toggle.State(enable = true))`
+- Add `testImplementation project(':feature-toggles:feature-toggles-test')` to dependencies

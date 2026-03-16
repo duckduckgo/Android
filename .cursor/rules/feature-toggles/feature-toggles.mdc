@@ -1,0 +1,80 @@
+---
+description: "Creating and using remote feature toggles"
+globs:
+  - "**/*Feature*.kt"
+  - "**/*Toggle*.kt"
+---
+
+# Feature Toggles
+
+Remote feature toggles control features without app updates via `@ContributesRemoteFeature` interfaces returning `Toggle` objects.
+
+## Creating Toggles
+
+### Standalone (most common)
+
+```kotlin
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "tabSwitcherAnimation",
+)
+interface TabSwitcherAnimationFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun self(): Toggle
+}
+```
+
+Requirements: `@ContributesRemoteFeature` with `scope` + `featureName` (camelCase, matches remote config key), a `self()` method with `@Toggle.DefaultValue`, returns `Toggle`, must be an interface.
+
+### Grouped
+
+Add a new method to an existing `@ContributesRemoteFeature` interface (e.g., `AndroidBrowserConfigFeature`).
+
+### API/Impl separation
+
+Define a clean interface in the API module (no annotation). In the Impl module, create a private trigger with `boundType` pointing to the API interface:
+
+```kotlin
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    boundType = YourFeatureToggles::class,
+    featureName = "yourFeatureName",
+)
+@Suppress("unused")
+private interface YourFeatureTogglesTrigger
+```
+
+## Default Values
+
+| Annotation | Use for |
+|---|---|
+| `DefaultFeatureValue.FALSE` | New features, gradual rollouts (most common) |
+| `DefaultFeatureValue.TRUE` | Kill switches, established features needing remote disable |
+| `DefaultFeatureValue.INTERNAL` | Dev/internal-only (`true` internal, `false` production) |
+
+`@Toggle.InternalAlwaysEnabled` forces toggle ON in internal builds regardless of remote config.
+
+## Sub-Features
+
+Add methods to the interface for related behaviors. Always check `self()` before sub-features. Use camelCase method names (`enable*`, `show*`, `use*`).
+
+## Using Toggles
+
+- Inject the feature interface, call `toggle.isEnabled()`
+- Always check `self()` before sub-features
+- **Never cache** toggle values — call `isEnabled()` each time
+- Use `toggle.enabled()` Flow for reactive observation
+
+## Dependencies
+
+```groovy
+implementation project(':feature-toggles:feature-toggles-api')
+implementation project(':anvil:anvil-annotations')
+implementation project(':di')
+```
+
+## Naming
+
+- `featureName`: camelCase, descriptive, specific, under 30 chars
+- Methods: camelCase verbs — `enable*`, `show*`, `use*`
+- One file per feature toggle interface, separate from implementation
