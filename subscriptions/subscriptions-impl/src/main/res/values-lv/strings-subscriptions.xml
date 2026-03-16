@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivizē Privacy Pro datorā, lai iestatītu Personal Information Removal</string>
-    <string name="pirDescription">DuckDuckGo pārlūkprogrammā galddatoram dodies uz <b>Iestatījumi &gt; Privacy Pro</b> un noklikšķini uz <b>Man ir abonements</b>, lai sāktu.</string>
+    <string name="pirTitle">Aktivizē DuckDuckGo abonementu datorā, lai iestatītu Personal Information Removal</string>
+    <string name="pirDescription">DuckDuckGo pārlūkprogrammā datora versijā atver <b>Iestatījumi &gt; Abonēt DuckDuckGo</b> un noklikšķini uz <b>Man ir abonements</b>, lai sāktu.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonementi</string>
     <string name="activitySubscriptionSettings">Abonementa iestatījumi</string>
     <string name="activityActivateSubscription">Man ir abonements</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonenti saņem mūsu VPN un uzlabotus mākslīgā intelekta modeļus Duck.ai. Personal Information Removal un Identity Theft Restoration.</string>

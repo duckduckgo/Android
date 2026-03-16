@@ -47,6 +47,10 @@ inputs:
     description: 'Whether to add the failure as a release blocker in Asana'
     required: false
     default: 'false'
+  create_asana_error_task:
+    description: 'Whether to crate an Asana task if the Maestro tests fail'
+    required: false
+    default: 'true'
   asana_releases_project_id:
     description: 'Asana Releases Project ID (needed if is_release_blocker is true)'
     required: false
@@ -104,7 +108,7 @@ runs:
       run: echo "flow_summary_status=${{ steps.analyze-maestro.outputs.flow_summary_status }}"
 
     - name: Create Asana task when Maestro tests failed
-      if: always() && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
+      if: always() && inputs.create_asana_error_task == 'true' && steps.analyze-maestro.outputs.flow_summary_status == 'failure'
       id: create-maestro-failure-task
       uses: duckduckgo/native-github-asana-sync@v2.0
       with:

@@ -27,9 +27,12 @@ import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.SyncDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
+import com.duckduckgo.sync.api.engine.SyncPatchResponse
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -117,7 +120,7 @@ class DuckChatSyncDataManagerTest {
             untilTimestamp = "2025-01-01T12:00:00Z",
         )
 
-        testee.onSuccess(response)
+        testee.onDeleteSuccess(response)
 
         verify(duckChatSyncRepository).clearDeletionTimestampIfMatches("2025-01-01T12:00:00Z")
     }
@@ -129,7 +132,7 @@ class DuckChatSyncDataManagerTest {
             untilTimestamp = null,
         )
 
-        testee.onSuccess(response)
+        testee.onDeleteSuccess(response)
 
         verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(org.mockito.kotlin.any())
     }
@@ -141,8 +144,94 @@ class DuckChatSyncDataManagerTest {
             featureSyncError = FeatureSyncError.INVALID_REQUEST,
         )
 
-        testee.onError(error)
+        testee.onDeleteError(error)
 
         verify(duckChatSyncRepository, never()).clearDeletionTimestampIfMatches(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenGetPatchesAndFeatureDisabledThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = false))
+
+        val result = testee.getPatches()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetPatchesAndChatHistoryDisabledThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(false)
+
+        val result = testee.getPatches()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetPatchesAndNoPendingDeletionsThenReturnsNull() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
+
+        val result = testee.getPatches()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenGetPatchesAndPendingDeletionsExistThenReturnsRequest() = runTest {
+        duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("chat1", "chat2"))
+
+        val result = testee.getPatches()
+
+        assertNotNull(result)
+        assertEquals(DeletableType.DUCK_AI_CHATS, result?.type)
+        assertTrue(result?.jsonString?.contains("chat1") == true)
+        assertTrue(result?.jsonString?.contains("chat2") == true)
+    }
+
+    @Test
+    fun whenOnPatchSuccessThenRemovesOnlySentIds() = runTest {
+        val response = SyncPatchResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            entryIds = listOf("chat1", "chat2"),
+        )
+
+        testee.onPatchSuccess(response)
+
+        verify(duckChatSyncRepository).removePendingChatDeletions(setOf("chat1", "chat2"))
+    }
+
+    @Test
+    fun whenOnPatchErrorThenPendingQueueIsKept() = runTest {
+        val error = SyncErrorResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            featureSyncError = FeatureSyncError.INVALID_REQUEST,
+        )
+
+        testee.onPatchError(error)
+
+        verify(duckChatSyncRepository, never()).clearPendingChatDeletions()
+        verify(duckChatSyncRepository, never()).removePendingChatDeletions(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenOnDeleteSuccessThenPendingQueueIsCleared() = runTest {
+        val response = SyncDeletionResponse(
+            type = DeletableType.DUCK_AI_CHATS,
+            untilTimestamp = "2025-01-01T12:00:00Z",
+        )
+
+        testee.onDeleteSuccess(response)
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
+    }
+
+    @Test
+    fun whenOnSyncDisabledThenPendingQueueIsCleared() = runTest {
+        testee.onSyncDisabled()
+
+        verify(duckChatSyncRepository).clearPendingChatDeletions()
     }
 }

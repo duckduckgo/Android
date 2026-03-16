@@ -47,7 +47,7 @@
         <activity
                 android:name=".pir.PirActivity"
                 android:exported="false"
-                android:label="@string/activityPir"
+                android:label="@string/ddg_subscription"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
 

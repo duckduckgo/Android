@@ -103,6 +103,29 @@ When working with Maestro tests in this project, always consider the existing or
 ```
 
 ### Prefer shorter, specific tests
-- Tests should ideally test something that can be run quickly. 
+- Tests should ideally test something that can be run quickly.
 - Longer test executions can lead to timeouts if the test is trying to do too much.
 - The more a test is doing, the harder it can be debug if it fails.
+
+## Remote Config Patches
+
+Maestro tests might require specific remote config feature flag states to test different code branches. Use the config patch mechanism to override flags at build time. See [`privacy-config/privacy-config-internal/README.md`](../../privacy-config/privacy-config-internal/README.md) for full details on how patches work, how to write them, and how to verify they were applied.
+
+Key points for Maestro tests:
+- Patches only work in `internal` builds — always use `installInternalRelease` when running tests that need patches
+- Store patch files alongside the tests that need them, under a `remote_config_patches/` subdirectory:
+  ```
+  .maestro/
+    my-feature/
+      remote_config_patches/
+        disable_something.json
+      my_test.yaml
+  ```
+- Apply patches at build time using `-Pconfig_patches`:
+  ```bash
+  ./gradlew installInternalRelease \
+    -Pconfig_patches=.maestro/my-feature/remote_config_patches/disable_something.json
+
+  maestro test .maestro/my-feature/my_test.yaml
+  ```
+- In CI, pass the flag via `gradle_flags` on `checkout-and-assemble` with `flavours: 'internal'` — see the README for the full workflow snippet

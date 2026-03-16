@@ -74,7 +74,7 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<List<Device>>
 
-    fun patch(
+    fun patchData(
         token: String,
         updates: JSONObject,
     ): Result<JSONObject?>
@@ -97,6 +97,11 @@ interface SyncApi {
     fun deleteAiChats(
         token: String,
         until: String,
+    ): Result<Unit>
+
+    fun patchAiChats(
+        token: String,
+        body: okhttp3.RequestBody,
     ): Result<Unit>
 
     /**
@@ -302,14 +307,14 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patch(
+    override fun patchData(
         token: String,
         updates: JSONObject,
     ): Result<JSONObject> {
         logcat(INFO) { "Sync-service: patch request $updates" }
 
         val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", updates)
+            val patchCall = syncService.patchData("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
             logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
@@ -402,6 +407,25 @@ class SyncServiceRemote @Inject constructor(
             deleteCall.execute()
         }.getOrElse { throwable ->
             logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(Unit)
+        }
+    }
+
+    override fun patchAiChats(
+        token: String,
+        body: okhttp3.RequestBody,
+    ): Result<Unit> {
+        logcat(INFO) { "Sync-service: patch ai chats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchAiChats("Bearer $token", body)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patch ai chats error ${throwable.localizedMessage}" }
             return Result.Error(reason = throwable.message.toString())
         }
 

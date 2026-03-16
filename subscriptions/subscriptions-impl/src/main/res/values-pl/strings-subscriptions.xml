@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Twoja subskrypcja została zakupiona za pośrednictwem sklepu Apple App Store. Aby zmienić plan lub ustawienia rozliczeń, wybierz kolejno Ustawienia &gt; Konto Apple &gt; Subskrypcje na urządzeniu zalogowanym na konto Apple wykorzystane do zakupu subskrypcji.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktywuj Privacy Pro na komputerze, aby skonfigurować usługę Personal Information Removal</string>
-    <string name="pirDescription">W przeglądarce DuckDuckGo na komputerze wybierz kolejno <b>Ustawienia &gt; Privacy Pro</b> i kliknij opcję <b>Mam subskrypcję</b>, aby rozpocząć.</string>
+    <string name="pirTitle">Aktywuj subskrypcję DuckDuckGo na komputerze, aby skonfigurować usługę Personal Information Removal</string>
+    <string name="pirDescription">W przeglądarce DuckDuckGo na komputerze przejdź do <b>Ustawień &gt; Subskrybuj DuckDuckGo</b> i kliknij <b>Mam subskrypcję</b>, aby zacząć.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Subskrypcje</string>
     <string name="activitySubscriptionSettings">Ustawienia subskrypcji</string>
     <string name="activityActivateSubscription">Mam subskrypcję</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Wyślij opinię</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subskrybenci otrzymują VPN, zaawansowane modele sztucznej inteligencji w Duck.ai, usługi Personal Information Removal oraz Identity Theft Restoration.</string>

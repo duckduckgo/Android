@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -128,6 +129,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     private fun fireDialogShownPixel(dialogType: PreOnboardingDialogType) {
         when (dialogType) {
+            SYNC_RESTORE -> { } // TODO - SyncRestore: add pixel for dialog shown
             INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
@@ -162,6 +164,10 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
     fun onPrimaryCtaClicked() {
         val currentDialog = _viewState.value.currentDialog ?: return
         when (currentDialog) {
+            SYNC_RESTORE -> {
+                // TODO - SyncRestore: handle primary CTA click
+            }
+
             INITIAL_REINSTALL_USER, INITIAL -> {
                 setCurrentDialog(COMPARISON_CHART)
             }
@@ -261,7 +267,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 pixel.fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
             }
 
-            INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN -> {
+            SYNC_RESTORE, INITIAL, COMPARISON_CHART, ADDRESS_BAR_POSITION, INPUT_SCREEN -> {
                 // no-op
             }
         }

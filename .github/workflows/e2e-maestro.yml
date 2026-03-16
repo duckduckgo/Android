@@ -1,0 +1,97 @@
+name: 'End to End Tests - Generic'
+
+# Generic Maestro e2e workflow. Provide a binary_id to skip APK assembly,
+# or set app_flavour to assemble fresh. Known tags:
+#   binaryUpload, customTabsTest, privacyTestInternal, onboardingTest,
+#   navigationTest, adClickTest, privacyTest, securityTest, securityTestInternal,
+#   releaseTest, permissionsTest, androidDesignSystemTest, inputScreenTest,
+#   omnibarTest, duckplayer, syncCriticalPathTest, autofillNoAuthTests,
+#   autofillBackfillingUsername, autofillPasswordGeneration
+
+on:
+  workflow_call:
+    inputs:
+      tags:
+        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest)'
+        required: true
+        type: string
+      test_name:
+        description: 'Display name for this test suite (used in Asana failure task)'
+        required: true
+        type: string
+      app_flavour:
+        description: 'App flavour to build when no binary_id is given (play or internal)'
+        required: false
+        type: string
+        default: 'play'
+      maestro_api_level:
+        description: 'Android API level to run tests on (e.g. 30, 33, 34)'
+        required: false
+        type: string
+        default: '30'
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Comma-separated Maestro tags to include (e.g. customTabsTest)'
+        required: true
+        type: string
+      test_name:
+        description: 'Display name for this test suite (used in Asana failure task)'
+        required: true
+        type: string
+      app_flavour:
+        description: 'App flavour to build when no binary_id is given (play or internal)'
+        required: false
+        type: string
+        default: 'play'
+      maestro_api_level:
+        description: 'Android API level to run tests on (e.g. 30, 33, 34)'
+        required: false
+        type: string
+        default: '30'
+
+concurrency:
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  instrumentation_tests:
+    runs-on: ubuntu-latest
+    name: End-to-End Tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
+        with:
+          flavours: ${{ inputs.app_flavour }}
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+
+      - name: Run Maestro Tests
+        id: maestro-run
+        uses: ./.github/actions/maestro-cloud-asana-reporter
+        timeout-minutes: 120
+        with:
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: ${{ inputs.test_name }}_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ inputs.app_flavour == 'internal' && steps.assemble.outputs.internal_apk_path || steps.assemble.outputs.play_apk_path }}
+          maestro_api_level: ${{ inputs.maestro_api_level }}
+          maestro_include_tags: ${{ inputs.tags }}
+          test_suite_name: ${{ inputs.test_name }}
+          is_release_blocker: false
+          create_asana_error_task: false
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}

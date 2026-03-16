@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import com.duckduckgo.duckchat.impl.JSONObjectAdapter
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -27,15 +28,8 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.ToJson
 import logcat.logcat
-import okio.Buffer
-import org.json.JSONException
-import org.json.JSONObject
 import javax.inject.Inject
 
 /**
@@ -115,23 +109,5 @@ class ChatSuggestionsJsMessaging @Inject constructor(
 
     companion object {
         const val JS_INTERFACE_NAME = "chatSuggestionsInterface"
-    }
-}
-
-internal class JSONObjectAdapter {
-    @FromJson
-    fun fromJson(reader: JsonReader): JSONObject? {
-        return (reader.readJsonValue() as? Map<*, *>)?.let { data ->
-            try {
-                JSONObject(data)
-            } catch (_: JSONException) {
-                null
-            }
-        }
-    }
-
-    @ToJson
-    fun toJson(writer: JsonWriter, value: JSONObject?) {
-        value?.let { writer.run { value(Buffer().writeUtf8(value.toString())) } }
     }
 }

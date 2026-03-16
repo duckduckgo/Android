@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -59,8 +60,10 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.api.SyncAutoRestore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -85,6 +88,7 @@ class WelcomePageViewModelTest {
     private val mockDuckChat: DuckChat = mock()
     private val mockInputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent = mock()
     private val mockDeviceInfo: DeviceInfo = mock()
+    private val mockSyncAutoRestore: SyncAutoRestore = mock()
 
     private fun createViewModel(): WelcomePageViewModel {
         return WelcomePageViewModel(
@@ -100,6 +104,7 @@ class WelcomePageViewModelTest {
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
             mockDeviceInfo,
+            mockSyncAutoRestore,
         )
     }
 
@@ -117,6 +122,7 @@ class WelcomePageViewModelTest {
             mockDuckChat,
             mockInputScreenOnboardingWideEvent,
             mockDeviceInfo,
+            mockSyncAutoRestore,
         )
     }
 
@@ -158,7 +164,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowComparisonChart)
+                assertTrue(command is ShowComparisonChart)
             }
         }
 
@@ -183,7 +189,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowDefaultBrowserDialog)
+                assertTrue(command is ShowDefaultBrowserDialog)
             }
         }
 
@@ -195,7 +201,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is Finish)
+                assertTrue(command is Finish)
             }
         }
 
@@ -230,7 +236,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowAddressBarPositionDialog)
+                assertTrue(command is ShowAddressBarPositionDialog)
             }
         }
 
@@ -243,8 +249,8 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowAddressBarPositionDialog)
-                Assert.assertTrue((command as ShowAddressBarPositionDialog).showSplitOption)
+                assertTrue(command is ShowAddressBarPositionDialog)
+                assertTrue((command as ShowAddressBarPositionDialog).showSplitOption)
             }
         }
 
@@ -255,7 +261,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is Finish)
+                assertTrue(command is Finish)
             }
         }
 
@@ -332,7 +338,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowInitialDialog)
+                assertTrue(command is ShowInitialDialog)
             }
         }
 
@@ -359,7 +365,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowInitialReinstallUserDialog)
+                assertTrue(command is ShowInitialReinstallUserDialog)
             }
         }
 
@@ -370,7 +376,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowComparisonChart)
+                assertTrue(command is ShowComparisonChart)
             }
         }
 
@@ -457,7 +463,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is OnboardingSkipped)
+                assertTrue(command is OnboardingSkipped)
             }
             verify(mockPixel).fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
         }
@@ -476,7 +482,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowSkipOnboardingOption)
+                assertTrue(command is ShowSkipOnboardingOption)
             }
             verify(mockPixel).fire(PREONBOARDING_SKIP_ONBOARDING_PRESSED)
         }
@@ -488,7 +494,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is ShowComparisonChart)
+                assertTrue(command is ShowComparisonChart)
             }
             verify(mockPixel).fire(PREONBOARDING_RESUME_ONBOARDING_PRESSED)
         }
@@ -502,7 +508,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is Finish)
+                assertTrue(command is Finish)
             }
             verify(mockPixel).fire(PREONBOARDING_AICHAT_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(true)
@@ -519,7 +525,7 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val command = awaitItem()
-                Assert.assertTrue(command is Finish)
+                assertTrue(command is Finish)
             }
             verify(mockPixel).fire(PREONBOARDING_SEARCH_ONLY_SELECTED)
             verify(mockOnboardingStore).storeInputScreenSelection(false)
@@ -585,14 +591,102 @@ class WelcomePageViewModelTest {
 
             testee.commands.test {
                 val skipCommand = awaitItem()
-                Assert.assertTrue(skipCommand is ShowSkipOnboardingOption)
+                assertTrue(skipCommand is ShowSkipOnboardingOption)
 
                 testee.onInputScreenOptionSelected(true)
                 testee.onPrimaryCtaClicked(PreOnboardingDialogType.INPUT_SCREEN)
 
                 val finishCommand = awaitItem()
-                Assert.assertTrue(finishCommand is Finish)
+                assertTrue(finishCommand is Finish)
             }
             verify(mockInputScreenOnboardingWideEvent).onInputScreenEnabledDuringOnboarding(reinstallUser = true)
         }
+
+    // region Sync Restore
+
+    @Test
+    fun whenCanRestoreThenLoadDaxDialogShowsSyncRestoreDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val viewModel = createViewModel()
+
+        viewModel.loadDaxDialog()
+
+        viewModel.commands.test {
+            assertTrue(awaitItem() is ShowSyncRestoreDialog)
+        }
+    }
+
+    @Test
+    fun whenCannotRestoreThenLoadDaxDialogShowsNormalDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(false)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val viewModel = createViewModel()
+
+        viewModel.loadDaxDialog()
+
+        viewModel.commands.test {
+            assertTrue(awaitItem() is ShowInitialDialog)
+        }
+    }
+
+    @Test
+    fun whenCannotRestoreAndReinstallThenLoadDaxDialogShowsReinstallDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(false)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.loadDaxDialog()
+
+        viewModel.commands.test {
+            assertTrue(awaitItem() is ShowInitialReinstallUserDialog)
+        }
+    }
+
+    @Test
+    fun whenSyncRestorePrimaryCtaClickedThenRestoreAccountAndShowComparisonChart() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.SYNC_RESTORE)
+
+        verify(mockSyncAutoRestore).restoreSyncAccount()
+        testee.commands.test {
+            assertTrue(awaitItem() is ShowComparisonChart)
+        }
+    }
+
+    @Test
+    fun whenSyncRestoreSecondaryCtaClickedThenShowSkipOnboardingOption() = runTest {
+        testee.onSecondaryCtaClicked(PreOnboardingDialogType.SYNC_RESTORE)
+
+        testee.commands.test {
+            assertTrue(awaitItem() is ShowSkipOnboardingOption)
+        }
+    }
+
+    @Test
+    fun whenCanRestoreAndReinstallThenSyncRestoreTakesPriority() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenReturn(true)
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.loadDaxDialog()
+
+        viewModel.commands.test {
+            assertTrue(awaitItem() is ShowSyncRestoreDialog)
+        }
+    }
+
+    @Test
+    fun whenCanRestoreThrowsThenLoadDaxDialogShowsNormalDialog() = runTest {
+        whenever(mockSyncAutoRestore.canRestore()).thenThrow(RuntimeException("Block Store error"))
+        whenever(mockAppBuildConfig.isAppReinstall()).thenReturn(false)
+        val viewModel = createViewModel()
+
+        viewModel.loadDaxDialog()
+
+        viewModel.commands.test {
+            assertTrue(awaitItem() is ShowInitialDialog)
+        }
+    }
+
+    // endregion
 }

@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJsMessageHandlersPlugin {
+
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
             override fun process(
@@ -60,6 +61,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
                     "openKeyboard",
                     "getAIChatPageContext",
                     "togglePageContextTelemetry",
+                    "submitAIChatPageContext",
                 )
         }
 }

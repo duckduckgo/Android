@@ -47,6 +47,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -57,6 +58,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -107,6 +109,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
+                is ShowSyncRestoreDialog -> configureDaxCta(SYNC_RESTORE)
                 is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowInitialDialog -> configureDaxCta(INITIAL, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART, showDuckAiCopy = it.showDuckAiCopy)
@@ -212,6 +215,32 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
+                SYNC_RESTORE -> {
+                    binding.daxDialogCta.root.show()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.descriptionCta.show()
+                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.daxDialogContentImage.gone()
+
+                    val ctaText = it.getString(R.string.syncRestoreDialogTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    val descriptionText = it.getString(R.string.syncRestoreDialogDescription)
+                    binding.daxDialogCta.descriptionCta.text = descriptionText.html(it)
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.setText(R.string.syncRestoreDialogPrimaryCta)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.syncRestoreDialogSecondaryCta)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
                 INITIAL_REINSTALL_USER -> {
                     binding.daxDialogCta.root.show()
                     binding.daxDialogCta.progressBarText.gone()

@@ -72,4 +72,63 @@ class DuckChatContextualSharedViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenMainBrowserPageFinishedThenCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onMainBrowserPageFinished("https://example.com")
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenMainBrowserPageFinishedWithNullUrlThenCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onMainBrowserPageFinished(null)
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRequestPageContextThenCollectPageContextCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.requestPageContext()
+
+            val command = awaitItem()
+            assertEquals(DuckChatContextualSharedViewModel.Command.CollectPageContext, command)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenMultipleSubscribersThenAllReceiveCommands() = runTest {
+        testee.commands.test {
+            testee.commands.test {
+                testee.onOpenRequested()
+
+                assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+                cancelAndConsumeRemainingEvents()
+            }
+
+            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenRequestedThenSingleOpenSheetCommandEmitted() = runTest {
+        testee.commands.test {
+            testee.onOpenRequested()
+
+            assertEquals(DuckChatContextualSharedViewModel.Command.OpenSheet, awaitItem())
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }

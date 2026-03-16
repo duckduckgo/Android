@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve, mint amellyel az előfizetés meg lett vásárolva.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Privacy Pro aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
-    <string name="pirDescription">A kezdéshez a DuckDuckGo böngésző asztali verziójában lépj a <b>Beállítások &gt; Privacy Pro</b> menüpontra, és kattints a <b>Van előfizetésem</b> lehetőségre.</string>
+    <string name="pirTitle">A DuckDuckGo-előfizetés aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
+    <string name="pirDescription">A DuckDuckGo asztali böngészőjében lépj a <b>Beállítások &gt; Előfizetés a DuckDuckGóra</b> lehetőségre, majd a kezdéshez kattints erre: <b>Van előfizetésem</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Előfizetések</string>
     <string name="activitySubscriptionSettings">Előfizetési beállítások</string>
     <string name="activityActivateSubscription">Van előfizetésem</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>

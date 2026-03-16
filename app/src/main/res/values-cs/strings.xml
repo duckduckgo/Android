@@ -843,7 +843,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Už se těšíš na rychlejší prohlížeč, který tě ochrání?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
     <string name="preOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
     <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
@@ -855,6 +857,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
     <string name="preOnboardingAddressBarOkButton">Další</string>
@@ -907,9 +910,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Víš, že…?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 

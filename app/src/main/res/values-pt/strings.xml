@@ -809,7 +809,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>Pronto para um navegador mais rápido que te mantém protegido?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vamos lá!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Já estive aqui antes</string>
     <string name="preOnboardingDaxDialog2Title">Proteções ativadas!</string>
     <string name="preOnboardingDaxDialog2Button">Escolhe o teu navegador</string>
@@ -821,6 +823,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina dados de navegação com um botão</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
     <string name="preOnboardingAddressBarTitle">Onde devo posicionar a barra de endereços?</string>
     <string name="preOnboardingAddressBarOkButton">Seguinte</string>
@@ -869,9 +872,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Saiba mais</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Experimenta gratuitamente!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorar</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Sabias?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Queres acesso fácil ao chat privado com IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Seguinte</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[As funcionalidades de IA são privadas e opcionais. Podes fazer alterações em <b>Definições > Funcionalidades de IA</b>.]]></string>
 

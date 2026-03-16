@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
@@ -45,9 +46,6 @@ class NativeInputCallbacks(
     val onDuckAiChatSubmitted: (String) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
-    val onFireButtonTapped: () -> Unit,
-    val onTabSwitcherTapped: () -> Unit,
-    val onMenuTapped: () -> Unit,
     val onStopTapped: () -> Unit,
 )
 
@@ -109,29 +107,74 @@ class RealNativeInputManager @Inject constructor(
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
-        fun isDescendantOf(
-            ancestor: View,
-            view: View,
-        ): Boolean {
-            var current: View? = view
-            while (current != null) {
-                if (current === ancestor) return true
-                val parent = current.parent
-                current = parent as? View
-            }
-            return false
-        }
-
-        if (!isNativeInputFieldEnabled || isVisible) return
-
+        if (!isNativeInputFieldEnabled) return
         val widget = widgetFrom(rootView) ?: return
+        val widgetRoot = widget.asView().parent?.parent as? View
+
+        if (isVisible) {
+            onKeyboardShown(widgetRoot)
+        } else {
+            onKeyboardHidden(widget, widgetRoot)
+        }
+    }
+
+    private fun onKeyboardShown(widgetRoot: View?) {
+        if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
+        omnibarController.hide()
+        setWidgetCardEndMargin(0)
+        widgetRoot?.translationZ = 0f
+        if (layoutCoordinator.isWidgetBottom() && widgetRoot != null) {
+            layoutCoordinator.applyBottomCardShape(widgetRoot)
+        }
+    }
+
+    private fun onKeyboardHidden(widget: NativeInputWidget, widgetRoot: View?) {
+        updateWidgetFocus(widget)
+        if (!omnibarController.isDuckAiMode() && !omnibarController.isSplitMode()) {
+            showTabsAndMenuButtons(widgetRoot)
+        }
+    }
+
+    private fun updateWidgetFocus(widget: NativeInputWidget) {
         val focusedView = rootView.findFocus()
-        val focusWithinWidget = focusedView?.let { isDescendantOf(widget.asView(), it) } ?: false
+        val focusWithinWidget = focusedView != null && isDescendantOf(widget.asView(), focusedView)
         if (widget.hasInputFocus() || !focusWithinWidget) {
             widget.clearInputFocus()
         } else {
             widget.requestInputFocus()
         }
+    }
+
+    private fun showTabsAndMenuButtons(widgetRoot: View?) {
+        omnibarController.showTabsAndMenuButtons()
+        widgetRoot?.let {
+            it.bringToFront()
+            it.translationZ = 8f.toPx()
+        }
+        if (widgetRoot != null) {
+            layoutCoordinator.applyRoundedCardShape(widgetRoot)
+        }
+        rootView.post {
+            if (widgetRoot != null && widgetRoot.translationZ != 0f) {
+                setWidgetCardEndMargin(omnibarController.getButtonsWidth())
+            }
+        }
+    }
+
+    private fun isDescendantOf(ancestor: View, view: View): Boolean {
+        var current: View? = view
+        while (current != null) {
+            if (current === ancestor) return true
+            current = current.parent as? View
+        }
+        return false
+    }
+
+    private fun setWidgetCardEndMargin(margin: Int) {
+        val card = rootView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
+        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        params.marginEnd = margin
+        card.layoutParams = params
     }
 
     override fun showNativeInput(
@@ -246,20 +289,15 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
     ) {
         widgetFrom(widgetView)?.apply {
-            bindMainButtons(
-                onFireButtonTapped = callbacks.onFireButtonTapped,
-                onTabSwitcherTapped = callbacks.onTabSwitcherTapped,
-                onMenuTapped = callbacks.onMenuTapped,
-            )
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
+            hideMainButtons()
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
         bindChatSuggestions(widgetView, lifecycleOwner, callbacks.onChatSuggestionSelected)
         bindSearchTabAutocompleteClearing(widgetView, callbacks.onClearAutocomplete)
         applyInitialTabSelection(widgetView)
-        applyMainButtonsVisibility(widgetView)
         layoutCoordinator.applyBottomCardShape(widgetView)
     }
 
@@ -296,10 +334,6 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
-    private fun applyMainButtonsVisibility(widgetView: View) {
-        widgetFrom(widgetView)?.setMainButtonsVisibility(!omnibarController.isDuckAiMode())
-    }
-
     private fun attachWidget(widgetView: View) {
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams())
         if (layoutCoordinator.isWidgetBottom()) {
@@ -331,7 +365,6 @@ class RealNativeInputManager @Inject constructor(
         widget.bindChatSuggestions(
             lifecycleOwner = lifecycleOwner,
             onChatSuggestionSelected = onChatSuggestionSelected,
-            onChatTabSelected = { omnibarController.hide() },
             onShowSuggestions = { chatAdapter ->
                 adapter = adapter ?: autoCompleteList.adapter
                 autoCompleteList.adapter = chatAdapter

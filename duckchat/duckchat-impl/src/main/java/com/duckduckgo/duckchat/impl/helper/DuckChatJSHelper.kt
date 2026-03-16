@@ -16,9 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import android.graphics.Bitmap
-import android.util.Base64
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,9 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
-import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -75,7 +70,6 @@ class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
-    private val faviconManager: FaviconManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : DuckChatJSHelper {
@@ -166,11 +160,21 @@ class RealDuckChatJSHelper @Inject constructor(
                     val reason = data?.optString(REASON) ?: REASON_USER_ACTION
                     logcat { "Duck.ai Contextual: getAIChatPageContext reason $reason" }
                     if (pageContext.isNotEmpty()) {
-                        if (reason == REASON_USER_ACTION) {
-                            duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
-                            getPageContextResponse(featureName, method, it, pageContext, tabId)
-                        } else {
-                            null
+                        when (reason) {
+                            REASON_USER_ACTION -> {
+                                duckChatPixels.reportContextualPageContextManuallyAttachedFrontend()
+                                getPageContextResponse(featureName, method, it, pageContext, tabId)
+                            }
+                            REASON_INIT -> {
+                                if (duckChat.isAutomaticContextAttachmentEnabled()) {
+                                    getPageContextResponse(featureName, method, it, pageContext, tabId)
+                                } else {
+                                    null
+                                }
+                            }
+                            else -> {
+                                null
+                            }
                         }
                     } else {
                         logcat { "Duck.ai Contextual: page context is empty, can't add it" }
@@ -244,6 +248,11 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CHAT_CONTEXTUAL_MODE, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_CHAT_SYNC, duckChat.isChatSyncFeatureEnabled())
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
+                put(
+                    SUPPORTS_MULTIPLE_PAGE_CONTEXT,
+                    duckChat.isDuckChatContextualModeEnabled() &&
+                        duckChat.areMultipleContentAttachmentsEnabled(),
+                )
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -255,41 +264,15 @@ class RealDuckChatJSHelper @Inject constructor(
         pageContext: String,
         tabId: String,
     ): JsCallbackData {
-        val json = JSONObject(pageContext)
-        val url = json.optString("url").takeIf { it.isNotBlank() }
-        if (url != null) {
-            val favicon = faviconManager.loadFromDisk(tabId, url)
-            if (favicon != null) {
-                logcat { "Duck.ai: Found favicon for tab $tabId and url $url" }
-                val faviconBase64 = encodeBitmapToBase64(favicon)
-                json.put(
-                    "favicon",
-                    JSONArray().put(
-                        JSONObject().apply {
-                            put("href", faviconBase64)
-                            put("rel", "icon")
-                        },
-                    ),
-                )
-            }
-        }
-
         val params =
             JSONObject().apply {
                 put(
                     PAGE_CONTEXT,
-                    json,
+                    JSONObject(pageContext),
                 )
             }
 
         return JsCallbackData(params, featureName, method, id)
-    }
-
-    private fun encodeBitmapToBase64(bitmap: Bitmap): String {
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-        val encoded = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
-        return "data:image/png;base64,$encoded"
     }
 
     private fun getOpenKeyboardResponse(
@@ -333,8 +316,8 @@ class RealDuckChatJSHelper @Inject constructor(
 
     companion object {
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
-        private const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
-        private const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
+        const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
+        const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
@@ -358,11 +341,13 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CHAT_CONTEXTUAL_MODE = "supportsAIChatContextualMode"
         private const val SUPPORTS_CHAT_SYNC = "supportsAIChatSync"
         private const val SUPPORTS_PAGE_CONTEXT = "supportsPageContext"
+        private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
         private const val REASON = "reason"
         private const val REASON_USER_ACTION = "userAction"
+        private const val REASON_INIT = "init"
         private const val ENABLED = "enabled"
         const val SELECTOR = "selector"
         private const val DEFAULT_SELECTOR = "'user-prompt'"

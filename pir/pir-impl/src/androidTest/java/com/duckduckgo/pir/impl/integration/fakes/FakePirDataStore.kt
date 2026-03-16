@@ -30,10 +30,12 @@ class FakePirDataStore : PirDataStore {
     override var weeklyStatLastSentMs: Long = 0L
     override var hasBrokerConfigBeenManuallyUpdated: Boolean = false
     override var latestBackgroundScanRunInMs: Long = 0L
+    override var featureReceivedMs: Long = 0L
 
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
         resetUserData()
     }
 

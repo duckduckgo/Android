@@ -1,35 +1,30 @@
-name: Release - Run E2E Maestro Tests
+name: Ad-hoc Release Tests - Maestro Cloud
 
 on:
   workflow_dispatch:
     inputs:
-      app-version:
-        description: 'App Version for Testing'
+      commit-ref:
+        description: 'Branch name, tag, or commit SHA to build and test'
         required: true
         default: 'PLACEHOLDER'
         type: string
-      test-tag:
-        description: 'Maestro Tests tag to include'
-        required: true
-        default: 'releaseTest'
-        type: string
-
-env:
-  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-  emoji_info: ":information_source:" # ℹ️
-  emoji_success: ":white_check_mark:" # ✅
-  emoji_failure: ":x:" # ❌
 
 jobs:
   run-release-tests:
     name: Create release APK and run E2E Maestro tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          submodules: recursive
+
       - name: Checkout and Assemble
         id: assemble
         uses: ./.github/actions/checkout-and-assemble
         with:
-          commit: ${{ inputs.app-version }}
+          commit: ${{ inputs.commit-ref }}
           flavours: 'play'
           release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
           release_key: ${{ secrets.FAKE_RELEASE_KEY }}
@@ -47,7 +42,7 @@ jobs:
           app-file: ${{ steps.assemble.outputs.play_apk_path }}
           android-api-level: 30
           workspace: .maestro
-          include-tags: ${{ inputs.test-tag }}
+          include-tags: releaseTest
 
       - name: Analyze Maestro Flow Results
         if: always()
@@ -67,15 +62,3 @@ jobs:
           echo "Release Tests Step Conclusion: ${{ steps.release-tests.conclusion }}" # From Maestro action itself
           echo "Analyzed Flow Summary Status: ${{ steps.analyze-flow-results.outputs.flow_summary_status }}" # From analyzer action
           printf "Analyzed Flow Summary Message:\n%s\n" "${{ steps.analyze-flow-results.outputs.flow_summary_message }}"
-
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v2.0
-        with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Tag Android Release (Robin)
-          asana-task-description: Run Release Tests in Maestro has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-          action: 'create-asana-task'

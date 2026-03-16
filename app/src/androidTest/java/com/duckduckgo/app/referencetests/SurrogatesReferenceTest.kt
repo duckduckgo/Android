@@ -31,7 +31,6 @@ import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
-import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
@@ -61,6 +60,7 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.FeatureToggleFake
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc

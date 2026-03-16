@@ -43,6 +43,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -381,6 +382,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         context?.let {
             // var afterAnimation: () -> Unit = {}
             when (onboardingDialogType) {
+                SYNC_RESTORE -> {
+                    // TODO - SyncRestore: add dialog UI
+                }
+
                 INITIAL_REINSTALL_USER -> {
                     // TODO
                 }

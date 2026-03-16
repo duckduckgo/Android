@@ -20,7 +20,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -29,6 +28,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -256,17 +256,24 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            // Privacy Pro
+            // Privacy Pro onboarding
             canShowPrivacyProCta() -> {
-                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
-                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
-                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
-                } else {
-                    R.string.onboardingPrivacyProDaxDialogOkButton
-                }
+                DaxBubbleCta.DaxPrivacyProCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onboardingSkipped = false,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                )
+            }
 
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
+            // Privacy Pro onboarding for returning users who skipped onboarding
+            canShowPrivacyProCtaForSkippedOnboarding() -> {
+                DaxBubbleCta.DaxPrivacyProCta(
+                    onboardingStore,
+                    appInstallStore,
+                    onboardingSkipped = true,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                )
             }
 
             // Add Widget
@@ -302,6 +309,14 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun canShowPrivacyProCta(): Boolean =
         daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && isPrivacyProCtaAvailable()
+
+    @WorkerThread
+    private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
+        extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding().isEnabled() &&
+            hideTips() &&
+            appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogPrivacyProShown() &&
+            isPrivacyProCtaAvailable()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -478,14 +493,31 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    @Deprecated("New users won't have this option available since extended onboarding")
     private fun hideTips() = settingsDataStore.hideTips
 
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
+    suspend fun getPrivacyProOnboardingOrigin(): String =
+        withContext(dispatchers.io()) {
+            val skippedOnboarding = hideTips()
+            val isFreeTrialCopy = freeTrialCopyAvailable()
+            when {
+                skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_reinstall_tryfreecopy"
+                skippedOnboarding && !isFreeTrialCopy -> "funnel_onboarding_android_reinstall_subscribecopy"
+                !skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_newinstall_tryfreecopy"
+                else -> "funnel_onboarding_android_newinstall_subscribecopy"
+            }
+        }
+
+    suspend fun isPromoOnboardingDialogShowing(): Boolean =
+        withContext(dispatchers.io()) {
+            canShowPrivacyProCtaForSkippedOnboarding()
+        }
+
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
+        private const val PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS = 7L
     }
 }

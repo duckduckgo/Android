@@ -31,6 +31,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -44,11 +45,13 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,6 +74,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -97,6 +101,9 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
+    private val mockDuckChatDeleter: DuckChatDeleter = mock()
+    private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val mockSyncEngine: SyncEngine = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -133,6 +140,9 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDeviceSyncState,
                 cookiesManager,
+                mockDuckChatDeleter,
+                mockDuckChatSyncRepository,
+                mockSyncEngine,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1302,6 +1312,33 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when multiple context attachments enabled, areMultipleContentAttachmentsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments enabled and contextual mode disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
         whenever(cookiesManager.get()).thenReturn(cookieManager)
@@ -1337,6 +1374,64 @@ class RealDuckChatTest {
         whenever(cookiesManager.get()).thenReturn(null)
 
         assertFalse(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository).recordSingleChatDeletion("abc-123")
+        verify(mockSyncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `when duck ai url without chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when non duck ai url with chatID param then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://example.com/?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when duck ai url with blank chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when legacy duckduckgo duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+    }
+
+    @Test
+    fun `when deleteChat and deleter returns false then deleteChat returns false`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(false)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(mockSyncEngine, never()).triggerSync(any())
     }
 
     companion object {

@@ -294,6 +294,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS("m_experimental-browsing-menu_displayed_customtabs"),
     EXPERIMENTAL_MENU_DISPLAYED_ERROR("m_experimental-browsing-menu_displayed_error"),
     EXPERIMENTAL_MENU_DISMISSED("m_experimental-browsing-menu_dismissed"),
+    SHEET_MENU_AICHAT("m_sheet-menu_aichat"),
+    SHEET_MENU_PASSWORDS("m_sheet-menu_passwords"),
+    SHEET_MENU_NEW_DUCK_ADDRESS("m_sheet-menu_new-duck-address"),
+    SHEET_MENU_VPN("m_sheet-menu_vpn"),
+    SHEET_MENU_SETTINGS("m_sheet-menu_settings"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),

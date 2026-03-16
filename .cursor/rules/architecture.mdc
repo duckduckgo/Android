@@ -238,6 +238,44 @@ dwellJob = scope.launch { /* cancels previous */ }
 
 ---
 
+## Navigation
+
+Use `GlobalActivityStarter` (from `navigation-api`) to navigate between activities. Never construct or start an Intent directly — the starter keeps navigation decoupled across modules.
+
+### Registering a screen
+
+Define an `ActivityParams` type and annotate the activity. Anvil codegen generates the mapper automatically.
+
+```kotlin
+// In the feature's -api module
+data class MyScreenParams(val id: String) : GlobalActivityStarter.ActivityParams
+
+// In the feature's -impl module
+@ContributeToActivityStarter(MyScreenParams::class)
+class MyActivity : DuckDuckGoActivity() {
+    private val params by lazy { intent.getActivityParams(MyScreenParams::class.java) }
+}
+```
+
+Use `screenName` to opt into deeplink support:
+```kotlin
+@ContributeToActivityStarter(MyScreenParams::class, screenName = "myScreen")
+```
+
+### Starting a screen — choose the right overload
+
+| Situation | Use |
+|---|---|
+| Fire and forget | `globalActivityStarter.start(context, params)` |
+| Need a result back | `globalActivityStarter.startForResult(context, params, launcher)` |
+| Need the raw `Intent` (e.g. `PendingIntent` for a notification) | `globalActivityStarter.startIntent(context, params)` |
+
+**Do not** use `startIntent()` + `launcher.launch(intent)` — use `startForResult()` instead. The `startIntent()` path returns a nullable `Intent` and calling `launch(null)` will crash.
+
+`FLAG_ACTIVITY_NEW_TASK` is added automatically when `context` is not an `Activity` (Services, broadcast receivers, JS message handlers, etc.) — do not add it manually.
+
+---
+
 ## URL vs. Search Classification
 
 Use `QueryUrlPredictor` (from `browser-api`) to decide whether a string is a navigable URL or a search query. Do **not** use `UriString.isWebUrl()` for this — it uses a regex that is too permissive (e.g. `bbc.comcomcomcom` passes).
@@ -263,22 +301,6 @@ private fun isNavigate(query: String): Boolean =
 import logcat.logcat   // correct
 // NOT: import com.squareup.logcat.logcat
 ```
-
----
-
-## Git Workflow
-
-Branch naming: `<purpose>/<git-username>/<feature-name>`
-
-- `purpose`: `feature`, `fix`, `poc`, `refactor`, `chore`, etc.
-- `git-username`: the author's GitHub handle (run `gh api user --jq '.login'` if unsure — for this repo it is `aitorvs`)
-- `feature-name`: kebab-case description
-
-Examples: `feature/aitorvs/duck-ai-url-routing`, `fix/aitorvs/bookmark-crash`
-
-### Pull Requests
-
-Use the repo's PR template (`.github/PULL_REQUEST_TEMPLATE.md`). Always ask the user for the Asana task link before creating a PR — it goes in the `Task/Issue URL:` field at the top.
 
 ---
 

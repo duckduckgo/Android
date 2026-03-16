@@ -7,7 +7,7 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_displayed": {
         "description": "Fires when the experimental browsing menu is displayed to the user",
@@ -15,7 +15,7 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_displayed_ntp": {
         "description": "Fires when the experimental browsing menu is displayed to the user on the new tab page",
@@ -23,7 +23,7 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_disabled": {
         "description": "Fires when the experimental browsing menu feature is disabled",
@@ -31,7 +31,7 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_enabled": {
         "description": "Fires when the experimental browsing menu feature is enabled",
@@ -39,7 +39,7 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_displayed_aichat": {
         "description": "Fires when the experimental browsing menu is displayed to the user on the AI Chat page",
@@ -47,7 +47,7 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_displayed_customtabs": {
         "description": "Fires when the experimental browsing menu is displayed to the user on the custom tab page",
@@ -55,7 +55,7 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_displayed_error": {
         "description": "Fires when the experimental browsing menu is displayed to the user on an error page",
@@ -63,7 +63,7 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
     },
     "m_experimental-browsing-menu_dismissed": {
         "description": "Fires when the experimental browsing menu is dismissed by the user",
@@ -71,6 +71,46 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"],
-        "expires": "2026-03-31"
+        "expires": "2026-04-30"
+    },
+    "m_sheet-menu_aichat": {
+        "description": "Fires when the user taps the Duck.ai (New AI Chat) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-30"
+    },
+    "m_sheet-menu_passwords": {
+        "description": "Fires when the user taps the Password Manager (Autofill) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-30"
+    },
+    "m_sheet-menu_new-duck-address": {
+        "description": "Fires when the user taps the Email Protection (New Duck Address) item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-30"
+    },
+    "m_sheet-menu_settings": {
+        "description": "Fires when the user taps the Settings item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-30"
+    },
+    "m_sheet-menu_vpn": {
+        "description": "Fires when the user taps the VPN item in the sheet browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2026-04-30"
     }
 }

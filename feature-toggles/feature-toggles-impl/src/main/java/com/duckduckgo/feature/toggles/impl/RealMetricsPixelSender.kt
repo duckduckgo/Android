@@ -54,7 +54,7 @@ class RealMetricsPixelSender @Inject constructor(
                 when (metricsPixel.type) {
                     MetricType.NORMAL -> sendNormal(definition)
                     MetricType.COUNT_WHEN_IN_WINDOW -> sendCount(definition, metricsPixel.value.toInt())
-                    MetricType.COUNT_ALWAYS -> Unit // TODO: not implemented yet
+                    MetricType.COUNT_ALWAYS -> sendCountAlways(definition, metricsPixel.value.toInt())
                 }
             }
         }
@@ -74,6 +74,18 @@ class RealMetricsPixelSender @Inject constructor(
         if (count >= threshold) return
         val newCount = store.increaseMetricForPixelDefinition(definition)
         if (newCount != threshold) return
+        val tag = tagFor(definition)
+        if (store.wasPixelFired(tag)) return
+        pixel.fire(definition.pixelName, definition.params)
+        store.storePixelTag(tag)
+    }
+
+    private suspend fun sendCountAlways(definition: PixelDefinition, threshold: Int) {
+        val count = store.getMetricForPixelDefinition(definition)
+        if (count >= threshold) return
+        val newCount = store.increaseMetricForPixelDefinition(definition)
+        if (newCount != threshold) return
+        if (!isInConversionWindow(definition)) return
         val tag = tagFor(definition)
         if (store.wasPixelFired(tag)) return
         pixel.fire(definition.pixelName, definition.params)

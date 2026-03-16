@@ -22,6 +22,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
@@ -33,6 +34,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -67,6 +69,8 @@ class WebViewDataManagerTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockDataClearingWideEvent: DataClearingWideEvent = mock()
+    private val mockDuckAiChatDeletionListener: DuckAiChatDeletionListener = mock()
+    private val mockDuckAiChatDeletionListeners: PluginPoint<DuckAiChatDeletionListener> = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private val testee by lazy {
@@ -84,12 +88,14 @@ class WebViewDataManagerTest {
             mockAppBuildConfig,
             mockSettingsDataStore,
             mockDataClearingWideEvent,
+            mockDuckAiChatDeletionListeners,
         )
     }
 
     @Before
     fun setup(): Unit = runBlocking {
         whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
+        whenever(mockDuckAiChatDeletionListeners.getPlugins()).thenReturn(listOf(mockDuckAiChatDeletionListener))
     }
 
     @Test
@@ -318,7 +324,7 @@ class WebViewDataManagerTest {
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
+            verify(mockWebLocalStorageManager).clearWebLocalStorage()
             verify(mockStorage, never()).deleteAllData()
             assertTrue(webView.historyCleared)
             assertTrue(webView.cacheCleared)
@@ -330,14 +336,14 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenClearDataWithShouldClearDataFalseAndShouldClearChatsTrueThenOnlyWebStorageCleared() = runTest {
+    fun whenClearDataWithShouldClearDataFalseAndShouldClearChatsTrueThenOnlyDuckAiDataCleared() = runTest {
         withContext(Dispatchers.Main) {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
             val webView = TestWebView(context)
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
+            verifyNoInteractions(mockWebLocalStorageManager)
             verify(mockStorage, never()).deleteAllData()
             assertFalse(webView.historyCleared)
             assertFalse(webView.cacheCleared)
@@ -356,7 +362,7 @@ class WebViewDataManagerTest {
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = true)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, true)
+            verify(mockWebLocalStorageManager).clearWebLocalStorage()
             verify(mockStorage, never()).deleteAllData()
             assertTrue(webView.historyCleared)
             assertTrue(webView.cacheCleared)
@@ -375,7 +381,7 @@ class WebViewDataManagerTest {
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = false)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, false)
+            verifyNoInteractions(mockWebLocalStorageManager)
             verify(mockStorage, never()).deleteAllData()
             assertFalse(webView.historyCleared)
             assertFalse(webView.cacheCleared)
@@ -393,11 +399,11 @@ class WebViewDataManagerTest {
             val exception = RuntimeException("test")
             val webView = TestWebView(context)
             whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
-            whenever(mockWebLocalStorageManager.clearWebLocalStorage(true, false)).thenThrow(exception)
+            whenever(mockWebLocalStorageManager.clearWebLocalStorage()).thenThrow(exception)
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(true, false)
+            verify(mockWebLocalStorageManager).clearWebLocalStorage()
             verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
             verify(mockStorage).deleteAllData()
             assertTrue(webView.historyCleared)
@@ -407,18 +413,14 @@ class WebViewDataManagerTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenClearDataWithParametersAndThrowsExceptionAndShouldClearDataFalseThenDoNotFallbackToDeleteAllData() = runTest {
+    fun whenClearDataWithParametersAndShouldClearDataFalseThenWebLocalStorageNotCleared() = runTest {
         withContext(Dispatchers.Main) {
             feature.webLocalStorage().setRawStoredState(State(enable = true))
-            val exception = RuntimeException("test")
             val webView = TestWebView(context)
-            whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
-            whenever(mockWebLocalStorageManager.clearWebLocalStorage(false, true)).thenThrow(exception)
 
             testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
 
-            verify(mockWebLocalStorageManager).clearWebLocalStorage(false, true)
-            verify(mockCrashLogger).logCrash(CrashLogger.Crash(shortName = "web_storage_on_clear_error", t = exception))
+            verifyNoInteractions(mockWebLocalStorageManager)
             verify(mockStorage, never()).deleteAllData()
             assertFalse(webView.historyCleared)
             assertFalse(webView.cacheCleared)
@@ -560,6 +562,120 @@ class WebViewDataManagerTest {
             verify(mockIndexedDBManager, never()).clearOnlyDuckAiData()
         }
     }
+
+    // region notifyOnDuckChatsDeleted tests
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndClearDuckAiDataEnabledAndIndexedDBEnabledThenNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndClearDuckAiDataDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(false)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndIndexedDBDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = false))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataLegacyAndIndexedDBThrowsThenStillNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockSettingsDataStore.clearDuckAiData).thenReturn(true)
+            whenever(mockIndexedDBManager.clearIndexedDB(true)).thenThrow(RuntimeException("test"))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueThenNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataFalseThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = true, shouldClearDuckAiData = false)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueAndIndexedDBDisabledThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataGranularWithShouldClearDuckAiDataTrueAndIndexedDBThrowsThenDoNotNotifyDuckChatsDeleted() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            whenever(mockIndexedDBManager.clearOnlyDuckAiData()).thenThrow(RuntimeException("test"))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage, shouldClearBrowserData = false, shouldClearDuckAiData = true)
+
+            verify(mockDuckAiChatDeletionListener, never()).onDuckAiChatsDeleted()
+        }
+    }
+
+    // endregion
 
     private class TestWebView(context: Context) : WebView(context) {
 

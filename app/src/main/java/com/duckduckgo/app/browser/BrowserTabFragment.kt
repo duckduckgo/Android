@@ -1272,11 +1272,6 @@ class BrowserTabFragment :
                     )
                 },
                 onChatSuggestionSelected = { query -> userEnteredQuery(query) },
-                onFireButtonTapped = { onFireButtonPressed() },
-                onTabSwitcherTapped = { launchTabSwitcher() },
-                onMenuTapped = {
-                    launchBrowserMenu(addExtraDelay = omnibarRepository.omnibarType == OmnibarType.SPLIT)
-                },
                 onStopTapped = {
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1711,6 +1706,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
+                pixel.fire(AppPixelName.SHEET_MENU_SETTINGS)
                 browserActivity?.launchSettings()
             }
             onMenuItemClicked(changeBrowserModeMenuItem) {
@@ -1728,6 +1724,7 @@ class BrowserTabFragment :
                 viewModel.onPinPageToHomeSelected()
             }
             onMenuItemClicked(createAliasMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_NEW_DUCK_ADDRESS)
                 viewModel.consumeAliasAndCopyToClipboard()
             }
             onMenuItemClicked(openInAppMenuItem) {
@@ -1739,6 +1736,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(autofillMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
+                pixel.fire(AppPixelName.SHEET_MENU_PASSWORDS)
                 viewModel.onAutofillMenuSelected()
             }
             onMenuItemClicked(openInDdgBrowserMenuItem) {
@@ -1748,12 +1746,15 @@ class BrowserTabFragment :
                 }
             }
             onMenuItemClicked(vpnMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_VPN)
                 viewModel.onVpnMenuClicked()
             }
             onMenuItemClicked(newDuckChatTabMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 viewModel.openNewDuckChat(omnibar.viewMode)
             }
             onMenuItemClicked(newDuckChatMenuItem) {
+                pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
                 activity?.currentFocus?.let {
                     it.hideKeyboard()
                     it.clearFocus()
@@ -2025,6 +2026,17 @@ class BrowserTabFragment :
                 processCommand(it)
             },
         )
+
+        sharedContextualViewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatContextualSharedViewModel.Command.CollectPageContext -> {
+                        viewModel.collectPageContext()
+                    }
+
+                    else -> {}
+                }
+            }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
@@ -2767,9 +2779,10 @@ class BrowserTabFragment :
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
-            is Command.DisableDuckAIFullScreen -> {
+            is Command.DuckAIFullScreenDisabled -> {
                 omnibar.setViewMode(Browser(it.url))
                 nativeInputManager.hideNativeInput()
+                sharedContextualViewModel.onMainBrowserPageFinished(it.url)
             }
 
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
@@ -3506,7 +3519,6 @@ class BrowserTabFragment :
 
         setupContextualSheetHeightSync()
 
-        omnibar.setExpanded(false)
         duckAiContextualFragment?.let { fragment ->
             openExistingContextualFragment(fragment)
         } ?: run {
@@ -3516,10 +3528,11 @@ class BrowserTabFragment :
         reactToDuckChatContextualSheetResult()
         ensureBrowserIsCompatibleWithContextualSheetState()
 
-        viewModel.collectPageContext()
+        omnibar.setExpanded(false)
     }
 
     private fun createNewContextualFragment(tabId: String) {
+        logcat { "Duck.ai Contextual: createNewContextualFragment" }
         val fragment = DuckChatContextualFragment()
         val args = Bundle()
         args.putString(DuckChatContextualFragment.KEY_DUCK_AI_CONTEXTUAL_TAB_ID, tabId)
@@ -3535,6 +3548,7 @@ class BrowserTabFragment :
     }
 
     private fun openExistingContextualFragment(fragment: DuckChatContextualFragment) {
+        logcat { "Duck.ai Contextual: openExistingContextualFragment" }
         val transaction = childFragmentManager.beginTransaction()
         transaction.show(fragment)
         transaction.commit()
@@ -5322,6 +5336,7 @@ class BrowserTabFragment :
         }
 
         fun showNewTab() {
+            logcat { "New tab: Show new tab" }
             newTabPageProvider
                 .provideNewTabPageVersion()
                 .onEach { newTabPage ->

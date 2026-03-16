@@ -1,0 +1,4 @@
+tracker.example/noop.js application/javascript
+(() => {
+    'use strict';
+})();

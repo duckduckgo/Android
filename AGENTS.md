@@ -11,6 +11,7 @@ The following rule files contain detailed guidance for specific topics. Read the
 | `.cursor/rules/maestro-ui-tests.mdc` | Maestro test setup, organization, tags, running locally and in CI |
 | `.cursor/rules/wide-events.mdc` | Wide event API, FlowStatus, CleanupPolicy, implementation patterns |
 | `.cursor/rules/dependency-updates.mdc` | How to safely update Android library dependencies |
+| `.cursor/rules/contributions.mdc` | Branch naming, commit messages, PR creation workflow |
 
 ---
 

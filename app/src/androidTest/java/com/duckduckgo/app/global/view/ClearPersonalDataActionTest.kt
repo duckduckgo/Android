@@ -309,21 +309,21 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearDataForSpecificDomainsCalledAndFeatureNotSupportedThenReturnsFeatureNotSupported() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
-        val result = testee.clearDataForSpecificDomains(domains = setOf("example.com"), shouldClearDuckAiData = false)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("example.com"))
         assertTrue(result is ClearDataResult.FeatureNotSupported)
     }
 
     @Test
     fun whenClearDataForSpecificDomainsCalledWithEmptyDomainsAndFeatureSupportedThenReturnsSuccess() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
-        val result = testee.clearDataForSpecificDomains(domains = emptySet(), shouldClearDuckAiData = false)
+        val result = testee.clearDataForSpecificDomains(domains = emptySet())
         assertTrue(result is ClearDataResult.Success)
     }
 
     @Test
     fun whenClearDataForSpecificDomainsCalledWithDuckDuckGoDomainsAndShouldNotClearDuckAiThenReturnsSuccess() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
-        val result = testee.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai"), shouldClearDuckAiData = false)
+        val result = testee.clearDataForSpecificDomains(domains = setOf("duckduckgo.com", "duck.ai"))
         assertTrue(result is ClearDataResult.Success)
     }
 

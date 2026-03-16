@@ -71,8 +71,8 @@ class RealPageContextJSHelperTest {
     }
 
     @Test
-    fun whenOnContextualOpenedThenReturnsCollectSubscription() {
-        val result = testee.onContextualOpened()
+    fun whenCollectPageContextThenReturnsCollectSubscription() {
+        val result = testee.collectPageContext()
 
         assertEquals(RealPageContextJSHelper.PAGE_CONTEXT_FEATURE_NAME, result.featureName)
         assertEquals("collect", result.subscriptionName)

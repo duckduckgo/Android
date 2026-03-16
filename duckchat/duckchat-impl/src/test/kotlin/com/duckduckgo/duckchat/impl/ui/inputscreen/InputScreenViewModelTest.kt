@@ -11,6 +11,8 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -40,6 +42,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSess
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentItem
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
@@ -96,6 +99,7 @@ class InputScreenViewModelTest {
     private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
     private val omnibarRepository: OmnibarRepository = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
+    private val tabRepository: TabRepository = mock()
 
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
@@ -144,6 +148,7 @@ class InputScreenViewModelTest {
             duckChatFeature = duckChatFeature,
             chatSuggestionsReader = chatSuggestionsReader,
             queryUrlPredictor = queryUrlPredictor,
+            tabRepository = tabRepository,
         )
 
     @Test
@@ -2470,6 +2475,273 @@ class InputScreenViewModelTest {
             advanceUntilIdle()
 
             assertTrue(viewModel.chatSuggestions.value.isEmpty())
+        }
+
+    // endregion
+
+    // region chat tab attachments
+
+    @Test
+    fun `when feature flag disabled then onChatTagTextChanged does not show popup`() =
+        runTest {
+            whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "1", title = "Duck", url = "https://duck.com")))
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when feature flag enabled and @ typed then popup shows matching tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com"),
+                    TabEntity(tabId = "2", title = "Example", url = "https://example.com"),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            val state = viewModel.tabAttachmentState.value
+            assertTrue(state.popupVisible)
+            assertEquals(2, state.filteredTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when @ typed with query then filters tabs by title`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com"),
+                    TabEntity(tabId = "2", title = "Example", url = "https://example.com"),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@duck", 5)
+            advanceUntilIdle()
+
+            val state = viewModel.tabAttachmentState.value
+            assertTrue(state.popupVisible)
+            assertEquals(1, state.filteredTabs.size)
+            assertEquals("DuckDuckGo", state.filteredTabs[0].title)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when no tabs match query then popup is hidden`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@xyz", 4)
+            advanceUntilIdle()
+
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab selected then token is returned with @ prefix`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            val token = viewModel.onTabAttachmentSelected(item)
+
+            assertEquals("@Example ", token)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab with long title selected then token is ellipsized`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "A Very Long Tab Title That Exceeds Limit", url = "https://example.com")
+            val token = viewModel.onTabAttachmentSelected(item)
+
+            assertEquals("@A Very Long Tab Titl\u2026 ", token)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab selected then it is added to attached tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            viewModel.onTabAttachmentSelected(item)
+
+            val attachedTabs = viewModel.tabAttachmentState.value.attachedTabs
+            assertEquals(1, attachedTabs.size)
+            assertEquals("1", attachedTabs[0].tabId)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when same tab selected twice then it is not duplicated in the state`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            viewModel.onTabAttachmentSelected(item)
+            viewModel.onTabAttachmentSelected(item)
+
+            assertEquals(1, viewModel.tabAttachmentState.value.attachedTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab attachment removed then it is removed from attached tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
+            viewModel.onTabAttachmentRemoved("1")
+
+            assertTrue(viewModel.tabAttachmentState.value.attachedTabs.isEmpty())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat submitted with attached tabs then query is enriched`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
+
+            viewModel.onChatSubmitted("hello @Example")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello @Example\n\n[Attached tabs: Example (https://example.com)]")
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat submitted without attached tabs then query is not enriched`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSubmitted("hello")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello")
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat submitted then attached tabs are cleared`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
+            viewModel.onChatSubmitted("hello @Example")
+
+            assertTrue(viewModel.tabAttachmentState.value.attachedTabs.isEmpty())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tabs have blank url then they are filtered out`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "Good Tab", url = "https://example.com"),
+                    TabEntity(tabId = "2", title = "Blank URL", url = ""),
+                    TabEntity(tabId = "3", title = "Null URL", url = null),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertEquals(1, viewModel.tabAttachmentState.value.filteredTabs.size)
+            assertEquals("Good Tab", viewModel.tabAttachmentState.value.filteredTabs[0].title)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when popup limited to max tabs then only 5 shown`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            val tabs = (1..10).map { TabEntity(tabId = "$it", title = "Tab $it", url = "https://tab$it.com") }
+            whenever(tabRepository.getTabs()).thenReturn(tabs)
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@Tab", 4)
+            advanceUntilIdle()
+
+            assertEquals(5, viewModel.tabAttachmentState.value.filteredTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tag query removed then popup is hidden`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "Example", url = "https://example.com")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@ex", 3)
+            advanceUntilIdle()
+            assertTrue(viewModel.tabAttachmentState.value.popupVisible)
+
+            viewModel.onChatTagTextChanged("hello", 5)
+            advanceUntilIdle()
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab has blank title then host is used as title`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "", url = "https://example.com/page")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertEquals("example.com", viewModel.tabAttachmentState.value.filteredTabs[0].title)
+        }
+
+    @Test
+    fun `when chat submitted with flag disabled then query is not enriched`() =
+        runTest {
+            // Flag is disabled by default
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSubmitted("hello")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello")
         }
 
     // endregion

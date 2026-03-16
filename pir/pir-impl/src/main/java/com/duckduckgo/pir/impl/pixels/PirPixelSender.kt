@@ -834,7 +834,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_OPTOUT_SUBMIT_SUCCESS_RATE to optOutSuccessRate.toString(),
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE, params)
     }
 
     override fun reportBrokerOptOutConfirmed7Days(brokerUrl: String) {
@@ -842,7 +842,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutUnconfirmed7Days(brokerUrl: String) {
@@ -850,7 +850,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutConfirmed14Days(brokerUrl: String) {
@@ -858,7 +858,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutUnconfirmed14Days(brokerUrl: String) {
@@ -866,7 +866,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutConfirmed21Days(brokerUrl: String) {
@@ -874,7 +874,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutUnconfirmed21Days(brokerUrl: String) {
@@ -882,7 +882,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutConfirmed42Days(brokerUrl: String) {
@@ -890,7 +890,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT, params)
     }
 
     override fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String) {
@@ -898,19 +898,19 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
         )
 
-        fire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
     }
 
     override fun reportDAU() {
-        fire(PIR_ENGAGEMENT_DAU)
+        enqueueFire(PIR_ENGAGEMENT_DAU)
     }
 
     override fun reportWAU() {
-        fire(PIR_ENGAGEMENT_WAU)
+        enqueueFire(PIR_ENGAGEMENT_WAU)
     }
 
     override fun reportMAU() {
-        fire(PIR_ENGAGEMENT_MAU)
+        enqueueFire(PIR_ENGAGEMENT_MAU)
     }
 
     override fun reportWeeklyChildOrphanedOptOuts(
@@ -924,7 +924,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ORPHANED_COUNT to orphanedRecordsCount.toString(),
         )
 
-        fire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
+        enqueueFire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
     }
 
     override fun reportScanStarted(brokerUrl: String) {
@@ -1351,7 +1351,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_SCAN_FREQUENCY to scanFrequencyWithinThreshold.toString(),
         )
-        fire(PIR_BG_STATS, params)
+        enqueueFire(PIR_BG_STATS, params)
     }
 
     override fun reportScanInvalidEvent(
@@ -1394,9 +1394,9 @@ class RealPirPixelSender @Inject constructor(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
     ) {
-        pixel.getPixelNames().forEach { (_, pixelName) ->
+        pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             logcat { "PIR-LOGGING: $pixelName params: $params" }
-            pixelSender.enqueueFire(pixelName = pixelName, parameters = params)
+            pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
         }
     }
 

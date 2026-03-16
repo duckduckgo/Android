@@ -809,7 +809,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
     <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
@@ -821,6 +823,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
     <string name="preOnboardingAddressBarOkButton">Næste</string>
@@ -869,9 +872,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Vidste du?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
