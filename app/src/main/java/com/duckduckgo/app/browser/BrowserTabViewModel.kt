@@ -4225,9 +4225,10 @@ class BrowserTabViewModel @Inject constructor(
                     val pageContext = pageContextJSHelper.processPageContext(featureName, method, data, tabId)
                     if (pageContext != null) {
                         if (androidBrowserConfig.storePageContext().isEnabled()) {
+                            val webViewUrl = withContext(dispatchers.main()) { getWebViewUrl() }
                             tabPageContextRepository.storePageContext(
                                 tabId = tabId,
-                                url = url.orEmpty(),
+                                url = webViewUrl.orEmpty(),
                                 serializedPageContext = pageContext,
                             )
                         }

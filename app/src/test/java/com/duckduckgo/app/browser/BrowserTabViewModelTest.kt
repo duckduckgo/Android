@@ -5601,7 +5601,7 @@ class BrowserTabViewModelTest {
 
             verify(mockTabPageContextRepository).storePageContext(
                 eq("abc"),
-                anyString(),
+                eq("someUrl"),
                 eq(serializedContext),
             )
         }
