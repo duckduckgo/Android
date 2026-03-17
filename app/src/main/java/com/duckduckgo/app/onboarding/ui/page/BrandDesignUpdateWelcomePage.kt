@@ -290,7 +290,19 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         onAnimationEnd: () -> Unit,
     ) {
         outroAnimatorSet = buildOutroAnimatorSet().apply { start() }
-        backgroundAnimator?.transitionTo(step = nextStep, onAnimationStarted = onAnimationStart, onAnimationEnd = onAnimationEnd)
+
+        val enterStartX = if (resources.configuration.smallestScreenWidthDp >= 600) {
+            binding.daxDialogCta.root.right.toFloat()
+        } else {
+            null
+        }
+
+        backgroundAnimator?.transitionTo(
+            step = nextStep,
+            enterStartX = enterStartX,
+            onAnimationStarted = onAnimationStart,
+            onAnimationEnd = onAnimationEnd,
+        )
     }
 
     override fun onViewCreated(

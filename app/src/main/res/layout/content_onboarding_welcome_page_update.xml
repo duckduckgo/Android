@@ -116,7 +116,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:alpha="0"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -116,13 +116,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:alpha="0"
+        android:visibility="invisible"
         app:layout_constrainedWidth="true"
-        tools:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="600dp" />
+        app:layout_constraintWidth_max="600dp"
+        tools:visibility="visible" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/welcomeScreenWalkingDax"
