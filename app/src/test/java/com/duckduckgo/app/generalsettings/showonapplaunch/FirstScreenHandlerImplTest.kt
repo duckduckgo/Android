@@ -18,7 +18,6 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -35,7 +34,6 @@ class FirstScreenHandlerImplTest {
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
     private val settingsDataStore: SettingsDataStore = mock()
-    private val tabRepository: TabRepository = mock()
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
@@ -52,129 +50,150 @@ class FirstScreenHandlerImplTest {
             androidBrowserConfigFeature = androidBrowserConfigFeature,
             showOnAppLaunchFeature = showOnAppLaunchFeature,
             settingsDataStore = settingsDataStore,
-            tabRepository = tabRepository,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             appCoroutineScope = testScope,
         )
     }
 
+    // --- Fresh launch tests (ShowOnAppLaunch behavior) ---
+
     @Test
-    fun whenIdleReturnDisabledAndShowOnAppLaunchEnabledThenDelegates() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+    fun whenFreshLaunchAndShowOnAppLaunchEnabledThenDelegates() = runTest {
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
-        verify(tabRepository, never()).add()
     }
 
     @Test
-    fun whenIdleReturnDisabledAndShowOnAppLaunchDisabledThenDoesNothing() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+    fun whenFreshLaunchAndShowOnAppLaunchDisabledThenDoesNothing() = runTest {
         whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(false)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
 
         verifyNoInteractions(showOnAppLaunchOptionHandler)
-        verify(tabRepository, never()).add()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndElapsedExceedsTimeoutThenAddsNewTab() = runTest {
+    fun whenFreshLaunchThenDoesNotCheckIdleReturn() = runTest {
+        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = true)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(idleReturnToggle, never()).isEnabled()
+    }
+
+    // --- Cold start tests (idle return behavior) ---
+
+    @Test
+    fun whenColdStartAndIdleReturnEnabledAndElapsedExceedsTimeoutThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
         val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
 
-        testee.onOpen(isFreshLaunch = true)
+        testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(tabRepository).add()
-        verify(showOnAppLaunchOptionHandler, never()).handleAppLaunchOption()
-    }
-
-    @Test
-    fun whenIdleReturnEnabledAndElapsedUnderTimeoutThenDelegates() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-        val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
-
-        testee.onOpen(isFreshLaunch = true)
-        testScope.testScheduler.advanceUntilIdle()
-
-        verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndNoTimestampThenAddsNewTab() = runTest {
+    fun whenColdStartAndIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
+        val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenColdStartAndIdleReturnEnabledAndNoTimestampThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
 
-        testee.onOpen(isFreshLaunch = true)
+        testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(tabRepository).add()
-    }
-
-    @Test
-    fun whenIdleReturnEnabledAndSettingsNullThenDelegates() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn(null)
-        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-
-        testee.onOpen(isFreshLaunch = true)
-        testScope.testScheduler.advanceUntilIdle()
-
-        verify(tabRepository, never()).add()
         verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 
     @Test
-    fun whenIdleReturnEnabledAndSettingsMalformedThenDelegates() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("not json")
-        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-
-        testee.onOpen(isFreshLaunch = true)
-        testScope.testScheduler.advanceUntilIdle()
-
-        verify(tabRepository, never()).add()
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
-    }
-
-    @Test
-    fun whenIdleReturnEnabledAndTimeoutMinutesMissingThenDelegates() = runTest {
-        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"otherKey": 30}""")
-        whenever(showOnAppLaunchToggle.isEnabled()).thenReturn(true)
-
-        testee.onOpen(isFreshLaunch = true)
-        testScope.testScheduler.advanceUntilIdle()
-
-        verify(tabRepository, never()).add()
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
-    }
-
-    @Test
-    fun whenIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenAddsNewTab() = runTest {
+    fun whenColdStartAndIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
         val exactlyThirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000)
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(exactlyThirtyMinutesAgo)
 
-        testee.onOpen(isFreshLaunch = true)
+        testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
 
-        verify(tabRepository).add()
-        verify(showOnAppLaunchOptionHandler, never()).handleAppLaunchOption()
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
+
+    @Test
+    fun whenColdStartAndIdleReturnEnabledAndSettingsNullThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(null)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenColdStartAndIdleReturnEnabledAndSettingsMalformedThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("not json")
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenColdStartAndIdleReturnEnabledAndTimeoutMinutesMissingThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"otherKey": 30}""")
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenColdStartAndIdleReturnDisabledThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenColdStartThenDoesNotCheckShowOnAppLaunch() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(false)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchToggle, never()).isEnabled()
+    }
+
+    // --- onClose ---
 
     @Test
     fun whenOnCloseThenWritesTimestamp() {
