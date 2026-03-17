@@ -76,7 +76,7 @@ class DataClearing @Inject constructor(
         clearDuckAiChatIfNeeded(tabUrl)
 
         navigationHistory.removeHistoryForTab(tabId)
-        tabRepository.deleteTabAndSelectSource(tabId)
+        tabRepository.deleteTabs(listOf(tabId))
 
         clearContextualChatDataIfNeeded(tabId)
 
