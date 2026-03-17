@@ -80,6 +80,6 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     companion object {
-        private const val DEFAULT_TIMEOUT_MS = 1 * 60 * 1000L // 30 minutes
+        private const val DEFAULT_TIMEOUT_MS = 30 * 60 * 1000L // 30 minutes
     }
 }
