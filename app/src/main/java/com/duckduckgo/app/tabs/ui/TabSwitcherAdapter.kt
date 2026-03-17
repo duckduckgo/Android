@@ -39,7 +39,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemDuckAiTabGridBinding
@@ -263,7 +263,7 @@ class TabSwitcherAdapter(
         holder.title.text = tab.tabEntity.title ?: ""
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)
-        loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
+        loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder, isDuckAiTab = true)
         loadSelectionState(holder, tab)
         attachTabClickListeners(
             tabViewHolder = holder,
@@ -450,7 +450,7 @@ class TabSwitcherAdapter(
                 logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
-                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
+                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder, isDuckAiTab = true)
             }
             bundle.getString(DIFF_KEY_TITLE)?.let {
                 viewHolder.title.text = it
@@ -515,6 +515,7 @@ class TabSwitcherAdapter(
         glide: RequestManager,
         tabPreview: ImageView,
         holder: TabSwitcherViewHolder,
+        isDuckAiTab: Boolean = false,
     ) {
         fun fitAndClipBottom() = object : Transformation<Bitmap> {
             override fun transform(
@@ -548,10 +549,16 @@ class TabSwitcherAdapter(
                     }
 
                     try {
+                        val cornerRadius = tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius).toFloat()
+                        val roundingTransform = if (isDuckAiTab) {
+                            GranularRoundedCorners(0f, 0f, cornerRadius, cornerRadius)
+                        } else {
+                            GranularRoundedCorners(cornerRadius, cornerRadius, cornerRadius, cornerRadius)
+                        }
                         glide.load(cachedWebViewPreview)
                             .transition(DrawableTransitionOptions.withCrossFade()).transform(
                                 fitAndClipBottom(),
-                                RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                                roundingTransform,
                             )
                             .into(tabPreview)
                     } catch (e: Exception) {
