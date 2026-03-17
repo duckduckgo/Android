@@ -51,6 +51,7 @@ import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,9 +87,11 @@ class SingleTabFireDialogViewModelTest {
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockDownloadsRepository: DownloadsRepository = mock()
     private val mockDuckChat: DuckChat = mock()
+    private val selectedTabFlow = MutableStateFlow<TabEntity?>(null)
 
     @Before
     fun setup() {
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(selectedTabFlow)
         whenever(mockDispatcherProvider.io()).thenReturn(coroutineTestRule.testDispatcherProvider.io())
         whenever(mockSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)

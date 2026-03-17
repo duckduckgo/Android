@@ -686,21 +686,21 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabData_thenVisitedSitesClearedByDeleteTab() = runTest {
+    fun whenClearSingleTabData_thenVisitedSitesClearedByReplaceTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabRepository).replaceTabWithNewTab("tab1")
     }
 
     @Test
-    fun whenClearSingleTabData_thenDeleteTab() = runTest {
+    fun whenClearSingleTabData_thenReplaceTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabRepository).replaceTabWithNewTab("tab1")
     }
 
     @Test
@@ -734,23 +734,23 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataFeatureNotSupported_thenStillDeleteTab() = runTest {
+    fun whenClearSingleTabDataFeatureNotSupported_thenStillReplaceTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.FeatureNotSupported)
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabRepository).replaceTabWithNewTab("tab1")
     }
 
     @Test
-    fun whenClearSingleTabDataError_thenStillDeleteTab() = runTest {
+    fun whenClearSingleTabDataError_thenStillReplaceTab() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Error(RuntimeException("test")))
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabs(listOf("tab1"))
+        verify(mockTabRepository).replaceTabWithNewTab("tab1")
     }
 
     @Test
