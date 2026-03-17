@@ -3511,9 +3511,7 @@ class BrowserTabViewModel @Inject constructor(
             if (isBlobDownloadWebViewFeatureEnabled) {
                 postMessageToConvertBlobToDataUri(webView, url)
             } else {
-                viewModelScope.launch(dispatchers.main()) {
-                    command.value = ConvertBlobToDataUri(url, mimeType)
-                }
+                command.value = ConvertBlobToDataUri(url, mimeType)
             }
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
@@ -4151,21 +4149,19 @@ class BrowserTabViewModel @Inject constructor(
 
             "initialPing" -> {
                 if (id != null) {
-                    viewModelScope.launch(dispatchers.main()) {
-                        command.value = SendResponseToJs(
-                            JsCallbackData(
-                                params = JSONObject(
-                                    mapOf(
-                                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
-                                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
-                                    ),
+                    command.value = SendResponseToJs(
+                        JsCallbackData(
+                            params = JSONObject(
+                                mapOf(
+                                    "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                                    "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
                                 ),
-                                featureName = featureName,
-                                method = method,
-                                id = id,
                             ),
-                        )
-                    }
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                        ),
+                    )
                 }
             }
 
