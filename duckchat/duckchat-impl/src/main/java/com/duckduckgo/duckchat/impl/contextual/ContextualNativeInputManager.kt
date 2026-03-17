@@ -116,6 +116,7 @@ class RealContextualNativeInputManager @Inject constructor(
     private fun sendPrompt(prompt: String) {
         val params = JSONObject().apply {
             put("platform", "android")
+            put("tool", "query")
             put(
                 "query",
                 JSONObject().apply {
