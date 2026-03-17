@@ -691,7 +691,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -700,7 +700,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -740,7 +740,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -750,7 +750,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
