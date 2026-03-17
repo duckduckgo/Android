@@ -116,6 +116,7 @@ fun DuckDuckGoTheme(
         ),
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_light),
+            switchTrackOn = Blue50,
             switchTrackOff = Gray60_50,
             switchThumb = White,
             sliderTrackInactive = Gray60_50,
@@ -169,6 +170,7 @@ fun DuckDuckGoTheme(
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_dark),
             switchTrackOff = Gray40_50,
+            switchTrackOn = Blue30,
             switchThumb = White,
             sliderTrackInactive = Gray40_50,
             textInputEnabledOutline = White30,
