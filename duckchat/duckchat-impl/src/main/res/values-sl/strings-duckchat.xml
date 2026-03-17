@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Omogočite v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>

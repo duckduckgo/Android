@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Caută pe Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Încearcă noua opțiune de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Activează în setările funcțiilor IA</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Gestionează în setările funcțiilor IA</string>
     <string name="duck_ai_paid_settings_manage_secondary">Configurează Duck.ai în setările funcțiilor IA.</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Rezumă această pagină</string>

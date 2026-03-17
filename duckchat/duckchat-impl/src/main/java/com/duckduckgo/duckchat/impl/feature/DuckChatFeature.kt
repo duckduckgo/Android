@@ -191,4 +191,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun chatTabAttachments(): Toggle
+
+    /**
+     * @return `true` when the duck.ai voice entry point button is enabled in the input screen
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceEntryPoint(): Toggle
 }

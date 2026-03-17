@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
@@ -146,6 +147,7 @@ class RealDuckChatPixels @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val statisticsUpdater: StatisticsUpdater,
     private val duckAiMetricCollector: DuckAiMetricCollector,
+    private val termsOfServiceHandler: DuckChatTermsOfServiceHandler,
 ) : DuckChatPixels {
 
     override fun sendReportMetricPixel(reportMetric: ReportMetric, modelTier: ModelTier?) {
@@ -167,6 +169,17 @@ class RealDuckChatPixels @Inject constructor(
                 USER_DID_SELECT_FIRST_HISTORY_ITEM -> DUCK_CHAT_OPEN_MOST_RECENT_HISTORY_CHAT to sessionParams
                 USER_DID_CREATE_NEW_CHAT -> DUCK_CHAT_START_NEW_CONVERSATION_BUTTON_CLICKED to sessionParams
                 USER_DID_TAP_KEYBOARD_RETURN_KEY -> DUCK_CHAT_KEYBOARD_RETURN_PRESSED to emptyMap()
+                ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS -> {
+                    val result = termsOfServiceHandler.userAcceptedTerms()
+                    if (result.isDuplicate) {
+                        if (result.isSyncEnabled) {
+                            pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+                        } else {
+                            pixel.fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+                        }
+                    }
+                    DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS to emptyMap()
+                }
             }
 
             withContext(dispatcherProvider.main()) {
@@ -398,6 +411,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED("m_aichat_experimental_omnibar_floating_return_pressed"),
     DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED("m_aichat_legacy_omnibar_back_button_pressed"),
     DUCK_CHAT_KEYBOARD_RETURN_PRESSED("m_aichat_duckai_keyboard_return_pressed"),
+    DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS("m_aichat_duckai_accepted_terms_and_conditions"),
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION("m_aichat_experimental_omnibar_daily_retention"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_DISPLAYED("m_aichat_new_address_bar_picker_displayed"),
     DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_CONFIRMED("m_aichat_new_address_bar_picker_confirmed"),
@@ -463,8 +477,13 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY("m_aichat_recent_chat_selected_daily"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT("m_aichat_recent_chat_selected_pinned_count"),
     DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY("m_aichat_recent_chat_selected_pinned_daily"),
+    DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT("m_aichat_voice_entry_tapped_count"),
+    DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY("m_aichat_voice_entry_tapped_daily"),
 
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
+
+    DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON("m_aichat_terms_accepted_duplicate_sync_on"),
+    DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF("m_aichat_terms_accepted_duplicate_sync_off"),
 }
 
 object DuckChatPixelParameters {
@@ -596,8 +615,19 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.SYNC_AI_CHAT_ACTIVE.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
+}
+
+internal fun Pixel.fireCountAndDaily(
+    countPixel: DuckChatPixelName,
+    dailyPixel: DuckChatPixelName,
+    parameters: Map<String, String> = emptyMap(),
+) {
+    fire(countPixel, parameters)
+    fire(dailyPixel, parameters, type = Pixel.PixelType.Daily())
 }
 
 internal fun inputScreenPixelsModeParam(isSearchMode: Boolean) = mapOf(

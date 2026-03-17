@@ -128,4 +128,9 @@ interface DuckChat {
      * Does not consider user preference — use for visibility checks.
      */
     fun isChatSuggestionsFeatureAvailable(): Boolean
+
+    /**
+     * Opens Duck.ai directly in voice mode (duck.ai/?mode=voice-mode).
+     */
+    fun openVoiceDuckChat()
 }

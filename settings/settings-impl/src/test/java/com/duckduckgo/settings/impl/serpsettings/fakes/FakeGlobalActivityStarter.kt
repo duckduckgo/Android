@@ -19,6 +19,7 @@ package com.duckduckgo.settings.impl.serpsettings.fakes
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
@@ -54,5 +55,17 @@ class FakeGlobalActivityStarter : GlobalActivityStarter {
     ): Intent? {
         startedDeeplinkActivities.add(deeplinkActivityParams)
         return intentToReturn
+    }
+
+    override fun startForResult(context: Context, params: ActivityParams, launcher: ActivityResultLauncher<Intent>) {
+        startedActivities.add(params)
+    }
+
+    override fun startForResult(
+        context: Context,
+        deeplinkActivityParams: GlobalActivityStarter.DeeplinkActivityParams,
+        launcher: ActivityResultLauncher<Intent>,
+    ) {
+        startedDeeplinkActivities.add(deeplinkActivityParams)
     }
 }

@@ -27,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 )
 interface RequestBlocklistFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 }
 

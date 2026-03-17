@@ -102,13 +102,13 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToRestore() {
-        val intent = globalActivityStarter.startIntent(
+        globalActivityStarter.startForResult(
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.activateUrl,
             ),
+            startForResultRestore,
         )
-        startForResultRestore.launch(intent)
     }
 
     private fun onPurchaseRestored() {

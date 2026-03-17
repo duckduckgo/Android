@@ -301,6 +301,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun fetchProTierEntitlements(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

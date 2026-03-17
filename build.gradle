@@ -198,6 +198,7 @@ fladle {
             recordVideo.set(false)
             testTargets.set([
                     "notAnnotation com.duckduckgo.espresso.PrivacyTest",
+                    "notAnnotation com.duckduckgo.espresso.InternalPrivacyTest",
                     "notAnnotation com.duckduckgo.espresso.UserJourney",
             ])
             devices.set([

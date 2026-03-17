@@ -3060,6 +3060,32 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenCtaRefreshedAndPromoOnboardingDialogShowingThenIsOnboardingCompleteInNewTabPageFalse() =
+        runTest {
+            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
+            whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
+            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
+            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+            whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+            whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+            whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+            testee.refreshCta()
+            assertTrue(
+                "When promo dialog is showable, refreshCta returns DaxPrivacyProCta",
+                testee.ctaViewState.value!!.cta is DaxBubbleCta.DaxPrivacyProCta,
+            )
+            assertFalse(
+                "When promo onboarding dialog is showing, isOnboardingCompleteInNewTabPage should be false so NTP can show the dialog",
+                testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage,
+            )
+        }
+
+    @Test
     fun whenCtaRefreshedAndMaliciousSiteBlockedThenViewStateUpdated() =
         runTest {
             whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
@@ -5626,7 +5652,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertTrue(this.locked)
@@ -5644,7 +5670,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": false }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5662,7 +5688,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandNotIssued<Command.UiLockChanged>()
         }
@@ -5678,7 +5704,7 @@ class BrowserTabViewModelTest {
                 null,
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5696,7 +5722,7 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "other": "value" }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandIssued<Command.UiLockChanged> {
                 assertFalse(this.locked)
@@ -5714,9 +5740,45 @@ class BrowserTabViewModelTest {
                 JSONObject("""{ "locked": true }"""),
                 false,
                 null,
-                { "someUrl" },
+                { "https://example.com" },
             )
             assertCommandNotIssued<Command.UiLockChanged>()
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedFromDuckAiThenSendCommandWithLockedFalse() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "https://duck.ai" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackMessageUiLockChangedFromDuckAiSubpageThenSendCommandWithLockedFalse() =
+        runTest {
+            fakeBrowserUiLockFeature.self().setRawStoredState(State(enable = true))
+            testee.processJsCallbackMessage(
+                BROWSER_UI_LOCK_FEATURE_NAME,
+                "uiLockChanged",
+                null,
+                JSONObject("""{ "locked": true }"""),
+                false,
+                null,
+                { "https://duck.ai/some/path" },
+            )
+            assertCommandIssued<Command.UiLockChanged> {
+                assertFalse(this.locked)
+            }
         }
 
     @Test
@@ -8215,6 +8277,7 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)

@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveerige töölaual Privacy Pro</string>
-    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisesse <b>Seaded &gt; Privacy Pro</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
+    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveeri arvutis DuckDuckGo tellimus</string>
+    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisse <b>Seaded &gt; DuckDuckGo tellimus</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Tellimused</string>
     <string name="activitySubscriptionSettings">Tellimuse seaded</string>
     <string name="activityActivateSubscription">Mul on tellimus</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>

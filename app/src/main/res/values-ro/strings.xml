@@ -826,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
     <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
     <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
@@ -838,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
@@ -892,6 +895,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 

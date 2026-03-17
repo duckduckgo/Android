@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Sök eller ange adress</string>
     <string name="input_screen_chat_hint">Fråga privat</string>
     <string name="input_screen_user_pref_without_ai">Sök endast</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Sök &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Prova den nya funktionen att fråga Duck.ai direkt från adressfältet. <annotation type="share_feedback">Berätta vad du tycker</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">Aktivera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_in_settings">Hantera i inställningarna för AI-funktioner</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfigurera Duck.ai i inställningarna för AI-funktioner.</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Sammanfatta denna sida</string>
