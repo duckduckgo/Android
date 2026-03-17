@@ -163,6 +163,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         get() {
             var v: View? = this
             while (v != null) {
+                // Prefer the widget card container so ChatState visibility changes do not hide larger parent containers.
+                if (v is MaterialCardView) return v
                 val p = v.parent
                 if (p is androidx.coordinatorlayout.widget.CoordinatorLayout) return v
                 v = p as? View
