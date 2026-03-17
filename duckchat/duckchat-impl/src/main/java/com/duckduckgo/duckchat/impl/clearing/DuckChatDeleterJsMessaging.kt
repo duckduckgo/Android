@@ -47,10 +47,10 @@ class DuckChatDeleterJsMessaging @Inject constructor(
     override val callbackName: String = "messageCallback"
 
     private val moshi by lazy { Moshi.Builder().add(JSONObjectAdapter()).build() }
+    private val duckDuckGoDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
     private val handlers = listOf(DuckAiDataClearingMessageHandler())
     private lateinit var jsMessageCallback: JsMessageCallback
     private lateinit var webView: WebView
-    private val duckDuckGoDomains: List<String> = listOf(AppUrl.Url.HOST, duckAiHostProvider.getHost())
 
     override val context: String = "contentScopeScripts"
     override val allowedDomains: List<String> = duckDuckGoDomains
