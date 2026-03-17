@@ -294,7 +294,7 @@ class BrowserMenuBottomSheet(
 
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
-        binding.privacyToolsSectionDivider.isVisible = viewState.vpnMenuState != VpnMenuState.Hidden
+        binding.privacyToolsSectionDivider.isVisible = viewState.isEmailSignedIn || viewState.vpnMenuState != VpnMenuState.Hidden
         binding.utilitiesSectionDivider.isVisible = false
         binding.customTabsMenuDivider.isVisible = false
     }
