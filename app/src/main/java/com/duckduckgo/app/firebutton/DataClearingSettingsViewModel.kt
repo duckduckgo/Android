@@ -25,6 +25,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.settings.clear.FireClearOption.DUCKAI_CHATS
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -149,7 +150,7 @@ class DataClearingSettingsViewModel @Inject constructor(
 
     fun onClearDataActionClicked() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS)
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY, type = Daily())
         viewModelScope.launch { _commands.send(Command.LaunchFireDialog) }
     }
 }

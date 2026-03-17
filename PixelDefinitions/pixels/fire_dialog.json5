@@ -20,6 +20,13 @@
         "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
         "parameters": ["appVersion"]
     },
+    "m_fire_dialog_single_tab_clear_pressed_daily": {
+        "description": "The user pressed clear in the single tab fire dialog (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_fire_dialog_clear_pressed_daily": {
         "description": "The user pressed clear in the fire dialog (daily)",
         "owners": ["0nko"],
@@ -32,6 +39,13 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_button_tapped_settings_daily": {
+        "description": "The fire button was tapped from settings (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
     "m_fire_button_tapped_browser_daily": {
