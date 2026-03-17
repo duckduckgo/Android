@@ -888,5 +888,9 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         ): Int {
             TODO("Not yet implemented")
         }
+
+        override suspend fun replaceTabWithNewTab(tabId: String) {
+            TODO("Not yet implemented")
+        }
     }
 }

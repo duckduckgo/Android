@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.dispatchers
 
-import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -56,151 +55,118 @@ class ExternalIntentProcessingStateTest {
 
     @Test
     fun `when initialized then hasPendingTabLaunch is false`() = runTest {
-        testee.hasPendingTabLaunch.test {
-            assertFalse(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when onIntentRequestToChangeTab called then hasPendingTabLaunch is true`() = runTest {
-        testee.hasPendingTabLaunch.test {
-            assertFalse(awaitItem())
-            testee.onIntentRequestToChangeTab()
+        testee.onIntentRequestToChangeTab()
 
-            assertTrue(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when tab with url is selected then hasPendingTabLaunch becomes false`() = runTest {
         testee.onIntentRequestToChangeTab()
+        assertTrue(testee.hasPendingTabLaunch)
 
-        testee.hasPendingTabLaunch.test {
-            assertTrue(awaitItem())
+        val tabWithUrl = TabEntity(
+            tabId = "tab1",
+            url = "https://example.com",
+            title = "Example",
+        )
+        selectedTabFlow.value = tabWithUrl
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-            val tabWithUrl = TabEntity(
-                tabId = "tab1",
-                url = "https://example.com",
-                title = "Example",
-            )
-            selectedTabFlow.value = tabWithUrl
-
-            assertFalse(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when tab with blank url is selected then hasPendingTabLaunch remains true`() = runTest {
         testee.onIntentRequestToChangeTab()
+        assertTrue(testee.hasPendingTabLaunch)
 
-        testee.hasPendingTabLaunch.test {
-            assertTrue(awaitItem())
+        val tabWithBlankUrl = TabEntity(
+            tabId = "tab1",
+            url = "",
+            title = "New Tab",
+        )
+        selectedTabFlow.value = tabWithBlankUrl
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-            val tabWithBlankUrl = TabEntity(
-                tabId = "tab1",
-                url = "",
-                title = "New Tab",
-            )
-            selectedTabFlow.value = tabWithBlankUrl
-
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when tab with null url is selected then hasPendingTabLaunch remains true`() = runTest {
         testee.onIntentRequestToChangeTab()
+        assertTrue(testee.hasPendingTabLaunch)
 
-        testee.hasPendingTabLaunch.test {
-            assertTrue(awaitItem())
+        val tabWithNullUrl = TabEntity(
+            tabId = "tab1",
+            url = null,
+            title = "New Tab",
+        )
+        selectedTabFlow.value = tabWithNullUrl
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-            val tabWithNullUrl = TabEntity(
-                tabId = "tab1",
-                url = null,
-                title = "New Tab",
-            )
-            selectedTabFlow.value = tabWithNullUrl
-
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when multiple tabs with urls are selected then hasPendingTabLaunch stays false`() = runTest {
         testee.onIntentRequestToChangeTab()
 
-        testee.hasPendingTabLaunch.test {
-            assertTrue(awaitItem())
+        val firstTab = TabEntity(
+            tabId = "tab1",
+            url = "https://example.com",
+            title = "Example",
+        )
+        selectedTabFlow.value = firstTab
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(testee.hasPendingTabLaunch)
 
-            val firstTab = TabEntity(
-                tabId = "tab1",
-                url = "https://example.com",
-                title = "Example",
-            )
-            selectedTabFlow.value = firstTab
-            assertFalse(awaitItem())
+        val secondTab = TabEntity(
+            tabId = "tab2",
+            url = "https://another.com",
+            title = "Another",
+        )
+        selectedTabFlow.value = secondTab
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-            val secondTab = TabEntity(
-                tabId = "tab2",
-                url = "https://another.com",
-                title = "Another",
-            )
-            selectedTabFlow.value = secondTab
-
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when null tab is selected then hasPendingTabLaunch is unchanged`() = runTest {
         testee.onIntentRequestToChangeTab()
+        assertTrue(testee.hasPendingTabLaunch)
 
-        testee.hasPendingTabLaunch.test {
-            assertTrue(awaitItem())
+        selectedTabFlow.value = null
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
-            selectedTabFlow.value = null
-
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.hasPendingTabLaunch)
     }
 
     @Test
     fun `when initialized then hasPendingDuckAiOpen is false`() = runTest {
-        testee.hasPendingDuckAiOpen.test {
-            assertFalse(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.hasPendingDuckAiOpen)
     }
 
     @Test
     fun `when onIntentRequestToOpenDuckAi called then hasPendingDuckAiOpen is true`() = runTest {
-        testee.hasPendingDuckAiOpen.test {
-            assertFalse(awaitItem())
-            testee.onIntentRequestToOpenDuckAi()
+        testee.onIntentRequestToOpenDuckAi()
 
-            assertTrue(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertTrue(testee.hasPendingDuckAiOpen)
     }
 
     @Test
     fun `when onDuckAiClosed called then hasPendingDuckAiOpen is false`() = runTest {
         testee.onIntentRequestToOpenDuckAi()
+        assertTrue(testee.hasPendingDuckAiOpen)
 
-        testee.hasPendingDuckAiOpen.test {
-            assertTrue(awaitItem())
+        testee.onDuckAiClosed()
 
-            testee.onDuckAiClosed()
-
-            assertFalse(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.hasPendingDuckAiOpen)
     }
 }

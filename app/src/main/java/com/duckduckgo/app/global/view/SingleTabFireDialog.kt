@@ -235,8 +235,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
         binding.dialogTitle.text = requireContext().getString(titleRes)
 
-        val showDeleteThisTab = state.isSingleTabEnabled && !state.isFromTabSwitcher
-        if (showDeleteThisTab) {
+        if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
             if (state.isDuckAiTab) {
                 binding.deleteThisTabButton.text = requireContext().getString(R.string.singleTabFireDialogDeleteThisChat)

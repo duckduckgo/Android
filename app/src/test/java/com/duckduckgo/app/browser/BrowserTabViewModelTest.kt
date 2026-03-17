@@ -738,8 +738,8 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
+            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(false)
+            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(false)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -8266,7 +8266,7 @@ class BrowserTabViewModelTest {
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingTabLaunchFlow.emit(true)
+            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -8299,7 +8299,7 @@ class BrowserTabViewModelTest {
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingDuckAiOpenFlow.emit(true)
+            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(true)
 
             flowSelectedTab.emit(ntpTab)
 

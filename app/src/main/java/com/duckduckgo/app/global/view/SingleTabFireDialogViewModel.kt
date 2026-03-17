@@ -87,7 +87,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val showDownloadsSubtitle: Boolean = false,
         val shouldRestartAfterClearing: Boolean = true,
         val tabCount: Int = 0,
-    )
+    ) {
+        val isDeleteThisTabButtonVisible: Boolean
+            get() = isSingleTabEnabled && !isFromTabSwitcher && (isDuckAiTab || tabCount > 1)
+    }
 
     sealed class Command {
         data object PlayAnimation : Command()

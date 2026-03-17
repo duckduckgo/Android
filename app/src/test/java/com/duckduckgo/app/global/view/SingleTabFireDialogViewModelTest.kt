@@ -405,6 +405,107 @@ class SingleTabFireDialogViewModelTest {
 
     // endregion
 
+    // region isDeleteThisTabButtonVisible
+
+    @Test
+    fun `when single tab with non-duck-ai url then isDeleteThisTabButtonVisible is false`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when single tab with duck-ai url then isDeleteThisTabButtonVisible is true`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when multiple tabs with non-duck-ai url then isDeleteThisTabButtonVisible is true`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when single tab enabled is false then isDeleteThisTabButtonVisible is false`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is tab switcher then isDeleteThisTabButtonVisible is false`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // endregion
+
     // region setOrigin
 
     @Test
