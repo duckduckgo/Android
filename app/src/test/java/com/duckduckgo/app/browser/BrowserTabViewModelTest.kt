@@ -3073,6 +3073,7 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
             testee.refreshCta()
             assertTrue(
                 "When promo dialog is showable, refreshCta returns DaxPrivacyProCta",
@@ -8276,6 +8277,7 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
