@@ -260,8 +260,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         val glide = Glide.with(context)
-        val chatTitle = (tab as? DuckAiTab)?.chatTitle
-        holder.title.text = chatTitle ?: tab.tabEntity.title ?: ""
+        holder.title.text = tab.tabEntity.title ?: ""
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
@@ -277,8 +276,7 @@ class TabSwitcherAdapter(
         holder.cancelLoadJobs()
         val context = holder.rootView.context
         holder.title.text = context.getString(R.string.duck_ai_tab_label)
-        val chatTitle = (tab as? DuckAiTab)?.chatTitle
-        holder.url.text = chatTitle ?: tab.tabEntity.title ?: ""
+        holder.url.text = tab.tabEntity.title ?: ""
         holder.url.visibility = View.VISIBLE
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)

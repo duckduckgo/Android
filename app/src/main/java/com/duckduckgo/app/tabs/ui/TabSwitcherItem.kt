@@ -33,7 +33,6 @@ sealed class TabSwitcherItem(val id: String) {
         data class DuckAiTab(
             private val entity: TabEntity,
             val isActive: Boolean,
-            val chatTitle: String? = null,
         ) : Tab(entity)
 
         val isNewTabPage: Boolean
