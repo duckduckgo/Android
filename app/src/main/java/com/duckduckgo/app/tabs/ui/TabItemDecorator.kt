@@ -25,6 +25,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.ui.view.toPx
@@ -69,6 +70,9 @@ class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
                         drawTabDecoration(child, canvas, selectionBorderStroke)
                     }
                     tabSwitcherItem is NormalTab && tabSwitcherItem.isActive -> {
+                        drawTabDecoration(child, canvas, activeTabBorderStroke)
+                    }
+                    tabSwitcherItem is DuckAiTab && tabSwitcherItem.isActive -> {
                         drawTabDecoration(child, canvas, activeTabBorderStroke)
                     }
                     tabSwitcherItem is TabSwitcherItem.TrackersAnimationInfoPanel -> Unit // No border for animation tile
