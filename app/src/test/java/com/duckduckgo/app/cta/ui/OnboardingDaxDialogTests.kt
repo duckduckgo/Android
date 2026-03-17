@@ -266,7 +266,7 @@ class OnboardingDaxDialogTests {
         whenever(extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
         whenever(extendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
         whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
 
         val result = testee.refreshCta(
