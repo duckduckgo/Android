@@ -132,10 +132,10 @@ class SingleTabFireDialogViewModelTest {
 
             assertFalse(state.isDuckAiChatsSelected)
             assertFalse(state.isSingleTabEnabled)
-            assertFalse(state.isFromTabSwitcher)
-            assertFalse(state.showDuckAiSubtitle)
-            assertTrue(state.showSiteDataSubtitle)
-            assertFalse(state.showDownloadsSubtitle)
+            assertEquals(FireDialogOrigin.BROWSER, state.dialogOrigin)
+            assertFalse(state.isDuckAiSubtitleVisible)
+            assertTrue(state.isSiteDataSubtitleVisible)
+            assertFalse(state.isDownloadsSubtitleVisible)
             assertTrue(state.shouldRestartAfterClearing)
 
             cancelAndConsumeRemainingEvents()
@@ -211,7 +211,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertTrue(state.showSiteDataSubtitle)
+            assertTrue(state.isSiteDataSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -226,7 +226,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertTrue(state.showSiteDataSubtitle)
+            assertTrue(state.isSiteDataSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -241,7 +241,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showSiteDataSubtitle)
+            assertFalse(state.isSiteDataSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -256,7 +256,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showSiteDataSubtitle)
+            assertFalse(state.isSiteDataSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -282,7 +282,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertTrue(state.showDownloadsSubtitle)
+            assertTrue(state.isDownloadsSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -308,7 +308,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showDownloadsSubtitle)
+            assertFalse(state.isDownloadsSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -323,7 +323,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showDownloadsSubtitle)
+            assertFalse(state.isDownloadsSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -343,7 +343,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertTrue(state.showDuckAiSubtitle)
+            assertTrue(state.isDuckAiSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -363,7 +363,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showDuckAiSubtitle)
+            assertFalse(state.isDuckAiSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -382,7 +382,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showDuckAiSubtitle)
+            assertFalse(state.isDuckAiSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -397,7 +397,7 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.showDuckAiSubtitle)
+            assertFalse(state.isDuckAiSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -504,6 +504,23 @@ class SingleTabFireDialogViewModelTest {
         }
     }
 
+    @Test
+    fun `when origin is settings then isDeleteThisTabButtonVisible is false`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     // endregion
 
     // region setOrigin
@@ -517,14 +534,14 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertTrue(state.isFromTabSwitcher)
+            assertEquals(FireDialogOrigin.TAB_SWITCHER, state.dialogOrigin)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun `when origin is browser then viewState reflects non-tab-switcher origin`() = runTest {
+    fun `when origin is browser then viewState reflects browser origin`() = runTest {
         testee = createViewModel()
 
         testee.setOrigin(FireDialogOrigin.BROWSER)
@@ -532,7 +549,85 @@ class SingleTabFireDialogViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.isFromTabSwitcher)
+            assertEquals(FireDialogOrigin.BROWSER, state.dialogOrigin)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is settings then viewState reflects settings origin`() = runTest {
+        testee = createViewModel()
+
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertEquals(FireDialogOrigin.SETTINGS, state.dialogOrigin)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is tab switcher then showDuckAiSubtitle is suppressed`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDuckAiSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is settings then showDuckAiSubtitle is suppressed`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isDuckAiSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is browser then showDuckAiSubtitle is preserved`() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = duckAiUrl, title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.isDuckAiSubtitleVisible)
 
             cancelAndConsumeRemainingEvents()
         }

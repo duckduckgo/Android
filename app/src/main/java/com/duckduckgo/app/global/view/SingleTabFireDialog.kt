@@ -245,13 +245,13 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
 
         val subtitleParts = buildList {
-            if (state.showSiteDataSubtitle) {
+            if (state.isSiteDataSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleSiteData))
             }
-            if (state.showDownloadsSubtitle) {
+            if (state.isDownloadsSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleDownloads))
             }
-            if (state.showDuckAiSubtitle) {
+            if (state.isDuckAiSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleDuckAi))
             }
         }

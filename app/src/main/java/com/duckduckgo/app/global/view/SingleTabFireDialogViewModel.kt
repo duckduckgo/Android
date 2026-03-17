@@ -28,7 +28,7 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -80,16 +80,18 @@ class SingleTabFireDialogViewModel @Inject constructor(
     data class ViewState(
         val isDuckAiChatsSelected: Boolean = false,
         val isSingleTabEnabled: Boolean = false,
-        val isFromTabSwitcher: Boolean = false,
+        val dialogOrigin: FireDialogProvider.FireDialogOrigin = BROWSER,
         val isDuckAiTab: Boolean = false,
-        val showDuckAiSubtitle: Boolean = false,
-        val showSiteDataSubtitle: Boolean = false,
-        val showDownloadsSubtitle: Boolean = false,
+        val isSiteDataSubtitleVisible: Boolean = false,
+        val isDownloadsSubtitleVisible: Boolean = false,
         val shouldRestartAfterClearing: Boolean = true,
         val tabCount: Int = 0,
     ) {
         val isDeleteThisTabButtonVisible: Boolean
-            get() = isSingleTabEnabled && !isFromTabSwitcher && (isDuckAiTab || tabCount > 1)
+            get() = isSingleTabEnabled && dialogOrigin == BROWSER && (isDuckAiTab || tabCount > 1)
+
+        val isDuckAiSubtitleVisible: Boolean
+            get() = isDuckAiTab && !isDuckAiChatsSelected && dialogOrigin == BROWSER
     }
 
     sealed class Command {
@@ -129,16 +131,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     isSingleTabEnabled = isDeleteBrowsingDataSupported,
                     isDuckAiTab = isDuckAiTab,
                     tabCount = tabCount,
-                    showDuckAiSubtitle = isDuckAiTab && !isDuckAiChatsSelected,
-                    showSiteDataSubtitle = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
-                    showDownloadsSubtitle = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
+                    isSiteDataSubtitleVisible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
+                    isDownloadsSubtitleVisible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
                 )
             }
         }
     }
 
     fun setOrigin(origin: FireDialogProvider.FireDialogOrigin) {
-        _viewState.update { it.copy(isFromTabSwitcher = origin == TAB_SWITCHER) }
+        _viewState.update { it.copy(dialogOrigin = origin) }
     }
 
     fun onShow() {
