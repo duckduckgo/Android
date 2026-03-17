@@ -28,8 +28,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -321,7 +319,6 @@ class RealDuckChat @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
-    private val appBuildConfig: AppBuildConfig,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -655,10 +652,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun getDuckChatLink(): String {
-        if (appBuildConfig.isInternalBuild()) {
-            return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
-        }
-        return duckChatLink
+        return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
     }
 
     private fun appendParameters(
@@ -881,7 +875,7 @@ class RealDuckChat @Inject constructor(
         }
 
     companion object {
-        private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCK_CHAT_WEB_LINK = "https://duck.ai/chat?duckai=5"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"

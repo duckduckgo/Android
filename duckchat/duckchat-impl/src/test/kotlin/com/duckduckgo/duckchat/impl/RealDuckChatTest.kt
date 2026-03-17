@@ -27,8 +27,6 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -108,7 +106,6 @@ class RealDuckChatTest {
     private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
     private val mockSyncEngine: SyncEngine = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -125,7 +122,6 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
-        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
@@ -151,7 +147,6 @@ class RealDuckChatTest {
                 mockDuckChatSyncRepository,
                 mockSyncEngine,
                 mockDuckAiHostProvider,
-                mockAppBuildConfig,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -398,14 +393,13 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
 
     @Test
     fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
-        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
         whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
 
         testee.openDuckChat()
@@ -413,7 +407,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://staging.duck.ai/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://staging.duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -428,7 +422,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = true,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -440,7 +434,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?mode=voice-mode&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -455,7 +449,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?mode=voice-mode&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -467,7 +461,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -483,7 +477,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&bang=true&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -499,7 +493,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -514,7 +508,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -558,7 +552,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&prompt=1&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -1257,49 +1251,49 @@ class RealDuckChatTest {
     fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and sidebar then return url with placement parameter`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&placement=sidebar&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&placement=sidebar&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query autoprompt and sidebar then return url with placement and prompt`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&placement=sidebar&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&placement=sidebar&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?placement=sidebar&duckai=5")
     }
 
     @Test
