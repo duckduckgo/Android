@@ -72,12 +72,6 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useExpandableBarcodeConnectSyncLayout(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun syncAutoRecoveryCapabilityDetectionWrite(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun syncAutoRecoveryCapabilityDetectionRead(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun syncAutoRestore(): Toggle
 }
