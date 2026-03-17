@@ -70,6 +70,34 @@ class NoPostValueOnSingleLiveEventDetectorTest {
     }
 
     @Test
+    fun whenPostValueOnSubclassOfSingleLiveEventThenError() {
+        val callSite = """
+            package com.duckduckgo.app
+            import com.duckduckgo.common.utils.SingleLiveEvent
+
+            class MySingleLiveEvent<T> : SingleLiveEvent<T>()
+
+            class MyViewModel {
+                val command = MySingleLiveEvent<String>()
+
+                fun doSomething() {
+                    command.postValue("Navigate")
+                }
+            }
+        """
+
+        assertLintError(
+            listOf(TestFiles.kotlin(callSite).indented(), TestFiles.kt(mutableLiveDataStub), TestFiles.kt(singleLiveEventStub)),
+            """
+                src/com/duckduckgo/app/MySingleLiveEvent.kt:10: Error: Do not use postValue() on SingleLiveEvent. Use setValue() (.value = ...) on the main thread instead. postValue() coalesces pending values, which silently drops commands. [NoPostValueOnSingleLiveEvent]
+                        command.postValue("Navigate")
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                1 errors, 0 warnings
+            """,
+        )
+    }
+
+    @Test
     fun whenPostValueOnRegularMutableLiveDataThenClean() {
         val callSite = """
             package com.duckduckgo.app
