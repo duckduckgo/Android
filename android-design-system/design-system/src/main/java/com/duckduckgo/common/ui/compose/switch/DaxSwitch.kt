@@ -39,6 +39,9 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
  * @param onCheckedChange callback invoked when the switch is toggled, or null to make the switch non-interactive
  * @param modifier the [Modifier] to apply
  * @param enabled whether the switch is enabled
+ *
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213690991241745?focus=true
+ * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=72-14&m=dev
  */
 @Composable
 fun DaxSwitch(
