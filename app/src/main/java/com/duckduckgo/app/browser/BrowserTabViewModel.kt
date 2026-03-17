@@ -4226,11 +4226,15 @@ class BrowserTabViewModel @Inject constructor(
                     if (pageContext != null) {
                         if (androidBrowserConfig.storePageContext().isEnabled()) {
                             val pageContextUrl = JSONObject(pageContext).optString("url", "")
-                            tabPageContextRepository.storePageContext(
-                                tabId = tabId,
-                                url = pageContextUrl,
-                                serializedPageContext = pageContext,
-                            )
+                            runCatching {
+                                tabPageContextRepository.storePageContext(
+                                    tabId = tabId,
+                                    url = pageContextUrl,
+                                    serializedPageContext = pageContext,
+                                )
+                            }.onFailure {
+                                logcat(ERROR) { "Failed to store page context: ${it.asLog()}" }
+                            }
                         }
 
                         val enrichedContext = enrichPageContextIfPossible(pageContext)
