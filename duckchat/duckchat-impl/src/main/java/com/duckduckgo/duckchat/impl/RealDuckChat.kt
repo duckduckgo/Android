@@ -499,11 +499,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun canHandleOnAiWebView(url: String): Boolean {
-        return runCatching {
-            val httpUrl = url.toHttpUrl()
-            val duckAiHost = duckAiHostProvider.getHost()
-            httpUrl.topPrivateDomain() == duckAiHost || httpUrl.host == duckAiHost || url == REVOKE_URL
-        }.getOrElse { false }
+        return runCatching { url.toHttpUrl().host == duckAiHostProvider.getHost() || url == REVOKE_URL }.getOrElse { false }
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled

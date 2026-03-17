@@ -76,9 +76,7 @@ class DuckChatWebViewViewModel @Inject constructor(
             if (!duckChat.isStandaloneMigrationEnabled()) return false
             val currentItem = history.currentItem?.url
             val firstItem = history.getItemAtIndex(0).url
-            val currentHttpUrl = currentItem?.toHttpUrl()
-            val duckAiHost = duckAiHostProvider.getHost()
-            (currentHttpUrl?.topPrivateDomain() == duckAiHost || currentHttpUrl?.host == duckAiHost) &&
+            currentItem?.toHttpUrl()?.host == duckAiHostProvider.getHost() &&
                 firstItem.toHttpUrl().topPrivateDomain() == AppUrl.Url.HOST
         }.getOrElse { false }
     }
