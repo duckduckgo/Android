@@ -598,7 +598,13 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
-        val normalTabs = tabEntities.map { entity ->
+        if (mode is Selection) {
+            return tabEntities.map {
+                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
+            }
+        }
+
+        val tabs = tabEntities.map { entity ->
             val isActive = entity.tabId == activeTab?.tabId
             val uri = entity.url?.let { Uri.parse(it) }
             if (uri != null && duckChat.isDuckChatUrl(uri)) {
@@ -608,22 +614,11 @@ class TabSwitcherViewModel @Inject constructor(
             }
         }
 
-        suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (!isTrackersAnimationInfoPanelHidden) {
-                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-
-                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
-            } else {
-                normalTabs
-            }
-        }
-
-        return if (mode is Selection) {
-            tabEntities.map {
-                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
-            }
+        return if (!isTrackersAnimationInfoPanelHidden) {
+            val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
-            getNormalTabItemsWithOptionalAnimationTile()
+            tabs
         }
     }
 
