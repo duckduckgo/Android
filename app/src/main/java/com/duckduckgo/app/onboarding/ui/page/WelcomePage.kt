@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -54,6 +55,8 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.InputMode.*
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.FinishAndSubmitChatPrompt
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.FinishAndSubmitSearchQuery
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
@@ -104,6 +107,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
+    private var currentInputMode: InputMode = SEARCH
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -133,6 +137,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     defaultInputMode = if (it.duckAiDefault) CHAT else SEARCH,
                 )
                 is Finish -> onContinuePressed()
+                is FinishAndSubmitSearchQuery -> {
+                    (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(it.query)
+                }
+                is FinishAndSubmitChatPrompt -> {
+                    (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(it.prompt)
+                }
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
             }
@@ -613,10 +623,23 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         inputMode: InputMode,
         suggestions: List<DaxDialogIntroOption>,
     ) {
+        currentInputMode = inputMode
         val inputScreenPreviewBinding = binding.daxDialogCta.inputScreenPreview
 
-        listOf(inputScreenPreviewBinding.suggestion1, inputScreenPreviewBinding.suggestion2, inputScreenPreviewBinding.suggestion3)
-            .forEachIndexed { index, button -> suggestions[index].setOptionView(button) }
+        val buttons = listOf(inputScreenPreviewBinding.suggestion1, inputScreenPreviewBinding.suggestion2, inputScreenPreviewBinding.suggestion3)
+        buttons.forEachIndexed { index, button ->
+            suggestions[index].setOptionView(button)
+            button.setOnClickListener {
+                viewModel.onInputModeDemoQuerySubmitted(suggestions[index].link, isChat = inputMode == CHAT)
+            }
+        }
+
+        inputScreenPreviewBinding.inputModeDemoActionIcon.setOnClickListener {
+            val query = inputScreenPreviewBinding.inputText.text?.toString().orEmpty().trim()
+            if (query.isNotEmpty()) {
+                viewModel.onInputModeDemoQuerySubmitted(query, isChat = currentInputMode == CHAT)
+            }
+        }
 
         when (inputMode) {
             SEARCH -> {
