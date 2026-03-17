@@ -1,0 +1,66 @@
+{
+  "name": "USPhoneBook",
+  "url": "usphonebook.com",
+  "version": "0.5.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678082400000,
+  "optOutUrl": "https://www.usphonebook.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "98a804b2-115c-4c2c-8e97-3f3679cd3fbb",
+          "url": "https://www.usphonebook.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "fd2f1b35-bf37-426f-b39b-f4b280513e53",
+          "selector": "//div[@class='success-wrapper-block' and @itemtype='https://schema.org/Person']",
+          "noResultsSelector": ".no-results-content-wrapper",
+          "profile": {
+            "name": {
+              "selector": ".//span[@itemprop='name']"
+            },
+            "age": {
+              "selector": ".ls_number-text",
+              "afterText": ", Age"
+            },
+            "addressCityState": {
+              "selector": "(.//div[@class='ls_success-content-extra-info'])[1]",
+              "afterText": "Lives in: "
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": "(.//div[@class='ls_success-content-extra-info'])[2]",
+              "afterText": "Relatives:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".ls_success-extra-margin",
+              "identifierType": "path",
+              "identifier": "https://www.usphonebook.com/${firstName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

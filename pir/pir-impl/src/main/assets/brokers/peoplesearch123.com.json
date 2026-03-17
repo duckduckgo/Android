@@ -1,0 +1,212 @@
+{
+  "name": "PeopleSearch123",
+  "url": "peoplesearch123.com",
+  "version": "0.2.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.peoplesearch123.com/optOut/name/landing",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.peoplesearch123.com/name/search-result",
+          "id": "7cca9863-e32a-47a3-9c96-741b2240c1f6"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#bottomModifySearch"
+            }
+          ],
+          "id": "363b4542-7680-4062-af35-29cf8a9f5eba"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#bottomModifySearch",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName-bottom"
+            },
+            {
+              "type": "middleName",
+              "selector": "#middleName-bottom"
+            },
+            {
+              "type": "lastName",
+              "selector": "#lastName-bottom"
+            },
+            {
+              "type": "city",
+              "selector": "#city-bottom"
+            },
+            {
+              "type": "state",
+              "selector": "#state-bottom"
+            }
+          ],
+          "id": "18df7e7a-ea74-4fd2-af42-93e82e22a165"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#ux-2"
+            }
+          ],
+          "id": "5334448e-6ca2-48d1-9a69-75d910dabd7b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "fa3f541b-d78d-4f86-a693-a75d61e9012e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='btn-primary']"
+                }
+              ],
+              "id": "369e2f3c-6810-42b5-8b90-9506172af8f5"
+            }
+          ],
+          "id": "5bf47d6c-b03d-4e01-9337-4712f818c25f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "ac06ec89-86e7-4dc1-b237-4a9376444db6"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//button[contains(text(), 'Yes')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//button[contains(text(), 'No')]"
+                  }
+                ]
+              },
+              "id": "acf3dacc-4cd4-4a6b-b7d6-4bc86da0ca08"
+            }
+          ],
+          "id": "3dbe2934-0e53-4856-a8fa-24245fea43c1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "49355923-fc1a-4fed-9a06-92d6551d2cb7"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".result .more",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "320111a3-5480-429b-85d7-7624b2af0fbb"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//li[contains(@class, 'searchedPerson')]",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".//a/div[1]//h3"
+            },
+            "age": {
+              "selector": ".//a/div[1]//h4",
+              "afterText": "Age:"
+            },
+            "relativesList": {
+              "selector": ".//strong[contains(text(), 'relative')]/following-sibling::text()",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".//strong[contains(text(), 'Locations:')]/following-sibling::text()",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "1145594d-2d15-4a67-91d5-415a03b832f1"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1738340502279,
+  "removedAt": null
+}

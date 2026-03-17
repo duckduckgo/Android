@@ -1,0 +1,208 @@
+{
+  "name": "PeopleSearchUSA",
+  "url": "peoplesearchusa.org",
+  "version": "0.2.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.peoplesearchusa.org/optOut/name/landing",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.peoplesearchusa.org/name/search-result",
+          "id": "449fddc8-e5e7-405f-aecc-e87ee25500d5"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-form-2"
+            }
+          ],
+          "id": "418e9529-1071-4a06-92d5-0da4fb6d7be5"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#email-form-2",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#First-Name-2"
+            },
+            {
+              "type": "lastName",
+              "selector": "#Last-Name-3"
+            },
+            {
+              "type": "city",
+              "selector": "#City-3"
+            },
+            {
+              "type": "state",
+              "selector": "#State"
+            }
+          ],
+          "id": "4f4d4748-38cd-4d72-bcc9-5df4aa1da12d"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-search-again"
+            }
+          ],
+          "id": "0349bd42-b9c3-4852-a347-0c986296e44d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "e3130d75-8535-48dd-9afb-824ba8d784a6"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='btn-research']"
+                }
+              ],
+              "id": "64ffd421-90a0-4844-862a-7b23d8169e38"
+            }
+          ],
+          "id": "add63065-0d9c-48de-aaaf-977854426d84"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "de1ed749-0255-46aa-b256-c64e9c633a3f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//button[contains(text(), 'Yes')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//button[contains(text(), 'No')]"
+                  }
+                ]
+              },
+              "id": "ae4aafef-9720-429f-8a88-b944aa85981a"
+            }
+          ],
+          "id": "6a6436d5-0bca-4b82-a299-164e71c0b919"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "d4f28712-83cb-499b-95c3-28cfe9a57885"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//a[contains(@class, 'possible-relatives-more')] | //a[contains(@class, 'possible-locations-more')]",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "6c5b5288-5d6e-4946-961c-8eb5a0093c00"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".search-list-item",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".search-list-name"
+            },
+            "age": {
+              "selector": ".search-list-age",
+              "afterText": "Age:"
+            },
+            "relativesList": {
+              "selector": ".search-possible-relatives .possible-locations-state",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".search-possible-locations .possible-locations-state",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "9d294f00-d9a2-4e7c-9527-0609cb221d6f"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1738341520312,
+  "removedAt": null
+}
