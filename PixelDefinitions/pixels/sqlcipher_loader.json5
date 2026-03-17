@@ -1,0 +1,9 @@
+{
+    "library_load_failure_sqlcipher": {
+        "description": "Fired when the sqlcipher native library fails to load due to an exception",
+        "owners": ["aitorvs"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
