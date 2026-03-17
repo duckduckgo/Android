@@ -98,6 +98,7 @@ class OnboardingBackgroundAnimator(
 
             val startX = enterStartX ?: (screenWidth + centerCropOverflow(inView, screenWidth))
             translationX = startX
+            alpha = 0f
             isVisible = true
 
             val exitAnimator = buildExitAnimator(outView, screenWidth, outViewImageWidth)
@@ -148,6 +149,8 @@ class OnboardingBackgroundAnimator(
             addUpdateListener { animator ->
                 val progress = animator.animatedValue as Float
                 inView.translationX = startX * (1f - progress)
+                // Fade in during last 25% — inverse of exit's first-25% fade-out
+                inView.alpha = minOf(1f, maxOf(0f, (progress - 0.75f) * 4f))
             }
         }
     }
