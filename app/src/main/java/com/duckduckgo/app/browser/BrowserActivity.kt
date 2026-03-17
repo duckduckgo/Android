@@ -380,15 +380,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
         showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
 
-        val deletedTabCount = intent?.getIntExtra(DELETED_TAB_COUNT_EXTRA, 0) ?: 0
-        if (deletedTabCount > 0) {
-            val message = if (deletedTabCount == 1) {
-                getString(R.string.singleTabFireDialogSnackbar)
-            } else {
-                getString(R.string.singleTabFireDialogMultipleTabsSnackbar, deletedTabCount.toString())
+        if (savedInstanceState == null) {
+            val deletedTabCount = intent?.getIntExtra(DELETED_TAB_COUNT_EXTRA, 0) ?: 0
+            if (deletedTabCount > 0) {
+                val message = if (deletedTabCount == 1) {
+                    getString(R.string.singleTabFireDialogSnackbar)
+                } else {
+                    getString(R.string.singleTabFireDialogMultipleTabsSnackbar, deletedTabCount.toString())
+                }
+                showSnackbar(message)
+                intent?.removeExtra(DELETED_TAB_COUNT_EXTRA)
             }
-            showSnackbar(message)
-            intent?.removeExtra(DELETED_TAB_COUNT_EXTRA)
         }
     }
 
