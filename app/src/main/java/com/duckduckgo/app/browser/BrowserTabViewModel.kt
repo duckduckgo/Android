@@ -4232,6 +4232,8 @@ class BrowserTabViewModel @Inject constructor(
                                     url = pageContextUrl,
                                     serializedPageContext = pageContext,
                                 )
+                            }.onFailure { throwable ->
+                                if (throwable is kotlinx.coroutines.CancellationException) throw throwable
                             }
                         }
 
