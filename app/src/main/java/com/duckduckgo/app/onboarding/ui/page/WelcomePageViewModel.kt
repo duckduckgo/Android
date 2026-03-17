@@ -167,6 +167,10 @@ class WelcomePageViewModel @Inject constructor(
 
         data object Finish : Command
 
+        data class FinishAndSubmitSearchQuery(val query: String) : Command
+
+        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
+
         data object OnboardingSkipped : Command
 
         data class SetAddressBarPositionOptions(
@@ -451,6 +455,16 @@ class WelcomePageViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             appBuildConfig.isAppReinstall()
         }
+
+    fun onInputModeDemoQuerySubmitted(query: String, isChat: Boolean) {
+        viewModelScope.launch {
+            if (isChat) {
+                _commands.send(Command.FinishAndSubmitChatPrompt(prompt = query))
+            } else {
+                _commands.send(Command.FinishAndSubmitSearchQuery(query = query))
+            }
+        }
+    }
 
     private fun isSplitOmnibarEnabled(): Boolean =
         androidBrowserConfigFeature.splitOmnibar().isEnabled() &&

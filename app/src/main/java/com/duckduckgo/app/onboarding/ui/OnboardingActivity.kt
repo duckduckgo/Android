@@ -27,17 +27,24 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -77,6 +84,19 @@ class OnboardingActivity : DuckDuckGoActivity() {
     fun onSkipClicked() {
         viewModel.onOnboardingSkipped()
         startActivity(BrowserActivity.intent(this@OnboardingActivity))
+        finish()
+    }
+
+    fun finishAndSubmitSearchQuery(query: String) {
+        viewModel.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, queryExtra = query))
+        finish()
+    }
+
+    fun finishAndSubmitChatPrompt(prompt: String) {
+        viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=onboarding"
+        startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
         finish()
     }
 
