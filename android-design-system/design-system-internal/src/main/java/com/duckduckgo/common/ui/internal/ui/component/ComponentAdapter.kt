@@ -20,7 +20,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class ComponentAdapter : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBACK) {
+class ComponentAdapter(
+    private val isDarkTheme: Boolean,
+) : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBACK) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).ordinal
 
@@ -28,7 +30,7 @@ class ComponentAdapter : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBA
         parent: ViewGroup,
         viewType: Int,
     ): ComponentViewHolder {
-        return ComponentViewHolder.create(parent, viewType)
+        return ComponentViewHolder.create(parent, viewType, isDarkTheme)
     }
 
     override fun onBindViewHolder(
