@@ -205,6 +205,13 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
             SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
             SqlCipherPixelName.LIBRARY_LOAD_TIMEOUT_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_SETTINGS.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
