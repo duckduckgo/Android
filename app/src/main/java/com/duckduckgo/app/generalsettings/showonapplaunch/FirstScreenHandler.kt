@@ -25,6 +25,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -48,19 +49,21 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
-        if (isFreshLaunch) {
-            if (showOnAppLaunchFeature.self().isEnabled()) {
+        if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
+            val timeoutMs = getTimeoutMs()
+            val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
+            logcat { "FirstScreen: timeout is $timeoutMs and lastBackgrounded is $lastBackgrounded" }
+            val elapsed = System.currentTimeMillis() - lastBackgrounded
+            logcat { "FirstScreen: time elapsed $elapsed" }
+            if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
+                logcat { "FirstScreen: handleAppLaunchOption" }
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
-        } else {
-            if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-                val timeoutMs = getTimeoutMs() ?: return
-                val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-                val elapsed = System.currentTimeMillis() - lastBackgrounded
-                if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
-                    showOnAppLaunchOptionHandler.handleAppLaunchOption()
-                }
-            }
+            return
+        }
+
+        if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
+            showOnAppLaunchOptionHandler.handleAppLaunchOption()
         }
     }
 
@@ -68,11 +71,15 @@ class FirstScreenHandlerImpl @Inject constructor(
         settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
     }
 
-    private fun getTimeoutMs(): Long? {
+    private fun getTimeoutMs(): Long {
         val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return null
+            ?: return DEFAULT_TIMEOUT_MS
         return runCatching {
             JSONObject(settings).getLong("timeoutMinutes") * 60 * 1000
-        }.getOrNull()
+        }.getOrDefault(DEFAULT_TIMEOUT_MS)
+    }
+
+    companion object {
+        private const val DEFAULT_TIMEOUT_MS = 1 * 60 * 1000L // 30 minutes
     }
 }
