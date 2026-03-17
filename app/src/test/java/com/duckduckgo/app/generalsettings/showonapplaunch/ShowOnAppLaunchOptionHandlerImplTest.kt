@@ -804,6 +804,10 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             TODO("Not yet implemented")
         }
 
+        override suspend fun delete(tab: TabEntity) {
+            TODO("Not yet implemented")
+        }
+
         override suspend fun markDeletable(tab: TabEntity) {
             TODO("Not yet implemented")
         }
