@@ -75,6 +75,16 @@ abstract class TabsDao {
     abstract fun getDeletableTabIds(): List<String>
 
     @Transaction
+    open fun replaceTab(tabId: String, tab: TabEntity) {
+        tab(tabId)?.let { oldTab ->
+            val newTab = tab.copy(position = oldTab.position)
+            insertTabAtPosition(newTab)
+            insertTabSelection(TabSelectionEntity(tabId = newTab.tabId))
+            deleteTab(oldTab)
+        }
+    }
+
+    @Transaction
     open fun markTabAsDeletable(tab: TabEntity) {
         // requirement: only one tab can be marked as deletable
         deleteTabsMarkedAsDeletable()

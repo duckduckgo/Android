@@ -336,6 +336,15 @@ class TabDataRepository @Inject constructor(
         tabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
     }
 
+    override suspend fun replaceTabWithNewTab(tabId: String) {
+        databaseExecutor().scheduleDirect {
+            val newTab = TabEntity(tabId = generateTabId())
+            tabsDao.replaceTab(tabId, newTab)
+            clearAllSiteData(listOf(tabId))
+        }
+        tabVisitedSitesRepository.clearTab(tabId)
+    }
+
     private fun clearAllSiteData(tabIds: List<String>) {
         tabIds.forEach { tabId ->
             webViewSessionStorage.deleteSession(tabId)

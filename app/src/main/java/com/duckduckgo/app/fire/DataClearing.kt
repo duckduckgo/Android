@@ -71,13 +71,12 @@ class DataClearing @Inject constructor(
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
         val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
-
         val tabUrl = tabRepository.getTab(tabId)?.url
+
         clearDuckAiChatIfNeeded(tabUrl)
         clearContextualChatDataIfNeeded(tabId)
-
         navigationHistory.removeHistoryForTab(tabId)
-        tabRepository.deleteTabs(listOf(tabId))
+        tabRepository.replaceTabWithNewTab(tabId)
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
