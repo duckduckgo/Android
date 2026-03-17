@@ -27,6 +27,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT_WITHOUT_INTRO_CTA
+import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DUCK_AI_FOCUSED
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -86,14 +88,14 @@ class OnboardingActivity : DuckDuckGoActivity() {
     }
 
     fun finishAndSubmitSearchQuery(query: String) {
-        viewModel.onOnboardingDone()
+        viewModel.onOnboardingDone(extendedOnboardingFlow = DEFAULT_WITHOUT_INTRO_CTA)
         startActivity(BrowserActivity.intent(this@OnboardingActivity, queryExtra = query))
         finish()
     }
 
     fun finishAndSubmitChatPrompt(prompt: String) {
-        viewModel.onOnboardingDone()
-        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true)
+        viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
+        val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=onboarding"
         startActivity(BrowserActivity.intent(this@OnboardingActivity, duckChatUrl = duckChatUrl, openDuckChat = true))
         finish()
     }
