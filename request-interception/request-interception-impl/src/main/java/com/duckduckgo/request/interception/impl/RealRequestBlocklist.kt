@@ -17,12 +17,12 @@
 package com.duckduckgo.request.interception.impl
 
 import android.net.Uri
-import android.util.Log
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.request.interception.api.RequestBlocklist
@@ -54,8 +54,6 @@ class RealRequestBlocklist @Inject constructor(
     @Volatile
     private var exceptions = listOf<Domain>()
 
-    var firstLog = false
-
     private val blockListSettingsJsonAdapter: JsonAdapter<RequestBlocklistSettings> =
         moshi.adapter(RequestBlocklistSettings::class.java)
 
@@ -73,17 +71,13 @@ class RealRequestBlocklist @Inject constructor(
         documentUrl: Uri,
         requestUrl: Uri,
     ): Boolean {
-        if (!requestBlocklistFeature.self().isEnabled().also { enabled ->
-                if (!firstLog) {
-                    firstLog = true
-                    Log.d("PageLoadBenchmark", "Loaded: ${blockedRequests.size} is enabled: $enabled")
-                }
-            }
-        ) {
+        if (!requestBlocklistFeature.self().isEnabled()) {
             return false
         }
 
-        if (isAnException(documentUrl)) return false
+        val documentHost = documentUrl.baseHost.orEmpty()
+
+        if (isAnException(documentHost)) return false
 
         val httpUrl = requestUrl.toString().toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
@@ -93,7 +87,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentUrl, rule)
+            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentHost, rule)
         }
     }
 
@@ -126,17 +120,19 @@ class RealRequestBlocklist @Inject constructor(
         }
     }
 
-    private fun isAnException(documentUrl: Uri): Boolean {
+    private fun isAnException(documentHost: String): Boolean {
         return exceptions.any { exception ->
-            UriString.sameOrSubdomain(documentUrl, exception)
+            UriString.sameOrSubdomain(documentHost.toDomain(), exception)
         }
     }
 
     private fun domainMatches(
-        documentUrl: Uri,
+        documentHost: String,
         rule: BlocklistRuleEntity,
     ): Boolean {
         if (rule.applyToAllDomains) return true
-        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentUrl, domain) }
+        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentHost.toDomain(), domain) }
     }
+
+    private fun String.toDomain() = Domain(this)
 }
