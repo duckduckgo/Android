@@ -330,6 +330,36 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when fire animation enabled then isFirePictogramVisible is true`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertTrue(state.isFirePictogramVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation disabled then isFirePictogramVisible is false`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+
+        testee = createViewModel()
+
+        testee.viewState.test {
+            val state = awaitItem()
+
+            assertFalse(state.isFirePictogramVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `when selected tab is duck ai and chats not selected then showDuckAiSubtitle is true`() = runTest {
         val duckAiUrl = "https://duck.ai/chat"
         whenever(mockTabRepository.getSelectedTab()).thenReturn(

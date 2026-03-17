@@ -48,6 +48,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -63,6 +64,7 @@ import com.google.android.material.R as MaterialR
 
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
+private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
 private const val ARG_ORIGIN = "origin"
 
 @InjectWith(FragmentScope::class)
@@ -168,7 +170,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun configureBottomSheet() {
-        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        (dialog as? BottomSheetDialog)?.behavior?.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            maxWidth = BOTTOM_SHEET_MAX_WIDTH_DP.toPx()
+        }
     }
 
     private fun observeViewModel() {
@@ -228,6 +233,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState) {
+        if (!state.isFirePictogramVisible) {
+            hideFirePictogram()
+        }
+
         val titleRes = if (state.isDuckAiChatsSelected) {
             R.string.singleTabFireDialogTitleWithChats
         } else {
@@ -279,6 +288,11 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 insets
             }
         }
+    }
+
+    private fun hideFirePictogram() {
+        binding.fireIcon.gone()
+        binding.fireIconFiller.show()
     }
 
     private fun configureFireAnimationView() {

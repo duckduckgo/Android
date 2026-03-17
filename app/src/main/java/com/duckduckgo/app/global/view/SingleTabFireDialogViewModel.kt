@@ -86,6 +86,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val isDownloadsSubtitleVisible: Boolean = false,
         val shouldRestartAfterClearing: Boolean = true,
         val tabCount: Int = 0,
+        val isFirePictogramVisible: Boolean = true,
     ) {
         val isDeleteThisTabButtonVisible: Boolean
             get() = isSingleTabEnabled && dialogOrigin == BROWSER && (isDuckAiTab || tabCount > 1)
@@ -133,6 +134,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     tabCount = tabCount,
                     isSiteDataSubtitleVisible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                     isDownloadsSubtitleVisible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
+                    isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
                 )
             }
         }
