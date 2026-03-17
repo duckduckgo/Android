@@ -49,6 +49,7 @@ class RealBrokerJsonUpdaterTest {
     private val mockDbpService: DbpService = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockBrokerDataDownloader: BrokerDataDownloader = mock()
+    private val mockBundledBrokerDataLoader: BundledBrokerDataLoader = mock()
     private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
@@ -60,6 +61,7 @@ class RealBrokerJsonUpdaterTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             pirRepository = mockPirRepository,
             brokerDataDownloader = mockBrokerDataDownloader,
+            bundledBrokerDataLoader = mockBundledBrokerDataLoader,
             pixelSender = mockPirPixelSender,
         )
     }
@@ -151,7 +153,7 @@ class RealBrokerJsonUpdaterTest {
     }
 
     @Test
-    fun whenMainConfigFailsThenReturnsFalse() = runTest {
+    fun whenMainConfigFailsAndBrokersExistThenReturnsTrue() = runTest {
         // Given
         val errorResponse = Response.error<PirMainConfig>(500, "Internal Server Error".toResponseBody())
         whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
@@ -162,12 +164,46 @@ class RealBrokerJsonUpdaterTest {
         val result = testee.update()
 
         // Then
-        assertFalse(result)
+        assertTrue(result)
         verifyNoInteractions(mockBrokerDataDownloader)
         verify(mockPirRepository, never()).updateMainEtag(any())
         verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
         verify(mockPirPixelSender).reportDownloadMainConfigBEFailure("500")
         verifyNoMoreInteractions(mockPirPixelSender)
+    }
+
+    @Test
+    fun whenNetworkFailsAndNoBrokerDataStoredThenLoadsBundledDataAndReturnsTrue() = runTest {
+        // Given
+        val errorResponse = Response.error<PirMainConfig>(500, "Internal Server Error".toResponseBody())
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(null)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(0)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(errorResponse)
+
+        // When
+        val result = testee.update()
+
+        // Then
+        assertTrue(result)
+        verify(mockBundledBrokerDataLoader).loadBundledBrokerData()
+    }
+
+    @Test
+    fun whenNetworkFailsAndBundleAlsoFailsThenReturnsFalse() = runTest {
+        // Given
+        val errorResponse = Response.error<PirMainConfig>(500, "Internal Server Error".toResponseBody())
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(null)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(0)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(errorResponse)
+        whenever(mockBundledBrokerDataLoader.loadBundledBrokerData()).thenThrow(RuntimeException("Asset read error"))
+
+        // When
+        val result = testee.update()
+
+        // Then
+        assertFalse(result)
+        verify(mockBundledBrokerDataLoader).loadBundledBrokerData()
     }
 
     @Test
@@ -189,7 +225,7 @@ class RealBrokerJsonUpdaterTest {
     }
 
     @Test
-    fun whenDbpServiceThrowsExceptionThenReturnsFalse() = runTest {
+    fun whenDbpServiceThrowsExceptionAndBrokersExistThenReturnsTrue() = runTest {
         // Given
         whenever(mockPirRepository.getCurrentMainEtag()).thenReturn("old-etag")
         whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
@@ -199,10 +235,11 @@ class RealBrokerJsonUpdaterTest {
         val result = testee.update()
 
         // Then
-        assertFalse(result)
+        assertTrue(result)
         verifyNoInteractions(mockBrokerDataDownloader)
         verify(mockPirRepository, never()).updateMainEtag(any())
         verify(mockPirRepository, never()).updateBrokerJsons(any())
+        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
         verify(mockPirPixelSender).reportDownloadMainConfigFailure(any())
         verifyNoMoreInteractions(mockPirPixelSender)
     }
@@ -249,17 +286,19 @@ class RealBrokerJsonUpdaterTest {
     }
 
     @Test
-    fun whenRepositoryThrowsExceptionThenReturnsFalse() = runTest {
+    fun whenRepositoryThrowsExceptionAndBrokersExistThenReturnsTrue() = runTest {
         // Given
         whenever(mockPirRepository.getCurrentMainEtag()).thenThrow(RuntimeException("Database error"))
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(2)
 
         // When
         val result = testee.update()
 
         // Then
-        assertFalse(result)
+        assertTrue(result)
         verifyNoInteractions(mockDbpService)
         verifyNoInteractions(mockBrokerDataDownloader)
+        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
         verify(mockPirPixelSender).reportDownloadMainConfigFailure(any())
         verifyNoMoreInteractions(mockPirPixelSender)
     }
@@ -295,10 +334,11 @@ class RealBrokerJsonUpdaterTest {
         val result = testee.update()
 
         // Then - etags should NOT be saved when download fails, and broker json failure pixel should be emitted
-        assertFalse(result)
+        assertTrue(result)
         verify(mockBrokerDataDownloader).downloadBrokerData(listOf(testFileName2, testFileName3))
         verify(mockPirRepository, never()).updateBrokerJsons(any())
         verify(mockPirRepository, never()).updateMainEtag(any())
+        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
         verify(mockPirPixelSender).reportDownloadBrokerJsonFailure(any())
         verifyNoMoreInteractions(mockPirPixelSender)
     }

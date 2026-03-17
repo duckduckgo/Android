@@ -58,9 +58,8 @@ class RealBrokerDataDownloaderTest {
         testee = RealBrokerDataDownloader(
             dbpService = mockDbpService,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            pirRepository = mockPirRepository,
             context = mockContext,
-            pirPixelSender = mockPixelSender,
+            brokerJsonProcessor = RealBrokerJsonProcessor(mockPirRepository, mockPixelSender),
         )
     }
 
