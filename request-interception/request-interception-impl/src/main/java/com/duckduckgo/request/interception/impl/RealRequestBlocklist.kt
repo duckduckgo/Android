@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.requestblocklist
+package com.duckduckgo.request.interception.impl
 
+import android.net.Uri
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.duckduckgo.privacy.config.api.RequestBlocklist
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -67,15 +68,18 @@ class RealRequestBlocklist @Inject constructor(
     }
 
     override fun containedInBlocklist(
-        documentUrl: String,
-        requestUrl: String,
+        documentUrl: Uri,
+        requestUrl: Uri,
     ): Boolean {
-        if (!requestBlocklistFeature.self().isEnabled()) return false
+        if (!requestBlocklistFeature.self().isEnabled()) {
+            return false
+        }
 
-        val documentDomain = Domain(documentUrl.extractDomain().orEmpty())
-        if (isAnException(documentDomain)) return false
+        val documentHost = documentUrl.baseHost.orEmpty()
 
-        val httpUrl = requestUrl.toHttpUrlOrNull() ?: return false
+        if (isAnException(documentHost)) return false
+
+        val httpUrl = requestUrl.toString().toHttpUrlOrNull() ?: return false
         val requestDomain = httpUrl.topPrivateDomain() ?: return false
 
         val rules = blockedRequests[requestDomain] ?: return false
@@ -83,7 +87,7 @@ class RealRequestBlocklist @Inject constructor(
         val normalizedUrl = httpUrl.toString()
 
         return rules.any { rule ->
-            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentDomain, rule)
+            rule.rule.containsMatchIn(normalizedUrl) && domainMatches(documentHost, rule)
         }
     }
 
@@ -116,18 +120,20 @@ class RealRequestBlocklist @Inject constructor(
         }
     }
 
-    private fun isAnException(documentDomain: Domain): Boolean {
+    private fun isAnException(documentHost: String): Boolean {
         return exceptions.any { exception ->
-            UriString.sameOrSubdomain(documentDomain, exception)
+            UriString.sameOrSubdomain(documentHost.toDomain(), exception)
         }
     }
 
     private fun domainMatches(
-        documentDomain: Domain,
+        documentHost: String,
         rule: BlocklistRuleEntity,
     ): Boolean {
-        if (documentDomain.value.isEmpty()) return false
+        if (documentHost.isEmpty()) return false
         if (rule.applyToAllDomains) return true
-        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentDomain, domain) }
+        return rule.domains.any { domain -> UriString.sameOrSubdomain(documentHost.toDomain(), domain) }
     }
+
+    private fun String.toDomain() = Domain(this)
 }
