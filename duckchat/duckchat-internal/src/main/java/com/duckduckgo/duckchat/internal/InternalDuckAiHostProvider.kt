@@ -17,31 +17,18 @@
 package com.duckduckgo.duckchat.internal
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.internal.store.DuckAiInternalSettingsDataStore
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 class InternalDuckAiHostProvider @Inject constructor(
     private val dataStore: DuckAiInternalSettingsDataStore,
-    @AppCoroutineScope private val appScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : DuckAiHostProvider {
 
-    @Volatile
-    private var cachedHost: String? = null
-
-    init {
-        appScope.launch(dispatcherProvider.io()) {
-            cachedHost = dataStore.customUrl?.extractHost()
-        }
-    }
+    private var cachedHost: String? = dataStore.customUrl?.extractHost()
 
     override fun getHost(): String = cachedHost ?: super.getHost()
 
@@ -49,9 +36,7 @@ class InternalDuckAiHostProvider @Inject constructor(
 
     fun setCustomUrl(url: String?) {
         cachedHost = url?.extractHost()
-        appScope.launch(dispatcherProvider.io()) {
-            dataStore.customUrl = url
-        }
+        dataStore.customUrl = url
     }
 
     private fun String.extractHost(): String? {

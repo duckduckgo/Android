@@ -17,12 +17,9 @@
 package com.duckduckgo.duckchat.internal
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.internal.store.DuckAiInternalSettingsDataStore
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -32,50 +29,43 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class InternalDuckAiHostProviderTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
-
     private val mockDataStore: DuckAiInternalSettingsDataStore = mock()
 
     private fun createProvider(customUrl: String? = null): InternalDuckAiHostProvider {
         whenever(mockDataStore.customUrl).thenReturn(customUrl)
-        return InternalDuckAiHostProvider(
-            mockDataStore,
-            coroutineRule.testScope,
-            coroutineRule.testDispatcherProvider,
-        )
+        return InternalDuckAiHostProvider(mockDataStore)
     }
 
     @Test
-    fun whenNoCustomUrlThenGetHostReturnsDefault() = runTest {
+    fun whenNoCustomUrlThenGetHostReturnsDefault() {
         val provider = createProvider(customUrl = null)
 
         assertEquals("duck.ai", provider.getHost())
     }
 
     @Test
-    fun whenCustomUrlWithSchemeThenGetHostReturnsCustomHost() = runTest {
+    fun whenCustomUrlWithSchemeThenGetHostReturnsCustomHost() {
         val provider = createProvider(customUrl = "https://staging.duck.ai")
 
         assertEquals("staging.duck.ai", provider.getHost())
     }
 
     @Test
-    fun whenCustomUrlHasNoSchemeThenHostIsExtracted() = runTest {
+    fun whenCustomUrlHasNoSchemeThenHostIsExtracted() {
         val provider = createProvider(customUrl = "staging.duck.ai")
 
         assertEquals("staging.duck.ai", provider.getHost())
     }
 
     @Test
-    fun whenCustomUrlHasPathThenOnlyHostIsExtracted() = runTest {
+    fun whenCustomUrlHasPathThenOnlyHostIsExtracted() {
         val provider = createProvider(customUrl = "https://staging.duck.ai/chat")
 
         assertEquals("staging.duck.ai", provider.getHost())
     }
 
     @Test
-    fun whenSetCustomUrlCalledThenHostUpdatesImmediately() = runTest {
+    fun whenSetCustomUrlCalledThenHostUpdatesImmediately() {
         val provider = createProvider(customUrl = null)
         assertEquals("duck.ai", provider.getHost())
 
@@ -85,7 +75,7 @@ class InternalDuckAiHostProviderTest {
     }
 
     @Test
-    fun whenSetCustomUrlToNullThenHostReverts() = runTest {
+    fun whenSetCustomUrlToNullThenHostReverts() {
         val provider = createProvider(customUrl = "https://staging.duck.ai")
         assertEquals("staging.duck.ai", provider.getHost())
 
@@ -95,7 +85,7 @@ class InternalDuckAiHostProviderTest {
     }
 
     @Test
-    fun whenSetCustomUrlCalledThenDataStoreIsUpdated() = runTest {
+    fun whenSetCustomUrlCalledThenDataStoreIsUpdated() {
         val provider = createProvider(customUrl = null)
 
         provider.setCustomUrl("https://staging.duck.ai")
@@ -104,21 +94,21 @@ class InternalDuckAiHostProviderTest {
     }
 
     @Test
-    fun whenGetCustomUrlCalledThenDelegatesToDataStore() = runTest {
+    fun whenGetCustomUrlCalledThenDelegatesToDataStore() {
         val provider = createProvider(customUrl = "https://staging.duck.ai")
 
         assertEquals("https://staging.duck.ai", provider.getCustomUrl())
     }
 
     @Test
-    fun whenCustomUrlIsBlankThenGetHostReturnsDefault() = runTest {
+    fun whenCustomUrlIsBlankThenGetHostReturnsDefault() {
         val provider = createProvider(customUrl = null)
 
         assertEquals("duck.ai", provider.getHost())
     }
 
     @Test
-    fun whenGetCustomUrlAndNoneSetThenReturnsNull() = runTest {
+    fun whenGetCustomUrlAndNoneSetThenReturnsNull() {
         val provider = createProvider(customUrl = null)
 
         assertNull(provider.getCustomUrl())
