@@ -35,6 +35,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -44,7 +45,6 @@ class RealSyncAutoRestoreManagerTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    // you might also need to add  if setting raw values for feature toggles
     private val persistentStorage: PersistentStorage = mock()
     private val dataStore: SyncAutoRestorePreferenceDataStore = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
@@ -65,22 +65,40 @@ class RealSyncAutoRestoreManagerTest {
     }
 
     @Test
-    fun whenSaveRecoveryPayloadCalledThenStoresSerializedJson() = runTest {
+    fun whenSaveAutoRestoreDataCalledThenStoresSerializedJsonAndSetsPreference() = runTest {
         val recoveryCode = "recovery-abc-123"
         val deviceId = "device-xyz-456"
 
-        testee.saveRecoveryPayload(recoveryCode, deviceId)
+        testee.saveAutoRestoreData(recoveryCode, deviceId)
 
         val bytesCaptor = argumentCaptor<ByteArray>()
         verify(persistentStorage).store(any(), bytesCaptor.capture())
         val json = String(bytesCaptor.firstValue, Charsets.UTF_8)
         assert(json.contains("\"recovery_code\":\"$recoveryCode\"")) { "JSON missing recovery_code: $json" }
         assert(json.contains("\"device_id\":\"$deviceId\"")) { "JSON missing device_id: $json" }
+        verify(dataStore).setRestoreOnReinstallEnabled(true)
     }
 
     @Test
-    fun whenSaveRecoveryPayloadWithNullDeviceIdThenSerializesWithoutDeviceIdField() = runTest {
-        testee.saveRecoveryPayload("code", null)
+    fun whenSaveAutoRestoreDataAndStorageFailsThenPreferenceNotSetAndReturnsFalse() = runTest {
+        whenever(persistentStorage.store(any(), any())).thenReturn(Result.failure(RuntimeException("Block Store error")))
+
+        val result = testee.saveAutoRestoreData("recovery-abc-123", "device-xyz-456")
+
+        assertFalse(result)
+        verify(dataStore, never()).setRestoreOnReinstallEnabled(any())
+    }
+
+    @Test
+    fun whenSaveAutoRestoreDataAndStorageSucceedsThenReturnsTrue() = runTest {
+        val result = testee.saveAutoRestoreData("recovery-abc-123", "device-xyz-456")
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenSaveAutoRestoreDataWithNullDeviceIdThenSerializesWithoutDeviceIdField() = runTest {
+        testee.saveAutoRestoreData("code", null)
 
         val bytesCaptor = argumentCaptor<ByteArray>()
         verify(persistentStorage).store(any(), bytesCaptor.capture())
@@ -130,10 +148,11 @@ class RealSyncAutoRestoreManagerTest {
     }
 
     @Test
-    fun whenClearRecoveryCodeCalledThenClearsPersistentStorage() = runTest {
-        testee.clearRecoveryCode()
+    fun whenClearAutoRestoreDataCalledThenClearsPersistentStorageAndResetsPreference() = runTest {
+        testee.clearAutoRestoreData()
 
         verify(persistentStorage).clear(any())
+        verify(dataStore).setRestoreOnReinstallEnabled(false)
     }
 
     @Test
