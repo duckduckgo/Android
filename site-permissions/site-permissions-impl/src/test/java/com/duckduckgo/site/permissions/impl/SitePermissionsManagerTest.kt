@@ -30,6 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
@@ -53,7 +54,9 @@ class SitePermissionsManagerTest {
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
     private val mockContext = mock<Context>()
-    private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
+    private val mockDuckAiHostProvider = mock<DuckAiHostProvider> {
+        on { getHost() } doReturn "duck.ai"
+    }
     private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
         MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
