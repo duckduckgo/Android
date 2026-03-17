@@ -333,7 +333,11 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             }
         } else {
             if (viewModel.viewState.value.shouldRestartAfterClearing) {
-                clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+                clearDataAction.killAndRestartProcess(
+                    notifyDataCleared = false,
+                    enableTransitionAnimation = false,
+                    deletedTabCount = viewModel.viewState.value.tabCount,
+                )
             } else {
                 pendingFragmentResultEvent?.let { sendFragmentResult(it) }
                 pendingFragmentResultEvent = null

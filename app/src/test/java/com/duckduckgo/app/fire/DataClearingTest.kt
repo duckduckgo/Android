@@ -127,7 +127,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -140,7 +140,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -153,7 +153,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -166,7 +166,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -179,7 +179,7 @@ class DataClearingTest {
         verify(mockClearDataAction).clearBrowserDataOnly(true)
         verify(mockClearDataAction).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -192,7 +192,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -205,7 +205,7 @@ class DataClearingTest {
         verify(mockClearDataAction, never()).clearBrowserDataOnly(any())
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -216,7 +216,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction).clearTabsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -265,7 +265,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(true)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -290,7 +290,7 @@ class DataClearingTest {
 
         verify(mockClearDataAction, never()).clearDuckAiChatsOnly()
         verify(mockClearDataAction).setAppUsedSinceLastClearFlag(false)
-        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearDataAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test

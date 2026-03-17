@@ -339,7 +339,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
     private var setAsDefaultBrowserDialog: DefaultBrowserBottomSheetDialog? = null
-    private var pendingSnackbarResId: Int = 0
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -356,13 +355,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         bindMockupToolbars()
 
         setContentView(binding.root)
-
-        // set the pending snackbar flag before initializing tabs so that
-        // the ViewModel flow sees it and doesn't launch the input screen
-        savedInstanceState?.getInt(KEY_PENDING_SNACKBAR, 0)?.takeIf { it != 0 }?.let {
-            pendingSnackbarResId = it
-            externalIntentProcessingState.onIntentRequestToShowSnackbar()
-        }
 
         initializeTabs(savedInstanceState)
 
@@ -388,16 +380,20 @@ open class BrowserActivity : DuckDuckGoActivity() {
         showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
 
-        if (pendingSnackbarResId != 0) {
-            showSnackbar(pendingSnackbarResId)
+        val deletedTabCount = intent?.getIntExtra(DELETED_TAB_COUNT_EXTRA, 0) ?: 0
+        if (deletedTabCount > 0) {
+            val message = if (deletedTabCount == 1) {
+                getString(R.string.singleTabFireDialogSnackbar)
+            } else {
+                getString(R.string.singleTabFireDialogMultipleTabsSnackbar, deletedTabCount.toString())
+            }
+            showSnackbar(message)
+            intent?.removeExtra(DELETED_TAB_COUNT_EXTRA)
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (pendingSnackbarResId != 0) {
-            outState.putInt(KEY_PENDING_SNACKBAR, pendingSnackbarResId)
-        }
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
@@ -461,6 +457,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun showSnackbar(messageResId: Int) {
+        showSnackbar(getString(messageResId))
+        externalIntentProcessingState.onPendingSnackbarDisplayed()
+    }
+
+    private fun showSnackbar(message: String) {
         lifecycleScope.launch {
             delay(500)
 
@@ -476,12 +477,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
-                message = getString(messageResId),
+                message = message,
                 anchor = anchorView,
             ).show()
-
-            pendingSnackbarResId = 0
-            externalIntentProcessingState.onPendingSnackbarDisplayed()
         }
     }
 
@@ -1201,6 +1199,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
             isLaunchFromBookmarksAppShortcut: Boolean = false,
+            deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -1217,6 +1216,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
+            intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             return intent
         }
 
@@ -1245,7 +1245,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val DISABLE_SWIPING_DELAY = 1000L
 
         private const val DUCK_AI_ANIM_READY_DELAY_MS = 300L
-        private const val KEY_PENDING_SNACKBAR = "pendingSnackbar"
+        private const val DELETED_TAB_COUNT_EXTRA = "DELETED_TAB_COUNT_EXTRA"
     }
 
     inner class BrowserStateRenderer {

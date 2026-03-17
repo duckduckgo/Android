@@ -86,6 +86,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val showSiteDataSubtitle: Boolean = false,
         val showDownloadsSubtitle: Boolean = false,
         val shouldRestartAfterClearing: Boolean = true,
+        val tabCount: Int = 0,
     )
 
     sealed class Command {
@@ -118,11 +119,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val downloads = downloadsRepository.getDownloads()
             val selectedTabUrl = tabRepository.getSelectedTab()?.url
             val isDuckAiTab = selectedTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
+            val tabCount = tabRepository.getOpenTabCount()
             _viewState.update {
                 it.copy(
                     isDuckAiChatsSelected = isDuckAiChatsSelected,
                     isSingleTabEnabled = isDeleteBrowsingDataSupported,
                     isDuckAiTab = isDuckAiTab,
+                    tabCount = tabCount,
                     showDuckAiSubtitle = isDuckAiTab && !isDuckAiChatsSelected,
                     showSiteDataSubtitle = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
                     showDownloadsSubtitle = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
