@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
+import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
@@ -50,7 +51,7 @@ class RealSecureStorageDatabaseFactoryTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val keyProvider: SecureStorageKeyProvider = mock()
-    private val sqlCipherLoader: SqlCipherLibraryLoader = mock()
+    private val sqlCipherLoader: SqlCipherLoader = mock()
     private val timeoutException: TimeoutCancellationException = mock()
 
     // Use a test DatabaseProvider that creates in-memory databases

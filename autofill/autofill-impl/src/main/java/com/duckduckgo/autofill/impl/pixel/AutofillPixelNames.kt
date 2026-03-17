@@ -72,8 +72,6 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FRO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_FAILURE_SQLCIPHER
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -238,8 +236,6 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_HARMONY_KEY_MISSING("autofill_harmony_key_missing"),
     AUTOFILL_PREFERENCES_KEY_MISSING("autofill_preferences_key_missing"),
     AUTOFILL_STORE_KEY_ALREADY_EXISTS("autofill_store_key_already_exists"),
-    LIBRARY_LOAD_TIMEOUT_SQLCIPHER("library_load_timeout_sqlcipher"),
-    LIBRARY_LOAD_FAILURE_SQLCIPHER("library_load_failure_sqlcipher"),
     AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_preferences_update_key_null_file"),
     AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_harmony_preferences_update_key_null_file"),
     AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE("autofill_preferences_get_key_null_file"),
@@ -332,8 +328,6 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED.pixelName to PixelParameter.removeAtb(),
             BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT.pixelName to PixelParameter.removeAtb(),
 
-            LIBRARY_LOAD_TIMEOUT_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
-            LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

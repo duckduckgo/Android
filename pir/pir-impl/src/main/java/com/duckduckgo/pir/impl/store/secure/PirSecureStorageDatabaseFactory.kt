@@ -18,16 +18,14 @@ package com.duckduckgo.pir.impl.store.secure
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.pir.impl.store.PirDatabase
+import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -45,7 +43,7 @@ interface PirSecureStorageDatabaseFactory {
 )
 class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
-    private val dispatchers: DispatcherProvider,
+    private val sqlCipherLoader: SqlCipherLoader,
     private val keyProvider: PirSecureStorageKeyProvider,
 ) : PirSecureStorageDatabaseFactory {
     private var _database: PirDatabase? = null
@@ -66,18 +64,12 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
             return _database
         }
 
-        logcat { "PIR-DB: Loading the sqlcipher native library" }
-        try {
-            withContext(dispatchers.io()) {
-                LibraryLoader.loadLibrary(context, "sqlcipher")
-            }
-            logcat { "PIR-DB: sqlcipher native library loaded ok" }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            // error loading the library (including UnsatisfiedLinkError if the native lib is missing)
-            logcat(ERROR) { "PIR-DB: Error loading sqlcipher library: ${t.asLog()}" }
+        logcat { "PIR-DB: Waiting for sqlcipher native library" }
+        sqlCipherLoader.waitForLibraryLoad().getOrElse { t ->
+            logcat(ERROR) { "PIR-DB: SqlCipher library load failure: ${t.asLog()}" }
+            return null
         }
+        logcat { "PIR-DB: sqlcipher native library loaded ok" }
 
         return try {
             // If we can't access the keystore, it means that L1Key will be null. We don't want to encrypt the db with a null key.

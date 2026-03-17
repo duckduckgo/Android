@@ -184,14 +184,6 @@ interface AutofillFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun sendSanitizedStackTraces(): Toggle
 
-    /**
-     * Controls whether SqlCipher library loading uses async mode or sync fallback.
-     *
-     * @return `true` to use async loading (default), `false` to use sync loading fallback
-     */
-    @DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun sqlCipherAsyncLoading(): Toggle
-
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun readFromHarmony(): Toggle
 }

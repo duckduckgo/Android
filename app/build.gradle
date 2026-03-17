@@ -317,6 +317,8 @@ dependencies {
     implementation project(':privacy-config-store')
     implementation project(':request-interception-api')
     implementation project(':request-interception-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
