@@ -205,7 +205,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onFireButtonTapped() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
         command.value = Command.ShowFireBottomSheet
     }
 

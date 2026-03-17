@@ -674,7 +674,7 @@ class TabSwitcherViewModelTest {
         testee.onFireButtonTapped()
 
         verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
     }
 
     @Test
