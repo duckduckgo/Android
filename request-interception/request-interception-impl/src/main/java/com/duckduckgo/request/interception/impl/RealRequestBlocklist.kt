@@ -130,6 +130,7 @@ class RealRequestBlocklist @Inject constructor(
         documentHost: String,
         rule: BlocklistRuleEntity,
     ): Boolean {
+        if (documentHost.isEmpty()) return false
         if (rule.applyToAllDomains) return true
         return rule.domains.any { domain -> UriString.sameOrSubdomain(documentHost.toDomain(), domain) }
     }
