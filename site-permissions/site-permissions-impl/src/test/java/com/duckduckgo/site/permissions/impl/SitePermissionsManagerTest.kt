@@ -58,21 +58,24 @@ class SitePermissionsManagerTest {
         MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
 
-    private val testee = SitePermissionsManagerImpl(
-        mockPackageManager,
-        mockLocationManager,
-        mockSitePermissionsRepository,
-        coroutineRule.testDispatcherProvider,
-        mockContext,
-        fakeMicrophoneSitePermissionsDomainRecoveryFeature,
-        mockDuckAiHostProvider,
-    )
+    private val testee by lazy {
+        SitePermissionsManagerImpl(
+            mockPackageManager,
+            mockLocationManager,
+            mockSitePermissionsRepository,
+            coroutineRule.testDispatcherProvider,
+            mockContext,
+            fakeMicrophoneSitePermissionsDomainRecoveryFeature,
+            mockDuckAiHostProvider,
+        )
+    }
 
     private val url = "https://domain.com/whatever"
     private val tabId = "tabId"
 
     @Before
     fun before() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
         fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
     }
@@ -227,5 +230,24 @@ class SitePermissionsManagerTest {
     @Test
     fun whenAndroidPermissionNotSupportedThenGetPermissionsQueryResponseReturnsDenied() = runTest {
         assertEquals(SitePermissionQueryResponse.Denied, testee.getPermissionsQueryResponse(url, tabId, "unsupported"))
+    }
+
+    @Test
+    fun whenRecoveryEnabledAndDuckAiAudioGrantedAndAndroidPermissionDeniedThenAudioNotAutoAccepted() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(duckAiUrl, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(duckAiUrl, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_DENIED)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(duckAiUrl.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(1, permissions.userHandled.size)
+        assertEquals(PermissionRequest.RESOURCE_AUDIO_CAPTURE, permissions.userHandled.first())
+        assertEquals(0, permissions.autoAccept.size)
     }
 }
