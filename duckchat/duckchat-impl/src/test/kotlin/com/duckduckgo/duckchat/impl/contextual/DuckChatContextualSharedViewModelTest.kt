@@ -79,7 +79,7 @@ class DuckChatContextualSharedViewModelTest {
             testee.onMainBrowserPageFinished("https://example.com")
 
             val command = awaitItem()
-            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished(), command)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -90,7 +90,7 @@ class DuckChatContextualSharedViewModelTest {
             testee.onMainBrowserPageFinished(null)
 
             val command = awaitItem()
-            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished, command)
+            assertEquals(DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished(), command)
             cancelAndConsumeRemainingEvents()
         }
     }

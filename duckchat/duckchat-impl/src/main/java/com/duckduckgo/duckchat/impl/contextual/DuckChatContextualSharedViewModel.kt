@@ -26,8 +26,8 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
     private val _command = MutableSharedFlow<Command>(extraBufferCapacity = 10)
     val commands = _command.asSharedFlow()
 
-    fun onPageContextReceived(tabId: String, pageContext: String) {
-        _command.tryEmit(Command.PageContextAttached(tabId, pageContext))
+    fun onPageContextReceived(tabId: String, pageContext: String, isStorePageContextEnabled: Boolean = false) {
+        _command.tryEmit(Command.PageContextAttached(tabId, pageContext, isStorePageContextEnabled))
     }
 
     fun onOpenRequested() {
@@ -38,21 +38,22 @@ class DuckChatContextualSharedViewModel() : ViewModel() {
         _command.tryEmit(Command.CollectPageContext)
     }
 
-    fun onMainBrowserPageFinished(url: String?) {
+    fun onMainBrowserPageFinished(url: String?, isStorePageContextEnabled: Boolean = false) {
         logcat { "Duck.ai: onMainBrowserPageFinished $url" }
-        _command.tryEmit(Command.MainBrowserPageFinished)
+        _command.tryEmit(Command.MainBrowserPageFinished(isStorePageContextEnabled))
     }
 
     sealed class Command {
         data class PageContextAttached(
             val tabId: String,
             val pageContext: String,
+            val isStorePageContextEnabled: Boolean = false,
         ) : Command()
 
         data object OpenSheet : Command()
 
         data object CollectPageContext : Command()
 
-        data object MainBrowserPageFinished : Command()
+        data class MainBrowserPageFinished(val isStorePageContextEnabled: Boolean = false) : Command()
     }
 }
