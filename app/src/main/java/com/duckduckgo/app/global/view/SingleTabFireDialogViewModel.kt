@@ -173,9 +173,12 @@ class SingleTabFireDialogViewModel @Inject constructor(
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
-            // TODO: call when conditional logic added in the next PR (#8000)
-//            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
-//            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+            _viewState.value.apply {
+                if (isSingleTabEnabled && dialogOrigin == BROWSER && !isDuckAiTab && tabCount == 1) {
+                    pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+                    pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+                }
+            }
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled

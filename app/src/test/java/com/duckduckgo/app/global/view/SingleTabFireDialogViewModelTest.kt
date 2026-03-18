@@ -29,6 +29,8 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.global.view.SingleTabFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED
@@ -901,6 +903,102 @@ class SingleTabFireDialogViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun `when delete all clicked with single non-duck-ai tab from browser then clear all button only pixel is fired`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when delete all clicked with multiple tabs then clear all button only pixel is not fired`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(3)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when delete all clicked with single duck-ai tab then clear all button only pixel is not fired`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when delete all clicked with feature disabled then clear all button only pixel is not fired`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when delete all clicked from settings then clear all button only pixel is not fired`() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
+
+        testee.onDeleteAllClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
     }
 
     // endregion
