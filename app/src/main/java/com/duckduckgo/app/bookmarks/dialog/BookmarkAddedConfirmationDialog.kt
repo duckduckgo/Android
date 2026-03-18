@@ -138,7 +138,11 @@ class BookmarkAddedConfirmationDialog(
         autoDismissDialogJob += lifecycleScope.launch {
             delay(BOOKMARKS_BOTTOM_SHEET_DURATION)
             if (isShowing && isActive) {
-                dismiss()
+                try {
+                    dismiss()
+                } catch (e: IllegalArgumentException) {
+                    logcat { "Auto-dismiss failed, window already removed: ${e.message}" }
+                }
             }
         }
     }
