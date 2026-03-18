@@ -81,6 +81,7 @@ abstract class TabsDao {
             insertTabAtPosition(newTab)
             insertTabSelection(TabSelectionEntity(tabId = newTab.tabId))
             deleteTab(oldTab)
+            deleteBlankTabsExceptSelected()
         }
     }
 
@@ -160,6 +161,9 @@ abstract class TabsDao {
 
     @Query("delete from tabs where url is null")
     abstract fun deleteBlankTabs()
+
+    @Query("delete from tabs where url is null and tabId not in (select tabId from tab_selection)")
+    abstract fun deleteBlankTabsExceptSelected()
 
     @Query("update tabs set position = position + 1 where position >= :position")
     abstract fun incrementPositionStartingAt(position: Int)
