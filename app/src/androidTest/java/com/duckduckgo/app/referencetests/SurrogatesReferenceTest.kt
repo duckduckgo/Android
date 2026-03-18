@@ -47,7 +47,6 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.RealUrlToTypeMapper
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
-import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -94,7 +93,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
     private lateinit var entityLookup: EntityLookup
     private lateinit var db: AppDatabase
-    private lateinit var trackerDetector: TrackerDetector
+    private lateinit var trackerDetector: TrackerDetectorImpl
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
     private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
