@@ -7,7 +7,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
@@ -81,8 +81,8 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
-    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
+    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
+    private val browserMenuHighlightFlow = MutableStateFlow(false)
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
@@ -119,7 +119,7 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
+        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(browserMenuHighlightFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -174,7 +174,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
+            browserMenuHighlightState = browserMenuHighlightState,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -1248,8 +1248,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun `when default browser experiment updates browser menu highlight, then update the view state`() = runTest {
-        defaultBrowserPromptsExperimentHighlightOverflowMenuFlow.value = true
+    fun `when browser menu highlight state emits true, then update the view state`() = runTest {
+        browserMenuHighlightFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()

@@ -20,9 +20,17 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 interface DownloadMenuStateProvider {
+    /**
+     * Reactive flow indicating whether there is a new download that has not been viewed by the user yet.
+     */
+    val hasNewDownloadFlow: Flow<Boolean>
+
     /**
      * Indicates whether there is a new download that has not been viewed by the user yet.
      */
@@ -45,13 +53,18 @@ class RealDownloadMenuStateProvider @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : DownloadMenuStateProvider {
 
+    private val _hasNewDownloadFlow = MutableStateFlow(settingsDataStore.hasNewDownload)
+    override val hasNewDownloadFlow: Flow<Boolean> = _hasNewDownloadFlow.asStateFlow()
+
     override fun hasNewDownload(): Boolean = settingsDataStore.hasNewDownload
 
     override fun onDownloadComplete() {
         settingsDataStore.hasNewDownload = true
+        _hasNewDownloadFlow.value = true
     }
 
     override fun onDownloadsScreenViewed() {
         settingsDataStore.hasNewDownload = false
+        _hasNewDownloadFlow.value = false
     }
 }
