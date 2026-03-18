@@ -26,7 +26,6 @@ import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import retrofit2.Invocation
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -47,16 +46,6 @@ class PirAuthInterceptor @Inject constructor(
             ?.method()
             ?.isAnnotationPresent(PirAuthRequired::class.java) == true
 
-        val hasExtendedTimeout = invocation
-            ?.method()
-            ?.isAnnotationPresent(PirExtendedReadTimeout::class.java) == true
-
-        val timeoutAdjustedChain = if (hasExtendedTimeout) {
-            chain.withReadTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-        } else {
-            chain
-        }
-
         return if (authRequired) {
             val accessToken = runBlocking { subscriptions.getAccessToken() }
                 ?: throw IOException("Can't obtain access token for requestCan't obtain access token for request")
@@ -65,21 +54,13 @@ class PirAuthInterceptor @Inject constructor(
                 .header("Authorization", "bearer $accessToken")
                 .build()
 
-            timeoutAdjustedChain.proceed(authenticatedRequest)
+            chain.proceed(authenticatedRequest)
         } else {
-            timeoutAdjustedChain.proceed(request)
+            chain.proceed(request)
         }
-    }
-
-    companion object {
-        private const val READ_TIMEOUT_SECONDS = 30
     }
 }
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PirAuthRequired
-
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class PirExtendedReadTimeout
