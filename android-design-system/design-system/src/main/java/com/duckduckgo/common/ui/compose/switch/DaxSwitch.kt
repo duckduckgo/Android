@@ -75,6 +75,8 @@ fun DaxSwitch(
             disabledUncheckedTrackColor = trackOff.copy(alpha = trackOff.alpha * 0.5f),
             disabledUncheckedBorderColor = Color.Transparent,
             disabledUncheckedIconColor = Color.Transparent,
+            disabledCheckedBorderColor = Color.Transparent,
+            disabledCheckedIconColor = Color.Transparent,
         ),
     )
 }
