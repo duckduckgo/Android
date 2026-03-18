@@ -20,10 +20,15 @@ import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,11 +41,12 @@ class ShowOnAppLaunchViewModelTest {
     private lateinit var testee: ShowOnAppLaunchViewModel
     private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun setup() {
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore(LastOpenedTab)
-        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter())
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
     }
 
     @Test
@@ -79,6 +85,65 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val updatedState = awaitItem()
             assertEquals(LastOpenedTab, updatedState.selectedOption)
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.showNTPAfterIdleReturn)
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.showNTPAfterIdleReturn)
+        }
+    }
+
+    @Test
+    fun whenNoSettingsThenDefaultTimeoutHoursIsOne() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(1, state.afterInactivityTimeoutHours)
+        }
+    }
+
+    @Test
+    fun whenSettingsHaveTimeoutMinutesThenTimeoutHoursIsCalculated() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
+            Toggle.State(true, settings = """{"timeoutMinutes":120}"""),
+        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(2, state.afterInactivityTimeoutHours)
+        }
+    }
+
+    @Test
+    fun whenSettingsHaveInvalidJsonThenDefaultTimeoutHoursIsUsed() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
+            Toggle.State(true, settings = """invalid"""),
+        )
+        testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(1, state.afterInactivityTimeoutHours)
         }
     }
 

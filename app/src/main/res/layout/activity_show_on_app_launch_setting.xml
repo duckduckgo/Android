@@ -36,6 +36,17 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_4">
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/afterInactivityMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_4"
+                android:visibility="gone"
+                app:textType="secondary"
+                app:typography="body2"
+                tools:text="@string/afterInactivityOptionMessage"
+                tools:visibility="visible" />
+
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/lastOpenedTabCheckListItem"
                 android:layout_width="match_parent"

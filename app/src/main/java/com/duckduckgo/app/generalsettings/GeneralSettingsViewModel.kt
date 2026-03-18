@@ -119,9 +119,9 @@ class GeneralSettingsViewModel @Inject constructor(
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
                 maliciousSiteProtectionFeatureAvailable =
-                    androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() &&
-                        maliciousSiteProtection.isFeatureEnabled() &&
-                        !androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
+                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() &&
+                    maliciousSiteProtection.isFeatureEnabled() &&
+                    !androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                 showChatSuggestionsToggle = duckChat.isEnabled() &&
                     duckChat.observeInputScreenUserSettingEnabled().firstOrNull() == true &&
                     duckChat.isChatSuggestionsFeatureAvailable(),

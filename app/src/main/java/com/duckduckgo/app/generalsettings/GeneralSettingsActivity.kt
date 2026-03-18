@@ -164,7 +164,7 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
 
                     binding.showOnAppLaunchButton.isVisible = it.isShowOnAppLaunchOptionVisible
                     setShowOnAppLaunchOptionSecondaryText(viewState.showOnAppLaunchSelectedOption)
-                    if (it.showNTPAfterIdleReturn){
+                    if (it.showNTPAfterIdleReturn) {
                         binding.showOnAppLaunchButton.setPrimaryText(resources.getText(R.string.afterInactivityOptionTitle))
                     } else {
                         binding.showOnAppLaunchButton.setPrimaryText(resources.getText(R.string.showOnAppLaunchOptionTitle))
