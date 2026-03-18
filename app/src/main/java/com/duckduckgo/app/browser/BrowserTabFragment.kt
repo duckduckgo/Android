@@ -1505,6 +1505,7 @@ class BrowserTabFragment :
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
+            pageContextHeader = viewModel.getPageContextHeader(),
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false

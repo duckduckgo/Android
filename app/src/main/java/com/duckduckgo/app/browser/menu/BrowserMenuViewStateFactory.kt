@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
+import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,6 +32,7 @@ interface BrowserMenuViewStateFactory {
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
+        pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ): BrowserMenuViewState
 }
 
@@ -43,23 +45,25 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
+        pageContextHeader: PageContextHeaderState,
     ): BrowserMenuViewState {
         return if (customTabsMode) {
-            createCustomTabsViewState(viewState)
+            createCustomTabsViewState(viewState, pageContextHeader)
         } else {
             when (omnibarViewMode) {
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState)
+                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, pageContextHeader)
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
-                else -> createBrowserViewState(browserViewState = viewState)
+                else -> createBrowserViewState(browserViewState = viewState, pageContextHeader = pageContextHeader)
             }
         }
     }
 
     private fun createCustomTabsViewState(
         browserViewState: BrowserViewState,
+        pageContextHeader: PageContextHeaderState,
     ): BrowserMenuViewState.CustomTabs {
         return BrowserMenuViewState.CustomTabs(
             canGoBack = browserViewState.canGoBack,
@@ -69,7 +73,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
-            pageContextHeader = browserViewState.pageContextHeader,
+            pageContextHeader = pageContextHeader,
         )
     }
 
@@ -86,17 +90,19 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
 
     private fun createDuckAiViewState(
         browserViewState: BrowserViewState,
+        pageContextHeader: PageContextHeaderState,
     ): BrowserMenuViewState.DuckAi {
         return BrowserMenuViewState.DuckAi(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
-            pageContextHeader = browserViewState.pageContextHeader,
+            pageContextHeader = pageContextHeader,
         )
     }
 
     private fun createBrowserViewState(
         browserViewState: BrowserViewState,
+        pageContextHeader: PageContextHeaderState,
     ): BrowserMenuViewState.Browser {
         val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
@@ -123,7 +129,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
-            pageContextHeader = browserViewState.pageContextHeader,
+            pageContextHeader = pageContextHeader,
         )
     }
 }

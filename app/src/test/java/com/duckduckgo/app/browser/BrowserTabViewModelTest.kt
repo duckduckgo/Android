@@ -1726,7 +1726,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(siteUrl)
         loadUrl(siteUrl, title = siteTitle)
 
-        val header = browserViewState().pageContextHeader
+        val header = testee.getPageContextHeader()
         assertTrue(header is PageContextHeaderState.Visible)
         val headerState = header as PageContextHeaderState.Visible
         assertEquals("TAB_ID", headerState.tabId)
@@ -1740,7 +1740,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(siteUrl)
         loadUrl(siteUrl)
 
-        val header = browserViewState().pageContextHeader
+        val header = testee.getPageContextHeader()
         assertTrue(header is PageContextHeaderState.Visible)
         assertNull((header as PageContextHeaderState.Visible).title)
     }
@@ -1749,7 +1749,7 @@ class BrowserTabViewModelTest {
     fun whenOnSiteChangedWithNoSiteThenPageContextHeaderIsHidden() = runTest {
         loadUrl(null)
 
-        assertEquals(PageContextHeaderState.Hidden, browserViewState().pageContextHeader)
+        assertEquals(PageContextHeaderState.Hidden, testee.getPageContextHeader())
     }
 
     @Test
@@ -1759,8 +1759,8 @@ class BrowserTabViewModelTest {
         givenCurrentSite(duckAiUrl)
         loadUrl(duckAiUrl)
 
-        assertTrue(browserViewState().pageContextHeader is PageContextHeaderState.DuckAi)
-        assertEquals("TAB_ID", (browserViewState().pageContextHeader as PageContextHeaderState.DuckAi).tabId)
+        assertTrue(testee.getPageContextHeader() is PageContextHeaderState.DuckAi)
+        assertEquals("TAB_ID", (testee.getPageContextHeader() as PageContextHeaderState.DuckAi).tabId)
     }
 
     @Test
@@ -1770,8 +1770,8 @@ class BrowserTabViewModelTest {
         testee.onReceivedError(BAD_URL, errorUrl)
         loadUrl(errorUrl)
 
-        assertTrue(browserViewState().pageContextHeader is PageContextHeaderState.Error)
-        assertEquals("example.com", (browserViewState().pageContextHeader as PageContextHeaderState.Error).shortUrl)
+        assertTrue(testee.getPageContextHeader() is PageContextHeaderState.Error)
+        assertEquals("example.com", (testee.getPageContextHeader() as PageContextHeaderState.Error).shortUrl)
     }
 
     @Test

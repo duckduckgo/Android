@@ -2049,7 +2049,32 @@ class BrowserTabViewModel @Inject constructor(
     private fun titleUpdated(title: String?) {
         logcat(VERBOSE) { "Page title updated: $title" }
         site?.title = title
-        onSiteChanged()
+    }
+
+    fun getPageContextHeader(): PageContextHeaderState {
+        val isErrorMode = browserViewState.value?.browserError != null && browserViewState.value?.browserError != OMITTED
+        val currentSite = site
+        return if (currentSite != null) {
+            val shortUrl = addressDisplayFormatter.getShortUrl(currentSite.url)
+            if (isErrorMode) {
+                PageContextHeaderState.Error(shortUrl)
+            } else if (duckChat.isDuckChatUrl(currentSite.url.toUri())) {
+                PageContextHeaderState.DuckAi(tabId = tabId)
+            } else {
+                PageContextHeaderState.Visible(
+                    title = currentSite.title,
+                    shortUrl = shortUrl,
+                    tabId = tabId,
+                )
+            }
+        } else {
+            val omnibarText = currentOmnibarViewState().omnibarText
+            if (isErrorMode && omnibarText.isNotEmpty()) {
+                PageContextHeaderState.Error(omnibarText)
+            } else {
+                PageContextHeaderState.Hidden
+            }
+        }
     }
 
     @VisibleForTesting
@@ -2425,30 +2450,6 @@ class BrowserTabViewModel @Inject constructor(
                         privacyShield = privacyProtection,
                         trackersBlocked = site?.trackerCount ?: 0,
                     )
-                val isErrorMode = browserViewState.value?.browserError != null && browserViewState.value?.browserError != OMITTED
-                val currentSite = site
-                val pageContextHeader = if (currentSite != null) {
-                    val shortUrl = addressDisplayFormatter.getShortUrl(currentSite.url)
-                    if (isErrorMode) {
-                        PageContextHeaderState.Error(shortUrl)
-                    } else if (duckChat.isDuckChatUrl(currentSite.url.toUri())) {
-                        PageContextHeaderState.DuckAi(tabId = tabId)
-                    } else {
-                        PageContextHeaderState.Visible(
-                            title = currentSite.title,
-                            shortUrl = shortUrl,
-                            tabId = tabId,
-                        )
-                    }
-                } else {
-                    val omnibarText = currentOmnibarViewState().omnibarText
-                    if (isErrorMode && omnibarText.isNotEmpty()) {
-                        PageContextHeaderState.Error(omnibarText)
-                    } else {
-                        PageContextHeaderState.Hidden
-                    }
-                }
-                browserViewState.value = currentBrowserViewState().copy(pageContextHeader = pageContextHeader)
             }
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
