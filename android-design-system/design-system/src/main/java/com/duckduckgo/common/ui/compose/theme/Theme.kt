@@ -126,6 +126,9 @@ fun DuckDuckGoTheme(
             backgroundBlue = Blue0_50,
             backgroundYellow = Yellow10,
         ),
+        status = DuckDuckGoStatusColors(
+            criticalPrimary = colorResource(R.color.alertRedOnLightDefault),
+        ),
         isDark = false,
     )
 
@@ -177,6 +180,9 @@ fun DuckDuckGoTheme(
         infoPanel = DuckDuckGoInfoPanelColors(
             backgroundBlue = Blue50_12,
             backgroundYellow = Yellow50_14,
+        ),
+        status = DuckDuckGoStatusColors(
+            criticalPrimary = colorResource(R.color.alertRedOnDarkDefault),
         ),
         isDark = true,
     )

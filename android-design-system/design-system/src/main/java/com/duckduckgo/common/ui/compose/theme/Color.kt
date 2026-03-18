@@ -38,6 +38,7 @@ data class DuckDuckGoColors(
     val icons: DuckDuckGoIconsColors,
     val infoPanel: DuckDuckGoInfoPanelColors,
     val textField: DuckDuckGoTextFieldColors,
+    val status: DuckDuckGoStatusColors,
     val system: DuckDuckGoSystemColors,
     val isDark: Boolean, // TODO we'll need to do an exploration into using the app pref for Theme switching
 )
@@ -102,6 +103,11 @@ data class DuckDuckGoSystemColors(
     val sliderTrackInactive: Color,
     val textInputEnabledOutline: Color,
     val touchFeedback: Color,
+)
+
+@Immutable
+data class DuckDuckGoStatusColors(
+    val criticalPrimary: Color,
 )
 
 @SuppressLint("ComposeCompositionLocalUsage")
