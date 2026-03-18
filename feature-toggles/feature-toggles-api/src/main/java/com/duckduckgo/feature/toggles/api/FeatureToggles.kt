@@ -35,6 +35,7 @@ import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 import org.jetbrains.annotations.VisibleForTesting
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.random.Random
@@ -50,7 +51,7 @@ class FeatureToggles private constructor(
     private val ioDispatcher: CoroutineDispatcher,
 ) {
 
-    private val featureToggleCache = mutableMapOf<Method, Toggle>()
+    private val featureToggleCache = ConcurrentHashMap<Method, Toggle>()
 
     data class Builder(
         private var store: Toggle.Store? = null,
@@ -114,9 +115,7 @@ class FeatureToggles private constructor(
     }
 
     private fun loadToggleMethod(method: Method): Toggle {
-        synchronized(featureToggleCache) {
-            featureToggleCache[method]?.let { return it }
-
+        return featureToggleCache.computeIfAbsent(method) {
             val defaultValue = try {
                 method.getAnnotation(Toggle.DefaultValue::class.java).defaultValue
             } catch (t: Throwable) {
@@ -135,7 +134,7 @@ class FeatureToggles private constructor(
                 method.getAnnotation(Toggle.Experiment::class.java)
             }.getOrNull() != null
 
-            return ToggleImpl(
+            ToggleImpl(
                 store = if (store is CachedToggleStore) store else CachedToggleStore(store),
                 key = getToggleNameForMethod(method),
                 defaultValue = resolvedDefaultValue,
@@ -147,7 +146,7 @@ class FeatureToggles private constructor(
                 forceDefaultVariant = forceDefaultVariant,
                 callback = callback,
                 ioDispatcher = ioDispatcher,
-            ).also { featureToggleCache[method] = it }
+            )
         }
     }
 
@@ -471,9 +470,10 @@ internal class ToggleImpl constructor(
             is CachedToggleStore -> {
                 s.setListener(
                     object : Listener {
-                        override fun onToggleStored(newValue: State) {
-                            // emit value just stored
-                            launch { trySend(isEnabled()) }
+                        override fun onToggleStored(k: String, newValue: State) {
+                            if (k == key) {
+                                launch { trySend(isEnabled()) }
+                            }
                         }
                     },
                 )
