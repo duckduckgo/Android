@@ -127,6 +127,14 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun omnibarAnimation(): Toggle
 
+    /**
+     * @return `true` when the remote config has the global "showNTPAfterIdleReturn" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun showNTPAfterIdleReturn(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
