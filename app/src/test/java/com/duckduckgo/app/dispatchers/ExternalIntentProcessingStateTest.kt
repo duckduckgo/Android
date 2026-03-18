@@ -169,4 +169,26 @@ class ExternalIntentProcessingStateTest {
 
         assertFalse(testee.hasPendingDuckAiOpen)
     }
+
+    @Test
+    fun `when initialized then hasPendingSnackbar is false`() = runTest {
+        assertFalse(testee.hasPendingSnackbar)
+    }
+
+    @Test
+    fun `when onIntentRequestToShowSnackbar called then hasPendingSnackbar is true`() = runTest {
+        testee.onIntentRequestToShowSnackbar()
+
+        assertTrue(testee.hasPendingSnackbar)
+    }
+
+    @Test
+    fun `when onPendingSnackbarDisplayed called then hasPendingSnackbar is false`() = runTest {
+        testee.onIntentRequestToShowSnackbar()
+        assertTrue(testee.hasPendingSnackbar)
+
+        testee.onPendingSnackbarDisplayed()
+
+        assertFalse(testee.hasPendingSnackbar)
+    }
 }
