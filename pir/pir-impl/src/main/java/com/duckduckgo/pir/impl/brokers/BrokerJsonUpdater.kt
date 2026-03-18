@@ -46,6 +46,7 @@ class RealBrokerJsonUpdater @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirRepository: PirRepository,
     private val brokerDataDownloader: BrokerDataDownloader,
+    private val bundledBrokerDataLoader: BundledBrokerDataLoader,
     private val pixelSender: PirPixelSender,
 ) : BrokerJsonUpdater {
 
@@ -56,39 +57,64 @@ class RealBrokerJsonUpdater @Inject constructor(
      * - If active brokers and/or any json etag has changed, we update the etags db.
      * - If any json etag changed, we download the json zip file.
      * - We extract the json files from the zip. For every json etag that changed, we parse the json file and update the data stored locally.
+     * - If the network update fails (getMainConfig or downloadBrokerData), we fall back to loading broker JSONs from bundled raw resources,
+     *   but only if no broker data has been stored previously.
+     * - Returns true if either the network update or the bundled fallback succeeded. Returns false only if both fail.
      * https://app.asana.com/0/1203581873609357/1207997441358507
      */
     override suspend fun update(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext kotlin.runCatching {
-            if (!pirRepository.isRepositoryAvailable()) {
-                return@withContext false
-            }
+        if (!pirRepository.isRepositoryAvailable()) return@withContext false
 
+        val networkUpdateSucceeded = runNetworkUpdate()
+
+        return@withContext if (!networkUpdateSucceeded) {
+            if (pirRepository.getStoredBrokersCount() == 0) {
+                logcat { "PIR-update: Network update failed and no broker data stored, loading bundled broker data" }
+                runCatching { bundledBrokerDataLoader.loadBundledBrokerData() }
+                    .onFailure { logcat(ERROR) { "PIR-update: Bundled broker load failed: $it" } }
+                    .isSuccess
+            } else {
+                logcat { "PIR-update: Network update failed but brokers already seeded from network, skipping bundle" }
+                return@withContext true
+            }
+        } else {
+            true
+        }
+    }
+
+    private suspend fun runNetworkUpdate(): Boolean {
+        return kotlin.runCatching {
             confirmEtagIntegrity()
-            dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also {
-                logcat { "PIR-update: Main config result $it." }
-                if (it.code() == 304) {
-                    logcat { "PIR-update: Main config did not change, nothing to do here" }
-                } else if (it.isSuccessful) {
-                    logcat { "PIR-update: Main config is new." }
-                    it.body()?.let { config ->
-                        logcat { "PIR-update: Main config $config." }
-                        try {
-                            checkUpdatesFromMainConfig(config)
-                            pirRepository.updateMainEtag(config.etag)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Throwable) {
-                            logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
-                            val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
-                            pixelSender.reportDownloadBrokerJsonFailure(message)
-                            return@withContext false
+            dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also { response ->
+                logcat { "PIR-update: Main config result $response." }
+                when {
+                    response.code() == 304 -> {
+                        logcat { "PIR-update: Main config did not change, nothing to do here" }
+                    }
+
+                    response.isSuccessful -> {
+                        logcat { "PIR-update: Main config is new." }
+                        response.body()?.let { config ->
+                            logcat { "PIR-update: Main config $config." }
+                            try {
+                                checkUpdatesFromMainConfig(config)
+                                pirRepository.updateMainEtag(config.etag)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Throwable) {
+                                logcat(ERROR) { "PIR-update: Failed to download broker json files: $e" }
+                                val message = e.asLog().sanitize() ?: e.message ?: "Unknown error"
+                                pixelSender.reportDownloadBrokerJsonFailure(message)
+                                return false
+                            }
                         }
                     }
-                } else {
-                    logcat(ERROR) { "PIR-update: Failed to get mainconfig ${it.code()}: ${it.message()}" }
-                    pixelSender.reportDownloadMainConfigBEFailure(it.code().toString())
-                    return@withContext false
+
+                    else -> {
+                        logcat(ERROR) { "PIR-update: Failed to get mainconfig ${response.code()}: ${response.message()}" }
+                        pixelSender.reportDownloadMainConfigBEFailure(response.code().toString())
+                        return false
+                    }
                 }
             }
             true

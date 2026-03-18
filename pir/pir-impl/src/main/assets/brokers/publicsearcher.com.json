@@ -1,0 +1,252 @@
+{
+  "name": "PublicSearcher",
+  "url": "publicsearcher.com",
+  "version": "0.5.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.publicsearcher.com/optOut/name/landingPage",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.publicsearcher.com/optOut/name/landingPage",
+          "id": "331b4f4e-5534-43f5-90f8-589c89d59a8d"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".search-wrapper"
+            }
+          ],
+          "id": "9a72ae74-eb07-4735-9da7-f5e67018b53a"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": ".search-wrapper",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": "#lastName"
+            },
+            {
+              "type": "state",
+              "selector": "#state"
+            }
+          ],
+          "id": "12a78bc7-1dca-423f-8c37-f5d85ccbf7e0"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ],
+          "id": "2489dee9-2b59-40bb-8ec4-88ef15c7c5c3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "d7ea97a0-ba6f-483a-afd1-af787745fcb8"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='loader-submit-btn']"
+                }
+              ],
+              "id": "6987e048-6062-488a-b9db-924e936f10af"
+            }
+          ],
+          "id": "25abf339-5c1c-4743-a266-7bfcafb82433"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "f4b692c2-2e98-49bb-bce7-f8edbde56e15"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//div[contains(text(), 'YES')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//div[contains(text(), 'NO')]"
+                  }
+                ]
+              },
+              "id": "d0208c1a-605a-4482-904f-34b9bed2c808"
+            }
+          ],
+          "id": "632f5161-71d4-4e0b-ac2d-f6c770ebda48"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "add a bit more wait time for the captchas to complete",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "3a01aae9-612e-4ed8-b36d-54484e62cd7b"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "captcha is not always present at this stage",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#svg-captcha-rendering svg",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "getCaptchaInfo",
+              "captchaType": "image",
+              "selector": "#svg-captcha-rendering svg",
+              "id": "3ade98cb-9fcd-4c02-803a-157fcd3c92c9"
+            },
+            {
+              "actionType": "solveCaptcha",
+              "captchaType": "image",
+              "selector": "#svgCaptchaInputId",
+              "id": "244986f1-e765-4f20-b94a-2e2faa3d7a75"
+            },
+            {
+              "actionType": "click",
+              "failSilently": true,
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "#svgCaptchaButtonId"
+                }
+              ],
+              "id": "42ba49cf-2b2f-4d77-8756-df800ef5e18d"
+            }
+          ],
+          "id": "0448a534-9040-484d-9e2f-f7faae520ddb"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "0466c021-3689-4151-86db-27e02305d4de"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".result .more",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "539c6e87-95d1-45e2-930b-32a2707a88cc"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//li[contains(@class, 'searchedPerson')]",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".//a/div[1]//h3"
+            },
+            "age": {
+              "selector": ".//a/div[1]//h4",
+              "afterText": "Age:"
+            },
+            "relativesList": {
+              "selector": ".//strong[contains(text(), 'relative')]/following-sibling::text()",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".//strong[contains(text(), 'Locations:')]/following-sibling::text()",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "0aa28805-62ab-4f8f-814e-56612537b735"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1738342848952,
+  "removedAt": null
+}

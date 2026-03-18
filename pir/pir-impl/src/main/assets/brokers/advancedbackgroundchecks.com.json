@@ -1,0 +1,81 @@
+{
+  "name": "AdvancedBackgroundChecks",
+  "url": "advancedbackgroundchecks.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678060800000,
+  "optOutUrl": "https://www.advancedbackgroundchecks.com/removal",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "070b6417-8ccd-4111-b5ae-7ae470b0399a",
+          "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".logo-advanced"
+            }
+          ],
+          "id": "95594c0e-e6a3-4b60-8596-489e58cead2c"
+        },
+        {
+          "actionType": "extract",
+          "id": "d760163d-4a1f-476a-bc3e-4f3ccedc29f1",
+          "selector": ".card-block",
+          "noResultsSelector": "//div[@id='site-content']//p[contains(text(), 'We could not find any results')]",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": "Age"
+            },
+            "alternativeNamesList": {
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'AKA')]]",
+              "afterText": "AKA:",
+              "separator": ","
+            },
+            "age": {
+              "selector": ".card-title",
+              "afterText": "Age"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[@class='card-text address-link-list']//a",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": "(.//p[@class='card-text'])[1]"
+            },
+            "relativesList": {
+              "selector": ".//p[contains(@class, 'card-text') and strong[contains(text(), 'Related to')]]",
+              "afterText": "Related to:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.advancedbackgroundchecks.com/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

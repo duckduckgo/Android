@@ -1,0 +1,67 @@
+{
+  "name": "OfficialUSA",
+  "url": "officialusa.com",
+  "version": "0.6.0",
+  "parent": "neighbor.report",
+  "addedDatetime": 1692594000000,
+  "optOutUrl": "https://www.officialusa.com/opt-out/",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "947ca80c-3331-4425-9ad3-ab25e2170f29",
+          "url": "https://officialusa.com/names/${firstName}-${lastName}/"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".navbar-brand"
+            }
+          ],
+          "id": "18dda546-a271-454c-ba9e-d213b2b5f4fc"
+        },
+        {
+          "actionType": "extract",
+          "id": "fd803889-7f13-4955-8cec-eac551f5c5f2",
+          "selector": ".person",
+          "noResultsSelector": "//h1[contains(text(), '404')]",
+          "profile": {
+            "name": {
+              "selector": ".//span[@itemprop='name']"
+            },
+            "age": null,
+            "addressFull": {
+              "selector": "(.//div[@class='detail-block__main-item-block']//li)[1]"
+            },
+            "addressCityState": {
+              "selector": ".//span[@itemprop='address']"
+            },
+            "phone": {
+              "selector": ".//span[@itemprop='telephone']"
+            },
+            "relativesList": null,
+            "profileUrl": null
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
