@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
@@ -48,6 +49,7 @@ class RealBrokerJsonUpdater @Inject constructor(
     private val brokerDataDownloader: BrokerDataDownloader,
     private val bundledBrokerDataLoader: BundledBrokerDataLoader,
     private val pixelSender: PirPixelSender,
+    private val pirRemoteFeatures: PirRemoteFeatures,
 ) : BrokerJsonUpdater {
 
     /**
@@ -69,6 +71,10 @@ class RealBrokerJsonUpdater @Inject constructor(
 
         return@withContext if (!networkUpdateSucceeded) {
             if (pirRepository.getStoredBrokersCount() == 0) {
+                if (!pirRemoteFeatures.useBundledBrokerJsons().isEnabled()) {
+                    logcat { "PIR-update: Bundled broker jsons disabled. Not loading bundled data." }
+                    return@withContext false
+                }
                 logcat { "PIR-update: Network update failed and no broker data stored, loading bundled broker data" }
                 runCatching { bundledBrokerDataLoader.loadBundledBrokerData() }
                     .onSuccess { pixelSender.reportBundleBrokerJsonLoaded() }

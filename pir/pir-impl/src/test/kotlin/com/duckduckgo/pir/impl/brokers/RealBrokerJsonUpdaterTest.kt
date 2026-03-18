@@ -17,6 +17,8 @@
 package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirBrokerEtags
@@ -51,10 +53,14 @@ class RealBrokerJsonUpdaterTest {
     private val mockBrokerDataDownloader: BrokerDataDownloader = mock()
     private val mockBundledBrokerDataLoader: BundledBrokerDataLoader = mock()
     private val mockPirPixelSender: PirPixelSender = mock()
+    private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
+    private val mockUseBundledBrokerJsonsToggle: Toggle = mock()
 
     @Before
     fun setUp() = runTest {
         whenever(mockPirRepository.isRepositoryAvailable()).thenReturn(true)
+        whenever(mockPirRemoteFeatures.useBundledBrokerJsons()).thenReturn(mockUseBundledBrokerJsonsToggle)
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(true)
 
         testee = RealBrokerJsonUpdater(
             dbpService = mockDbpService,
@@ -63,6 +69,7 @@ class RealBrokerJsonUpdaterTest {
             brokerDataDownloader = mockBrokerDataDownloader,
             bundledBrokerDataLoader = mockBundledBrokerDataLoader,
             pixelSender = mockPirPixelSender,
+            pirRemoteFeatures = mockPirRemoteFeatures,
         )
     }
 
@@ -341,5 +348,38 @@ class RealBrokerJsonUpdaterTest {
         verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
         verify(mockPirPixelSender).reportDownloadBrokerJsonFailure(any())
         verifyNoMoreInteractions(mockPirPixelSender)
+    }
+
+    @Test
+    fun whenKillswitchDisabledAndNetworkFailsAndNoBrokerDataStoredThenSkipsBundleAndReturnsFalse() = runTest {
+        // Given
+        whenever(mockUseBundledBrokerJsonsToggle.isEnabled()).thenReturn(false)
+        val errorResponse = Response.error<PirMainConfig>(500, "Internal Server Error".toResponseBody())
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(null)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(0)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(errorResponse)
+
+        // When
+        val result = testee.update()
+
+        // Then
+        assertFalse(result)
+        verify(mockBundledBrokerDataLoader, never()).loadBundledBrokerData()
+    }
+
+    @Test
+    fun whenKillswitchEnabledAndNetworkFailsAndNoBrokerDataStoredThenLoadsBundledData() = runTest {
+        // Given - killswitch enabled (default), so bundled data should be loaded
+        val errorResponse = Response.error<PirMainConfig>(500, "Internal Server Error".toResponseBody())
+        whenever(mockPirRepository.getCurrentMainEtag()).thenReturn(null)
+        whenever(mockPirRepository.getStoredBrokersCount()).thenReturn(0)
+        whenever(mockDbpService.getMainConfig(null)).thenReturn(errorResponse)
+
+        // When
+        val result = testee.update()
+
+        // Then
+        assertTrue(result)
+        verify(mockBundledBrokerDataLoader).loadBundledBrokerData()
     }
 }
