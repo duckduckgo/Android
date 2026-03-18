@@ -44,12 +44,15 @@ class ExternalIntentProcessingStateImpl @Inject constructor(
     @AppCoroutineScope coroutineScope: CoroutineScope,
     tabRepository: TabRepository,
 ) : ExternalIntentProcessingState {
+    @Volatile
     override var hasPendingTabLaunch: Boolean = false
         private set
 
+    @Volatile
     override var hasPendingDuckAiOpen: Boolean = false
         private set
 
+    @Volatile
     override var hasPendingSnackbar: Boolean = false
         private set
 

@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -264,7 +265,9 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     private suspend fun waitForTabsToUpdate(originalTabId: String?) {
         // wait for the tab selection to change before signaling completion
-        tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
+        withTimeoutOrNull(TAB_UPDATE_TIMEOUT_MS) {
+            tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
+        }
         delay(500)
     }
 
@@ -282,5 +285,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     companion object {
         private const val DIALOG_WARNING_MESSAGE_SHOWN_LIMIT = 2
+        private const val TAB_UPDATE_TIMEOUT_MS = 5000L
     }
 }
