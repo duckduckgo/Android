@@ -98,4 +98,8 @@
     <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">After Inactivity</string>
+    <string name="afterInactivityOptionMessage">Choose what you see when you return after 4 hours of inactivity.</string>
+
 </resources>
