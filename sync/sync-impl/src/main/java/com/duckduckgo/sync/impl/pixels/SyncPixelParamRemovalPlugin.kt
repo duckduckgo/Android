@@ -58,15 +58,6 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED.pixelName to PixelParameter.removeAtb(),
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS.pixelName to PixelParameter.removeAtb(),
 
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_UNENCRYPTED_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_UNAVAILABLE_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_CHECK_ERROR_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_WRITE_SUCCESS_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_WRITE_ERROR_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_SUCCESS_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_ERROR_DAILY.pixelName to PixelParameter.removeAtb(),
-            SyncPixelName.SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_MISMATCH_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
