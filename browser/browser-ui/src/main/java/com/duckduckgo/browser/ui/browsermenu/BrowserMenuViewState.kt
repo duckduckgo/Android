@@ -83,6 +83,7 @@ sealed class PageContextHeaderState {
     ) : PageContextHeaderState()
 
     data class DuckAi(
+        val title: String?,
         val tabId: String,
     ) : PageContextHeaderState()
 

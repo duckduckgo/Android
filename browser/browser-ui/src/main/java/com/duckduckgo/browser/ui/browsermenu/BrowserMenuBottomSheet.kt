@@ -388,9 +388,10 @@ class BrowserMenuBottomSheet(
             }
             is PageContextHeaderState.DuckAi -> {
                 binding.menuHeader.root.isVisible = true
-                binding.menuHeader.headerTitle.isVisible = true
-                binding.menuHeader.headerTitle.text = context.getString(R.string.browserMenuDuckChat)
-                binding.menuHeader.headerShortUrl.isVisible = false
+                binding.menuHeader.headerTitle.isVisible = !pageContextHeaderState.title.isNullOrBlank()
+                binding.menuHeader.headerTitle.text = pageContextHeaderState.title
+                binding.menuHeader.headerShortUrl.isVisible = true
+                binding.menuHeader.headerShortUrl.text = context.getString(R.string.browserMenuDuckChat)
                 binding.menuHeader.headerFavicon.setImageResource(drawable.ic_duck_ai_color_24)
                 binding.menuHeader.headerCloseButton.setOnClickListener { performDismiss() }
             }

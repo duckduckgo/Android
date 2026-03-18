@@ -98,14 +98,15 @@ class BrowserMenuBottomSheetTest {
 
     @Test
     fun whenRenderDuckAiMenuThenMenuHeaderIsShown() {
-        val viewState = BrowserMenuViewState.DuckAi(pageContextHeader = PageContextHeaderState.DuckAi(tabId = "tab1"))
+        val viewState = BrowserMenuViewState.DuckAi(pageContextHeader = PageContextHeaderState.DuckAi(title = "Python help", tabId = "tab1"))
 
         dialog.render(viewState)
 
         assertTrue(menuHeader.isVisible)
-        val expectedTitle = dialog.context.getString(R.string.browserMenuDuckChat)
-        assertEquals(expectedTitle, headerTitle.text.toString())
-        assertFalse(headerShortUrl.isVisible)
+        assertEquals("Python help", headerTitle.text.toString())
+        assertTrue(headerShortUrl.isVisible)
+        val expectedShortUrl = dialog.context.getString(R.string.browserMenuDuckChat)
+        assertEquals(expectedShortUrl, headerShortUrl.text.toString())
     }
 
     @Test

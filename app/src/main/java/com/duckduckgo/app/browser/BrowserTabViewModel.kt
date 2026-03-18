@@ -2059,7 +2059,7 @@ class BrowserTabViewModel @Inject constructor(
             if (isErrorMode) {
                 PageContextHeaderState.Error(shortUrl)
             } else if (duckChat.isDuckChatUrl(currentSite.url.toUri())) {
-                PageContextHeaderState.DuckAi(tabId = tabId)
+                PageContextHeaderState.DuckAi(title = currentSite.title, tabId = tabId)
             } else {
                 PageContextHeaderState.Visible(
                     title = currentSite.title,
