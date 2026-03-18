@@ -251,15 +251,18 @@ class SingleTabFireDialogViewModel @Inject constructor(
             when (result) {
                 is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
                 is ClearDataResult.Success -> {
-                    // wait for the tab selection to change before signaling completion so that
-                    // the tab changes have time to settle
-                    tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
-                    delay(500)
+                    waitForTabsToUpdate(originalTabId)
                     command.send(Command.OnSingleTabClearComplete)
                 }
                 else -> command.send(Command.OnSingleTabClearError)
             }
         }
+    }
+
+    private suspend fun waitForTabsToUpdate(originalTabId: String?) {
+        // wait for the tab selection to change before signaling completion
+        tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
+        delay(500)
     }
 
     private suspend fun trySendDailyDeleteClicked() {
