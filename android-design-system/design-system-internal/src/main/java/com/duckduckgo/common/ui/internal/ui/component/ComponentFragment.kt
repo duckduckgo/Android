@@ -31,7 +31,7 @@ import kotlinx.coroutines.runBlocking
 import kotlin.getValue
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 
-@SuppressLint("NoFragment") // we don't use DI here
+@SuppressLint("NoFragment", "DenyListedApi") // we don't use DI here
 abstract class ComponentFragment : Fragment() {
 
     private val appComponentsViewModel by appComponentsViewModel()
