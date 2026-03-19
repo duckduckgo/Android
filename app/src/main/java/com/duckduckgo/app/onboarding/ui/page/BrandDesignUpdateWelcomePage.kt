@@ -34,6 +34,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionListenerAdapter
+import androidx.transition.TransitionManager
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -83,6 +86,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
+    private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
     private var isAnimating = false
@@ -370,6 +374,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxAnimatorSet = null
         walkingDaxDelayedRunnable?.let { binding.welcomeScreenWalkingDax.removeCallbacks(it) }
         walkingDaxDelayedRunnable = null
+        comparisonChartFadeInAnimatorSet?.cancel()
+        comparisonChartFadeInAnimatorSet = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -495,7 +501,36 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
-                    // TODO
+                    val transition = AutoTransition()
+                    transition.addListener(object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
+                                playTogether(
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.comparisonChartContent.root, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                )
+                                addListener(object : AnimatorListenerAdapter() {
+                                    override fun onAnimationEnd(animation: Animator) {
+                                        isAnimating = false
+                                    }
+                                })
+                                start()
+                            }
+                        }
+                    })
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, transition)
+
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = true
+                    binding.daxDialogCta.comparisonChartContent.root.alpha = 0f
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                    binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
