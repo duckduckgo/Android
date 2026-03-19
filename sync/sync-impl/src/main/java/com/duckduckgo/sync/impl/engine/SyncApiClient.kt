@@ -107,7 +107,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
-            DUCK_AI_CHATS -> error("DUCK_AI_CHATS does not support GET")
+            DUCK_AI_CHATS -> Result.Error(reason = "DUCK_AI_CHATS does not support GET")
         }
 
         return when (result) {
