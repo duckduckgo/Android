@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
     <string name="singleTabFireDialogSnackbar">1 lap és az adatai törölve</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s lap és adataik törölve</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
 
