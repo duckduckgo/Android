@@ -263,7 +263,6 @@ class TabSwitcherAdapter(
         holder.title.text = tab.tabEntity.title ?: ""
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
         updateUnreadIndicator(holder, tab.tabEntity)
-        loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder, isDuckAiTab = true)
         loadSelectionState(holder, tab)
         attachTabClickListeners(
             tabViewHolder = holder,
@@ -449,9 +448,6 @@ class TabSwitcherAdapter(
             for (key in bundle.keySet()) {
                 logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
-            if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
-                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder, isDuckAiTab = true)
-            }
             bundle.getString(DIFF_KEY_TITLE)?.let {
                 viewHolder.title.text = it
             }
@@ -587,7 +583,6 @@ class TabSwitcherAdapter(
                 glide.clear(holder.favicon)
             }
             is TabSwitcherViewHolder.DuckAiTabGridViewHolder -> {
-                glide.clear(holder.tabPreview)
                 // favicon is a static drawable; no need to clear
             }
             is TabSwitcherViewHolder.DuckAiTabListViewHolder -> {
@@ -732,7 +727,6 @@ class TabSwitcherAdapter(
             override val close: ImageView,
             override val tabUnread: ImageView,
             override val selectionIndicator: ImageView,
-            val tabPreview: ImageView,
         ) : TabSwitcherViewHolder(rootView), TabViewHolder {
 
             constructor(binding: ItemDuckAiTabGridBinding) : this(
@@ -742,7 +736,6 @@ class TabSwitcherAdapter(
                 close = binding.close,
                 tabUnread = binding.tabUnread,
                 selectionIndicator = binding.selectionIndicator,
-                tabPreview = binding.tabPreview,
             )
         }
 

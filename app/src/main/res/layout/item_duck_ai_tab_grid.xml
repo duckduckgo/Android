@@ -101,8 +101,8 @@
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/background_rounded_top_corners"
+            android:layout_height="@dimen/gridItemPreviewHeight"
+            android:background="@drawable/background_rounded_background"
             android:layout_marginTop="@dimen/keyline_2"
             android:paddingStart="@dimen/keyline_2"
             android:paddingEnd="6dp"
@@ -117,18 +117,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/favicon"
             tools:text="Explain quantum entanglement" />
-
-        <!-- Screenshot preview -->
-        <ImageView
-            android:id="@+id/tabPreview"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/gridItemPreviewHeight"
-            android:importantForAccessibility="no"
-            android:scaleType="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
