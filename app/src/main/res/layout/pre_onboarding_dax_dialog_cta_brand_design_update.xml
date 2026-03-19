@@ -52,6 +52,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <include
+                android:id="@+id/comparisonChartContent"
+                layout="@layout/include_brand_design_comparison_chart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="gone" />
+
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/primaryCta"
                 android:layout_width="match_parent"
