@@ -21,7 +21,6 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
@@ -76,7 +75,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = true,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -106,7 +105,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -132,7 +131,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -158,7 +157,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -184,7 +183,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -210,7 +209,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -256,7 +255,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -323,7 +322,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = browserViewState,
             customTabsMode = false,
             tabId = "",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -355,16 +354,12 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Test
     fun `when site has url and title then page context header is Visible`() = runTest {
-        val site: Site = mock()
-        whenever(site.url).thenReturn("https://www.example.com/")
-        whenever(site.title).thenReturn("Example Site")
-
         val result = testee.create(
             omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
             viewState = BrowserViewState(),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = site,
+            title = "Example Site",
             shortUrl = "example.com",
             omnibarText = null,
         )
@@ -379,16 +374,12 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Test
     fun `when site has url and null title then page context header is Visible with null title`() = runTest {
-        val site: Site = mock()
-        whenever(site.url).thenReturn("https://www.example.com/")
-        whenever(site.title).thenReturn(null)
-
         val result = testee.create(
             omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
             viewState = BrowserViewState(),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = site,
+            title = null,
             shortUrl = "example.com",
             omnibarText = null,
         )
@@ -405,7 +396,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = BrowserViewState(),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = null,
         )
@@ -416,17 +407,12 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Test
     fun `when site is duck ai url then page context header is DuckAi`() = runTest {
-        val duckAiUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        val site: Site = mock()
-        whenever(site.url).thenReturn(duckAiUrl)
-        whenever(site.title).thenReturn("Duck.ai Chat")
-
         val result = testee.create(
             omnibarViewMode = ViewMode.DuckAI,
             viewState = BrowserViewState(),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = site,
+            title = "Duck.ai Chat",
             shortUrl = null,
             omnibarText = null,
         )
@@ -438,15 +424,12 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Test
     fun `when site has error then page context header is Error`() = runTest {
-        val site: Site = mock()
-        whenever(site.url).thenReturn("https://www.example.com/")
-
         val result = testee.create(
             omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
             viewState = BrowserViewState(browserError = WebViewErrorResponse.BAD_URL),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = site,
+            title = null,
             shortUrl = "example.com",
             omnibarText = null,
         )
@@ -463,7 +446,7 @@ class RealBrowserMenuViewStateFactoryTest {
             viewState = BrowserViewState(browserError = WebViewErrorResponse.BAD_URL),
             customTabsMode = false,
             tabId = "TAB_ID",
-            site = null,
+            title = null,
             shortUrl = null,
             omnibarText = "broken-site.com",
         )

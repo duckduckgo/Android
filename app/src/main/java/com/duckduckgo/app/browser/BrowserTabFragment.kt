@@ -1509,8 +1509,8 @@ class BrowserTabFragment :
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
-            shortUrl = addressDisplayFormatter.getShortUrl(currentSite?.url),
-            site = currentSite,
+            title = currentSite?.title,
+            shortUrl = currentSite?.url?.let { addressDisplayFormatter.getShortUrl(it) },
             tabId = tabId,
             omnibarText = viewModel.omnibarViewState.value?.omnibarText,
         )
