@@ -114,7 +114,7 @@
         layout="@layout/pre_onboarding_dax_dialog_cta_brand_design_update"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="4dp"
         android:alpha="0"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
