@@ -288,7 +288,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Schede e dati</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Schede, dati e chat di Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Elimina il giorno…</string>
+    <string name="settingsAutomaticallyClearWhen">Elimina in questa circostanza:</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Elimina il giorno…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Solo in caso di uscita dall\'app</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uscita dall\'app, inattività di 5 secondi</string>

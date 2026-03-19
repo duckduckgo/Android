@@ -288,7 +288,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Slet den ...</string>
+    <string name="settingsAutomaticallyClearWhen">Slet ved ...</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Slet den ...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
