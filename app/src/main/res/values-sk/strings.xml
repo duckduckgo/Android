@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
     <string name="dataClearingActivityTitle">Vymazanie údajov</string>
-    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Údaje môžeš údaje vymazať manuálne pomocou tlačidla Fire Button alebo si môžeš nastaviť automatické vymazávanie.</string>
+    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Údaje môžeš vymazať manuálne pomocou tlačidla Fire Button alebo si môžeš nastaviť automatické vymazávanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d lokalita bola vylúčená z vymazania</item>
         <item quantity="few">%1$d lokality boli vylúčené z vymazania</item>
