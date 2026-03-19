@@ -383,11 +383,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (savedInstanceState == null) {
             val deletedTabCount = intent?.getIntExtra(DELETED_TAB_COUNT_EXTRA, 0) ?: 0
             if (deletedTabCount > 0) {
-                val message = if (deletedTabCount == 1) {
-                    getString(R.string.singleTabFireDialogSnackbar)
-                } else {
-                    getString(R.string.singleTabFireDialogMultipleTabsSnackbar, deletedTabCount.toString())
-                }
+                val message = resources.getQuantityString(R.plurals.singleTabFireDialogSnackbar, deletedTabCount, deletedTabCount)
                 showSnackbar(message)
                 intent?.removeExtra(DELETED_TAB_COUNT_EXTRA)
             }
@@ -447,7 +443,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    showSnackbar(R.string.singleTabFireDialogSnackbar)
+                    showSnackbar(resources.getQuantityString(R.plurals.singleTabFireDialogSnackbar, 1, 1))
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
