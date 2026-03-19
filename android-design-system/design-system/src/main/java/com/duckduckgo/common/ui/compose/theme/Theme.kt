@@ -113,6 +113,7 @@ fun DuckDuckGoTheme(
             white = White,
             destructive = AlertRedOnLightDefault,
             text = White,
+            disabled = colorResource(R.color.icon_tertiary_light),
         ),
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_light),
@@ -169,6 +170,7 @@ fun DuckDuckGoTheme(
             white = White,
             destructive = AlertRedOnDarkDefault,
             text = Black,
+            disabled = colorResource(R.color.icon_tertiary_dark),
         ),
         system = DuckDuckGoSystemColors(
             lines = colorResource(R.color.lines_dark),
