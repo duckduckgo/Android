@@ -103,23 +103,24 @@ class RealSqlCipherLoader @Inject constructor(
 
     private fun doLoad() {
         logcat { "SqlCipher: starting async library load" }
-        LibraryLoader.loadLibrary(
-            context,
-            SQLCIPHER_LIB_NAME,
-            object : LibraryLoader.LibraryLoaderListener {
-                override fun success() {
-                    logcat { "SqlCipher: native library loaded successfully" }
-                    libraryLoaded.complete(Unit)
-                }
+        val listener = object : LibraryLoader.LibraryLoaderListener {
+            override fun success() {
+                logcat { "SqlCipher: native library loaded successfully" }
+                libraryLoaded.complete(Unit)
+            }
 
-                override fun failure(throwable: Throwable) {
-                    logcat(ERROR) { "SqlCipher: native library load failed: ${throwable.javaClass.simpleName} - ${throwable.message}" }
-                    if (libraryLoaded.completeExceptionally(throwable)) {
-                        pixel.fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
-                    }
+            override fun failure(throwable: Throwable) {
+                logcat(ERROR) { "SqlCipher: native library load failed: ${throwable.javaClass.simpleName} - ${throwable.message}" }
+                if (libraryLoaded.completeExceptionally(throwable)) {
+                    pixel.fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
                 }
-            },
-        )
+            }
+        }
+        try {
+            LibraryLoader.loadLibrary(context, SQLCIPHER_LIB_NAME, listener)
+        } catch (t: Throwable) {
+            listener.failure(t)
+        }
     }
 
     private companion object {
