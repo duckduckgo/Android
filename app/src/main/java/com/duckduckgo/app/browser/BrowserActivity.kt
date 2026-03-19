@@ -817,7 +817,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             // when swiping is enabled, the state is controlled be flows initialized in configureFlowCollectors()
             viewModel.selectedTab.observe(this) {
                 if (it != null) {
-                    selectTab(it)
+                    selectTab(it) // this updates lastAccesstime
                 }
             }
 

@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -58,41 +59,24 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val shouldShow: Boolean = false
     )
 
-    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
-        .map { tab -> tab?.tabId }
-        .filterNotNull()
+    val tabsFlow: Flow<List<TabEntity>> = tabRepository.flowTabs
         .distinctUntilChanged()
-        .debounce(100)
-
-    val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
-        .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
-        .distinctUntilChanged()
-
-    val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
-        tabs.indexOfFirst { it.tabId == selectedTab }
-    }.filterNot { it == -1 }
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow()
 
-    // val viewState = combine(
-    //     _viewState,
-    //     tabsFlow,
-    //     selectedTabFlow,
-    // ) { state, tabs, selectedTab ->
-    //     val lastTab = tabs.firstOrNull { it.tabId == selectedTab }
-    //     if (lastTab != null){
-    //         state.copy(
-    //             tabTitle = lastTab.title!!, url = lastTab.url!!,
-    //             tabId = lastTab.tabId,
-    //             currentTabId = currentTab.tabId,
-    //             shouldShow = true,
-    //         )
-    //     } else {
-    //
-    //     }
-    //
-    // }.flowOn(dispatchers.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+    val viewState = combine(
+        _viewState,
+        tabsFlow,
+    ) { state, tabs ->
+        val lastTab = tabs.first()
+        state.copy(
+            tabTitle = lastTab.title ?: "Title", url = lastTab.url ?: "url.com",
+            tabId = lastTab.tabId,
+            currentTabId = lastTab.tabId,
+            shouldShow = true,
+        )
+
+    }.flowOn(dispatchers.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -101,7 +85,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
             val lastTab = tabRepository.getSelectedTab()
             val tabs = tabRepository.getTabs().toString()
             logcat { "Hatch: tabs $tabs" }
-            if (lastTab != null){
+            if (lastTab != null) {
                 if (lastTab.url != null && lastTab.title != null) {
                     _viewState.value = ViewState(
                         tabTitle = lastTab.title!!, url = lastTab.url!!,
