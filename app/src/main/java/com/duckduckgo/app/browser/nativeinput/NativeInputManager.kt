@@ -42,7 +42,6 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onBrowserChatSubmitted: (String) -> Unit,
     val onDuckAiChatSubmitted: (String) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
