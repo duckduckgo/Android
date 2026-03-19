@@ -296,8 +296,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Вкладки, данные и чаты Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Удалить...</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Удалить...</string>
+    <string name="settingsAutomaticallyClearWhen">Когда удалять...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Когда удалять...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Только после выхода из приложения</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">После выхода из приложения, через 5 секунд бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">После выхода из приложения, через 5 минут бездействия</string>
