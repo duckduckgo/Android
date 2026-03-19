@@ -423,7 +423,7 @@
             android:layout_width="match_parent"
             android:layout_height="32dp" />
 
-        <!-- ICON BUTTONS (View only, no Compose equivalent) -->
+        <!-- ICON BUTTONS -->
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/label"
             android:layout_width="match_parent"
@@ -432,6 +432,11 @@
             app:layout_constraintTop_toTopOf="parent"
             app:primaryText="Icon Buttons" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:platformType="view" />
+
         <com.duckduckgo.common.ui.view.button.IconButton
             android:id="@+id/getIconButton"
             android:layout_width="wrap_content"
@@ -439,6 +444,16 @@
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
             app:srcCompat="@drawable/ic_union" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:platformType="compose" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_icon_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

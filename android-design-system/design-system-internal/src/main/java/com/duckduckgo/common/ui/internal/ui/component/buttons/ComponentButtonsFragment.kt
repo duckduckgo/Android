@@ -33,6 +33,7 @@ import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostSecondaryButto
 import com.duckduckgo.common.ui.compose.button.DaxDestructivePrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
@@ -280,6 +281,18 @@ class ComponentButtonsFragment : Fragment() {
                 )
                 DaxDestructiveGhostAltButton(text = "Ghost Alt Disabled", onClick = {}, enabled = false)
             }
+        }
+
+        // Icon Button
+        view.setupThemedComposeView(
+            id = com.duckduckgo.common.ui.internal.R.id.compose_icon_button,
+            isDarkTheme = isDarkTheme,
+        ) {
+            DaxIconButton(
+                onClick = {},
+                iconPainter = painterResource(R.drawable.ic_union),
+                contentDescription = "Menu",
+            )
         }
     }
 }
