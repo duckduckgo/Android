@@ -104,8 +104,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
     fun onHatchPressed() {
         viewModelScope.launch(dispatchers.io()) {
-            val tab = tabRepository.getTab(_viewState.value.currentTabId)
-            tabRepository.deleteTabAndSelectSource(_viewState.value.currentTabId)
+            tabRepository.select(_viewState.value.currentTabId)
         }
     }
 }

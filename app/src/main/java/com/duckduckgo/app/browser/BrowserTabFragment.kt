@@ -694,6 +694,9 @@ class BrowserTabFragment :
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
+    private val newTabReturnHatchView
+        get() = binding.includeNewBrowserTab.newTabReturnHatchView
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -3432,6 +3435,9 @@ class BrowserTabFragment :
                 hideKeyboard()
             }
         }
+        // newTabReturnHatchView.onHatchSelected { tabId ->
+        //     viewModel.closeAndSelectSourceTab()
+        // }
     }
 
     private fun configureFindInPage() {

@@ -73,10 +73,15 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
-        binding.returnHatchCTA.setOnClickListener {
+        binding.returnHatchRoot.setOnClickListener {
             viewModel.onHatchPressed()
         }
 
+    }
+
+    fun onHatchSelected(onClick: (String) -> Unit) {
+        val tab = viewModel.viewState.value.tabId
+        binding.returnHatchRoot.setOnClickListener { onClick.invoke(tab) }
     }
 
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
