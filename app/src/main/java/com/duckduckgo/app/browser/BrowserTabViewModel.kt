@@ -304,7 +304,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
@@ -2049,32 +2048,6 @@ class BrowserTabViewModel @Inject constructor(
     private fun titleUpdated(title: String?) {
         logcat(VERBOSE) { "Page title updated: $title" }
         site?.title = title
-    }
-
-    fun getPageContextHeader(): PageContextHeaderState {
-        val isErrorMode = browserViewState.value?.browserError != null && browserViewState.value?.browserError != OMITTED
-        val currentSite = site
-        return if (currentSite != null) {
-            val shortUrl = addressDisplayFormatter.getShortUrl(currentSite.url)
-            if (isErrorMode) {
-                PageContextHeaderState.Error(shortUrl)
-            } else if (duckChat.isDuckChatUrl(currentSite.url.toUri())) {
-                PageContextHeaderState.DuckAi(title = currentSite.title, tabId = tabId)
-            } else {
-                PageContextHeaderState.Visible(
-                    title = currentSite.title,
-                    shortUrl = shortUrl,
-                    tabId = tabId,
-                )
-            }
-        } else {
-            val omnibarText = currentOmnibarViewState().omnibarText
-            if (isErrorMode && omnibarText.isNotEmpty()) {
-                PageContextHeaderState.Error(omnibarText)
-            } else {
-                PageContextHeaderState.Hidden
-            }
-        }
     }
 
     @VisibleForTesting

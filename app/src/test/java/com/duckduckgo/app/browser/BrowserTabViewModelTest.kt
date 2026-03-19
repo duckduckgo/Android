@@ -233,7 +233,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
-import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -1717,61 +1716,6 @@ class BrowserTabViewModelTest {
             )
         }
         assertEquals(PROTECTED, privacyShieldState().privacyShield)
-    }
-
-    @Test
-    fun whenOnSiteChangedWithUrlAndTitleThenPageContextHeaderIsVisible() = runTest {
-        val siteUrl = "https://www.example.com/"
-        val siteTitle = "Example Site"
-        givenCurrentSite(siteUrl)
-        loadUrl(siteUrl, title = siteTitle)
-
-        val header = testee.getPageContextHeader()
-        assertTrue(header is PageContextHeaderState.Visible)
-        val headerState = header as PageContextHeaderState.Visible
-        assertEquals("TAB_ID", headerState.tabId)
-        assertEquals("example.com", headerState.shortUrl)
-        assertEquals(siteTitle, headerState.title)
-    }
-
-    @Test
-    fun whenOnSiteChangedWithUrlAndNullTitleThenPageContextHeaderIsVisibleWithNullTitle() = runTest {
-        val siteUrl = "https://www.example.com/"
-        givenCurrentSite(siteUrl)
-        loadUrl(siteUrl)
-
-        val header = testee.getPageContextHeader()
-        assertTrue(header is PageContextHeaderState.Visible)
-        assertNull((header as PageContextHeaderState.Visible).title)
-    }
-
-    @Test
-    fun whenOnSiteChangedWithNoSiteThenPageContextHeaderIsHidden() = runTest {
-        loadUrl(null)
-
-        assertEquals(PageContextHeaderState.Hidden, testee.getPageContextHeader())
-    }
-
-    @Test
-    fun whenOnSiteChangedWithDuckAiUrlThenPageContextHeaderIsDuckAi() = runTest {
-        val duckAiUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        givenCurrentSite(duckAiUrl)
-        loadUrl(duckAiUrl)
-
-        assertTrue(testee.getPageContextHeader() is PageContextHeaderState.DuckAi)
-        assertEquals("TAB_ID", (testee.getPageContextHeader() as PageContextHeaderState.DuckAi).tabId)
-    }
-
-    @Test
-    fun whenOnSiteChangedWithErrorThenPageContextHeaderIsError() = runTest {
-        val errorUrl = "https://www.example.com/"
-        givenCurrentSite(errorUrl)
-        testee.onReceivedError(BAD_URL, errorUrl)
-        loadUrl(errorUrl)
-
-        assertTrue(testee.getPageContextHeader() is PageContextHeaderState.Error)
-        assertEquals("example.com", (testee.getPageContextHeader() as PageContextHeaderState.Error).shortUrl)
     }
 
     @Test

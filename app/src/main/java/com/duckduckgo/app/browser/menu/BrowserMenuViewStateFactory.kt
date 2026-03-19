@@ -17,8 +17,10 @@
 package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
@@ -32,7 +34,10 @@ interface BrowserMenuViewStateFactory {
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
-        pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
+        tabId: String,
+        site: Site?,
+        shortUrl: String?,
+        omnibarText: String?,
     ): BrowserMenuViewState
 }
 
@@ -45,25 +50,31 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         omnibarViewMode: Omnibar.ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
-        pageContextHeader: PageContextHeaderState,
+        tabId: String,
+        site: Site?,
+        shortUrl: String?,
+        omnibarText: String?,
     ): BrowserMenuViewState {
         return if (customTabsMode) {
-            createCustomTabsViewState(viewState, pageContextHeader)
+            createCustomTabsViewState(viewState, site, tabId, shortUrl, omnibarText)
         } else {
             when (omnibarViewMode) {
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, pageContextHeader)
+                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, site, tabId)
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
-                else -> createBrowserViewState(browserViewState = viewState, pageContextHeader = pageContextHeader)
+                else -> createBrowserViewState(viewState, site, tabId, shortUrl, omnibarText)
             }
         }
     }
 
     private fun createCustomTabsViewState(
         browserViewState: BrowserViewState,
-        pageContextHeader: PageContextHeaderState,
+        site: Site?,
+        tabId: String,
+        shortUrl: String?,
+        omnibarText: String?,
     ): BrowserMenuViewState.CustomTabs {
         return BrowserMenuViewState.CustomTabs(
             canGoBack = browserViewState.canGoBack,
@@ -73,7 +84,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
             canChangePrivacyProtection = browserViewState.canChangePrivacyProtection,
             isPrivacyProtectionDisabled = browserViewState.isPrivacyProtectionDisabled,
-            pageContextHeader = pageContextHeader,
+            pageContextHeader = createBrowserHeaderContextState(browserViewState, site, tabId, shortUrl, omnibarText),
         )
     }
 
@@ -90,19 +101,23 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
 
     private fun createDuckAiViewState(
         browserViewState: BrowserViewState,
-        pageContextHeader: PageContextHeaderState,
+        site: Site?,
+        tabId: String,
     ): BrowserMenuViewState.DuckAi {
         return BrowserMenuViewState.DuckAi(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
-            pageContextHeader = pageContextHeader,
+            pageContextHeader = PageContextHeaderState.DuckAi(title = site?.title, tabId = tabId),
         )
     }
 
     private fun createBrowserViewState(
         browserViewState: BrowserViewState,
-        pageContextHeader: PageContextHeaderState,
+        site: Site?,
+        tabId: String,
+        shortUrl: String?,
+        omnibarText: String?,
     ): BrowserMenuViewState.Browser {
         val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
@@ -129,7 +144,32 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
-            pageContextHeader = pageContextHeader,
+            pageContextHeader = createBrowserHeaderContextState(browserViewState, site, tabId, shortUrl, omnibarText),
         )
+    }
+
+    private fun createBrowserHeaderContextState(
+        viewState: BrowserViewState,
+        site: Site?,
+        tabId: String,
+        shortUrl: String?,
+        omnibarText: String?,
+    ): PageContextHeaderState {
+        val isErrorMode = viewState.browserError != OMITTED
+        return if (site != null && shortUrl != null) {
+            if (isErrorMode) {
+                PageContextHeaderState.Error(shortUrl)
+            } else {
+                PageContextHeaderState.Visible(
+                    title = site.title,
+                    shortUrl = shortUrl,
+                    tabId = tabId,
+                )
+            }
+        } else if (isErrorMode && omnibarText != null) {
+            PageContextHeaderState.Error(omnibarText)
+        } else {
+            PageContextHeaderState.Hidden
+        }
     }
 }
