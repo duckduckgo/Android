@@ -23,7 +23,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
@@ -52,11 +51,8 @@ class RealSqlCipherLoader @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val currentTimeProvider: CurrentTimeProvider,
 ) : SqlCipherLoader, MainProcessLifecycleObserver, PirProcessLifecycleObserver {
 
-    // Eagerly initialised — never null, never replaced. CompletableDeferred.complete()
-    // is idempotent so concurrent doLoad() calls are always safe.
     private val libraryLoaded = CompletableDeferred<Unit>()
 
     // Eagerly kick off the load at app startup, well before autofill or PIR need it.
@@ -83,47 +79,37 @@ class RealSqlCipherLoader @Inject constructor(
             appCoroutineScope.launch(dispatchers.io()) { doLoad() }
         }
 
-        val waitStartTimeMillis = currentTimeProvider.currentTimeMillis()
-        logcat { "SqlCipher-Init: Waiting for library load to complete (timeout=${timeoutMillis}ms)" }
-
         return try {
             withTimeout(timeoutMillis) {
                 libraryLoaded.await()
             }
-            val waitDurationMillis = currentTimeProvider.currentTimeMillis() - waitStartTimeMillis
-            logcat { "SqlCipher-Init: Library load wait completed successfully (${waitDurationMillis}ms)" }
+            logcat { "SqlCipher: native library loaded" }
             Result.success(Unit)
         } catch (e: TimeoutCancellationException) {
-            logcat(ERROR) { "SqlCipher-Init: Timeout after waiting ${timeoutMillis}ms for library load" }
+            logcat(ERROR) { "SqlCipher: timed out waiting for native library after ${timeoutMillis}ms" }
             pixel.fire(LIBRARY_LOAD_TIMEOUT_SQLCIPHER, type = Daily())
             Result.failure(e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Throwable) {
-            logcat(ERROR) { "SqlCipher-Init: Failed while waiting for library load: ${e.javaClass.simpleName} - ${e.message}" }
+            logcat(ERROR) { "SqlCipher: failed waiting for native library: ${e.javaClass.simpleName} - ${e.message}" }
             Result.failure(e)
         }
     }
 
     private fun doLoad() {
-        val startTimeMillis = currentTimeProvider.currentTimeMillis()
-        logcat { "SqlCipher-Init: Starting async library load" }
+        logcat { "SqlCipher: starting async library load" }
         LibraryLoader.loadLibrary(
             context,
             SQLCIPHER_LIB_NAME,
             object : LibraryLoader.LibraryLoaderListener {
                 override fun success() {
-                    val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
-                    logcat { "SqlCipher-Init: Async library load completed successfully (${durationMillis}ms)" }
+                    logcat { "SqlCipher: native library loaded successfully" }
                     libraryLoaded.complete(Unit)
                 }
 
                 override fun failure(throwable: Throwable) {
-                    val durationMillis = currentTimeProvider.currentTimeMillis() - startTimeMillis
-                    logcat(ERROR) {
-                        "SqlCipher-Init: Async library load failed after ${durationMillis}ms: " +
-                            "${throwable.javaClass.simpleName} - ${throwable.message}"
-                    }
+                    logcat(ERROR) { "SqlCipher: native library load failed: ${throwable.javaClass.simpleName} - ${throwable.message}" }
                     // Guard ensures the pixel fires exactly once even if doLoad() races.
                     if (libraryLoaded.completeExceptionally(throwable)) {
                         pixel.fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())

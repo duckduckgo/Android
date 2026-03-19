@@ -18,7 +18,6 @@ package com.duckduckgo.sqlcipher.loader.impl
 
 import android.content.Context
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +39,6 @@ class RealSqlCipherLoaderTest {
     private val mockContext: Context = mock()
     private val mockDispatchers: DispatcherProvider = mock()
     private val mockPixel: Pixel = mock()
-    private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
 
     // A dispatcher that never runs its tasks, keeping libraryLoaded pending.
     private val neverDispatcher = object : CoroutineDispatcher() {
@@ -56,7 +54,6 @@ class RealSqlCipherLoaderTest {
             dispatchers = mockDispatchers,
             pixel = mockPixel,
             appCoroutineScope = appScope,
-            currentTimeProvider = mockCurrentTimeProvider,
         )
 
         var result: Result<Unit>? = null
