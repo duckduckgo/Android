@@ -71,7 +71,12 @@ class RealBrokerJsonUpdater @Inject constructor(
             if (pirRepository.getStoredBrokersCount() == 0) {
                 logcat { "PIR-update: Network update failed and no broker data stored, loading bundled broker data" }
                 runCatching { bundledBrokerDataLoader.loadBundledBrokerData() }
-                    .onFailure { logcat(ERROR) { "PIR-update: Bundled broker load failed: $it" } }
+                    .onSuccess { pixelSender.reportBundleBrokerJsonLoaded() }
+                    .onFailure {
+                        logcat(ERROR) { "PIR-update: Bundled broker load failed: $it" }
+                        val message = it.asLog().sanitize() ?: it.message ?: "Unknown error"
+                        pixelSender.reportBundleBrokerJsonFailure(message)
+                    }
                     .isSuccess
             } else {
                 logcat { "PIR-update: Network update failed but brokers already seeded from network, skipping bundle" }
