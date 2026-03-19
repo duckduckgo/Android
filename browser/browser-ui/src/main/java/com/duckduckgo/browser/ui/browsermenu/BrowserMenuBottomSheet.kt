@@ -23,6 +23,8 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.lifecycle.coroutineScope
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
 import com.duckduckgo.common.ui.setRoundCorners
@@ -34,10 +36,12 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.mobile.android.R.drawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.launch
 
 @SuppressLint("NoBottomSheetDialog")
 class BrowserMenuBottomSheet(
     private val context: Context,
+    private val faviconManager: FaviconManager,
     private val onDismissListener: () -> Unit,
     private val onMenuItemClickListener: () -> Unit,
 ) : BottomSheetDialog(context) {
@@ -63,8 +67,7 @@ class BrowserMenuBottomSheet(
         }
 
         setOnCancelListener {
-            onDismissListener()
-            dismiss()
+            performDismiss()
         }
     }
 
@@ -254,6 +257,7 @@ class BrowserMenuBottomSheet(
 
         autofillMenuItem.isVisible = viewState.showAutofill
 
+        renderPageContextHeader(viewState.pageContextHeader)
         vpnMenuItem.isVisible = false
 
         binding.urlPageActionsSectionDivider.isVisible = true
@@ -264,6 +268,8 @@ class BrowserMenuBottomSheet(
     }
 
     private fun renderNewTabPageMenu(viewState: BrowserMenuViewState.NewTabPage) {
+        binding.menuHeader.root.isVisible = false
+
         backMenuItem.isEnabled = false
         forwardMenuItem.isEnabled = viewState.canGoForward
         newTabMenuItem.isEnabled = true
@@ -329,6 +335,8 @@ class BrowserMenuBottomSheet(
             if (viewState.isPrivacyProtectionDisabled) drawable.ic_shield_24 else drawable.ic_shield_disabled_24,
         )
 
+        renderPageContextHeader(viewState.pageContextHeader)
+
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = false
         binding.privacyToolsSectionDivider.isVisible = false
@@ -349,6 +357,7 @@ class BrowserMenuBottomSheet(
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
+        renderPageContextHeader(viewState.pageContextHeader)
 
         duckChatHistoryMenuItem.isVisible = true
         duckChatSettingsMenuItem.isVisible = true
@@ -358,6 +367,46 @@ class BrowserMenuBottomSheet(
         binding.privacyToolsSectionDivider.isVisible = false
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
+    }
+
+    private fun renderPageContextHeader(pageContextHeaderState: PageContextHeaderState) {
+        when (pageContextHeaderState) {
+            is PageContextHeaderState.Visible -> {
+                binding.menuHeader.root.isVisible = true
+                binding.menuHeader.headerTitle.isVisible = !pageContextHeaderState.title.isNullOrBlank()
+                binding.menuHeader.headerTitle.text = pageContextHeaderState.title
+                binding.menuHeader.headerShortUrl.isVisible = true
+                binding.menuHeader.headerShortUrl.text = pageContextHeaderState.shortUrl
+                lifecycle.coroutineScope.launch {
+                    faviconManager.loadToViewFromLocalWithPlaceholder(
+                        tabId = pageContextHeaderState.tabId,
+                        url = pageContextHeaderState.shortUrl,
+                        view = binding.menuHeader.headerFavicon,
+                    )
+                }
+                binding.menuHeader.headerCloseButton.setOnClickListener { performDismiss() }
+            }
+            is PageContextHeaderState.DuckAi -> {
+                binding.menuHeader.root.isVisible = true
+                binding.menuHeader.headerTitle.isVisible = !pageContextHeaderState.title.isNullOrBlank()
+                binding.menuHeader.headerTitle.text = pageContextHeaderState.title
+                binding.menuHeader.headerShortUrl.isVisible = true
+                binding.menuHeader.headerShortUrl.text = context.getString(R.string.browserMenuDuckChat)
+                binding.menuHeader.headerFavicon.setImageResource(drawable.ic_duck_ai_color_24)
+                binding.menuHeader.headerCloseButton.setOnClickListener { performDismiss() }
+            }
+            is PageContextHeaderState.Error -> {
+                binding.menuHeader.root.isVisible = true
+                binding.menuHeader.headerTitle.isVisible = false
+                binding.menuHeader.headerShortUrl.isVisible = true
+                binding.menuHeader.headerShortUrl.text = pageContextHeaderState.shortUrl
+                binding.menuHeader.headerFavicon.setImageResource(drawable.ic_globe_24)
+                binding.menuHeader.headerCloseButton.setOnClickListener { performDismiss() }
+            }
+            PageContextHeaderState.Hidden -> {
+                binding.menuHeader.root.isVisible = false
+            }
+        }
     }
 
     private fun renderVpnMenu(viewState: VpnMenuState) {
@@ -425,5 +474,10 @@ class BrowserMenuBottomSheet(
 
         val iconRes = if (isVpnEnabled) drawable.ic_vpn_24 else drawable.ic_vpn_unlocked_24
         menuItemView.setIcon(iconRes)
+    }
+
+    private fun performDismiss() {
+        onDismissListener.invoke()
+        dismiss()
     }
 }

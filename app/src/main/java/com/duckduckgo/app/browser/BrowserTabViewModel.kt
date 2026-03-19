@@ -1760,6 +1760,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
+            is WebNavigationStateChange.TitleUpdated -> titleUpdated(stateChange.title)
+
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
             else -> {}
         }
@@ -2041,6 +2043,11 @@ class BrowserTabViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
+    }
+
+    private fun titleUpdated(title: String?) {
+        logcat(VERBOSE) { "Page title updated: $title" }
+        site?.title = title
     }
 
     @VisibleForTesting
