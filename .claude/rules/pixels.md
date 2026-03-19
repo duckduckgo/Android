@@ -1,1 +1,1 @@
-../../.cursor/rules/pixels.md
+../../.cursor/rules/pixels.mdc
