@@ -25,6 +25,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,7 +37,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     private val mockTrackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
     private val mockDeviceShieldPixels = mock<DeviceShieldPixels>()
-    private val protectedAppsChannel = Channel<List<TrackingProtectionAppInfo>>(1, BufferOverflow.DROP_LATEST)
+    private lateinit var protectedAppsChannel: Channel<List<TrackingProtectionAppInfo>>
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -45,11 +46,17 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Before
     fun setup() {
+        protectedAppsChannel = Channel(1, BufferOverflow.DROP_LATEST)
         testee = UnprotectedAppsBucketPixelSender(
             mockTrackingProtectionAppsRepository,
             mockDeviceShieldPixels,
             coroutineRule.testDispatcherProvider,
         )
+    }
+
+    @After
+    fun tearDown() {
+        protectedAppsChannel.close()
     }
 
     @Test
