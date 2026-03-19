@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
     <string name="dataClearingActivityTitle">Duomenų valymas</string>
-    <string name="dataClearingDescription">Ištrindamas duomenis gali padėti apsaugoti savo privatumą internete. Jei nori ištrinti duomenis rankiniu būdu, naudok „Fire Button” arba nustatyk automatinį trynimą.</string>
+    <string name="dataClearingDescription">Jei ištrinsi duomenis gali apsaugoti savo privatumą internete. Naudok „Fire“ mygtuką, jei nori ištrinti duomenis rankiniu būdu, arba nustatyk, kad jie būtų trinami automatiškai.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d vieta, kuriai netaikomas valymas</item>
         <item quantity="few">%1$d vietos, kurioms netaikomas valymas</item>
@@ -275,12 +275,8 @@
     <string name="singleTabFireDialogSubtitleDuckAi">„Ištrinti viską“ neištrins tavo „Duck.ai“ pokalbių istorijos.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
-    <plurals name="singleTabFireDialogSnackbar">
-        <item quantity="one">Ištrinta %1$d kortelė ir jos duomenys</item>
-        <item quantity="few">Ištrinta %1$d kortelių ir jų duomenys</item>
-        <item quantity="many">Ištrinta %1$d kortelių ir jų duomenys</item>
-        <item quantity="other">Ištrinta %1$d kortelių ir jų duomenys</item>
-    </plurals>
+    <string name="singleTabFireDialogSnackbar">Ištrinta 1 kortelė ir jos duomenys</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Ištrintos %1$s kortelės (-ių) ir jų duomenys.</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nepavyko ištrinti interneto svetainės duomenų. Atnaujink „WebView“.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dėl klaidos nepavyko ištrinti interneto svetainės duomenų.</string>
 
