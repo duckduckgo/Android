@@ -277,6 +277,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">Удалена %1$d вкладка и ее данные</item>
+        <item quantity="few">Удалены %1$d вкладок и их данные</item>
+        <item quantity="many">Удалены %1$d вкладок и их данные</item>
         <item quantity="other">Удалены %1$d вкладок и их данные</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>

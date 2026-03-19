@@ -277,6 +277,7 @@
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">%1$d kartica i njezini podaci izbrisani su</item>
+        <item quantity="few">%1$d kartica i njihovi podaci izbrisani su</item>
         <item quantity="other">%1$d kartica i njihovi podaci izbrisani su</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>

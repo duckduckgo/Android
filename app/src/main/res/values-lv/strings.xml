@@ -272,6 +272,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
     <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="zero">%1$d cilnes un to dati dzēsti</item>
         <item quantity="one">%1$d cilne un tās dati dzēsti</item>
         <item quantity="other">%1$d cilnes un to dati dzēsti</item>
     </plurals>

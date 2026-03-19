@@ -277,6 +277,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">Bola odstránená %1$d karta a jej údaje</item>
+        <item quantity="few">Bolo odstránených %1$d kariet a ich údaje</item>
+        <item quantity="many">Bolo odstránených %1$d kariet a ich údaje</item>
         <item quantity="other">Bolo odstránených %1$d kariet a ich údaje</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>

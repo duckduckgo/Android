@@ -277,6 +277,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">Ištrinta %1$d kortelė ir jos duomenys</item>
+        <item quantity="few">Ištrinta %1$d kortelių ir jų duomenys</item>
+        <item quantity="many">Ištrinta %1$d kortelių ir jų duomenys</item>
         <item quantity="other">Ištrinta %1$d kortelių ir jų duomenys</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nepavyko ištrinti interneto svetainės duomenų. Atnaujink „WebView“.</string>

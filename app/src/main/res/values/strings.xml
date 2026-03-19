@@ -267,8 +267,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Deleting site data can sign you out of accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
     <plurals name="singleTabFireDialogSnackbar">
-        <item quantity="one">%1$d tab and its data deleted</item>
-        <item quantity="other">%1$d tabs and their data deleted</item>
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d tab and its data deleted</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d tabs and their data deleted</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site data could not be deleted. Please update WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Site data could not be deleted due to an error.</string>

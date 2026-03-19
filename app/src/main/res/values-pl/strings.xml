@@ -277,6 +277,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">%1$d karta i jej dane zostały usunięte</item>
+        <item quantity="few">%1$d kart i ich dane zostały usunięte</item>
+        <item quantity="many">%1$d kart i ich dane zostały usunięte</item>
         <item quantity="other">%1$d kart i ich dane zostały usunięte</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>

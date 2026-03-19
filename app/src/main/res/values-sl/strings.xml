@@ -277,6 +277,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">%1$d zavihek in njegovi podatki so izbrisani</item>
+        <item quantity="two">%1$d zavihkov in njihovi podatki so izbrisani</item>
+        <item quantity="few">%1$d zavihkov in njihovi podatki so izbrisani</item>
         <item quantity="other">%1$d zavihkov in njihovi podatki so izbrisani</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati. Posodobite WebView.</string>
