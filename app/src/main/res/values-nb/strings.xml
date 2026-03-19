@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Hvis du sletter nettstedsdata, kan du bli logget ut av kontoer.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette avbryter pågående nedlastinger.</string>
     <string name="singleTabFireDialogSnackbar">1 fane med data er slettet</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s faner og deres data er slettet</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nettstedsdataene kunne ikke slettes. Oppdater WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Nettstedsdataene kunne ikke slettes på grunn av en feil.</string>
 
