@@ -1064,6 +1064,13 @@
             }
         ]
     },
+    "m_dbp_user-eligible": {
+        "description": "Android specific daily pixel fired when the user is eligible to run PIR (flag enabled, valid subscription, PIR entitlement, and repository available).",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],
