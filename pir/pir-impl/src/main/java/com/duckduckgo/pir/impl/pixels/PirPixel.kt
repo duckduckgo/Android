@@ -309,6 +309,10 @@ enum class PirPixel(
         baseName = "m_dbp_bundle_broker-json_failure",
         types = setOf(Count, Daily()),
     ),
+    PIR_CAN_RUN_PIR(
+        baseName = "m_dbp_user-eligible",
+        type = Daily(),
+    ),
     ;
 
     constructor(

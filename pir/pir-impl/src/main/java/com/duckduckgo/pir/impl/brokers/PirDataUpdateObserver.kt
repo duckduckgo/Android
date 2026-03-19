@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +45,7 @@ class PirDataUpdateObserver @Inject constructor(
     private val pirFeatureDataCleaner: PirFeatureDataCleaner,
     private val pirRepository: PirRepository,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val pirPixelSender: PirPixelSender,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -53,6 +55,7 @@ class PirDataUpdateObserver @Inject constructor(
                 .collectLatest { enabled ->
                     val featureReceiveMs = pirRepository.getFeatureReceivedMs()
                     if (enabled) {
+                        pirPixelSender.reportCanRunPir()
                         // We only set the value if it was not set previously
                         if (featureReceiveMs == 0L) {
                             pirRepository.setFeatureReceivedMs(currentTimeProvider.currentTimeMillis())
