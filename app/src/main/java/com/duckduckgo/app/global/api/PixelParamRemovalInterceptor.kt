@@ -37,6 +37,7 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
+import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -202,6 +203,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
+            SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
