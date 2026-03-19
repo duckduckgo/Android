@@ -58,13 +58,6 @@
                 app:layout_constraintStart_toStartOf="@id/guidelineStart"
                 app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
-                <Space
-                    android:id="@+id/fireIconFiller"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:visibility="gone"
-                    />
-
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/fireIcon"
                     android:layout_width="96dp"
