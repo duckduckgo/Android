@@ -54,7 +54,7 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_2"
-                android:paddingBottom="@dimen/keyline_3">
+                android:paddingBottom="@dimen/keyline_2">
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/backMenuItem"
@@ -120,7 +120,8 @@
                 android:id="@+id/urlPageActionsSectionDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:defaultPadding="true"
+                android:layout_marginBottom="@dimen/keyline_2"
+                app:defaultPadding="false"
                 app:fullWidth="false" />
 
             <include
