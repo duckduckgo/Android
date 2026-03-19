@@ -178,6 +178,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenGetChangesAndNoPendingDeletionsThenReturnsEmpty() = runTest {
         duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(emptySet())
 
         val result = testee.getChanges()
@@ -188,6 +189,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenGetChangesAndPendingDeletionsExistThenReturnsRequest() = runTest {
         duckChatFeature.supportsSyncChatsDeletion().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChatFeatureRepository.isAIChatHistoryEnabled()).thenReturn(true)
         whenever(duckChatSyncRepository.getPendingChatDeletions()).thenReturn(setOf("chat1", "chat2"))
 
         val result = testee.getChanges()
