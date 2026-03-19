@@ -520,14 +520,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
-                    binding.welcomeScreenWalkingDax.isVisible = false
-                    (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                        verticalBias = 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                    }
-
-                    val transition = AutoTransition()
+                    val transition = androidx.transition.ChangeBounds()
                     transition.addListener(object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
                             comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
@@ -546,7 +539,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             }
                         }
                     })
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, transition)
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
 
                     binding.daxDialogCta.welcomeContent.root.isVisible = false
                     binding.daxDialogCta.secondaryCta.isVisible = false
