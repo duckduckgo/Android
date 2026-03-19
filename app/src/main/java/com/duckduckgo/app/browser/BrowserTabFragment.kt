@@ -1249,10 +1249,6 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onBrowserChatSubmitted = { query ->
-                    val url = duckChat.getDuckChatUrl(query, true)
-                    browserActivity?.launchNewTab(query = url, skipHome = true)
-                },
                 onDuckAiChatSubmitted = { query ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(

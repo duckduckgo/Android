@@ -158,11 +158,20 @@ class RealNativeInputOmnibarController(
     override fun restore() {
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }
         restoreOmnibarColors()
+        restoreOmnibarContent()
         restoreBottomOmnibarPosition()
         if (omnibar.omnibarType == OmnibarType.SPLIT) {
             rootView.findViewById<View?>(R.id.navigationBar)?.show()
         }
         omnibar.isScrollingEnabled = true
+    }
+
+    private fun restoreOmnibarContent() {
+        val omnibarView = omnibar.omnibarView as? View ?: return
+        omnibarView.findViewById<View?>(R.id.endIconsContainer)?.show()
+        omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
+        omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
+        omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
     }
 
     private fun restoreOmnibarColors() {
