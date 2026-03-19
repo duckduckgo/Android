@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tlačidlo Fire</string>
     <string name="dataClearingActivityTitle">Vymazanie údajov</string>
-    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Pomocou tlačidla Fire Button môžeš údaje vymazať manuálne alebo nastaviť automatické vymazanie.</string>
+    <string name="dataClearingDescription">Odstránenie údajov môže pomôcť chrániť tvoje súkromie online. Údaje môžeš údaje vymazať manuálne pomocou tlačidla Fire Button alebo si môžeš nastaviť automatické vymazávanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d lokalita bola vylúčená z vymazania</item>
         <item quantity="few">%1$d lokality boli vylúčené z vymazania</item>
@@ -275,12 +275,8 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Možnosť „Odstrániť všetko“ neodstráni tvoju históriu četu na Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
-    <plurals name="singleTabFireDialogSnackbar">
-        <item quantity="one">Bola odstránená %1$d karta a jej údaje</item>
-        <item quantity="few">Bolo odstránených %1$d kariet a ich údaje</item>
-        <item quantity="many">Bolo odstránených %1$d kariet a ich údaje</item>
-        <item quantity="other">Bolo odstránených %1$d kariet a ich údaje</item>
-    </plurals>
+    <string name="singleTabFireDialogSnackbar">Bola odstránená 1 karta a jej údaje</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Bolo vymazaných %1$s kariet aj s ich údajmi</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
 
