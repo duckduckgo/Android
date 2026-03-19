@@ -623,6 +623,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
             }
         }
+
+        if (currentViewMode == ViewMode.DuckAI && viewMode != ViewMode.DuckAI) {
+            viewModelScope.launch {
+                command.send(Command.FocusInputField)
+            }
+        }
     }
 
     fun onPrivacyShieldChanged(privacyShieldState: PrivacyShieldState) {
