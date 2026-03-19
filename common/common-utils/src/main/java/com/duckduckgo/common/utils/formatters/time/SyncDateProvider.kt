@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.sync
+package com.duckduckgo.common.utils.formatters.time
 
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
