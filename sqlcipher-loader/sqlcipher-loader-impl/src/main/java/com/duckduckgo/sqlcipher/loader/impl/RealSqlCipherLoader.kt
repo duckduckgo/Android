@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -54,19 +55,22 @@ class RealSqlCipherLoader @Inject constructor(
 ) : SqlCipherLoader, MainProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     private val libraryLoaded = CompletableDeferred<Unit>()
+    private val loadStarted = AtomicBoolean(false)
 
     // Eagerly kick off the load at app startup, well before autofill or PIR need it.
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
-            logcat { "SqlCipher: Attempting to load native library on the main process" }
-            doLoad()
+            if (loadStarted.compareAndSet(false, true)) {
+                logcat { "SqlCipher: Attempting to load native library on the main process" }
+                doLoad()
+            }
         }
     }
 
     // Also trigger load when PIR process starts.
     override fun onPirProcessCreated() {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (!libraryLoaded.isCompleted) {
+            if (loadStarted.compareAndSet(false, true)) {
                 logcat { "SqlCipher: Attempting to load native library on the PIR process" }
                 doLoad()
             }
@@ -74,8 +78,8 @@ class RealSqlCipherLoader @Inject constructor(
     }
 
     override suspend fun waitForLibraryLoad(timeoutMillis: Long): Result<Unit> {
-        // If onCreate hasn't fired yet (edge case), trigger the load inline.
-        if (!libraryLoaded.isCompleted) {
+        // If neither lifecycle callback has fired yet (edge case), trigger the load inline.
+        if (loadStarted.compareAndSet(false, true)) {
             appCoroutineScope.launch(dispatchers.io()) { doLoad() }
         }
 
@@ -110,7 +114,6 @@ class RealSqlCipherLoader @Inject constructor(
 
                 override fun failure(throwable: Throwable) {
                     logcat(ERROR) { "SqlCipher: native library load failed: ${throwable.javaClass.simpleName} - ${throwable.message}" }
-                    // Guard ensures the pixel fires exactly once even if doLoad() races.
                     if (libraryLoaded.completeExceptionally(throwable)) {
                         pixel.fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
                     }
