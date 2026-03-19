@@ -234,7 +234,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState) {
         if (!state.isFirePictogramVisible) {
-            hideFirePictogram()
+            binding.fireIcon.gone()
         }
 
         val titleRes = if (state.isDuckAiChatsSelected) {
@@ -288,11 +288,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 insets
             }
         }
-    }
-
-    private fun hideFirePictogram() {
-        binding.fireIcon.gone()
-        binding.fireIconFiller.show()
     }
 
     private fun configureFireAnimationView() {

@@ -34,19 +34,29 @@
         android:background="@drawable/rounded_top_corners_bottom_sheet_background"
         android:fillViewport="true">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:paddingVertical="30dp"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineStart"
+                style="@style/FireDialogContentGuidelineStart" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineEnd"
+                style="@style/FireDialogContentGuidelineEnd" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/headerContainer"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginHorizontal="@dimen/keyline_5"
-                android:paddingBottom="@dimen/keyline_4">
+                android:paddingBottom="@dimen/keyline_4"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
                 <Space
                     android:id="@+id/fireIconFiller"
@@ -88,12 +98,13 @@
 
             <LinearLayout
                 android:id="@+id/buttonsContainer"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginBottom="58dp"
-                android:layout_marginHorizontal="@dimen/keyline_5">
+                app:layout_constraintTop_toBottomOf="@id/headerContainer"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
                     android:id="@+id/deleteAllButton"
@@ -106,13 +117,12 @@
                     android:id="@+id/deleteThisTabButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_1"
                     app:daxButtonSize="large"
                     android:text="@string/singleTabFireDialogDeleteThisTab" />
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>
