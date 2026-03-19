@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
     <string name="singleTabFireDialogSnackbar">Bola odstránená 1 karta a jej údaje</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Bolo vymazaných %1$s kariet aj s ich údajmi</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
 
