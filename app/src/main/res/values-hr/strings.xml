@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
     <string name="singleTabFireDialogSnackbar">1 kartica i njezini podaci izbrisani su</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Izbrisano je %1$s kartica i njihovih podataka</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
 
