@@ -45,6 +45,9 @@ interface PirRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun useBundledBrokerJsons(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun trackerBlocking(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)
