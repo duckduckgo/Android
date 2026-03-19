@@ -7074,6 +7074,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSubmittedQueryIsDuckChatLinkWithAutoPromptThenOpenDuckChatWithAutoPrompt() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duck.ai/chat?q=example&prompt=1", null)).thenReturn(
+            "https://duck.ai/chat?q=example&prompt=1",
+        )
+
+        testee.onUserSubmittedQuery("https://duck.ai/chat?q=example&prompt=1")
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt("example")
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(anyString())
+    }
+
+    @Test
     fun whenSubmittedQueryIsDuckChatLinkWithoutQueryThenOpenDuckChatWithoutQuery() {
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/?ia=chat", null)).thenReturn("https://duckduckgo.com/?ia=chat")

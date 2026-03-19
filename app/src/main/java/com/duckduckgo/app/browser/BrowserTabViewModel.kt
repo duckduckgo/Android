@@ -1291,9 +1291,15 @@ class BrowserTabViewModel @Inject constructor(
             is ShouldLaunchDuckChatLink -> {
                 runCatching {
                     logcat { "Duck.ai: ShouldLaunchDuckChatLink $urlToNavigate" }
-                    val queryParameter = urlToNavigate.toUri().getQueryParameter(QUERY)
+                    val duckChatUri = urlToNavigate.toUri()
+                    val queryParameter = duckChatUri.getQueryParameter(QUERY)
+                    val shouldAutoPrompt = duckChatUri.getQueryParameter(DUCK_CHAT_AUTO_PROMPT_QUERY_PARAMETER) != null
                     if (queryParameter != null) {
-                        duckChat.openDuckChatWithPrefill(queryParameter)
+                        if (shouldAutoPrompt) {
+                            duckChat.openDuckChatWithAutoPrompt(queryParameter)
+                        } else {
+                            duckChat.openDuckChatWithPrefill(queryParameter)
+                        }
                     } else {
                         duckChat.openDuckChat()
                     }
@@ -4906,6 +4912,7 @@ class BrowserTabViewModel @Inject constructor(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        private const val DUCK_CHAT_AUTO_PROMPT_QUERY_PARAMETER = "prompt"
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.
