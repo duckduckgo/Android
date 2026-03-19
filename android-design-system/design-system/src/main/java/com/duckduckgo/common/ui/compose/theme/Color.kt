@@ -87,6 +87,8 @@ data class DuckDuckGoIconsColors(
     val white: Color,
     val destructive: Color,
     val text: Color,
+    // TODO: Doesn't seem to exist in the android design system on Figma, but we have a View version. Need confirmation on what the deal is.
+    val disabled: Color,
 )
 
 @Immutable
