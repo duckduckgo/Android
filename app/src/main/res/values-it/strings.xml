@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Elimina tutto\" non elimina la cronologia chat di Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">L\'eliminazione dei dati del sito può comportare la disconnessione dagli account.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Questa operazione annullerà i download in corso.</string>
-    <string name="singleTabFireDialogSnackbar">1 scheda e i relativi dati eliminati</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s schede e i relativi dati eliminati</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d scheda e i relativi dati eliminati</item>
+        <item quantity="other">%1$d schede e i relativi dati eliminati</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Impossibile eliminare i dati del sito. Aggiorna WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">I dati del sito non sono stati eliminati a causa di un errore.</string>
 

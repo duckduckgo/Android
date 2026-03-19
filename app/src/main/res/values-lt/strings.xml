@@ -275,8 +275,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">„Ištrinti viską“ neištrins tavo „Duck.ai“ pokalbių istorijos.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
-    <string name="singleTabFireDialogSnackbar">Ištrinta 1 kortelė ir jos duomenys</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Ištrinta %1$s kortelių ir jų duomenys</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">Ištrinta %1$d kortelė ir jos duomenys</item>
+        <item quantity="other">Ištrinta %1$d kortelių ir jų duomenys</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nepavyko ištrinti interneto svetainės duomenų. Atnaujink „WebView“.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dėl klaidos nepavyko ištrinti interneto svetainės duomenų.</string>
 

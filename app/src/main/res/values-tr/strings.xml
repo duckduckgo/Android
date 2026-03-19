@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Tümünü Sil\" seçeneği Duck.ai sohbet geçmişini silmeyecek.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
-    <string name="singleTabFireDialogSnackbar">1 sekme ve içerdiği veriler silindi</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s sekme ve içerdikleri veriler silindi</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d sekme ve içerdiği veriler silindi</item>
+        <item quantity="other">%1$d sekme ve içerdikleri veriler silindi</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
 

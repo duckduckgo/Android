@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">„Kustuta kõik” ei kustuta su Duck.ai vestlusajalugu.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
     <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
-    <string name="singleTabFireDialogSnackbar">1 vahekaart ja selle andmed on kustutatud</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s vahekaarti ja nende andmed on kustutatud</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d vahekaart ja selle andmed on kustutatud</item>
+        <item quantity="other">%1$d vahekaarti ja nende andmed on kustutatud</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Saidi andmeid ei saanud kustutada. Värskendage WebView\'d.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Saidi andmeid ei saanud vea tõttu kustutada.</string>
 

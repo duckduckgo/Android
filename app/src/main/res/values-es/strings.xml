@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">«Eliminar todo» no borrará tu historial de chat de Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar datos del sitio puede hacer que cierres sesión en tus cuentas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta acción cancelará las descargas en curso.</string>
-    <string name="singleTabFireDialogSnackbar">1 pestaña y sus datos eliminados</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s pestañas y sus datos eliminados</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d pestaña y sus datos eliminados</item>
+        <item quantity="other">%1$d pestañas y sus datos eliminados</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">No se ha podido borrar los datos del sitio. Actualiza WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Los datos del sitio no se han podido eliminar debido a un error.</string>
 

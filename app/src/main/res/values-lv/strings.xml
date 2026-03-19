@@ -271,8 +271,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Dzēst visu\" neizdzēsīs tavu Duck.ai tērzēšanas vēsturi.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
-    <string name="singleTabFireDialogSnackbar">1 cilne un tās dati dzēsti</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s cilnes un to dati dzēsti</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d cilne un tās dati dzēsti</item>
+        <item quantity="other">%1$d cilnes un to dati dzēsti</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Vietnes datus nevarēja izdzēst. Lūdzu, atjaunini WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Vietnes datus nevarēja dzēst kļūdas dēļ.</string>
 

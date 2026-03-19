@@ -275,8 +275,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">»Izbriši vse« ne bo izbrisalo vaše zgodovine klepetov na Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
-    <string name="singleTabFireDialogSnackbar">1 zavihek in njegovi podatki so izbrisani</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s zavihkov in njihovi podatki so izbrisani</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d zavihek in njegovi podatki so izbrisani</item>
+        <item quantity="other">%1$d zavihkov in njihovi podatki so izbrisani</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati. Posodobite WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Podatkov spletnega mesta ni bilo mogoče izbrisati zaradi napake.</string>
 

@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">„Изтриване на всички“ няма да изтрие историята на чатовете в Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
-    <string name="singleTabFireDialogSnackbar">1 раздел и данните в него са изтрити</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s раздела и данните в тях са изтрити</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d раздел и данните в него са изтрити</item>
+        <item quantity="other">%1$d раздела и данните в тях са изтрити</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
 

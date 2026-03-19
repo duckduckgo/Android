@@ -271,8 +271,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">„Șterge tot” nu va șterge istoricul chaturilor tale Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
-    <string name="singleTabFireDialogSnackbar">1 filă și datele aferente au fost șterse</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s file și datele aferente au fost șterse</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
+        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
 

@@ -275,8 +275,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Izbriši sve\" neće izbrisati tvoju Duck.ai povijest čavrljanja.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
-    <string name="singleTabFireDialogSnackbar">1 kartica i njezini podaci izbrisani su</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s kartica i njihovi podaci izbrisani su</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d kartica i njezini podaci izbrisani su</item>
+        <item quantity="other">%1$d kartica i njihovi podaci izbrisani su</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
 

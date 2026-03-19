@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Slet alle\" sletter ikke din Duck.ai-chathistorik.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Sletning af webstedsdata kan logge dig ud af konti.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette annullerer igangværende downloads.</string>
-    <string name="singleTabFireDialogSnackbar">1 fane og dens data slettet</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s faner og deres data slettet</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d fane og dens data slettet</item>
+        <item quantity="other">%1$d faner og deres data slettet</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Webstedsdata kunne ikke slettes. Opdater WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Webstedsdata kunne ikke slettes på grund af en fejl.</string>
 

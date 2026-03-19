@@ -266,8 +266,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">\"Delete All\" will not delete your Duck.ai chat history.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Deleting site data can sign you out of accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
-    <string name="singleTabFireDialogSnackbar">1 tab and its data deleted</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s tabs and their data deleted</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d tab and its data deleted</item>
+        <item quantity="other">%1$d tabs and their data deleted</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Site data could not be deleted. Please update WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Site data could not be deleted due to an error.</string>
 

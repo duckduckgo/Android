@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">« Tout supprimer » ne supprimera pas l\'historique de vos discussions Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">La suppression des données de site peut vous déconnecter des comptes.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Cela annulera les téléchargements en cours.</string>
-    <string name="singleTabFireDialogSnackbar">1 onglet et ses données ont été supprimés</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s onglets et leurs données ont été supprimés</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d onglet et ses données ont été supprimés</item>
+        <item quantity="other">%1$d onglets et leurs données ont été supprimés</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Les données du site n\'ont pas pu être supprimées. Veuillez mettre à jour WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Les données du site n\'ont pas pu être supprimées en raison d\'une erreur.</string>
 

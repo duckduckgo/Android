@@ -275,8 +275,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Možnosť „Odstrániť všetko“ neodstráni tvoju históriu četu na Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
-    <string name="singleTabFireDialogSnackbar">Bola odstránená 1 karta a jej údaje</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Bolo odstránených %1$s kariet a ich údaje</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">Bola odstránená %1$d karta a jej údaje</item>
+        <item quantity="other">Bolo odstránených %1$d kariet a ich údaje</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>
 

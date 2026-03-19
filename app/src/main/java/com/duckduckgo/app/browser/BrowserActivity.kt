@@ -432,7 +432,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogSnackbar)
+                    // This will be added in a subsequent PR #8000
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSingleTabClearSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)

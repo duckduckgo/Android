@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Η επιλογή «Διαγραφή όλων» δεν θα διαγράψει το ιστορικό συνομιλιών σας στο Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
-    <string name="singleTabFireDialogSnackbar">1 καρτέλα και τα δεδομένα της διαγράφηκαν</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s καρτέλες και τα δεδομένα τους διαγράφηκαν</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d καρτέλα και τα δεδομένα της διαγράφηκαν</item>
+        <item quantity="other">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου λόγω σφάλματος.</string>
 

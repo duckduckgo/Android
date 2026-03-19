@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Mit „Alle löschen“ wird dein Duck.ai-Chatverlauf nicht gelöscht.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
-    <string name="singleTabFireDialogSnackbar">1 Tab und dessen Daten gelöscht</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s Tabs und deren Daten gelöscht</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d Tab und dessen Daten gelöscht</item>
+        <item quantity="other">%1$d Tabs und deren Daten gelöscht</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
 

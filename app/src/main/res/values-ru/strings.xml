@@ -275,8 +275,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Функция «Удалить все» не стирает историю чатов с Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
-    <string name="singleTabFireDialogSnackbar">Удалена 1 вкладка и ее данные</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Удалены %1$s вкладок и их данные</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">Удалена %1$d вкладка и ее данные</item>
+        <item quantity="other">Удалены %1$d вкладок и их данные</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
 

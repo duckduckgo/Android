@@ -267,8 +267,10 @@
     <string name="singleTabFireDialogSubtitleDuckAi">Din Duck.ai-chatthistorik raderas inte om du väljer Radera alla.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
-    <string name="singleTabFireDialogSnackbar">1 flik och dess data raderades</string>
-    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s flikar och deras data raderades</string>
+    <plurals name="singleTabFireDialogSnackbar">
+        <item quantity="one">%1$d flik och dess data raderades</item>
+        <item quantity="other">%1$d flikar och deras data raderades</item>
+    </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
 
