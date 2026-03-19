@@ -93,7 +93,6 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
-        if (omnibarController.isDuckAiMode()) return false
         val removed = removeWidget()
         if (!removed) return false
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
@@ -103,7 +102,7 @@ class RealNativeInputManager @Inject constructor(
         }
         omnibarController.restore()
         omnibarController.show()
-        return true
+        return !omnibarController.isDuckAiMode()
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
@@ -230,7 +229,7 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onDuckAiChatSubmitted(query)
                 } else {
                     hideNativeInput()
-                    callbacks.onBrowserChatSubmitted(query)
+                    callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
             },
         )
