@@ -146,8 +146,10 @@ class DuckChatSyncDataManager @Inject constructor(
     }
 
     override fun onError(error: SyncErrorResponse) {
-        logcat(LogPriority.ERROR) { "DuckChat-Sync: patch failed with ${error.featureSyncError}" }
-        // no-op, keep pending IDs for retry as queue is cleared by bulk delete or sync disable
+        if (error.type == SyncableType.DUCK_AI_CHATS) {
+            logcat(LogPriority.ERROR) { "DuckChat-Sync: patch failed with ${error.featureSyncError}" }
+            // no-op, keep pending IDs for retry as queue is cleared by bulk delete or sync disable
+        }
     }
 
     override fun onSyncDisabled() {
