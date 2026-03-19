@@ -1,0 +1,157 @@
+{
+  "name": "Inforver",
+  "url": "inforver.com",
+  "version": "0.7.0",
+  "addedDatetime": 1677736800000,
+  "optOutUrl": "https://persontrust.com/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "840da5cd-0581-4692-af09-ce89c83e6786",
+          "url": "https://inforver.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "4cabd3c9-83bd-4cfb-9acb-d20738bfea21",
+          "selector": ".search-item",
+          "profile": {
+            "name": {
+              "selector": ".//div[@class='search-item__title-text']",
+              "beforeText": ","
+            },
+            "alternativeNamesList": {
+              "selector": ".//dt[contains(@class, 'search-item__info-title') and contains(., 'Also Known As')]/following-sibling::div[@class='search-item__info-col']/dd",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".search-item__title-age"
+            },
+            "addressCityState": {
+              "selector": ".//dt[contains(@class, 'search-item__info-title') and contains(., 'Home Address')]/following-sibling::div[@class='search-item__info-col']"
+            },
+            "addressCityStateList": {
+              "selector": ".//dt[contains(@class, 'search-item__info-title') and contains(., 'Previous Addresses')]/following-sibling::div[@class='search-item__info-col']/dd",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//dt[contains(@class, 'search-item__info-title') and contains(., 'Possible Relatives')]/following-sibling::div[@class='search-item__info-col']/dd",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".search-item__title a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://inforver.com/control/privacy",
+          "id": "d575aa21-cabe-4a45-96e6-a377e9760fa7"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".contact"
+            }
+          ],
+          "id": "d513bf54-796a-4e20-9658-b1cbc10ed28f"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "b4611820-fdd9-42b4-a0d8-9041d2ed9556"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": "//form[@id='form-contact']"
+            }
+          ],
+          "id": "bfee72f0-387a-4ebd-85ba-31f421c25a99"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "7f8551de-5222-460b-af2e-1481e91fe4c4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "3e5199f3-e304-4557-b67e-e051a15df4a8"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "086cee2a-a935-426b-8638-a9cde4506f98"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "6826c42f-c566-4de0-8ce1-4a1d3de4e426"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763397120461
+}

@@ -19,20 +19,13 @@ package com.duckduckgo.pir.impl.brokers
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
-import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
-import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okio.FileSystem.Companion.SYSTEM
 import okio.Path.Companion.toPath
-import okio.buffer
 import okio.source
 import java.io.File
 import java.io.FileOutputStream
@@ -53,18 +46,9 @@ interface BrokerDataDownloader {
 class RealBrokerDataDownloader @Inject constructor(
     private val dbpService: DbpService,
     private val dispatcherProvider: DispatcherProvider,
-    private val pirRepository: PirRepository,
     private val context: Context,
-    private val pirPixelSender: PirPixelSender,
+    private val brokerJsonProcessor: BrokerJsonProcessor,
 ) : BrokerDataDownloader {
-
-    private val brokerAdapter by lazy {
-        Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .add(StepsAsStringAdapter())
-            .build()
-            .adapter(PirJsonBroker::class.java)
-    }
 
     override suspend fun downloadBrokerData(brokersToUpdate: List<String>) {
         withContext(dispatcherProvider.io()) {
@@ -134,30 +118,7 @@ class RealBrokerDataDownloader @Inject constructor(
             file.extension == "json" && file.name in brokersToUpdateSet
         }?.forEach { jsonFile ->
             logcat { "PIR-update: Processing data from ${jsonFile.name}" }
-            val broker = runCatching { jsonFile.source().buffer().use { brokerAdapter.fromJson(it) } }
-                .onFailure { logcat(ERROR) { "PIR-update: Failed to parse ${jsonFile.name}: $it" } }
-                .getOrNull()
-            if (broker != null) {
-                try {
-                    pirRepository.updateBrokerData(jsonFile.name, broker)
-                    pirPixelSender.reportUpdateBrokerJsonSuccess(
-                        brokerJsonFileName = jsonFile.name,
-                        removedAtMs = broker.removedAt ?: 0L,
-                    )
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    pirPixelSender.reportUpdateBrokerJsonFailure(
-                        brokerJsonFileName = jsonFile.name,
-                        removedAtMs = broker.removedAt ?: 0L,
-                    )
-                }
-            } else {
-                pirPixelSender.reportUpdateBrokerJsonFailure(
-                    brokerJsonFileName = jsonFile.name,
-                    removedAtMs = 0L,
-                )
-            }
+            brokerJsonProcessor.processAndStoreBroker(jsonFile.name, jsonFile.source())
         }
 
         logcat { "PIR-update: Stored all new broker data" }

@@ -1,0 +1,77 @@
+{
+  "name": "Cyber Background Checks",
+  "url": "cyberbackgroundchecks.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1705644000000,
+  "optOutUrl": "https://cyberbackgroundchecks.com/donotsellmyinfo",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "9f5caaf9-5bd7-494e-bfbb-e33c4927cdb3",
+          "url": "https://www.cyberbackgroundchecks.com/people/${firstName}-${lastName}/${state}/${city}"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".navbar-brand"
+            }
+          ],
+          "id": "131315c4-a434-480e-a5d4-27f73bfafc7a"
+        },
+        {
+          "actionType": "extract",
+          "id": "d6c07b68-7a33-45a4-9e8e-ae6f9262ef29",
+          "selector": ".card",
+          "noResultsSelector": "//h1[@class='total-records-label' and contains(., '0 results')]",
+          "profile": {
+            "name": {
+              "selector": ".name-given"
+            },
+            "alternativeNamesList": {
+              "selector": ".aka",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".//p[contains(@class, 'address-current')]//a[@class='address']"
+            },
+            "addressFullList": {
+              "selector": ".//p[contains(@class, 'address-previous')]//a[@class='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".relative",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='btn btn-primary btn-block']",
+              "identifierType": "path",
+              "identifier": "https://www.cyberbackgroundchecks.com/detail/${firstName}-${middleName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -34,6 +34,7 @@ import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECT
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
+import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
 import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
@@ -81,6 +82,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             ISSUE_AVOID_COMPUTATION,
             DenyListedApiDetector.ISSUE,
             NO_LIFECYCLE_SCOPE_IN_FRAGMENT,
+            NO_POST_VALUE_ON_SINGLE_LIVE_EVENT,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,

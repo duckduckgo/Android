@@ -1,0 +1,267 @@
+{
+  "name": "PeopleFinders",
+  "url": "peoplefinders.com",
+  "version": "0.9.0",
+  "addedDatetime": 1677132000000,
+  "optOutUrl": "https://www.peoplefinders.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "12c69911-415b-4904-8162-d7993d44e348",
+          "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "body.peoplesearch"
+            }
+          ],
+          "id": "aaaab20b-aaaa-45b6-8c53-36e9bed2612b"
+        },
+        {
+          "actionType": "extract",
+          "id": "f35cbfda-053f-444c-93b7-36e9bed2612b",
+          "selector": ".record",
+          "noResultsSelector": ".no-results",
+          "profile": {
+            "name": {
+              "selector": ".//h4[@class='record__title']"
+            },
+            "alternativeNamesList": {
+              "selector": "(.//ul[@class='clean-list mb-0 mt-2'])[1]//li//li[@class='text-dark']",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".col-lg-3 > .text-dark"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-lg-2 col-xl-3']//li[@class='text-dark']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-lg-3 col-md-2']//li//li[@class='text-dark']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "param",
+              "identifier": "id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "da658a1f-254b-42c6-b78a-f93655048db8",
+          "url": "https://www.peoplefinders.com/opt-out"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".opt-out-body",
+              "failSilently": true
+            }
+          ],
+          "id": "623b0022-8c67-4cef-8a11-4481c34229b7"
+        },
+        {
+          "actionType": "click",
+          "id": "c15a2587-ff08-4ec6-b7c0-0744273d57a9",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-success opt-out-button']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "5685d436-32d5-4de0-a2b8-d5bbb4fa778d",
+          "selector": ".v-out-out-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": ".//input[@placeholder='First Name']"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".v-out-out-form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@type='email']"
+            }
+          ],
+          "id": "45b04749-beb1-4567-a95f-649c2966b810"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[@class='terms-wrapper']/input[@type='checkbox']"
+            }
+          ],
+          "id": "5ec1e28f-c179-424d-a50c-8808040668c3"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "fcf4b0cf-9bb4-42e6-a2a9-68e4f2a25a2c",
+          "selector": ".v-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "25c7fbb0-0508-4f93-aeb8-3642ecef8c33",
+          "selector": ".v-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "4ac6a176-ddaf-437f-8d8f-2dde0fe6b0ed",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Email Sent"
+            }
+          ],
+          "id": "31e2af63-840f-4040-8f35-35d8d0156201"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "6f43425f-a49d-4eac-bec2-794c5f6bd687",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Record Suppression Form"
+            }
+          ],
+          "id": "c39dbadc-e398-4068-93cb-bb3c1a2b047e"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".v-out-out-record-removal-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "$generated_phone_number$",
+              "selector": ".//input[@type='tel']"
+            },
+            {
+              "type": "$generated_random_number$",
+              "selector": ".//select[option[1][text()='Month']]",
+              "min": "1",
+              "max": "12"
+            },
+            {
+              "type": "$generated_random_number$",
+              "selector": ".//input[@name='day']",
+              "min": "1",
+              "max": "28"
+            },
+            {
+              "type": "birthYear",
+              "selector": ".//input[@name='year']"
+            },
+            {
+              "type": "$generated_street_address$",
+              "selector": ".//input[@placeholder='Street Address']"
+            },
+            {
+              "type": "city",
+              "selector": ".//input[@placeholder='City']"
+            },
+            {
+              "type": "state",
+              "selector": ".//select[option[1][text()='State']]"
+            }
+          ],
+          "id": "6ba153e8-676c-4b81-8a4b-5b6689fd978c"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//div[contains(@class, 'opt-out-card')]//input[@type='checkbox']"
+            }
+          ],
+          "id": "3a6a98ff-0ad6-4d0e-9537-a0844ced4598"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "45f59ed0-3a36-4ab6-9c45-e906471fb3e4",
+          "selector": ".v-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "85469ad1-8870-449d-961e-22ea10738ec0",
+          "selector": ".v-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "cab0438c-1770-4dac-930d-041d44772172",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "bc09540c-8aeb-4d9f-b515-0ebb6f4583a5",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Opt-Out Request Confirmation"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

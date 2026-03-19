@@ -37,7 +37,6 @@ interface DbpService {
     ): Response<PirMainConfig>
 
     @PirAuthRequired
-    @PirExtendedReadTimeout
     @GET("$BASE_URL/remote/v0?name=all.zip&type=spec")
     @Streaming
     suspend fun getBrokerJsonFiles(): ResponseBody

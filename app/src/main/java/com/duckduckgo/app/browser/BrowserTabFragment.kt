@@ -614,6 +614,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager
 
+    @Inject
+    lateinit var addressDisplayFormatter: AddressDisplayFormatter
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -1501,10 +1504,15 @@ class BrowserTabFragment :
         viewState: BrowserViewState,
         omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode,
     ) {
+        val currentSite = viewModel.siteLiveData.value
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
+            title = currentSite?.title,
+            shortUrl = currentSite?.url?.let { addressDisplayFormatter.getShortUrl(it) },
+            tabId = tabId,
+            omnibarText = viewModel.omnibarViewState.value?.omnibarText,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
@@ -1653,6 +1661,7 @@ class BrowserTabFragment :
     private fun createBottomSheetMenu() {
         bottomSheetMenu = BrowserMenuBottomSheet(
             context = requireContext(),
+            faviconManager = faviconManager,
             onDismissListener = {
                 pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISMISSED)
             },

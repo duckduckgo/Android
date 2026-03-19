@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
@@ -43,7 +44,7 @@ interface SecureStorageDatabaseFactory {
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val keyProvider: SecureStorageKeyProvider,
     private val databaseProvider: DatabaseProvider,
-    private val sqlCipherLoader: SqlCipherLibraryLoader,
+    private val sqlCipherLoader: SqlCipherLoader,
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
     private val mutex = Mutex()

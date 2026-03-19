@@ -783,11 +783,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
-        } else {
-            logcat(INFO) { "shared text empty, defaulting to show on app launch option" }
-            if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
-                viewModel.handleShowOnAppLaunchOption()
-            }
         }
     }
 

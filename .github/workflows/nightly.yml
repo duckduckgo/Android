@@ -72,7 +72,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: JVM tests
-        run: ./gradlew jvm_tests
+        run: ./gradlew jvm_tests -Dpts.enabled=false
 
       - name: Bundle the JVM checks report
         if: always()

@@ -26,6 +26,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.FEATURE_NAME
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_COMPLETED
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleterJsMessaging.Companion.METHOD_CLEAR_DATA_FAILED
@@ -59,6 +60,7 @@ class RealDuckChatDeleter @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val messaging: DuckChatDeleterJsMessaging,
     private val duckAiDataClearingFeature: DuckAiDataClearingFeature,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : DuckChatDeleter {
 
     private val mutex = Mutex()
@@ -67,6 +69,8 @@ class RealDuckChatDeleter @Inject constructor(
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
     private var readyDeferred: CompletableDeferred<Unit>? = null
     private var clearResultDeferred: CompletableDeferred<Boolean>? = null
+
+    private val domains: List<String> = listOf("https://${duckAiHostProvider.getHost()}", "https://duckduckgo.com")
 
     // Script loader state
     private var cachedScript: String? = null
@@ -81,7 +85,7 @@ class RealDuckChatDeleter @Inject constructor(
                     val wv = getOrCreateWebView(script)
 
                     var allSucceeded = true
-                    for (domain in DOMAINS) {
+                    for (domain in domains) {
                         val success = clearFromDomain(wv, domain, chatId)
                         if (!success) {
                             logcat { "DuckChatDeleter: clearing failed for domain $domain, chatId $chatId" }
@@ -256,9 +260,6 @@ class RealDuckChatDeleter @Inject constructor(
         private const val SUBSCRIPTION_CLEAR_DATA = "duckAiClearData"
         private const val STEP_TIMEOUT_MS = 5000L
         private const val EMPTY_HTML = "<html></html>"
-
-        private val DOMAINS = listOf("https://duck.ai", "https://duckduckgo.com")
-
         private const val JS_FILE_NAME = "duckAiDataClearing.js"
         private const val CONTENT_SCOPE_PLACEHOLDER = "\$CONTENT_SCOPE$"
         private const val USER_UNPROTECTED_DOMAINS_PLACEHOLDER = "\$USER_UNPROTECTED_DOMAINS$"

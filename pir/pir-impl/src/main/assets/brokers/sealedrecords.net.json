@@ -1,0 +1,208 @@
+{
+  "name": "SealedRecords",
+  "url": "sealedrecords.net",
+  "version": "0.2.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.sealedrecords.net/optOut/name/landing",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.sealedrecords.net/name/search-result",
+          "id": "c8a32ec6-d560-4ecb-92f6-e83033fd317a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-form-2"
+            }
+          ],
+          "id": "58e40fd4-c1a1-41bd-a3c3-34a3e702c4ff"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#email-form-2",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#First-Name-2"
+            },
+            {
+              "type": "lastName",
+              "selector": "#Last-Name-3"
+            },
+            {
+              "type": "city",
+              "selector": "#City-3"
+            },
+            {
+              "type": "state",
+              "selector": "#State"
+            }
+          ],
+          "id": "87f1b5ae-6c26-467a-b11f-ba6af67e1c5b"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-search-again"
+            }
+          ],
+          "id": "5f797133-1947-4b9b-9687-a9780e58f480"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "80978439-12c1-41a2-997f-90ce0cc759e6"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='btn-research']"
+                }
+              ],
+              "id": "7fb9456f-9f9d-4ad3-b0f2-eaa7c82f5963"
+            }
+          ],
+          "id": "c0de04eb-795d-4313-a3de-d6eae8bcfdb1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "c5c28008-7a9d-4c5b-a1a4-30056658780f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//button[contains(text(), 'Yes')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//button[contains(text(), 'No')]"
+                  }
+                ]
+              },
+              "id": "37b9a3fb-b0e1-4127-bd7d-67be58aa6692"
+            }
+          ],
+          "id": "8de43d8c-c65f-4863-a4fb-4059235b35b1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "85e6e2fe-1f1c-4cd0-a989-9fb1ed1129e2"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//a[contains(@class, 'possible-relatives-more')] | //a[contains(@class, 'possible-locations-more')]",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "e0225377-fbc4-4cde-afc0-e1ef9151e0fe"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".search-list-item",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".search-list-name"
+            },
+            "age": {
+              "selector": ".search-list-age",
+              "afterText": "Age:"
+            },
+            "relativesList": {
+              "selector": ".search-possible-relatives .possible-locations-state",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".search-possible-locations .possible-locations-state",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "bd240ad8-0dd7-4d20-9448-e135059efade"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1738342963204,
+  "removedAt": null
+}
