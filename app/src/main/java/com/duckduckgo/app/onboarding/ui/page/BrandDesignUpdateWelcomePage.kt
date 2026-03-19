@@ -472,24 +472,27 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 ) {
                                     val animators = mutableListOf<Animator>(
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    )
-                                    if (showSecondaryCta) {
-                                        binding.daxDialogCta.secondaryCta.isVisible = true
-                                        animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
-                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                                    }
-                                    AnimatorSet().apply {
-                                        playTogether(animators)
-                                        addListener(object : AnimatorListenerAdapter() {
-                                            override fun onAnimationEnd(animation: Animator) {
-                                                isAnimating = false
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                )
+                                if (showSecondaryCta) {
+                                    binding.daxDialogCta.secondaryCta.isVisible = true
+                                    animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                }
+                                AnimatorSet().apply {
+                                    playTogether(animators)
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
+                                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                            if (showSecondaryCta) {
+                                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                                             }
-                                        })
-                                        start()
-                                    }
+                                        }
+                                    })
+                                    start()}
                                 }
                             }
                         },
@@ -589,9 +592,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
                 binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                 if (onboardingDialogType == INITIAL_REINSTALL_USER) {
                     binding.daxDialogCta.secondaryCta.isVisible = true
                     binding.daxDialogCta.secondaryCta.alpha = 1f
+                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                 }
             }
 
