@@ -102,7 +102,7 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="@dimen/gridItemPreviewHeight"
-            android:background="@drawable/background_rounded_background"
+            android:background="@drawable/background_rounded_message_container"
             android:layout_marginTop="@dimen/keyline_2"
             android:paddingStart="@dimen/keyline_2"
             android:paddingEnd="6dp"

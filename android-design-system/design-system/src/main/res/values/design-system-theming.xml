@@ -236,6 +236,7 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/white84</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
+        <item name="daxColorMessageContainer">@color/white9</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
@@ -373,7 +374,7 @@
         <item name="daxColorButtonGhostAltTextPressed">@color/black60</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnLightPressed</item>
-
+        <item name="daxColorMessageContainer">@color/blue45</item>
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue50</item>
         <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
