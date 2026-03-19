@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Botão de proteção</string>
     <string name="dataClearingActivityTitle">Limpeza de Dados</string>
-    <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para limpar dados manualmente ou configura a limpeza automática.</string>
+    <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para eliminar dados manualmente ou configura a eliminação automática.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site excluído da limpeza</item>
         <item quantity="other">%1$d sites excluídos da limpeza</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar dados do site pode terminar a tua sessão nas contas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta ação vai cancelar as transferências em curso.</string>
     <string name="singleTabFireDialogSnackbar">1 separador e respetivos dados eliminados</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s separadores e respetivos dados eliminados</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Não foi possível apagar os dados do site. Atualiza o WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Não foi possível apagar os dados do site devido a um erro.</string>
 

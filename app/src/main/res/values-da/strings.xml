@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
-    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at rydde data manuelt, eller opsæt automatisk rydning.</string>
+    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at slette data manuelt eller opsætte automatisk sletning.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d websted udelukket fra rydning</item>
         <item quantity="other">%1$d websteder udelukket fra rydning</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Sletning af webstedsdata kan logge dig ud af konti.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette annullerer igangværende downloads.</string>
     <string name="singleTabFireDialogSnackbar">1 fane og dens data slettet</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s faner og deres data slettet</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Webstedsdata kunne ikke slettes. Opdater WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Webstedsdata kunne ikke slettes på grund af en fejl.</string>
 

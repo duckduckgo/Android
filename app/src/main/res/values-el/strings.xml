@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
     <string name="dataClearingActivityTitle">Διαγραφή δεδομένων</string>
-    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε τα δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη εκκαθάριση.</string>
+    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε τα δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη διαγραφή.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d ιστότοπος εξαιρέθηκε από την εκκαθάριση</item>
         <item quantity="other">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
     <string name="singleTabFireDialogSnackbar">1 καρτέλα και τα δεδομένα της διαγράφηκαν</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s καρτέλες και τα δεδομένα τους διαγράφηκαν</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου λόγω σφάλματος.</string>
 

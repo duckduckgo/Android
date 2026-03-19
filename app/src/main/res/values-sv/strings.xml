@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
-    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att rensa data manuellt eller ställa in automatisk rensning.</string>
+    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställa in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webbplats undantas från rensning</item>
         <item quantity="other">%1$d webbplatser undantas från rensning</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
     <string name="singleTabFireDialogSnackbar">1 flik och dess data raderades</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s flikar och deras data raderades</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
 

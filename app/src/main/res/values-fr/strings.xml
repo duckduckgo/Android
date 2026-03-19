@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Effacement des données</string>
-    <string name="dataClearingDescription">Supprimer vos données peut contribuer à protéger la confidentialité en ligne. Utilisez le Fire Button pour effacer manuellement les données, ou configurez un nettoyage automatique.</string>
+    <string name="dataClearingDescription">Supprimer vos données peut contribuer à protéger la confidentialité en ligne. Utilisez le Fire Button pour supprimer manuellement les données ou configurez une suppression automatique.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site exclu du nettoyage</item>
         <item quantity="other">%1$d sites exclus du nettoyage</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">La suppression des données de site peut vous déconnecter des comptes.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Cela annulera les téléchargements en cours.</string>
     <string name="singleTabFireDialogSnackbar">1 onglet et ses données ont été supprimés</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s onglets et leurs données ont été supprimés</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Les données du site n\'ont pas pu être supprimées. Veuillez mettre à jour WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Les données du site n\'ont pas pu être supprimées en raison d\'une erreur.</string>
 

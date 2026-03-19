@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
     <string name="singleTabFireDialogSnackbar">Došlo ke smazání 1 karty a jejích dat</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Došlo ke smazání %1$s karet a jejich dat</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Data webu se nepodařilo smazat. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Data webu se nepodařilo smazat kvůli chybě.</string>
 

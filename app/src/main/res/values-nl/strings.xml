@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
     <string name="singleTabFireDialogSnackbar">1 tabblad en bijbehorende gegevens zijn verwijderd</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s tabbladen en bijbehorende gegevens zijn verwijderd</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
 

@@ -227,7 +227,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datu notīrīšana</string>
-    <string name="dataClearingDescription">Tavu datu dzēšana var palīdzēt aizsargāt tavu privātumu tiešsaistē. Izmanto Fire Button, lai manuāli notīrītu datus, vai arī iestatītu automātisku notīrīšanu.</string>
+    <string name="dataClearingDescription">Tavu datu dzēšana var palīdzēt aizsargāt tavu privātumu tiešsaistē. Izmanto Fire Button, lai manuāli dzēstu datus vai arī iestatītu automātisku dzēšanu.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="zero">%1$d vietas izslēgtas no tīrīšanas</item>
         <item quantity="one">%1$d vieta izslēgta no tīrīšanas</item>
@@ -272,6 +272,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
     <string name="singleTabFireDialogSnackbar">1 cilne un tās dati dzēsti</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s cilnes un to dati dzēsti</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Vietnes datus nevarēja izdzēst. Lūdzu, atjaunini WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Vietnes datus nevarēja dzēst kļūdas dēļ.</string>
 

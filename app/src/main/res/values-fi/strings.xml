@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
     <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
-    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Tyhjennä tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen tyhjennys.</string>
+    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Poista tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen poisto.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d kohde jätettiin poiston ulkopuolelle</item>
         <item quantity="other">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Sivustotietojen poistaminen voi kirjata sinut ulos tileiltä.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tämä peruuttaa käynnissä olevat lataukset.</string>
     <string name="singleTabFireDialogSnackbar">1 välilehti ja sen tiedot on poistettu</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s välilehteä ja niiden tiedot on poistettu</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Sivuston tietoja ei voitu poistaa. Päivitä WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Sivuston tietoja ei voitu poistaa virheen vuoksi.</string>
 

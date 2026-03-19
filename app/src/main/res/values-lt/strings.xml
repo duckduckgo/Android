@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
     <string name="dataClearingActivityTitle">Duomenų valymas</string>
-    <string name="dataClearingDescription">Ištrindamas duomenis gali padėti apsaugoti savo privatumą internete. Jei nori išvalyti duomenis rankiniu būdu, naudok „Fire Button“ arba nustatyk automatinį valymą.</string>
+    <string name="dataClearingDescription">Ištrindamas duomenis gali padėti apsaugoti savo privatumą internete. Jei nori ištrinti duomenis rankiniu būdu, naudok „Fire Button” arba nustatyk automatinį trynimą.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d vieta, kuriai netaikomas valymas</item>
         <item quantity="few">%1$d vietos, kurioms netaikomas valymas</item>
@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
     <string name="singleTabFireDialogSnackbar">Ištrinta 1 kortelė ir jos duomenys</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Ištrinta %1$s kortelių ir jų duomenys</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nepavyko ištrinti interneto svetainės duomenų. Atnaujink „WebView“.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dėl klaidos nepavyko ištrinti interneto svetainės duomenų.</string>
 

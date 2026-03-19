@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Изчистване на данни</string>
-    <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността ти онлайн. Използвай Fire Button, за да изчистиш данните ръчно, или задай автоматично изчистване.</string>
+    <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността ти онлайн. Използвай Fire Button, за да изтриеш данните ръчно или да зададеш автоматично изтриване.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d сайт е изключен от изчистване</item>
         <item quantity="other">%1$d сайта са изключени от изчистване</item>
@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
     <string name="singleTabFireDialogSnackbar">1 раздел и данните в него са изтрити</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s раздела и данните в тях са изтрити</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
 

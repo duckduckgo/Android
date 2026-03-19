@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
     <string name="dataClearingActivityTitle">Очистка данных</string>
-    <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно стирать автоматически или вручную с помощью кнопки Fire Button.</string>
+    <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно удалять автоматически или вручную с помощью кнопки Fire Button.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d сайт исключен из очистки</item>
         <item quantity="few">%1$d сайта исключено из очистки</item>
@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
     <string name="singleTabFireDialogSnackbar">Удалена 1 вкладка и ее данные</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">Удалены %1$s вкладок и их данные</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
 
