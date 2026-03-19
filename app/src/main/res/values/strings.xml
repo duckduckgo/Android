@@ -225,7 +225,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Data Clearing</string>
-    <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to clear data manually, or set up automatic clearing.</string>
+    <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to delete data manually, or set up automatic deletion.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">1 site excluded from clearing</item>
         <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d sites excluded from clearing</item>
