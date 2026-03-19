@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -40,12 +41,13 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, SqlCipherLoader::class)
 @ContributesMultibinding(AppScope::class, MainProcessLifecycleObserver::class)
+@ContributesMultibinding(AppScope::class, PirProcessLifecycleObserver::class)
 class RealSqlCipherLoader @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : SqlCipherLoader, MainProcessLifecycleObserver {
+) : SqlCipherLoader, MainProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     private val libraryLoaded = CompletableDeferred<Unit>()
 
@@ -53,7 +55,18 @@ class RealSqlCipherLoader @Inject constructor(
     // well before autofill or PIR need it.
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
+            logcat { "SqlCipher: Attempting to load native library loaded on the main process" }
             doLoad()
+        }
+    }
+
+    // Also trigger load when PIR process starts
+    override fun onPirProcessCreated() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            if (!libraryLoaded.isCompleted) {
+                logcat { "SqlCipher: Attempting to load native library loaded on the PIR process" }
+                doLoad()
+            }
         }
     }
 

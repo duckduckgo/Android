@@ -51,16 +51,19 @@ class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val mutex = Mutex()
 
     override suspend fun getDatabase(): PirDatabase? {
-        _database?.let { return it }
+        _database?.let {
+            logcat { "PIR-DB: Returning existing database instance" }
+            return it
+        }
         return mutex.withLock {
             getInnerDatabase()
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun getInnerDatabase(): PirDatabase? {
         // If we have already the DB instance then let's use it
         if (_database != null) {
+            logcat { "PIR-DB: Database was initialized while waiting for lock" }
             return _database
         }
 
