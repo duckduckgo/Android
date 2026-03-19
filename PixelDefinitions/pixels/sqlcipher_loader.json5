@@ -1,7 +1,14 @@
 {
+    "library_load_timeout_sqlcipher": {
+        "description": "Fired when the sqlcipher native library takes longer than the timeout period to load asynchronously",
+        "owners": ["aitorvs", "CDRussell", "karlenDimla"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "library_load_failure_sqlcipher": {
         "description": "Fired when the sqlcipher native library fails to load due to an exception",
-        "owners": ["aitorvs"],
+        "owners": ["aitorvs", "CDRussell", "karlenDimla"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]

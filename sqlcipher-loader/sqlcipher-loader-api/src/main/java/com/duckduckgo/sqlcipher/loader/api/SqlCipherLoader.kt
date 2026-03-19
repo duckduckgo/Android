@@ -21,7 +21,8 @@ interface SqlCipherLoader {
      * Suspends until the SQLCipher native library is ready to use.
      * Safe to call from any thread. Returns immediately if already loaded.
      *
+     * @param timeoutMillis Maximum time to wait for library loading in milliseconds (default: 10 seconds)
      * @return Result.success if loaded, Result.failure on error or timeout.
      */
-    suspend fun waitForLibraryLoad(): Result<Unit>
+    suspend fun waitForLibraryLoad(timeoutMillis: Long = 10_000): Result<Unit>
 }
