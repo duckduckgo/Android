@@ -359,9 +359,15 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         _binding?.fireAnimationView?.removeAllAnimatorListeners()
         _binding?.fireAnimationView?.removeUpdateListener(accelerateAnimatorUpdateListener)
         _binding?.fireAnimationView?.cancelAnimation()
-        _binding?.fireAnimationView?.gone()
-        isCancelable = true
-        dismissAllowingStateLoss()
+
+        dialog?.window?.decorView?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.withEndAction {
+                isCancelable = true
+                dismissAllowingStateLoss()
+            }
+            ?.start()
     }
 
     private sealed class ClearAllEvent {
