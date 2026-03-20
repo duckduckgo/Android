@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.downloads.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.Context
+import android.view.View
 
-dependencies {
-    implementation project(path: ':navigation-api')
-    implementation KotlinX.coroutines.core
-    implementation Google.android.material
-}
-android {
-  namespace 'com.duckduckgo.downloads.api'
+interface DownloadsMenuPlugin {
+    fun getView(context: Context): View?
 }

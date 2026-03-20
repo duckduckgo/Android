@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.downloads.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-dependencies {
-    implementation project(path: ':navigation-api')
-    implementation KotlinX.coroutines.core
-    implementation Google.android.material
-}
-android {
-  namespace 'com.duckduckgo.downloads.api'
+/**
+ * Launch the Downloads activity
+ */
+data object DownloadsScreenNoParams : ActivityParams {
+    private fun readResolve(): Any = DownloadsScreenNoParams
 }
