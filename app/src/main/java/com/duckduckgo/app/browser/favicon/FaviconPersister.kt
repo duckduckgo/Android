@@ -96,7 +96,11 @@ class FileBasedFaviconPersister(
     ) {
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
-            file.copyTo(persistedFile, overwrite = true)
+            try {
+                file.copyTo(persistedFile, overwrite = true)
+            } catch (e: FileAlreadyExistsException) {
+                logcat { "FaviconPersister: failed to overwrite ${persistedFile.name}: ${e.message}" }
+            }
         }
     }
 

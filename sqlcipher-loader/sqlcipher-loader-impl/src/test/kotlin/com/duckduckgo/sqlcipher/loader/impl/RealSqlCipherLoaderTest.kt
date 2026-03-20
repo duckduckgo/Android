@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.securestorage
+package com.duckduckgo.sqlcipher.loader.impl
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
-import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_FAILURE_SQLCIPHER
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.library.loader.LibraryLoader
+import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER
+import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName.LIBRARY_LOAD_TIMEOUT_SQLCIPHER
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertNotNull
@@ -49,30 +49,33 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
-import java.time.LocalDateTime
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 @Config(shadows = [ShadowLibraryLoader::class])
-class SqlCipherLibraryLoaderTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class RealSqlCipherLoaderTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val mockFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
-    private val fakeTimeProvider = FakeCurrentTimeProvider()
-    private val pixel: Pixel = mock()
-    private lateinit var context: Context
-    private lateinit var loader: SqlCipherLibraryLoader
+    private val mockContext: Context = mock()
+    private val mockPixel: Pixel = mock()
+    private lateinit var loader: RealSqlCipherLoader
 
     @Before
     fun setup() {
         ShadowLibraryLoader.reset()
-        context = ApplicationProvider.getApplicationContext()
-        loader = SqlCipherLibraryLoader(context, coroutineTestRule.testDispatcherProvider, mockFeature, fakeTimeProvider, pixel)
+        loader = RealSqlCipherLoader(
+            context = mockContext,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
     }
 
     @After
@@ -81,122 +84,94 @@ class SqlCipherLibraryLoaderTest {
     }
 
     @Test
-    fun whenFeatureFlagEnabledThenUsesAsyncLoading() = runTest {
-        configureAsyncLoadingEnabled()
+    fun whenCallerCancelledWhileAwaitingLibraryLoadThenCancellationExceptionPropagates() = runTest {
+        val testee = RealSqlCipherLoader(
+            context = mockContext,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
 
+        var result: Result<Unit>? = null
+        val job = launch {
+            // Use Long.MAX_VALUE so the withTimeout inside waitForLibraryLoad does not
+            // fire before the cancellation when runCurrent() advances virtual time.
+            result = testee.waitForLibraryLoad(timeoutMillis = Long.MAX_VALUE)
+        }
+
+        // Run until the coroutine suspends on libraryLoaded.await() without advancing
+        // virtual time (which would trigger the Long.MAX_VALUE timeout delay).
+        runCurrent()
+
+        // Cancel the caller while it is suspended on await().
+        job.cancel()
+        advanceUntilIdle()
+
+        // CancellationException must be rethrown (cooperative cancellation), not
+        // swallowed and returned as Result.failure — which was the pre-fix bug.
+        assertNull(result)
+    }
+
+    @Test
+    fun whenLoadSucceedsThenReturnsSuccess() = runTest {
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
 
-        // Verify async loading started (callback stored)
-        assertNotNull("Async callback should be set", ShadowLibraryLoader.asyncCallback)
-
-        // Complete the async load
         ShadowLibraryLoader.completeAsyncSuccess()
 
         assertTrue(resultDeferred.await().isSuccess)
     }
 
     @Test
-    fun whenFeatureFlagDisabledThenUsesSyncLoading() = runTest {
-        configureAsyncLoadingDisabled()
-
-        val result = loader.waitForLibraryLoad()
-
-        // Verify sync loading was used (no callback)
-        assertNull("Sync loading should not set callback", ShadowLibraryLoader.asyncCallback)
-        assertTrue(result.isSuccess)
-    }
-
-    @Test
-    fun whenAsyncLoadSucceedsThenReturnsSuccess() = runTest {
-        configureAsyncLoadingEnabled()
-
+    fun whenLoadFailsThenReturnsFailure() = runTest {
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
 
-        ShadowLibraryLoader.completeAsyncSuccess()
-
-        assertTrue(resultDeferred.await().isSuccess)
-    }
-
-    @Test
-    fun whenAsyncLoadFailsThenReturnsFailure() = runTest {
-        configureAsyncLoadingEnabled()
-
-        val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
         ShadowLibraryLoader.completeAsyncFailure(UnsatisfiedLinkError("Test error"))
 
         resultDeferred.await().assertIsFailure<UnsatisfiedLinkError>()
     }
 
     @Test
-    fun whenSyncLoadFailsThenReturnsFailure() = runTest {
-        configureAsyncLoadingDisabled()
-
-        ShadowLibraryLoader.syncShouldFail = true
-
-        loader.waitForLibraryLoad().assertIsFailure<UnsatisfiedLinkError>()
-    }
-
-    @Test
     fun whenTimeoutOccursThenReturnsFailureWithTimeoutException() = runTest {
-        configureAsyncLoadingEnabled()
-
-        // Start waiting but don't complete the load
+        // Don't complete the load — let the timeout fire
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
 
-        // Don't call completeAsyncSuccess() - let it timeout
         resultDeferred.await().assertIsFailure<TimeoutCancellationException>()
     }
 
     @Test
-    fun whenAsyncLoadingEnabledAndTimeoutOccursThenTimeoutPixelFired() = runTest {
-        configureAsyncLoadingEnabled()
-
+    fun whenTimeoutOccursThenTimeoutPixelFired() = runTest {
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
         resultDeferred.await()
 
-        verify(pixel).fire(LIBRARY_LOAD_TIMEOUT_SQLCIPHER, type = Daily())
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+        verify(mockPixel).fire(LIBRARY_LOAD_TIMEOUT_SQLCIPHER, type = Daily())
+        verify(mockPixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+        verifyNoMoreInteractions(mockPixel)
     }
 
     @Test
-    fun whenAsyncLoadingEnabledAndLoadFailsThenFailurePixelFired() = runTest {
-        configureAsyncLoadingEnabled()
-
+    fun whenLoadFailsThenFailurePixelFired() = runTest {
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
         ShadowLibraryLoader.completeAsyncFailure(UnsatisfiedLinkError("Test error"))
         resultDeferred.await()
 
-        verify(pixel).fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+        verify(mockPixel).fire(LIBRARY_LOAD_FAILURE_SQLCIPHER, type = Daily())
+        verify(mockPixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+        verifyNoMoreInteractions(mockPixel)
     }
 
     @Test
-    fun whenAsyncLoadingEnabledAndLoadSucceedsThenNoPixelFired() = runTest {
-        configureAsyncLoadingEnabled()
-
+    fun whenLoadSucceedsThenNoPixelFired() = runTest {
         val resultDeferred = asyncImmediately { loader.waitForLibraryLoad() }
         ShadowLibraryLoader.completeAsyncSuccess()
         resultDeferred.await()
 
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
-    }
-
-    @Test
-    fun whenAsyncLoadingDisabledAndSyncLoadFailsThenNoPixelFired() = runTest {
-        configureAsyncLoadingDisabled()
-        ShadowLibraryLoader.syncShouldFail = true
-
-        loader.waitForLibraryLoad()
-
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
-        verify(pixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(LIBRARY_LOAD_TIMEOUT_SQLCIPHER), any(), any(), any())
+        verify(mockPixel, never()).fire(eq(LIBRARY_LOAD_FAILURE_SQLCIPHER), any(), any(), any())
+        verifyNoMoreInteractions(mockPixel)
     }
 
     @Test
     fun whenCalledMultipleTimesThenInitializesOnlyOnce() = runTest {
-        configureAsyncLoadingEnabled()
-
         // First call
         val result1Deferred = asyncImmediately { loader.waitForLibraryLoad() }
         ShadowLibraryLoader.completeAsyncSuccess()
@@ -205,10 +180,9 @@ class SqlCipherLibraryLoaderTest {
         // Reset shadow state to detect new initialization attempts
         ShadowLibraryLoader.asyncCallback = null
 
-        // Second call - should reuse existing initialization
+        // Second call — should reuse the already-completed initialization
         val result2 = loader.waitForLibraryLoad()
 
-        // Verify no new initialization happened
         assertNull("Should not start new initialization", ShadowLibraryLoader.asyncCallback)
         assertTrue(result1.isSuccess)
         assertTrue(result2.isSuccess)
@@ -216,17 +190,12 @@ class SqlCipherLibraryLoaderTest {
 
     @Test
     fun whenMultipleCallersWaitConcurrentlyThenAllSucceed() = runTest {
-        configureAsyncLoadingEnabled()
-
-        // Launch multiple concurrent waiters
         val result1 = asyncImmediately { loader.waitForLibraryLoad() }
         val result2 = asyncImmediately { loader.waitForLibraryLoad() }
         val result3 = asyncImmediately { loader.waitForLibraryLoad() }
 
-        // Complete once
         ShadowLibraryLoader.completeAsyncSuccess()
 
-        // All should succeed
         assertTrue(result1.await().isSuccess)
         assertTrue(result2.await().isSuccess)
         assertTrue(result3.await().isSuccess)
@@ -234,23 +203,34 @@ class SqlCipherLibraryLoaderTest {
 
     @Test
     fun whenMultipleCallersWaitWithTimeoutThenAllTimeout() = runTest {
-        configureAsyncLoadingEnabled()
-
-        // Launch multiple concurrent waiters with timeout
         val result1 = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
         val result2 = asyncImmediately { loader.waitForLibraryLoad(timeoutMillis = 100) }
 
-        // Don't complete - let them timeout
         result1.await().assertIsFailure<TimeoutCancellationException>()
         result2.await().assertIsFailure<TimeoutCancellationException>()
     }
 
-    private fun configureAsyncLoadingEnabled() {
-        mockFeature.sqlCipherAsyncLoading().setRawStoredState(Toggle.State(enable = true))
+    @Test
+    fun whenOnCreateFiredBeforeWaitThenLoadTriggeredEarly() = runTest {
+        loader.onCreate(mock<LifecycleOwner>())
+
+        assertNotNull("onCreate should trigger library load", ShadowLibraryLoader.asyncCallback)
+
+        ShadowLibraryLoader.completeAsyncSuccess()
+        assertTrue(loader.waitForLibraryLoad().isSuccess)
     }
 
-    private fun configureAsyncLoadingDisabled() {
-        mockFeature.sqlCipherAsyncLoading().setRawStoredState(Toggle.State(enable = false))
+    @Test
+    fun whenOnPirProcessCreatedFiredBeforeWaitThenLoadTriggeredEarly() = runTest {
+        loader.onPirProcessCreated()
+
+        assertNotNull(
+            "onPirProcessCreated should trigger library load",
+            ShadowLibraryLoader.asyncCallback,
+        )
+
+        ShadowLibraryLoader.completeAsyncSuccess()
+        assertTrue(loader.waitForLibraryLoad().isSuccess)
     }
 
     /**
@@ -264,34 +244,37 @@ class SqlCipherLibraryLoaderTest {
 
     private inline fun <reified T : Throwable> Result<*>.assertIsFailure() {
         assertTrue("Expected failure but was success", isFailure)
-        assertTrue("Expected ${T::class.simpleName} but was ${exceptionOrNull()?.javaClass?.simpleName}", exceptionOrNull() is T)
+        assertTrue(
+            "Expected ${T::class.simpleName} but was ${exceptionOrNull()?.javaClass?.simpleName}",
+            exceptionOrNull() is T,
+        )
     }
 }
 
 /**
  * Shadow for LibraryLoader to avoid actual native library loading in tests.
- * Allows tests to control when async/sync loading completes and whether it succeeds or fails.
+ * Allows tests to control when async loading completes and whether it succeeds or fails.
  */
 @Implements(LibraryLoader::class)
 class ShadowLibraryLoader {
     @Suppress("unused")
     companion object {
         var asyncCallback: LibraryLoader.LibraryLoaderListener? = null
-        var syncShouldFail = false
 
         @JvmStatic
         @Implementation
-        fun loadLibrary(context: Context, name: String, listener: LibraryLoader.LibraryLoaderListener) {
-            // Store callback - test controls when to complete
+        fun loadLibrary(
+            context: Context,
+            name: String,
+            listener: LibraryLoader.LibraryLoaderListener,
+        ) {
+            // Store callback — test controls when to complete
             asyncCallback = listener
         }
 
         @JvmStatic
         @Implementation
         fun loadLibrary(context: Context, name: String) {
-            if (syncShouldFail) {
-                throw UnsatisfiedLinkError("Test failure")
-            }
             // Sync load succeeds immediately in tests
         }
 
@@ -305,13 +288,6 @@ class ShadowLibraryLoader {
 
         fun reset() {
             asyncCallback = null
-            syncShouldFail = false
         }
     }
-}
-
-class FakeCurrentTimeProvider : CurrentTimeProvider {
-    override fun elapsedRealtime(): Long = System.currentTimeMillis()
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
-    override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
 }

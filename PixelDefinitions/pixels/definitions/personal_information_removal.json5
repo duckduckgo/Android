@@ -1036,6 +1036,41 @@
             }
         ]
     },
+    "m_dbp_bundle_broker-json_loaded": {
+        "description": "Android specific pixel fired when broker JSON data is successfully loaded from the bundled assets as a fallback after a network update failure.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "vpn_connection_state",
+                "description": "Reported VPN connection state when the pixel is fired",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_bundle_broker-json_failure": {
+        "description": "Android specific pixel fired when the broker JSON update still failed despite attempting to load data from the bundled assets.",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_details",
+                "description": "Sanitized exception message from the bundle load failure",
+                "type": "string"
+            }
+        ]
+    },
+    "m_dbp_user-eligible": {
+        "description": "Android specific daily pixel fired when the user is eligible to run PIR (flag enabled, valid subscription, PIR entitlement, and repository available).",
+        "owners": ["karlenDimla", "landomen"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_dbp_data_broker_action-failed_error": {
         "description": "Fired when a scan or opt-out action fails while processing a data broker.",
         "owners": ["karlenDimla", "landomen"],

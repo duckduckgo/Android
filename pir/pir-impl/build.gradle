@@ -65,7 +65,7 @@ dependencies {
 
     // Encryption
     implementation "net.zetetic:sqlcipher-android:_"
-    implementation project(':library-loader-api')
+    implementation project(':sqlcipher-loader-api')
     implementation AndroidX.security.crypto
 
     testImplementation Testing.junit4

@@ -23,7 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
@@ -48,6 +48,7 @@ class DuckChatWebViewViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val dispatchers: DispatcherProvider,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -75,7 +76,7 @@ class DuckChatWebViewViewModel @Inject constructor(
             if (!duckChat.isStandaloneMigrationEnabled()) return false
             val currentItem = history.currentItem?.url
             val firstItem = history.getItemAtIndex(0).url
-            currentItem?.toHttpUrl()?.topPrivateDomain() == HOST_DUCK_AI &&
+            currentItem?.toHttpUrl()?.host == duckAiHostProvider.getHost() &&
                 firstItem.toHttpUrl().topPrivateDomain() == AppUrl.Url.HOST
         }.getOrElse { false }
     }

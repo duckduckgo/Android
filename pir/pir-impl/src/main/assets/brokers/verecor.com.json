@@ -1,0 +1,157 @@
+{
+  "name": "Verecor",
+  "url": "verecor.com",
+  "version": "0.7.0",
+  "addedDatetime": 1677132000000,
+  "optOutUrl": "https://verecor.com/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "e007a43a-da7b-493c-aaae-53cd58712d31",
+          "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "59e6d7e7-6159-4414-85ff-5dc7dbf6ddfc",
+          "selector": ".search-item",
+          "noResultsSelector": "//div[contains(@class, 'page-404')]//h1[contains(text(), 'Sorry')]",
+          "profile": {
+            "name": {
+              "selector": "h4"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 location']//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 relatives']//li",
+              "findElements": true,
+              "beforeText": ","
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://verecor.com/view/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "725e8cf0-06bf-433a-9945-6d554a64df9e",
+          "url": "https://verecor.com/ng/control/privacy"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "8a175360-6fc6-4a2d-b3df-d203cd4cacff"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "5b8d015c-0f73-46c7-8faa-f5350000e312",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf_captcha_token' and @value and @value != '']",
+              "parent": "//form[@id='form-contact']"
+            }
+          ],
+          "id": "abcb6d7c-300b-4674-96b7-f980a6bde9ed"
+        },
+        {
+          "actionType": "click",
+          "id": "13b946a4-d75e-4b53-ad40-eb77a4b1b53e",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-sbmt"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "bbc76986-de00-4a1d-b089-0b9d41c0ccf5",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "38a06696-6818-4047-957d-1c23c1e5bf19",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "13980ac7-ea82-4c76-a07b-d1d64776f23b",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763742029895
+}

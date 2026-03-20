@@ -1,0 +1,202 @@
+{
+  "name": "InfoTracer",
+  "url": "infotracer.com",
+  "version": "0.3.0",
+  "addedDatetime": 1770227618445,
+  "optOutUrl": "https://members.infotracer.com/removeMyData",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://members.infotracer.com/removeMyData?fname=${firstName}&lname=${lastName}&city=${city}&state=${state|upcase}&multiple=1",
+          "id": "127da963-3e92-451e-8a63-077edf1a6621"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#notrobl"
+            }
+          ],
+          "id": "4fe16315-973e-4aa7-a903-a1c19ed1cdd1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//th[contains(text(), 'Report ID')]"
+            }
+          ],
+          "id": "f51882cd-6ca6-43f8-8b59-5d05231e8196"
+        },
+        {
+          "actionType": "extract",
+          "selector": "tr",
+          "profile": {
+            "name": {
+              "selector": ".//td[3]"
+            },
+            "alternativeNamesList": {
+              "selector": ".//td[4]",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".//td[5]"
+            },
+            "addressCityStateList": {
+              "selector": ".//td[6]",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//td[7]",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//td[1]"
+            }
+          },
+          "id": "c1b9f277-bc42-4957-a804-985e85c947e0"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://members.infotracer.com/removeMyData?fname=${firstName}&lname=${lastName}&city=${city}&state=${state|upcase}&multiple=1",
+          "id": "d930c7d4-f3a1-4df4-a8fa-b8b2d549a4c9"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#notrobl"
+            }
+          ],
+          "id": "18d0d6cd-89e1-45e2-b025-8c42fb2ee288"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//th[contains(text(), 'Report ID')]"
+            }
+          ],
+          "id": "ff19011f-3302-479d-839c-0f1ec63c7bde"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[class~='btn-danger']",
+              "parent": {
+                "profileMatch": {
+                  "selector": "tr",
+                  "profile": {
+                    "name": {
+                      "selector": ".//td[3]"
+                    },
+                    "alternativeNamesList": {
+                      "selector": ".//td[4]",
+                      "findElements": true
+                    },
+                    "age": {
+                      "selector": ".//td[5]"
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//td[6]",
+                      "findElements": true
+                    },
+                    "relativesList": {
+                      "selector": ".//td[7]",
+                      "findElements": true
+                    },
+                    "profileUrl": {
+                      "selector": ".//td[1]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "36dac9b4-3666-47cf-a7e9-f90c7d72de43"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='DataRemovalFormModel[email]']"
+            }
+          ],
+          "id": "9b4ec854-7455-4857-a30f-84e1bcbc7703"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "71d79c0a-f35a-4771-84f5-23c87c36fba3"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "c59a58aa-07d1-4b1f-b9df-b650c7d4fab8"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[class~='btn-primary'][type='submit']"
+            }
+          ],
+          "id": "3c4e0334-71d9-4fc5-8c7c-5c1fccb53712"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Please check your email and confirm your request."
+            }
+          ],
+          "id": "b9975884-7019-4281-883e-b88cf4e525a4"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "_comment": "InfoTracer confirmation link is not valid for ~1 hour after submission. 390s x 10 retries = 65 min total polling time.",
+          "pollingTime": 390,
+          "id": "ef2c022a-7741-4284-b385-4b9d5245dac2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We have received your data removal request"
+            }
+          ],
+          "id": "17c41d13-b690-4fc5-a4ce-01ac6cffb319"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  },
+  "removedAt": null
+}

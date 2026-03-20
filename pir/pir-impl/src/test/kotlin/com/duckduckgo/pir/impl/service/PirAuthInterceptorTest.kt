@@ -32,7 +32,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Invocation
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 class PirAuthInterceptorTest {
     private lateinit var testee: PirAuthInterceptor
@@ -82,33 +81,6 @@ class PirAuthInterceptorTest {
 
         val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
         verify(mockChain).proceed(requestCaptor.capture())
-
-        val capturedRequest = requestCaptor.firstValue
-        assertNotNull(capturedRequest.header("Authorization"))
-        assertEquals("bearer $testToken", capturedRequest.header("Authorization"))
-    }
-
-    @Test
-    fun whenRequestWithExtendedReadTimeoutAnnotationThenUsesExtendedTimeout() = runTest {
-        val testToken = "test-access-token"
-        whenever(mockSubscriptions.getAccessToken()).thenReturn(testToken)
-
-        val mockMethod = TestInterface::class.java.getMethod("authRequiredWithExtendedTimeout")
-        val invocation = Invocation.of(mockMethod, emptyList<Any>())
-        val request = Request.Builder()
-            .url("https://example.com")
-            .tag(Invocation::class.java, invocation)
-            .build()
-
-        whenever(mockChain.request()).thenReturn(request)
-        val timeoutChain: Interceptor.Chain = mock()
-        whenever(mockChain.withReadTimeout(30, TimeUnit.SECONDS)).thenReturn(timeoutChain)
-        whenever(timeoutChain.proceed(any())).thenReturn(mockResponse)
-
-        testee.intercept(mockChain)
-
-        val requestCaptor = org.mockito.kotlin.argumentCaptor<Request>()
-        verify(timeoutChain).proceed(requestCaptor.capture())
 
         val capturedRequest = requestCaptor.firstValue
         assertNotNull(capturedRequest.header("Authorization"))
@@ -171,10 +143,6 @@ class PirAuthInterceptorTest {
     interface TestInterface {
         @PirAuthRequired
         fun authRequiredMethod()
-
-        @PirAuthRequired
-        @PirExtendedReadTimeout
-        fun authRequiredWithExtendedTimeout()
 
         fun nonAuthRequiredMethod()
     }

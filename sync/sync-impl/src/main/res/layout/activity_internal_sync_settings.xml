@@ -115,11 +115,22 @@
                 app:typography="body1" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
-                android:id="@+id/blockStoreInput"
+                android:id="@+id/blockStoreRecoveryCodeInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/keyline_4"
-                android:hint="@string/sync_internal_block_store_input_hint"
+                android:hint="@string/sync_internal_block_store_recovery_code_hint"
+                app:editable="true"
+                app:type="single_line" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/blockStoreDeviceIdInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:hint="@string/sync_internal_block_store_device_id_hint"
                 app:editable="true"
                 app:type="single_line" />
 

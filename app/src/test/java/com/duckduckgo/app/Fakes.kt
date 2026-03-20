@@ -132,6 +132,12 @@ class FakeSettingsDataStore :
             store["appBackgroundedTimestamp"] = value
         }
 
+    override var lastSessionBackgroundTimestamp: Long
+        get() = store["lastSessionBackgroundTimestamp"] as Long? ?: 0L
+        set(value) {
+            store["lastSessionBackgroundTimestamp"] = value
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true
         set(value) {

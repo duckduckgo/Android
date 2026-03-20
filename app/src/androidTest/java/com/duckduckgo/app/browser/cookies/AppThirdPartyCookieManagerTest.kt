@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -51,6 +52,7 @@ class AppThirdPartyCookieManagerTest {
     private lateinit var testee: AppThirdPartyCookieManager
     private lateinit var webView: WebView
     private val thirdPartyCookieNamesMock: ThirdPartyCookieNames = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     @UiThreadTest
     @Before
@@ -64,8 +66,14 @@ class AppThirdPartyCookieManagerTest {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         whenever(thirdPartyCookieNamesMock.hasExcludedCookieName("$USER_ID_COOKIE=test")).thenReturn(true)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
 
-        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNamesMock)
+        testee = AppThirdPartyCookieManager(
+            cookieManagerProvider,
+            authCookiesAllowedDomainsRepository,
+            thirdPartyCookieNamesMock,
+            mockDuckAiHostProvider,
+        )
     }
 
     @UiThreadTest
@@ -178,7 +186,7 @@ class AppThirdPartyCookieManagerTest {
 
     @Test
     fun whenClearAllDataIfDomainIsInExclusionListThenDomainNotDeletedFromDatabase() = runTest {
-        val excludedDomains = AppThirdPartyCookieManager.hostsThatAlwaysRequireThirdPartyCookies
+        val excludedDomains = listOf("home.nest.com", "duck.ai", "duckduckgo.com")
         excludedDomains.forEach { domain ->
             givenDomainIsInTheThirdPartyCookieList(domain)
         }

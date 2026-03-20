@@ -1,0 +1,218 @@
+{
+  "name": "Centeda",
+  "url": "centeda.com",
+  "version": "0.90.0",
+  "addedDatetime": 1677736800000,
+  "optOutUrl": "https://centeda.com/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ce7caa09-bcf4-4bf9-bc7a-024c2c50bd1f",
+          "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "b4350352-85cc-461c-b520-029002683826"
+        },
+        {
+          "actionType": "extract",
+          "id": "e779b827-702d-402d-ae79-f3681ad50008",
+          "selector": ".search-result .search-item",
+          "noResultsSelector": "//div[@class='no-phone-info'] | //h1[contains(text(), 'Oops')]",
+          "profile": {
+            "name": {
+              "selector": ".title",
+              "beforeText": "Age "
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 known-as']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 lived-in']//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 related-to']//li"
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "param",
+              "identifier": "pid"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "id": "7f9525f8-6195-4dfe-bcc0-b95aab2a0053"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".page-title",
+              "parent": ".search-page"
+            }
+          ],
+          "id": "eeeef2aa-1360-4e5e-912b-28b3e067c941"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//a[contains(text(), 'Profile control')]",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".search-item",
+                  "profile": {
+                    "name": {
+                      "selector": ".title",
+                      "beforeText": "Age "
+                    },
+                    "alternativeNamesList": {
+                      "selector": ".//div[@class='col-sm-24 col-md-8 known-as']//li",
+                      "findElements": true
+                    },
+                    "age": {
+                      "selector": ".age"
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//div[@class='col-sm-24 col-md-8 lived-in']//li",
+                      "findElements": true
+                    },
+                    "relativesList": {
+                      "selector": ".//div[@class='col-sm-24 col-md-8 related-to']//li",
+                      "findElements": true
+                    },
+                    "profileUrl": {
+                      "selector": "//following-sibling::a[contains(@href, '/ng/control/privacy?pid=')][1]",
+                      "identifierType": "param",
+                      "identifier": "pid"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "d4b18372-1ab7-461f-b281-2ceba2f38c78"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            },
+            {
+              "type": "element",
+              "selector": "//input[@id='url' and @value and @value != '']",
+              "parent": ".container"
+            }
+          ],
+          "id": "c424f2aa-1360-4e5e-912b-28b3e067c941"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            }
+          ],
+          "id": "e31ba7ef-ed02-4ae8-b13d-d53d1d79b1e4"
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "selector": ".g-recaptcha",
+          "id": "d82fb50e-2459-4933-b57b-043426699aaf"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "selector": ".g-recaptcha",
+          "id": "2e502c72-9ae2-447e-96aa-ed4238102535"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-primary"
+            }
+          ],
+          "id": "c1a8ae1a-12d0-48a8-852e-c2cc5b0a8fe3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "ccc23925-b884-4b1a-be66-5c119db0212d"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "4159b21a-06f6-4689-8975-29a62ef615a3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "695d2e23-0286-44db-ae3e-5c2c5fc062a3"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}
