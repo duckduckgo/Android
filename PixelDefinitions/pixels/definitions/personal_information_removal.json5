@@ -41,6 +41,12 @@
                 "description": "VPN bypass status when the submission succeeded",
                 "type": "string",
                 "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -117,6 +123,12 @@
                 "description": "VPN bypass status when the failure happened",
                 "type": "string",
                 "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -399,6 +411,12 @@
                 "enum": ["on", "off", "unsupported"]
             },
             {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
+            },
+            {
                 "key": "parent",
                 "description": "The parent data broker of the broker scanned",
                 "type": "string"
@@ -468,6 +486,12 @@
                     "solveCaptcha",
                     "condition"
                 ]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -544,6 +568,12 @@
                     "solveCaptcha",
                     "condition"
                 ]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1134,6 +1164,12 @@
                 "key": "profile_queries",
                 "description": "Total number of profile queries made during the initial scan",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1425,6 +1461,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1459,6 +1501,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1483,6 +1531,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1502,6 +1556,12 @@
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
