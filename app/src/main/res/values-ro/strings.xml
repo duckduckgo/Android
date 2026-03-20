@@ -227,7 +227,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
-    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
+    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității tale online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site exclus de la ștergere</item>
         <item quantity="few">%1$d site-uri excluse de la ștergere</item>
