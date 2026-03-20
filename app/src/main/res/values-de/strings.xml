@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
     <string name="singleTabFireDialogSnackbar">1 Tab und dessen Daten gelöscht</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s Tab und dessen Daten gelöscht</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
 

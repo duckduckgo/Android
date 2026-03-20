@@ -276,6 +276,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
     <string name="singleTabFireDialogSnackbar">1 karta i jej dane zostały usunięte</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s tabs and their data deleted</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
 

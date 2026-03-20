@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
     <string name="singleTabFireDialogSnackbar">1 раздел и данните в него са изтрити</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s tabs and their data deleted</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
 
