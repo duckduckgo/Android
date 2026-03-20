@@ -169,7 +169,7 @@ class TabDataRepository @Inject constructor(
 
     private fun buildSiteDataSync(
         url: String?,
-        tabId: String
+        tabId: String,
     ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
@@ -181,7 +181,7 @@ class TabDataRepository @Inject constructor(
 
     private suspend fun buildSiteData(
         url: String?,
-        tabId: String
+        tabId: String,
     ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url ?: return data
@@ -264,7 +264,7 @@ class TabDataRepository @Inject constructor(
 
     override fun countTabsAccessedWithinRange(
         accessOlderThan: Long,
-        accessNotMoreThan: Long?
+        accessNotMoreThan: Long?,
     ): Int {
         val now = timeProvider.localDateTimeNow()
         val start = now.minusDays(accessOlderThan)
@@ -306,7 +306,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun updateTabPosition(
         from: Int,
-        to: Int
+        to: Int,
     ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateTabsOrder(from, to)
@@ -388,7 +388,7 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun undoDeletable(
         tabIds: List<String>,
-        moveActiveTabToEnd: Boolean
+        moveActiveTabToEnd: Boolean,
     ) {
         databaseExecutor().scheduleDirect {
             tabsDao.undoDeletableTabs(tabIds, moveActiveTabToEnd)

@@ -27,7 +27,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionViewModel
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -76,7 +75,6 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         binding.returnHatchRoot.setOnClickListener {
             viewModel.onHatchPressed()
         }
-
     }
 
     fun onHatchSelected(onClick: (String) -> Unit) {
@@ -86,7 +84,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
         logcat { "Hatch: render $state" }
-        if (state.shouldShow){
+        if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.tabTitle
             binding.returnHatchSiteURL.text = state.url.extractDomain()
             binding.returnHatchRoot.show()
@@ -97,5 +95,4 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             binding.returnHatchRoot.gone()
         }
     }
-
 }

@@ -74,7 +74,6 @@ class DefaultTabManager @Inject constructor(
         withContext(dispatchers.io()) {
             tabRepository.updateTabLastAccess(tabId)
         }
-
     }
 
     override suspend fun onTabsChanged(updatedTabIds: List<TabModel>) {
