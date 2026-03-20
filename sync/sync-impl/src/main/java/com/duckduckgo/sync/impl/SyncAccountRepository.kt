@@ -45,12 +45,14 @@ import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -64,6 +66,8 @@ interface SyncAccountRepository {
 
     fun parseSyncAuthCode(stringCode: String): SyncAuthCode
     fun isSyncSupported(): Boolean
+
+    @WorkerThread
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
     fun processCode(code: SyncAuthCode, existingDeviceId: String? = null): Result<Boolean>
@@ -111,6 +115,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : SyncAccountRepository {
 
     /**
@@ -729,6 +734,7 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
+        runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
         val result = syncApi.createAccount(
             account.userId,
             account.passwordHash,
@@ -737,6 +743,7 @@ class AppSyncAccountRepository @Inject constructor(
             encryptedDeviceName,
             encryptedDeviceType,
         )
+        runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
 
         return when (result) {
             is Error -> {
@@ -745,7 +752,9 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
+                runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
                 syncEngine.triggerSync(ACCOUNT_CREATION)
+                runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
                 logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)
             }

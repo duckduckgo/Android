@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -87,6 +88,7 @@ class SyncActivityViewModelTest {
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
@@ -105,6 +107,7 @@ class SyncActivityViewModelTest {
             syncFeatureToggle = syncFeatureToggle,
             settingsPageFeature = fakeSettingsPageFeature,
             syncPixels = syncPixels,
+            syncSetupWideEvent = syncSetupWideEvent,
             deviceAuthenticator = deviceAuthenticator,
         )
         whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
@@ -225,6 +228,47 @@ class SyncActivityViewModelTest {
             awaitItem().assertCommandType(RequestSetupAuthentication::class)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenOnFlowStartedCalled() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem()
+            verify(syncSetupWideEvent).onFlowStarted(source = null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceWithSourceThenOnFlowStartedCalledWithSource() = runTest {
+        givenUserHasDeviceAuthentication(true)
+        testee.commands().test {
+            testee.onSyncThisDevice(source = "settings")
+            awaitItem()
+            verify(syncSetupWideEvent).onFlowStarted(source = "settings")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem()
+            verify(syncSetupWideEvent).onFlowStarted(source = null)
+            verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenConnectionCancelledThenOnFlowCancelledCalled() = runTest {
+        testee.onConnectionCancelled()
+
+        verify(syncSetupWideEvent).onFlowCancelled()
     }
 
     @Test
