@@ -40,11 +40,19 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.core
 }
 
 android {
     anvil {
         generateDaggerFactories = true
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
     namespace 'com.duckduckgo.sqlcipher.loader.impl'
 }
