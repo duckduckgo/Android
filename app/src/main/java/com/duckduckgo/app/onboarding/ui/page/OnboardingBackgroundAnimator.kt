@@ -88,7 +88,6 @@ class OnboardingBackgroundAnimator(
 
         val density = inView.resources.displayMetrics.density
         val screenWidth = inView.rootView.width.toFloat()
-        val outViewImageWidth = outView.drawable?.intrinsicWidth?.takeIf { it > 0 }?.toFloat() ?: screenWidth
 
         with(inView) {
             updateLayoutParams<ConstraintLayout.LayoutParams> {
@@ -101,7 +100,7 @@ class OnboardingBackgroundAnimator(
             alpha = 0f
             isVisible = true
 
-            val exitAnimator = buildExitAnimator(outView, screenWidth, outViewImageWidth)
+            val exitAnimator = buildExitAnimator(outView, screenWidth)
             val enterAnimator = buildEnterAnimator(inView, startX)
             enterExitAnimatorSet = AnimatorSet().apply {
                 playTogether(exitAnimator, enterAnimator)
@@ -157,15 +156,16 @@ class OnboardingBackgroundAnimator(
         backgroundSecondary.animate().cancel()
     }
 
-    private fun buildExitAnimator(outView: View, screenWidth: Float, imageWidth: Float): ValueAnimator {
-        val maxSlideDistance = ((screenWidth - imageWidth) / 2f) + screenWidth
+    private fun buildExitAnimator(outView: View, screenWidth: Float): ValueAnimator {
+        val overflow = centerCropOverflow(outView as ImageView, screenWidth)
+        val maxSlideDistance = screenWidth + overflow
 
         return ValueAnimator.ofFloat(0f, 1f).apply {
             duration = EXIT_DURATION
             interpolator = EASE_IN_OUT
             addUpdateListener { animator ->
                 val progress = animator.animatedValue as Float
-                outView.translationX = maxSlideDistance * progress
+                outView.translationX = -maxSlideDistance * progress
                 // Fade out at 4x speed: fully transparent at 25% of the slide
                 outView.alpha = maxOf(0f, 1f - progress * 4f)
             }
