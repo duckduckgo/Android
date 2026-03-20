@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
     <string name="dataClearingActivityTitle">Czyszczenie danych</string>
-    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie usunąć dane lub skonfiguruj automatyczne usuwanie.</string>
+    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie usunąć dane, lub skonfiguruj automatyczne usuwanie.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d witryna wyłączona z czyszczenia</item>
         <item quantity="few">%1$d witryny wyłączone z czyszczenia</item>
@@ -276,10 +276,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d karta i jej dane zostały usunięte</item>
-        <item quantity="few">%1$d kart i ich dane zostały usunięte</item>
-        <item quantity="many">%1$d kart i ich dane zostały usunięte</item>
-        <item quantity="other">%1$d kart i ich dane zostały usunięte</item>
+        <item quantity="one">Usunięto %1$d kartę wraz z danymi</item>
+        <item quantity="few">Usunięto %1$d karty wraz z danymi</item>
+        <item quantity="many">Usunięto %1$d kart wraz z danymi</item>
+        <item quantity="other">Usunięto %1$d karty wraz z danymi</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
