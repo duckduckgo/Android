@@ -1,5 +1,23 @@
 # AGENTS.md — DuckDuckGo Android Browser
 
+## Available Agents
+
+Agents in `.claude/agents/` are invoked automatically when their trigger conditions match.
+Always delegate to the agent — do not apply its instructions inline.
+
+### `ddg-api-proposal-reviewer`
+
+Use this when someone asks for a review of a DuckDuckGo Android public API proposal.
+
+Triggers:
+- An Asana task URL that is confirmed to be an API proposal (title contains "API Proposal", or the task is in the API Proposals board, or the description proposes changes to a `-api` module)
+- Pasted Kotlin code from or intended for a `-api` module, with a design question
+- A file containing a proposal, with a review request
+
+Do **not** trigger on general Asana URLs paired with "review", impl-only changes, or general Kotlin questions.
+
+When this agent returns output, relay it to the user verbatim and in full — do not summarize, shorten, or paraphrase.
+
 ## Detailed Rules
 
 The following rule files contain detailed guidance for specific topics. Read them before working in those areas — do not rely on summaries here.
