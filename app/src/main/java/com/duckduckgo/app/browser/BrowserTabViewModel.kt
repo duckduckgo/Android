@@ -275,6 +275,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -383,6 +384,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -505,6 +507,7 @@ class BrowserTabViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
+    private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
@@ -4246,6 +4249,20 @@ class BrowserTabViewModel @Inject constructor(
                         val enrichedContext = enrichPageContextIfPossible(pageContext)
                         withContext(dispatchers.main()) {
                             command.value = Command.PageContextReceived(tabId, enrichedContext)
+                        }
+
+                        if (androidBrowserConfig.storePageContext().isEnabled()) {
+                            runCatching {
+                                val pageContextUrl = JSONObject(pageContext).optString("url", "")
+                                tabPageContextRepository.storePageContext(
+                                    tabId = tabId,
+                                    url = pageContextUrl,
+                                    serializedPageContext = pageContext,
+                                )
+                            }.onFailure {
+                                ensureActive()
+                                logcat(WARN) { "Failed to store page context: ${it.asLog()}" }
+                            }
                         }
                     }
                 }
