@@ -25,7 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -39,7 +39,7 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var remoteMessagingRepository: RemoteMessagingRepository
+    lateinit var remoteMessageModel: RemoteMessageModel
 
     @Inject
     @AppCoroutineScope
@@ -58,9 +58,9 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
 
     private fun onPromoLinkSharedSuccessfully() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            remoteMessagingRepository.messageFlow().map { it?.id }.take(1).collect {
+            remoteMessageModel.getActiveMessages().map { it?.id }.take(1).collect {
                 val messageId = it.orEmpty()
-                remoteMessagingRepository.dismissMessage(messageId)
+                remoteMessageModel.dismissMessage(messageId)
                 val pixelsParams: Map<String, String> = mapOf(
                     Pixel.PixelParameter.MESSAGE_SHOWN to messageId,
                     Pixel.PixelParameter.ACTION_SUCCESS to "true",

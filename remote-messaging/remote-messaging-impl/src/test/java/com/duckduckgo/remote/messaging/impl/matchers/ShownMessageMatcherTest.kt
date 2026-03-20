@@ -3,7 +3,7 @@ package com.duckduckgo.remote.messaging.impl.matchers
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.AppRemoteMessagingRepositoryTest.Companion.aRemoteMessage
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*

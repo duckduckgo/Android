@@ -37,4 +37,8 @@ interface RemoteMessageModel {
     suspend fun getRemoteMessageImageFile(surface: Surface): String?
 
     suspend fun clearMessageImage(surface: Surface)
+
+    fun isMessageDismissed(id: String): Boolean
+
+    suspend fun dismissMessage(id: String)
 }

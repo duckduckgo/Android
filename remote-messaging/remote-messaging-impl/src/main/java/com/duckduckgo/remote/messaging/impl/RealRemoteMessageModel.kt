@@ -22,7 +22,6 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.squareup.anvil.annotations.ContributesBinding
@@ -86,6 +85,16 @@ class RealRemoteMessageModel @Inject constructor(
 
     override suspend fun clearMessageImage(surface: Surface) {
         remoteMessagingRepository.clearMessageImage(surface)
+    }
+
+    override fun isMessageDismissed(id: String): Boolean {
+        return remoteMessagingRepository.dismissedMessages().contains(id)
+    }
+
+    override suspend fun dismissMessage(id: String) {
+        withContext(dispatchers.io()) {
+            remoteMessagingRepository.dismissMessage(id)
+        }
     }
 
     private fun Content.getPrimaryAction(): Action? {
