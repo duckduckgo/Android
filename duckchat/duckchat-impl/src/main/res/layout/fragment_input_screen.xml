@@ -30,15 +30,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+        android:id="@+id/inputScreenHatch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"/>
+
     <FrameLayout
         android:id="@+id/ddgLogoContainer"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="40dp"
         android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/inputScreenHatch">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ddgLogo"

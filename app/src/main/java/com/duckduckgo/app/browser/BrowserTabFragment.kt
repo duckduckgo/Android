@@ -1299,6 +1299,7 @@ class BrowserTabFragment :
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
                     useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false,
+                    showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
                 ),
             )
         val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation(isTopOmnibar)
@@ -3438,6 +3439,10 @@ class BrowserTabFragment :
 
         if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             newTabReturnHatchView.gone()
+        }
+
+        newTabReturnHatchView.setOnClickListener {
+            browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
         }
     }
 

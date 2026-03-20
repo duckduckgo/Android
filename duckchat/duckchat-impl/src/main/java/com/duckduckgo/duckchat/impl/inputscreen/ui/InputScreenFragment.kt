@@ -218,6 +218,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
+        binding.inputScreenHatch.isVisible = params?.showReturnHatch ?: false
+        binding.inputScreenHatch.setOnClickListener {
+            exitInputScreen()
+        }
         val initialText = params?.query ?: ""
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
         inputModeWidget.provideInitialInputState(initialText, showMainButtons)
