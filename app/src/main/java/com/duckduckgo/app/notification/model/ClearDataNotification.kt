@@ -62,7 +62,7 @@ class ClearDataNotification(
         }
 
         return withContext(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 if (automaticDataClearing.isAutomaticDataClearingOptionSelected()) {
                     logcat(VERBOSE) { "No need for notification, user already has automatic data clearing option set" }
                     return@withContext false
@@ -108,8 +108,8 @@ class ClearDataNotificationPlugin @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : SchedulableNotificationPlugin {
 
-    private val useImprovedDataClearing = coroutineScope.async(dispatcherProvider.io()) {
-        androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()
+    private val useSingleTabFireDialog = coroutineScope.async(dispatcherProvider.io()) {
+        androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
     }
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -134,7 +134,7 @@ class ClearDataNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = if (runBlocking { useImprovedDataClearing.await() }) {
+        val intent = if (runBlocking { useSingleTabFireDialog.await() }) {
             DataClearingSettingsActivity.intent(context).apply {
                 putExtra(DataClearingSettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
             }

@@ -400,7 +400,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireButtonSettingClicked() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 command.send(Command.LaunchDataClearingSettingsScreen)
             } else {
                 command.send(LaunchFireButtonScreen)
