@@ -169,14 +169,6 @@ interface DuckChatFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun supportsMultipleContexts(): Toggle
 
-    /**
-     * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
-     * This controls syncing the status indicator with DuckChat enabled state and showing the
-     * "Enable/Manage in AI Features Settings" item.
-     * If the remote feature is not present defaults to `true`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun duckAiPaidSettingsStatus(): Toggle
 
     /**
      * @return `true` when we can sync the deletion of duck chats to sync backend

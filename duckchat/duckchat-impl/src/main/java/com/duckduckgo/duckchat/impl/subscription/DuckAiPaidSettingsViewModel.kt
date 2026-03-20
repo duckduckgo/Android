@@ -21,11 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_OPEN_DUCK_AI_CLICKED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_PAID_SETTINGS_OPENED
 import kotlinx.coroutines.channels.BufferOverflow
@@ -42,14 +40,11 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class DuckAiPaidSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
-    dispatchers: DispatcherProvider,
     private val duckChat: DuckChatInternal,
-    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     data class ViewState(
         val isDuckAIEnabled: Boolean = true,
-        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -70,21 +65,13 @@ class DuckAiPaidSettingsViewModel @Inject constructor(
     init {
         pixel.fire(DUCK_CHAT_PAID_SETTINGS_OPENED)
 
-        viewModelScope.launch(dispatchers.io()) {
-            val isFeatureEnabled = duckChatFeature.duckAiPaidSettingsStatus().isEnabled()
-            if (isFeatureEnabled) {
-                duckChat.observeEnableDuckChatUserSetting()
-                    .onEach { isDuckAiEnabled ->
-                        _viewState.update {
-                            ViewState(
-                                isDuckAIEnabled = isDuckAiEnabled,
-                                isDuckAiPaidSettingsFeatureEnabled = true,
-                            )
-                        }
-                    }
-                    .launchIn(viewModelScope)
+        duckChat.observeEnableDuckChatUserSetting()
+            .onEach { isDuckAiEnabled ->
+                _viewState.update {
+                    ViewState(isDuckAIEnabled = isDuckAiEnabled)
+                }
             }
-        }
+            .launchIn(viewModelScope)
     }
 
     fun onLearnMoreSelected() {
