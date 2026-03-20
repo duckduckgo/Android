@@ -54,11 +54,8 @@ a confirmed module location. Do not assume or guess.
 **For each type in the proposal (caller classes, interfaces, implementations):**
 
 1. Check whether the proposal explicitly states the module. If it does, use that.
-2. If not, search the codebase:
-   - Use `Grep` to find the file: search for `class ClassName` or `interface ClassName`
-   - Use `Glob` if you know the likely directory structure (e.g., `**/TabRepository.kt`)
-   - Once you find the file path, derive the module from it (e.g.,
-     `tabs/tabs-api/src/...` → `:tabs-api`)
+2. If not, search the codebase for `class ClassName` or `interface ClassName`, then
+   derive the module from the file path (e.g., `tabs/tabs-api/src/...` → `:tabs-api`).
 3. If the codebase is not available and the proposal does not state the module, **stop
    and ask the user** before proceeding:
 
@@ -227,7 +224,7 @@ Ask: could the module hook into something (lifecycle, plugin point, observer) ra
 requiring callers to call into it? Could the information be passed at the call site instead?
 
 **Important — `:app` depending on `-impl` does NOT bypass the public API:**
-`:app` adds `-impl` modules as Gradle dependencies so Anvil can wire the full DI graph.
+`:app` adds `-impl` modules as Gradle dependencies so that they are built and included in the APK.
 This is a build-time wiring concern, not a licence for app-layer code to directly call into
 impl classes. In practice, app-layer code (e.g. in `DataClearing`) still goes through the
 `-api` interface, just like any other module. Do not reason that "the caller is in the app
