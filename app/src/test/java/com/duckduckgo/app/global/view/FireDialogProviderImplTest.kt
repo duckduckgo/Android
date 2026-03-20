@@ -48,7 +48,6 @@ class FireDialogProviderImplTest {
     fun `when singleTabFireDialog enabled then return dialog`() = runTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
@@ -59,7 +58,6 @@ class FireDialogProviderImplTest {
     fun `when singleTabFireDialog enabled then takes priority over granular flag`() = runTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(true))
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
@@ -70,7 +68,6 @@ class FireDialogProviderImplTest {
     fun `when granularFireDialog enabled then return GranularFireDialog`() = runTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(true))
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 
@@ -78,21 +75,9 @@ class FireDialogProviderImplTest {
     }
 
     @Test
-    fun `when improvedDataClearingOptions enabled then return NonGranularFireDialog`() = runTest {
-        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
-        fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
-
-        val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
-
-        assertTrue(dialog is NonGranularFireDialog)
-    }
-
-    @Test
     fun `when all flags disabled then return LegacyFireDialog`() = runTest {
         fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
         fakeAndroidBrowserConfigFeature.granularFireDialog().setRawStoredState(State(false))
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
 
         val dialog = testee.createFireDialog(FireDialogOrigin.BROWSER)
 

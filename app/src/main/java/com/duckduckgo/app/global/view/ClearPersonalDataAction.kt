@@ -112,8 +112,9 @@ interface ClearDataAction {
      * Kills and restarts the current process.
      * @param notifyDataCleared whether to notify that data has been cleared
      * @param enableTransitionAnimation whether to enable transition animation during restart
+     * @param deletedTabCount number of tabs that were deleted (shown in the snackbar)
      */
-    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true)
+    fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean = true, deletedTabCount: Int = 0)
 }
 
 class ClearPersonalDataAction(
@@ -137,9 +138,9 @@ class ClearPersonalDataAction(
     duckAiHostProvider: DuckAiHostProvider,
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean) {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean, enableTransitionAnimation: Boolean, deletedTabCount: Int) {
         logcat(INFO) { "Restarting process" }
-        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation)
+        FireActivity.triggerRestart(context, notifyDataCleared, enableTransitionAnimation, deletedTabCount)
     }
 
     override fun killProcess() {

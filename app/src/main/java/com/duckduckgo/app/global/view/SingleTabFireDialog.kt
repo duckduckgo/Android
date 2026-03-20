@@ -48,6 +48,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -63,6 +64,7 @@ import com.google.android.material.R as MaterialR
 
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
+private const val BOTTOM_SHEET_MAX_WIDTH_DP = 640
 private const val ARG_ORIGIN = "origin"
 
 @InjectWith(FragmentScope::class)
@@ -95,6 +97,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private var animationEnabled = false
     private var canFinish = false
+    private var pendingFragmentResultEvent: String? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -167,7 +170,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun configureBottomSheet() {
-        (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        (dialog as? BottomSheetDialog)?.behavior?.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            maxWidth = BOTTOM_SHEET_MAX_WIDTH_DP.toPx()
+        }
     }
 
     private fun observeViewModel() {
@@ -205,15 +211,15 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 }
             }
             is Command.OnSingleTabClearComplete -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearFeatureNotSupported -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
             is Command.OnSingleTabClearError -> {
-                sendFragmentResult(FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR)
+                pendingFragmentResultEvent = FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR
                 onClearAllEvent(ClearAllEvent.ClearingFinished)
             }
         }
@@ -227,6 +233,10 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun render(state: SingleTabFireDialogViewModel.ViewState) {
+        if (!state.isFirePictogramVisible) {
+            binding.fireIcon.gone()
+        }
+
         val titleRes = if (state.isDuckAiChatsSelected) {
             R.string.singleTabFireDialogTitleWithChats
         } else {
@@ -234,8 +244,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
         binding.dialogTitle.text = requireContext().getString(titleRes)
 
-        val showDeleteThisTab = state.isSingleTabEnabled && !state.isFromTabSwitcher
-        if (showDeleteThisTab) {
+        if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
             if (state.isDuckAiTab) {
                 binding.deleteThisTabButton.text = requireContext().getString(R.string.singleTabFireDialogDeleteThisChat)
@@ -245,13 +254,13 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
 
         val subtitleParts = buildList {
-            if (state.showSiteDataSubtitle) {
+            if (state.isSiteDataSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleSiteData))
             }
-            if (state.showDownloadsSubtitle) {
+            if (state.isDownloadsSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleDownloads))
             }
-            if (state.showDuckAiSubtitle) {
+            if (state.isDuckAiSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleDuckAi))
             }
         }
@@ -332,11 +341,33 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             }
         } else {
             if (viewModel.viewState.value.shouldRestartAfterClearing) {
-                clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
+                clearDataAction.killAndRestartProcess(
+                    notifyDataCleared = false,
+                    enableTransitionAnimation = false,
+                    deletedTabCount = viewModel.viewState.value.tabCount,
+                )
             } else {
-                dismiss()
+                pendingFragmentResultEvent?.let { sendFragmentResult(it) }
+                pendingFragmentResultEvent = null
+
+                dismissSingleTabClear()
             }
         }
+    }
+
+    private fun dismissSingleTabClear() {
+        _binding?.fireAnimationView?.removeAllAnimatorListeners()
+        _binding?.fireAnimationView?.removeUpdateListener(accelerateAnimatorUpdateListener)
+        _binding?.fireAnimationView?.cancelAnimation()
+
+        dialog?.window?.decorView?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.withEndAction {
+                isCancelable = true
+                dismissAllowingStateLoss()
+            }
+            ?.start()
     }
 
     private sealed class ClearAllEvent {

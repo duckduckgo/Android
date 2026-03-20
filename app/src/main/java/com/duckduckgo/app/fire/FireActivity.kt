@@ -55,9 +55,10 @@ class FireActivity : AppCompatActivity() {
             context: Context,
             notifyDataCleared: Boolean,
             enableTransitionAnimation: Boolean = true,
+            deletedTabCount: Int = 0,
         ) {
             val intent = Intent(context, FireActivity::class.java)
-            val nextIntent = getRestartIntent(context, notifyDataCleared)
+            val nextIntent = getRestartIntent(context, notifyDataCleared, deletedTabCount)
 
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
@@ -79,8 +80,14 @@ class FireActivity : AppCompatActivity() {
         private fun getRestartIntent(
             context: Context,
             notifyDataCleared: Boolean = false,
+            deletedTabCount: Int = 0,
         ): Intent {
-            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared, isLaunchFromClearDataAction = true)
+            val intent = BrowserActivity.intent(
+                context,
+                notifyDataCleared = notifyDataCleared,
+                isLaunchFromClearDataAction = true,
+                deletedTabCount = deletedTabCount,
+            )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }

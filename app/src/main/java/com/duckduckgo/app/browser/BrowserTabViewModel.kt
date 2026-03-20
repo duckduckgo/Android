@@ -846,9 +846,11 @@ class BrowserTabViewModel @Inject constructor(
                 showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
             }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
-                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
-                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
+                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
+                val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
+
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar) {
                     viewModelScope.launch {
                         // whenever an event fires, so the user switched to a new tab page, launch the input screen
                         // unless an onboarding promo message is displayed
