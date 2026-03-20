@@ -88,6 +88,7 @@ dependencies {
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation project(path: ':common-test')
+    androidTestImplementation project(path: ':feature-toggles-test')
     androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
