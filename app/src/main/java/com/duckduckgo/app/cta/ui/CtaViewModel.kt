@@ -313,7 +313,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
-        extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding().isEnabled() &&
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
             hideTips() &&
             appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
             !daxDialogPrivacyProShown() &&
