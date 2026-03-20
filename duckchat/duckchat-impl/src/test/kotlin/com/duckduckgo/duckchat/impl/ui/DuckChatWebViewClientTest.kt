@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.localserver.api.DuckAiLocalServer
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -32,13 +33,15 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class DuckChatWebViewClientTest {
 
+    private val localServer: DuckAiLocalServer = mock()
+
     @Test
     fun whenOnPageStartedCalledThenJsPluginOnPageStartedInvoked() = runTest {
         val mockPlugin: JsInjectorPlugin = mock()
         val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
         whenever(pluginPoint.getPlugins()).thenReturn(listOf(mockPlugin))
 
-        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint, localServer)
         val webView: WebView = mock()
         val url = "https://example.com"
 
@@ -51,7 +54,7 @@ class DuckChatWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInvokedWithUrl() = runTest {
         val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
         whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
-        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint, localServer)
         val webView: WebView = mock()
         val url = "https://example.com"
         var receivedUrl: String? = null
@@ -66,7 +69,7 @@ class DuckChatWebViewClientTest {
     fun whenOnPageFinishedCalledWithoutUrlThenListenerReceivesNull() = runTest {
         val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
         whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
-        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint, localServer)
         val webView: WebView = mock()
         var receivedUrl: String? = "initial"
         duckChatWebViewClient.onPageFinishedListener = { receivedUrl = it }
@@ -74,5 +77,18 @@ class DuckChatWebViewClientTest {
         duckChatWebViewClient.onPageFinished(webView, null)
 
         assertNull(receivedUrl)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenServerPortIsInjectedIntoWebView() {
+        val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
+        whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
+        whenever(localServer.port).thenReturn(8080)
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint, localServer)
+        val webView: WebView = mock()
+
+        duckChatWebViewClient.onPageFinished(webView, "https://duckduckgo.com/duckchat/v1/")
+
+        verify(webView).evaluateJavascript("window.__duckAiNativeServer = { port: 8080 };", null)
     }
 }

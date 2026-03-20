@@ -252,6 +252,8 @@ fladle {
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	implementation project(":duck-ai-local-server-api")
+	implementation project(":duck-ai-local-server-impl")
 	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")

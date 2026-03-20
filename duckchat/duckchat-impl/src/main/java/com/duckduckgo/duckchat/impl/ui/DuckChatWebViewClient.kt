@@ -22,10 +22,12 @@ import android.webkit.WebViewClient
 import androidx.annotation.UiThread
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.duckchat.localserver.api.DuckAiLocalServer
 import javax.inject.Inject
 
 class DuckChatWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val localServer: DuckAiLocalServer,
 ) : WebViewClient() {
 
     var onPageFinishedListener: ((String?) -> Unit)? = null
@@ -47,6 +49,14 @@ class DuckChatWebViewClient @Inject constructor(
         url: String?,
     ) {
         super.onPageFinished(view, url)
+        injectServerPort(view)
         onPageFinishedListener?.invoke(url)
+    }
+
+    private fun injectServerPort(webView: WebView) {
+        webView.evaluateJavascript(
+            "window.__duckAiNativeServer = { port: ${localServer.port} };",
+            null,
+        )
     }
 }
