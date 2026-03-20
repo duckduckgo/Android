@@ -47,6 +47,8 @@ ext.proprietaryFontAvailable = hasGprCredentials && useProprietaryFontProp?.toBo
 
 if (proprietaryFontAvailable) {
     logger.lifecycle("DUCKSANS: Using proprietary font AAR from GitHub Packages")
+} else if (hasGprCredentials) {
+    logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (opted out via -PuseProprietaryFont=false)")
 } else {
     logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (credentials not found)")
 }
