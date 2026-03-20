@@ -31,4 +31,6 @@ interface RemoteMessagingRepository {
     suspend fun getRemoteMessageImageFile(surface: Surface): String?
 
     suspend fun clearMessageImage(surface: Surface)
+
+    suspend fun getCardItemImageFilePath(itemId: String): String?
 }
