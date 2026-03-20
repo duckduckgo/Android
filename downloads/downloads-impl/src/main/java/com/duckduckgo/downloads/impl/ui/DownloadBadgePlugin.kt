@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.menu
+package com.duckduckgo.downloads.impl.ui
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadMenuStateProvider
 import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

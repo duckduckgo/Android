@@ -294,6 +294,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadConfirmation
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
+import com.duckduckgo.downloads.api.DownloadsMenuPlugin
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -649,6 +650,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
+    @Inject
+    lateinit var downloadsMenuPlugins: PluginPoint<DownloadsMenuPlugin>
 
     @Inject
     lateinit var systemAutofillEngagement: SystemAutofillEngagement
@@ -1602,10 +1606,7 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
             }
-            onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                browserActivity?.launchDownloads()
-            }
+            setupDownloadsMenuItem(this) { view, action -> onMenuItemClicked(view, action) }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                 browserActivity?.launchSettings()
@@ -1707,10 +1708,7 @@ class BrowserTabFragment :
                 pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                 viewModel.onBrokenSiteSelected()
             }
-            onMenuItemClicked(downloadsMenuItem) {
-                pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-                browserActivity?.launchDownloads()
-            }
+            setupDownloadsMenuItem(this, isBottomSheet = true) { view, action -> onMenuItemClicked(view, action) }
             onMenuItemClicked(settingsMenuItem) {
                 pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                 pixel.fire(AppPixelName.SHEET_MENU_SETTINGS)
@@ -1788,6 +1786,28 @@ class BrowserTabFragment :
     private fun onForwardArrowClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
         viewModel.onUserPressedForward()
+    }
+
+    private fun setupDownloadsMenuItem(
+        menu: Any,
+        isBottomSheet: Boolean = false,
+        onMenuItemClicked: (View, () -> Unit) -> Unit,
+    ) {
+        val container = when (menu) {
+            is BrowserPopupMenu -> menu.downloadsMenuContainer as? android.widget.FrameLayout
+            is BrowserMenuBottomSheet -> menu.downloadsMenuContainer
+            else -> null
+        } ?: return
+        val downloadsView = downloadsMenuPlugins.getPlugins().firstOrNull()?.getView(requireContext()) ?: return
+        if (isBottomSheet && downloadsView is com.duckduckgo.common.ui.view.MenuItemView) {
+            downloadsView.setSize(com.duckduckgo.common.ui.view.MenuItemViewSize.MEDIUM)
+            downloadsView.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_downloads_24)
+        }
+        container.addView(downloadsView)
+        onMenuItemClicked(downloadsView) {
+            pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+            browserActivity?.launchDownloads()
+        }
     }
 
     private fun onBackArrowLongClicked() {

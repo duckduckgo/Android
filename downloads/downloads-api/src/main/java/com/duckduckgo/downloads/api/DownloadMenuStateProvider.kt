@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-sealed interface DownloadsScreens {
+interface DownloadMenuStateProvider {
+    /**
+     * Indicates whether there is a new download that has not been viewed by the user yet.
+     */
+    fun hasNewDownload(): Boolean
 
     /**
-     * Launch the Downloads activity
+     * Indicates that a new download has completed, and the user should be notified about it until they view the downloads screen.
      */
-    data object DownloadsScreenNoParams : ActivityParams {
-        private fun readResolve(): Any = DownloadsScreenNoParams
-    }
+    fun onDownloadComplete()
+
+    /**
+     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
+     */
+    fun onDownloadsScreenViewed()
 }

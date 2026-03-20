@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -125,8 +126,8 @@ class BrowserMenuBottomSheet(
     val createAliasMenuItem: MenuItemView
         get() = binding.createAliasMenuItem
 
-    val downloadsMenuItem: MenuItemView
-        get() = binding.downloadsMenuItem
+    val downloadsMenuContainer: FrameLayout
+        get() = binding.downloadsMenuContainer
 
     val duckChatHistoryMenuItem: MenuItemView
         get() = binding.duckChatHistoryMenuItem
@@ -196,7 +197,7 @@ class BrowserMenuBottomSheet(
         settingsMenuItem.isVisible = true
         refreshActionMenuItem.isVisible = false
         bookmarksMenuItem.isVisible = true
-        downloadsMenuItem.isVisible = true
+        downloadsMenuContainer.isVisible = true
     }
 
     private fun renderBrowserMenu(viewState: BrowserMenuViewState.Browser) {
@@ -270,7 +271,6 @@ class BrowserMenuBottomSheet(
         renderPageContextHeader(viewState.pageContextHeader)
         renderVpnMenu(viewState.vpnMenuState)
         fireMenuItem.isVisible = viewState.showFireMenuItem
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
@@ -295,8 +295,7 @@ class BrowserMenuBottomSheet(
 
         refreshMenuItem.isVisible = false
         autofillMenuItem.isVisible = viewState.showAutofill
-        downloadsMenuItem.isVisible = true
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
+        downloadsMenuContainer.isVisible = true
         duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn
@@ -335,7 +334,7 @@ class BrowserMenuBottomSheet(
         changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
 
         bookmarksMenuItem.isVisible = false
-        downloadsMenuItem.isVisible = false
+        downloadsMenuContainer.isVisible = false
 
         privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
         val privacyProtectionLabel = context.getText(
@@ -372,8 +371,7 @@ class BrowserMenuBottomSheet(
         brokenSiteMenuItem.isVisible = viewState.canReportSite
         printPageMenuItem.isVisible = viewState.canPrintPage
         autofillMenuItem.isVisible = viewState.showAutofill
-        downloadsMenuItem.isVisible = true
-        downloadsMenuItem.showDotIndicator = viewState.showDownloadDot
+        downloadsMenuContainer.isVisible = true
         renderPageContextHeader(viewState.pageContextHeader)
 
         duckChatHistoryMenuItem.isVisible = true

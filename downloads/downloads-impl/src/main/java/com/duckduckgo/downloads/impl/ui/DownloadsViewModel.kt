@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadMenuStateProvider
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.R
@@ -56,6 +57,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -152,6 +154,7 @@ class DownloadsViewModel @Inject constructor(
             if (staleDownloadIds.isNotEmpty()) {
                 downloadsRepository.delete(staleDownloadIds)
             }
+            downloadMenuStateProvider.onDownloadsScreenViewed()
         }
     }
 

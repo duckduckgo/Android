@@ -20,25 +20,22 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.common.ui.view.MenuItemView
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadMenuStateProvider
 import com.duckduckgo.downloads.api.DownloadsMenuPlugin
-import com.duckduckgo.downloads.api.DownloadsScreenNoParams
 import com.duckduckgo.downloads.impl.R
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 class RealDownloadsMenuPlugin @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
+    private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : DownloadsMenuPlugin {
 
     override fun getView(context: Context): View {
         return MenuItemView(context).apply {
             label(context.getString(R.string.downloadsMenuPluginDownloads))
-            setIcon(R.drawable.ic_downloads_16)
-            setOnClickListener {
-                globalActivityStarter.start(context, DownloadsScreenNoParams)
-            }
+            setIcon(com.duckduckgo.mobile.android.R.drawable.ic_downloads_16)
+            showDotIndicator = downloadMenuStateProvider.hasNewDownload()
         }
     }
 }

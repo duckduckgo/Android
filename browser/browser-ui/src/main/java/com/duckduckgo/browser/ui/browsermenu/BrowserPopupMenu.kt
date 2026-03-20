@@ -122,10 +122,10 @@ class BrowserPopupMenu(
         }
     }
 
-    val downloadsMenuItem: View by lazy {
+    val downloadsMenuContainer: View by lazy {
         when (omnibarType) {
-            OmnibarType.SINGLE_BOTTOM -> bottomBinding.downloadsMenuItem
-            else -> topBinding.downloadsMenuItem
+            OmnibarType.SINGLE_BOTTOM -> bottomBinding.downloadsMenuContainer
+            else -> topBinding.downloadsMenuContainer
         }
     }
 
@@ -297,7 +297,7 @@ class BrowserPopupMenu(
      */
     private fun showCommonItems() {
         bookmarksMenuItem.isVisible = true
-        downloadsMenuItem.isVisible = true
+        downloadsMenuContainer.isVisible = true
         settingsMenuItem.isVisible = true
     }
 

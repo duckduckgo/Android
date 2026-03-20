@@ -14,44 +14,38 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.menu
+package com.duckduckgo.downloads.impl.ui
 
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import android.content.Context
+import android.content.SharedPreferences
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadMenuStateProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-interface DownloadMenuStateProvider {
-    /**
-     * Indicates whether there is a new download that has not been viewed by the user yet.
-     */
-    fun hasNewDownload(): Boolean
-
-    /**
-     * Indicates that a new download has completed, and the user should be notified about it until they view the downloads screen.
-     */
-    fun onDownloadComplete()
-
-    /**
-     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
-     */
-    fun onDownloadsScreenViewed()
-}
-
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDownloadMenuStateProvider @Inject constructor(
-    private val settingsDataStore: SettingsDataStore,
+    private val context: Context,
 ) : DownloadMenuStateProvider {
 
-    override fun hasNewDownload(): Boolean = settingsDataStore.hasNewDownload
+    private val preferences: SharedPreferences by lazy {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    override fun hasNewDownload(): Boolean = preferences.getBoolean(KEY_HAS_NEW_DOWNLOAD, false)
 
     override fun onDownloadComplete() {
-        settingsDataStore.hasNewDownload = true
+        preferences.edit().putBoolean(KEY_HAS_NEW_DOWNLOAD, true).apply()
     }
 
     override fun onDownloadsScreenViewed() {
-        settingsDataStore.hasNewDownload = false
+        preferences.edit().putBoolean(KEY_HAS_NEW_DOWNLOAD, false).apply()
+    }
+
+    companion object {
+        private const val PREFS_NAME = "com.duckduckgo.downloads.menu_state"
+        private const val KEY_HAS_NEW_DOWNLOAD = "has_new_download"
     }
 }

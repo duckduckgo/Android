@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
+import com.duckduckgo.downloads.api.DownloadMenuStateProvider
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.R
@@ -62,6 +63,8 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
+    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+
     private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
@@ -70,6 +73,7 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
+                mockDownloadMenuStateProvider,
             )
         model
     }

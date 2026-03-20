@@ -45,7 +45,6 @@ interface BrowserMenuViewStateFactory {
 @SingleInstanceIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
-    private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : BrowserMenuViewStateFactory {
     override fun create(
         omnibarViewMode: Omnibar.ViewMode,
@@ -97,7 +96,6 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             vpnMenuState = browserViewState.vpnMenuState,
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             showAutofill = browserViewState.showAutofill,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
             canGoForward = browserViewState.canGoForward,
         )
     }
@@ -111,7 +109,6 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canPrintPage = browserViewState.canPrintPage,
             canReportSite = browserViewState.canReportSite,
             showAutofill = browserViewState.showAutofill,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
             pageContextHeader = PageContextHeaderState.DuckAi(title = title, tabId = tabId),
         )
     }
@@ -137,7 +134,6 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             canFireproofSite = browserViewState.canFireproofSite,
             isFireproofWebsite = browserViewState.isFireproofWebsite,
             showFireMenuItem = browserViewState.fireButton is HighlightableButton.Visible,
-            showDownloadDot = downloadMenuStateProvider.hasNewDownload(),
             isEmailSignedIn = browserViewState.isEmailSignedIn,
             canChangeBrowsingMode = browserViewState.canChangeBrowsingMode,
             isDesktopBrowsingMode = browserViewState.isDesktopBrowsingMode,
