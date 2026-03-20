@@ -5260,6 +5260,7 @@ class BrowserTabFragment :
 
                     override fun onPrimaryButtonClicked() {
                         dialog.dismiss()
+                        showNewTab()
                         viewModel.onUserClickCtaOkButton(configuration)
                     }
 
