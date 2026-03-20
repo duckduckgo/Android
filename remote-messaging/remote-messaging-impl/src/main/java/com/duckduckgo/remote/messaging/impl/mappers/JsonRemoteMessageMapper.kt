@@ -124,6 +124,7 @@ private val twoLineListItemMapper: (JsonListItem, Set<MessageActionMapperPlugin>
         primaryActionText = jsonItem.primaryActionText.orEmpty(),
         matchingRules = jsonItem.matchingRules.orEmpty(),
         exclusionRules = jsonItem.exclusionRules.orEmpty(),
+        imageUrl = jsonItem.imageUrl,
     )
 }
 
