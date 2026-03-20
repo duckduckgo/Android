@@ -3336,14 +3336,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun appLinkClicked(appLink: AppLink) {
+        appLinksHandler.setUserQueryState(false)
         when {
             // When in custom tab, always open the app link directly, without prompting.
             isCustomTabScreen -> command.value = OpenAppLink(appLink)
 
-            appSettingsPreferencesStore.showAppLinksPrompt || appLinksHandler.isUserQuery() -> {
-                command.value = ShowAppLinkPrompt(appLink)
-                appLinksHandler.setUserQueryState(false)
-            }
+            appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
 
             else -> command.value = OpenAppLink(appLink)
         }
