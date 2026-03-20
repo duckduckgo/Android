@@ -88,10 +88,6 @@ class RealRemoteMessageModel @Inject constructor(
         remoteMessagingRepository.clearMessageImage(surface)
     }
 
-    override suspend fun getCardItemImageFilePath(itemId: String): String? {
-        return remoteMessagingRepository.getCardItemImageFilePath(itemId)
-    }
-
     private fun Content.getPrimaryAction(): Action? {
         return when (this) {
             is Content.BigSingleAction -> {

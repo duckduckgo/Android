@@ -618,7 +618,7 @@ class CardsListRemoteMessageViewModelTest {
             assertNull(cardItems?.get(0)?.imageFilePath)
 
             // Verify getCardItemImageFilePath was never called since imageUrl is null
-            verify(remoteMessagingModel, never()).getCardItemImageFilePath(any())
+            verify(remoteMessagingRepository, never()).getCardItemImageFilePath(any())
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -665,8 +665,8 @@ class CardsListRemoteMessageViewModelTest {
             surfaces = listOf(Surface.MODAL),
         )
         whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
-        whenever(remoteMessagingModel.getCardItemImageFilePath(eq("item1"))).thenReturn("/path/to/item1.png")
-        whenever(remoteMessagingModel.getCardItemImageFilePath(eq("item2"))).thenReturn(null)
+        whenever(remoteMessagingRepository.getCardItemImageFilePath(eq("item1"))).thenReturn("/path/to/item1.png")
+        whenever(remoteMessagingRepository.getCardItemImageFilePath(eq("item2"))).thenReturn(null)
 
         viewModel.viewState.test {
             assertNull(awaitItem()) // Initial state
