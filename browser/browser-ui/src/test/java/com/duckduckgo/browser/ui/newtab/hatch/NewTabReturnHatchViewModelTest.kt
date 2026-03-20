@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.newtab.hatch
+package com.duckduckgo.browser.ui.newtab.hatch
 
 import app.cash.turbine.test
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -40,8 +38,6 @@ class NewTabReturnHatchViewModelTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockTabRepository: TabRepository = mock()
-    private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val mockToggle: Toggle = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
 
     private lateinit var testee: NewTabReturnHatchViewModel
@@ -49,13 +45,10 @@ class NewTabReturnHatchViewModelTest {
     @Before
     fun setup() {
         whenever(mockTabRepository.flowLastAccessedTab).thenReturn(lastAccessedTabFlow)
-        whenever(mockAndroidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
 
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            androidBrowserConfigFeature = mockAndroidBrowserConfigFeature,
         )
     }
 
@@ -98,31 +91,6 @@ class NewTabReturnHatchViewModelTest {
 
             lastAccessedTabFlow.emit(tab2)
             assertEquals("tab2", awaitItem().tabId)
-        }
-    }
-
-    @Test
-    fun whenFeatureDisabledThenViewStateHidesHatch() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-
-        lastAccessedTabFlow.emit(tab)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShow)
-        }
-    }
-
-    @Test
-    fun whenFeatureDisabledAndNoTabThenViewStateHidesHatch() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
-
-        lastAccessedTabFlow.emit(null)
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShow)
         }
     }
 
