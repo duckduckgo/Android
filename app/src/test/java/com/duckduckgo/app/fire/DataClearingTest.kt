@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -29,6 +32,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -84,6 +88,9 @@ class DataClearingTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var mockContextualDataStore: DuckChatContextualDataStore
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
 
     @Before
@@ -106,6 +113,7 @@ class DataClearingTest {
             navigationHistory = mockNavigationHistory,
             tabRepository = mockTabRepository,
             duckChat = mockDuckChat,
+            contextualDataStore = mockContextualDataStore,
         )
     }
 
@@ -683,7 +691,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -692,7 +700,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -732,7 +740,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -742,7 +750,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).deleteTabAndSelectSource("tab1")
+        verify(mockTabRepository).deleteTabs(listOf("tab1"))
     }
 
     @Test
@@ -795,6 +803,58 @@ class DataClearingTest {
         testee.clearSingleTabData("tab1")
 
         verify(mockDuckChat, never()).deleteChat(any())
+    }
+
+    // --- clearContextualChatDataIfNeeded tests ---
+
+    @Test
+    fun whenClearSingleTabDataWithContextualChatAndDuckAiChatsEnabled_thenDeleteContextualChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai/chat?chatID=contextual-123")
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-123")
+        verify(mockContextualDataStore).clearTabChatUrl("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithContextualChatAndDuckAiChatsDisabled_thenDoNotDeleteContextualChat() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        configureManualOptions(emptySet())
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockContextualDataStore, never()).getTabChatUrl(any())
+        verify(mockContextualDataStore, never()).clearTabChatUrl(any())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNoContextualChatUrlAndDuckAiChatsEnabled_thenStillClearStoreEntries() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn(null)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockContextualDataStore).clearTabChatUrl("tab1")
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckAiTabAndContextualChat_thenDeleteBothChats() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=tab-chat", position = 0))
+        configureManualOptions(setOf(FireClearOption.DUCKAI_CHATS))
+        whenever(mockContextualDataStore.getTabChatUrl("tab1")).thenReturn("https://duck.ai/chat?chatID=contextual-456")
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=tab-chat")
+        verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-456")
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
