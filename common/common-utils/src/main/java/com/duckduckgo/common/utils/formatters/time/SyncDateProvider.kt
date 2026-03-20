@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.settings.impl
+package com.duckduckgo.common.utils.formatters.time
 
-import java.time.*
-import java.time.format.*
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class SyncDateProvider {
     companion object {

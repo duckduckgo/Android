@@ -22,7 +22,6 @@ import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.DeletableType
 import com.duckduckgo.sync.api.engine.DeletableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
-import com.duckduckgo.sync.api.engine.PatchableDataManager
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -30,8 +29,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.api.engine.SyncPatchRequest
-import com.duckduckgo.sync.api.engine.SyncPatchResponse
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
@@ -75,7 +73,6 @@ internal class SyncEngineTest {
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val syncablePersisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager> = mock()
-    private val patchableDataManagerPlugins: PluginPoint<PatchableDataManager> = mock()
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
@@ -91,13 +88,11 @@ internal class SyncEngineTest {
             providerPlugins,
             syncablePersisterPlugins,
             deletableDataManagerPlugins,
-            patchableDataManagerPlugins,
             lifecyclePlugins,
         )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
-        whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
     }
 
     @Test
@@ -151,7 +146,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(ACCOUNT_CREATION)
 
         verify(syncStateRepository).store(any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -179,7 +174,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(ACCOUNT_CREATION)
 
         verify(syncStateRepository).store(any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -214,7 +209,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -227,7 +222,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).get(any(), any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -240,7 +235,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -275,7 +270,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(FEATURE_READ)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -288,7 +283,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(FEATURE_READ)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -323,7 +318,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(DATA_CHANGE)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -336,7 +331,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(DATA_CHANGE)
 
         verify(syncApiClient).get(any(), any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -349,7 +344,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(DATA_CHANGE)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -395,7 +390,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(BACKGROUND_SYNC)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -409,7 +404,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(BACKGROUND_SYNC)
 
         verify(syncApiClient).get(any(), any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -423,7 +418,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(BACKGROUND_SYNC)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -449,7 +444,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(ACCOUNT_LOGIN)
 
         verify(syncApiClient).get(any(), any())
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -503,7 +498,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -516,7 +511,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncOperationErrorRecorder).record(BOOKMARKS.field, TIMESTAMP_CONFLICT)
@@ -530,7 +525,7 @@ internal class SyncEngineTest {
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncOperationErrorRecorder).record(BOOKMARKS.field, ORPHANS_PRESENT)
@@ -550,7 +545,7 @@ internal class SyncEngineTest {
         // Verify GET called for first sync (DEDUPLICATION)
         verify(syncApiClient).get(BOOKMARKS, "0")
         // Verify PATCH called for changes after dedup (LOCAL_WINS)
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -566,7 +561,7 @@ internal class SyncEngineTest {
         // Verify first sync for BOOKMARKS: GET with DEDUPLICATION
         verify(syncApiClient).get(BOOKMARKS, "0")
         // Verify regular sync for CREDENTIALS: PATCH
-        verify(syncApiClient).patchData(any())
+        verify(syncApiClient).patch(any())
         // Verify empty changes for SETTINGS: GET
         verify(syncApiClient).get(eq(SETTINGS), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -582,7 +577,7 @@ internal class SyncEngineTest {
         // Verify error recorded for SETTINGS provider (at least once)
         verify(syncOperationErrorRecorder, atLeastOnce()).record(SETTINGS.field, DATA_PROVIDER_ERROR)
         // Verify BOOKMARKS and CREDENTIALS still processed
-        verify(syncApiClient, times(2)).patchData(any())
+        verify(syncApiClient, times(2)).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -640,7 +635,7 @@ internal class SyncEngineTest {
         // Verify deletion processed
         verify(syncApiClient).delete(deletionRequest)
         // Verify BOOKMARKS changes processed
-        verify(syncApiClient).patchData(bookmarksChanges)
+        verify(syncApiClient).patch(bookmarksChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -648,7 +643,7 @@ internal class SyncEngineTest {
     fun whenDeletionSucceedsThenManagerOnSuccessIsCalled() {
         val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         val deletionManager = mock<DeletableDataManager>()
-        whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(deletionManager.getDeletableType()).thenReturn(DUCK_AI_CHATS)
         whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
 
         val deletionResponse = SyncDeletionResponse(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
@@ -666,7 +661,7 @@ internal class SyncEngineTest {
     fun whenDeletionFailsWithFeatureErrorThenManagerOnErrorIsCalled() {
         val deletionRequest = SyncDeletionRequest(DUCK_AI_CHATS, "2024-01-01T00:00:00.000Z")
         val deletionManager = mock<DeletableDataManager>()
-        whenever(deletionManager.getType()).thenReturn(DUCK_AI_CHATS)
+        whenever(deletionManager.getDeletableType()).thenReturn(DUCK_AI_CHATS)
         whenever(deletionManager.getDeletions()).thenReturn(deletionRequest)
 
         givenDeletionError(deletionRequest, API_CODE.COUNT_LIMIT.code)
@@ -695,65 +690,87 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenPatchesExistThenTheyAreProcessed() {
-        val patchRequest = givenPendingPatches(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
-        givenPatchDeletableEntriesSuccess(patchRequest)
-
-        val bookmarksChanges = givenChangesForType(BOOKMARKS, "{}", ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+    fun whenDuckAiChatsChangesExistThenPatchIsCalled() {
+        val json = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProvider = FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges)
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProvider))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty())))
         givenPatchSuccess()
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).patchDeletableEntries(patchRequest)
-        verify(syncApiClient).patchData(bookmarksChanges)
+        verify(syncApiClient).patch(duckChatChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test
-    fun whenPatchSucceedsThenManagerOnPatchSuccessIsCalled() {
-        val patchRequest = SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
-        val patchManager = mock<PatchableDataManager>()
-        whenever(patchManager.getType()).thenReturn(DUCK_AI_CHATS)
-        whenever(patchManager.getPatches()).thenReturn(patchRequest)
-
-        val patchResponse = SyncPatchResponse(DUCK_AI_CHATS, listOf("abc"))
-        givenPatchDeletableEntriesSuccess(patchRequest, patchResponse)
-        whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
-        givenNoProviders()
+    fun whenDuckAiChatsChangesAreEmptyThenGetIsNotCalled() {
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, "", ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProvider = FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges)
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProvider))
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(patchManager).onPatchSuccess(patchResponse)
+        verify(syncApiClient, times(0)).get(any(), any())
+        verify(syncApiClient, times(0)).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test
-    fun whenPatchFailsWithFeatureErrorThenManagerOnPatchErrorIsCalled() {
-        val patchRequest = SyncPatchRequest(DUCK_AI_CHATS, """[{"id":"abc","deleted":"2024-01-01T00:00:00.000Z"}]""")
-        val patchManager = mock<PatchableDataManager>()
-        whenever(patchManager.getType()).thenReturn(DUCK_AI_CHATS)
-        whenever(patchManager.getPatches()).thenReturn(patchRequest)
-
-        givenPatchDeletableEntriesError(patchRequest, API_CODE.COUNT_LIMIT.code)
-        whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
-        givenNoProviders()
+    fun whenDuckAiChatsFirstSyncThenGetIsSkippedButPatchIsCalled() {
+        val json = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val firstSyncChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, FirstSync)
+        val afterDedupChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, json, ModifiedSince.Timestamp("2024-01-01"))
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, firstSyncChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, afterDedupChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty())))
+        givenPatchSuccess()
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(patchManager).onPatchError(SyncErrorResponse(DUCK_AI_CHATS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+        // GET should not be called for DUCK_AI_CHATS (does not support GET)
+        verify(syncApiClient, times(0)).get(any(), any())
+        // PATCH should be called for changes after dedup
+        verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
     @Test
-    fun whenNoPatchesThenNormalSyncContinues() {
-        givenNoLocalChanges()
-        givenNoDeletions()
-        givenGetSuccess()
+    fun whenDuckAiChatsAndBookmarksChangesExistThenBothArePatched() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val duckChatJson = """[{"id":"chat1","deleted":"2024-01-01T00:00:00.000Z"}]"""
+        val duckChatChanges = SyncChangesRequest(SyncableType.DUCK_AI_CHATS, duckChatJson, ModifiedSince.Timestamp("2024-01-01"))
+
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        whenever(syncablePersisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
+        whenever(providerPlugins.getPlugins())
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, bookmarksChanges),
+                    FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, duckChatChanges),
+                ),
+            )
+            .thenReturn(
+                listOf(
+                    FakeSyncableDataProvider(BOOKMARKS, SyncChangesRequest.empty()),
+                    FakeSyncableDataProvider(SyncableType.DUCK_AI_CHATS, SyncChangesRequest.empty()),
+                ),
+            )
+        givenPatchSuccess()
 
         syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient, times(0)).patchDeletableEntries(any())
-        verify(syncApiClient).get(any(), any())
+        verify(syncApiClient).patch(bookmarksChanges)
+        verify(syncApiClient).patch(duckChatChanges)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -821,25 +838,25 @@ internal class SyncEngineTest {
     }
 
     private fun givenPatchError() {
-        whenever(syncApiClient.patchData(any())).thenReturn(
+        whenever(syncApiClient.patch(any())).thenReturn(
             Result.Error(TOO_MANY_REQUESTS_1.code, "patch failed"),
         )
     }
 
     private fun givenPatchLimitError() {
-        whenever(syncApiClient.patchData(any())).thenReturn(
+        whenever(syncApiClient.patch(any())).thenReturn(
             Result.Error(API_CODE.COUNT_LIMIT.code, "patch failed"),
         )
     }
 
     private fun givenPatchContentTooLargeError() {
-        whenever(syncApiClient.patchData(any())).thenReturn(
+        whenever(syncApiClient.patch(any())).thenReturn(
             Result.Error(API_CODE.CONTENT_TOO_LARGE.code, "patch failed"),
         )
     }
 
     private fun givenPatchSuccess() {
-        whenever(syncApiClient.patchData(any())).thenReturn(
+        whenever(syncApiClient.patch(any())).thenReturn(
             Success(
                 SyncChangesResponse.empty(BOOKMARKS),
             ),
@@ -948,22 +965,6 @@ internal class SyncEngineTest {
 
     private fun givenNoDeletions() {
         whenever(deletableDataManagerPlugins.getPlugins()).thenReturn(emptyList())
-    }
-
-    private fun givenPendingPatches(type: DeletableType, jsonString: String): SyncPatchRequest {
-        val patchRequest = SyncPatchRequest(type, jsonString)
-        val patchManager = FakePatchableDataManager(type, patchRequest)
-        whenever(patchableDataManagerPlugins.getPlugins()).thenReturn(listOf(patchManager))
-        return patchRequest
-    }
-
-    private fun givenPatchDeletableEntriesSuccess(request: SyncPatchRequest, response: SyncPatchResponse? = null) {
-        val patchResponse = response ?: SyncPatchResponse(request.type, emptyList())
-        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Success(patchResponse))
-    }
-
-    private fun givenPatchDeletableEntriesError(request: SyncPatchRequest, errorCode: Int) {
-        whenever(syncApiClient.patchDeletableEntries(request)).thenReturn(Result.Error(errorCode, "patch failed"))
     }
 
     private fun givenChangesForType(

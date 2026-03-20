@@ -20,7 +20,7 @@ interface DeletableDataManager {
     /**
      * Which deletable data type this deletion is for
      */
-    fun getType(): DeletableType
+    fun getDeletableType(): DeletableType
 
     /**
      * Used by the SyncClient to get all the deletions from each deletable feature
