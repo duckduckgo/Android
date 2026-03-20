@@ -58,7 +58,7 @@ class RealRemoteMessagingConfigProcessor(
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
             val message = remoteMessagingConfigMatcher.evaluate(config)
 
-            remoteMessageImageStore.fetchAndStoreImage(message)
+            remoteMessageImageStore.fetchAndStoreImages(message)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
             remoteMessagingRepository.activeMessage(message)
         } else {
