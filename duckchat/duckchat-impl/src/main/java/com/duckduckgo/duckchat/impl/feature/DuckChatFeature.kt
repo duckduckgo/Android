@@ -169,7 +169,6 @@ interface DuckChatFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun supportsMultipleContexts(): Toggle
 
-
     /**
      * @return `true` when we can sync the deletion of duck chats to sync backend
      * If the remote feature is not present defaults to `true`
