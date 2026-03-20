@@ -56,7 +56,7 @@ sealed class BrowserMenuViewState {
         val canFindInPage: Boolean = true,
         val canChangePrivacyProtection: Boolean = false,
         val isPrivacyProtectionDisabled: Boolean = false,
-        val pageContextHeader: PageContextHeaderState,
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 
     data class NewTabPage(
@@ -71,7 +71,7 @@ sealed class BrowserMenuViewState {
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
-        val pageContextHeader: PageContextHeaderState,
+        val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 }
 
