@@ -60,7 +60,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <com.duckduckgo.app.browser.newtab.hatch.NewTabReturnHatchView
+                <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
                     android:id="@+id/newTabReturnHatchView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

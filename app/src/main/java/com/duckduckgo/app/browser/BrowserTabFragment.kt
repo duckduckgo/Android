@@ -3435,9 +3435,10 @@ class BrowserTabFragment :
                 hideKeyboard()
             }
         }
-        // newTabReturnHatchView.onHatchSelected { tabId ->
-        //     viewModel.closeAndSelectSourceTab()
-        // }
+
+        if (!androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
+            newTabReturnHatchView.gone()
+        }
     }
 
     private fun configureFindInPage() {
