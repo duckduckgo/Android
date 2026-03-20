@@ -167,7 +167,10 @@ class TabDataRepository @Inject constructor(
 
     private fun generateTabId() = UUID.randomUUID().toString()
 
-    private fun buildSiteDataSync(url: String?, tabId: String): MutableLiveData<Site> {
+    private fun buildSiteDataSync(
+        url: String?,
+        tabId: String
+    ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
             val siteMonitor = siteFactory.buildSite(url = it, tabId = tabId)
@@ -176,7 +179,10 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    private suspend fun buildSiteData(url: String?, tabId: String): MutableLiveData<Site> {
+    private suspend fun buildSiteData(
+        url: String?,
+        tabId: String
+    ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url ?: return data
         val siteMonitor = siteFactory.buildSite(url = url, tabId = tabId)
@@ -256,7 +262,10 @@ class TabDataRepository @Inject constructor(
         return tabsDao.tabs().size
     }
 
-    override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
+    override fun countTabsAccessedWithinRange(
+        accessOlderThan: Long,
+        accessNotMoreThan: Long?
+    ): Int {
         val now = timeProvider.localDateTimeNow()
         val start = now.minusDays(accessOlderThan)
         val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive
@@ -295,7 +304,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateTabPosition(from: Int, to: Int) {
+    override suspend fun updateTabPosition(
+        from: Int,
+        to: Int
+    ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateTabsOrder(from, to)
         }
@@ -374,7 +386,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
+    override suspend fun undoDeletable(
+        tabIds: List<String>,
+        moveActiveTabToEnd: Boolean
+    ) {
         databaseExecutor().scheduleDirect {
             tabsDao.undoDeletableTabs(tabIds, moveActiveTabToEnd)
         }
