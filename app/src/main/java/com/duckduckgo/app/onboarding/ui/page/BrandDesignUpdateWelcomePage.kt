@@ -648,6 +648,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = true
                 binding.daxDialogCta.comparisonChartContent.root.alpha = 1f
+                listOf(
+                    binding.daxDialogCta.comparisonChartContent.check1,
+                    binding.daxDialogCta.comparisonChartContent.check2,
+                    binding.daxDialogCta.comparisonChartContent.check3,
+                    binding.daxDialogCta.comparisonChartContent.check4,
+                    binding.daxDialogCta.comparisonChartContent.check5,
+                ).forEach { checkView ->
+                    checkView.alpha = 1f
+                    checkView.scaleX = 1f
+                    checkView.scaleY = 1f
+                }
 
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
