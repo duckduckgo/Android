@@ -448,6 +448,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
                                 )
                                 if (showSecondaryCta) {
+                                    binding.daxDialogCta.secondaryCta.isVisible = true
                                     animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
                                         .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                                 }
@@ -527,6 +528,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 if (onboardingDialogType == INITIAL_REINSTALL_USER) {
+                    binding.daxDialogCta.secondaryCta.isVisible = true
                     binding.daxDialogCta.secondaryCta.alpha = 1f
                 }
             }
