@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarydning</string>
-    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at slette data manuelt eller opsætte automatisk sletning.</string>
+    <string name="dataClearingDescription">Sletning af dine data kan hjælpe med at beskytte dit privatliv online. Brug Fire Button til at slette data manuelt, eller opsæt automatisk sletning.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d websted udelukket fra rydning</item>
         <item quantity="other">%1$d websteder udelukket fra rydning</item>
@@ -291,7 +291,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Slet den ...</string>
+    <string name="settingsAutomaticallyClearWhen">Slet ved ...</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Slet den ...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kun ved app-afslutning</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App-afslutning, inaktiv i 5 sekunder</string>
