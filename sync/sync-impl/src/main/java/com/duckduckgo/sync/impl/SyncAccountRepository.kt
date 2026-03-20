@@ -734,16 +734,19 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
-        runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
-        val result = syncApi.createAccount(
-            account.userId,
-            account.passwordHash,
-            account.protectedSecretKey,
-            deviceId,
-            encryptedDeviceName,
-            encryptedDeviceType,
-        )
-        runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
+        val result = try {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
+            syncApi.createAccount(
+                account.userId,
+                account.passwordHash,
+                account.protectedSecretKey,
+                deviceId,
+                encryptedDeviceName,
+                encryptedDeviceType,
+            )
+        } finally {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
+        }
 
         return when (result) {
             is Error -> {
@@ -752,9 +755,12 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
-                syncEngine.triggerSync(ACCOUNT_CREATION)
-                runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
+                try {
+                    runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
+                    syncEngine.triggerSync(ACCOUNT_CREATION)
+                } finally {
+                    runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
+                }
                 logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)
             }
