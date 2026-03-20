@@ -187,6 +187,67 @@ class BrowserMenuBottomSheetTest {
         assertFalse(dialog.createAliasMenuItem.isVisible)
     }
 
+    @Test
+    fun whenRenderCustomTabsModeThenMenuActionItemsShouldBeUpdated() {
+        val viewState = BrowserMenuViewState.CustomTabs()
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertFalse(dialog.newTabMenuItem.isVisible)
+        assertFalse(dialog.newDuckChatTabMenuItem.isVisible)
+        assertFalse(dialog.newDuckChatMenuItem.isVisible)
+        assertFalse(dialog.settingsMenuItem.isVisible)
+        assertFalse(dialog.refreshMenuItem.isVisible)
+        assertTrue(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.Browser(showDuckChatOption = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertTrue(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAIModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.DuckAi()
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatTabMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertTrue(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.NewTabPage(showDuckChatOption = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertFalse(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
     // region Helpers
 
     private val menuHeader: View

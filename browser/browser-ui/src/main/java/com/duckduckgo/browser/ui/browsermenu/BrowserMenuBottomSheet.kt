@@ -95,6 +95,9 @@ class BrowserMenuBottomSheet(
     val settingsMenuItem: MenuActionButtonView
         get() = binding.settingsMenuItem
 
+    val refreshActionMenuItem: MenuActionButtonView
+        get() = binding.refreshActionMenuItem
+
     val defaultBrowserMenuItem: View
         get() = binding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
 
@@ -188,6 +191,10 @@ class BrowserMenuBottomSheet(
 
     private fun showCommonItems() {
         menuActionItemsContainer.isVisible = true
+        newTabMenuItem.isVisible = true
+        newDuckChatMenuItem.isVisible = true
+        settingsMenuItem.isVisible = true
+        refreshActionMenuItem.isVisible = false
         bookmarksMenuItem.isVisible = true
         downloadsMenuItem.isVisible = true
     }
@@ -302,14 +309,13 @@ class BrowserMenuBottomSheet(
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        newTabMenuItem.isEnabled = false
-        newDuckChatTabMenuItem.isEnabled = false
+        newTabMenuItem.isVisible = false
         newDuckChatTabMenuItem.isVisible = false
-        newDuckChatMenuItem.isEnabled = false
-        newDuckChatMenuItem.isVisible = true
-        settingsMenuItem.isEnabled = false
+        newDuckChatMenuItem.isVisible = false
+        settingsMenuItem.isVisible = false
+        refreshActionMenuItem.isVisible = true
 
-        refreshMenuItem.isVisible = true
+        refreshMenuItem.isVisible = false
         printPageMenuItem.isVisible = true
         sharePageMenuItem.isVisible = viewState.canSharePage
         findInPageMenuItem.isVisible = viewState.canFindInPage

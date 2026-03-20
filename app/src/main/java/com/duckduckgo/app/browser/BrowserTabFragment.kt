@@ -1675,12 +1675,10 @@ class BrowserTabFragment :
                 onForwardArrowClicked()
             }
             onMenuItemClicked(refreshMenuItem) {
-                viewModel.onRefreshRequested(triggeredByUser = true)
-                if (isActiveCustomTab()) {
-                    viewModel.fireCustomTabRefreshPixel()
-                } else {
-                    viewModel.handleMenuRefreshAction()
-                }
+                onRefreshClicked()
+            }
+            onMenuItemClicked(refreshActionMenuItem) {
+                onRefreshClicked()
             }
             onMenuItemClicked(newTabMenuItem) {
                 viewModel.onNewTabMenuItemClicked()
@@ -1795,6 +1793,15 @@ class BrowserTabFragment :
     private fun onBackArrowClicked() {
         pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
         activity?.onBackPressed()
+    }
+
+    private fun onRefreshClicked() {
+        viewModel.onRefreshRequested(triggeredByUser = true)
+        if (isActiveCustomTab()) {
+            viewModel.fireCustomTabRefreshPixel()
+        } else {
+            viewModel.handleMenuRefreshAction()
+        }
     }
 
     private fun launchCustomTabUrlInDdg(url: String) {
