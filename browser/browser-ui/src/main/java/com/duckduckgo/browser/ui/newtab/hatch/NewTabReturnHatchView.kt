@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.newtab.hatch
+package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.content.Context
 import android.util.AttributeSet
@@ -25,8 +25,8 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
