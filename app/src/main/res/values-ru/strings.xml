@@ -228,7 +228,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
     <string name="dataClearingActivityTitle">Очистка данных</string>
-    <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно удалять автоматически или вручную с помощью кнопки Fire Button.</string>
+    <string name="dataClearingDescription">Удаление данных способствует конфиденциальности онлайн. Данные можно стирать автоматически или вручную с помощью кнопки Fire Button.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d сайт исключен из очистки</item>
         <item quantity="few">%1$d сайта исключено из очистки</item>
@@ -277,9 +277,9 @@
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
     <plurals name="singleTabFireDialogSnackbar">
         <item quantity="one">Удалена %1$d вкладка и ее данные</item>
-        <item quantity="few">Удалены %1$d вкладок и их данные</item>
-        <item quantity="many">Удалены %1$d вкладок и их данные</item>
-        <item quantity="other">Удалены %1$d вкладок и их данные</item>
+        <item quantity="few">Удалены %1$d вкладки и их данные</item>
+        <item quantity="many">Удалено %1$d вкладок и их данные</item>
+        <item quantity="other">Удалены вкладки (%1$d) и их данные</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Удалить данные сайта не удалось. Обновите WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Данные сайта не удалось удалить из-за ошибки.</string>
@@ -301,8 +301,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки и данные</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Вкладки, данные и чаты Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Удалить...</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Удалить...</string>
+    <string name="settingsAutomaticallyClearWhen">Когда удалять...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Когда удалять...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Только после выхода из приложения</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">После выхода из приложения, через 5 секунд бездействия</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">После выхода из приложения, через 5 минут бездействия</string>
