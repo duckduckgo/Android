@@ -670,6 +670,14 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenOnFireButtonTappedThenPixelsSent() {
+        testee.onFireButtonTapped()
+
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+        verify(mockPixel).fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY, type = Daily())
+    }
+
+    @Test
     fun whenOnUpButtonPressedCalledThePixelSent() {
         testee.onUpButtonPressed()
 

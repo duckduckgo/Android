@@ -38,6 +38,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -158,7 +159,12 @@ class SingleTabFireDialogViewModel @Inject constructor(
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
+
+            // TODO: call when conditional logic added in the next PR (#8000)
+//            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
+//            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
@@ -201,9 +207,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     shouldRestartAfterClearing = false,
                 )
             }
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
 
             command.send(Command.OnClearStarted)
-            pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
