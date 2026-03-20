@@ -92,8 +92,6 @@ interface TabRepository {
 
     suspend fun deleteTabs(tabIds: List<String>)
 
-    suspend fun replaceTabWithNewTab(tabId: String)
-
     /**
      * Deletes from the DB all tabs that are marked as "deletable"
      */

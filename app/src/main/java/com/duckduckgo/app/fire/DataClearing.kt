@@ -19,6 +19,7 @@
 package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
+import androidx.core.net.toUri
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -27,6 +28,7 @@ import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -61,6 +63,7 @@ class DataClearing @Inject constructor(
     private val dataClearingWideEvent: DataClearingWideEvent,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
     private val navigationHistory: NavigationHistory,
+    private val tabOperations: TabAtomicOperations,
     private val tabRepository: TabRepository,
     private val duckChat: DuckChat,
     private val contextualDataStore: DuckChatContextualDataStore,
@@ -76,10 +79,20 @@ class DataClearing @Inject constructor(
         clearDuckAiChatIfNeeded(tabUrl)
         clearContextualChatDataIfNeeded(tabId)
         navigationHistory.removeHistoryForTab(tabId)
-        tabRepository.replaceTabWithNewTab(tabId)
+
+        val url = getNewTabUrl(tabUrl)
+        tabOperations.replaceTabWithNewTab(tabId, url)
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
+    }
+
+    private fun getNewTabUrl(tabUrl: String?): String? = tabUrl?.toUri()?.let {
+        if (duckChat.isDuckChatUrl(it)) {
+            duckChat.getDuckChatUrl("", autoPrompt = false)
+        } else {
+            null
+        }
     }
 
     private suspend fun clearContextualChatDataIfNeeded(tabId: String) {

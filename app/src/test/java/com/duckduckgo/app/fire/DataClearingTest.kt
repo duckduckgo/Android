@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -43,14 +44,19 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class DataClearingTest {
 
     @get:Rule
@@ -86,6 +92,9 @@ class DataClearingTest {
     private lateinit var mockDuckChat: DuckChat
 
     @Mock
+    private lateinit var mockTabOperations: TabAtomicOperations
+
+    @Mock
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
@@ -111,6 +120,7 @@ class DataClearingTest {
             dataClearingWideEvent = mockDataClearingWideEvent,
             tabVisitedSitesRepository = mockTabVisitedSitesRepository,
             navigationHistory = mockNavigationHistory,
+            tabOperations = mockTabOperations,
             tabRepository = mockTabRepository,
             duckChat = mockDuckChat,
             contextualDataStore = mockContextualDataStore,
@@ -691,7 +701,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).replaceTabWithNewTab("tab1")
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), anyOrNull())
     }
 
     @Test
@@ -700,7 +710,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).replaceTabWithNewTab("tab1")
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), anyOrNull())
     }
 
     @Test
@@ -740,7 +750,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).replaceTabWithNewTab("tab1")
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), anyOrNull())
     }
 
     @Test
@@ -750,7 +760,7 @@ class DataClearingTest {
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockTabRepository).replaceTabWithNewTab("tab1")
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), anyOrNull())
     }
 
     @Test
@@ -855,6 +865,43 @@ class DataClearingTest {
 
         verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=tab-chat")
         verify(mockDuckChat).deleteChat("https://duck.ai/chat?chatID=contextual-456")
+    }
+
+    // --- getNewTabUrl tests (via clearSingleTabData) ---
+
+    @Test
+    fun whenClearSingleTabDataWithDuckChatUrl_thenReplaceTabWithNewDuckChatUrl() = runTest {
+        val duckChatUrl = "https://duck.ai/chat?chatID=abc-123"
+        val freshDuckChatUrl = "https://duck.ai/chat?dprompt=&autoPrompt=false"
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = duckChatUrl, position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.getDuckChatUrl("", autoPrompt = false)).thenReturn(freshDuckChatUrl)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab("tab1", freshDuckChatUrl)
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNonDuckChatUrl_thenReplaceTabWithNullUrl() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), isNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNullUrl_thenReplaceTabWithNullUrl() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), isNull())
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
