@@ -28,6 +28,7 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -92,6 +93,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
+    private var checkIconAnimatorSet: AnimatorSet? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
     private var isAnimating = false
@@ -392,6 +394,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxDelayedRunnable = null
         comparisonChartFadeInAnimatorSet?.cancel()
         comparisonChartFadeInAnimatorSet = null
+        checkIconAnimatorSet?.cancel()
+        checkIconAnimatorSet = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -532,7 +536,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 )
                                 addListener(object : AnimatorListenerAdapter() {
                                     override fun onAnimationEnd(animation: Animator) {
-                                        isAnimating = false
+                                        playCheckIconAnimation()
                                     }
                                 })
                                 start()
@@ -699,6 +703,46 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             .start()
     }
 
+    private fun playCheckIconAnimation() {
+        val overshoot = OvershootInterpolator()
+        val checkViews = listOf(
+            binding.daxDialogCta.comparisonChartContent.check1,
+            binding.daxDialogCta.comparisonChartContent.check2,
+            binding.daxDialogCta.comparisonChartContent.check3,
+            binding.daxDialogCta.comparisonChartContent.check4,
+            binding.daxDialogCta.comparisonChartContent.check5,
+        )
+
+        val iconAnimators = checkViews.mapIndexed { index, checkView ->
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(checkView, View.ALPHA, 0f, 1f).apply {
+                        duration = CHECK_ICON_FADE_DURATION
+                    },
+                    ObjectAnimator.ofFloat(checkView, View.SCALE_X, 0f, 1f).apply {
+                        duration = CHECK_ICON_ANIMATION_DURATION
+                        interpolator = overshoot
+                    },
+                    ObjectAnimator.ofFloat(checkView, View.SCALE_Y, 0f, 1f).apply {
+                        duration = CHECK_ICON_ANIMATION_DURATION
+                        interpolator = overshoot
+                    },
+                )
+                startDelay = index * CHECK_ICON_STAGGER_DELAY
+            }
+        }
+
+        checkIconAnimatorSet = AnimatorSet().apply {
+            playTogether(iconAnimators)
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isAnimating = false
+                }
+            })
+            start()
+        }
+    }
+
     private fun showDefaultBrowserDialog(intent: Intent) {
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
@@ -787,6 +831,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
         private const val TYPING_DELAY_MS = 20L
         private const val TYPING_POST_DELAY_MS = 20L
+
+        private const val CHECK_ICON_ANIMATION_DURATION = 300L
+        private const val CHECK_ICON_FADE_DURATION = 100L
+        private const val CHECK_ICON_STAGGER_DELAY = 100L
 
         private const val WALKING_DAX_DELAY = 400L
         private const val WALKING_DAX_FADE_DURATION = 100L
