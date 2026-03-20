@@ -231,7 +231,7 @@ When defining a wide event, ensure:
 - All latency parameters use bucketed values, not raw milliseconds
 - Custom fields under `feature.data.ext.*` use bounded enums where possible
 - No PII or high-cardinality unbounded strings appear in any field
-- Error fields (`error_message`, `error_domain`, `error_code`) are included when the flow can end with `FAILURE` status
+- Error field `failure_reason` is included when the flow can end with `FAILURE` status
 - Sample rate is documented
 
 ## Expiry Dates
