@@ -191,6 +191,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -638,6 +639,7 @@ class BrowserTabFragment :
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
     private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
     private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
+    private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -4579,6 +4581,7 @@ class BrowserTabFragment :
         widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
+        privacyProSkippedOnboardingBottomSheet?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
         super.onDestroy()
@@ -5206,6 +5209,11 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
+                is DaxBubbleCta.DaxPrivacyProCta -> if (configuration.onboardingSkipped) {
+                    showPrivacyProSkippedOnboardingBottomSheet(configuration)
+                } else {
+                    showDaxOnboardingBubbleCta(configuration)
+                }
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -5239,6 +5247,37 @@ class BrowserTabFragment :
 
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
+        }
+
+        private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: DaxBubbleCta.DaxPrivacyProCta) {
+            if (privacyProSkippedOnboardingBottomSheet?.isShowing == true) return
+
+            privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(
+                context = requireContext(),
+                isFreeTrialCopy = configuration.isFreeTrialCopy,
+            ).also { dialog ->
+                dialog.eventListener = object : PrivacyProSkippedOnboardingBottomSheetDialog.EventListener {
+                    override fun onShown() {
+                        viewModel.onCtaShown()
+                    }
+
+                    override fun onPrimaryButtonClicked() {
+                        dialog.dismiss()
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    }
+
+                    override fun onNotNowButtonClicked() {
+                        dialog.dismiss()
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
+                    }
+
+                    override fun onCanceled() {
+                        dialog.dismiss()
+                        viewModel.onUserClickCtaDismissButton(configuration)
+                    }
+                }
+                dialog.show()
+            }
         }
 
         @SuppressLint("ClickableViewAccessibility")
