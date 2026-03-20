@@ -19,6 +19,7 @@
 package com.duckduckgo.app.fire
 
 import android.annotation.SuppressLint
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -54,9 +55,8 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class DataClearingTest {
 
     @get:Rule
