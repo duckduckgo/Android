@@ -118,7 +118,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
-    <string name="fireClearAll">Tabbladen en gegevens wissen</string>
+    <string name="fireClearAll">Tabbladen en gegevens verwijderen</string>
     <string name="fireClearAllPlusDuckChats">Tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Aan</string>
     <string name="dataClearingAutomaticClearingOff">Uit</string>
     <string name="dataClearingClearBrowsingData">Browsegegevens verwijderen</string>
-    <string name="dataClearingAutomaticDataClearing">Automatische gegevensverwijdering</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Gegevens automatisch wissen</string>
+    <string name="dataClearingAutomaticDataClearing">Gegevens automatisch verwijderen</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Gegevens automatisch verwijderen</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Alle open tabbladen sluiten</string>
     <string name="dataClearingAutomaticDataOptionDescription">Verwijder alle sitegegevens, inclusief bezochte sites. Mogelijk word je uitgelegd bij accounts.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Alle chats verwijderen, inclusief vastgezette chats</string>
@@ -268,8 +268,8 @@
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
     <plurals name="singleTabFireDialogSnackbar">
-        <item quantity="one">%1$d tabblad en bijbehorende gegevens zijn verwijderd</item>
-        <item quantity="other">%1$d tabbladen en bijbehorende gegevens zijn verwijderd</item>
+        <item quantity="one">%1$d tabblad en bijbehorende gegevens verwijderd</item>
+        <item quantity="other">%1$d tabbladen en bijbehorende gegevens verwijderd</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
@@ -291,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabbladen en gegevens</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabbladen, gegevens en Duck.ai-chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Wissen op…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Wissen op…</string>
+    <string name="settingsAutomaticallyClearWhen">Verwijderen op…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Verwijderen op…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Alleen app afsluiten</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App afsluiten, 5 seconden inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App afsluiten, 5 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App afsluiten, 15 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
-    <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
+    <string name="settingsClearAiDataTitle">Duck.ai-chats verwijderen</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
     <string name="settingsClearDataActionSecondaryText">Wist alle tabbladen en gegevens van sites die je niet Fireproof hebt gemaakt.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Sluit alle tabbladen, Duck.ai-chats en wist gegevens van sites die je niet Fireproof hebt gemaakt.</string>
