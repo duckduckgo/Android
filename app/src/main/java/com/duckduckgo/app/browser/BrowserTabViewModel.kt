@@ -3198,7 +3198,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             val contextDaxDialogsShown =
                 withContext(dispatchers.io()) {
-                    ctaViewModel.areBubbleDaxDialogsCompleted() && !ctaViewModel.isPromoOnboardingDialogShowing()
+                    ctaViewModel.areBubbleDaxDialogsCompleted()
                 }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
             ctaViewState.value =
@@ -3261,6 +3261,12 @@ class BrowserTabViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 onBrokenSiteCtaDismissButtonClicked(cta)
             }
+        }
+    }
+
+    fun onPrivacyProSkippedOnboardingDismissed() {
+        if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
+            command.value = LaunchInputScreen
         }
     }
 

@@ -5268,12 +5268,16 @@ class BrowserTabFragment :
 
                     override fun onNotNowButtonClicked() {
                         dialog.dismiss()
+                        showNewTab()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
+                        viewModel.onPrivacyProSkippedOnboardingDismissed()
                     }
 
                     override fun onCanceled() {
                         dialog.dismiss()
+                        showNewTab()
                         viewModel.onUserClickCtaDismissButton(configuration)
+                        viewModel.onPrivacyProSkippedOnboardingDismissed()
                     }
                 }
                 dialog.show()

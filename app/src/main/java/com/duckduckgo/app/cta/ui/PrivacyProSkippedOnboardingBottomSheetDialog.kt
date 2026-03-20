@@ -50,7 +50,7 @@ class PrivacyProSkippedOnboardingBottomSheetDialog(
         this.behavior.isDraggable = false
 
         binding.privacyProSkippedOnboardingTitle.text =
-            getString(context, R.string.defaultBrowserBottomSheetDialogTitle).preventWidows()
+            getString(context, R.string.onboardingSkippedPrivacyProDaxDialogTitle).preventWidows()
         binding.privacyProSkippedOnboardingSubTitle.text =
             getString(context, R.string.onboardingPrivacyProDaxDialogDescription).html(context)
         binding.privacyProSkippedOnboardingPrimaryButton.text =
