@@ -268,6 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">L\'eliminazione dei dati del sito può comportare la disconnessione dagli account.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Questa operazione annullerà i download in corso.</string>
     <string name="singleTabFireDialogSnackbar">1 scheda e i relativi dati eliminati</string>
+    <string name="singleTabFireDialogMultipleTabsSnackbar" instruction="Placeholder is the number of tabs">%1$s schede e i relativi dati sono stati eliminati</string>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Impossibile eliminare i dati del sito. Aggiorna WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">I dati del sito non sono stati eliminati a causa di un errore.</string>
 
@@ -288,7 +289,7 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Schede e dati</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Schede, dati e chat di Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Elimina il giorno…</string>
+    <string name="settingsAutomaticallyClearWhen">Elimina in questa circostanza:</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Elimina il giorno…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Solo in caso di uscita dall\'app</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uscita dall\'app, inattività di 5 secondi</string>
