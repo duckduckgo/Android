@@ -36,8 +36,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,12 +59,16 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockPendingSubscriptionEventStore: PendingSubscriptionEventStore = mock()
+    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        pendingSubscriptionEventStore = mockPendingSubscriptionEventStore,
+        faviconManager = mockFaviconManager,
     )
     private val viewModel =
         object {
@@ -1360,4 +1366,121 @@ class RealDuckChatJSHelperTest {
 
         verify(mockDuckChatPixels, times(1)).reportOpen()
     }
+
+    // region enrichPageContextIfPossible
+
+    @Test
+    fun whenEnrichPageContextWithUrlAndFaviconThenFaviconIsAdded() = runTest {
+        val pageContext = """{"title":"Example","url":"https://example.com"}"""
+        val bitmap = android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.loadFromDisk("tab1", "https://example.com")).thenReturn(bitmap)
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertTrue(json.has("favicon"))
+        val faviconArray = json.getJSONArray("favicon")
+        assertEquals(1, faviconArray.length())
+        assertEquals("icon", faviconArray.getJSONObject(0).getString("rel"))
+        assertTrue(faviconArray.getJSONObject(0).getString("href").startsWith("data:image/png;base64,"))
+    }
+
+    @Test
+    fun whenEnrichPageContextWithUrlButNoFaviconThenNoFaviconAdded() = runTest {
+        val pageContext = """{"title":"Example","url":"https://example.com"}"""
+        whenever(mockFaviconManager.loadFromDisk("tab1", "https://example.com")).thenReturn(null)
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+    }
+
+    @Test
+    fun whenEnrichPageContextWithNoUrlThenFaviconNotLoaded() = runTest {
+        val pageContext = """{"title":"Example"}"""
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+        verify(mockFaviconManager, org.mockito.kotlin.never()).loadFromDisk(org.mockito.kotlin.any(), org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun whenEnrichPageContextWithBlankUrlThenFaviconNotLoaded() = runTest {
+        val pageContext = """{"title":"Example","url":""}"""
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+        verify(mockFaviconManager, org.mockito.kotlin.never()).loadFromDisk(org.mockito.kotlin.any(), org.mockito.kotlin.any())
+    }
+
+    // endregion
+
+    // region storePendingPromptEvent
+
+    @Test
+    fun whenStorePendingPromptEventThenEventIsStoredWithCorrectStructure() {
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+
+        testee.storePendingPromptEvent("hello", listOf(pageContext))
+
+        verify(mockPendingSubscriptionEventStore).store(
+            org.mockito.kotlin.check { event ->
+                assertEquals(DUCK_CHAT_FEATURE_NAME, event.featureName)
+                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
+                assertEquals("android", event.params.getString("platform"))
+                assertEquals("hello", event.params.getJSONObject("query").getString("prompt"))
+                assertTrue(event.params.getJSONObject("query").getBoolean("autoSubmit"))
+                assertEquals("Example", event.params.getJSONObject("pageContext").getString("title"))
+            },
+        )
+    }
+
+    // endregion
+
+    // region consumePendingEventOnHandoff
+
+    @Test
+    fun whenConsumePendingEventOnHandoffWithHandoffMethodThenReturnsEvent() {
+        val event = com.duckduckgo.js.messaging.api.SubscriptionEventData("aiChat", "test", JSONObject())
+        whenever(mockPendingSubscriptionEventStore.consume()).thenReturn(event)
+
+        val result = testee.consumePendingEventOnHandoff("getAIChatNativeHandoffData")
+
+        assertEquals(event, result)
+    }
+
+    @Test
+    fun whenConsumePendingEventOnHandoffWithOtherMethodThenReturnsNull() {
+        val result = testee.consumePendingEventOnHandoff("getAIChatNativeConfigValues")
+
+        assertNull(result)
+        verify(mockPendingSubscriptionEventStore, org.mockito.kotlin.never()).consume()
+    }
+
+    @Test
+    fun whenConsumePendingEventOnHandoffWithNothingStoredThenReturnsNull() {
+        whenever(mockPendingSubscriptionEventStore.consume()).thenReturn(null)
+
+        val result = testee.consumePendingEventOnHandoff("getAIChatNativeHandoffData")
+
+        assertNull(result)
+    }
+
+    // endregion
+
+    // region clearPendingEvent
+
+    @Test
+    fun whenClearPendingEventThenStoreIsCleared() {
+        testee.clearPendingEvent()
+
+        verify(mockPendingSubscriptionEventStore).clear()
+    }
+
+    // endregion
 }

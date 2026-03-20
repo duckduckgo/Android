@@ -100,6 +100,8 @@ class InputScreenViewModelTest {
     private val omnibarRepository: OmnibarRepository = mock()
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val tabRepository: TabRepository = mock()
+    private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
+    private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
 
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
@@ -149,6 +151,8 @@ class InputScreenViewModelTest {
             chatSuggestionsReader = chatSuggestionsReader,
             queryUrlPredictor = queryUrlPredictor,
             tabRepository = tabRepository,
+            tabPageContextRepository = tabPageContextRepository,
+            duckChatJSHelper = duckChatJSHelper,
         )
 
     @Test
@@ -2622,17 +2626,18 @@ class InputScreenViewModelTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun `when chat submitted with attached tabs then query is enriched`() =
+    fun `when chat submitted with attached tabs but no page contexts then falls back to normal submission`() =
         runTest {
             duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
             whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(tabPageContextRepository.getPageContexts(any())).thenReturn(emptyMap())
 
             val viewModel = createViewModel()
             viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
 
             viewModel.onChatSubmitted("hello @Example")
 
-            verify(duckChat).openDuckChatWithAutoPrompt("hello @Example\n\n[Attached tabs: Example (https://example.com)]")
+            verify(duckChat).openDuckChatWithAutoPrompt("hello @Example")
         }
 
     @SuppressLint("DenyListedApi")
@@ -2646,19 +2651,6 @@ class InputScreenViewModelTest {
             viewModel.onChatSubmitted("hello")
 
             verify(duckChat).openDuckChatWithAutoPrompt("hello")
-        }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun `when chat submitted then attached tabs are cleared`() =
-        runTest {
-            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
-
-            val viewModel = createViewModel()
-            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
-            viewModel.onChatSubmitted("hello @Example")
-
-            assertTrue(viewModel.tabAttachmentState.value.attachedTabs.isEmpty())
         }
 
     @SuppressLint("DenyListedApi")

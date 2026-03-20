@@ -16,7 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,6 +38,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -52,6 +55,14 @@ interface DuckChatJSHelper {
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
+
+    suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String
+
+    fun storePendingPromptEvent(prompt: String, pageContexts: List<JSONObject>)
+
+    fun clearPendingEvent()
+
+    fun consumePendingEventOnHandoff(method: String): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -72,6 +83,8 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dataStore: DuckChatDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pendingSubscriptionEventStore: PendingSubscriptionEventStore,
+    private val faviconManager: FaviconManager,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -212,6 +225,67 @@ class RealDuckChatJSHelper @Inject constructor(
             subscriptionName,
             JSONObject(),
         )
+    }
+
+    override suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                val faviconBase64 = favicon.encodeBitmapToBase64()
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+        return json.toString()
+    }
+
+    override fun storePendingPromptEvent(prompt: String, pageContexts: List<JSONObject>) {
+        val params = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", prompt)
+                    put("autoSubmit", true)
+                },
+            )
+            // TODO: Switch to "pageContexts" array once C-S-S and frontend support multiple contexts
+            // put(
+            //     "pageContexts",
+            //     JSONArray().apply {
+            //         pageContexts.forEach { put(it) }
+            //     },
+            // )
+            // Attach first context only for now
+            pageContexts.firstOrNull()?.let { put("pageContext", it) }
+        }
+
+        pendingSubscriptionEventStore.store(
+            SubscriptionEventData(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
+                params = params,
+            ),
+        )
+    }
+
+    override fun clearPendingEvent() {
+        pendingSubscriptionEventStore.clear()
+    }
+
+    override fun consumePendingEventOnHandoff(method: String): SubscriptionEventData? {
+        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
+        return pendingSubscriptionEventStore.consume()
     }
 
     private fun getAIChatNativeHandoffData(
@@ -356,5 +430,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
         private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
+        private const val SUBSCRIPTION_SUBMIT_NATIVE_PROMPT = "submitAIChatNativePrompt"
     }
 }
