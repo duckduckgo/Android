@@ -273,8 +273,8 @@
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
     <plurals name="tabsClearedSnackbarMessage">
         <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
-        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
         <item quantity="few">%1$d file și datele aferente au fost șterse</item>
+        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>

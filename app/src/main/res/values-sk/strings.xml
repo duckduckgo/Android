@@ -276,10 +276,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">Bola odstránená %1$d karta a jej údaje</item>
-        <item quantity="other">Bolo odstránených %1$d kariet a ich údaje</item>
-        <item quantity="few">Bolo odstránených %1$d kariet a ich údaje</item>
-        <item quantity="many">Bolo odstránených %1$d kariet a ich údaje</item>
+        <item quantity="one">%1$d karta a jej údaje boli odstránené</item>
+        <item quantity="few">%1$d karty a ich údaje boli odstránené</item>
+        <item quantity="many">%1$d kariet a ich údaje boli odstránené</item>
+        <item quantity="other">%1$d kariet a ich údaje boli odstránené</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Údaje o stránke sa nepodarilo odstrániť. Aktualizuj WebView.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Údaje o stránke sa nepodarilo odstrániť kvôli chybe.</string>

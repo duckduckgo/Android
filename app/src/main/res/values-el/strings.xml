@@ -268,7 +268,7 @@
     <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">%1$d καρτέλα και τα δεδομένα της διαγράφηκαν</item>
+        <item quantity="one">%1$d καρτέλα και τα δεδομένα τους διαγράφηκαν</item>
         <item quantity="other">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>

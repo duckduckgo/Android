@@ -276,10 +276,10 @@
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
     <plurals name="tabsClearedSnackbarMessage">
-        <item quantity="one">Ištrinta %1$d kortelė ir jos duomenys</item>
-        <item quantity="other">Ištrinta %1$d kortelių ir jų duomenys</item>
-        <item quantity="few">Ištrinta %1$d kortelių ir jų duomenys</item>
-        <item quantity="many">Ištrinta %1$d kortelių ir jų duomenys</item>
+        <item quantity="one">%1$d skirtukas ir jų duomenys ištrinti</item>
+        <item quantity="few">%1$d skirtukai ir jų duomenys ištrinti</item>
+        <item quantity="many">%1$d skirtuko ir jų duomenys ištrinti</item>
+        <item quantity="other">%1$d skirtukų ir jų duomenys ištrinti</item>
     </plurals>
     <string name="singleTabFireDialogClearNotSupportedSnackbar">Nepavyko ištrinti interneto svetainės duomenų. Atnaujink „WebView“.</string>
     <string name="singleTabFireDialogClearErrorSnackbar">Dėl klaidos nepavyko ištrinti interneto svetainės duomenų.</string>
