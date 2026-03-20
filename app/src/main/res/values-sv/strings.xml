@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
-    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställa in automatisk radering.</string>
+    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställ in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webbplats undantas från rensning</item>
         <item quantity="other">%1$d webbplatser undantas från rensning</item>
