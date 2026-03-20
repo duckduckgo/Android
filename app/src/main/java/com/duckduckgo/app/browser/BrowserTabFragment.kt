@@ -192,6 +192,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
+import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -5209,11 +5210,7 @@ class BrowserTabFragment :
         private fun showCta(configuration: Cta) {
             when (configuration) {
                 is HomePanelCta -> showBottomSheetCta(configuration)
-                is DaxBubbleCta.DaxPrivacyProCta -> if (configuration.onboardingSkipped) {
-                    showPrivacyProSkippedOnboardingBottomSheet(configuration)
-                } else {
-                    showDaxOnboardingBubbleCta(configuration)
-                }
+                is SubscriptionPromoModalCta -> showPrivacyProSkippedOnboardingBottomSheet(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -5249,7 +5246,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: DaxBubbleCta.DaxPrivacyProCta) {
+        private fun showPrivacyProSkippedOnboardingBottomSheet(configuration: SubscriptionPromoModalCta) {
             if (privacyProSkippedOnboardingBottomSheet?.isShowing == true) return
 
             privacyProSkippedOnboardingBottomSheet = PrivacyProSkippedOnboardingBottomSheetDialog(

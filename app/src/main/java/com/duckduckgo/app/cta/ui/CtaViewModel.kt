@@ -262,19 +262,12 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxPrivacyProCta(
                     onboardingStore,
                     appInstallStore,
-                    onboardingSkipped = false,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
                 )
             }
 
             // Privacy Pro onboarding for returning users who skipped onboarding
             canShowPrivacyProCtaForSkippedOnboarding() -> {
-                DaxBubbleCta.DaxPrivacyProCta(
-                    onboardingStore,
-                    appInstallStore,
-                    onboardingSkipped = true,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                )
+                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
             // Add Widget

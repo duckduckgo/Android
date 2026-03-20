@@ -810,33 +810,19 @@ sealed class DaxBubbleCta(
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val onboardingSkipped: Boolean,
-        val isFreeTrialCopy: Boolean,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
-        title = if (onboardingSkipped) R.string.onboardingSkippedPrivacyProDaxDialogTitle else R.string.onboardingPrivacyProDaxDialogTitle,
+        title = R.string.onboardingPrivacyProDaxDialogTitle,
         description = R.string.onboardingPrivacyProDaxDialogDescription,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
-        primaryCta = if (isFreeTrialCopy) R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton else R.string.onboardingPrivacyProDaxDialogOkButton,
+        primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    ) {
-        override val markAsReadOnShow: Boolean = false
+    )
 
-        private fun subscriptionOnboardingPixelParams(): Map<String, String> = mapOf(
-            Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam,
-            Pixel.PixelParameter.RU to onboardingSkipped.toString(),
-            Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
-        )
-
-        override fun pixelShownParameters(): Map<String, String> =
-            subscriptionOnboardingPixelParams() + (Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
-
-        override fun pixelOkParameters(): Map<String, String> = subscriptionOnboardingPixelParams()
-    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
@@ -940,6 +926,25 @@ class BrokenSitePromptDialogCta : Cta {
         binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
         onCtaShown()
     }
+}
+
+class SubscriptionPromoModalCta(
+    val isFreeTrialCopy: Boolean,
+) : Cta {
+    override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
+    override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
+    override val okPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+    override val cancelPixel: Pixel.PixelName? = null
+    override val closePixel: Pixel.PixelName? = null
+
+    private fun pixelParams(): Map<String, String> = mapOf(
+        Pixel.PixelParameter.RU to "true",
+        Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
+    )
+
+    override fun pixelShownParameters(): Map<String, String> = pixelParams()
+    override fun pixelOkParameters(): Map<String, String> = pixelParams()
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {
