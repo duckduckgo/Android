@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datenlöschung</string>
-    <string name="dataClearingDescription">Das Löschen deiner Daten kann dazu beitragen, deinen Online-Datenschutz zu verbessern. Verwende den Fire Button, um Daten manuell zu löschen, oder richte eine automatische Datenlöschung ein.</string>
+    <string name="dataClearingDescription">Das Löschen deiner Daten kann dazu beitragen, deinen Online-Datenschutz zu verbessern. Verwende den Fire Button, um Daten manuell zu löschen, oder richte die automatische Löschung ein.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d Website vom Löschen ausgeschlossen</item>
         <item quantity="other">%1$d Websites vom Löschen ausgeschlossen</item>
@@ -234,7 +234,7 @@
     <string name="dataClearingAutomaticClearingOn">Ein</string>
     <string name="dataClearingAutomaticClearingOff">Aus</string>
     <string name="dataClearingClearBrowsingData">Browserdaten löschen</string>
-    <string name="dataClearingAutomaticDataClearing">Automatische Datenlöschung</string>
+    <string name="dataClearingAutomaticDataClearing">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Daten automatisch löschen</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Alle offenen Tabs schließen</string>
     <string name="dataClearingAutomaticDataOptionDescription">Löschen aller Websitedaten, einschließlich der besuchten Seiten; du wirst möglicherweise von Konten abgemeldet.</string>
@@ -258,6 +258,22 @@
         <item quantity="other">Von %1$d Websites löschen. Du wirst möglicherweise von Konten abgemeldet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabs und Seitendaten löschen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabs, Seitendaten und Chats löschen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alle löschen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Diesen Tab löschen</string>
+    <string name="singleTabFireDialogDeleteThisChat">Diesen Chat löschen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Mit „Alle löschen“ wird dein Duck.ai-Chatverlauf nicht gelöscht.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d Tab und dessen Daten gelöscht</item>
+        <item quantity="other">%1$d Tabs und deren Daten gelöscht</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Websitedaten konnten nicht gelöscht werden. Bitte aktualisiere WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Die Websitedaten konnten aufgrund eines Fehlers nicht gelöscht werden.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Berechtigungen</string>
 
@@ -275,8 +291,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, Daten und Duck.ai-Chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Löschen …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
+    <string name="settingsAutomaticallyClearWhen">Löschen am …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen am …</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>
