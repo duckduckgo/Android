@@ -38,7 +38,6 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -83,7 +82,6 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     }
 
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
-        logcat { "Hatch: render $state" }
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.tabTitle
             binding.returnHatchSiteURL.text = state.url.extractDomain()
