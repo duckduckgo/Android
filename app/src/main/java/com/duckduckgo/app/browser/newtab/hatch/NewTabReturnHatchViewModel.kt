@@ -18,37 +18,26 @@ package com.duckduckgo.app.browser.newtab.hatch
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.tabs.TabManager.TabModel
-import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class NewTabReturnHatchViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -56,55 +45,30 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val url: String = "",
         val tabId: String = "",
         val currentTabId: String = "",
-        val shouldShow: Boolean = false
+        val shouldShow: Boolean = false,
     )
 
-    val tabsFlow: Flow<List<TabEntity>> = tabRepository.flowTabs
-        .distinctUntilChanged()
-
-    private val _viewState = MutableStateFlow(ViewState())
-
-    val viewState = combine(
-        _viewState,
-        tabsFlow,
-    ) { state, tabs ->
-        val lastTab = tabs.first()
-        state.copy(
-            tabTitle = lastTab.title ?: "Title", url = lastTab.url ?: "url.com",
-            tabId = lastTab.tabId,
-            currentTabId = lastTab.tabId,
-            shouldShow = true,
-        )
-
-    }.flowOn(dispatchers.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
-
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
-
-        viewModelScope.launch(dispatchers.io()) {
-            val lastTab = tabRepository.getSelectedTab()
-            val tabs = tabRepository.getTabs().toString()
-            logcat { "Hatch: tabs $tabs" }
-            if (lastTab != null) {
-                if (lastTab.url != null && lastTab.title != null) {
-                    _viewState.value = ViewState(
-                        tabTitle = lastTab.title!!, url = lastTab.url!!,
-                        tabId = lastTab.tabId,
-                        currentTabId = lastTab.tabId,
-                        shouldShow = true,
-                    )
-                } else {
-                    _viewState.value = ViewState(shouldShow = false)
-                }
+    val viewState = tabRepository.flowLastAccessedTab
+        .map { lastTab ->
+            val featureEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()
+            if (featureEnabled && lastTab != null) {
+                ViewState(
+                    tabTitle = lastTab.title.orEmpty(),
+                    url = lastTab.url.orEmpty(),
+                    tabId = lastTab.tabId,
+                    currentTabId = lastTab.tabId,
+                    shouldShow = true,
+                )
             } else {
-                _viewState.value = ViewState(shouldShow = false)
+                ViewState(shouldShow = false)
             }
         }
-    }
+        .flowOn(dispatchers.io())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ViewState())
 
     fun onHatchPressed() {
         viewModelScope.launch(dispatchers.io()) {
-            tabRepository.select(_viewState.value.currentTabId)
+            tabRepository.select(viewState.value.currentTabId)
         }
     }
 }

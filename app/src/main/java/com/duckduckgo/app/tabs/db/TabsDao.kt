@@ -236,6 +236,12 @@ abstract class TabsDao {
         return tabs().lastOrNull()
     }
 
+    @Query("select * from tabs where deletable is 0 and lastAccessTime is not null and url is not null and title is not null order by lastAccessTime desc limit 1")
+    abstract fun lastAccessedTab(): TabEntity?
+
+    @Query("select * from tabs where deletable is 0 and lastAccessTime is not null and url is not null and title is not null order by lastAccessTime desc limit 1")
+    abstract fun flowLastAccessedTab(): Flow<TabEntity?>
+
     @Query("update tabs set lastAccessTime=:lastAccessTime where tabId=:tabId")
     abstract fun updateTabLastAccess(
         tabId: String,
