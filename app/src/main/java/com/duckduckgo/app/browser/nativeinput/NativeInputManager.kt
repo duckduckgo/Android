@@ -196,7 +196,11 @@ class RealNativeInputManager @Inject constructor(
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
-            widgetFrom(widgetView)?.text = prefillText
+            callbacks.onClearAutocomplete()
+            widgetFrom(widgetView)?.apply {
+                text = prefillText
+                selectAllText()
+            }
         }
         attachWidget(widgetView)
         if (!omnibarController.isDuckAiMode()) {
