@@ -19,9 +19,12 @@ package com.duckduckgo.remote.messaging.impl.store
 import android.content.Context
 import com.bumptech.glide.Glide
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.Surface
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.io.File
@@ -31,8 +34,9 @@ interface RemoteMessageImageStore {
     /**
      * Fetches and stores the image associated with the provided [message].
      * Stores one image per surface specified in the message.
+     * For CardsList messages, also fetches and caches per-item images.
      */
-    suspend fun fetchAndStoreImage(message: RemoteMessage?)
+    suspend fun fetchAndStoreImages(message: RemoteMessage?)
 
     /**
      * Returns the local file where the image for the active message and surface is stored.
@@ -44,6 +48,11 @@ interface RemoteMessageImageStore {
      * Clears the stored image file for the specified surface.
      */
     suspend fun clearStoredImageFile(surface: Surface)
+
+    /**
+     * Returns the local file path for a card item image, or null if it doesn't exist.
+     */
+    suspend fun getCardItemImageFilePath(itemId: String): String?
 }
 
 class GlideRemoteMessageImageStore(
@@ -51,39 +60,22 @@ class GlideRemoteMessageImageStore(
     private val dispatcherProvider: DispatcherProvider,
 ) : RemoteMessageImageStore {
 
-    override suspend fun fetchAndStoreImage(message: RemoteMessage?) {
+    override suspend fun fetchAndStoreImages(message: RemoteMessage?) {
         val imageUrl = message?.content?.getImageUrl()
 
         message?.surfaces?.forEach { surface ->
             deleteStoredImage(surface)
         }
 
-        if (imageUrl.isNullOrEmpty()) {
-            logcat { "RMF: No image URL to prefetch for message: ${message?.id}" }
-            return
-        }
-
-        withContext(dispatcherProvider.io()) {
-            // Store one image per surface
-            message.surfaces.forEach { surface ->
-                runCatching {
-                    logcat { "RMF: Prefetching image: $imageUrl for message: ${message.id} surface: ${surface.jsonValue}" }
-
-                    val downloadedFile = Glide.with(context)
-                        .asFile()
-                        .load(imageUrl)
-                        .submit()
-                        .get()
-
-                    val permanentFile = getImageFile(surface)
-                    downloadedFile.copyTo(permanentFile, overwrite = true)
-
-                    logcat { "RMF: Successfully saved image to permanent storage: ${permanentFile.absolutePath}" }
-                }.onFailure { error ->
-                    logcat { "RMF: Failed to prefetch image $imageUrl for surface ${surface.jsonValue}: ${error.message}" }
+        if (!imageUrl.isNullOrEmpty()) {
+            withContext(dispatcherProvider.io()) {
+                message.surfaces.forEach { surface ->
+                    downloadImageToFile(imageUrl, getImageFile(surface))
                 }
             }
         }
+
+        fetchAndStoreCardItemImages(message)
     }
 
     override suspend fun getLocalImageFilePath(surface: Surface): String? {
@@ -117,6 +109,67 @@ class GlideRemoteMessageImageStore(
         return File(context.filesDir, fileName)
     }
 
+    override suspend fun getCardItemImageFilePath(itemId: String): String? {
+        return withContext(dispatcherProvider.io()) {
+            val file = getCardItemImageFile(itemId)
+            if (file.exists()) file.absolutePath else null
+        }
+    }
+
+    private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
+        val cardsList = message?.content as? Content.CardsList ?: return
+
+        clearAllCardItemImages()
+        val itemsWithImages = cardsList.listItems
+            .filterIsInstance<CardItem.ListItem>()
+            .filter { !it.imageUrl.isNullOrEmpty() }
+
+        if (itemsWithImages.isEmpty()) return
+
+        withContext(dispatcherProvider.io()) {
+            itemsWithImages.map { item ->
+                async {
+                    val targetFile = getCardItemImageFile(item.id)
+                    targetFile.parentFile?.mkdirs()
+                    downloadImageToFile(item.imageUrl.orEmpty(), targetFile)
+                }
+            }.awaitAll()
+        }
+    }
+
+    private suspend fun clearAllCardItemImages() {
+        withContext(dispatcherProvider.io()) {
+            runCatching {
+                val dir = File(context.filesDir, CARD_ITEM_IMAGES_DIR)
+                if (dir.exists()) {
+                    logcat { "RMF: Clearing all card item images" }
+                    dir.deleteRecursively()
+                }
+            }.onFailure {
+                logcat { "RMF: Failed to clear card item images: ${it.message}" }
+            }
+        }
+    }
+
+    private fun downloadImageToFile(imageUrl: String, targetFile: File) {
+        runCatching {
+            logcat { "RMF: Prefetching image: $imageUrl -> ${targetFile.name}" }
+            val downloadedFile = Glide.with(context)
+                .asFile()
+                .load(imageUrl)
+                .submit()
+                .get()
+            downloadedFile.copyTo(targetFile, overwrite = true)
+            logcat { "RMF: Successfully saved image: ${targetFile.absolutePath}" }
+        }.onFailure { error ->
+            logcat { "RMF: Failed to prefetch image $imageUrl: ${error.message}" }
+        }
+    }
+
+    private fun getCardItemImageFile(itemId: String): File {
+        return File(context.filesDir, "$CARD_ITEM_IMAGES_DIR/$itemId.png")
+    }
+
     private fun Content.getImageUrl(): String? {
         return when (this) {
             is Content.Small -> null
@@ -130,5 +183,6 @@ class GlideRemoteMessageImageStore(
 
     companion object {
         private const val REMOTE_IMAGE_FILE_PREFIX = "active_message_remote_image"
+        private const val CARD_ITEM_IMAGES_DIR = "rmf_card_item_images"
     }
 }
