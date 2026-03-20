@@ -220,7 +220,7 @@ class DuckChatSyncDataManagerTest {
     @Test
     fun whenOnPatchErrorThenPendingQueueIsKept() = runTest {
         val error = SyncErrorResponse(
-            type = DeletableType.DUCK_AI_CHATS,
+            type = SyncableType.DUCK_AI_CHATS,
             featureSyncError = FeatureSyncError.INVALID_REQUEST,
         )
 
