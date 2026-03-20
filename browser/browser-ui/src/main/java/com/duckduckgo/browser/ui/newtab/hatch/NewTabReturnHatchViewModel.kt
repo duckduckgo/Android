@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.newtab.hatch
+package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -37,7 +36,6 @@ import javax.inject.Inject
 class NewTabReturnHatchViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -50,8 +48,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
 
     val viewState = tabRepository.flowLastAccessedTab
         .map { lastTab ->
-            val featureEnabled = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()
-            if (featureEnabled && lastTab != null) {
+            if (lastTab != null) {
                 ViewState(
                     tabTitle = lastTab.title.orEmpty(),
                     url = lastTab.url.orEmpty(),
