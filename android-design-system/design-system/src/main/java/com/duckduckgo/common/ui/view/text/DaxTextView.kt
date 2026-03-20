@@ -100,8 +100,8 @@ constructor(
         Button,
         Caption,
         CaptionAllCaps,
-        Title_Onboarding,
-        Body_Onboarding,
+        TitleOnboarding,
+        BodyOnboarding,
         ;
 
         companion object {
@@ -122,8 +122,8 @@ constructor(
                     11 -> Button
                     12 -> Caption
                     13 -> CaptionAllCaps
-                    14 -> Title_Onboarding
-                    15 -> Body_Onboarding
+                    14 -> TitleOnboarding
+                    15 -> BodyOnboarding
                     else -> Body1
                 }
             }
@@ -144,8 +144,8 @@ constructor(
                     Button -> R.style.Typography_DuckDuckGo_Button
                     Caption -> R.style.Typography_DuckDuckGo_Caption
                     CaptionAllCaps -> R.style.Typography_DuckDuckGo_Caption_AllCaps
-                    Title_Onboarding -> R.style.Typography_DuckDuckGo_Onboarding_Title
-                    Body_Onboarding -> R.style.Typography_DuckDuckGo_Onboarding_Body
+                    TitleOnboarding -> R.style.Typography_DuckDuckGo_Onboarding_Title
+                    BodyOnboarding -> R.style.Typography_DuckDuckGo_Onboarding_Body
                 }
             }
         }
