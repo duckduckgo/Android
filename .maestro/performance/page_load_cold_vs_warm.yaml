@@ -1,0 +1,68 @@
+appId: com.duckduckgo.mobile.android
+name: "Benchmark: Page load cold vs warm"
+tags:
+  - benchmark
+---
+# For each website in the list, performs a paired measurement:
+#   1. Cold load — full state/cache clear, fresh app launch, no HTTP cache.
+#   2. Warm loads (×warmIterations) — immediate relaunches of the same session; HTTP cache
+#      populated by the preceding cold load.
+
+- runScript: steps/init_websites.js
+
+- repeat:
+    while:
+      true: ${output.websites.counter < output.websites.urls.length}
+    commands:
+      # ── Cold load ────────────────────────────────────────────────────────
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - extendedWaitUntil:
+          visible: "Search"
+          timeout: 5000
+
+      - tapOn:
+          id: "omnibarTextInput"
+
+      - inputText: "${output.websites.urls[output.websites.counter]}"
+      - pressKey: Enter
+
+      - extendedWaitUntil:
+          notVisible:
+            id: pageLoadingIndicator
+          timeout: 30000
+          optional: true
+
+      - stopApp
+
+      # ── Warm loads ──────────────────────────────────────────────────────
+      # Relaunched multiple times without clearing state: onboarding is already
+      # done and the HTTP cache is populated from the cold load above.
+      - evalScript: ${output.websites.iterationCounter = 0}
+      - repeat:
+          while:
+            true: ${output.websites.iterationCounter < output.websites.warmIterations}
+          commands:
+            - launchApp:
+                stopApp: true
+
+            - tapOn:
+                id: "omnibarTextInput"
+
+            - inputText: "${output.websites.urls[output.websites.counter]}"
+            - pressKey: Enter
+
+            - extendedWaitUntil:
+                notVisible:
+                  id: pageLoadingIndicator
+                timeout: 30000
+                optional: true
+
+            - stopApp
+            - evalScript: ${output.websites.iterationCounter++}
+
+      - evalScript: ${output.websites.counter++}
