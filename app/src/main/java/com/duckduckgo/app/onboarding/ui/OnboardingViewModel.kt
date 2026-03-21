@@ -24,6 +24,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.*
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel.ExtendedOnboardingFlow.DEFAULT
@@ -45,6 +46,7 @@ class OnboardingViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager,
     private val dismissedCtaDao: DismissedCtaDao,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -72,19 +74,18 @@ class OnboardingViewModel @Inject constructor(
                     // no-op
                 }
                 DUCK_AI_FOCUSED -> {
-                    val ctaIdsToDismiss = listOf(
+                    // Mark this as a duck.ai onboarding path so CtaViewModel shows duck.ai-specific CTAs
+                    onboardingStore.setDuckAiOnboardingFlow()
+
+                    // Silence all standard DAX CTAs so they don't appear in the browser
+                    listOf(
                         CtaId.DAX_INTRO,
                         CtaId.DAX_DIALOG_SERP,
                         CtaId.DAX_DIALOG_TRACKERS_FOUND,
                         CtaId.DAX_FIRE_BUTTON,
                         CtaId.DAX_END,
                         CtaId.DAX_INTRO_PRIVACY_PRO,
-                    )
-
-                    ctaIdsToDismiss.forEach {
-                        dismissedCtaDao.insert(DismissedCta(it))
-                    }
-                    userStageStore.stageCompleted(AppStage.ESTABLISHED)
+                    ).forEach { dismissedCtaDao.insert(DismissedCta(it)) }
                 }
                 DEFAULT_WITHOUT_INTRO_CTA -> {
                     dismissedCtaDao.insert(DismissedCta(CtaId.DAX_INTRO))
