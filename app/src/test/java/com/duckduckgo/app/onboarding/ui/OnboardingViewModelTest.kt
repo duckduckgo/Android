@@ -21,6 +21,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -57,6 +58,8 @@ class OnboardingViewModelTest {
 
     private val dismissedCtaDao: DismissedCtaDao = mock()
 
+    private val onboardingStore: OnboardingStore = mock()
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -66,6 +69,7 @@ class OnboardingViewModelTest {
             appBuildConfig = appBuildConfig,
             newAddressBarOptionManager = newAddressBarOptionManager,
             dismissedCtaDao = dismissedCtaDao,
+            onboardingStore = onboardingStore,
         )
     }
 

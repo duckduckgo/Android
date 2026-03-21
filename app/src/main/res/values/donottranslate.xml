@@ -112,6 +112,13 @@
     <string name="preOnboardingInputModeDemoChatSuggestion3">Surprise me!</string>
     <string name="preOnboardingInputModeDemoChatSuggestion3Prompt">What are 10 fascinating facts across science, nature, and history?</string>
 
+    <!-- Duck.ai onboarding CTAs (do not translate) -->
+    <string name="onboardingDuckAiFireButtonDaxDialogTitle">And that\'s Duck.ai!</string>
+    <string name="onboardingDuckAiFireButtonDaxDialogDescription"><![CDATA[Private AI chats you can delete anytime with the <b>Fire Button</b>.<br/><br/>Give it a try! 🔥]]></string>
+    <string name="onboardingDuckAiEndDaxDialogTitle">You\'ve got this!</string>
+    <string name="onboardingDuckAiEndDaxDialogDescription"><![CDATA[Use the address bar to search and visit sites or toggle to Duck.ai for private AI chat.<br/><br/>You can use Duck.ai from anywhere you see the chat icon]]></string>
+    <string name="onboardingDuckAiEndDaxDialogButton">Got it!</string>
+
     <!-- Default browser changed survey -->
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>

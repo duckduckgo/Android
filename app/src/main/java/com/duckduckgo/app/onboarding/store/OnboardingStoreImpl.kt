@@ -213,10 +213,19 @@ class OnboardingStoreImpl @Inject constructor(
         preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, true) }
     }
 
+    override fun setDuckAiOnboardingFlow() {
+        preferences.edit { putBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, true) }
+    }
+
+    override fun isDuckAiOnboardingFlow(): Boolean {
+        return preferences.getBoolean(KEY_DUCK_AI_ONBOARDING_FLOW, false)
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
         private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
         private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
+        private const val KEY_DUCK_AI_ONBOARDING_FLOW = "duckAiOnboardingFlow"
     }
 }

@@ -538,6 +538,43 @@ sealed class OnboardingDaxDialogCta(
         }
     }
 
+    class DaxDuckAiFireButtonCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_DUCK_AI_FIRE_BUTTON,
+        R.string.onboardingDuckAiFireButtonDaxDialogDescription,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_DISMISS_BUTTON,
+        "duck_ai_fire_button_cta",
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onSecondaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onDismissCtaClicked: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxTitle = context.getString(R.string.onboardingDuckAiFireButtonDaxDialogTitle),
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                primaryCtaText = null,
+                binding = binding,
+                onPrimaryCtaClicked = onPrimaryCtaClicked,
+                onSecondaryCtaClicked = onSecondaryCtaClicked,
+                onTypingAnimationFinished = onTypingAnimationFinished,
+                onDismissCtaClicked = onDismissCtaClicked,
+            )
+        }
+    }
+
     companion object {
         const val SERP = "duckduckgo"
         val mainTrackerNetworks = listOf("Facebook", "Google")
@@ -1075,6 +1112,21 @@ sealed class DaxBubbleCta(
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore,
+    )
+
+    data class DaxDuckAiEndCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : DaxBubbleCta(
+        ctaId = CtaId.DAX_DUCK_AI_END,
+        title = R.string.onboardingDuckAiEndDaxDialogTitle,
+        description = R.string.onboardingDuckAiEndDaxDialogDescription,
+        primaryCta = R.string.onboardingDuckAiEndDaxDialogButton,
+        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        ctaPixelParam = "duck_ai_end_cta",
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
     )
