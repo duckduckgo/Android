@@ -75,6 +75,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerOrigin.SERP_AUTO
@@ -91,7 +92,9 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.net.HttpURLConnection
 import java.net.URI
+import java.net.URL
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -135,6 +138,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
+    private val appBuildConfig: AppBuildConfig,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -668,8 +672,56 @@ class BrowserWebViewClient @Inject constructor(
                 webView,
                 documentUrl?.toUri(),
                 webViewClientListener,
-            )
+            ) ?: stripCspForDebug(request)
         }
+
+    /**
+     * Debug-only: strips Content-Security-Policy from duck.ai main frame responses so that
+     * JS fetch() calls to http://127.0.0.1:N (the native local server) are not blocked.
+     * Returns null (normal loading) in release builds or for non-duck.ai requests.
+     * The production fix is a frontend CSP update.
+     */
+    private fun stripCspForDebug(request: WebResourceRequest): WebResourceResponse? {
+        if (!appBuildConfig.isDebug) return null
+        if (!request.isForMainFrame) return null
+        val host = request.url.host ?: return null
+        if (!host.endsWith("duck.ai")) return null
+
+        return runCatching {
+            val connection = (URL(request.url.toString()).openConnection() as HttpURLConnection).apply {
+                instanceFollowRedirects = false
+                val skipHeaders = setOf("host", "content-length", "transfer-encoding", "accept-encoding")
+                request.requestHeaders.forEach { (k, v) ->
+                    if (k.lowercase() !in skipHeaders) setRequestProperty(k, v)
+                }
+                setRequestProperty("Accept-Encoding", "identity")
+                android.webkit.CookieManager.getInstance().getCookie(request.url.toString())
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { setRequestProperty("Cookie", it) }
+            }
+            connection.connect()
+
+            connection.headerFields["Set-Cookie"]?.forEach { cookie ->
+                android.webkit.CookieManager.getInstance().setCookie(request.url.toString(), cookie)
+            }
+
+            val headers = mutableMapOf<String, String>()
+            connection.headerFields.forEach { (key, values) ->
+                if (key != null && !key.equals("Content-Security-Policy", ignoreCase = true)) {
+                    headers[key] = values.joinToString(", ")
+                }
+            }
+
+            val mimeType = connection.contentType?.substringBefore(";")?.trim() ?: "text/html"
+            val body = connection.inputStream.readBytes().toString(Charsets.UTF_8)
+            val strippedBody = body.replace(CSP_META_REGEX, "")
+            logcat { "CSP stripped for ${request.url} (metaFound=${body.length != strippedBody.length})" }
+            WebResourceResponse(mimeType, "utf-8", connection.responseCode, connection.responseMessage ?: "OK", headers, strippedBody.toByteArray(Charsets.UTF_8).inputStream())
+        }.getOrElse {
+            logcat(WARN) { "CSP strip failed for ${request.url}: ${it.message}" }
+            null
+        }
+    }
 
     override fun onRenderProcessGone(
         view: WebView?,
@@ -916,6 +968,11 @@ class BrowserWebViewClient @Inject constructor(
         // dedicated scope for request count timeout jobs (static, to be shared across all instances)
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        private val CSP_META_REGEX = Regex(
+            """<meta\b[^>]*\bhttp-equiv\s*=\s*["']Content-Security-Policy["'][^>]*/?>""",
+            RegexOption.IGNORE_CASE,
+        )
     }
 }
 
