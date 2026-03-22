@@ -203,10 +203,11 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
         detectedRefreshPatterns: Set<RefreshPattern>,
+        suppressDuckAiOnboardingCta: Boolean = false,
     ): Cta? {
         return withContext(dispatcher) {
             if (isBrowserShowing) {
-                getBrowserCta(site, detectedRefreshPatterns)
+                getBrowserCta(site, detectedRefreshPatterns, suppressDuckAiOnboardingCta)
             } else {
                 getHomeCta()
             }
@@ -330,7 +331,7 @@ class CtaViewModel @Inject constructor(
         extendedOnboardingFeatureToggles.freeTrialCopy().isEnabled() && subscriptions.isFreeTrialEligible()
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {
+    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>, suppressDuckAiOnboardingCta: Boolean): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -345,7 +346,7 @@ class CtaViewModel @Inject constructor(
 
             // Duck.ai-focused onboarding CTAs
             if (duckChat.isDuckChatUrl(it.url.toUri())) {
-                if (onboardingStore.isDuckAiOnboardingFlow()) {
+                if (onboardingStore.isDuckAiOnboardingFlow() && !suppressDuckAiOnboardingCta) {
                     if (!duckAiFireButtonShown()) {
                         return OnboardingDaxDialogCta.DaxDuckAiFireButtonCta(onboardingStore, appInstallStore)
                     }
