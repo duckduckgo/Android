@@ -823,7 +823,6 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
-
     data class DaxDialogIntroOption(
         val optionText: String,
         @DrawableRes val iconRes: Int,
