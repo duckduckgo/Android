@@ -560,6 +560,7 @@ class BrowserTabViewModel @Inject constructor(
     private var returnedHomeAfterSiteLoaded = false
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
+    private var suppressDuckAiOnboardingCta = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -1871,6 +1872,12 @@ class BrowserTabViewModel @Inject constructor(
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title, urlUnchangedForExternalLaunchPurposes(site?.url, url))
         setAdClickActiveTabData(url)
+
+        val uri = site?.uri
+        if (uri != null && duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("flow") == "mobile-app-onboarding") {
+            // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
+            suppressDuckAiOnboardingCta = true
+        }
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value =
@@ -3285,6 +3292,7 @@ class BrowserTabViewModel @Inject constructor(
                         isBrowserShowing && !isErrorShowing,
                         siteLiveData.value,
                         detectedRefreshPatterns,
+                        suppressDuckAiOnboardingCta,
                     )
                 }
             val contextDaxDialogsShown =
@@ -4336,6 +4344,10 @@ class BrowserTabViewModel @Inject constructor(
                     withContext(dispatchers.main()) {
                         response?.let {
                             command.value = SendResponseToJs(it)
+                        }
+                        if (method == "responseReceived") {
+                            suppressDuckAiOnboardingCta = false
+                            refreshCta()
                         }
                     }
                     duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
