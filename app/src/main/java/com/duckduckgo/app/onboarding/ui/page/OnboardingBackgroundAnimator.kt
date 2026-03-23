@@ -44,6 +44,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_welcome_screen_background,
         maxHeightDp = 404,
     )
+    data object ComparisonChart : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_browser_comparison_background,
+        maxHeightDp = 216,
+    )
 }
 
 /**
