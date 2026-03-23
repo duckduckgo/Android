@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/daxCtaContainer"
@@ -22,7 +22,6 @@
     android:alpha="0"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="vertical"
     android:visibility="invisible"
     tools:alpha="1"
     tools:visibility="visible">
@@ -86,4 +85,17 @@
         </LinearLayout>
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
 
-</LinearLayout>
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
+        android:id="@+id/stepIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="58dp"
+        android:alpha="0"
+        android:translationZ="8dp"
+        android:visibility="gone"
+        tools:alpha="1"
+        tools:visibility="visible" />
+
+</FrameLayout>
