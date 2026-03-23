@@ -184,6 +184,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
 
@@ -212,6 +213,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>
