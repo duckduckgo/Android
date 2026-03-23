@@ -93,7 +93,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
-    private var checkIconAnimatorSet: AnimatorSet? = null
+    private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
     private var isAnimating = false
@@ -394,8 +394,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxDelayedRunnable = null
         comparisonChartFadeInAnimatorSet?.cancel()
         comparisonChartFadeInAnimatorSet = null
-        checkIconAnimatorSet?.cancel()
-        checkIconAnimatorSet = null
+        comparisonChartDetailAnimatorSet?.cancel()
+        comparisonChartDetailAnimatorSet = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -543,6 +543,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             }
                         }
                     })
+                    binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
+                    binding.daxDialogCta.stepIndicator.isVisible = true
+                    binding.daxDialogCta.stepIndicator.alpha = 0f
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
 
                     binding.welcomeScreenWalkingDax.isVisible = false
@@ -660,6 +663,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     checkView.scaleY = 1f
                 }
 
+                binding.daxDialogCta.stepIndicator.isVisible = true
+                binding.daxDialogCta.stepIndicator.alpha = 1f
+                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -743,8 +749,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
         }
 
-        checkIconAnimatorSet = AnimatorSet().apply {
-            playTogether(iconAnimators)
+        val stepIndicatorFadeIn = ObjectAnimator.ofFloat(binding.daxDialogCta.stepIndicator, View.ALPHA, 0f, 1f).apply {
+            duration = DIALOG_CONTENT_FADE_IN_DURATION
+        }
+
+        comparisonChartDetailAnimatorSet = AnimatorSet().apply {
+            playTogether(iconAnimators + stepIndicatorFadeIn)
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     isAnimating = false
