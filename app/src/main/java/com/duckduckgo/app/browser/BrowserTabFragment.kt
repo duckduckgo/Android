@@ -255,6 +255,7 @@ import com.duckduckgo.browser.ui.autocomplete.BrowserAutoCompleteSuggestionsAdap
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.BrowserPopupMenu
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -3441,9 +3442,14 @@ class BrowserTabFragment :
             newTabReturnHatchView.gone()
         }
 
-        newTabReturnHatchView.setOnClickListener {
-            browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
-        }
+        newTabReturnHatchView.setHatchPressedListener(
+            object : NewTabReturnHatchView.ItemPressedListener {
+                override fun onHatchPressed() {
+                    logcat { "Hatch: inputScreenHatch.setOnClickListener" }
+                    browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
+                }
+            },
+        )
     }
 
     private fun configureFindInPage() {

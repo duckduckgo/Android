@@ -47,6 +47,10 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
 
+    interface ItemPressedListener {
+        fun onHatchPressed()
+    }
+
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
 
@@ -56,6 +60,8 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
     private val conflatedJob = ConflatedJob()
+
+    private var hatchItemPressedListener: ItemPressedListener? = null
 
     private val viewModel: NewTabReturnHatchViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabReturnHatchViewModel::class.java]
@@ -70,10 +76,6 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         conflatedJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
-        binding.returnHatchRoot.setOnClickListener {
-            callOnClick()
-        }
     }
 
     val tabId: String
@@ -89,6 +91,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             }
         } else {
             binding.returnHatchRoot.gone()
+        }
+    }
+
+    fun setHatchPressedListener(itemPressedListener: ItemPressedListener) {
+        hatchItemPressedListener = itemPressedListener
+        binding.returnHatchRoot.setOnClickListener {
+            hatchItemPressedListener?.onHatchPressed()
         }
     }
 }
