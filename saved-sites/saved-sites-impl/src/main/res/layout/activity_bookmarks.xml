@@ -80,6 +80,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/bookmarksSearchMenuContentDescription"
                             android:src="@drawable/ic_find_search_24" />
                     </FrameLayout>
 
@@ -100,6 +101,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/bookmarksAddFolderMenuContentDescription"
                             android:src="@drawable/ic_folder_add_24" />
                     </FrameLayout>
 
@@ -120,6 +122,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/bookmarksMenuContentDescription"
                             android:src="@drawable/ic_menu_vertical_24" />
 
                     </FrameLayout>
