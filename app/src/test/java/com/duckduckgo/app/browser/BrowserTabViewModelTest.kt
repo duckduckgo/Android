@@ -2819,6 +2819,7 @@ class BrowserTabViewModelTest {
             val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
             assertNull(command)
             verify(mockTabRepository).select(emptyTabId)
+            assertCommandIssued<ShowKeyboard>()
         }
 
     @Test
@@ -2843,6 +2844,7 @@ class BrowserTabViewModelTest {
             assertNotNull(command)
             assertTrue(command is Command.LaunchNewTab)
             verify(mockTabRepository, never()).select(any())
+            assertCommandNotIssued<ShowKeyboard>()
         }
 
     @Test
@@ -2865,6 +2867,7 @@ class BrowserTabViewModelTest {
             assertNotNull(command)
             assertTrue(command is Command.LaunchNewTab)
             verify(mockTabRepository, never()).select(any())
+            assertCommandNotIssued<ShowKeyboard>()
         }
 
     @Test
