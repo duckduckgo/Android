@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Πίσω</string>
     <string name="browserMenuForward">Εμπρός</string>
     <string name="browserMenuRefresh">Ανανέωση</string>
+    <string name="browserMenuFire">Εκκαθάριση καρτελών και δεδομένων</string>
 </resources>

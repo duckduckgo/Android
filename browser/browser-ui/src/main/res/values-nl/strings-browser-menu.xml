@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Terug</string>
     <string name="browserMenuForward">Vooruit</string>
     <string name="browserMenuRefresh">Vernieuwen</string>
+    <string name="browserMenuFire">Tabbladen en gegevens wissen</string>
 </resources>
