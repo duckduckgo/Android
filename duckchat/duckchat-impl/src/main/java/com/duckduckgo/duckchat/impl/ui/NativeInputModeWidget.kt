@@ -110,6 +110,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
+    private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     override var onStopTapped: (() -> Unit)? = null
 
@@ -303,6 +304,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onShowSuggestions: (ChatSuggestionsAdapter) -> Unit,
         onClearSuggestions: (Boolean) -> Unit,
     ) {
+        this.onShowSuggestions = onShowSuggestions
         this.onClearSuggestions = onClearSuggestions
 
         val adapter = ChatSuggestionsAdapter { suggestion ->
@@ -314,7 +316,6 @@ class NativeInputModeWidget @JvmOverloads constructor(
                 hideChatSuggestions(hideList = true)
                 return
             }
-            onShowSuggestions(adapter)
             fetchChatSuggestions(lifecycleOwner, query, adapter)
         }
 
@@ -338,6 +339,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun tearDownChatSuggestions() {
         hideChatSuggestions(hideList = true)
         chatSuggestionsAdapter = null
+        onShowSuggestions = null
         onClearSuggestions = null
     }
 
@@ -362,6 +364,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsJob?.cancel()
         chatSuggestionsJob = lifecycleOwner.lifecycleScope.launch {
             val suggestions = runCatching { chatSuggestionsReader.fetchSuggestions(query) }.getOrDefault(emptyList())
+            if (suggestions.isNotEmpty()) {
+                onShowSuggestions?.invoke(adapter)
+            }
             adapter.submitList(suggestions)
             if (suggestions.isEmpty()) {
                 onClearSuggestions?.invoke(true)
