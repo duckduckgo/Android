@@ -54,10 +54,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
@@ -841,7 +841,7 @@ class WebViewRequestInterceptorTest {
     fun whenRequestIsNotInBlocklistThenContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         configureSubframeRequest()
-        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(false)
+        whenever(requestBlocklist.containedInBlocklist(any(), any())).thenReturn(false)
         val response = testee.shouldIntercept(
             request = mockRequest,
             documentUri = "foo.com".toUri(),
@@ -861,7 +861,7 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun configureRequestInBlocklist() {
-        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(true)
+        whenever(requestBlocklist.containedInBlocklist(any(), any())).thenReturn(true)
     }
 
     private fun configureShouldBlock() {

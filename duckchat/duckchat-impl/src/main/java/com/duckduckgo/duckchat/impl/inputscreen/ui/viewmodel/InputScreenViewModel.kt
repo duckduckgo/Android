@@ -81,6 +81,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -161,6 +162,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
+    private val isSearchModeFlow = MutableStateFlow(true)
     private var userSelectedMode: UserSelectedMode = NONE
     private var currentPagePosition: Int = 0
     private val _visibilityState =
@@ -265,8 +267,9 @@ class InputScreenViewModel @AssistedInject constructor(
     val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
-        combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
-            serviceAvailable && inputAllowed
+        combine(voiceServiceAvailable, voiceInputAllowed, isSearchModeFlow) { serviceAvailable, inputAllowed, isSearchMode ->
+            val newEntryPointActive = !isSearchMode && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()
+            if (newEntryPointActive) inputAllowed else serviceAvailable && inputAllowed
         }.onEach { voiceInputPossible ->
             _visibilityState.update {
                 it.copy(
@@ -540,6 +543,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatSelected() {
+        isSearchModeFlow.value = false
         viewModelScope.launch {
             _submitButtonIconState.update {
                 it.copy(icon = SubmitButtonIcon.SEND)
@@ -564,6 +568,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSelected() {
+        isSearchModeFlow.value = true
         _tabAttachmentState.update { it.copy(popupVisible = false, filteredTabs = emptyList(), activeAtIndex = -1) }
         if (userSelectedMode == CHAT) {
             fireModeSwitchedPixel(directionToSearch = true)
@@ -628,6 +633,14 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onSendButtonClicked() {
         val pixelParams = inputScreenPixelsModeParam(isSearchMode = userSelectedMode == SEARCH)
         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, parameters = pixelParams)
+    }
+
+    fun onVoiceEntryTapped() {
+        pixel.fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY,
+        )
+        duckChat.openVoiceDuckChat()
     }
 
     fun onVoiceSearchDisabled() {

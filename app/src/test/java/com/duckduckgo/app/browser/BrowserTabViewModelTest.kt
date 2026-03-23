@@ -205,6 +205,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_SERP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -592,6 +593,7 @@ class BrowserTabViewModelTest {
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
     private val mockHistory: NavigationHistory = mock()
     private val mockPageContextJSHelper: PageContextJSHelper = mock()
+    private val mockTabPageContextRepository: TabPageContextRepository = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -736,8 +738,8 @@ class BrowserTabViewModelTest {
             whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
             whenever(mockDuckAiFeatureState.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
             whenever(mockDuckAiFeatureState.showContextualMode).thenReturn(mockDuckAiContextualModeFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(mockHasPendingTabLaunchFlow)
-            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(mockHasPendingDuckAiOpenFlow)
+            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(false)
+            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(false)
             whenever(mockVpnMenuStateProvider.getVpnMenuState()).thenReturn(flowOf(VpnMenuState.Hidden))
             whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
             remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -922,6 +924,7 @@ class BrowserTabViewModelTest {
                 serpSettingsFeature = serpSettingsFeature,
                 syncStatusChangedObserver = mockSyncStatusChangedObserver,
                 pageContextJSHelper = mockPageContextJSHelper,
+                tabPageContextRepository = mockTabPageContextRepository,
                 serpEasterEggLogosToggles = mockSerpEasterEggLogosToggles,
                 serpLogos = mockSerpLogos,
                 tabVisitedSitesRepository = mockTabVisitedSitesRepository,
@@ -3073,6 +3076,7 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
             testee.refreshCta()
             assertTrue(
                 "When promo dialog is showable, refreshCta returns DaxPrivacyProCta",
@@ -5571,6 +5575,62 @@ class BrowserTabViewModelTest {
                 assertFalse(json.has("favicon"))
             }
             verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+        }
+
+    @Test
+    fun whenPageContextReceivedAndStorePageContextEnabledThenCacheInRepository() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            val serializedContext = """{"title":"Example","url":"https://example.com"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            verify(mockTabPageContextRepository).storePageContext(
+                eq("abc"),
+                eq("https://example.com"),
+                eq(serializedContext),
+            )
+        }
+
+    @Test
+    fun whenPageContextReceivedAndStorePageContextDisabledThenDoNotCache() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = false))
+            val serializedContext = """{"title":"Example"}"""
+            val data = JSONObject().apply { put("serializedPageData", serializedContext) }
+            whenever(
+                mockPageContextJSHelper.processPageContext(
+                    eq(PAGE_CONTEXT_FEATURE_NAME),
+                    eq("collectionResult"),
+                    anyOrNull(),
+                    eq("abc"),
+                ),
+            ).thenReturn(serializedContext)
+
+            testee.processJsCallbackMessage(
+                PAGE_CONTEXT_FEATURE_NAME,
+                "collectionResult",
+                "contextId",
+                data,
+                false,
+            ) { "someUrl" }
+
+            verify(mockTabPageContextRepository, never()).storePageContext(anyString(), anyString(), anyString())
         }
 
     @Test
@@ -8206,7 +8266,7 @@ class BrowserTabViewModelTest {
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingTabLaunchFlow.emit(true)
+            whenever(mockExternalIntentProcessingState.hasPendingTabLaunch).thenReturn(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -8239,7 +8299,7 @@ class BrowserTabViewModelTest {
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
-            mockHasPendingDuckAiOpenFlow.emit(true)
+            whenever(mockExternalIntentProcessingState.hasPendingDuckAiOpen).thenReturn(true)
 
             flowSelectedTab.emit(ntpTab)
 
@@ -8276,6 +8336,7 @@ class BrowserTabViewModelTest {
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
 
             testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
             mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)

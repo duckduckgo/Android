@@ -117,8 +117,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear Tabs and Data</string>
-    <string name="fireClearAllPlusDuckChats">Clear Tabs, Data, and Duck.ai Chats</string>
+    <string name="fireClearAll">Delete Tabs and Data</string>
+    <string name="fireClearAllPlusDuckChats">Delete Tabs, Data, and Duck.ai Chats</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -225,7 +225,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Data Clearing</string>
-    <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to clear data manually, or set up automatic clearing.</string>
+    <string name="dataClearingDescription">Deleting your data can help protect your privacy online. Use the Fire Button to delete data manually, or set up automatic deletion.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">1 site excluded from clearing</item>
         <item quantity="other" instruction="Placeholder is the number of sites excluded">%1$d sites excluded from clearing</item>
@@ -233,8 +233,8 @@
     <string name="dataClearingAutomaticClearingOn">On</string>
     <string name="dataClearingAutomaticClearingOff">Off</string>
     <string name="dataClearingClearBrowsingData">Clear Browsing Data</string>
-    <string name="dataClearingAutomaticDataClearing">Automatic Data Clearing</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automatically Clear Data</string>
+    <string name="dataClearingAutomaticDataClearing">Automatically Delete Data</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatically Delete Data</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Close all open tabs</string>
     <string name="dataClearingAutomaticDataOptionDescription">Delete all site data, including visited sites. May sign you out of accounts.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Delete all chats, including pinned chats</string>
@@ -257,6 +257,22 @@
         <item quantity="other" instruction="Placeholder is the number of tabs">Delete from %1$d sites. May sign you out of accounts.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Delete tabs and site data?</string>
+    <string name="singleTabFireDialogTitleWithChats">Delete tabs, site data, and chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Delete All</string>
+    <string name="singleTabFireDialogDeleteThisTab">Delete This Tab</string>
+    <string name="singleTabFireDialogDeleteThisChat">Delete This Chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Delete All\" will not delete your Duck.ai chat history.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Deleting site data can sign you out of accounts.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one" instruction="Placeholder is the number of tabs deleted, e.g. 1 tab and its data deleted">%1$d tab and its data deleted</item>
+        <item quantity="other" instruction="Placeholder is the number of tabs deleted, e.g. 3 tabs and their data deleted">%1$d tabs and their data deleted</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Site data could not be deleted. Please update WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Site data could not be deleted due to an error.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
 
@@ -274,15 +290,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabs, data, and Duck.ai chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Clear On…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
+    <string name="settingsAutomaticallyClearWhen">Delete On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Delete on…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">App exit only</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App exit, inactive for 5 seconds</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App exit, inactive for 5 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, inactive for 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
-    <string name="settingsClearAiDataTitle">Clear Duck.ai Chats</string>
+    <string name="settingsClearAiDataTitle">Delete Duck.ai Chats</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button will also delete Duck.ai history, including pinned chats.</string>
     <string name="settingsClearDataActionSecondaryText">Clears all tabs and data for any sites you haven\'t fireproofed.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Clears all tabs, Duck.ai chats, and data for any sites you haven\'t fireproofed.</string>

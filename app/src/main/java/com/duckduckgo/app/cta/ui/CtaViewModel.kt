@@ -50,6 +50,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -103,7 +104,7 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun isPrivacyProCtaAvailable(): Boolean =
-        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+        subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
@@ -515,6 +516,8 @@ class CtaViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             canShowPrivacyProCtaForSkippedOnboarding()
         }
+
+    private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2

@@ -22,6 +22,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -47,6 +48,7 @@ class PirDataUpdateObserverTest {
     private val pirFeatureDataCleaner: PirFeatureDataCleaner = mock()
     private val pirRepository: PirRepository = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
+    private val pirPixelSender: PirPixelSender = mock()
     private val canRunPirFlow = MutableStateFlow(false)
 
     private lateinit var pirDataUpdateObserver: PirDataUpdateObserver
@@ -65,6 +67,7 @@ class PirDataUpdateObserverTest {
             pirFeatureDataCleaner = pirFeatureDataCleaner,
             pirRepository = pirRepository,
             currentTimeProvider = currentTimeProvider,
+            pirPixelSender = pirPixelSender,
         )
     }
 

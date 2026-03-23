@@ -672,6 +672,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         if (binding.webview.canGoBack()) {
             binding.webview.url?.let { url ->
                 val uri = url.toUri()
+                if (!uri.isHierarchical) return true
                 return uri.getQueryParameter("preventBackNavigation") != "true"
             }
             return false

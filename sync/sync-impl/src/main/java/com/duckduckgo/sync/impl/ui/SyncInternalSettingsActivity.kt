@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
@@ -101,7 +104,17 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
-        binding.blockStoreWriteButton.setOnClickListener { viewModel.onBlockStoreWriteClicked(binding.blockStoreInput.text) }
+        binding.userIdTextView.setOnClickListener { copyToClipboard("User ID", binding.userIdTextView.text.toString()) }
+        binding.deviceNameTextView.setOnClickListener { copyToClipboard("Device Name", binding.deviceNameTextView.text.toString()) }
+        binding.deviceIdTextView.setOnClickListener { copyToClipboard("Device ID", binding.deviceIdTextView.text.toString()) }
+        binding.secretKeyTextView.setOnClickListener { copyToClipboard("Secret Key", binding.secretKeyTextView.text.toString()) }
+        binding.tokenTextView.setOnClickListener { copyToClipboard("Token", binding.tokenTextView.text.toString()) }
+        binding.blockStoreWriteButton.setOnClickListener {
+            viewModel.onBlockStoreWriteClicked(
+                recoveryCode = binding.blockStoreRecoveryCodeInput.text,
+                deviceId = binding.blockStoreDeviceIdInput.text.takeIf { it.isNotBlank() },
+            )
+        }
         binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
     }
 
@@ -150,6 +163,12 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun copyToClipboard(label: String, value: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText(label, value))
+        Toast.makeText(this, "$label copied", Toast.LENGTH_SHORT).show()
+    }
+
     private fun getScanOptions(): ScanOptions {
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
@@ -189,9 +208,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.blockStoreCurrentValue.text = when (val value = viewState.blockStoreCurrentValue) {
             is SyncInternalSettingsViewModel.BlockStoreValue.Loading -> "Loading..."
             is SyncInternalSettingsViewModel.BlockStoreValue.NotSet -> "(key not set)"
-            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> {
-                if (value.value.isEmpty()) "(empty string)" else value.value
-            }
+            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> value.value
         }
 
         binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->

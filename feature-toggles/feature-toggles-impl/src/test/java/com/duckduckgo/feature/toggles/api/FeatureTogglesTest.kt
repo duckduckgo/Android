@@ -198,6 +198,18 @@ class FeatureTogglesTest {
         }
     }
 
+    @Test
+    fun whenADifferentToggleIsWrittenThenEnabledFlowDoesNotEmit() = runTest {
+        feature.enabledByDefault().enabled().test {
+            assertTrue(awaitItem()) // initial emission
+
+            // Write to a different toggle — key filter must suppress any emission on this flow
+            feature.disableByDefault().setRawStoredState(Toggle.State(enable = true))
+
+            expectNoEvents()
+        }
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun whenWrongReturnValueThenThrow() {
         feature.wrongReturnValue()

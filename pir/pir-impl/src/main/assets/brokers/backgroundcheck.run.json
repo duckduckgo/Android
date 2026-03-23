@@ -1,0 +1,148 @@
+{
+  "name": "backgroundcheck.run",
+  "url": "backgroundcheck.run",
+  "version": "0.8.0",
+  "addedDatetime": 1677736800000,
+  "optOutUrl": "https://backgroundcheck.run/ng/control/privacy",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "64967cc5-ebf6-4c27-b12c-8f15dceb2678",
+          "url": "https://backgroundcheck.run/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "57dfbc89-94c8-49f0-9952-c58c92883ffd",
+          "selector": ".b-pfl-list",
+          "noResultsSelector": "//h3[@class='no-records-found'] | //div[@id='results_container' and contains(text(), 'Not found')]",
+          "profile": {
+            "name": {
+              "selector": ".name"
+            },
+            "alternativeNamesList": {
+              "selector": ".//span[contains(., 'Known as')]/following-sibling::span[@class='medium-20 col']/span[@class='info']/span[@class='nowrap']",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "age:",
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//span[@itemprop='relatedTo']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://backgroundcheck.run/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://backgroundcheck.run/ng/control/privacy",
+          "id": "fa29793c-3f85-4f01-a5fe-4ffcc26c197c"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt Out')]",
+              "parent": ".container"
+            }
+          ],
+          "id": "df2eb20b-1ecb-45b6-8c53-9ee1354e918b"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#name"
+            },
+            {
+              "type": "email",
+              "selector": "#email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ],
+          "id": "71be571c-ce0c-43cb-afad-ae6547d44726"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']",
+              "parent": "//form[@id='privacynew']"
+            }
+          ],
+          "id": "ed8a7fc7-ba2b-4b27-9c85-94442d0dd2da"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "e8794659-162d-4de7-9845-bbd140c54a00"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ],
+          "id": "6ab596e2-3642-4dba-97f0-1270d8feefd1"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "9431f4e4-140a-4ade-8e74-3b7917b6ab2b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ],
+          "id": "92e1c4ff-4466-42e7-b2dd-70a319af48da"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763397120464
+}

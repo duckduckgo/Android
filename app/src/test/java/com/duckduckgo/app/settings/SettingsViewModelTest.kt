@@ -299,7 +299,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when fire button setting clicked and improved data clearing enabled then launch data clearing settings screen`() = runTest {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
 
         testee.commands().test {
             testee.onFireButtonSettingClicked()
@@ -310,7 +310,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `when fire button setting clicked and improved data clearing disabled then launch fire button screen`() = runTest {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
 
         testee.commands().test {
             testee.onFireButtonSettingClicked()

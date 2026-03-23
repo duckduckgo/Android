@@ -18,11 +18,13 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityShowOnAppLaunchSettingBinding
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
@@ -113,6 +115,18 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                             specificPageUrlInput.isEnabled = true
                         }
                     }
+                }
+
+                if (viewState.showNTPAfterIdleReturn) {
+                    setTitle(R.string.afterInactivityOptionTitle)
+                    binding.afterInactivityMessage.text = getString(
+                        R.string.afterInactivityOptionMessage,
+                        viewState.afterInactivityTimeoutHours.toString(),
+                    )
+                    binding.afterInactivityMessage.visibility = View.VISIBLE
+                } else {
+                    setTitle(R.string.showOnAppLaunchOptionTitle)
+                    binding.afterInactivityMessage.visibility = View.GONE
                 }
 
                 if (binding.specificPageUrlInput.text.isBlank()) {

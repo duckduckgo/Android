@@ -19,7 +19,8 @@ package com.duckduckgo.serp.logos.impl.ui
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
@@ -52,7 +53,12 @@ class SerpEasterEggLogoViewModelTest {
     @Before
     fun setUp() {
         fakeFavouriteSerpLogoDataStore = FakeFavouriteSerpLogoDataStore()
-        serpEasterEggLogosToggles = FakeFeatureToggleFactory.create(SerpEasterEggLogosToggles::class.java)
+        serpEasterEggLogosToggles = FeatureToggles.Builder()
+            .store(FakeToggleStore())
+            .featureName("fakeFeature")
+            .ioDispatcher(coroutineTestRule.testDispatcher)
+            .build()
+            .create(SerpEasterEggLogosToggles::class.java)
     }
 
     private fun createViewModel(): SerpEasterEggLogoViewModel {

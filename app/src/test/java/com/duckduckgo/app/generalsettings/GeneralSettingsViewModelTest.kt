@@ -496,6 +496,59 @@ internal class GeneralSettingsViewModelTest {
         verify(mockPixel).fire(AppPixelName.CHAT_SUGGESTIONS_GENERAL_SETTINGS_TOGGLED_OFF_DAILY, type = Pixel.PixelType.Daily())
     }
 
+    @Test
+    fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state!!.showNTPAfterIdleReturn)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state!!.showNTPAfterIdleReturn)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenShowNTPAfterIdleReturnEnabledThenShowOnAppLaunchOptionIsVisible() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state!!.isShowOnAppLaunchOptionVisible)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenBothShowOnAppLaunchAndIdleReturnDisabledThenShowOnAppLaunchOptionIsNotVisible() = runTest {
+        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(Toggle.State(false))
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
+
+        initTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state!!.isShowOnAppLaunchOptionVisible)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,

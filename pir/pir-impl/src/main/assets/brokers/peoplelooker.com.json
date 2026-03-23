@@ -1,0 +1,102 @@
+{
+  "name": "PeopleLooker",
+  "url": "peoplelooker.com",
+  "version": "0.4.0",
+  "parent": "beenverified.com",
+  "optOutUrl": "https://www.peoplelooker.com/svc/optout/search/optouts",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.peoplelooker.com/svc/optout/search/optouts",
+          "id": "fffdf3ca-c08b-4261-9d19-6b6463865677"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#optout-form"
+            }
+          ],
+          "id": "fffd175a-9c31-46c8-8a37-eab78c3c37e5"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#optout-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "//input[@name='fname']"
+            },
+            {
+              "type": "lastName",
+              "selector": "//input[@name='ln']"
+            },
+            {
+              "type": "state",
+              "selector": "//input[@name='state']"
+            }
+          ],
+          "id": "fffa01d9-630f-42e4-a8b8-4c87ddab91e3"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@type='submit']"
+            }
+          ],
+          "id": "fffeb5ef-b469-41a6-af92-da9056c00781"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#result-filter"
+            }
+          ],
+          "id": "fffeb5ef-b469-41a6-af92-da9056c00fff"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".MuiGrid-root.MuiGrid-container.MuiGrid-spacing-xs-2 > div:nth-child(2) > .MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiCard-root",
+          "noResultsSelector": "img[alt='Search Logo']",
+          "profile": {
+            "name": {
+              "selector": "h2",
+              "beforeText": ", "
+            },
+            "age": {
+              "selector": "h2",
+              "afterText": ", "
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) .MuiTypography-body1"
+            }
+          },
+          "id": "4285ef9d-aebf-4176-80e6-2959fc9f5c8a"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1745320373493,
+  "removedAt": null
+}

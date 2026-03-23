@@ -499,7 +499,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 viewModel.onBrowserMenuTapped()
             }
             onVoiceClick = {
-                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+                val isChatTab = inputModeWidget.isChatTabSelected()
+                if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+                    viewModel.onVoiceEntryTapped()
+                } else {
+                    voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+                }
             }
             onClearTextTapped = {
                 viewModel.onClearTextTapped()
@@ -578,7 +583,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED)
         }
         inputScreenButtons.onVoiceClick = {
-            voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+            val isChatTab = inputModeWidget.isChatTabSelected()
+            if (isChatTab && duckChatFeature.duckAiVoiceEntryPoint().isEnabled()) {
+                viewModel.onVoiceEntryTapped()
+            } else {
+                voiceSearchLauncher.launch(requireActivity(), VoiceSearchMode.fromValue(inputModeWidget.getSelectedTabPosition()))
+            }
         }
     }
 

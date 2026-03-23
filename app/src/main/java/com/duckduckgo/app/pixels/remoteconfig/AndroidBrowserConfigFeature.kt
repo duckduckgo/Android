@@ -127,6 +127,14 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun omnibarAnimation(): Toggle
 
+    /**
+     * @return `true` when the remote config has the global "showNTPAfterIdleReturn" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun showNTPAfterIdleReturn(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
@@ -246,15 +254,6 @@ interface AndroidBrowserConfigFeature {
     fun onboardingDuckAiCopyUpdatesFeb26(): Toggle
 
     /**
-     * Controls the automatic data clearing options, which allows to specify granular automatic clearing options.
-     * @return `true` when the remote config has the global "improvedDataClearingOptions" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun improvedDataClearingOptions(): Toggle
-
-    /**
      * Controls the fire dialog and data clearing options.
      * @return `true` when the remote config has the global "granularFireDialog" androidBrowserConfig
      * sub-feature flag enabled
@@ -336,4 +335,13 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun sendPageLoadWideEvent(): Toggle
+
+    /**
+     * Controls whether page content is cached in Room for each tab.
+     * @return `true` when the remote config has the global "storePageContext" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun storePageContext(): Toggle
 }

@@ -1,0 +1,76 @@
+{
+  "name": "ClustrMaps",
+  "url": "clustrmaps.com",
+  "version": "0.6.0",
+  "parent": "neighbor.report",
+  "addedDatetime": 1692594000000,
+  "optOutUrl": "https://clustrmaps.com/bl/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "c4d4ce8d-0b33-46cb-8e73-a544b362460d",
+          "url": "https://clustrmaps.com/persons/${firstName}-${lastName}/${state|stateFull|capitalize}/${city|hyphenated}"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".navbar-brand"
+            }
+          ],
+          "id": "d5e4e7e8-b272-42d4-93d3-a358c57858c7"
+        },
+        {
+          "actionType": "extract",
+          "id": "f0e4f08c-c999-451c-b195-93f481c0a4de",
+          "selector": ".//div[@itemprop='Person']",
+          "noResultsSelector": "//div[h1[contains(text(), 'No results found')]]",
+          "profile": {
+            "name": {
+              "selector": "(.//a[@class='persons'])[1]"
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".//div[@class='mb-1 i_room']//a"
+            },
+            "addressCityState": {
+              "selector": ".//div[@class='person_city person_details i_home']"
+            },
+            "phone": {
+              "selector": ".i_phone"
+            },
+            "relativesList": {
+              "selector": ".i_people",
+              "afterText": "Associated persons:"
+            },
+            "profileUrl": {
+              "selector": ".persons",
+              "identifierType": "path",
+              "identifier": "https://clustrmaps.com/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

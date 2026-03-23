@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.GranularFireDialogViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING_DAILY
@@ -35,6 +36,7 @@ import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -353,6 +355,7 @@ class GranularFireDialogViewModelTest {
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
         verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
         verify(mockPixel).enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
@@ -499,6 +502,7 @@ class GranularFireDialogViewModelTest {
             coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
             verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             verify(mockPixel).enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
             verify(mockPixel).enqueueFire(
                 pixel = FIRE_DIALOG_ANIMATION,

@@ -95,6 +95,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -378,11 +379,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
         showNewAddressBarOptionChoiceScreen()
         checkForLanscapeOrientation()
+
+        if (savedInstanceState == null) {
+            val deletedTabCount = intent?.getIntExtra(DELETED_TAB_COUNT_EXTRA, 0) ?: 0
+            if (deletedTabCount > 0) {
+                val message = resources.getQuantityString(
+                    R.plurals.tabsClearedSnackbarMessage,
+                    deletedTabCount,
+                    deletedTabCount,
+                )
+                showSnackbar(message)
+                intent?.removeExtra(DELETED_TAB_COUNT_EXTRA)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
         if (swipingTabsFeature.isEnabled) {
             outState.putParcelable(KEY_TAB_PAGER_STATE, tabPagerAdapter.saveState())
         }
@@ -423,28 +436,35 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 FireDialog.EVENT_ON_CANCEL -> {
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+                    externalIntentProcessingState.onPendingSnackbarDisplayed()
                 }
                 FireDialog.EVENT_ON_CLEAR_STARTED -> {
                     isDataClearingInProgress = true
                     removeObservers()
                 }
                 FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED -> {
+                    externalIntentProcessingState.onIntentRequestToShowSnackbar()
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogSnackbar)
+                    showSnackbar(resources.getQuantityString(R.plurals.tabsClearedSnackbarMessage, 1, 1))
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
+                    showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_ERROR -> {
-                    showSingleTabClearSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
+                    showSnackbar(R.string.singleTabFireDialogClearErrorSnackbar)
                 }
             }
         }
     }
 
-    private fun showSingleTabClearSnackbar(messageResId: Int) {
+    private fun showSnackbar(messageResId: Int) {
+        showSnackbar(getString(messageResId))
+        externalIntentProcessingState.onPendingSnackbarDisplayed()
+    }
+
+    private fun showSnackbar(message: String) {
         lifecycleScope.launch {
             delay(500)
 
@@ -460,7 +480,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
             DefaultSnackbar(
                 parentView = binding.fragmentContainer,
-                message = getString(messageResId),
+                message = message,
                 anchor = anchorView,
             ).show()
         }
@@ -624,7 +644,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             logcat(INFO) { "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set" }
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                     val clearOptions = fireDataStore.getManualClearOptions()
                     dataClearingWideEvent.start(
                         entryPoint = DataClearingWideEvent.EntryPoint.APP_SHORTCUT,
@@ -783,11 +803,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
             }
-        } else {
-            logcat(INFO) { "shared text empty, defaulting to show on app launch option" }
-            if (!intent.getBooleanExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, false)) {
-                viewModel.handleShowOnAppLaunchOption()
-            }
         }
     }
 
@@ -916,6 +931,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun launchFire(launchedFromFocusedNtp: Boolean = false) {
         val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY, params, type = Daily())
 
         lifecycleScope.launch {
             val dialog = fireDialogProvider.createFireDialog(BROWSER)
@@ -1186,6 +1202,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
             isLaunchFromBookmarksAppShortcut: Boolean = false,
+            deletedTabCount: Int = 0,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -1202,6 +1219,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(LAUNCH_FROM_BOOKMARKS_APP_SHORTCUT_EXTRA, isLaunchFromBookmarksAppShortcut)
+            intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             return intent
         }
 
@@ -1230,6 +1248,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val DISABLE_SWIPING_DELAY = 1000L
 
         private const val DUCK_AI_ANIM_READY_DELAY_MS = 300L
+        private const val DELETED_TAB_COUNT_EXTRA = "DELETED_TAB_COUNT_EXTRA"
     }
 
     inner class BrowserStateRenderer {

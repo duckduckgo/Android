@@ -72,7 +72,7 @@ class TabDataRepository @Inject constructor(
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val duckChatContextualDataStore: DuckChatContextualDataStore,
     private val tabVisitedSitesRepository: TabVisitedSitesRepository,
-) : TabRepository {
+) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
@@ -334,6 +334,15 @@ class TabDataRepository @Inject constructor(
             clearAllSiteData(tabIds)
         }
         tabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
+    }
+
+    override suspend fun replaceTabWithNewTab(tabId: String, url: String?) {
+        databaseExecutor().scheduleDirect {
+            val newTab = TabEntity(url = url, tabId = generateTabId())
+            tabsDao.replaceTab(tabId, newTab)
+            clearAllSiteData(listOf(tabId))
+        }
+        tabVisitedSitesRepository.clearTab(tabId)
     }
 
     private fun clearAllSiteData(tabIds: List<String>) {

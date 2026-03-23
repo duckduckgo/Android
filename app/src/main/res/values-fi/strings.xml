@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Poista tiedot</string>
-    <string name="fireClearAll">Tyhjennä välilehdet ja tiedot</string>
-    <string name="fireClearAllPlusDuckChats">Tyhjennä välilehdet, tiedot ja Duck.ai-keskustelut</string>
+    <string name="fireClearAll">Poista välilehdet ja tiedot</string>
+    <string name="fireClearAllPlusDuckChats">Poista välilehdet, tiedot ja Duck.ai-keskustelut</string>
     <string name="fireCancel">Peruuta</string>
     <string name="fireDataCleared">Tiedot poistettu</string>
 
@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire-painike</string>
     <string name="dataClearingActivityTitle">Datan tyhjentäminen</string>
-    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Tyhjennä tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen tyhjennys.</string>
+    <string name="dataClearingDescription">Tietojesi poistaminen voi auttaa suojaamaan yksityisyyttäsi verkossa. Poista tiedot manuaalisesti Fire Buttonilla tai määritä automaattinen poisto.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d kohde jätettiin poiston ulkopuolelle</item>
         <item quantity="other">%1$d kohdetta jätettiin poiston ulkopuolelle</item>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Päällä</string>
     <string name="dataClearingAutomaticClearingOff">Pois</string>
     <string name="dataClearingClearBrowsingData">Poista selaustiedot</string>
-    <string name="dataClearingAutomaticDataClearing">Automaattinen tietojen tyhjennys</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Tyhjennä tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticDataClearing">Poista tiedot automaattisesti</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Poista tiedot automaattisesti</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Sulje kaikki avoimet välilehdet</string>
     <string name="dataClearingAutomaticDataOptionDescription">Poista kaikki sivuston tiedot, mukaan lukien vieraillut sivustot. Saattaa kirjata sinut ulos tileiltä.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Poista kaikki keskustelut, myös kiinnitetyt keskustelut</string>
@@ -258,6 +258,22 @@
         <item quantity="other">Poista %1$d sivustolta. Saattaa kirjata sinut ulos tileiltä.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Poistetaanko välilehdet ja sivuston tiedot?</string>
+    <string name="singleTabFireDialogTitleWithChats">Poistetaanko välilehdet, sivuston tiedot ja keskustelut?</string>
+    <string name="singleTabFireDialogDeleteAll">Poista kaikki</string>
+    <string name="singleTabFireDialogDeleteThisTab">Poista tämä välilehti</string>
+    <string name="singleTabFireDialogDeleteThisChat">Poista tämä keskustelu</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Poista kaikki\" ei poista Duck.ai-keskusteluhistoriaasi.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Sivustotietojen poistaminen voi kirjata sinut ulos tileiltä.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tämä peruuttaa käynnissä olevat lataukset.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d välilehti ja sen tiedot poistettu</item>
+        <item quantity="other">%1$d välilehteä ja niiden tiedot poistettu</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Sivuston tietoja ei voitu poistaa. Päivitä WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Sivuston tietoja ei voitu poistaa virheen vuoksi.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Käyttöoikeudet</string>
 
@@ -275,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Välilehdet ja tiedot</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Välilehdet, tiedot ja Duck.ai-keskustelut</string>
 
-    <string name="settingsAutomaticallyClearWhen">Tyhjennä…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Tyhjennä…</string>
+    <string name="settingsAutomaticallyClearWhen">Poistopäivä…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Poistopäivä…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Vain sovelluksesta poistuttaessa</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Sovelluksesta poistuttaessa, 5 sekunnin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Sovelluksesta poistuttaessa, 5 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Sovelluksesta poistuttaessa, 15 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Sovelluksesta poistuttaessa, 30 minuutin toimettomuuden jälkeen</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Sovelluksesta poistuttaessa, 1 tunnin toimettomuuden jälkeen</string>
-    <string name="settingsClearAiDataTitle">Tyhjennä Duck.ai-keskustelut</string>
+    <string name="settingsClearAiDataTitle">Poista Duck.ai-keskustelut</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button poistaa myös Duck.ai-historian, mukaan lukien kiinnitetyt keskustelut.</string>
     <string name="settingsClearDataActionSecondaryText">Tyhjentää kaikki välilehdet ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tyhjentää kaikki välilehdet, Duck.ai-keskustelut ja tiedot sivustoilta, joita et ole tehnyt palonkestäviksi Fireproof-ominaisuudella.</string>

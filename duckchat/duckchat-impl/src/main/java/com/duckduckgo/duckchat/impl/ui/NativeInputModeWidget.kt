@@ -62,6 +62,7 @@ interface NativeInputWidget {
     fun hasInputFocus(): Boolean
     fun clearInputFocus()
     fun requestInputFocus()
+    fun selectAllText()
     fun hideKeyboard()
     fun selectChatTab()
     fun isChatTabSelected(): Boolean

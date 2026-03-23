@@ -75,6 +75,17 @@ abstract class TabsDao {
     abstract fun getDeletableTabIds(): List<String>
 
     @Transaction
+    open fun replaceTab(tabId: String, tab: TabEntity) {
+        tab(tabId)?.let { oldTab ->
+            val newTab = tab.copy(position = oldTab.position)
+            insertTabAtPosition(newTab)
+            insertTabSelection(TabSelectionEntity(tabId = newTab.tabId))
+            deleteTab(oldTab)
+            deleteBlankTabsExceptSelected()
+        }
+    }
+
+    @Transaction
     open fun markTabAsDeletable(tab: TabEntity) {
         // requirement: only one tab can be marked as deletable
         deleteTabsMarkedAsDeletable()
@@ -150,6 +161,9 @@ abstract class TabsDao {
 
     @Query("delete from tabs where url is null")
     abstract fun deleteBlankTabs()
+
+    @Query("delete from tabs where url is null and tabId not in (select tabId from tab_selection)")
+    abstract fun deleteBlankTabsExceptSelected()
 
     @Query("update tabs set position = position + 1 where position >= :position")
     abstract fun incrementPositionStartingAt(position: Int)

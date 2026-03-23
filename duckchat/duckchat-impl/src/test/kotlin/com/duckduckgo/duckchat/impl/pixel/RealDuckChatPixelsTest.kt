@@ -19,12 +19,15 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_ACCEPT_TERMS_AND_CONDITIONS
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_CREATE_NEW_CHAT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_OPEN_HISTORY
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_ITEM
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
+import com.duckduckgo.duckchat.impl.helper.TermsAcceptanceResult
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_AUTO_ATTACHED_DAILY
@@ -83,6 +86,7 @@ class RealDuckChatPixelsTest {
 
     private val statisticsUpdater: StatisticsUpdater = mock()
     private val duckAiMetricCollector: DuckAiMetricCollector = mock()
+    private val mockTermsOfServiceHandler: DuckChatTermsOfServiceHandler = mock()
 
     private lateinit var testee: RealDuckChatPixels
 
@@ -97,6 +101,7 @@ class RealDuckChatPixelsTest {
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             statisticsUpdater = statisticsUpdater,
             duckAiMetricCollector = duckAiMetricCollector,
+            termsOfServiceHandler = mockTermsOfServiceHandler,
         )
     }
 
@@ -365,5 +370,43 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_COUNT)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_PAGE_CONTEXT_INVALID_NO_CONTENT_DAILY, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and duplicate with sync on then fires both pixels`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = true, isSyncEnabled = true))
+
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
+
+        advanceUntilIdle()
+
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_ON)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and duplicate with sync off then fires both pixels`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = true, isSyncEnabled = false))
+
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
+
+        advanceUntilIdle()
+
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_TERMS_ACCEPTED_DUPLICATE_SYNC_OFF)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
+    }
+
+    @Test
+    fun `when sendReportMetricPixel with USER_DID_ACCEPT_TERMS_AND_CONDITIONS and not duplicate then fires only base pixel`() = runTest {
+        whenever(mockTermsOfServiceHandler.userAcceptedTerms()).thenReturn(TermsAcceptanceResult(isDuplicate = false, isSyncEnabled = false))
+
+        testee.sendReportMetricPixel(USER_DID_ACCEPT_TERMS_AND_CONDITIONS)
+
+        advanceUntilIdle()
+
+        verify(mockTermsOfServiceHandler).userAcceptedTerms()
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS, parameters = emptyMap())
     }
 }

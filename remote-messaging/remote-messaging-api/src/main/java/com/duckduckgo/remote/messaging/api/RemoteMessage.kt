@@ -187,6 +187,7 @@ sealed class CardItem {
         val primaryActionText: String = "",
         val matchingRules: List<Int>,
         val exclusionRules: List<Int>,
+        val imageUrl: String? = null,
     ) : CardItem()
 
     /**

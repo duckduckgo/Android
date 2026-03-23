@@ -1,0 +1,388 @@
+{
+    "autofill_harmony_preferences_retrieval_failed": {
+        "description": "Retrieving autofill harmony preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_preferences_retrieval_failed": {
+        "description": "Retrieving autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_preferences_update_key_failed": {
+        "description": "Updating key on autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that failed to update",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_preferences_update_key_failed": {
+        "description": "Updating key on autofill harmony preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that failed to update in Harmony",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_preferences_get_key_failed": {
+        "description": "Getting key on autofill harmony preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that failed to read from Harmony",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_preferences_get_key_failed": {
+        "description": "Getting key on autofill preferences failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that failed to read from legacy",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the error thrown, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_key_mismatch": {
+        "description": "Harmony and legacy preferences both have non-null values for the same key but they differ (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that has a mismatch between Harmony and legacy",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_key_missing": {
+        "description": "Harmony preferences returns null for a key that exists in legacy preferences (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that is missing from Harmony",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_preferences_key_missing": {
+        "description": "Legacy preferences returns null for a key that exists in harmony preferences (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that is missing from legacy preferences",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_store_key_already_exists": {
+        "description": "Write guard blocked an attempt to overwrite an existing encryption key — prevents irreversible credential corruption (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that already exists and was protected from overwrite",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_update_key_rollback_failed": {
+        "description": "Rolling back legacy key write after Harmony write failure also failed (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key that failed to rollback",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "error",
+                "description": "The stacktrace for the rollback error, sanitized to remove potentially sensitive data",
+                "type": "string"
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    }
+}

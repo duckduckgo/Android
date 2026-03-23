@@ -30,6 +30,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_FAILURE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_LOADED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CAN_RUN_PIR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_BROKER_JSON_FAILURE
@@ -364,6 +367,11 @@ interface PirPixelSender {
     fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
 
     /**
+     * Emits a daily pixel to report that the user is eligible to run PIR.
+     */
+    fun reportCanRunPir()
+
+    /**
      * Emits a pixel to report Daily Active Users for PIR.
      */
     fun reportDAU()
@@ -545,6 +553,12 @@ interface PirPixelSender {
     )
 
     suspend fun reportDownloadBrokerJsonFailure(
+        message: String,
+    )
+
+    suspend fun reportBundleBrokerJsonLoaded()
+
+    fun reportBundleBrokerJsonFailure(
         message: String,
     )
 
@@ -899,6 +913,10 @@ class RealPirPixelSender @Inject constructor(
         )
 
         enqueueFire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
+    }
+
+    override fun reportCanRunPir() {
+        enqueueFire(PIR_CAN_RUN_PIR)
     }
 
     override fun reportDAU() {
@@ -1305,6 +1323,20 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
         )
         fire(PIR_DOWNLOAD_BROKER_JSON_FAILURE, params)
+    }
+
+    override suspend fun reportBundleBrokerJsonLoaded() {
+        val params = mapOf(
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+        )
+        enqueueFire(PIR_BUNDLE_BROKER_JSON_LOADED, params)
+    }
+
+    override fun reportBundleBrokerJsonFailure(message: String) {
+        val params = mapOf(
+            PARAM_KEY_ERROR_DETAILS to message,
+        )
+        fire(PIR_BUNDLE_BROKER_JSON_FAILURE, params)
     }
 
     override fun reportBrokerActionFailure(

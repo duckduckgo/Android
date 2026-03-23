@@ -89,6 +89,7 @@ import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
@@ -96,10 +97,10 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -361,8 +362,9 @@ class BrowserModule {
         cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
         thirdPartyCookieNames: ThirdPartyCookieNames,
+        duckAiHostProvider: DuckAiHostProvider,
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames, duckAiHostProvider)
     }
 
     @Provides

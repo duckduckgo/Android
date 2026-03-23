@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Sekmeleri ve Verileri Temizle</string>
-    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Temizle</string>
+    <string name="fireClearAll">Sekmeleri ve Verileri Sil</string>
+    <string name="fireClearAllPlusDuckChats">Sekmeleri, Verileri ve Duck.ai Sohbetlerini Sil</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Veri Temizleme</string>
-    <string name="dataClearingDescription">Kişisel verilerini silmek, çevrimiçi gizliliğini korumana yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullan veya otomatik silme işlemini ayarla.</string>
+    <string name="dataClearingDescription">Kişisel verilerinizi silmek, çevrimiçi gizliliğinizi korumanıza yardımcı olabilir. Verileri manuel olarak silmek için Fire Button\'ı kullanın veya otomatik silmeyi ayarlayın.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site temizleme işleminden hariç tutuldu.</item>
         <item quantity="other">%1$d site temizleme işleminden hariç tutuldu.</item>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Açık</string>
     <string name="dataClearingAutomaticClearingOff">Kapalı</string>
     <string name="dataClearingClearBrowsingData">Tarama Verilerini Temizle</string>
-    <string name="dataClearingAutomaticDataClearing">Otomatik Veri Temizleme</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Verileri Otomatik Olarak Temizle</string>
+    <string name="dataClearingAutomaticDataClearing">Verileri Otomatik Olarak Sil</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Verileri Otomatik Olarak Sil</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Tüm açık sekmeleri kapatır</string>
     <string name="dataClearingAutomaticDataOptionDescription">Ziyaret edilen siteler dahil olmak üzere tüm site verilerini siler. Hesaplarınızdan çıkış yapılabilir.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Sabitlenmiş sohbetler dahil tüm sohbetleri siler</string>
@@ -258,6 +258,22 @@
         <item quantity="other">%1$d siteden sil. Hesaplarınızdan çıkış yapılabilir.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Sekmeleri ve site verilerini silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogTitleWithChats">Sekmeleri, site verilerini ve sohbetleri silmek mi istiyorsunuz?</string>
+    <string name="singleTabFireDialogDeleteAll">Tümünü Sil</string>
+    <string name="singleTabFireDialogDeleteThisTab">Bu Sekmeyi Sil</string>
+    <string name="singleTabFireDialogDeleteThisChat">Bu Sohbeti Sil</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Tümünü Sil\" seçeneği Duck.ai sohbet geçmişini silmeyecek.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d sekme ve verileri silindi</item>
+        <item quantity="other">%1$d sekme ve verileri silindi</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Site verileri silinemedi. Lütfen WebView\'yu güncelleyin.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Bir hata nedeniyle site verileri silinemedi.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">İzinler</string>
 
@@ -275,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Sekmeler, veriler ve Duck.ai sohbetleri</string>
 
-    <string name="settingsAutomaticallyClearWhen">Temizle…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
+    <string name="settingsAutomaticallyClearWhen">Sil...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Sil...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
-    <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Temizle</string>
+    <string name="settingsClearAiDataTitle">Duck.ai Sohbetlerini Sil</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button, sabitlenmiş sohbetler dahil olmak üzere Duck.ai geçmişini de silecektir.</string>
     <string name="settingsClearDataActionSecondaryText">Tüm sekmeleri ve fireproof uygulanmayan sitelere ait verileri temizler.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Tüm sekmeleri, Duck.ai sohbetlerini ve fireproof uygulanmayan sitelere ait verileri temizler.</string>

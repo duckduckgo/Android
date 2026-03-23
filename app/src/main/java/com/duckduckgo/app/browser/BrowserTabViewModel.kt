@@ -275,6 +275,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -383,6 +384,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -505,6 +507,7 @@ class BrowserTabViewModel @Inject constructor(
     private val contentScopeScriptsSubscriptionEventPluginPoint: PluginPoint<ContentScopeScriptsSubscriptionEventPlugin>,
     private val serpSettingsFeature: SerpSettingsFeature,
     private val pageContextJSHelper: PageContextJSHelper,
+    private val tabPageContextRepository: TabPageContextRepository,
     private val syncStatusChangedObserver: SyncStatusChangedObserver,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
     private val serpLogos: SerpLogos,
@@ -843,9 +846,11 @@ class BrowserTabViewModel @Inject constructor(
                 showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
             }.flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
-                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch.value
-                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen.value
-                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen) {
+                val hasPendingTabLaunch = externalIntentProcessingState.hasPendingTabLaunch
+                val hasPendingDuckAiOpen = externalIntentProcessingState.hasPendingDuckAiOpen
+                val hasPendingSnackbar = externalIntentProcessingState.hasPendingSnackbar
+
+                if (!hasPendingTabLaunch && !hasPendingDuckAiOpen && !hasPendingSnackbar) {
                     viewModelScope.launch {
                         // whenever an event fires, so the user switched to a new tab page, launch the input screen
                         // unless an onboarding promo message is displayed
@@ -1600,12 +1605,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentBrowserViewState().sslError != NONE) {
-            command.postValue(HideSSLError)
+            command.value = HideSSLError
             return true
         }
 
         if (currentBrowserViewState().maliciousSiteBlocked) {
-            command.postValue(HideWarningMaliciousSite(navigation.canGoBack))
+            command.value = HideWarningMaliciousSite(navigation.canGoBack)
             return true
         }
 
@@ -1760,6 +1765,8 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
 
+            is WebNavigationStateChange.TitleUpdated -> titleUpdated(stateChange.title)
+
             is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
             else -> {}
         }
@@ -1849,9 +1856,9 @@ class BrowserTabViewModel @Inject constructor(
                     .drop(count = 1) // skip current state - we're only interested in change events
                     .onEach { isInAllowList ->
                         if (isInAllowList) {
-                            command.postValue(RefreshAndShowPrivacyProtectionDisabledConfirmation(domain))
+                            command.value = RefreshAndShowPrivacyProtectionDisabledConfirmation(domain)
                         } else {
-                            command.postValue(RefreshAndShowPrivacyProtectionEnabledConfirmation(domain))
+                            command.value = RefreshAndShowPrivacyProtectionEnabledConfirmation(domain)
                         }
                     }.launchIn(viewModelScope)
         }
@@ -2043,6 +2050,11 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
+    private fun titleUpdated(title: String?) {
+        logcat(VERBOSE) { "Page title updated: $title" }
+        site?.title = title
+    }
+
     @VisibleForTesting
     fun stripBasicAuthFromUrl(url: String): String {
         try {
@@ -2219,7 +2231,7 @@ class BrowserTabViewModel @Inject constructor(
             )
         navigationStateChanged(webViewNavigationState)
 
-        command.postValue(Command.PageStarted)
+        command.value = Command.PageStarted
     }
 
     override fun onSitePermissionRequested(
@@ -2234,8 +2246,8 @@ class BrowserTabViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch(dispatchers.io()) {
-            command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request)
         }
     }
 
@@ -2265,23 +2277,29 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun titleReceived(newTitle: String) {
         site?.title = newTitle
-        command.postValue(ShowWebPageTitle(newTitle))
+        command.value = ShowWebPageTitle(newTitle)
         onSiteChanged()
     }
 
     @AnyThread
     override fun sendEmailRequested(emailAddress: String) {
-        command.postValue(SendEmail(emailAddress))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = SendEmail(emailAddress)
+        }
     }
 
     @AnyThread
     override fun dialTelephoneNumberRequested(telephoneNumber: String) {
-        command.postValue(DialNumber(telephoneNumber))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = DialNumber(telephoneNumber)
+        }
     }
 
     @AnyThread
     override fun sendSmsRequested(telephoneNumber: String) {
-        command.postValue(SendSms(telephoneNumber))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = SendSms(telephoneNumber)
+        }
     }
 
     override fun surrogateDetected(surrogate: SurrogateResponse) {
@@ -2351,9 +2369,9 @@ class BrowserTabViewModel @Inject constructor(
         when (action) {
             LeaveSite -> {
                 if (activeCustomTab) {
-                    command.postValue(CloseCustomTab)
+                    command.value = CloseCustomTab
                 } else {
-                    command.postValue(EscapeMaliciousSite)
+                    command.value = EscapeMaliciousSite
                     openNewTab()
                     closeCurrentTab()
                 }
@@ -2362,7 +2380,7 @@ class BrowserTabViewModel @Inject constructor(
             VisitSite -> {
                 val params = mapOf(CATEGORY_KEY to feed.name.lowercase())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_VISIT_SITE, params)
-                command.postValue(BypassMaliciousSiteWarning(siteUrl, feed))
+                command.value = BypassMaliciousSiteWarning(siteUrl, feed)
                 val documentUrlString = siteUrl.toString()
                 loadingViewState.value =
                     currentLoadingViewState().copy(
@@ -2389,8 +2407,8 @@ class BrowserTabViewModel @Inject constructor(
                     )
             }
 
-            LearnMore -> command.postValue(OpenBrokenSiteLearnMore(SCAM_PROTECTION_LEARN_MORE_URL))
-            ReportError -> command.postValue(ReportBrokenSiteError("$SCAM_PROTECTION_REPORT_ERROR_URL$siteUrl"))
+            LearnMore -> command.value = OpenBrokenSiteLearnMore(SCAM_PROTECTION_LEARN_MORE_URL)
+            ReportError -> command.value = ReportBrokenSiteError("$SCAM_PROTECTION_REPORT_ERROR_URL$siteUrl")
         }
     }
 
@@ -2442,7 +2460,7 @@ class BrowserTabViewModel @Inject constructor(
                         showPrivacyShield = HighlightableButton.Visible(enabled = false),
                         sslError = errorResponse.errorType,
                     )
-                command.postValue(ShowSSLError(handler, errorResponse))
+                command.value = ShowSSLError(handler, errorResponse)
             }
         } else {
             logcat { "SSLError: allow bypass certificates feature disabled, cancelling request" }
@@ -3527,7 +3545,9 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
-        command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
     }
 
     @SuppressLint("RequiresFeature", "PostMessageUsage") // it's already checked in isBlobDownloadWebViewFeatureEnabled
@@ -3562,8 +3582,10 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun showEmailProtectionChooseEmailPrompt() {
-        emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
+        viewModelScope.launch(dispatchers.main()) {
+            emailManager.getEmailAddress()?.let {
+                command.value = ShowEmailProtectionChooseEmailPrompt(it)
+            }
         }
     }
 
@@ -3588,14 +3610,14 @@ class BrowserTabViewModel @Inject constructor(
         originalUrl: String,
         duckAddress: String,
     ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
+        command.value = InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true)
     }
 
     fun usePersonalDuckAddress(
         originalUrl: String,
         duckAddress: String,
     ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
+        command.value = InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false)
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
@@ -3714,7 +3736,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onUrlExtractionError(initialUrl: String) {
-        command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = LoadExtractedUrl(extractedUrl = initialUrl)
+        }
     }
 
     override fun onUrlExtracted(
@@ -3722,11 +3746,15 @@ class BrowserTabViewModel @Inject constructor(
         extractedUrl: String?,
     ) {
         val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
-        command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = LoadExtractedUrl(extractedUrl = destinationUrl)
+        }
     }
 
     fun returnNoCredentialsWithPage(originalUrl: String) {
-        command.postValue(CancelIncomingAutofillRequest(originalUrl))
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = CancelIncomingAutofillRequest(originalUrl)
+        }
     }
 
     fun onConfigurationChanged() {
@@ -3762,7 +3790,7 @@ class BrowserTabViewModel @Inject constructor(
         if (androidBrowserConfig.errorPagePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
-        command.postValue(WebViewError(errorType, url))
+        command.value = WebViewError(errorType, url)
     }
 
     override fun onReceivedMaliciousSiteWarning(
@@ -4022,10 +4050,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun handleNewTabForEmptyUrlOnCustomTab() {
-        command.postValue(
-            ShowWebPageTitle(
-                title = ABOUT_BLANK,
-            ),
+        command.value = ShowWebPageTitle(
+            title = ABOUT_BLANK,
         )
     }
 
@@ -4226,6 +4252,20 @@ class BrowserTabViewModel @Inject constructor(
                         withContext(dispatchers.main()) {
                             command.value = Command.PageContextReceived(tabId, enrichedContext)
                         }
+
+                        if (androidBrowserConfig.storePageContext().isEnabled()) {
+                            runCatching {
+                                val pageContextUrl = JSONObject(pageContext).optString("url", "")
+                                tabPageContextRepository.storePageContext(
+                                    tabId = tabId,
+                                    url = pageContextUrl,
+                                    serializedPageContext = pageContext,
+                                )
+                            }.onFailure {
+                                ensureActive()
+                                logcat(WARN) { "Failed to store page context: ${it.asLog()}" }
+                            }
+                        }
                     }
                 }
             }
@@ -4423,9 +4463,9 @@ class BrowserTabViewModel @Inject constructor(
             Action.LeaveSite -> {
                 pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
                 if (activeCustomTab) {
-                    command.postValue(CloseCustomTab)
+                    command.value = CloseCustomTab
                 } else {
-                    command.postValue(HideSSLError)
+                    command.value = HideSSLError
                 }
             }
 
@@ -4825,9 +4865,9 @@ class BrowserTabViewModel @Inject constructor(
             // TODO remove launch once address bar trackers animation is enabled permanently
             viewModelScope.launch {
                 if (addressBarTrackersAnimationManager.isFeatureEnabled() && trackersCount().isNotEmpty()) {
-                    command.postValue(Command.EnqueueCookiesAnimation(isCosmetic))
+                    command.value = Command.EnqueueCookiesAnimation(isCosmetic)
                 } else {
-                    command.postValue(ShowAutoconsentAnimation(isCosmetic))
+                    command.value = ShowAutoconsentAnimation(isCosmetic)
                 }
             }
         }

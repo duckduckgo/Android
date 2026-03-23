@@ -42,7 +42,6 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onBrowserChatSubmitted: (String) -> Unit,
     val onDuckAiChatSubmitted: (String) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
@@ -93,7 +92,6 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
-        if (omnibarController.isDuckAiMode()) return false
         val removed = removeWidget()
         if (!removed) return false
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
@@ -103,7 +101,7 @@ class RealNativeInputManager @Inject constructor(
         }
         omnibarController.restore()
         omnibarController.show()
-        return true
+        return !omnibarController.isDuckAiMode()
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
@@ -198,7 +196,11 @@ class RealNativeInputManager @Inject constructor(
         val prefillText = query.ifEmpty { omnibarController.getText() }
         bindWidget(widgetView, lifecycleOwner, tabs, callbacks)
         if (!omnibarController.isDuckAiMode() && prefillText.isNotEmpty()) {
-            widgetFrom(widgetView)?.text = prefillText
+            callbacks.onClearAutocomplete()
+            widgetFrom(widgetView)?.apply {
+                text = prefillText
+                selectAllText()
+            }
         }
         attachWidget(widgetView)
         if (!omnibarController.isDuckAiMode()) {
@@ -230,7 +232,7 @@ class RealNativeInputManager @Inject constructor(
                     callbacks.onDuckAiChatSubmitted(query)
                 } else {
                     hideNativeInput()
-                    callbacks.onBrowserChatSubmitted(query)
+                    callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
             },
         )

@@ -235,7 +235,7 @@
         <item name="daxColorButtonGhostAltText">@color/white84</item>
         <item name="daxColorButtonGhostAltTextPressed">@color/white84</item>
         <item name="daxColorButtonDestructiveGhostText">@color/alertRedOnDarkDefault</item>
-        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkTextPressed</item>
+        <item name="daxColorButtonDestructiveGhostTextPressed">@color/alertRedOnDarkDefault</item>
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
@@ -363,7 +363,7 @@
         <item name="daxColorButtonDestructiveContainer">@color/alertRedOnLightDefault</item>
         <item name="daxColorButtonDestructiveContainerPressed">@color/alertRedOnLightPressed</item>
         <item name="daxColorButtonDestructiveGhostContainer">@android:color/transparent</item>
-        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault</item>
+        <item name="daxColorButtonDestructiveGhostContainerPressed">@color/alertRedOnLightDefault_18</item>
         <item name="daxColorButtonGhostAltContainerPressed">@color/black6</item>
         <item name="daxColorButtonPrimaryText">@color/white</item>
         <item name="daxColorButtonPrimaryTextPressed">@color/white</item>

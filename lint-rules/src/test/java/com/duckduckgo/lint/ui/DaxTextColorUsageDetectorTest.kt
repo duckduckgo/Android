@@ -60,6 +60,10 @@ class DaxTextColorUsageDetectorTest {
             val tertiary: Color
         )
 
+        data class DuckDuckGoColors(
+            val text: DuckDuckGoTextColors
+        )
+
         object DuckDuckGoTheme {
             val textColors: DuckDuckGoTextColors
                 @Composable
@@ -68,7 +72,21 @@ class DaxTextColorUsageDetectorTest {
                     secondary = Color(0xFF666666),
                     tertiary = Color(0xFF999999)
                 )
+
+            val colors: DuckDuckGoColors
+                @Composable
+                get() = DuckDuckGoColors(
+                    text = DuckDuckGoTextColors(
+                        primary = Color(0xFF000000),
+                        secondary = Color(0xFF666666),
+                        tertiary = Color(0xFF999999)
+                    )
+                )
         }
+
+        val AlertGreen: Color
+            @Composable
+            get() = Color(0xFF21C000)
         """.trimIndent()
     ).indented()
 
@@ -158,6 +176,190 @@ class DaxTextColorUsageDetectorTest {
     }
 
     @Test
+    fun whenColorFromDuckDuckGoThemeColorsTextThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = DuckDuckGoTheme.colors.text.primary
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromThemeVariableColorsTextThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    @Composable
+                    fun TestScreen() {
+                        val theme = DuckDuckGoTheme
+                        DaxText(
+                            text = "Hello",
+                            color = theme.colors.text.secondary
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingThemeColorsThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
+
+                    object ExampleDefaults {
+                        val titleColor: Color
+                            @Composable
+                            get() = DuckDuckGoTheme.colors.text.primary
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.titleColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsingStaticThemeColorThenNoWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+                    import com.duckduckgo.common.ui.compose.theme.AlertGreen
+
+                    object ExampleDefaults {
+                        val statusColor: Color
+                            @Composable
+                            get() = AlertGreen
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.statusColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+            .expectClean()
+    }
+
+    @Test
+    fun whenColorFromDefaultsObjectUsesArbitraryColorThenWarning() {
+        lint()
+            .files(
+                TestFiles.kt(
+                    """
+                    package com.example.test
+
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+                    import com.duckduckgo.common.ui.compose.component.core.text.DaxText
+
+                    object ExampleDefaults {
+                        val invalidColor: Color
+                            @Composable
+                            get() = Color.Red
+                    }
+
+                    @Composable
+                    fun TestScreen() {
+                        DaxText(
+                            text = "Hello",
+                            color = ExampleDefaults.invalidColor
+                        )
+                    }
+                    """.trimIndent()
+                ).indented(),
+                composeStubs,
+                themeStubs,
+                daxTextStub
+            )
+            .allowCompilationErrors()
+            .issues(INVALID_DAX_TEXT_COLOR_USAGE)
+            .skipTestModes(TestMode.WHITESPACE)
+            .run()
+                .expectContains("InvalidDaxTextColorUsage")
+                .expectContains("Use DuckDuckGoTheme semantic text colors")
+                .expectContains("color = ExampleDefaults.invalidColor")
+                .expectContains("0 errors, 1 warnings")
+    }
+
+    @Test
     fun whenDefaultColorUsedThenNoWarning() {
         lint()
             .files(
@@ -214,9 +416,13 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme semantic text colors (preferred: DuckDuckGoTheme.colors.text, legacy: DuckDuckGoTheme.textColors) instead of arbitrary Color values.
+
+                Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic text colors or theme-defined static colors.
 
                 Examples:
+                • DuckDuckGoTheme.colors.text.primary
+                • theme.colors.text.secondary
                 • DuckDuckGoTheme.textColors.primary
                 • DuckDuckGoTheme.textColors.secondary
 
@@ -258,9 +464,13 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:11: Warning: Use DuckDuckGoTheme semantic text colors (preferred: DuckDuckGoTheme.colors.text, legacy: DuckDuckGoTheme.textColors) instead of arbitrary Color values.
+
+                Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic text colors or theme-defined static colors.
 
                 Examples:
+                • DuckDuckGoTheme.colors.text.primary
+                • theme.colors.text.secondary
                 • DuckDuckGoTheme.textColors.primary
                 • DuckDuckGoTheme.textColors.secondary
 
@@ -319,18 +529,26 @@ class DaxTextColorUsageDetectorTest {
             .run()
             .expect(
                 """
-                src/com/example/test/test.kt:17: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:17: Warning: Use DuckDuckGoTheme semantic text colors (preferred: DuckDuckGoTheme.colors.text, legacy: DuckDuckGoTheme.textColors) instead of arbitrary Color values.
+
+                Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic text colors or theme-defined static colors.
 
                 Examples:
+                • DuckDuckGoTheme.colors.text.primary
+                • theme.colors.text.secondary
                 • DuckDuckGoTheme.textColors.primary
                 • DuckDuckGoTheme.textColors.secondary
 
                 For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR. [InvalidDaxTextColorUsage]
                         color = Color.Blue
                                 ~~~~~~~~~~
-                src/com/example/test/test.kt:27: Warning: Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.
+                src/com/example/test/test.kt:27: Warning: Use DuckDuckGoTheme semantic text colors (preferred: DuckDuckGoTheme.colors.text, legacy: DuckDuckGoTheme.textColors) instead of arbitrary Color values.
+
+                Defaults classes are allowed only when their implementation resolves to DuckDuckGoTheme semantic text colors or theme-defined static colors.
 
                 Examples:
+                • DuckDuckGoTheme.colors.text.primary
+                • theme.colors.text.secondary
                 • DuckDuckGoTheme.textColors.primary
                 • DuckDuckGoTheme.textColors.secondary
 
