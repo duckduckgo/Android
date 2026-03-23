@@ -5077,7 +5077,6 @@ class BrowserTabFragment :
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
-                    logcat { "Hatch: selected tab $tabId browserShowing $browserShowing" }
                     if (browserShowing) {
                         showBrowser()
                     } else {

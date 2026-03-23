@@ -238,7 +238,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         get() {
             return if (swipingTabsFeature.isEnabled) {
                 val selectedTabId = tabManager.getSelectedTabId()
-                logcat { "Hatch: selectedTabId $selectedTabId" }
                 supportFragmentManager.fragments
                     .filterIsInstance<BrowserTabFragment>()
                     .firstOrNull { it.tabId == selectedTabId }
@@ -414,14 +413,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                     launch {
                         viewModel.selectedTabFlow.collectLatest {
-                            logcat { "Hatch: onSelectedTabChanged $it" }
                             tabManager.onSelectedTabChanged(it)
                         }
                     }
 
                     launch {
                         viewModel.selectedTabIndex.collectLatest {
-                            logcat { "Hatch: selectedTabIndex $it" }
                             onMoveToTabRequested(it)
                         }
                     }
@@ -1484,7 +1481,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
-        logcat { "Hatch: onTabsUpdated" }
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
 

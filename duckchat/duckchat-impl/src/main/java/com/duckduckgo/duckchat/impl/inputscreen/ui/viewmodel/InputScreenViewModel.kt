@@ -803,7 +803,6 @@ class InputScreenViewModel @AssistedInject constructor(
         chatSuggestionsFetchJob = viewModelScope.launch {
             try {
                 val suggestions = chatSuggestionsReader.fetchSuggestions(query)
-                logcat { "Hatch: chat suggestions $suggestions" }
                 _chatSuggestions.value = suggestions
             } catch (e: Exception) {
                 // Skip logging for CancellationException since it's expected when a new query replaces an in-flight fetch.

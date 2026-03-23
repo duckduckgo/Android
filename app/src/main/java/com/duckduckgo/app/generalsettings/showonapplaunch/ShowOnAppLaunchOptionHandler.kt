@@ -30,7 +30,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
@@ -51,14 +50,6 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
 
     override suspend fun handleAppLaunchOption() {
         val lastTab = tabRepository.getSelectedTab()
-        logcat { "Hatch: lastTab $lastTab" }
-        // check inactivity times
-        // if more then X
-        //     store currently selected tab
-        //     create new tab
-        //     hatch view model reads stored tab and selected tab
-        // else
-        // let the other options play out
 
         when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
             LastOpenedTab -> Unit

@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
@@ -69,8 +68,6 @@ class TabPagerAdapter(
     override fun createFragment(position: Int): Fragment {
         val tab = tabs[position]
         val isExternal = activity.consumeExternalLaunchForTab(tab.tabId)
-        logcat { "Hatch: createFragment position=$position, tabId=${tab.tabId}, url=${tab.url}, isExternal=$isExternal" }
-
         // Check if there's a message specifically for this tab's source tab ID
         val pendingMessage = pendingMessages.remove(tab.sourceTabId)
         pendingMessage?.cleanupJob?.cancel()

@@ -78,6 +78,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
+        conflatedJob.cancel()
+    }
+
     val tabId: String
         get() = viewModel.viewState.value.tabId
 
