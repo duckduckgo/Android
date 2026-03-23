@@ -3445,7 +3445,6 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchPressedListener(
             object : NewTabReturnHatchView.ItemPressedListener {
                 override fun onHatchPressed() {
-                    logcat { "Hatch: inputScreenHatch.setOnClickListener" }
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
             },

@@ -121,4 +121,43 @@ class NewTabReturnHatchViewModelTest {
 
         verify(mockTabRepository).select("")
     }
+
+    @Test
+    fun whenInitialStateThenTabIdIsEmpty() = runTest {
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals("", state.tabId)
+            assertFalse(state.shouldShow)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabHasNullTitleAndUrlThenViewStateUsesEmptyStrings() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = null, title = null)
+
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShow)
+            assertEquals("", state.tabTitle)
+            assertEquals("", state.url)
+            assertEquals("tab1", state.tabId)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabClearedThenViewStateHidesHatch() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            skipItems(1) // initial state
+
+            lastAccessedTabFlow.emit(tab)
+            assertTrue(awaitItem().shouldShow)
+
+            lastAccessedTabFlow.emit(null)
+            assertFalse(awaitItem().shouldShow)
+        }
+    }
 }
