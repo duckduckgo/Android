@@ -61,7 +61,7 @@ class BrowserMenuBottomSheet(
             behavior.apply {
                 isDraggable = true
                 isHideable = true
-                peekHeight = context.resources.displayMetrics.heightPixels / 2
+                peekHeight = computePeekHeight()
                 state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
@@ -493,8 +493,16 @@ class BrowserMenuBottomSheet(
         menuItemView.setIcon(iconRes)
     }
 
+    internal fun computePeekHeight(): Int {
+        return context.resources.displayMetrics.heightPixels * PEEK_HEIGHT_PERCENT / 100
+    }
+
     private fun performDismiss() {
         onDismissListener.invoke()
         dismiss()
+    }
+
+    companion object {
+        internal const val PEEK_HEIGHT_PERCENT = 80
     }
 }
