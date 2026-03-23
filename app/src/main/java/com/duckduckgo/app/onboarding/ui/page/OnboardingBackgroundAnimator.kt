@@ -125,14 +125,11 @@ class OnboardingBackgroundAnimator(
      * Used to restore the correct background state after configuration changes (e.g., rotation).
      */
     fun snapTo(step: OnboardingBackgroundStep) {
-        val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
-        val outView = activeView
-
         cancel()
 
-        val density = inView.resources.displayMetrics.density
+        val density = backgroundSecondary.resources.displayMetrics.density
 
-        with(inView) {
+        with(backgroundSecondary) {
             updateLayoutParams<ConstraintLayout.LayoutParams> {
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
             }
@@ -142,11 +139,11 @@ class OnboardingBackgroundAnimator(
             isVisible = true
         }
 
-        outView.alpha = 0f
-        outView.translationX = 0f
-        outView.isVisible = false
+        backgroundPrimary.alpha = 0f
+        backgroundPrimary.translationX = 0f
+        backgroundPrimary.isVisible = false
 
-        activeView = inView
+        activeView = backgroundSecondary
     }
 
     fun cancel() {
