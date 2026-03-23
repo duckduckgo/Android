@@ -434,12 +434,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
                     }
+
                     playOutroAnimation(
                         nextStep = OnboardingBackgroundStep.Welcome,
                         onAnimationStart = {
                             if (showWalkingDax) playWalkingDaxAnimation()
                         },
                         onAnimationEnd = {
+                            if (showSecondaryCta) {
+                                binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+                            }
                             fadeInDialog {
                                 val animators = mutableListOf<Animator>(
                                     ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.root, View.ALPHA, 1f)
