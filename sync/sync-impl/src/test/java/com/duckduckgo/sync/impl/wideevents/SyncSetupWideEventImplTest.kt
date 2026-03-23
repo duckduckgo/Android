@@ -286,6 +286,19 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
+    fun `onRecoveryCodeGenerationFailed finishes flow with failure`() = runTest {
+        whenever(wideEventClient.getFlowIds(any()))
+            .thenReturn(Result.success(listOf(1L)))
+
+        wideEvent.onRecoveryCodeGenerationFailed()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure(reason = "recovery_code_generation_failed"),
+        )
+    }
+
+    @Test
     fun `onFlowCancelled finishes flow with cancelled`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(1L)))

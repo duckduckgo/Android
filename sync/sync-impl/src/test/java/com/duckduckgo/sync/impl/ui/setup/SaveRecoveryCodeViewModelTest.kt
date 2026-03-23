@@ -189,6 +189,22 @@ class SaveRecoveryCodeViewModelTest {
     }
 
     @Test
+    fun whenUserSignedInAndRecoveryCodeNullThenOnRecoveryCodeGenerationFailedCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "error"))
+
+        testee.commands().test {
+            testee.viewState().test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            val command = awaitItem()
+            assertTrue(command is Command.FinishWithError)
+            verify(syncSetupWideEvent).onRecoveryCodeGenerationFailed()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenUserClicksCopyThenCopyToClipboard() = runTest {
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))

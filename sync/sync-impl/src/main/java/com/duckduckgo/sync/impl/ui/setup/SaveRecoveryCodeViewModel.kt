@@ -72,7 +72,10 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                 )
                 syncSetupWideEvent.onRecoveryCodeShown()
                 viewState.emit(ViewState(newState))
-            } ?: command.send(Command.FinishWithError)
+            } ?: run {
+                syncSetupWideEvent.onRecoveryCodeGenerationFailed()
+                command.send(Command.FinishWithError)
+            }
         } else {
             viewState.emit(ViewState(CreatingAccount))
             syncAccountRepository.createAccount().onFailure {

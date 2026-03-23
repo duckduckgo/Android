@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -62,6 +63,7 @@ class RecoverDataViewModelTest {
     private val clipboard: ClipboardInteractor = mock()
     private val syncPixels: SyncPixels = mock()
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
     private val testee = RecoverDataViewModel(
         recoveryPDF,
@@ -70,6 +72,7 @@ class RecoverDataViewModelTest {
         coroutineTestRule.testDispatcherProvider,
         syncPixels,
         syncAutoRestoreManager,
+        syncSetupWideEvent,
     )
 
     @Test
@@ -265,6 +268,37 @@ class RecoverDataViewModelTest {
             verify(syncAutoRestoreManager, never()).setRestoreOnReinstallEnabled(any())
             verify(syncAutoRestoreManager, never()).saveRecoveryPayload(any(), any())
             verify(syncAutoRestoreManager, never()).clearRecoveryCode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedInThenOnRecoveryCodeShownCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+
+        testee.viewState().test {
+            awaitItem()
+            verify(syncSetupWideEvent).onRecoveryCodeShown()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoveryCodeNullThenOnRecoveryCodeGenerationFailedCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "error"))
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
+
+        testee.commands().test {
+            testee.viewState().test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            val command = awaitItem()
+            assertTrue(command is Command.FinishWithError)
+            verify(syncSetupWideEvent).onRecoveryCodeGenerationFailed()
             cancelAndIgnoreRemainingEvents()
         }
     }

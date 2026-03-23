@@ -44,6 +44,7 @@ interface SyncSetupWideEvent {
     suspend fun onAccountCreated()
     suspend fun onAccountCreationFailed()
     suspend fun onRecoveryCodeShown()
+    suspend fun onRecoveryCodeGenerationFailed()
     suspend fun onFlowCancelled()
 }
 
@@ -190,7 +191,7 @@ class SyncSetupWideEventImpl @Inject constructor(
 
         wideEventClient.flowFinish(
             wideEventId = id,
-            status = FlowStatus.Failure(reason = "account_creation_failed"),
+            status = FlowStatus.Failure(reason = STEP_ACCOUNT_CREATION_FAILED),
         )
         cachedFlowId = null
     }
@@ -201,6 +202,17 @@ class SyncSetupWideEventImpl @Inject constructor(
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_RECOVERY_CODE_SHOWN, success = true)
         wideEventClient.flowFinish(wideEventId = id, status = FlowStatus.Success)
+        cachedFlowId = null
+    }
+
+    override suspend fun onRecoveryCodeGenerationFailed() {
+        if (!isFeatureEnabled()) return
+        val id = getCurrentWideEventId() ?: return
+
+        wideEventClient.flowFinish(
+            wideEventId = id,
+            status = FlowStatus.Failure(reason = STEP_RECOVERY_CODE_GENERATION_FAILED),
+        )
         cachedFlowId = null
     }
 
@@ -225,6 +237,8 @@ class SyncSetupWideEventImpl @Inject constructor(
         const val STEP_INTRO_SCREEN_SHOWN = "intro_screen_shown"
         const val STEP_SYNC_ENABLED = "sync_enabled"
         const val STEP_ACCOUNT_CREATED = "account_created"
+        const val STEP_ACCOUNT_CREATION_FAILED = "account_creation_failed"
         const val STEP_RECOVERY_CODE_SHOWN = "recovery_code_shown"
+        const val STEP_RECOVERY_CODE_GENERATION_FAILED = "recovery_code_generation_failed"
     }
 }
