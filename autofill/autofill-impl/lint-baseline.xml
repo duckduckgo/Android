@@ -1949,7 +1949,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="63"
+            line="65"
             column="13"/>
     </issue>
 
@@ -1960,7 +1960,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="65"
+            line="67"
             column="13"/>
     </issue>
 
@@ -2510,7 +2510,7 @@
         errorLine2="        ~~">
         <location
             file="src/main/res/layout/popup_window_import_passwords_menu.xml"
-            line="31"
+            line="33"
             column="9"/>
     </issue>
 
@@ -4939,68 +4939,13 @@
     </issue>
 
     <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
+        id="DeprecatedWidgetInXml"
+        message="Always favor the use of the Design System Component"
+        errorLine1="        &lt;TextView"
+        errorLine2="         ~~~~~~~~">
         <location
-            file="src/main/res/layout/content_autofill_generate_password_dialog.xml"
-            line="25"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_autofill_save_new_credentials.xml"
-            line="25"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_autofill_select_credentials_tooltip.xml"
-            line="22"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/content_autofill_update_existing_credentials.xml"
-            line="25"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_email_protection_choose_email.xml"
-            line="27"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_email_protection_in_context_sign_up.xml"
-            line="24"
+            file="src/main/res/layout/autofill_remote_view.xml"
+            line="31"
             column="10"/>
     </issue>
 
@@ -5011,29 +4956,18 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="29"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="DeprecatedWidgetInXml"
-        message="Always favor the use of the Design System Component"
-        errorLine1="        &lt;TextView"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/autofill_remote_view.xml"
-            line="36"
+            line="38"
             column="10"/>
     </issue>
 
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine1="    android:background=&quot;@color/gray0&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="11"
+            line="12"
             column="5"/>
     </issue>
 
@@ -5044,7 +4978,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="34"
+            line="36"
             column="13"/>
     </issue>
 
@@ -5055,7 +4989,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="41"
+            line="43"
             column="13"/>
     </issue>
 
