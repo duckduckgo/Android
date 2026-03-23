@@ -524,7 +524,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
-                    val transition = androidx.transition.ChangeBounds()
+                    val transition = androidx.transition.ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
                     transition.addListener(object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
                             comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
@@ -547,6 +549,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.stepIndicator.isVisible = true
                     binding.daxDialogCta.stepIndicator.alpha = 0f
                     TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    val cardView = binding.daxDialogCta.cardView
+                    cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                    android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                        interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator()
+                        addUpdateListener {
+                            cardView.setArrowAnimationFraction(it.animatedValue as Float)
+                        }
+                        start()
+                    }
 
                     binding.welcomeScreenWalkingDax.isVisible = false
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
@@ -646,6 +659,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     bottomToTop = ConstraintLayout.LayoutParams.UNSET
                     bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                 }
+                val cardView = binding.daxDialogCta.cardView
+                cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                cardView.setArrowAnimationFraction(1f)
                 binding.daxDialogCta.welcomeContent.root.isVisible = false
                 binding.daxDialogCta.secondaryCta.isVisible = false
 
@@ -857,6 +873,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val CHECK_ICON_FADE_DURATION = 130L
         private const val CHECK_ICON_STAGGER_DELAY = 130L
         private const val CHECK_ICON_OVERSHOOT_TENSION = 2.4f
+
+        private const val DIALOG_TRANSITION_DURATION = 400L
+        private const val ARROW_TARGET_OFFSET_END_DP = 80
 
         private const val WALKING_DAX_DELAY = 400L
         private const val WALKING_DAX_FADE_DURATION = 100L
