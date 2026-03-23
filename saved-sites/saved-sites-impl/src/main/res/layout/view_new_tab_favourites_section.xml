@@ -84,6 +84,7 @@
             android:layout_gravity="center"
             android:background="@drawable/selectable_circular_32dp_shape_container_ripple"
             android:layout_centerHorizontal="true"
+            android:contentDescription="@string/newTabFavoritesToggleContentDescription"
             android:padding="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_chevron_small_down_16"/>
 
