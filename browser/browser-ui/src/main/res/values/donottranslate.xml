@@ -17,6 +17,5 @@
 <resources>
 
     <string name="tabSwitcherContentDescription">Tabs</string>
-    <string name="browserMenuFire">Clear Tabs and Data</string>
 
 </resources>
