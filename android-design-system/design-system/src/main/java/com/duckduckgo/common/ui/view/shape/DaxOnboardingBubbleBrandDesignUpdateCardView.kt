@@ -36,6 +36,8 @@ constructor(
     defStyleAttr: Int = R.attr.cardViewStyle,
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
+    private var animatableEdgeTreatment: AnimatableOffsetEdgeTreatment? = null
+
     init {
         val attr = context.theme.obtainStyledAttributes(
             attrs,
@@ -64,7 +66,13 @@ constructor(
         strokeWidth = resources.getDimensionPixelSize(R.dimen.dax_brand_design_bubble_stroke_width)
 
         val edgeTreatment = DaxBubbleBottomEdgeTreatment()
-        val offsetEdgeTreatment = applyOffsetEdgeTreatment(offsetStart, offsetEnd, edgeTreatment)
+        val offsetEdgeTreatment = if (offsetStart != 0) {
+            AnimatableOffsetEdgeTreatment(edgeTreatment, offsetStart.toFloat()).also {
+                animatableEdgeTreatment = it
+            }
+        } else {
+            applyOffsetEdgeTreatment(offsetStart, offsetEnd, edgeTreatment)
+        }
 
         shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornerRadius)
@@ -95,6 +103,29 @@ constructor(
                 layoutParams = params
             }
         }
+    }
+
+    /**
+     * Set the target position for the arrow animation.
+     *
+     * @param offsetFromEndPx visual offset from the right/end edge in pixels.
+     */
+    fun setArrowAnimationTarget(offsetFromEndPx: Float) {
+        animatableEdgeTreatment?.offsetFromEndPx = offsetFromEndPx
+    }
+
+    /**
+     * Drive the arrow animation.
+     *
+     * @param fraction 0 = arrow at initial [arrowOffsetStart] position,
+     *   1 = arrow at target position set via [setArrowAnimationTarget].
+     */
+    fun setArrowAnimationFraction(fraction: Float) {
+        animatableEdgeTreatment?.fraction = fraction
+        // Re-assign shapeAppearanceModel to force MaterialShapeDrawable to
+        // mark its cached path as dirty. A plain invalidate() only triggers
+        // draw(), but the drawable skips getEdgePath() unless pathDirty is set.
+        shapeAppearanceModel = shapeAppearanceModel
     }
 
     /**
