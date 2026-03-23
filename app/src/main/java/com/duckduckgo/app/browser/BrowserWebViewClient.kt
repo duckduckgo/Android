@@ -86,6 +86,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.distinctUntilChanged
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
@@ -93,6 +94,7 @@ import logcat.logcat
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -139,6 +141,18 @@ class BrowserWebViewClient @Inject constructor(
     private var lastPageStarted: String? = null
     private var start: Long? = null
     private var lastInterceptedAppSchemeUrl: String? = null
+
+    private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appSchemeInterceptionFeature.self().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isAppSchemeInterceptionEnabled.set(enabled)
+                }
+        }
+    }
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
@@ -533,7 +547,7 @@ class BrowserWebViewClient @Inject constructor(
      * @return true if the URL was handled and loading should stop, false otherwise
      */
     private fun interceptAppSchemeUrl(webView: WebView, url: String): Boolean {
-        if (!appSchemeInterceptionFeature.self().isEnabled()) {
+        if (!isAppSchemeInterceptionEnabled.get()) {
             return false
         }
         val uri = url.toUri()

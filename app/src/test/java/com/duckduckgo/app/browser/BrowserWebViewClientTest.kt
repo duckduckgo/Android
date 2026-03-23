@@ -87,6 +87,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -172,6 +173,7 @@ class BrowserWebViewClientTest {
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
+    private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
 
     @Before
     fun setup() =
@@ -181,6 +183,7 @@ class BrowserWebViewClientTest {
             whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
             val enabledToggle: Toggle = mock()
             whenever(enabledToggle.isEnabled()).thenReturn(true)
+            whenever(enabledToggle.enabled()).thenReturn(appSchemeInterceptionEnabledFlow)
             whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(enabledToggle)
             testee =
                 BrowserWebViewClient(
@@ -1595,10 +1598,8 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppSchemeInterceptionFeatureDisabledThenAppSchemeUrlNotIntercepted() {
-        val disabledToggle: Toggle = mock()
-        whenever(disabledToggle.isEnabled()).thenReturn(false)
-        whenever(mockAppSchemeInterceptionFeature.self()).thenReturn(disabledToggle)
+    fun whenAppSchemeInterceptionFeatureDisabledThenAppSchemeUrlNotIntercepted() = runTest {
+        appSchemeInterceptionEnabledFlow.emit(false)
 
         val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
         testee.onPageStarted(webView, intentUrl, null)
