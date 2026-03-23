@@ -39,6 +39,7 @@
         <item name="onboardingAccentAltGlowPrimary">#29A1CFF7</item> <!--16% Alpha-->
         <item name="onboardingAccentBrand">@color/mandarin50</item>
         <item name="onboardingAccentContentPrimary">@color/white</item>
+        <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
 
         <!--Surface-->
@@ -83,6 +84,7 @@
         <item name="onboardingAccentAltGlowPrimary">#1FA1CFF7</item> <!--12% Alpha-->
         <item name="onboardingAccentBrand">@color/pollen30</item>
         <item name="onboardingAccentContentPrimary">@color/pollen100</item>
+        <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
 
         <!--Surface-->
