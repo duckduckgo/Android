@@ -845,7 +845,7 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         }
 
         override suspend fun getSelectedTab(): TabEntity? {
-            TODO("Not yet implemented")
+            return null
         }
 
         override suspend fun getLastAccessedTab(): TabEntity? {
