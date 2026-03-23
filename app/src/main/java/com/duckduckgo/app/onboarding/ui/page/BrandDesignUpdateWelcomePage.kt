@@ -715,7 +715,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playCheckIconAnimation() {
-        val overshoot = OvershootInterpolator()
+        val overshoot = OvershootInterpolator(CHECK_ICON_OVERSHOOT_TENSION)
         val checkViews = listOf(
             binding.daxDialogCta.comparisonChartContent.check1,
             binding.daxDialogCta.comparisonChartContent.check2,
@@ -843,9 +843,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val TYPING_DELAY_MS = 20L
         private const val TYPING_POST_DELAY_MS = 20L
 
-        private const val CHECK_ICON_ANIMATION_DURATION = 300L
-        private const val CHECK_ICON_FADE_DURATION = 100L
-        private const val CHECK_ICON_STAGGER_DELAY = 100L
+        private const val CHECK_ICON_ANIMATION_DURATION = 400L
+        private const val CHECK_ICON_FADE_DURATION = 130L
+        private const val CHECK_ICON_STAGGER_DELAY = 130L
+        private const val CHECK_ICON_OVERSHOOT_TENSION = 2.4f
 
         private const val WALKING_DAX_DELAY = 400L
         private const val WALKING_DAX_FADE_DURATION = 100L
