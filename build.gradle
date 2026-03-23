@@ -41,7 +41,7 @@ plugins {
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
 def gprUser = findProperty("ducksans.gpr.user") ?: providers.environmentVariable("DUCKSANS_PACKAGE_AUTH_USER").getOrNull()
 def gprKey = findProperty("ducksans.gpr.key") ?: providers.environmentVariable("DUCKSANS_PACKAGE_AUTH_TOKEN").getOrNull()
-def hasGprCredentials = gprUser != null && gprKey != null
+def hasGprCredentials = gprUser && gprKey
 def useProprietaryFontProp = findProperty("useProprietaryFont")
 ext.proprietaryFontAvailable = hasGprCredentials && useProprietaryFontProp?.toBoolean() != false
 
