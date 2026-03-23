@@ -211,6 +211,28 @@
     </issue>
 
     <issue
+        id="MissingTranslation"
+        message="&quot;subscriptionExpiredStatusIconContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
+        errorLine1="    &lt;string name=&quot;subscriptionExpiredStatusIconContentDescription&quot;>Subscription expired&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-subscriptions.xml"
+            line="215"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;subscriptionActiveStatusIconContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
+        errorLine1="    &lt;string name=&quot;subscriptionActiveStatusIconContentDescription&quot;>Subscription active&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-subscriptions.xml"
+            line="216"
+            column="13"/>
+    </issue>
+
+    <issue
         id="Untranslatable"
         message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
         errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
@@ -2060,265 +2082,529 @@
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierPlusName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;tierPlusName&quot; translatable=&quot;false&quot;>PLUS&lt;/string>"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-subscriptions.xml"
+            line="212"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
     <issue
         id="Untranslatable"
-        message="The resource string &quot;activityPir&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
-        errorLine1="    &lt;string name=&quot;activityPir&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"
+        message="The resource string &quot;tierProName&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;tierProName&quot; translatable=&quot;false&quot;>PRO&lt;/string>"
         errorLine2="                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-subscriptions.xml"
-            line="172"
+            line="213"
             column="32"/>
     </issue>
 
@@ -2771,39 +3057,6 @@
             file="src/main/java/com/duckduckgo/subscriptions/impl/settings/views/ProSettingView.kt"
             line="111"
             column="9"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageView"
-        errorLine2="             ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_subscription_settings.xml"
-            line="40"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_subscription_settings.xml"
-            line="66"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_subscription_settings.xml"
-            line="92"
-            column="18"/>
     </issue>
 
     <issue

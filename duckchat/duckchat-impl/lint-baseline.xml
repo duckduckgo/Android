@@ -8,7 +8,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="560"
+            line="581"
             column="24"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="575"
+            line="602"
             column="24"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="580"
+            line="607"
             column="24"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="633"
+            line="662"
             column="20"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                               ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="779"
+            line="808"
             column="32"/>
     </issue>
 
@@ -96,7 +96,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="332"
+            line="345"
             column="24"/>
     </issue>
 
@@ -107,7 +107,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="342"
+            line="355"
             column="24"/>
     </issue>
 
@@ -118,7 +118,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="347"
+            line="360"
             column="24"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="362"
+            line="375"
             column="24"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="369"
+            line="382"
             column="24"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                       ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="540"
+            line="592"
             column="24"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                      ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/inputscreen/ui/InputScreenFragment.kt"
-            line="609"
+            line="666"
             column="23"/>
     </issue>
 
@@ -239,7 +239,7 @@
         errorLine2="                                ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="703"
+            line="732"
             column="33"/>
     </issue>
 
@@ -263,6 +263,534 @@
             file="src/main/res/drawable/logo_full_ai.xml"
             line="2"
             column="20"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_without_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_without_ai_updated&quot; translatable=&quot;false&quot;>Search only&lt;/string>"
+        errorLine2="                                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-duckchat.xml"
+            line="58"
+            column="62"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-duckchat.xml"
+            line="60"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;input_screen_user_pref_with_ai_updated&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;input_screen_user_pref_with_ai_updated&quot; translatable=&quot;false&quot;>Toggle between\nSearch and Duck.ai&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-duckchat.xml"
+            line="60"
+            column="59"/>
     </issue>
 
     <issue
@@ -382,7 +910,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="166"
+            line="167"
             column="22"/>
     </issue>
 
@@ -404,7 +932,7 @@
         errorLine2="                     ~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="166"
+            line="167"
             column="22"/>
     </issue>
 
@@ -426,7 +954,7 @@
         errorLine2="            ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="283"
+            line="287"
             column="13"/>
     </issue>
 
@@ -437,96 +965,8 @@
         errorLine2="                                  ^">
         <location
             file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="283"
+            line="287"
             column="35"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="106"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="124"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="147"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                    &lt;ImageView"
-        errorLine2="                     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_duck_chat_settings.xml"
-            line="173"
-            column="22"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
-            line="65"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                            &lt;ImageView"
-        errorLine2="                             ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/bottom_sheet_new_address_bar_option.xml"
-            line="78"
-            column="30"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="181"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                &lt;ImageView"
-        errorLine2="                 ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_input_mode_switch_widget.xml"
-            line="209"
-            column="18"/>
     </issue>
 
     <issue
@@ -536,7 +976,7 @@
         errorLine2="                        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/fragment_contextual_duck_ai.xml"
-            line="294"
+            line="295"
             column="25"/>
     </issue>
 
