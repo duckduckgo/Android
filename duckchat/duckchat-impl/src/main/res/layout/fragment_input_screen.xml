@@ -46,7 +46,8 @@
         android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputScreenHatch">
+        app:layout_constraintTop_toBottomOf="@+id/inputScreenHatch"
+        app:layout_goneMarginTop="180dp">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ddgLogo"
