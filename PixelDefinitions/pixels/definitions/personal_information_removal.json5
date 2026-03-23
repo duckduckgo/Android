@@ -1089,7 +1089,7 @@
                 "type": "string"
             },
             {
-                "key": "actionID",
+                "key": "action_id",
                 "description": "The unique identifier of the action that failed",
                 "type": "string"
             },
