@@ -95,6 +95,9 @@ class BrowserMenuBottomSheet(
     val settingsMenuItem: MenuActionButtonView
         get() = binding.settingsMenuItem
 
+    val refreshActionMenuItem: MenuActionButtonView
+        get() = binding.refreshActionMenuItem
+
     val defaultBrowserMenuItem: View
         get() = binding.includeDefaultBrowserMenuItem.defaultBrowserMenuItem
 
@@ -158,6 +161,9 @@ class BrowserMenuBottomSheet(
     val brokenSiteMenuItem: MenuItemView
         get() = binding.reportBrokenSiteMenuItem
 
+    val fireMenuItem: MenuItemView
+        get() = binding.fireMenuItem
+
     fun render(viewState: BrowserMenuViewState) {
         hideAllMenuItems()
         showCommonItems()
@@ -185,6 +191,10 @@ class BrowserMenuBottomSheet(
 
     private fun showCommonItems() {
         menuActionItemsContainer.isVisible = true
+        newTabMenuItem.isVisible = true
+        newDuckChatMenuItem.isVisible = true
+        settingsMenuItem.isVisible = true
+        refreshActionMenuItem.isVisible = false
         bookmarksMenuItem.isVisible = true
         downloadsMenuItem.isVisible = true
     }
@@ -258,11 +268,14 @@ class BrowserMenuBottomSheet(
         autofillMenuItem.isVisible = viewState.showAutofill
 
         renderPageContextHeader(viewState.pageContextHeader)
-        vpnMenuItem.isVisible = false
+        renderVpnMenu(viewState.vpnMenuState)
+        fireMenuItem.isVisible = viewState.showFireMenuItem
 
         binding.urlPageActionsSectionDivider.isVisible = true
         binding.librarySectionDivider.isVisible = true
-        binding.privacyToolsSectionDivider.isVisible = viewState.canFireproofSite || viewState.isEmailSignedIn
+        val hasMinOnePrivacyItem =
+            viewState.showFireMenuItem || viewState.canFireproofSite || viewState.isEmailSignedIn || viewState.vpnMenuState != VpnMenuState.Hidden
+        binding.privacyToolsSectionDivider.isVisible = hasMinOnePrivacyItem
         binding.utilitiesSectionDivider.isVisible = true
         binding.customTabsMenuDivider.isVisible = false
     }
@@ -284,10 +297,11 @@ class BrowserMenuBottomSheet(
         downloadsMenuItem.isVisible = true
         duckChatHistoryMenuItem.isVisible = false
         renderVpnMenu(viewState.vpnMenuState)
+        createAliasMenuItem.isVisible = viewState.isEmailSignedIn
 
         binding.urlPageActionsSectionDivider.isVisible = false
         binding.librarySectionDivider.isVisible = true
-        binding.privacyToolsSectionDivider.isVisible = viewState.vpnMenuState != VpnMenuState.Hidden
+        binding.privacyToolsSectionDivider.isVisible = viewState.isEmailSignedIn || viewState.vpnMenuState != VpnMenuState.Hidden
         binding.utilitiesSectionDivider.isVisible = false
         binding.customTabsMenuDivider.isVisible = false
     }
@@ -295,14 +309,13 @@ class BrowserMenuBottomSheet(
     private fun renderCustomTabsMenu(viewState: BrowserMenuViewState.CustomTabs) {
         backMenuItem.isEnabled = viewState.canGoBack
         forwardMenuItem.isEnabled = viewState.canGoForward
-        newTabMenuItem.isEnabled = false
-        newDuckChatTabMenuItem.isEnabled = false
+        newTabMenuItem.isVisible = false
         newDuckChatTabMenuItem.isVisible = false
-        newDuckChatMenuItem.isEnabled = false
-        newDuckChatMenuItem.isVisible = true
-        settingsMenuItem.isEnabled = false
+        newDuckChatMenuItem.isVisible = false
+        settingsMenuItem.isVisible = false
+        refreshActionMenuItem.isVisible = true
 
-        refreshMenuItem.isVisible = true
+        refreshMenuItem.isVisible = false
         printPageMenuItem.isVisible = true
         sharePageMenuItem.isVisible = viewState.canSharePage
         findInPageMenuItem.isVisible = viewState.canFindInPage

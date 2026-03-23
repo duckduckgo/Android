@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Natrag</string>
     <string name="browserMenuForward">Naprijed</string>
     <string name="browserMenuRefresh">Osvježi</string>
+    <string name="browserMenuFire">Obriši kartice i podatke</string>
 </resources>

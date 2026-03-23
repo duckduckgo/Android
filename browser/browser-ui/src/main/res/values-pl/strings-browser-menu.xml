@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Wstecz</string>
     <string name="browserMenuForward">Dalej</string>
     <string name="browserMenuRefresh">Odśwież</string>
+    <string name="browserMenuFire">Wyczyść karty i dane</string>
 </resources>

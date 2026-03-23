@@ -53,4 +53,5 @@
     <string name="browserMenuBack">Back</string>
     <string name="browserMenuForward">Forward</string>
     <string name="browserMenuRefresh">Refresh</string>
+    <string name="browserMenuFire">Clear Tabs and Data</string>
 </resources>

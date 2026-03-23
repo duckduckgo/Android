@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Tagasi</string>
     <string name="browserMenuForward">Edasi</string>
     <string name="browserMenuRefresh">Värskenda</string>
+    <string name="browserMenuFire">Kustuta vahekaardid ja andmed</string>
 </resources>

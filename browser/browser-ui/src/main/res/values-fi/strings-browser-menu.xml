@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Takaisin</string>
     <string name="browserMenuForward">Eteenpäin</string>
     <string name="browserMenuRefresh">Päivitä</string>
+    <string name="browserMenuFire">Tyhjennä välilehdet ja tiedot</string>
 </resources>

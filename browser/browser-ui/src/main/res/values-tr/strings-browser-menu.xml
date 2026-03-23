@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Geri</string>
     <string name="browserMenuForward">İleri</string>
     <string name="browserMenuRefresh">Yenile</string>
+    <string name="browserMenuFire">Sekmeleri ve Verileri Temizle</string>
 </resources>

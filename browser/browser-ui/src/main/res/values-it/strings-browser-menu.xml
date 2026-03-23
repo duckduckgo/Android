@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Indietro</string>
     <string name="browserMenuForward">Avanti</string>
     <string name="browserMenuRefresh">Aggiorna</string>
+    <string name="browserMenuFire">Cancella tutte le schede e i dati</string>
 </resources>

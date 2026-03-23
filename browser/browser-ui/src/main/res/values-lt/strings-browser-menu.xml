@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Atgal</string>
     <string name="browserMenuForward">Pirmyn</string>
     <string name="browserMenuRefresh">Atnaujinti</string>
+    <string name="browserMenuFire">Valyti skirtukus ir duomenis</string>
 </resources>
