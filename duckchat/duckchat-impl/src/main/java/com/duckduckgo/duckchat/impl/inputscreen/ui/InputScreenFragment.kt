@@ -220,19 +220,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
-        binding.inputScreenHatch.isVisible = params?.showReturnHatch ?: false
-        binding.inputScreenHatch.setHatchPressedListener(
-            object : NewTabReturnHatchView.ItemPressedListener {
-                override fun onHatchPressed() {
-                    logcat { "Hatch: inputScreenHatch.setOnClickListener" }
-                    exitInputScreen()
-                }
-            },
-        )
 
         val initialText = params?.query ?: ""
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
         inputModeWidget.provideInitialInputState(initialText, showMainButtons)
+
+        configureHatchView(params?.showReturnHatch)
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
@@ -284,7 +277,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             else -> 0
         }
         configureOmnibar(tabs, useTopBar)
-
         configureVoice(useTopBar)
         configureObservers()
         configureLogoAnimation()
@@ -454,7 +446,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun configureOmnibar(
         tabs: Int,
-        useTopBar: Boolean
+        useTopBar: Boolean,
     ) =
         with(inputModeWidget) {
             onSearchSent = { query ->
@@ -545,6 +537,18 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val data = Intent().putExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM, query)
         requireActivity().setResult(InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED, data)
         exitInputScreen()
+    }
+
+    private fun configureHatchView(showReturnHatch: Boolean?) {
+        binding.inputScreenHatch.isVisible = showReturnHatch ?: false
+        binding.inputScreenHatch.setHatchPressedListener(
+            object : NewTabReturnHatchView.ItemPressedListener {
+                override fun onHatchPressed() {
+                    logcat { "Hatch: inputScreenHatch.setOnClickListener" }
+                    exitInputScreen()
+                }
+            },
+        )
     }
 
     private fun configureVoice(useTopBar: Boolean) {
@@ -699,7 +703,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun showOrHideLogo(
         shouldBeVisible: Boolean,
         wasHidden: Boolean,
-        searchMode: Boolean
+        searchMode: Boolean,
     ) {
         binding.ddgLogoContainer.animate().cancel()
         binding.ddgLogoContainer.alpha = 1f
@@ -805,7 +809,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun showOverlay(
         overlay: View,
-        onAnimationUpdate: () -> Unit = {}
+        onAnimationUpdate: () -> Unit = {},
     ) {
         disableViewPagerInput()
         overlay.elevation = 3f.toPx()
@@ -822,7 +826,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun hideOverlay(
         overlay: View,
-        onAnimationUpdate: () -> Unit = {}
+        onAnimationUpdate: () -> Unit = {},
     ) {
         overlay.animate()
             .alpha(0f)
@@ -844,7 +848,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun hideOverlayImmediately(
         overlay: View,
-        onAnimationUpdate: () -> Unit = {}
+        onAnimationUpdate: () -> Unit = {},
     ) {
         overlay.animate().cancel()
         overlay.visibility = View.INVISIBLE
@@ -871,7 +875,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun showLogoIfNoContent(
         hasContent: Boolean,
-        state: InputScreenVisibilityState
+        state: InputScreenVisibilityState,
     ) {
         if (!hasContent && !state.autoCompleteSuggestionsVisible && !state.chatSuggestionsVisible) {
             binding.ddgLogoContainer.isVisible = true
