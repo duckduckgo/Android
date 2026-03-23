@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -62,6 +63,8 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
+    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+
     private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
@@ -70,6 +73,7 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
+                mockDownloadMenuStateProvider,
             )
         model
     }
@@ -369,6 +373,16 @@ class DownloadsViewModelTest {
         testee.syncDownloads()
 
         verify(mockDownloadsRepository, never()).delete(listOf(1L))
+    }
+
+    @Test
+    fun whenSyncDownloadsThenDownloadsScreenViewedIsCalled() = runTest {
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(emptyList()))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadMenuStateProvider).onDownloadsScreenViewed()
     }
 
     private fun oneItem() =

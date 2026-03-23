@@ -31,6 +31,7 @@ sealed class BrowserMenuViewState {
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
         val showFireMenuItem: Boolean = false,
+        val showDownloadDot: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
@@ -65,12 +66,14 @@ sealed class BrowserMenuViewState {
         val isEmailSignedIn: Boolean = false,
         val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
         val showAutofill: Boolean = false,
+        val showDownloadDot: Boolean = false,
     ) : BrowserMenuViewState()
 
     data class DuckAi(
         val canPrintPage: Boolean = false,
         val canReportSite: Boolean = false,
         val showAutofill: Boolean = false,
+        val showDownloadDot: Boolean = false,
         val pageContextHeader: PageContextHeaderState = PageContextHeaderState.Hidden,
     ) : BrowserMenuViewState()
 }
