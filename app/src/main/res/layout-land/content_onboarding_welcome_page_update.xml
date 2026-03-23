@@ -146,6 +146,22 @@
                 app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
                 tools:alpha="1"
                 tools:lottie_progress="1" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/bottomWingAnimation"
+                android:layout_width="0dp"
+                android:layout_height="199dp"
+                android:layout_marginTop="40dp"
+                android:alpha="0"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/daxDialogCta"
+                app:lottie_rawRes="@raw/onboarding_wing_bottom"
+                tools:alpha="1"
+                tools:lottie_progress="0.5"
+                tools:visibility="visible" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>
