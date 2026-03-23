@@ -45,6 +45,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.toPx
@@ -174,6 +175,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                             binding.viewPager.isUserInputEnabled = false
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -218,9 +220,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
+
         val initialText = params?.query ?: ""
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
         inputModeWidget.provideInitialInputState(initialText, showMainButtons)
+
+        configureHatchView(params?.showReturnHatch)
 
         val useTopBar = inputScreenConfigResolver.useTopBar()
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
@@ -272,7 +277,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             else -> 0
         }
         configureOmnibar(tabs, useTopBar)
-
         configureVoice(useTopBar)
         configureObservers()
         configureLogoAnimation()
@@ -440,7 +444,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar(tabs: Int, useTopBar: Boolean) =
+    private fun configureOmnibar(
+        tabs: Int,
+        useTopBar: Boolean,
+    ) =
         with(inputModeWidget) {
             onSearchSent = { query ->
                 viewModel.onSearchSubmitted(query)
@@ -532,6 +539,21 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         exitInputScreen()
     }
 
+    private fun configureHatchView(showReturnHatch: Boolean?) {
+        binding.inputScreenHatch.isVisible = showReturnHatch ?: false
+        binding.inputScreenHatch.setHatchPressedListener(
+            object : NewTabReturnHatchView.ItemPressedListener {
+                override fun onHatchPressed() {
+                    val tabId = binding.inputScreenHatch.tabId
+                    logcat { "Hatch: inputScreenHatch.setOnClickListener tabId=$tabId" }
+                    val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
+                    requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
+                    exitInputScreen()
+                }
+            },
+        )
+    }
+
     private fun configureVoice(useTopBar: Boolean) {
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
@@ -540,6 +562,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
                             viewModel.onSearchSubmitted(result.query)
                         }
+
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
                             viewModel.onChatSubmitted(result.query)
                         }
@@ -680,7 +703,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .start()
     }
 
-    private fun showOrHideLogo(shouldBeVisible: Boolean, wasHidden: Boolean, searchMode: Boolean) {
+    private fun showOrHideLogo(
+        shouldBeVisible: Boolean,
+        wasHidden: Boolean,
+        searchMode: Boolean,
+    ) {
         binding.ddgLogoContainer.animate().cancel()
         binding.ddgLogoContainer.alpha = 1f
         if (shouldBeVisible && wasHidden) {
@@ -783,7 +810,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
     }
 
-    private fun showOverlay(overlay: View, onAnimationUpdate: () -> Unit = {}) {
+    private fun showOverlay(
+        overlay: View,
+        onAnimationUpdate: () -> Unit = {},
+    ) {
         disableViewPagerInput()
         overlay.elevation = 3f.toPx()
         overlay.alpha = 0f
@@ -797,7 +827,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .start()
     }
 
-    private fun hideOverlay(overlay: View, onAnimationUpdate: () -> Unit = {}) {
+    private fun hideOverlay(
+        overlay: View,
+        onAnimationUpdate: () -> Unit = {},
+    ) {
         overlay.animate()
             .alpha(0f)
             .setDuration(OVERLAY_ANIMATION_DURATION)
@@ -816,7 +849,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             .start()
     }
 
-    private fun hideOverlayImmediately(overlay: View, onAnimationUpdate: () -> Unit = {}) {
+    private fun hideOverlayImmediately(
+        overlay: View,
+        onAnimationUpdate: () -> Unit = {},
+    ) {
         overlay.animate().cancel()
         overlay.visibility = View.INVISIBLE
         hideOverlay(overlay, onAnimationUpdate)
@@ -840,7 +876,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         showLogoIfNoContent(hasContent, state)
     }
 
-    private fun showLogoIfNoContent(hasContent: Boolean, state: InputScreenVisibilityState) {
+    private fun showLogoIfNoContent(
+        hasContent: Boolean,
+        state: InputScreenVisibilityState,
+    ) {
         if (!hasContent && !state.autoCompleteSuggestionsVisible && !state.chatSuggestionsVisible) {
             binding.ddgLogoContainer.isVisible = true
             binding.ddgLogo.progress = if (state.searchMode) 0f else 1f

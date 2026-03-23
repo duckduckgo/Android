@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.newtab.hatch
+package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.content.Context
 import android.util.AttributeSet
@@ -25,8 +25,8 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.browser.ui.databinding.ViewNewTabHatchBinding
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -38,7 +38,6 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import logcat.logcat
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
@@ -47,6 +46,10 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
+
+    interface ItemPressedListener {
+        fun onHatchPressed()
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -57,6 +60,8 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     private val binding: ViewNewTabHatchBinding by viewBinding()
 
     private val conflatedJob = ConflatedJob()
+
+    private var hatchItemPressedListener: ItemPressedListener? = null
 
     private val viewModel: NewTabReturnHatchViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabReturnHatchViewModel::class.java]
@@ -71,19 +76,12 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         conflatedJob += viewModel.viewState
             .onEach { render(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
-
-        binding.returnHatchRoot.setOnClickListener {
-            viewModel.onHatchPressed()
-        }
     }
 
-    fun onHatchSelected(onClick: (String) -> Unit) {
-        val tab = viewModel.viewState.value.tabId
-        binding.returnHatchRoot.setOnClickListener { onClick.invoke(tab) }
-    }
+    val tabId: String
+        get() = viewModel.viewState.value.tabId
 
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
-        logcat { "Hatch: render $state" }
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.tabTitle
             binding.returnHatchSiteURL.text = state.url.extractDomain()
@@ -93,6 +91,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
             }
         } else {
             binding.returnHatchRoot.gone()
+        }
+    }
+
+    fun setHatchPressedListener(itemPressedListener: ItemPressedListener) {
+        hatchItemPressedListener = itemPressedListener
+        binding.returnHatchRoot.setOnClickListener {
+            hatchItemPressedListener?.onHatchPressed()
         }
     }
 }
