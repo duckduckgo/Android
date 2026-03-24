@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
+import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -69,7 +70,9 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
+    private lateinit var animator: NativeInputAnimator
     private var isNativeInputFieldEnabled: Boolean = false
+    private var isExiting: Boolean = false
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -77,6 +80,7 @@ class RealNativeInputManager @Inject constructor(
 
     override fun init(omnibar: Omnibar, rootView: ViewGroup, lifecycleOwner: LifecycleOwner, onDisabled: () -> Unit) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
+        this.animator = RealNativeInputAnimator()
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
@@ -92,20 +96,59 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
-        val removed = removeWidget()
-        if (!removed) return false
+        val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
+            ?: rootView.findViewById(R.id.inputModeBottomRoot)
+            ?: return false
+
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
-        if (omnibarController.isBrowserMode()) {
-            hideNtp()
+
+        val card = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
+        val omnibarCard = omnibarController.getCardView()
+
+        isExiting = true
+        if (!omnibarController.isDuckAiMode() && card != null && omnibarCard != null && omnibarCard.width > 0) {
+            animator.animateExit(card, widgetView, omnibarCard, layoutCoordinator.isWidgetBottom()) {
+                isExiting = false
+                onHide()
+            }
+        } else {
+            isExiting = false
+            onHide()
         }
+
+        return !omnibarController.isDuckAiMode()
+    }
+
+    private fun onHide() {
         omnibarController.restore()
         omnibarController.show()
-        return !omnibarController.isDuckAiMode()
+
+        val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
+        if (widgetCard != null) {
+            (widgetCard as? MaterialCardView)?.cardElevation = 0f
+            widgetCard.animate()
+                .alpha(0f)
+                .setDuration(FADE_OUT_DURATION_MS)
+                .withEndAction {
+                    widgetCard.alpha = 1f
+                    removeWidget()
+                    if (omnibarController.isBrowserMode()) {
+                        hideNtp()
+                    }
+                }
+                .start()
+        } else {
+            removeWidget()
+            if (omnibarController.isBrowserMode()) {
+                hideNtp()
+            }
+        }
     }
 
     override fun onKeyboardVisibilityChanged(isVisible: Boolean) {
         if (!isNativeInputFieldEnabled) return
+        if (isExiting) return
         val widget = widgetFrom(rootView) ?: return
         val widgetRoot = widget.asView().parent?.parent as? View
 
@@ -119,11 +162,25 @@ class RealNativeInputManager @Inject constructor(
     private fun onKeyboardShown(widgetRoot: View?) {
         if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
         omnibarController.hide()
-        setWidgetCardEndMargin(0)
         widgetRoot?.translationZ = 0f
         if (layoutCoordinator.isWidgetBottom() && widgetRoot != null) {
-            layoutCoordinator.applyBottomCardShape(widgetRoot)
+            expandBottomCardToFull(widgetRoot)
+        } else {
+            setWidgetCardEndMargin(0)
         }
+    }
+
+    private fun expandBottomCardToFull(widgetRoot: View) {
+        val card = widgetRoot.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
+        val parentWidth = (card.parent as? View)?.width ?: return
+
+        layoutCoordinator.applyBottomCardCorners(widgetRoot)
+
+        animator.animateCardWidth(
+            card = card,
+            widgetView = widgetRoot,
+            target = CardWidthTarget(width = parentWidth, marginStart = 0, marginEnd = 0, bottomMargin = 0),
+        )
     }
 
     private fun onKeyboardHidden(widget: NativeInputWidget, widgetRoot: View?) {
@@ -144,7 +201,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun showTabsAndMenuButtons(widgetRoot: View?) {
-        omnibarController.showTabsAndMenuButtons()
+        omnibarController.showTransparentOmnibar()
         widgetRoot?.let {
             it.bringToFront()
             it.translationZ = 8f.toPx()
@@ -170,9 +227,24 @@ class RealNativeInputManager @Inject constructor(
 
     private fun setWidgetCardEndMargin(margin: Int) {
         val card = rootView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
+        val widgetView = rootView.findViewById(R.id.inputModeTopRoot)
+            ?: rootView.findViewById<View?>(R.id.inputModeBottomRoot)
+            ?: return
         val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        params.marginEnd = margin
-        card.layoutParams = params
+        val targetMarginEnd = params.marginStart + margin
+        if (params.marginEnd == targetMarginEnd) return
+        val parentWidth = (card.parent as? View)?.width ?: return
+
+        animator.animateCardWidth(
+            card = card,
+            widgetView = widgetView,
+            target = CardWidthTarget(
+                width = parentWidth - params.marginStart - targetMarginEnd,
+                marginStart = params.marginStart,
+                marginEnd = targetMarginEnd,
+                bottomMargin = params.bottomMargin,
+            ),
+        )
     }
 
     override fun showNativeInput(
@@ -184,6 +256,9 @@ class RealNativeInputManager @Inject constructor(
     ) {
         if (!isNativeInputFieldEnabled) return
 
+        if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
+
+        animator.cancelAnimation()
         if (omnibarController.isDuckAiMode()) {
             omnibarController.forceToTop()
         }
@@ -204,7 +279,6 @@ class RealNativeInputManager @Inject constructor(
         }
         attachWidget(widgetView)
         if (!omnibarController.isDuckAiMode()) {
-            omnibarController.hide()
             showNtp()
         }
     }
@@ -217,21 +291,19 @@ class RealNativeInputManager @Inject constructor(
         widget.bindInputEvents(
             onSearchTextChanged = callbacks.onSearchTextChanged,
             onSearchSubmitted = { query ->
-                if (omnibarController.isDuckAiMode()) {
-                    removeWidget()
-                    omnibarController.restore()
-                    omnibarController.show()
-                } else {
-                    hideNativeInput()
-                }
+                hideNativeInput()
                 callbacks.onSearchSubmitted(query)
             },
             onChatSubmitted = { query ->
                 if (omnibarController.isDuckAiMode()) {
+                    widget.text = ""
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query)
                 } else {
-                    hideNativeInput()
+                    animator.cancelAnimation()
+                    rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
+                    rootView.findViewById<View?>(R.id.focusedView)?.gone()
+                    onHide()
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
             },
@@ -337,7 +409,16 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun attachWidget(widgetView: View) {
+        val omnibarCard = omnibarController.getCardView()
+        val widgetCard = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
+        val margins = if (!omnibarController.isDuckAiMode() && omnibarCard != null && widgetCard != null) {
+            animator.init(widgetCard, omnibarCard, omnibarCard.width, omnibarCard.height, layoutCoordinator.isWidgetBottom())
+        } else {
+            null
+        }
+
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams())
+        widgetView.translationZ = WIDGET_ELEVATION_DP.toPx()
         if (layoutCoordinator.isWidgetBottom()) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
@@ -347,8 +428,20 @@ class RealNativeInputManager @Inject constructor(
         layoutCoordinator.configureAutocompleteLayout(widgetView)
         layoutCoordinator.configureContentOffset(widgetView)
         widgetView.post { layoutCoordinator.applyForcedBottomTranslation(widgetView) }
-        if (!omnibarController.isDuckAiMode()) {
-            widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+
+        if (widgetCard != null && omnibarCard != null && margins != null) {
+            animator.animateEnter(widgetCard, omnibarCard, widgetView, margins) {
+                if (!omnibarController.isDuckAiMode()) {
+                    omnibarController.hide()
+                    widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+                }
+            }
+        } else {
+            animator.applyLayoutTransitions(widgetView)
+            if (!omnibarController.isDuckAiMode()) {
+                omnibarController.hide()
+                widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
+            }
         }
     }
 
@@ -386,5 +479,10 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+    }
+
+    companion object {
+        private const val WIDGET_ELEVATION_DP = 8f
+        private const val FADE_OUT_DURATION_MS = 150L
     }
 }
