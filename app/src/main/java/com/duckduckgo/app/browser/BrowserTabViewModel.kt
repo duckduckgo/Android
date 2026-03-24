@@ -4232,8 +4232,8 @@ class BrowserTabViewModel @Inject constructor(
                             command.value = SendResponseToJs(it)
                         }
                     }
-                    duckChatJSHelper.consumePendingEventOnHandoff(method)?.let { event ->
-                        // There is a pending subscription event waiting to be sent
+                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                        // There is a pending tab context prompt waiting to be sent
                         withContext(dispatchers.main()) {
                             _subscriptionEventDataChannel.send(event)
                         }
