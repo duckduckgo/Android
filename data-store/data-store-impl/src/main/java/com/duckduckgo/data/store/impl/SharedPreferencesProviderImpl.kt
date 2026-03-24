@@ -110,6 +110,14 @@ class SharedPreferencesProviderImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(
+        origin: SharedPreferences,
+        name: String,
+    ): SharedPreferences? {
+        logcat { "Migrate and return encrypted preferences to Harmony" }
+        return migrateEncryptedToHarmonyIfNecessary(origin, name)
+    }
+
     private fun getEncryptedSharedPreferencesInternal(
         name: String,
         multiprocess: Boolean,

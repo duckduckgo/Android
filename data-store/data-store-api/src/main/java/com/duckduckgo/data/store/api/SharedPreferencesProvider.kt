@@ -54,4 +54,15 @@ interface SharedPreferencesProvider {
      * @return the encrypted shared preferences or null if there was any error (eg. device doesn't support it)
      */
     suspend fun getMigratedEncryptedSharedPreferences(origin: SharedPreferences, name: String): SharedPreferences?
+
+    /**
+     * Returns an instance of Encrypted Shared Preferences supporting multiprocess, migrating its contents if needed.
+     * Unlike [getMigratedEncryptedSharedPreferences], read/write failures on the returned instance will throw
+     * rather than being swallowed silently. Callers are responsible for handling exceptions from all read and write operations.
+     * @param origin The SharedPreferences instance to migrate
+     * @param name Name of the shared preferences
+     *
+     * @return the raw encrypted shared preferences or null if there was any error (eg. device doesn't support it)
+     */
+    suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(origin: SharedPreferences, name: String): SharedPreferences?
 }
