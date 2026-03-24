@@ -7,6 +7,8 @@ Always delegate to the agent — do not apply its instructions inline.
 
 ### `ddg-api-proposal-reviewer`
 
+**Command:** `/review-public-api <url-or-code>`
+
 Use this when someone asks for a review of a DuckDuckGo Android public API proposal.
 
 Triggers:
