@@ -42,7 +42,7 @@ class NativeInputLayoutCoordinator(
         }
     }
 
-    fun applyBottomCardShape(widgetView: View) {
+    fun applyBottomCardCorners(widgetView: View) {
         if (!isWidgetBottom()) return
         val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
         val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
@@ -54,10 +54,22 @@ class NativeInputLayoutCoordinator(
                 .setBottomLeftCornerSize(0f)
                 .setBottomRightCornerSize(0f)
                 .build()
-        card.useCompatPadding = false
+    }
+
+    fun applyBottomCardShape(widgetView: View) {
+        if (!isWidgetBottom()) return
+        applyBottomCardCorners(widgetView)
+        val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
+        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT
+        params.marginStart = 0
+        params.marginEnd = 0
+        params.bottomMargin = 0
+        card.layoutParams = params
     }
 
     fun applyRoundedCardShape(widgetView: View) {
+        if (!isWidgetBottom()) return
         val card = widgetView.findViewById<MaterialCardView?>(R.id.inputModeWidgetCard) ?: return
         val radius = card.resources.getDimension(R.dimen.extraLargeShapeCornerRadius)
         card.shapeAppearanceModel =
@@ -65,7 +77,13 @@ class NativeInputLayoutCoordinator(
                 .toBuilder()
                 .setAllCornerSizes(radius)
                 .build()
-        card.useCompatPadding = true
+        val horizontalInset = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val bottomInset = card.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
+        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        params.marginStart = horizontalInset
+        params.marginEnd = horizontalInset
+        params.bottomMargin = bottomInset
+        card.layoutParams = params
     }
 
     fun configureAutocompleteLayout(widgetView: View) {
