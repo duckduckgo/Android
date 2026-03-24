@@ -810,18 +810,26 @@ sealed class DaxBubbleCta(
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
+        val isFreeTrialCopy: Boolean = false,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
         title = R.string.onboardingPrivacyProDaxDialogTitle,
         description = R.string.onboardingPrivacyProDaxDialogDescription,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
-        primaryCta = R.string.onboardingPrivacyProDaxDialogOkButton,
+        primaryCta =
+            if (isFreeTrialCopy) {
+                R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+            } else {
+                R.string.onboardingPrivacyProDaxDialogOkButton
+            },
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+        override val markAsReadOnShow: Boolean = false
+    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
