@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_ai_chat_add_16"
-                app:primaryText="@string/browserMenuNewAIChat" />
+                app:primaryText="@string/browserMenuNewChat" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/includeDuckChatMenuItem"
@@ -132,7 +132,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_print_16"
-                app:primaryText="@string/browserMenuPrint" />
+                app:primaryText="@string/browserMenuPrintSite" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
@@ -175,8 +175,8 @@
                 android:id="@+id/chatHistoryMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_history_16"
-                app:primaryText="@string/browserMenuChatHistory" />
+                app:iconDrawable="@drawable/ic_dot_list_24"
+                app:primaryText="@string/browserMenuDuckChatHistory" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/autofillMenuItem"
