@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Sukurkite „Duck“ adresą</string>
     <string name="browserMenuFindInPage">Rasti puslapyje</string>
     <string name="browserMenuPrint">Spausdinti puslapį</string>
+    <string name="browserMenuPrintSite">Spausdinti</string>
     <string name="browserMenuOpenAppLink">Atidaryti programėlėje</string>
     <string name="browserMenuAddToHome">Pridėti prie pagrindinio ekrano</string>
     <string name="browserMenuReportBrokenSite">Pranešti apie sugadintą svetainę</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Naujas pokalbis</string>
     <string name="browserMenuNewAIChat">Naujas DI pokalbis</string>
     <string name="browserMenuChatHistory">Pokalbių istorija</string>
+    <string name="browserMenuDuckChatHistory">„Duck.ai“ pokalbiai</string>
     <string name="browserMenuChatSettings">„Duck.ai“ nustatymai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->

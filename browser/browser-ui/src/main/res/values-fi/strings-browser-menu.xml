@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Luo Duck Address</string>
     <string name="browserMenuFindInPage">Etsi sivulta</string>
     <string name="browserMenuPrint">Tulosta sivu</string>
+    <string name="browserMenuPrintSite">Tulosta</string>
     <string name="browserMenuOpenAppLink">Avaa sovelluksessa</string>
     <string name="browserMenuAddToHome">Lisää kotinäytölle</string>
     <string name="browserMenuReportBrokenSite">Ilmoita viallisesta sivustosta</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Uusi keskustelu</string>
     <string name="browserMenuNewAIChat">Uusi AI Chat</string>
     <string name="browserMenuChatHistory">Keskusteluhistoria</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai-keskustelut</string>
     <string name="browserMenuChatSettings">Duck.ai-asetukset</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->

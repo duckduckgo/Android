@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Duck Address genereren</string>
     <string name="browserMenuFindInPage">Zoek op pagina</string>
     <string name="browserMenuPrint">Pagina printen</string>
+    <string name="browserMenuPrintSite">Afdrukken</string>
     <string name="browserMenuOpenAppLink">Openen in de app</string>
     <string name="browserMenuAddToHome">Toevoegen aan Home Screen</string>
     <string name="browserMenuReportBrokenSite">Defecte website melden</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Nieuwe chat</string>
     <string name="browserMenuNewAIChat">Nieuwe AI Chat</string>
     <string name="browserMenuChatHistory">Chatgeschiedenis</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai chats</string>
     <string name="browserMenuChatSettings">Duck.ai-instellingen</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->

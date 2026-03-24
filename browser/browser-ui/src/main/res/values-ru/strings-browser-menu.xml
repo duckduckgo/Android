@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Создать адрес Duck</string>
     <string name="browserMenuFindInPage">Найти на странице</string>
     <string name="browserMenuPrint">Печать страницы</string>
+    <string name="browserMenuPrintSite">Распечатать</string>
     <string name="browserMenuOpenAppLink">Открыть в приложении</string>
     <string name="browserMenuAddToHome">Добавить на домашнюю страницу</string>
     <string name="browserMenuReportBrokenSite">Сообщить о неработающем сайте</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Запустить чат</string>
     <string name="browserMenuNewAIChat">Запустить AI Chat</string>
     <string name="browserMenuChatHistory">История чата</string>
+    <string name="browserMenuDuckChatHistory">Чаты Duck.ai</string>
     <string name="browserMenuChatSettings">Настройки Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
