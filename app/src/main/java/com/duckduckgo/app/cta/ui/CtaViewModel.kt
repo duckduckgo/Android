@@ -262,6 +262,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxPrivacyProCta(
                     onboardingStore,
                     appInstallStore,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
                 )
             }
 
