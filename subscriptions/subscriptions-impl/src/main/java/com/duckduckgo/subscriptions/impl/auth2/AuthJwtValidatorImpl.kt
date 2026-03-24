@@ -84,7 +84,7 @@ class AuthJwtValidatorImpl @Inject constructor(
             .parse(jwkSet)
             .getKeys()
 
-        return io.jsonwebtoken.Jwts.parser()
+        val claims = io.jsonwebtoken.Jwts.parser()
             .keyLocator { header ->
                 val keyId = (header as io.jsonwebtoken.JwsHeader).keyId
                 jwks.first { it.id == keyId }.toKey()
@@ -92,10 +92,16 @@ class AuthJwtValidatorImpl @Inject constructor(
             .clock { Date(timeProvider.currentTimeMillis()) }
             .requireIssuer("https://quack.duckduckgo.com")
             .requireAudience(requiredAudience)
-            .require("scope", requiredScope)
             .build()
             .parseSignedClaims(jwt)
             .payload
+
+        val scopes = claims.get("scope", String::class.java)?.split(" ") ?: emptyList()
+        if (requiredScope !in scopes) {
+            throw IllegalArgumentException("Required scope '$requiredScope' not present")
+        }
+
+        return claims
     }
 
     private val Claims.accountExternalId: String

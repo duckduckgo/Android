@@ -19,12 +19,19 @@ package com.duckduckgo.subscriptions.impl.auth2
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.subscriptions.impl.model.Entitlement
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Jwks
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.math.BigInteger
+import java.security.interfaces.ECPublicKey
 import java.time.Instant
 import java.time.LocalDateTime
+import java.util.Base64
+import java.util.Date
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class AuthJwtValidatorImplTest {
@@ -142,6 +149,12 @@ class AuthJwtValidatorImplTest {
         )
     }
 
+    @Test
+    fun `when access token has scope with additional scopes then validation passes`() {
+        val (jwt, jwkSet) = generateTestAccessToken(scope = "privacypro api-keys:create")
+        authJwtValidator.validateAccessToken(jwt, jwkSet)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `when access token has incorrect scope then validating throws IllegalArgumentException`() {
         authJwtValidator.validateAccessToken(
@@ -156,6 +169,41 @@ class AuthJwtValidatorImplTest {
             jwt = FakeCredentialsWithIncorrectScope.REFRESH_TOKEN,
             jwkSet = FakeCredentialsWithIncorrectScope.JWK_SET,
         )
+    }
+
+    private fun generateTestAccessToken(scope: String): Pair<String, String> {
+        val keyPair = Jwts.SIG.ES256.keyPair().build()
+        val kid = UUID.randomUUID().toString()
+
+        val jwt = Jwts.builder()
+            .header().keyId(kid).and()
+            .issuer("https://quack.duckduckgo.com")
+            .audience().add("PrivacyPro").and()
+            .subject("test-account-id")
+            .expiration(Date.from(Instant.parse("2099-01-01T00:00:00Z")))
+            .claim("scope", scope)
+            .claim("api", "v2")
+            .claim("email", null)
+            .claim("entitlements", emptyList<Map<String, Any>>())
+            .signWith(keyPair.private)
+            .compact()
+
+        val ecPublicKey = keyPair.public as ECPublicKey
+        val x = ecPublicKey.w.affineX.toBase64Url()
+        val y = ecPublicKey.w.affineY.toBase64Url()
+        val jwkSetJson = """{"keys":[{"kty":"EC","crv":"P-256","kid":"$kid","x":"$x","y":"$y"}]}"""
+
+        return Pair(jwt, jwkSetJson)
+    }
+
+    private fun BigInteger.toBase64Url(): String {
+        val bytes = toByteArray()
+        val normalized = when {
+            bytes.size == 33 && bytes[0] == 0.toByte() -> bytes.copyOfRange(1, 33)
+            bytes.size < 32 -> ByteArray(32 - bytes.size) + bytes
+            else -> bytes
+        }
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(normalized)
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {

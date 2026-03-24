@@ -278,7 +278,7 @@ class AuthClientImpl @Inject constructor(
     private companion object {
         const val AUTH_V2_CLIENT_ID = "f4311287-0121-40e6-8bbd-85c36daf1837"
         const val AUTH_V2_REDIRECT_URI = "com.duckduckgo:/authcb"
-        const val AUTH_V2_SCOPE = "privacypro"
+        const val AUTH_V2_SCOPE = "privacypro api-keys:create"
         const val AUTH_V2_CODE_CHALLENGE_METHOD = "S256"
         const val AUTH_V2_RESPONSE_TYPE = "code"
         const val GRANT_TYPE_AUTHORIZATION_CODE = "authorization_code"
