@@ -24,7 +24,6 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import logcat.logcat
-import java.util.Collections
 import java.util.WeakHashMap
 import javax.inject.Inject
 
@@ -39,8 +38,7 @@ class AutoconsentReloadLoopDetector @Inject constructor(
         var reloadLoopDetected: Boolean = false,
     )
 
-    private val tabStates: MutableMap<WebView, TabState> =
-        Collections.synchronizedMap(WeakHashMap())
+    private val tabStates: MutableMap<WebView, TabState> = WeakHashMap()
 
     fun updateUrl(webView: WebView, url: String) {
         val newUri = url.toUri()
