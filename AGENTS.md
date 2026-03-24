@@ -205,3 +205,47 @@ The `lint-rules` module enforces at compile time:
 | Scheduling | WorkManager |
 | Logging | logcat (Square) |
 | Annotation Processing | KSP |
+
+---
+
+## Cursor Cloud specific instructions
+
+### Prerequisites (already installed in the VM snapshot)
+
+- JDK 17 (`openjdk-17-jdk`) — required by Gradle's `jvmToolchain(17)`
+- JDK 21 — used to run the Gradle daemon itself
+- Android SDK at `/opt/android-sdk` with: platform 35, build-tools 35.0.0, NDK 21.4.7075529, CMake 3.22.1
+- Environment variables persisted in `~/.bashrc`: `ANDROID_HOME`, `ANDROID_SDK_ROOT`, `JAVA_HOME`
+
+### Environment variables
+
+These must be set for Gradle to find the Android SDK (already in `~/.bashrc`):
+
+```
+ANDROID_HOME=/opt/android-sdk
+ANDROID_SDK_ROOT=/opt/android-sdk
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+```
+
+### Git submodules
+
+Run `git submodule update --init --recursive` after cloning or pulling. The update script handles this.
+
+### Key commands
+
+All standard build/test commands are in the **Build & Test Commands** section above. Quick reference:
+
+- **Format check:** `./gradlew spotlessCheck`
+- **Format fix:** `./gradlew spotlessApply`
+- **Single module tests:** `./gradlew :module-name:testDebugUnitTest`
+- **Build debug APK:** `./gradlew assembleInternalDebug`
+- **All unit tests:** `./gradlew jvm_tests`
+
+### Gotchas
+
+- The project requires JDK 17 as a toolchain but runs Gradle with JDK 21. Both must be installed. If only JDK 21 is present, Gradle fails with "Cannot find a Java installation matching this tasks requirements: {languageVersion=17}".
+- The Gradle configuration cache is used. If environment changes cause stale cache errors, delete `.gradle/configuration-cache` and retry.
+- Spotless ratchets from `origin/develop` — it only enforces formatting on changed files relative to the develop branch.
+- Two modules (`httpsupgrade-impl`, `anrs-impl`) use NDK 21.4.7075529 for C++ native code via CMake. Without the NDK, building these modules (or the full app) will fail.
+- No Docker, databases, or external services are needed. Room/SQLCipher databases are on-device only.
+- There is no Android emulator in the Cloud VM — Maestro UI tests and `installInternalRelease` require a connected device/emulator and cannot run here. Unit tests (`jvm_tests`) run on JVM and work fully.
