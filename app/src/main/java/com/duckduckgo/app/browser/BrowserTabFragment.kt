@@ -2799,8 +2799,10 @@ class BrowserTabFragment :
             is Command.PageStarted -> onPageStarted()
             is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
             is Command.DuckAIFullScreenDisabled -> {
+                if (omnibar.viewMode == DuckAI) {
+                    nativeInputManager.hideNativeInput()
+                }
                 omnibar.setViewMode(Browser(it.url))
-                nativeInputManager.hideNativeInput()
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
@@ -3642,6 +3644,7 @@ class BrowserTabFragment :
                     hasFocus: Boolean,
                     query: String,
                 ) {
+                    if (nativeInputManager.isNativeInputEnabled()) return
                     onOmnibarTextFocusChanged(hasFocus, query)
                 }
 
@@ -3657,10 +3660,12 @@ class BrowserTabFragment :
                 }
 
                 override fun onOmnibarTextChanged(state: OmnibarTextState) {
+                    if (nativeInputManager.isNativeInputEnabled()) return
                     onUserEnteredText(state.text, state.hasFocus)
                 }
 
                 override fun onShowSuggestions(state: OmnibarTextState) {
+                    if (nativeInputManager.isNativeInputEnabled()) return
                     viewModel.triggerAutocomplete(
                         state.text,
                         state.hasFocus,
