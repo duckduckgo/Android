@@ -17,29 +17,34 @@
 package com.duckduckgo.duckchat.impl.helper
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
-interface PendingSubscriptionEventStore {
-    fun store(event: SubscriptionEventData)
-    fun consume(): SubscriptionEventData?
+data class PendingTabContext(
+    val prompt: String,
+    val pageContexts: List<JSONObject>,
+)
+
+interface PendingTabContextStore {
+    fun store(prompt: String, pageContexts: List<JSONObject>)
+    fun consume(): PendingTabContext?
     fun clear()
 }
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealPendingSubscriptionEventStore @Inject constructor() : PendingSubscriptionEventStore {
+class RealPendingTabContextStore @Inject constructor() : PendingTabContextStore {
 
-    private val pending = AtomicReference<SubscriptionEventData?>(null)
+    private val pending = AtomicReference<PendingTabContext?>(null)
 
-    override fun store(event: SubscriptionEventData) {
-        pending.set(event)
+    override fun store(prompt: String, pageContexts: List<JSONObject>) {
+        pending.set(PendingTabContext(prompt, pageContexts))
     }
 
-    override fun consume(): SubscriptionEventData? {
+    override fun consume(): PendingTabContext? {
         return pending.getAndSet(null)
     }
 

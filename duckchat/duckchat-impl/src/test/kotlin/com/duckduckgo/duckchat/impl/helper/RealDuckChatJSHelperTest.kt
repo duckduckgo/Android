@@ -16,7 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -26,10 +28,13 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -43,7 +48,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -59,16 +67,19 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
-    private val mockPendingSubscriptionEventStore: PendingSubscriptionEventStore = mock()
-    private val mockFaviconManager: com.duckduckgo.app.browser.favicon.FaviconManager = mock()
+    private val mockPendingTabContextStore: PendingTabContextStore = mock()
+    private val mockFaviconManager: FaviconManager = mock()
+    private val mockDuckChatFeature: DuckChatFeature =
+        FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
-        pendingSubscriptionEventStore = mockPendingSubscriptionEventStore,
+        pendingTabContextStore = mockPendingTabContextStore,
         faviconManager = mockFaviconManager,
+        duckChatFeature = mockDuckChatFeature,
     )
     private val viewModel =
         object {
@@ -1404,7 +1415,7 @@ class RealDuckChatJSHelperTest {
 
         val json = JSONObject(result)
         assertFalse(json.has("favicon"))
-        verify(mockFaviconManager, org.mockito.kotlin.never()).loadFromDisk(org.mockito.kotlin.any(), org.mockito.kotlin.any())
+        verify(mockFaviconManager, never()).loadFromDisk(any(), any())
     }
 
     @Test
@@ -1415,71 +1426,100 @@ class RealDuckChatJSHelperTest {
 
         val json = JSONObject(result)
         assertFalse(json.has("favicon"))
-        verify(mockFaviconManager, org.mockito.kotlin.never()).loadFromDisk(org.mockito.kotlin.any(), org.mockito.kotlin.any())
+        verify(mockFaviconManager, never()).loadFromDisk(any(), any())
     }
 
     // endregion
 
-    // region storePendingPromptEvent
+    // region storeTabContextPromptEvent
 
+    @SuppressLint("DenyListedApi")
     @Test
-    fun whenStorePendingPromptEventThenEventIsStoredWithCorrectStructure() {
+    fun whenStoreTabContextPromptEventThenDataIsStored() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
         val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
 
-        testee.storePendingPromptEvent("hello", listOf(pageContext))
+        testee.storeTabContextPromptEvent("hello", listOf(pageContext))
 
-        verify(mockPendingSubscriptionEventStore).store(
-            org.mockito.kotlin.check { event ->
-                assertEquals(DUCK_CHAT_FEATURE_NAME, event.featureName)
-                assertEquals("submitAIChatNativePrompt", event.subscriptionName)
-                assertEquals("android", event.params.getString("platform"))
-                assertEquals("hello", event.params.getJSONObject("query").getString("prompt"))
-                assertTrue(event.params.getJSONObject("query").getBoolean("autoSubmit"))
-                assertEquals("Example", event.params.getJSONObject("pageContext").getString("title"))
-            },
-        )
+        verify(mockPendingTabContextStore).store(eq("hello"), any())
+    }
+
+    @Test
+    fun whenStoreTabContextPromptEventWithFeatureDisabledThenNothingStored() {
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+
+        testee.storeTabContextPromptEvent("hello", listOf(pageContext))
+
+        verify(mockPendingTabContextStore, never()).store(any(), any())
     }
 
     // endregion
 
-    // region consumePendingEventOnHandoff
+    // region consumeTabContextPromptOnHandoff
 
+    @SuppressLint("DenyListedApi")
     @Test
-    fun whenConsumePendingEventOnHandoffWithHandoffMethodThenReturnsEvent() {
-        val event = com.duckduckgo.js.messaging.api.SubscriptionEventData("aiChat", "test", JSONObject())
-        whenever(mockPendingSubscriptionEventStore.consume()).thenReturn(event)
+    fun whenConsumeTabContextPromptOnHandoffWithHandoffMethodAndFeatureEnabledThenReturnsEvent() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+        whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("hello", listOf(pageContext)))
 
-        val result = testee.consumePendingEventOnHandoff("getAIChatNativeHandoffData")
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
 
-        assertEquals(event, result)
+        assertNotNull(result)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
+        assertEquals("submitAIChatNativePrompt", result.subscriptionName)
+        assertEquals("hello", result.params.getJSONObject("query").getString("prompt"))
+        assertTrue(result.params.getJSONObject("query").getBoolean("autoSubmit"))
+        assertEquals("Example", result.params.getJSONObject("pageContext").getString("title"))
     }
 
     @Test
-    fun whenConsumePendingEventOnHandoffWithOtherMethodThenReturnsNull() {
-        val result = testee.consumePendingEventOnHandoff("getAIChatNativeConfigValues")
+    fun whenConsumeTabContextPromptOnHandoffWithOtherMethodThenReturnsNull() {
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues")
 
         assertNull(result)
-        verify(mockPendingSubscriptionEventStore, org.mockito.kotlin.never()).consume()
+        verify(mockPendingTabContextStore, never()).consume()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenConsumeTabContextPromptOnHandoffWithNothingStoredThenReturnsNull() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingTabContextStore.consume()).thenReturn(null)
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+
+        assertNull(result)
     }
 
     @Test
-    fun whenConsumePendingEventOnHandoffWithNothingStoredThenReturnsNull() {
-        whenever(mockPendingSubscriptionEventStore.consume()).thenReturn(null)
-
-        val result = testee.consumePendingEventOnHandoff("getAIChatNativeHandoffData")
+    fun whenConsumeTabContextPromptOnHandoffWithFeatureDisabledThenReturnsNull() {
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
 
         assertNull(result)
+        verify(mockPendingTabContextStore, never()).consume()
     }
 
     // endregion
 
-    // region clearPendingEvent
+    // region clearTabContextPromptEvent
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearTabContextPromptEventThenStoreIsCleared() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+
+        testee.clearTabContextPromptEvent()
+
+        verify(mockPendingTabContextStore).clear()
+    }
 
     @Test
-    fun whenClearPendingEventThenStoreIsCleared() {
-        testee.clearPendingEvent()
+    fun whenClearTabContextPromptEventWithFeatureDisabledThenNothingCleared() {
+        testee.clearTabContextPromptEvent()
 
-        verify(mockPendingSubscriptionEventStore).clear()
+        verify(mockPendingTabContextStore, never()).clear()
     }
 
     // endregion

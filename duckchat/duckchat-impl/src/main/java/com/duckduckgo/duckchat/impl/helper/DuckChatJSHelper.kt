@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -58,11 +59,11 @@ interface DuckChatJSHelper {
 
     suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String
 
-    fun storePendingPromptEvent(prompt: String, pageContexts: List<JSONObject>)
+    fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>)
 
-    fun clearPendingEvent()
+    fun clearTabContextPromptEvent()
 
-    fun consumePendingEventOnHandoff(method: String): SubscriptionEventData?
+    fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -83,8 +84,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dataStore: DuckChatDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val pendingSubscriptionEventStore: PendingSubscriptionEventStore,
+    private val pendingTabContextStore: PendingTabContextStore,
     private val faviconManager: FaviconManager,
+    private val duckChatFeature: DuckChatFeature,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -248,14 +250,28 @@ class RealDuckChatJSHelper @Inject constructor(
         return json.toString()
     }
 
-    override fun storePendingPromptEvent(prompt: String, pageContexts: List<JSONObject>) {
+    override fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>) {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return
+        pendingTabContextStore.store(prompt, pageContexts)
+    }
+
+    override fun clearTabContextPromptEvent() {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return
+        pendingTabContextStore.clear()
+    }
+
+    override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return null
+        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
+        val pending = pendingTabContextStore.consume() ?: return null
+
         val params = JSONObject().apply {
             put(PLATFORM, ANDROID)
             put("tool", "query")
             put(
                 "query",
                 JSONObject().apply {
-                    put("prompt", prompt)
+                    put("prompt", pending.prompt)
                     put("autoSubmit", true)
                 },
             )
@@ -263,29 +279,17 @@ class RealDuckChatJSHelper @Inject constructor(
             // put(
             //     "pageContexts",
             //     JSONArray().apply {
-            //         pageContexts.forEach { put(it) }
+            //         pending.pageContexts.forEach { put(it) }
             //     },
             // )
-            // Attach first context only for now
-            pageContexts.firstOrNull()?.let { put("pageContext", it) }
+            pending.pageContexts.firstOrNull()?.let { put("pageContext", it) }
         }
 
-        pendingSubscriptionEventStore.store(
-            SubscriptionEventData(
-                featureName = DUCK_CHAT_FEATURE_NAME,
-                subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
-                params = params,
-            ),
+        return SubscriptionEventData(
+            featureName = DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
+            params = params,
         )
-    }
-
-    override fun clearPendingEvent() {
-        pendingSubscriptionEventStore.clear()
-    }
-
-    override fun consumePendingEventOnHandoff(method: String): SubscriptionEventData? {
-        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
-        return pendingSubscriptionEventStore.consume()
     }
 
     private fun getAIChatNativeHandoffData(

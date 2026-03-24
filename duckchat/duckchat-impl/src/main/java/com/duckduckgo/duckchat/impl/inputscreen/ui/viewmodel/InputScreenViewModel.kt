@@ -394,7 +394,7 @@ class InputScreenViewModel @AssistedInject constructor(
         if (visibilityState.value.fullScreenMode) {
             onChatSubmitted(prompt)
         } else {
-            duckChatJSHelper.clearPendingEvent()
+            duckChatJSHelper.clearTabContextPromptEvent()
             command.value = Command.SubmitChat(prompt)
             duckChat.openDuckChatWithAutoPrompt(prompt)
         }
@@ -507,11 +507,11 @@ class InputScreenViewModel @AssistedInject constructor(
                 if (storedPendingContexts) {
                     navigateToDuckChat(query = "")
                 } else {
-                    duckChatJSHelper.clearPendingEvent()
+                    duckChatJSHelper.clearTabContextPromptEvent()
                     navigateToDuckChat(query)
                 }
             } else {
-                duckChatJSHelper.clearPendingEvent()
+                duckChatJSHelper.clearTabContextPromptEvent()
                 navigateToDuckChat(query)
             }
 
@@ -784,7 +784,7 @@ class InputScreenViewModel @AssistedInject constructor(
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
     fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
-        duckChatJSHelper.clearPendingEvent()
+        duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
             val url = duckChat.getDuckChatUrl("", false)
                 .toUri()
@@ -911,7 +911,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
         if (enrichedContexts.isEmpty()) return false
 
-        duckChatJSHelper.storePendingPromptEvent(query, enrichedContexts)
+        duckChatJSHelper.storeTabContextPromptEvent(query, enrichedContexts)
 
         return true
     }
