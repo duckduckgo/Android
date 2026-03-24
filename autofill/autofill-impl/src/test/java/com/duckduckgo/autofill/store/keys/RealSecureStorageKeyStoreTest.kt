@@ -216,7 +216,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
             assertEquals("Trying to overwrite already existing key", e.message)
         }
@@ -235,7 +235,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 
@@ -252,7 +252,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 
@@ -633,7 +633,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 

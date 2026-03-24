@@ -61,8 +61,13 @@ class RealSecureStorageKeyProvider @Inject constructor(
         l1KeyMutex.withLock {
             // If no key exists in the keystore, we generate a new one and store it
             return if (secureStorageKeyRepository.getL1Key() == null) {
-                randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
-                    secureStorageKeyRepository.setL1Key(it)
+                val newKey = randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE)
+                try {
+                    secureStorageKeyRepository.setL1Key(newKey)
+                    newKey
+                } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+                    // Another process wrote the key between our read and write — use theirs
+                    secureStorageKeyRepository.getL1Key() ?: throw e
                 }
             } else {
                 secureStorageKeyRepository.getL1Key()!!
@@ -73,8 +78,13 @@ class RealSecureStorageKeyProvider @Inject constructor(
     override suspend fun getl2Key(): Key {
         l2KeyMutex.withLock {
             val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
-                randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
-                    secureStorageKeyRepository.setPassword(it)
+                val newPassword = randomBytesGenerator.generateBytes(PASSWORD_SIZE)
+                try {
+                    secureStorageKeyRepository.setPassword(newPassword)
+                    newPassword
+                } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+                    // Another process wrote the password between our read and write — use theirs
+                    secureStorageKeyRepository.getPassword() ?: throw e
                 }
             } else {
                 secureStorageKeyRepository.getPassword()
@@ -86,8 +96,19 @@ class RealSecureStorageKeyProvider @Inject constructor(
 
     private suspend fun getl2Key(password: String): Key {
         val keyMaterial = if (secureStorageKeyRepository.getEncryptedL2Key() == null) {
-            secureStorageKeyGenerator.generateKey().encoded.also {
-                encryptAndStoreL2Key(it, password)
+            val keyBytes = secureStorageKeyGenerator.generateKey().encoded
+            try {
+                encryptAndStoreL2Key(keyBytes, password)
+                keyBytes
+            } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+                // Another process wrote the L2 key between our read and write — decrypt and use theirs
+                encryptionHelper.decrypt(
+                    EncryptedBytes(
+                        secureStorageKeyRepository.getEncryptedL2Key() ?: throw e,
+                        secureStorageKeyRepository.getEncryptedL2KeyIV() ?: throw e,
+                    ),
+                    deriveKeyFromPassword(password),
+                )
             }
         } else {
             encryptionHelper.decrypt(
@@ -113,12 +134,18 @@ class RealSecureStorageKeyProvider @Inject constructor(
             secureStorageKeyRepository.setEncryptedL2KeyIV(it.iv)
         }.data
 
-    private suspend fun getPasswordSalt() = if (secureStorageKeyRepository.getPasswordSalt() == null) {
-        randomBytesGenerator.generateBytes(PASSWORD_KEY_SALT_SIZE).also {
-            secureStorageKeyRepository.setPasswordSalt(it)
+    private suspend fun getPasswordSalt(): ByteArray {
+        if (secureStorageKeyRepository.getPasswordSalt() != null) {
+            return secureStorageKeyRepository.getPasswordSalt()!!
         }
-    } else {
-        secureStorageKeyRepository.getPasswordSalt()!!
+        val newSalt = randomBytesGenerator.generateBytes(PASSWORD_KEY_SALT_SIZE)
+        return try {
+            secureStorageKeyRepository.setPasswordSalt(newSalt)
+            newSalt
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+            // Another process wrote the salt between our read and write — use theirs
+            secureStorageKeyRepository.getPasswordSalt() ?: throw e
+        }
     }
 
     private suspend fun deriveKeyFromPassword(password: String) =

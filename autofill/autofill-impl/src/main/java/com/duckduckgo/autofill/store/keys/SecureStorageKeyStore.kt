@@ -208,7 +208,7 @@ class RealSecureStorageKeyStore(
                     getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
                     type = Daily(),
                 )
-                throw SecureStorageException.InternalSecureStorageException("Trying to overwrite already existing key")
+                throw SecureStorageException.KeyAlreadyExistsException("Trying to overwrite already existing key")
             }
 
             // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
