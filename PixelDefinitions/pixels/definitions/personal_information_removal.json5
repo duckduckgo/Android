@@ -1142,7 +1142,14 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
     },
     "m_dbp_foreground-run_started": {
         "description": "Fired when pir run is started in the foreground",
@@ -1154,6 +1161,11 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "power_saving",
+                "description": "Whether the device is in power saving mode",
                 "type": "string"
             }
         ]
@@ -1173,6 +1185,11 @@
             {
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
+                "type": "string"
+            },
+            {
+                "key": "battery-optimizations",
+                "description": "Whether battery optimizations are enabled for the app",
                 "type": "string"
             }
         ]

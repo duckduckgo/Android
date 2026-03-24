@@ -95,16 +95,22 @@ import javax.inject.Inject
 interface PirPixelSender {
     /**
      * Emits a pixel to signal that a manually initiated scan has started.
+     *
+     * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      */
-    fun reportManualScanStarted()
+    fun reportManualScanStarted(
+        isPowerSavingEnabled: Boolean,
+    )
 
     /**
      * Emits a pixel to signal that a manually initiated scan has been completed.
      *
      * @param totalTimeInMillis - how long it took for the scan to complete
+     * @param batteryOptimizationsEnabled - whether battery optimizations are enabled for the app
      */
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
+        batteryOptimizationsEnabled: Boolean,
     )
 
     /**
@@ -602,15 +608,22 @@ class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
     private val networkProtectionState: NetworkProtectionState,
 ) : PirPixelSender {
-    override fun reportManualScanStarted() {
-        fire(PIR_FOREGROUND_RUN_STARTED)
+    override fun reportManualScanStarted(
+        isPowerSavingEnabled: Boolean,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+        )
+        fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
 
     override fun reportManualScanCompleted(
         totalTimeInMillis: Long,
+        batteryOptimizationsEnabled: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -1470,5 +1483,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
         private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
         private const val PARAM_KEY_VPN_STATE = "vpn_connection_state"
+        private const val PARAM_KEY_POWER_SAVING = "power_saving"
+        private const val PARAM_KEY_BATTERY_OPTIMIZATIONS = "battery-optimizations"
     }
 }

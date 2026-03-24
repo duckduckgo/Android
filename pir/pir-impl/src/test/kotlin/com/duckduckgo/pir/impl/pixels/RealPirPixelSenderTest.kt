@@ -39,8 +39,8 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportManualScanStartedThenFiresCorrectPixel() = runTest {
-        testee.reportManualScanStarted()
+    fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
+        testee.reportManualScanStarted(isPowerSavingEnabled = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender, times(2)).fire(
@@ -50,14 +50,15 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assert(paramsCaptor.firstValue.containsKey("power_saving"))
+        assert(paramsCaptor.firstValue["power_saving"] == "true")
     }
 
     @Test
-    fun whenReportManualScanCompletedThenFiresPixelWithTotalTime() = runTest {
+    fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
         val totalTimeInMillis = 12345L
 
-        testee.reportManualScanCompleted(totalTimeInMillis)
+        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -69,6 +70,8 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue.containsKey("totalTimeInMillis"))
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "12345")
+        assert(paramsCaptor.firstValue.containsKey("battery-optimizations"))
+        assert(paramsCaptor.firstValue["battery-optimizations"] == "false")
     }
 
     @Test
