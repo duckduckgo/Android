@@ -31,6 +31,7 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
@@ -48,6 +49,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.AutoTransition
 import androidx.transition.TransitionListenerAdapter
 import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -64,6 +66,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTOR
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -108,6 +111,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
+    private var inputScreenFadeInAnimatorSet: AnimatorSet? = null
     private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
@@ -430,6 +434,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 onboardingDialogType = dialog,
                                 selectedAddressBarPosition = state.selectedAddressBarPosition,
                                 showSplitOption = state.showSplitOption,
+                                inputScreenSelected = state.inputScreenSelected,
                             )
                         }
                     }
@@ -487,8 +492,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         changeBoundsTransition = null
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
+        binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
+        inputScreenFadeInAnimatorSet?.cancel()
+        inputScreenFadeInAnimatorSet = null
         bobbingDaxAnimator?.cancel()
         bobbingDaxAnimator = null
         binding.bobbingDaxAnimation.cancelAnimation()
@@ -855,7 +863,72 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 INPUT_SCREEN -> {
-                    // TODO
+                    val transition = AutoTransition().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    transition.addListener(object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            if (!isAdded) return
+                            binding.daxDialogCta.inputScreenContent.inputScreenTitle.startOnboardingTypingAnimation(
+                                getString(R.string.preOnboardingInputScreenTitleUpdated),
+                            ) {
+                                inputScreenFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(
+                                            binding.daxDialogCta.inputScreenContent.inputScreenOptionsContainer,
+                                            View.ALPHA,
+                                            1f,
+                                        ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(
+                                            binding.daxDialogCta.inputScreenContent.inputScreenDescription,
+                                            View.ALPHA,
+                                            1f,
+                                        ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
+                                        }
+                                    })
+                                    start()
+                                }
+                            }
+                        }
+                    })
+
+                    binding.daxDialogCta.stepIndicator.animateToNextStep()
+
+                    TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+
+                    val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+                    binding.daxDialogCta.root.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        if (isTablet) {
+                            verticalBias = 0.5f
+                            bottomToTop = binding.leftWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
+
+                    binding.welcomeScreenWalkingDax.isVisible = false
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = false
+
+                    val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                    binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
+
+                    binding.daxDialogCta.inputScreenContent.root.isVisible = true
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                    binding.daxDialogCta.primaryCta.alpha = 0f
+
+                    updateAiChatToggleState(binding, withAi = true)
                 }
             }
         }
@@ -865,6 +938,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         onboardingDialogType: PreOnboardingDialogType,
         selectedAddressBarPosition: OmnibarType,
         showSplitOption: Boolean,
+        inputScreenSelected: Boolean,
     ) {
         snapToIntroEndState()
 
@@ -1071,7 +1145,53 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
             INPUT_SCREEN -> {
                 binding.bottomWingAnimation.isVisible = false
-                // TODO
+
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    if (isTablet) {
+                        verticalBias = 0.5f
+                        bottomToTop = binding.leftWingAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
+
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                binding.daxDialogCta.addressBarContent.root.isVisible = false
+
+                val descriptionText = getString(R.string.preOnboardingInputScreenDescription)
+                binding.daxDialogCta.inputScreenContent.inputScreenDescription.text = descriptionText.html(requireContext())
+
+                binding.daxDialogCta.inputScreenContent.root.isVisible = true
+                binding.daxDialogCta.inputScreenContent.inputScreenTitle.cancelAnimation()
+                binding.daxDialogCta.inputScreenContent.inputScreenTitle.text =
+                    getString(R.string.preOnboardingInputScreenTitleUpdated)
+                binding.daxDialogCta.inputScreenContent.inputScreenOptionsContainer.alpha = 1f
+                binding.daxDialogCta.inputScreenContent.inputScreenDescription.alpha = 1f
+
+                binding.daxDialogCta.stepIndicator.isVisible = true
+                binding.daxDialogCta.stepIndicator.alpha = 1f
+                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 3)
+
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingInputScreenButton)
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
+
+                updateAiChatToggleState(binding, withAi = inputScreenSelected)
             }
         }
     }
@@ -1225,10 +1345,50 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun updateAiChatToggleState(
         binding: ContentOnboardingWelcomePageUpdateBinding,
-        isLightMode: Boolean,
         withAi: Boolean,
     ) {
-        // TODO
+        val withoutAiImageRes = if(!withAi) {
+            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_active
+        } else {
+            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_inactive
+        }
+        val withAiImageRes = if(withAi) {
+            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_active
+        } else {
+            com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_inactive
+        }
+
+        val content = binding.daxDialogCta.inputScreenContent
+        crossfadeImage(content.inputScreenSearchOnlyImageFront, content.inputScreenSearchOnlyImageBack, withoutAiImageRes)
+        crossfadeImage(content.inputScreenWithAiImageFront, content.inputScreenWithAiImageBack, withAiImageRes)
+
+        content.inputScreenSearchOnlyCheck.quietlySetIsChecked(newCheckedState = !withAi, changeListener = null)
+        content.inputScreenWithAiCheck.quietlySetIsChecked(newCheckedState = withAi, changeListener = null)
+
+        content.inputScreenSearchOnlyCaption.setText(com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_without_ai_updated)
+        content.inputScreenWithAiCaption.setText(com.duckduckgo.duckchat.impl.R.string.input_screen_user_pref_with_ai_updated)
+
+        content.inputScreenSearchOnlyContainer.setOnClickListener {
+            viewModel.onInputScreenOptionSelected(withAi = false)
+        }
+        content.inputScreenWithAiContainer.setOnClickListener {
+            viewModel.onInputScreenOptionSelected(withAi = true)
+        }
+    }
+
+    private fun crossfadeImage(frontView: ImageView, backView: ImageView, newRes: Int) {
+        backView.setImageDrawable(frontView.drawable)
+        backView.alpha = 1f
+        frontView.setImageResource(newRes)
+        frontView.alpha = 0f
+        frontView.animate()
+            .alpha(1f)
+            .setDuration(TOGGLE_CROSSFADE_DURATION.toLong())
+            .setListener(null)
+        backView.animate()
+            .alpha(0f)
+            .setDuration(TOGGLE_CROSSFADE_DURATION.toLong())
+            .setListener(null)
     }
 
     companion object {
@@ -1277,6 +1437,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_FINAL_X_DP = 22
         private const val WALKING_DAX_MAX_HEIGHT_DP = 274
         private const val WALKING_DAX_MIN_HEIGHT_DP = 174
+
+        private const val TOGGLE_CROSSFADE_DURATION = 200
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
 

@@ -73,7 +73,14 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                <include
+                    android:id="@+id/inputScreenContent"
+                    layout="@layout/include_brand_design_input_screen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

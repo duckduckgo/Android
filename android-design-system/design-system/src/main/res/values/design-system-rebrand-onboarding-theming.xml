@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <attr name="onboardingTextPrimary" format="color" />
+    <attr name="onboardingTextSecondary" format="color" />
     <attr name="onboardingSurfaceBackdrop" format="color" />
     <attr name="onboardingSurfaceTertiary" format="color" />
     <attr name="onboardingSurfaceDecorationPrimary" format="color" />
@@ -33,6 +34,7 @@
 
         <!--Onboarding Colors-->
         <item name="onboardingTextPrimary">#F5242323</item> <!--96%-->
+        <item name="onboardingTextSecondary">#99000000</item> <!--60%-->
         <item name="onboardingSurfaceBackdrop">@color/white</item>
         <item name="onboardingSurfaceTertiary">@color/white</item>
         <item name="onboardingSurfaceDecorationPrimary">#17242323</item> <!--9% Alpha-->
@@ -54,6 +56,7 @@
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
         <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
+        <item name="daxColorSecondaryText">?attr/onboardingTextSecondary</item>
 
         <!--Button-->
         <item name="daxButtonPrimary">
@@ -82,6 +85,7 @@
 
         <!--Onboarding Colors-->
         <item name="onboardingTextPrimary">@color/white</item>
+        <item name="onboardingTextSecondary">#99FFFFFF</item> <!--60%-->
         <item name="onboardingSurfaceBackdrop">#133E7C</item>
         <item name="onboardingSurfaceTertiary">#011D34</item>
         <item name="onboardingSurfaceDecorationPrimary">#0FFFFFFF</item> <!--6% Alpha-->
@@ -103,6 +107,8 @@
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
         <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
+        <item name="daxColorSecondaryText">?attr/onboardingTextSecondary</item>
+
 
         <!--Button-->
         <item name="daxButtonPrimary">
