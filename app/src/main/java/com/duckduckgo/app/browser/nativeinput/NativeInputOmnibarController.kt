@@ -17,9 +17,11 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.graphics.Color
+import android.os.Build
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
@@ -49,6 +51,7 @@ interface NativeInputOmnibarController : OmnibarState {
     fun hideBackground()
     fun showTabsAndMenuButtons()
     fun getButtonsWidth(): Int
+    fun getCardView(): View?
     fun restore()
     fun forceToTop()
 }
@@ -82,9 +85,6 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
         }
     }
 
@@ -100,9 +100,6 @@ class RealNativeInputOmnibarController(
             omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
             omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
             omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
         }
     }
 
@@ -111,8 +108,18 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainerShadow)?.apply {
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = 0f
+            removeCustomShadow()
         }
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.setCardBackgroundColor(Color.TRANSPARENT)
+    }
+
+    private fun View.removeCustomShadow() {
+        outlineProvider = ViewOutlineProvider.BACKGROUND
+        elevation = 0f
+        if (Build.VERSION.SDK_INT >= 28) {
+            outlineAmbientShadowColor = Color.BLACK
+            outlineSpotShadowColor = Color.BLACK
+        }
     }
 
     private fun hideOmnibarContent(omnibarView: View) {
@@ -148,6 +155,11 @@ class RealNativeInputOmnibarController(
         layoutListener = null
     }
 
+    override fun getCardView(): View? {
+        val omnibarView = omnibar.omnibarView as? View ?: return null
+        return omnibarView.findViewById(R.id.omniBarContainerShadow)
+    }
+
     override fun getButtonsWidth(): Int {
         val omnibarView = omnibar.omnibarView as? View ?: return 0
         val tabsMenu = omnibarView.findViewById<View?>(R.id.tabsMenu)
@@ -181,7 +193,8 @@ class RealNativeInputOmnibarController(
             ?.setBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar))
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainerShadow)?.apply {
             setCardBackgroundColor(ctx.getColorFromAttr(com.google.android.material.R.attr.colorSurface))
-            cardElevation = 1f.toPx()
+            val isTop = omnibar.omnibarType == OmnibarType.SINGLE_TOP || omnibar.omnibarType == OmnibarType.SPLIT
+            cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
         }
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
             ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
