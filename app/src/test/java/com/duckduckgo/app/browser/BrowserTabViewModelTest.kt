@@ -4969,18 +4969,22 @@ class BrowserTabViewModelTest {
             optOutFailed = true,
             selfTestFailed = true,
             isCosmetic = true,
-            consentRule = null,
-            consentReloadLoop = false,
+            consentRule = "someCMP",
+            consentReloadLoop = true,
         )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertEquals("someCMP", testee.siteLiveData.value?.consentRule)
+        assertTrue(testee.siteLiveData.value?.consentReloadLoop!!)
         testee.onWebViewRefreshed()
         assertFalse(testee.siteLiveData.value?.consentManaged!!)
         assertFalse(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertFalse(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertFalse(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertNull(testee.siteLiveData.value?.consentRule)
+        assertFalse(testee.siteLiveData.value?.consentReloadLoop!!)
     }
 
     @Test
