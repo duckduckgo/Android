@@ -2800,16 +2800,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewTabMenuItemClickedAndEmptyTabWithBlankUrlAndBlankSourceTabIdExistsThenSelectEmptyTab() =
+    fun whenNewTabMenuItemClickedAndCurrentTabIsReusableEmptyTabThenShowKeyboard() =
         runTest {
             swipingTabsFeature.self().setRawStoredState(State(enable = true))
             swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
-            val emptyTabId = "EMPTY_TAB"
+            val emptyTabId = "abc"
             whenever(mockTabRepository.getTabs()).thenReturn(
                 listOf(
-                    TabEntity("1", "https://example.com", position = 0),
-                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 0),
                 ),
             )
 
@@ -2820,6 +2819,29 @@ class BrowserTabViewModelTest {
             assertNull(command)
             verify(mockTabRepository).select(emptyTabId)
             assertCommandIssued<ShowKeyboard>()
+        }
+
+    @Test
+    fun whenNewTabMenuItemClickedAndDifferentReusableEmptyTabSelectedThenKeyboardCommandNotIssued() =
+        runTest {
+            swipingTabsFeature.self().setRawStoredState(State(enable = true))
+            swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
+
+            val emptyTabId = "EMPTY_TAB"
+            whenever(mockTabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity("abc", "https://example.com", position = 0),
+                    TabEntity(emptyTabId, url = "", sourceTabId = null, position = 1),
+                ),
+            )
+
+            testee.onNewTabMenuItemClicked()
+
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val command = commandCaptor.allValues.find { it is Command.LaunchNewTab }
+            assertNull(command)
+            verify(mockTabRepository).select(emptyTabId)
+            assertCommandNotIssued<ShowKeyboard>()
         }
 
     @Test
