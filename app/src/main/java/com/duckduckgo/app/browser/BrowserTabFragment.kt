@@ -2801,7 +2801,7 @@ class BrowserTabFragment :
             is Command.DuckAIFullScreenDisabled -> {
                 omnibar.setViewMode(Browser(it.url))
                 nativeInputManager.hideNativeInput()
-                sharedContextualViewModel.onMainBrowserPageFinished(it.url)
+                sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
@@ -2810,7 +2810,7 @@ class BrowserTabFragment :
             }
 
             is Command.PageContextReceived -> {
-                sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext)
+                sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
         }
     }

@@ -2169,6 +2169,10 @@ class BrowserTabViewModel @Inject constructor(
             serpLogoJob += viewModelScope.launch {
                 evaluateSerpLogoState(url)
             }
+
+            if (androidBrowserConfig.storePageContext().isEnabled()) {
+                collectPageContext()
+            }
         }
     }
 

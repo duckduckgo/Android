@@ -5634,6 +5634,28 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenPageFinishedAndStorePageContextEnabledThenCollectPageContext() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = true))
+            val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+            testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
+
+            verify(mockPageContextJSHelper).collectPageContext()
+        }
+
+    @Test
+    fun whenPageFinishedAndStorePageContextDisabledThenDoNotCollectPageContext() =
+        runTest {
+            fakeAndroidConfigBrowserFeature.storePageContext().setRawStoredState(State(enable = false))
+            val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+            testee.pageFinished(mockWebView, webViewNavState, "https://example.com")
+
+            verify(mockPageContextJSHelper, never()).collectPageContext()
+        }
+
+    @Test
     fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() =
         runTest {
             whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
