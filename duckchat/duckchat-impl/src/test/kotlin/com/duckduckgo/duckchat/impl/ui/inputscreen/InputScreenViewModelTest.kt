@@ -2152,6 +2152,17 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `when onChatSubmitted with URL then stale tab context prompt event is cleared`() =
+        runTest {
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            verify(duckChatJSHelper).clearTabContextPromptEvent()
+        }
+
+    @Test
     fun `when onChatSubmitted with URL then chat pixels are not fired`() =
         runTest {
             whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)

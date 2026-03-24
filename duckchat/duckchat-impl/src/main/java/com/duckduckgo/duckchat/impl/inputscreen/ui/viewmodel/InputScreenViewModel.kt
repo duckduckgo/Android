@@ -495,6 +495,7 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onChatSubmitted(query: String) {
         viewModelScope.launch {
             if (queryUrlPredictor.isUrl(query)) {
+                duckChatJSHelper.clearTabContextPromptEvent()
                 command.value = Command.SubmitSearch(query)
                 return@launch
             }
