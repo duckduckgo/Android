@@ -161,7 +161,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImageStore).fetchAndStoreImage(evaluatedMessage)
+        verify(remoteMessageImageStore).fetchAndStoreImages(evaluatedMessage)
         verify(remoteMessagingRepository).activeMessage(evaluatedMessage)
     }
 
@@ -174,7 +174,7 @@ class RealRemoteMessagingConfigProcessorTest {
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
-        verify(remoteMessageImageStore).fetchAndStoreImage(null)
+        verify(remoteMessageImageStore).fetchAndStoreImages(null)
         verify(remoteMessagingRepository).activeMessage(null)
     }
 }

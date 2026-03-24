@@ -23,6 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+    tools:ignore="Overdraw"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -331,10 +332,35 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <WebView
-        android:id="@+id/simpleWebview"
+    <FrameLayout
+        android:id="@+id/contextualWebviewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <WebView
+            android:id="@+id/simpleWebview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/contextualNativeInputCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:cardBackgroundColor="?attr/daxColorSurface"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="false">
+
+            <com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
+                android:id="@+id/contextualNativeInputWidget"
+                android:paddingHorizontal="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
 
 </LinearLayout>

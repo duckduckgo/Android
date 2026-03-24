@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
     <string name="input_screen_chat_hint">Privat fragen</string>
     <string name="input_screen_user_pref_without_ai">Nur Suchen</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Suche &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Probiere die neue Option aus, um Duck.ai direkt über die Adressleiste zu fragen. <annotation type="share_feedback">Feedback teilen</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -93,7 +95,6 @@
     <string name="duck_ai_paid_settings_enable_in_settings">In Einstellungen für KI-Funktionen aktivieren</string>
     <string name="duck_ai_paid_settings_manage_in_settings">In Einstellungen für KI-Funktionen verwalten</string>
     <string name="duck_ai_paid_settings_manage_secondary">Konfiguriere Duck.ai in den Einstellungen für KI-Funktionen.</string>
-
 
     <!-- Duck.ai Contextual Bottom Sheet -->
     <string name="duckAIContextualPromptSummarize">Diese Seite zusammenfassen</string>

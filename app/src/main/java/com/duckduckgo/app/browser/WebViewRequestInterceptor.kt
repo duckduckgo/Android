@@ -32,10 +32,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.common.utils.AppUrl
@@ -47,8 +47,12 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -94,6 +98,10 @@ class WebViewRequestInterceptor(
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
+    private val requestBlocklist: RequestBlocklist,
+    private val contentBlocking: ContentBlocking,
+    private val trackerAllowlist: TrackerAllowlist,
+    private val userAllowListRepository: UserAllowListRepository,
     private val duckPlayer: DuckPlayer,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
@@ -138,6 +146,8 @@ class WebViewRequestInterceptor(
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url: Uri = request.url
+        val documentUrlString = documentUri.toString()
+        val urlString = url.toString()
 
         if (!checkMaliciousAfterHttpsUpgrade) {
             maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
@@ -147,14 +157,14 @@ class WebViewRequestInterceptor(
             }
         }
 
-        if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
+        if (requestFilterer.shouldFilterOutRequest(request, documentUrlString)) return WebResourceResponse(null, null, null)
 
-        adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
+        adClickManager.detectAdClick(urlString, request.isForMainFrame)
 
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(urlString, getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -188,7 +198,7 @@ class WebViewRequestInterceptor(
         if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             withContext(dispatchers.main()) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(url.toString(), getHeaders(request))
+                webView.loadUrl(urlString, getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -201,6 +211,18 @@ class WebViewRequestInterceptor(
 
         if (url != null && url.isHttp) {
             webViewClientListener?.pageHasHttpResources(documentUri)
+        }
+
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri, url)) {
+            val isContentBlockingException = contentBlocking.isAnException(documentUrlString)
+            val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
+            val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)
+
+            if (!isContentBlockingException && !isInTrackerAllowList && !isUserAllowlisted) {
+                logcat { "Blocking request $url by request blocklist" }
+                return WebResourceResponse(null, null, null)
+            }
+            return null
         }
 
         return getWebResourceResponse(request, documentUri, webViewClientListener)

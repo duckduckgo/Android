@@ -21,6 +21,7 @@ import android.webkit.ValueCallback
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
@@ -41,12 +42,14 @@ class WebViewCookieManagerTest {
     private val removeCookieStrategy = mock<RemoveCookiesStrategy>()
     private val cookieManagerProvider = mock<CookieManagerProvider>()
     private val cookieManager = mock<CookieManager>()
+    private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
     private val ddgCookie = Cookie(DDG_HOST, "da=abc")
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
     private val testee: WebViewCookieManager = WebViewCookieManager(
         cookieManagerProvider,
         removeCookieStrategy,
         coroutineRule.testDispatcherProvider,
+        mockDuckAiHostProvider,
     )
 
     @Before
@@ -55,6 +58,7 @@ class WebViewCookieManagerTest {
         whenever(cookieManager.setCookie(any(), any(), any())).then {
             (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
         }
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
     }
 
     @Test

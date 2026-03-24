@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -51,6 +52,7 @@ class AppThirdPartyCookieManagerTest {
     private lateinit var testee: AppThirdPartyCookieManager
     private lateinit var webView: WebView
     private val thirdPartyCookieNamesMock: ThirdPartyCookieNames = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     @UiThreadTest
     @Before
@@ -64,8 +66,14 @@ class AppThirdPartyCookieManagerTest {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         whenever(thirdPartyCookieNamesMock.hasExcludedCookieName("$USER_ID_COOKIE=test")).thenReturn(true)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
 
-        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNamesMock)
+        testee = AppThirdPartyCookieManager(
+            cookieManagerProvider,
+            authCookiesAllowedDomainsRepository,
+            thirdPartyCookieNamesMock,
+            mockDuckAiHostProvider,
+        )
     }
 
     @UiThreadTest
@@ -150,6 +158,23 @@ class AppThirdPartyCookieManagerTest {
         assertNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
     }
 
+    @UiThreadTest
+    @Test
+    fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithAppDomainAndNoSsDomainThenDomainAddedToTheList() = runTest {
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_APP_DOMAIN_URI)
+
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain(EXAMPLE_URI.host!!))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenProcessUriForThirdPartyCookiesIfUrlIsGoogleAuthWithBothSsDomainAndAppDomainThenSsDomainUsed() = runTest {
+        testee.processUriForThirdPartyCookies(webView, THIRD_PARTY_AUTH_BOTH_DOMAINS_URI)
+
+        assertNotNull(authCookiesAllowedDomainsRepository.getDomain("ss.com"))
+        assertNull(authCookiesAllowedDomainsRepository.getDomain("app.com"))
+    }
+
     @Test
     fun whenClearAllDataThenDomainDeletedFromDatabase() = runTest {
         givenDomainIsInTheThirdPartyCookieList(EXAMPLE_URI.host!!)
@@ -161,7 +186,7 @@ class AppThirdPartyCookieManagerTest {
 
     @Test
     fun whenClearAllDataIfDomainIsInExclusionListThenDomainNotDeletedFromDatabase() = runTest {
-        val excludedDomains = AppThirdPartyCookieManager.hostsThatAlwaysRequireThirdPartyCookies
+        val excludedDomains = listOf("home.nest.com", "duck.ai", "duckduckgo.com")
         excludedDomains.forEach { domain ->
             givenDomainIsInTheThirdPartyCookieList(domain)
         }
@@ -194,6 +219,10 @@ class AppThirdPartyCookieManagerTest {
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fexample.com".toUri()
         val NON_THIRD_PARTY_AUTH_URI =
             "https://accounts.google.com/o/oauth2/auth/identifier?response_type=code&ss_domain=https%3A%2F%2Fexample.com".toUri()
+        val THIRD_PARTY_AUTH_APP_DOMAIN_URI =
+            "https://accounts.google.com/v3/signin/identifier?response_type=permission%20id_token&app_domain=https%3A%2F%2Fexample.com".toUri()
+        val THIRD_PARTY_AUTH_BOTH_DOMAINS_URI =
+            "https://accounts.google.com?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fss.com&app_domain=https%3A%2F%2Fapp.com".toUri()
         const val USER_ID_COOKIE = "user_id"
     }
 }

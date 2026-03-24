@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Volver</string>
     <string name="browserMenuForward">Avanzar</string>
     <string name="browserMenuRefresh">Actualizar</string>
+    <string name="browserMenuFire">Borrar datos y pestañas</string>
 </resources>

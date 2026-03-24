@@ -88,6 +88,7 @@ class GeneralSettingsViewModel @Inject constructor(
         val maliciousSiteProtectionFeatureAvailable: Boolean,
         val showChatSuggestionsToggle: Boolean = false,
         val chatSuggestionsEnabled: Boolean = true,
+        val showNTPAfterIdleReturn: Boolean = false,
     )
 
     sealed class Command {
@@ -113,7 +114,8 @@ class GeneralSettingsViewModel @Inject constructor(
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
                 voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
-                isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled(),
+                isShowOnAppLaunchOptionVisible = showOnAppLaunchFeature.self().isEnabled() ||
+                    androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
                 maliciousSiteProtectionFeatureAvailable =
@@ -124,6 +126,7 @@ class GeneralSettingsViewModel @Inject constructor(
                     duckChat.observeInputScreenUserSettingEnabled().firstOrNull() == true &&
                     duckChat.isChatSuggestionsFeatureAvailable(),
                 chatSuggestionsEnabled = duckChat.observeChatSuggestionsUserSettingEnabled().firstOrNull() ?: true,
+                showNTPAfterIdleReturn = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
             )
         }
 

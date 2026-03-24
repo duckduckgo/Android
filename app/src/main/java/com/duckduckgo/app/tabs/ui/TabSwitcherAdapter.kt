@@ -442,13 +442,15 @@ class TabSwitcherAdapter(
         if (holder is TabSwitcherViewHolder) {
             holder.cancelLoadJobs()
         }
+
+        val glide = Glide.with(holder.itemView.context.applicationContext)
         when (holder) {
             is TabSwitcherViewHolder.GridTabViewHolder -> {
-                Glide.with(holder.rootView).clear(holder.tabPreview)
-                Glide.with(holder.rootView).clear(holder.favicon)
+                glide.clear(holder.tabPreview)
+                glide.clear(holder.favicon)
             }
             is TabSwitcherViewHolder.ListTabViewHolder -> {
-                Glide.with(holder.rootView).clear(holder.favicon)
+                glide.clear(holder.favicon)
             }
         }
     }
@@ -465,8 +467,8 @@ class TabSwitcherAdapter(
         }
     }
 
-    fun updateData(updatedList: List<TabSwitcherItem>) {
-        differ.submitList(updatedList)
+    fun updateData(updatedList: List<TabSwitcherItem>, onDataUpdated: Runnable? = null) {
+        differ.submitList(updatedList, onDataUpdated)
     }
 
     fun getTabSwitcherItem(position: Int): TabSwitcherItem? = differ.currentList.getOrNull(position)

@@ -38,6 +38,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_REVOKED,
+    featureName = "pluginPproUpsellRevokedMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PproUpsellRevokedMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,

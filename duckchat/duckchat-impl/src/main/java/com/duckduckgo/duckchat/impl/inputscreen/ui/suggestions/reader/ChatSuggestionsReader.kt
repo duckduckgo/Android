@@ -26,6 +26,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -55,7 +56,12 @@ class RealChatSuggestionsReader @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val messaging: ChatSuggestionsJsMessaging,
     private val duckAiChatHistoryFeature: DuckAiChatHistoryFeature,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : ChatSuggestionsReader {
+
+    // TODO: At the time of this implementation, both domains are needed for fetching the recent chats.
+    //  Once domain consolidation is deployed for Android, we can remove the duckduckgo domain.
+    private val domains: List<String> = listOf("https://${duckAiHostProvider.getHost()}", "https://duckduckgo.com")
 
     private var webView: WebView? = null
     private var pageLoadDeferred: CompletableDeferred<Unit>? = null
@@ -72,7 +78,7 @@ class RealChatSuggestionsReader @Inject constructor(
             val wv = getOrCreateWebView(script)
 
             val results = mutableListOf<DomainResult>()
-            for (domain in DOMAINS) {
+            for (domain in domains) {
                 val result = fetchFromDomain(wv, domain, query, maxSuggestions)
                 if (result != null) {
                     results.add(result)
@@ -314,11 +320,6 @@ class RealChatSuggestionsReader @Inject constructor(
         private const val FETCH_TIMEOUT_MS = 3000L
         private const val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000
         private const val EMPTY_HTML = "<html></html>"
-
-        // TODO: At the time of this implementation, both domains are needed for fetching the recent chats.
-        //  Once domain consolidation is deployed for Android, we can remove the duckduckgo domain.
-        private val DOMAINS = listOf("https://duck.ai", "https://duckduckgo.com")
-
         private const val JS_FILE_NAME = "duckAiChatHistory.js"
         private const val CONTENT_SCOPE_PLACEHOLDER = "\$CONTENT_SCOPE$"
         private const val USER_UNPROTECTED_DOMAINS_PLACEHOLDER = "\$USER_UNPROTECTED_DOMAINS$"

@@ -241,9 +241,9 @@ class PirEndToEndTest {
         fakeDbpService = FakeDbpService()
 
         fakePixel = FakePixel()
-        pixelSender = RealPirPixelSender(fakePixel)
-        fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
         fakeNetworkProtectionState = FakeNetworkProtectionState()
+        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState)
+        fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
 
         pirRepository = RealPirRepository(
             dispatcherProvider = dispatcherProvider,
@@ -290,7 +290,6 @@ class PirEndToEndTest {
             pirSchedulingRepository = pirSchedulingRepository,
             currentTimeProvider = fakeTimeProvider,
             moshi = moshi,
-            networkProtectionState = fakeNetworkProtectionState,
         )
 
         brokerActionProcessor = RealBrokerActionProcessor(fakePirMessagingInterface, moshi)

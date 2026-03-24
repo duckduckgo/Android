@@ -28,7 +28,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_UPDATE_VERIFIED_INSTALL("verified_app_update"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
+    FORGET_ALL_PRESSED_BROWSING_DAILY("m_fire_button_tapped_browser_daily"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
+    FORGET_ALL_PRESSED_TABSWITCHING_DAILY("m_fire_button_tapped_tab_switcher_daily"),
+    FORGET_ALL_PRESSED_SETTINGS("m_fire_button_tapped_settings"),
+    FORGET_ALL_PRESSED_SETTINGS_DAILY("m_fire_button_tapped_settings_daily"),
     FORGET_ALL_EXECUTED("mf"),
     FORGET_ALL_AUTO_RESTART("m_f_r"),
     FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
@@ -294,6 +298,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EXPERIMENTAL_MENU_DISPLAYED_CUSTOMTABS("m_experimental-browsing-menu_displayed_customtabs"),
     EXPERIMENTAL_MENU_DISPLAYED_ERROR("m_experimental-browsing-menu_displayed_error"),
     EXPERIMENTAL_MENU_DISMISSED("m_experimental-browsing-menu_dismissed"),
+    SHEET_MENU_AICHAT("m_sheet-menu_aichat"),
+    SHEET_MENU_PASSWORDS("m_sheet-menu_passwords"),
+    SHEET_MENU_NEW_DUCK_ADDRESS("m_sheet-menu_new-duck-address"),
+    SHEET_MENU_VPN("m_sheet-menu_vpn"),
+    SHEET_MENU_SETTINGS("m_sheet-menu_settings"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
@@ -319,9 +328,14 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
+    FIRE_DIALOG_CLEAR_PRESSED_DAILY("m_fire_dialog_clear_pressed_daily"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
     FIRE_DIALOG_SHOWN("m_fire_dialog_shown"),
+    FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED("m_fire_dialog_single_tab_clear_pressed"),
+    FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY("m_fire_dialog_single_tab_clear_pressed_daily"),
+    FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY("m_fire_dialog_clear_all_button_only"),
+    FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY("m_fire_dialog_clear_all_button_only_daily"),
 
     FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
     FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),

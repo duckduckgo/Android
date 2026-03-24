@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import android.text.Editable
 import android.text.InputType
+import android.text.Spannable
 import android.text.Spanned
 import android.text.style.CharacterStyle
 import android.text.style.ImageSpan
@@ -41,6 +42,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -55,6 +57,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentTagSpan
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.google.android.material.card.MaterialCardView
@@ -64,7 +67,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @InjectWith(ViewScope::class)
-class InputModeWidget @JvmOverloads constructor(
+open class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -108,6 +111,9 @@ class InputModeWidget @JvmOverloads constructor(
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
+    var tabAttachmentsEnabled: Boolean = false
+    var onChatTagTextChanged: ((String, Int) -> Unit)? = null
+    var onTabAttachmentRemoved: ((String) -> Unit)? = null
     var onInputFieldClicked: (() -> Unit)? = null
     var onVoiceClick: (() -> Unit)? = null
 
@@ -145,6 +151,8 @@ class InputModeWidget @JvmOverloads constructor(
 
     private var originalText: String? = null
     private var hasTextChangedFromOriginal = false
+    private var isDeletingTag = false
+    private val knownTagTabIds = mutableSetOf<String>()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
@@ -289,7 +297,15 @@ class InputModeWidget @JvmOverloads constructor(
 
                 when (inputModeSwitch.selectedTabPosition) {
                     0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
-                    1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                    1 -> {
+                        onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                        if (tabAttachmentsEnabled) {
+                            onChatTagTextChanged?.invoke(
+                                inputField.text.toString(),
+                                inputField.selectionStart,
+                            )
+                        }
+                    }
                 }
 
                 val isNullOrEmpty = text.isNullOrEmpty()
@@ -299,6 +315,10 @@ class InputModeWidget @JvmOverloads constructor(
             doAfterTextChanged { text ->
                 text?.let {
                     removeFormatting(text)
+                    if (tabAttachmentsEnabled && !isDeletingTag) {
+                        removeCorruptedTags(text)
+                        notifyRemovedTags(text)
+                    }
                 }
             }
         }
@@ -311,7 +331,8 @@ class InputModeWidget @JvmOverloads constructor(
                 addAll(text.getSpans(0, text.length, URLSpan::class.java))
                 addAll(text.getSpans(0, text.length, ImageSpan::class.java))
             }.filter { span ->
-                (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
+                span !is TabAttachmentTagSpan &&
+                    (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
             }
 
         if (spans.isNotEmpty()) {
@@ -512,10 +533,77 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    // region tab attachments tagging
+    // To be revisited once we have the final design
+
+    fun getAnchorView(): View = inputModeWidgetCard
+
+    fun insertTabTag(token: String, tabId: String, atIndex: Int, cursorPosition: Int) {
+        val editable = inputField.text
+        val end = cursorPosition.coerceAtMost(editable.length)
+        val start = atIndex.coerceAtMost(end)
+        editable.replace(start, end, token)
+
+        // The tag covers everything except the trailing space
+        val tagText = token.trimEnd()
+        val tagEnd = start + tagText.length
+        val tagBgColor = ColorUtils.setAlphaComponent(inputField.currentTextColor, 38)
+        val span = TabAttachmentTagSpan(
+            tabId = tabId,
+            expectedText = tagText,
+            backgroundColor = tagBgColor,
+            cornerRadius = TAG_CORNER_RADIUS,
+            paddingH = TAG_PADDING_H,
+        )
+        editable.setSpan(span, start, tagEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        knownTagTabIds.add(tabId)
+        inputField.setSelection((start + token.length).coerceAtMost(editable.length))
+    }
+
+    // Remove any tag that was partially deleted or manipulated.
+    // Iterates in reverse span-start order so that text.delete() doesn't shift positions of earlier spans.
+    private fun removeCorruptedTags(text: Editable) {
+        val tags = text.getSpans(0, text.length, TabAttachmentTagSpan::class.java)
+            .sortedByDescending { text.getSpanStart(it) }
+        isDeletingTag = true
+        for (tag in tags) {
+            val spanStart = text.getSpanStart(tag)
+            val spanEnd = text.getSpanEnd(tag)
+            if (spanStart < 0 || spanEnd < 0) continue
+
+            val currentText = text.subSequence(spanStart, spanEnd).toString()
+            if (currentText != tag.expectedText) {
+                val deleteEnd = if (spanEnd < text.length && text[spanEnd] == ' ') spanEnd + 1 else spanEnd
+                text.removeSpan(tag)
+                text.delete(spanStart, deleteEnd)
+                onTabAttachmentRemoved?.invoke(tag.tabId)
+            }
+        }
+        isDeletingTag = false
+    }
+
+    // This handles the cases where the user deleted the tag all at once (via selection or other keyboard shortcuts)
+    private fun notifyRemovedTags(text: Editable) {
+        if (knownTagTabIds.isEmpty()) return
+        val currentTagIds = text.getSpans(0, text.length, TabAttachmentTagSpan::class.java)
+            .map { it.tabId }
+            .toSet()
+        val removed = knownTagTabIds - currentTagIds
+        for (tabId in removed) {
+            onTabAttachmentRemoved?.invoke(tabId)
+        }
+        knownTagTabIds.clear()
+        knownTagTabIds.addAll(currentTagIds)
+    }
+
+    // endregion
+
     companion object {
         private const val FADE_DURATION = 150L
         private const val EXPAND_COLLAPSE_TRANSITION_DURATION = 150L
         private const val MAX_LINES = 5
         private const val CHAT_MIN_LINES = 2
+        private const val TAG_CORNER_RADIUS = 16f
+        private const val TAG_PADDING_H = 8f
     }
 }

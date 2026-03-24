@@ -49,5 +49,6 @@ interface AppTPStateMessagePlugin : ActivePlugin {
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
+    featureName = "pluginPointAppTPStateMessagePlugin",
 )
 private interface AppTPStateMessagePluginPoint

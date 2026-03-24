@@ -104,8 +104,10 @@ report
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/pages/duckplayer/
 
 # Pixel processing results
-PixelDefinitions/pixel_processing_results/*
+PixelDefinitions/pixels/pixel_processing_results/*
 PixelDefinitions/node_modules/
 
 # LLM
 .claude/settings.local.json
+/.claude/worktrees/*
+docs/*

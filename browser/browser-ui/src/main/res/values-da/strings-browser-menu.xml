@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Tilbage</string>
     <string name="browserMenuForward">Frem</string>
     <string name="browserMenuRefresh">Opdater</string>
+    <string name="browserMenuFire">Ryd faner og data</string>
 </resources>

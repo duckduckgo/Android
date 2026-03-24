@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.navigation.bar.view
 
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -42,7 +42,7 @@ class BrowserNavigationBarViewModelTest {
 
     private val pixelMock: Pixel = mock()
 
-    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
+    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
 
     private val highlightPopupMenuFlow = MutableStateFlow(false)
 
@@ -50,14 +50,14 @@ class BrowserNavigationBarViewModelTest {
 
     @Before
     fun setUp() {
-        whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(highlightPopupMenuFlow)
+        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(highlightPopupMenuFlow)
         whenever(tabRepositoryMock.flowTabs).thenReturn(flowOf(listOf(TabEntity("abc"))))
 
         testee = BrowserNavigationBarViewModel(
             pixel = pixelMock,
             tabRepository = tabRepositoryMock,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
+            browserMenuHighlightState = browserMenuHighlightState,
         )
     }
 
@@ -139,7 +139,7 @@ class BrowserNavigationBarViewModelTest {
     }
 
     @Test
-    fun `when highlightPopupMenu flow emits true, viewState shows browser menu highlight`() = runTest {
+    fun `when browser menu highlight state emits true, viewState shows browser menu highlight`() = runTest {
         testee.viewState.test {
             val initial = awaitItem()
             Assert.assertEquals(false, initial.showBrowserMenuHighlight)

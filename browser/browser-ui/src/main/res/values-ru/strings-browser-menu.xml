@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Назад</string>
     <string name="browserMenuForward">Вперёд</string>
     <string name="browserMenuRefresh">Обновить</string>
+    <string name="browserMenuFire">Сбросить вкладки и данные</string>
 </resources>

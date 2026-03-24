@@ -40,5 +40,7 @@ interface FireDialog {
         const val EVENT_ON_CLEAR_STARTED = "onClearStarted"
         const val EVENT_CLEAR_WITHOUT_RESTART_STARTED = "onClearWithoutRestartStarted"
         const val EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE = "onSingleTabClearFinished"
+        const val EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED = "onSingleTabClearFeatureNotSupported"
+        const val EVENT_ON_SINGLE_TAB_CLEAR_ERROR = "onSingleTabClearError"
     }
 }

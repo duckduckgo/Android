@@ -25,6 +25,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <include
+        android:id="@+id/menuHeader"
+        layout="@layout/view_browser_menu_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,7 +54,7 @@
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_2"
-                android:paddingBottom="@dimen/keyline_3">
+                android:paddingBottom="@dimen/keyline_2">
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/backMenuItem"
@@ -106,13 +114,25 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuSettings"
                     app:menuActionSrc="@drawable/ic_settings_24" />
+
+                <com.duckduckgo.common.ui.view.MenuActionButtonView
+                    android:id="@+id/refreshActionMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/keyline_1"
+                    android:visibility="gone"
+                    app:menuActionLabel="@string/browserMenuRefresh"
+                    app:menuActionSrc="@drawable/ic_reload_24"
+                    tools:visibility="visible" />
             </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/urlPageActionsSectionDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:defaultPadding="true"
+                android:layout_marginBottom="@dimen/keyline_2"
+                app:defaultPadding="false"
                 app:fullWidth="false" />
 
             <include
@@ -256,6 +276,14 @@
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuFireproofSite" />
 
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:id="@+id/fireMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_fire_24"
+                app:menuSize="medium"
+                app:primaryText="@string/browserMenuFire" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/utilitiesSectionDivider"
                 android:layout_width="match_parent"
@@ -307,8 +335,9 @@
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/runningInDdgBrowserMenuItem"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2"

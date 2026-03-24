@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.sync.Mutex
@@ -43,7 +44,7 @@ interface SecureStorageDatabaseFactory {
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val keyProvider: SecureStorageKeyProvider,
     private val databaseProvider: DatabaseProvider,
-    private val sqlCipherLoader: SqlCipherLibraryLoader,
+    private val sqlCipherLoader: SqlCipherLoader,
 ) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
     private val mutex = Mutex()
@@ -74,16 +75,21 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
             return if (keyProvider.canAccessKeyStore()) {
                 logcat { "Autofill-DB-Init: Keystore accessible, creating encrypted database" }
                 // At this point, we are guaranteed that if l1key is null, it's because it hasn't been generated yet. Else, we always use the one stored.
-                _database = databaseProvider.buildRoomDatabase(
-                    SecureStorageDatabase::class.java,
-                    "secure_storage_database_encrypted.db",
-                    config = RoomDatabaseConfig(
-                        openHelperFactory = SupportOpenHelperFactory(keyProvider.getl1Key()),
-                        migrations = ALL_MIGRATIONS,
-                    ),
-                )
-                logcat { "Autofill-DB-Init: Database created successfully" }
-                _database
+                try {
+                    _database = databaseProvider.buildRoomDatabase(
+                        SecureStorageDatabase::class.java,
+                        "secure_storage_database_encrypted.db",
+                        config = RoomDatabaseConfig(
+                            openHelperFactory = SupportOpenHelperFactory(keyProvider.getl1Key()),
+                            migrations = ALL_MIGRATIONS,
+                        ),
+                    )
+                    logcat { "Autofill-DB-Init: Database created successfully" }
+                    _database
+                } catch (_: SecureStorageException) {
+                    logcat(ERROR) { "Autofill-DB-Init: Cannot read l1Key - database creation aborted" }
+                    null
+                }
             } else {
                 logcat(ERROR) { "Autofill-DB-Init: Cannot access keystore - database creation aborted" }
                 null

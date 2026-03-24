@@ -743,6 +743,21 @@ class TabDataRepositoryTest {
         db.close()
     }
 
+    @Test
+    fun whenReplaceTabWithNewTabThenDaoReplaceTabCalledAndSiteDataCleared() = runTest {
+        val testee = tabDataRepository()
+
+        testee.replaceTabWithNewTab(TAB_ID)
+
+        argumentCaptor<TabEntity>().apply {
+            verify(mockDao).replaceTab(eq(TAB_ID), capture())
+            assertNotNull(firstValue.tabId)
+            assertNotSame(TAB_ID, firstValue.tabId)
+        }
+        verify(mockWebViewSessionStorage).deleteSession(TAB_ID)
+        verify(mockTabVisitedSitesRepository).clearTab(TAB_ID)
+    }
+
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),

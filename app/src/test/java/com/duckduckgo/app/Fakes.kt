@@ -132,6 +132,12 @@ class FakeSettingsDataStore :
             store["appBackgroundedTimestamp"] = value
         }
 
+    override var lastSessionBackgroundTimestamp: Long
+        get() = store["lastSessionBackgroundTimestamp"] as Long? ?: 0L
+        set(value) {
+            store["lastSessionBackgroundTimestamp"] = value
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true
         set(value) {
@@ -224,6 +230,12 @@ class FakeSettingsDataStore :
         get() = store["showTrackersCountInAddressBar"] as Boolean? ?: true
         set(value) {
             store["showTrackersCountInAddressBar"] = value
+        }
+
+    override var hasNewDownload: Boolean
+        get() = store["hasNewDownload"] as Boolean? ?: false
+        set(value) {
+            store["hasNewDownload"] = value
         }
 
     override var singleTabFireDialogShownCount: Int

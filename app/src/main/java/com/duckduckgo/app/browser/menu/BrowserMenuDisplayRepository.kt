@@ -68,17 +68,18 @@ class RealBrowserMenuDisplayRepository @Inject constructor(
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 0)
     override val browserMenuState: Flow<BrowserMenuDisplayState> = flow {
         val isActivate = browserConfigFeature.experimentalBrowsingMenu().isEnabled()
+        val isRolloutEnabled = browserConfigFeature.rolloutBrowsingMenu().isEnabled()
         emit(
             BrowserMenuDisplayState(
-                hasOption = isActivate,
-                isEnabled = browserMenuStore.useBottomSheetMenu,
+                hasOption = isActivate && !isRolloutEnabled,
+                isEnabled = isRolloutEnabled || (isActivate && browserMenuStore.useBottomSheetMenu),
             ),
         )
         refreshTrigger.collect {
             emit(
                 BrowserMenuDisplayState(
-                    hasOption = isActivate,
-                    isEnabled = browserMenuStore.useBottomSheetMenu,
+                    hasOption = isActivate && !isRolloutEnabled,
+                    isEnabled = isRolloutEnabled || (isActivate && browserMenuStore.useBottomSheetMenu),
                 ),
             )
         }

@@ -146,28 +146,25 @@
                     layout="@layout/pre_onboarding_address_bar_position_horizontal"
                     android:visibility="gone" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:id="@+id/duckAiInputScreenToggleContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_4"
                     android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:visibility="gone">
 
                     <LinearLayout
                         android:id="@+id/duckAiInputScreenWithoutAiContainer"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:paddingTop="@dimen/keyline_6"
                         android:paddingBottom="@dimen/keyline_2"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        app:layout_constraintWidth_max="160dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/duckAiInputScreenWithAiContainer"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
                         <ImageView
                             android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
@@ -179,11 +176,12 @@
                             android:src="@drawable/searchbox_withoutai_active" />
 
                         <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiCaption"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
                             android:layout_marginTop="6dp"
-                            android:gravity="center"
-                            android:text="@string/input_screen_user_pref_without_ai"
+                            android:gravity="center_horizontal"
                             app:textType="primary"
                             app:typography="caption" />
 
@@ -199,17 +197,13 @@
                     <LinearLayout
                         android:id="@+id/duckAiInputScreenWithAiContainer"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
                         android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
                         android:paddingTop="@dimen/keyline_6"
                         android:paddingBottom="@dimen/keyline_2"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        app:layout_constraintWidth_max="160dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/duckAiInputScreenWithoutAiContainer"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
 
                         <ImageView
                             android:id="@+id/duckAiInputScreenToggleWithAiImage"
@@ -221,11 +215,12 @@
                             android:src="@drawable/searchbox_withai_inactive" />
 
                         <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithAiCaption"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
                             android:layout_marginTop="6dp"
-                            android:gravity="center"
-                            android:text="@string/input_screen_user_pref_with_ai"
+                            android:gravity="center_horizontal"
                             app:textType="primary"
                             app:typography="caption" />
 
@@ -238,7 +233,7 @@
 
                     </LinearLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/duckAiInputScreenToggleDescription"

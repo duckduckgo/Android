@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Обратно</string>
     <string name="browserMenuForward">Напред</string>
     <string name="browserMenuRefresh">Опресняване</string>
+    <string name="browserMenuFire">Изчистване на раздели и данни</string>
 </resources>

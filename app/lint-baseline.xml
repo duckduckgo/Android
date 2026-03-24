@@ -201,6 +201,28 @@
 
     <issue
         id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModel.kt"
+            line="60"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/app/onboarding/ui/page/BrandDesignUpdatePageViewModelTest.kt"
+            line="52"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
         message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
         errorLine1="import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment"
         errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -3580,8 +3602,8 @@
         errorLine1="        context.getSharedPreferences(AppInstallSharedPreferences.FILENAME, Context.MODE_PRIVATE).edit { clear() }"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/androidTest/java/com/duckduckgo/app/global/install/AppInstallSharedPreferencesTest.kt"
-            line="34"
+            file="src/test/java/com/duckduckgo/app/global/install/AppInstallSharedPreferencesTest.kt"
+            line="44"
             column="9"/>
     </issue>
 
@@ -11139,34 +11161,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_large_dark.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_large_dark.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_large_light.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_large_light.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_small_dark.webp` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_small_dark.webp"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/onboarding_background_small_light.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/onboarding_background_small_light.png"/>
-    </issue>
-
-    <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
         errorLine1="    &lt;EditText"
@@ -12073,6 +12067,15 @@
             file="src/main/res/layout/view_favorite_widget_light_item.xml"
             line="37"
             column="9"/>
+    </issue>
+
+    <issue
+        id="NoImplImportsInAppModule"
+        message="Modules should not import from :*-impl modules.&#xA;Consider using the public API instead: com.duckduckgo.duckchat.impl.ui.NativeInputWidget&#xA;If the API doesn&apos;t expose what you need, extend the API module first."
+        errorLine1="import com.duckduckgo.duckchat.impl.ui.NativeInputWidget"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/app/browser/nativeinput/NativeInputManager.kt"/>
     </issue>
 
 </issues>

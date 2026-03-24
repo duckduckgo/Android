@@ -1,0 +1,117 @@
+{
+  "name": "TruePeopleSearch",
+  "url": "truepeoplesearch.com",
+  "version": "0.7.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1703138400000,
+  "optOutUrl": "https://www.truepeoplesearch.com/removal",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "127f6406-5630-42dc-bfdf-d7df7862f5d6",
+          "url": "https://www.truepeoplesearch.com/results?name=${firstName}%20${lastName}&citystatezip=${city|capitalize},${state|upcase}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "detect CF managed challenge - the page renders a hidden input named cf-turnstile-response when Cloudflare intercepts with an inline challenge",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//input[@name='cf-turnstile-response'])]",
+              "failSilently": false
+            }
+          ],
+          "id": "8ae2fd99-5e9d-4f2e-bdb0-8acf9d7237ba"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "detect Datadome bot protection - Datadome injects an iframe from captcha-delivery.com with a slide-to-verify challenge",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//iframe[contains(@src,'captcha-delivery.com')])]",
+              "failSilently": false
+            }
+          ],
+          "id": "263f1b6f-674f-46e5-9f0f-97e832c34219"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "detect CF internal captcha form - the site renders its own form#captchaForm with an h-captcha div wrapping a Cloudflare challenge iframe plus a Submit button",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//form[@id='captchaForm'])]",
+              "failSilently": false
+            }
+          ],
+          "id": "9ea1684f-1953-45b7-954e-d1597a0c5063"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "Add an expectation to wait for the .card-summary element to appear. Gives time to automatically solve the CF challenge. failSilently is required because legitimate no-results pages also lack .card-summary — in that case we fall through to extract, which handles it via noResultsSelector.",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".card-summary",
+              "failSilently": true
+            }
+          ],
+          "id": "2f3f5cf4-0eb1-4e1b-a3db-ca9eb48c15a1"
+        },
+        {
+          "actionType": "extract",
+          "id": "267a0b26-dc67-4ed9-b5c4-a6de838765ed",
+          "selector": ".card-summary",
+          "noResultsSelector": "//span[contains(text(), 'We could not find any records')]",
+          "profile": {
+            "name": {
+              "selector": ".h4"
+            },
+            "age": {
+              "selector": ".//div[@class='h4']/following-sibling::div[1]",
+              "afterText": "Age "
+            },
+            "addressCityState": {
+              "selector": ".//div[@class='h4']/following-sibling::div[2]",
+              "afterText": "Lives in"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='h4']/following-sibling::div[3]",
+              "afterText": "Used to live in",
+              "separator": ",",
+              "beforeText": "..."
+            },
+            "relativesList": {
+              "selector": ".//div[@class='h4']/following-sibling::div[4]",
+              "afterText": "Related to",
+              "separator": ",",
+              "beforeText": "..."
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://www.truepeoplesearch.com/find/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

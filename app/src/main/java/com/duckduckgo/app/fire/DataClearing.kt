@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.fire
 
+import android.annotation.SuppressLint
+import androidx.core.net.toUri
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireClearOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.WARN
@@ -50,7 +61,56 @@ class DataClearing @Inject constructor(
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val dataClearingWideEvent: DataClearingWideEvent,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+    private val navigationHistory: NavigationHistory,
+    private val tabOperations: TabAtomicOperations,
+    private val tabRepository: TabRepository,
+    private val duckChat: DuckChat,
+    private val contextualDataStore: DuckChatContextualDataStore,
 ) : ManualDataClearing, AutomaticDataClearing {
+
+    override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
+        logcat { "Performing single tab clear for tab: $tabId" }
+
+        val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
+        val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
+        val tabUrl = tabRepository.getTab(tabId)?.url
+
+        clearDuckAiChatIfNeeded(tabUrl)
+        clearContextualChatDataIfNeeded(tabId)
+        navigationHistory.removeHistoryForTab(tabId)
+
+        val url = getNewTabUrl(tabUrl)
+        tabOperations.replaceTabWithNewTab(tabId, url)
+
+        logcat { "Single tab clear completed for tab: $tabId" }
+        return clearDataResult
+    }
+
+    private fun getNewTabUrl(tabUrl: String?): String? = tabUrl?.toUri()?.let {
+        if (duckChat.isDuckChatUrl(it)) {
+            duckChat.getDuckChatUrl("", autoPrompt = false)
+        } else {
+            null
+        }
+    }
+
+    private suspend fun clearContextualChatDataIfNeeded(tabId: String) {
+        val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
+            .contains(FireClearOption.DUCKAI_CHATS)
+
+        if (isDuckAiChatHistoryClearingEnabled) {
+            val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            clearDuckAiChatIfNeeded(contextualTabChatUrl)
+
+            contextualDataStore.clearTabChatUrl(tabId)
+        }
+    }
+
+    private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
+        if (tabUrl == null) return
+        duckChat.deleteChat(tabUrl)
+    }
 
     override suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean, wasAppUsedSinceLastClear: Boolean) {
         val options = fireDataStore.getManualClearOptions()
@@ -68,11 +128,6 @@ class DataClearing @Inject constructor(
             dataClearingWideEvent.finishSuccess() // If there is an open wide event, complete it before killing the process.
             clearDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
-    }
-
-    override suspend fun clearSingleTabData(tabId: String) {
-        // TODO: Wire up visited sites, history, duck.ai chat deletion, and WebStorageCompat clearing
-        logcat { "Single tab clear requested for tab: $tabId [NO OP for now]" }
     }
 
     override suspend fun clearDataUsingAutomaticFireOptions(killProcessIfNeeded: Boolean): Boolean {

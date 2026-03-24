@@ -200,23 +200,23 @@ class HistoryDaoTest {
     }
 
     @Test
-    fun whenDeleteHistoryForTabThenVisitsAndOrphanedEntriesRemoved() {
+    fun whenDeleteHistoryForTabThenAllEntriesVisitedByThatTabRemoved() {
         runTest {
             val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
             // url1 only visited by tab1 - entry should be removed
             historyDao.updateOrInsertVisit("url1", "title1", null, false, insertDate, tabId = "tab1")
-            // url2 visited by both tabs - entry should remain with tab2's visit
+            // url2 visited by both tabs - entry should also be removed (visited by tab1)
             historyDao.updateOrInsertVisit("url2", "title2", null, false, insertDate.plusMinutes(1), tabId = "tab1")
             historyDao.updateOrInsertVisit("url2", "title2", null, false, insertDate.plusMinutes(2), tabId = "tab2")
+            // url3 only visited by tab2 - entry should remain
+            historyDao.updateOrInsertVisit("url3", "title3", null, false, insertDate.plusMinutes(3), tabId = "tab2")
 
             historyDao.deleteHistoryForTab("tab1")
 
             val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-            // url1 should be gone (orphaned), url2 should remain
+            // url1 and url2 removed, only url3 remains
             Assert.assertEquals(1, historyEntriesWithVisits.count())
-            Assert.assertEquals("url2", historyEntriesWithVisits.first().historyEntry.url)
-            Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
-            Assert.assertEquals("tab2", historyEntriesWithVisits.first().visits.first().tabId)
+            Assert.assertEquals("url3", historyEntriesWithVisits.first().historyEntry.url)
         }
     }
 
@@ -237,7 +237,7 @@ class HistoryDaoTest {
     }
 
     @Test
-    fun whenTwoTabsVisitSameUrlAtSameTimeThenDeletingOneTabLeavesOtherIntact() {
+    fun whenTwoTabsVisitSameUrlAndOneTabIsBurnedThenEntireEntryIsRemoved() {
         runTest {
             val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
             historyDao.updateOrInsertVisit("url", "title", null, false, insertDate, tabId = "tab1")
@@ -246,10 +246,7 @@ class HistoryDaoTest {
             historyDao.deleteHistoryForTab("tab1")
 
             val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-            Assert.assertEquals(1, historyEntriesWithVisits.count())
-            val visits = historyEntriesWithVisits.first().visits
-            Assert.assertEquals(1, visits.count())
-            Assert.assertEquals("tab2", visits.first().tabId)
+            Assert.assertEquals(0, historyEntriesWithVisits.count())
         }
     }
 

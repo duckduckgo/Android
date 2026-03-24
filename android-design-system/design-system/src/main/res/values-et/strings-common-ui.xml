@@ -37,4 +37,7 @@
     <string name="alwaysOn">Alati sisse lülitatud</string>
     <string name="on">Sees</string>
     <string name="off">Väljas</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Loe edasi</string>
 </resources>

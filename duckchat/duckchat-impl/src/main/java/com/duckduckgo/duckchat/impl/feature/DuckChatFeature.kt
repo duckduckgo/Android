@@ -163,6 +163,13 @@ interface DuckChatFeature {
     fun automaticContextAttachment(): Toggle
 
     /**
+     * @return `true` when the contextual mode can attach more tha one context
+     * This is a capability flag, so it defaults to enabled unless remote config disables it.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun supportsMultipleContexts(): Toggle
+
+    /**
      * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
      * This controls syncing the status indicator with DuckChat enabled state and showing the
      * "Enable/Manage in AI Features Settings" item.
@@ -184,4 +191,18 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun chatTabAttachments(): Toggle
+
+    /**
+     * @return `true` when the duck.ai voice entry point button is enabled in the input screen
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceEntryPoint(): Toggle
 }

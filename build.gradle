@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
 
@@ -140,6 +142,7 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                                 && dependencyPath != ":js-messaging-api"
+                                && dependencyPath != ":browser-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"
@@ -173,6 +176,22 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+// Develocity test retry configuration to detect flaky tests
+def isCI = System.getenv('CI') != null
+subprojects {
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        develocity.testRetry {
+            maxRetries = isCI ? 1 : 0
+            maxFailures = 5
+            failOnPassedAfterRetry = true
+        }
+        develocity.predictiveTestSelection {
+            enabled.set(System.getProperty("pts.enabled", "true").toBoolean())
+        }
+    }
+}
+
 fladle {
     configs {
         serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
@@ -184,6 +203,7 @@ fladle {
             recordVideo.set(false)
             testTargets.set([
                     "notAnnotation com.duckduckgo.espresso.PrivacyTest",
+                    "notAnnotation com.duckduckgo.espresso.InternalPrivacyTest",
                     "notAnnotation com.duckduckgo.espresso.UserJourney",
             ])
             devices.set([
@@ -191,6 +211,8 @@ fladle {
                     ["model": "Pixel2.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
+            // retry once, if it succeeds it will be reported as a flaky test
+            flakyTestAttempts.set(1)
         }
     }
 }
@@ -200,6 +222,19 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
     )
+}
+
+afterEvaluate {
+    // Export Firebase Test Lab (Flank) tests to Develocity
+    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_FIREBASE
+        ).configure {
+            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
+        }
+    }
 }
 
 apply plugin: 'android-reporting'

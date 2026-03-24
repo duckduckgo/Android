@@ -107,8 +107,8 @@
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
-    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
+    <string name="pirTitle">Activate the DuckDuckGo subscription on desktop to set up Personal Information Removal</string>
+    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Subscribe to DuckDuckGo</b> and click <b>I Have a Subscription</b> to get started.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -168,7 +168,6 @@
     <string name="activitySubscriptions">Subscriptions</string>
     <string name="activitySubscriptionSettings">Subscription Settings</string>
     <string name="activityActivateSubscription">I Have a Subscription</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send Feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subscribers get our VPN, advanced AI models in Duck.ai, Personal Information Removal, and Identity Theft Restoration.</string>

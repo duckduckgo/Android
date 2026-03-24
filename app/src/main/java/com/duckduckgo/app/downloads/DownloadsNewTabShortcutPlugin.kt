@@ -33,6 +33,8 @@ import javax.inject.Inject
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
     priority = NewTabPageShortcutPlugin.PRIORITY_DOWNLOADS,
+    featureName = "pluginDownloadsNewTabShortcutPlugin",
+    parentFeatureName = "pluginPointNewTabPageShortcutPlugin",
 )
 class DownloadsNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

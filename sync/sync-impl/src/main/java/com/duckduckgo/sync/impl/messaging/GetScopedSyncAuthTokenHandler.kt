@@ -16,9 +16,12 @@
 
 package com.duckduckgo.sync.impl.messaging
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -31,6 +34,8 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.logcat
 import org.json.JSONObject
@@ -42,6 +47,9 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
     private val syncStore: SyncStore,
     private val deviceSyncState: DeviceSyncState,
     private val syncPixels: SyncPixels,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -70,14 +78,16 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
                         return
                     }
 
-                val jsonPayload = runCatching {
-                    handleRescopeTokenResult(syncApi.rescopeToken(token, SCOPE))
-                }.getOrElse { e ->
-                    logcat(LogPriority.ERROR) { "DuckChat-Sync: exception during rescope token: ${e.message}" }
-                    createErrorPayload("internal error")
-                }
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    val jsonPayload = runCatching {
+                        handleRescopeTokenResult(syncApi.rescopeToken(token, SCOPE))
+                    }.getOrElse { e ->
+                        logcat(LogPriority.ERROR) { "DuckChat-Sync: exception during rescope token: ${e.message}" }
+                        createErrorPayload("internal error")
+                    }
 
-                sendResponse(jsMessaging, jsMessage, jsonPayload)
+                    sendResponse(jsMessaging, jsMessage, jsonPayload)
+                }
             }
 
             private fun handleRescopeTokenResult(result: Result<String>): JSONObject {
@@ -140,7 +150,7 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
             override val allowedDomains: List<String> =
                 listOf(
                     AppUrl.Url.HOST,
-                    HOST_DUCK_AI,
+                    duckAiHostProvider.getHost(),
                 )
 
             override val featureName: String = "aiChat"
@@ -149,6 +159,5 @@ class GetScopedSyncAuthTokenHandler @Inject constructor(
 
     private companion object {
         private const val SCOPE = "ai_chats"
-        private const val HOST_DUCK_AI = "duck.ai"
     }
 }

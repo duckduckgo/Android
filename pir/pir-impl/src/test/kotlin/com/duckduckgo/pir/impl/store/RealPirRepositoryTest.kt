@@ -866,6 +866,22 @@ class RealPirRepositoryTest {
     }
 
     @Test
+    fun whenGetFeatureReceivedMsThenReturnValueFromDataStore() = runTest {
+        whenever(mockPirDataStore.featureReceivedMs).thenReturn(12345L)
+
+        val result = testee.getFeatureReceivedMs()
+
+        assertEquals(12345L, result)
+    }
+
+    @Test
+    fun whenSetFeatureReceivedMsThenDelegateToDataStore() = runTest {
+        testee.setFeatureReceivedMs(12345L)
+
+        verify(mockPirDataStore).featureReceivedMs = 12345L
+    }
+
+    @Test
     fun whenClearAllDataThenDeleteAllTables() = runTest {
         testee.clearAllData()
 

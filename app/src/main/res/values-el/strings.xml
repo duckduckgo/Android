@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
-    <string name="fireClearAll">Εκκαθάριση καρτελών και δεδομένων</string>
-    <string name="fireClearAllPlusDuckChats">Εκκαθάριση καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
+    <string name="fireClearAll">Διαγραφή καρτελών και δεδομένων</string>
+    <string name="fireClearAllPlusDuckChats">Διαγραφή καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
 
@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
     <string name="dataClearingActivityTitle">Διαγραφή δεδομένων</string>
-    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε τα δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη εκκαθάριση.</string>
+    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη διαγραφή.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d ιστότοπος εξαιρέθηκε από την εκκαθάριση</item>
         <item quantity="other">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">Ενεργό</string>
     <string name="dataClearingAutomaticClearingOff">Κλειστό</string>
     <string name="dataClearingClearBrowsingData">Εκκαθάριση δεδομένων περιήγησης</string>
-    <string name="dataClearingAutomaticDataClearing">Αυτόματη εκκαθάριση δεδομένων</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Αυτόματη απαλοιφή δεδομένων</string>
+    <string name="dataClearingAutomaticDataClearing">Αυτόματη διαγραφή δεδομένων</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Αυτόματη διαγραφή δεδομένων</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Κλείσιμο όλων των ανοιχτών καρτελών</string>
     <string name="dataClearingAutomaticDataOptionDescription">Διαγράψτε όλα τα δεδομένα των ιστοτόπων, συμπεριλαμβανομένων των ιστοτόπων που επισκεφτήκατε. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Διαγραφή όλων των συνομιλιών, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών</string>
@@ -258,6 +258,22 @@
         <item quantity="other">Διαγραφή από %1$d ιστότοπους. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Διαγραφή καρτελών και δεδομένων ιστότοπου;</string>
+    <string name="singleTabFireDialogTitleWithChats">Διαγραφή καρτελών, δεδομένων ιστότοπου και συνομιλιών;</string>
+    <string name="singleTabFireDialogDeleteAll">Διαγραφή όλων</string>
+    <string name="singleTabFireDialogDeleteThisTab">Διαγραφή αυτής της καρτέλας</string>
+    <string name="singleTabFireDialogDeleteThisChat">Διαγραφή αυτής της συνομιλίας</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Η επιλογή «Διαγραφή όλων» δεν θα διαγράψει το ιστορικό συνομιλιών σας στο Duck.ai.</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d καρτέλα και τα δεδομένα τους διαγράφηκαν</item>
+        <item quantity="other">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου λόγω σφάλματος.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Δικαιώματα</string>
 
@@ -275,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Καρτέλες, δεδομένα και συνομιλίες Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Εκκαθάριση στις…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Εκκαθάριση στις…</string>
+    <string name="settingsAutomaticallyClearWhen">Διαγραφή στις...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Διαγραφή στις...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Μόνο έξοδος εφαρμογής</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Έξοδος εφαρμογής, ανενεργή για 5 δευτερόλεπτα</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Έξοδος εφαρμογής, ανενεργή για 5 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Έξοδος εφαρμογής, ανενεργή για 15 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Έξοδος εφαρμογής, ανενεργή για 30 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
-    <string name="settingsClearAiDataTitle">Εκκαθάριση συνομιλιών Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Διαγραφή συνομιλιών Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών.</string>
     <string name="settingsClearDataActionSecondaryText">Εκκαθαρίζει όλες τις καρτέλες και τα δεδομένα για ιστότοπους που δεν έχετε προστατεύσει με Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Εκκαθαρίζει όλες τις καρτέλες, τις συνομιλίες Duck.ai και τα δεδομένα για οποιονδήποτε ιστότοπο δεν έχετε προστατεύσει με Fireproof.</string>
@@ -809,7 +825,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
     <string name="preOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
     <string name="preOnboardingDaxDialog2Button">Επιλέξτε το πρόγραμμα περιήγησής σας</string>
@@ -821,6 +839,7 @@
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
     <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
     <string name="preOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
     <string name="preOnboardingAddressBarOkButton">Επόμενο</string>
@@ -869,9 +888,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Το γνωρίζατε;</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Θέλετε εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Επόμενο</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Οι λειτουργίες τεχνητής νοημοσύνης είναι ιδιωτικές και προαιρετικές. Μπορείτε να κάνετε αλλαγές στις <b>Ρυθμίσεις > Λειτουργίες τεχνητής νοημοσύνης</b>.]]></string>
 

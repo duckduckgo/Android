@@ -28,6 +28,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
@@ -64,7 +65,9 @@ interface PirDetachedWebViewProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealPirDetachedWebViewProvider @Inject constructor() :
+class RealPirDetachedWebViewProvider @Inject constructor(
+    private val userAgentProvider: UserAgentProvider,
+) :
     PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun createInstance(
@@ -155,7 +158,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 }
             }
             settings.apply {
-                userAgentString = CUSTOM_UA
+                userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -164,10 +167,5 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 cacheMode = WebSettings.LOAD_NO_CACHE
             }
         }
-    }
-
-    companion object {
-        private const val CUSTOM_UA =
-            "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
 }

@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.messaging
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
@@ -42,6 +43,7 @@ class SubscriptionMessagingInterfaceTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val privacyProFeature: PrivacyProFeature = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,
@@ -49,6 +51,7 @@ class SubscriptionMessagingInterfaceTest {
         coroutineRule.testScope,
         pixelSender,
         subscriptionsChecker,
+        mockDuckAiHostProvider,
         privacyProFeature,
     )
 

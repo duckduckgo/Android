@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Jūsų prenumerata buvo įsigyta per „Apple App Store“. Norėdami pakeisti savo plano ar atsiskaitymo nustatymus, eikite į Nustatymai &gt; „Apple“ paskyra &gt; Prenumeratos įrenginyje, prijungtame prie tos pačios „Apple“ paskyros, naudotos prenumeratai įsigyti.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktyvuokite „Privacy Pro“ darbalaukyje, kad nustatytumėte Asmeninės informacijos pašalinimą.</string>
-    <string name="pirDescription">„DuckDuckGo“ naršyklėje, skirtoje darbalaukiui, eikite į <b>Nustatymai &gt; „Privacy Pro“</b> ir spustelėkite <b>Turiu prenumeratą</b>, kad pradėtumėte.</string>
+    <string name="pirTitle">Aktyvuokite „DuckDuckGo“ prenumeratą darbalaukyje, kad nustatytumėte asmeninės informacijos pašalinimą</string>
+    <string name="pirDescription">Staliniam kompiuteriui skirtoje naršyklėje „DuckDuckGo“ eik į <b>Nustatymai &gt; Prenumeruoti „DuckDuckGo“ </b> ir spustelėk <b>Turiu prenumeratą</b>, kad pradėtum.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Prenumeratos</string>
     <string name="activitySubscriptionSettings">Prenumeratos nustatymai</string>
     <string name="activityActivateSubscription">Turiu prenumeratą</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>

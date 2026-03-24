@@ -29,6 +29,7 @@ interface PirDataStore {
     var weeklyStatLastSentMs: Long
     var hasBrokerConfigBeenManuallyUpdated: Boolean
     var latestBackgroundScanRunInMs: Long
+    var featureReceivedMs: Long
 
     fun reset()
     fun resetUserData()
@@ -108,9 +109,18 @@ internal class RealPirDataStore(
             }
         }
 
+    override var featureReceivedMs: Long
+        get() = preferences.getLong(KEY_FEATURE_RECEIVED_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_FEATURE_RECEIVED_MS, value)
+            }
+        }
+
     override fun reset() {
         mainConfigEtag = null
         hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
         resetUserData()
     }
 
@@ -133,5 +143,6 @@ internal class RealPirDataStore(
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
         private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
         private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"
+        private const val KEY_FEATURE_RECEIVED_MS = "KEY_FEATURE_RECEIVED_MS"
     }
 }

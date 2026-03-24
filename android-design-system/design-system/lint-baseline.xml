@@ -1300,20 +1300,6 @@
     </issue>
 
     <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_chrome_comparison_chart.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_chrome_comparison_chart.png"/>
-    </issue>
-
-    <issue
-        id="IconLocation"
-        message="Found bitmap drawable `res/drawable/ic_ddg_comparison_chart.png` in densityless folder">
-        <location
-            file="src/main/res/drawable/ic_ddg_comparison_chart.png"/>
-    </issue>
-
-    <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
         errorLine1="    &lt;ImageView"
@@ -1428,72 +1414,6 @@
             file="src/main/java/com/duckduckgo/common/ui/compose/textfield/DaxSecureTextField.kt"
             line="107"
             column="24"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="        color = contentColor,"
-        errorLine2="                ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/sheets/DaxActionBottomSheetDialog.kt"
-            line="116"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                                    color = DuckDuckGoTheme.colors.text.primary,"
-        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/sheets/DaxPromoBottomSheetDialog.kt"
-            line="102"
-            column="45"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                                color = DuckDuckGoTheme.colors.text.primary,"
-        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/sheets/DaxPromoBottomSheetDialog.kt"
-            line="108"
-            column="41"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                color = DuckDuckGoTheme.colors.brand.accentBlue,"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/buttons/GhostButton.kt"
-            line="78"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                color = DuckDuckGoTheme.colors.text.primaryInverted,"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/buttons/PrimaryButton.kt"
-            line="80"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="InvalidDaxTextColorUsage"
-        message="Use DuckDuckGoTheme.textColors instead of arbitrary Color values to maintain design system consistency and theme support.&#xA;&#xA;Examples:&#xA;• DuckDuckGoTheme.textColors.primary&#xA;• DuckDuckGoTheme.textColors.secondary&#xA;&#xA;For one-off cases requiring custom colors, use good judgement or consider raising it in the Android Design System AOR."
-        errorLine1="                color = DuckDuckGoTheme.colors.brand.accentBlue,"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/common/ui/compose/buttons/SecondaryButton.kt"
-            line="85"
-            column="25"/>
     </issue>
 
 </issues>

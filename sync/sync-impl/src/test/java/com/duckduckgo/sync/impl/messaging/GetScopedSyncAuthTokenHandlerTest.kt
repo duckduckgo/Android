@@ -17,6 +17,8 @@
 package com.duckduckgo.sync.impl.messaging
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -30,6 +32,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
@@ -41,11 +44,15 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class GetScopedSyncAuthTokenHandlerTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockSyncApi: SyncApi = mock()
     private val mockSyncStore: SyncStore = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val mockSyncPixels: SyncPixels = mock()
     private val mockJsMessaging: JsMessaging = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     val callbackDataCaptor = argumentCaptor<JsCallbackData>()
 
@@ -53,11 +60,16 @@ class GetScopedSyncAuthTokenHandlerTest {
 
     @Before
     fun setUp() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+
         handler = GetScopedSyncAuthTokenHandler(
             syncApi = mockSyncApi,
             syncStore = mockSyncStore,
             deviceSyncState = mockDeviceSyncState,
             syncPixels = mockSyncPixels,
+            appCoroutineScope = coroutineTestRule.testScope,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
     }
 

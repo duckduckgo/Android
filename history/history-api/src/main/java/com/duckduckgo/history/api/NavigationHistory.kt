@@ -71,9 +71,9 @@ interface NavigationHistory {
     suspend fun hasHistory(): Boolean
 
     /**
-     * Removes all history visits associated with a specific tab.
-     * History entries that have no remaining visits will be deleted.
-     * @param tabId The tab ID whose history should be removed.
+     * Removes all history entries that were visited by a specific tab,
+     * including all visits from other tabs to those same entries.
+     * @param tabId The tab ID whose history entries should be removed.
      */
     suspend fun removeHistoryForTab(tabId: String)
 }

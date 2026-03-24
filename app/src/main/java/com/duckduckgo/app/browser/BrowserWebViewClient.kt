@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -85,6 +86,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.distinctUntilChanged
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
@@ -92,10 +94,12 @@ import logcat.logcat
 import java.net.URI
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
+private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -130,11 +134,25 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
+    private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
+    private var lastInterceptedAppSchemeUrl: String? = null
+
+    private val isAppSchemeInterceptionEnabled = AtomicBoolean(true)
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appSchemeInterceptionFeature.self().enabled()
+                .distinctUntilChanged()
+                .collect { enabled ->
+                    isAppSchemeInterceptionEnabled.set(enabled)
+                }
+        }
+    }
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
@@ -475,6 +493,15 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         logcat { "onPageStarted webViewUrl: ${webView.url} URL: $url lastPageStarted $lastPageStarted" }
+
+        // Handle app-scheme URLs that bypass shouldOverrideUrlLoading (e.g., window.open with intent:// URLs)
+        if (url != null && interceptAppSchemeUrl(webView, url)) {
+            logcat { "interceptAppSchemeUrl: intercepted $url in onPageStarted, returning early" }
+            return
+        }
+
+        lastInterceptedAppSchemeUrl = null
+
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
@@ -508,6 +535,38 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    /**
+     * Intercepts app-scheme URLs (e.g., intent://, tel://, mailto://) that bypass shouldOverrideUrlLoading().
+     * This can happen when window.open() is used with special URLs, as the WebViewTransport mechanism
+     * loads URLs directly without triggering shouldOverrideUrlLoading().
+     *
+     * Delegates to [shouldOverride] so URL-type dispatch logic is not duplicated.
+     *
+     * @return true if the URL was handled and loading should stop, false otherwise
+     */
+    private fun interceptAppSchemeUrl(webView: WebView, url: String): Boolean {
+        if (!isAppSchemeInterceptionEnabled.get()) {
+            return false
+        }
+        val uri = url.toUri()
+        val scheme = uri.scheme ?: return false
+
+        if (scheme in STANDARD_WEB_SCHEMES) {
+            return false
+        }
+
+        if (url == lastInterceptedAppSchemeUrl) {
+            return true
+        }
+        lastInterceptedAppSchemeUrl = url
+
+        logcat { "interceptAppSchemeUrl: detected app scheme '$scheme' for $url" }
+
+        webView.stopLoading()
+        shouldOverride(webView, uri, isForMainFrame = true, isRedirect = false)
+        return true
     }
 
     private fun handleMediaPlayback(
@@ -740,6 +799,19 @@ class BrowserWebViewClient @Inject constructor(
         error: WebResourceError?,
     ) {
         error?.let { webResourceError ->
+            // Handle unsupported scheme errors for app-scheme URLs (e.g., intent://, tel://, mailto://)
+            // This catches cases where shouldOverrideUrlLoading is bypassed (like window.open)
+            if (webResourceError.errorCode == ERROR_UNSUPPORTED_SCHEME &&
+                request?.isForMainFrame == true &&
+                request.url != null &&
+                view != null
+            ) {
+                logcat { "interceptAppSchemeUrl: ERROR_UNSUPPORTED_SCHEME for main frame in onReceivedError" }
+                if (interceptAppSchemeUrl(view, request.url.toString())) {
+                    return
+                }
+            }
+
             val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
                 if (parsedError != OMITTED) {

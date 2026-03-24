@@ -49,7 +49,7 @@ import javax.inject.Inject
 )
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val trackerDetector: TrackerDetector,
+    private val trackerDetectorClientProvider: TrackerDetectorClientProvider,
     private val tdsTrackerDao: TdsTrackerDao,
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
@@ -109,7 +109,7 @@ class TrackerDataLoader @Inject constructor(
         val trackers = tdsTrackerDao.getAll()
         logcat { "Loaded ${trackers.size} tds trackers from DB" }
         val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
-        trackerDetector.addClient(client)
+        trackerDetectorClientProvider.addClient(client)
     }
 
     companion object {

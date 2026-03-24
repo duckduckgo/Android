@@ -123,6 +123,26 @@
     {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/malicious-site-protection/reference_malware_hashPrefixes.json",
       "to": "malicious-site-protection/malicious-site-protection-impl/src/test/resources/reference_tests/block/reference_malware_hashPrefixes.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/tests.json",
+      "to": "app/src/androidTest/resources/reference_tests/request-blocklist/tests.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/config-reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/request-blocklist/config-reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/tds-reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/request-blocklist/tds-reference.json"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/surrogates-reference.txt",
+      "to": "app/src/androidTest/resources/reference_tests/request-blocklist/surrogates-reference.txt"
+    },
+    {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/request-blocklist/user-allowlist-reference.json",
+      "to": "app/src/androidTest/resources/reference_tests/request-blocklist/user-allowlist-reference.json"
     }
   ],
   "copyFilesSettings": {

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
@@ -45,6 +47,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -55,6 +58,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -66,6 +70,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -104,13 +109,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
+                is ShowSyncRestoreDialog -> configureDaxCta(SYNC_RESTORE)
                 is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowInitialDialog -> configureDaxCta(INITIAL, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
-                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
+                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
@@ -209,6 +215,32 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
+                SYNC_RESTORE -> {
+                    binding.daxDialogCta.root.show()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.descriptionCta.show()
+                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.daxDialogContentImage.gone()
+
+                    val ctaText = it.getString(R.string.syncRestoreDialogTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    val descriptionText = it.getString(R.string.syncRestoreDialogDescription)
+                    binding.daxDialogCta.descriptionCta.text = descriptionText.html(it)
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.setText(R.string.syncRestoreDialogPrimaryCta)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.syncRestoreDialogSecondaryCta)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
                 INITIAL_REINSTALL_USER -> {
                     binding.daxDialogCta.root.show()
                     binding.daxDialogCta.progressBarText.gone()
@@ -380,8 +412,27 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 3
-                    val ctaText = it.getString(R.string.preOnboardingInputScreenTitle)
+                    val ctaText = it.getString(
+                        if (showDuckAiCopy) R.string.preOnboardingInputScreenTitleUpdated else R.string.preOnboardingInputScreenTitle,
+                    )
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_without_ai
+                        },
+                    )
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_with_ai
+                        },
+                    )
+
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.show()
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.alpha = MIN_ALPHA

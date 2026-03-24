@@ -91,7 +91,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
                     updateAutomaticClearingStatus(it.automaticallyClearingEnabled)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
-                    updateClearDataAction(it.clearDuckAiData)
                     updateFireproofWebsitesCount(it.fireproofWebsitesCount)
                 }
             }.launchIn(lifecycleScope)
@@ -122,14 +121,6 @@ class DataClearingSettingsActivity : DuckDuckGoActivity() {
     ) {
         binding.clearDuckAiDataSetting.quietlySetIsChecked(enabled, clearDuckAiDataToggleListener)
         binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
-    private fun updateClearDataAction(clearDuckAiData: Boolean) {
-        if (clearDuckAiData) {
-            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAllPlusDuckChats))
-        } else {
-            binding.clearDataAction.setPrimaryText(resources.getString(R.string.fireClearAll))
-        }
     }
 
     private fun updateFireproofWebsitesCount(count: Int) {

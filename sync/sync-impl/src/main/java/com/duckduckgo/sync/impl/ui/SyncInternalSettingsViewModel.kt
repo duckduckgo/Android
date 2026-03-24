@@ -21,12 +21,17 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.persistentstorage.api.PersistentStorage
+import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
+import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
@@ -45,6 +50,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
@@ -59,6 +65,9 @@ constructor(
     private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
     private val syncPromotionDataStore: SyncPromotionDataStore,
+    private val persistentStorage: PersistentStorage,
+    private val syncAutoRestoreManager: SyncAutoRestoreManager,
+    private val syncFeature: SyncFeature,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -79,7 +88,17 @@ constructor(
         val connectedDevices: List<ConnectedDevice> = emptyList(),
         val useDevEnvironment: Boolean = false,
         val environment: String = "",
+        val syncAutoRestoreEnabled: Boolean = false,
+        val blockStoreAvailable: Boolean? = null,
+        val blockStoreE2ESupported: Boolean? = null,
+        val blockStoreCurrentValue: BlockStoreValue = BlockStoreValue.Loading,
     )
+
+    sealed class BlockStoreValue {
+        data object Loading : BlockStoreValue()
+        data object NotSet : BlockStoreValue()
+        data class HasValue(val value: String) : BlockStoreValue()
+    }
 
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
@@ -87,11 +106,31 @@ constructor(
         data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
         data object LoginSuccess : Command()
+        data object LaunchRecoverDataScreen : Command()
     }
 
     init {
         viewModelScope.launch(dispatchers.io()) {
             updateViewState()
+            checkSyncAutoRestoreFlag()
+            checkBlockStoreAvailability()
+            refreshBlockStoreValue()
+        }
+    }
+
+    fun onResume() {
+        viewModelScope.launch(dispatchers.io()) {
+            refreshBlockStoreValue()
+        }
+    }
+
+    fun onLaunchRecoverDataScreen() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                command.send(Command.LaunchRecoverDataScreen)
+            } else {
+                command.send(Command.ShowMessage("Not signed in — create an account first"))
+            }
         }
     }
 
@@ -324,6 +363,82 @@ constructor(
         viewModelScope.launch {
             syncPromotionDataStore.clearPromoHistory(PasswordsScreen)
             command.send(ShowMessage("'Password screen' promo history cleared"))
+        }
+    }
+
+    private fun checkSyncAutoRestoreFlag() {
+        val enabled = syncFeature.syncAutoRestore().isEnabled()
+        viewState.update { it.copy(syncAutoRestoreEnabled = enabled) }
+    }
+
+    private suspend fun checkBlockStoreAvailability() {
+        when (val availability = persistentStorage.checkAvailability()) {
+            is PersistentStorageAvailability.Unavailable -> {
+                viewState.update { it.copy(blockStoreAvailable = false, blockStoreE2ESupported = false) }
+            }
+            is PersistentStorageAvailability.Available -> {
+                viewState.update { it.copy(blockStoreAvailable = true, blockStoreE2ESupported = availability.isEndToEndEncryptionSupported) }
+            }
+        }
+    }
+
+    private suspend fun refreshBlockStoreValue() {
+        val bytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
+        val blockStoreValue = when {
+            bytes == null -> BlockStoreValue.NotSet
+            else -> BlockStoreValue.HasValue(String(bytes, Charsets.UTF_8))
+        }
+        viewState.update { it.copy(blockStoreCurrentValue = blockStoreValue) }
+    }
+
+    fun onBlockStoreWriteRecoveryCode() {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()
+            if (recoveryCode == null) {
+                command.send(ShowMessage("No recovery code available"))
+                return@launch
+            }
+            val deviceId = syncAccountRepository.getAccountInfo().deviceId
+            runCatching {
+                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode.rawCode, deviceId)
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Recovery code stored successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Store failed: ${error.message}"))
+            }
+        }
+    }
+
+    fun onBlockStoreWriteClicked(recoveryCode: String, deviceId: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (recoveryCode.isBlank()) {
+                command.send(ShowMessage("Recovery code is required"))
+                return@launch
+            }
+            val trimmedDeviceId = deviceId?.takeIf { it.isNotBlank() }
+            if (trimmedDeviceId != null && trimmedDeviceId.length !in 8..64) {
+                command.send(ShowMessage("Device ID must be 8–64 chars (or leave blank)"))
+                return@launch
+            }
+            runCatching {
+                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode, deviceId?.takeIf { it.isNotBlank() })
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Stored successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Store failed: ${error.message}"))
+            }
+        }
+    }
+
+    fun onBlockStoreClearClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            runCatching {
+                syncAutoRestoreManager.clearRecoveryCode()
+                refreshBlockStoreValue()
+                command.send(ShowMessage("Cleared successfully"))
+            }.onFailure { error ->
+                command.send(ShowMessage("Clear failed: ${error.message}"))
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -37,11 +39,14 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val urlConverter: UrlConverter,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedOption: ShowOnAppLaunchOption,
         val specificPageUrl: String,
+        val showNTPAfterIdleReturn: Boolean = false,
+        val afterInactivityTimeoutHours: Int = DEFAULT_TIMEOUT_HOURS,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -55,8 +60,14 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         combine(
             showOnAppLaunchOptionDataStore.optionFlow,
             showOnAppLaunchOptionDataStore.specificPageUrlFlow,
-        ) { option, specificPageUrl ->
-            _viewState.value = ViewState(option, specificPageUrl)
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
+        ) { option, specificPageUrl, showNTPAfterIdleReturn ->
+            _viewState.value = ViewState(
+                selectedOption = option,
+                specificPageUrl = specificPageUrl,
+                showNTPAfterIdleReturn = showNTPAfterIdleReturn,
+                afterInactivityTimeoutHours = getTimeoutHours(),
+            )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
     }
@@ -72,5 +83,18 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             val convertedUrl = urlConverter.convertUrl(url)
             showOnAppLaunchOptionDataStore.setSpecificPageUrl(convertedUrl)
         }
+    }
+
+    private fun getTimeoutHours(): Int {
+        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
+            ?: return DEFAULT_TIMEOUT_HOURS
+        return runCatching {
+            val timeoutMinutes = JSONObject(settings).getInt("timeoutMinutes")
+            timeoutMinutes / 60
+        }.getOrDefault(DEFAULT_TIMEOUT_HOURS)
+    }
+
+    companion object {
+        private const val DEFAULT_TIMEOUT_HOURS = 1
     }
 }

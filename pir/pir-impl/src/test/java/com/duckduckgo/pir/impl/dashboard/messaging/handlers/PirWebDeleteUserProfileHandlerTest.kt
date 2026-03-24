@@ -26,6 +26,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -49,6 +50,7 @@ class PirWebDeleteUserProfileHandlerTest {
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
+    private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() {
@@ -58,6 +60,7 @@ class PirWebDeleteUserProfileHandlerTest {
             workHandler = mockWorkHandler,
             pirFeatureDataCleaner = mockPirFeatureDataCleaner,
             pirWebProfileStateHolder = mockPirWebProfileStateHolder,
+            pirPixelSender = mockPirPixelSender,
         )
     }
 
@@ -75,6 +78,7 @@ class PirWebDeleteUserProfileHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
+        verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
         verify(mockWorkHandler).cancelWork()
         verify(mockPirFeatureDataCleaner).removeUserData()
@@ -116,6 +120,7 @@ class PirWebDeleteUserProfileHandlerTest {
         testee.process(jsMessage, mockJsMessaging, null)
 
         // Then
+        verify(mockPirPixelSender).reportUserReset()
         verify(mockPirWebProfileStateHolder).clear()
         verify(mockWorkHandler).cancelWork()
         verify(mockPirFeatureDataCleaner).removeUserData()

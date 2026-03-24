@@ -69,7 +69,7 @@ class SubscriptionFeaturesFetcher @Inject constructor(
         playBillingManager.productsFlow
             .firstOrNull() { it.isNotEmpty() }
             ?.filter {
-                if (privacyProFeature.allowProTierPurchase().isEnabled()) {
+                if (privacyProFeature.fetchProTierEntitlements().isEnabled()) {
                     it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
                 } else {
                     it.productId == BASIC_SUBSCRIPTION

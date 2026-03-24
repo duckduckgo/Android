@@ -74,11 +74,6 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<List<Device>>
 
-    fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject?>
-
     fun getBookmarks(
         token: String,
         since: String,
@@ -98,6 +93,17 @@ interface SyncApi {
         token: String,
         until: String,
     ): Result<Unit>
+
+    fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject>
+
+    fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String? = null,
+    ): Result<JSONObject>
 
     /**
      * Obtain a new "scoped token" for the sync service
@@ -302,27 +308,6 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject> {
-        logcat(INFO) { "Sync-service: patch request $updates" }
-
-        val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", updates)
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            logcat(INFO) { "Sync-service: patch response: $it" }
-            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
-            Result.Success(data)
-        }
-    }
-
     override fun getBookmarks(
         token: String,
         since: String,
@@ -407,6 +392,49 @@ class SyncServiceRemote @Inject constructor(
 
         return onSuccess(response) {
             Result.Success(Unit)
+        }
+    }
+
+    override fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchData request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchData("Bearer $token", updates)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchData error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchData response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchData: empty Body")
+            Result.Success(data)
+        }
+    }
+
+    override fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String?,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchChats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchChats("Bearer $token", body, since)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchChats error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchChats response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchChats: empty Body")
+            Result.Success(data)
         }
     }
 

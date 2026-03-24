@@ -39,6 +39,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_DISABLED,
+    featureName = "pluginPproUpsellDisabledMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PproUpsellDisabledMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,

@@ -54,6 +54,9 @@ object DaoModule {
     fun providesTabsDao(database: AppDatabase) = database.tabsDao()
 
     @Provides
+    fun providesTabPageContextDao(database: AppDatabase) = database.tabPageContextDao()
+
+    @Provides
     fun surveyDao(database: AppDatabase) = database.surveyDao()
 
     @Provides

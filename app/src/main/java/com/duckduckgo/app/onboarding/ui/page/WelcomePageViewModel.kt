@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -41,6 +42,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -68,12 +70,19 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.sync.api.SyncAutoRestore
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
+import logcat.logcat
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -91,6 +100,7 @@ class WelcomePageViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent,
     private val deviceInfo: DeviceInfo,
+    private val syncAutoRestore: SyncAutoRestore,
 ) : ViewModel() {
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -99,6 +109,19 @@ class WelcomePageViewModel @Inject constructor(
     private var inputScreenSelected: Boolean = true
     private var maxPageCount: Int = 2
     private var reinstallUser: Boolean = false
+
+    private val canRestoreDeferred: Deferred<Boolean> = viewModelScope.async(dispatchers.io()) {
+        try {
+            logcat { "Sync-AutoRestore: checking canRestore..." }
+            val result = syncAutoRestore.canRestore()
+            logcat(LogPriority.INFO) { "Sync-AutoRestore: canRestore=$result" }
+            result
+        } catch (t: Throwable) {
+            coroutineContext.ensureActive()
+            logcat(LogPriority.WARN) { "Sync-AutoRestore: canRestore check failed - ${t.message}" }
+            false
+        }
+    }
 
     init {
         viewModelScope.launch(dispatchers.io()) {
@@ -111,6 +134,8 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     sealed interface Command {
+        data object ShowSyncRestoreDialog : Command
+
         data class ShowInitialReinstallUserDialog(val showDuckAiCopy: Boolean) : Command
 
         data class ShowInitialDialog(val showDuckAiCopy: Boolean) : Command
@@ -127,7 +152,7 @@ class WelcomePageViewModel @Inject constructor(
             val showSplitOption: Boolean,
         ) : Command
 
-        data object ShowInputScreenDialog : Command
+        data class ShowInputScreenDialog(val showDuckAiCopy: Boolean) : Command
 
         data object Finish : Command
 
@@ -140,6 +165,14 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onPrimaryCtaClicked(currentDialog: PreOnboardingDialogType) {
         when (currentDialog) {
+            SYNC_RESTORE -> {
+                viewModelScope.launch {
+                    logcat { "Sync-AutoRestore: user accepted restore, calling restoreSyncAccount()" }
+                    syncAutoRestore.restoreSyncAccount()
+                    _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
+                }
+            }
+
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
                     _commands.send(ShowComparisonChart(showDuckAiCopy = isDuckAiCopyEnabled()))
@@ -179,6 +212,7 @@ class WelcomePageViewModel @Inject constructor(
                 viewModelScope.launch {
                     _commands.send(OnboardingSkipped)
                     pixel.fire(PREONBOARDING_CONFIRM_SKIP_ONBOARDING_PRESSED)
+                    duckChat.setInputScreenUserSetting(true)
                 }
             }
 
@@ -204,7 +238,7 @@ class WelcomePageViewModel @Inject constructor(
                         }
                     }
                     if (androidBrowserConfigFeature.showInputScreenOnboarding().isEnabled()) {
-                        _commands.send(Command.ShowInputScreenDialog)
+                        _commands.send(Command.ShowInputScreenDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
                     } else {
                         _commands.send(Finish)
                     }
@@ -229,6 +263,13 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onSecondaryCtaClicked(currentDialog: PreOnboardingDialogType) {
         when (currentDialog) {
+            SYNC_RESTORE -> {
+                viewModelScope.launch {
+                    logcat { "Sync-AutoRestore: user skipped restore" }
+                    _commands.send(ShowSkipOnboardingOption)
+                }
+            }
+
             INITIAL_REINSTALL_USER -> {
                 viewModelScope.launch {
                     reinstallUser = true
@@ -295,6 +336,9 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
+            SYNC_RESTORE -> {
+                // TODO - SyncRestore: add pixel for dialog shown
+            }
             INITIAL_REINSTALL_USER -> {
                 pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
             }
@@ -331,12 +375,28 @@ class WelcomePageViewModel @Inject constructor(
 
     fun loadDaxDialog() {
         viewModelScope.launch {
-            if (isAppReinstall()) {
-                _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
+            val canRestore = withTimeoutOrNull(BLOCK_STORE_TIMEOUT_MS) {
+                canRestoreDeferred.await()
+            } ?: false
+
+            // Always call isAppReinstall() — it has side effects (creates DDG downloads directory, persists reinstall state)
+            reinstallUser = isAppReinstall()
+
+            if (canRestore) {
+                logcat(LogPriority.INFO) { "Sync-AutoRestore: first dialog=SYNC_RESTORE" }
+                _commands.send(ShowSyncRestoreDialog)
             } else {
-                _commands.send(ShowInitialDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
+                if (reinstallUser) {
+                    _commands.send(ShowInitialReinstallUserDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
+                } else {
+                    _commands.send(ShowInitialDialog(showDuckAiCopy = isDuckAiCopyEnabled()))
+                }
             }
         }
+    }
+
+    companion object {
+        private const val BLOCK_STORE_TIMEOUT_MS = 3_000L
     }
 
     private suspend fun isDuckAiCopyEnabled(): Boolean = withContext(dispatchers.io()) {

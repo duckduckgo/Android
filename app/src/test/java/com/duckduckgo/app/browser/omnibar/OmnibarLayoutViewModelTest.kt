@@ -7,7 +7,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
@@ -81,14 +81,15 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
-    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
+    private val browserMenuHighlightState: BrowserMenuHighlightState = mock()
+    private val browserMenuHighlightFlow = MutableStateFlow(false)
 
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
     private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
     private val duckAiShowInputScreenFlow = MutableStateFlow(false)
+    private val nativeInputFieldSettingFlow = MutableStateFlow(false)
     private val isFullUrlEnabledFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
     private val urlDisplayRepository: UrlDisplayRepository = mock()
@@ -118,7 +119,7 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
+        whenever(browserMenuHighlightState.shouldHighlight).thenReturn(browserMenuHighlightFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -126,6 +127,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(urlDisplayRepository.isFullUrlEnabled).then { isFullUrlEnabledFlow }
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
+        whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputFieldSettingFlow)
         whenever(serpEasterEggLogosToggles.setFavourite()).thenReturn(mock())
         whenever(serpEasterEggLogosToggles.setFavourite().isEnabled()).thenReturn(false)
         whenever(serpEasterEggLogosToggles.setFavourite().enabled()).thenReturn(setFavouriteFeatureEnabledFlow)
@@ -172,7 +174,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
+            browserMenuHighlightState = browserMenuHighlightState,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -1246,8 +1248,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun `when default browser experiment updates browser menu highlight, then update the view state`() = runTest {
-        defaultBrowserPromptsExperimentHighlightOverflowMenuFlow.value = true
+    fun `when browser menu highlight state emits true, then update the view state`() = runTest {
+        browserMenuHighlightFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1435,6 +1437,17 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNativeInputFieldEnabledThenShowClickCatcherTrue() = runTest {
+        nativeInputFieldSettingFlow.value = true
+
+        testee.viewState.test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.showTextInputClickCatcher)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -2190,6 +2203,19 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is Command.FocusInputField)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiHeaderPressedAndNativeInputEnabledThenInputScreenShown() = runTest {
+        duckAiShowInputScreenFlow.value = false
+        nativeInputFieldSettingFlow.value = true
+        testee.onDuckAiHeaderClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
             cancelAndIgnoreRemainingEvents()
         }
     }

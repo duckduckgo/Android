@@ -30,7 +30,9 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.newaddressbaroption.NewAddressBarCallback
@@ -44,11 +46,13 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -71,6 +75,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -97,6 +102,10 @@ class RealDuckChatTest {
     private val mockNewAddressBarOptionBottomSheetDialog: NewAddressBarOptionBottomSheetDialog = mock()
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val cookiesManager: CookieManagerProvider = mock()
+    private val mockDuckChatDeleter: DuckChatDeleter = mock()
+    private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
+    private val mockSyncEngine: SyncEngine = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -112,6 +121,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(0L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiVoiceSearch().setRawStoredState(State(enable = false))
@@ -133,6 +143,10 @@ class RealDuckChatTest {
                 mockNewAddressBarOptionBottomSheetDialogFactory,
                 mockDeviceSyncState,
                 cookiesManager,
+                mockDuckChatDeleter,
+                mockDuckChatSyncRepository,
+                mockSyncEngine,
+                mockDuckAiHostProvider,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -379,7 +393,21 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenDuckChatCalledWithCustomHostThenUrlUsesCustomHost() = runTest {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+
+        testee.openDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://staging.duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -394,7 +422,34 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = true,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenVoiceDuckChatCalledThenOpenDuckChatWithVoiceModeUrl() = runTest {
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&duckai=5",
+        )
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
+    fun whenOpenVoiceDuckChatCalledWithActiveSessionThenHasSessionActiveIsFalse() = runTest {
+        val thirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000L)
+        whenever(mockDuckChatFeatureRepository.lastSessionTimestamp()).thenReturn(thirtyMinutesAgo)
+
+        testee.openVoiceDuckChat()
+
+        verify(mockBrowserNav).openDuckChat(
+            mockContext,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai/chat?mode=voice-mode&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -406,7 +461,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -422,7 +477,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&bang=true&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&bang=true&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -438,7 +493,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -453,7 +508,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -497,7 +552,7 @@ class RealDuckChatTest {
         verify(mockBrowserNav).openDuckChat(
             mockContext,
             hasSessionActive = false,
-            duckChatUrl = "https://duckduckgo.com/?q=example&prompt=1&ia=chat&duckai=5",
+            duckChatUrl = "https://duck.ai/chat?q=example&prompt=1&duckai=5",
         )
         verify(mockContext).startActivity(mockIntent)
     }
@@ -853,6 +908,15 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `input screen feature - when native input enabled then emit disabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isNativeInputFieldUserSettingEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreen.value)
+    }
+
+    @Test
     fun `input screen feature - when global feature flag disabled then emit disabled`() = runTest {
         duckChatFeature.self().setRawStoredState(State(false))
 
@@ -1187,49 +1251,49 @@ class RealDuckChatTest {
     fun `when get duck chat url with query and autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and no autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and no autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and autoprompt then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = true, sidebar = false)
 
-        assertTrue(url == "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query and sidebar then return url with placement parameter`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = false, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&placement=sidebar&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&placement=sidebar&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with query autoprompt and sidebar then return url with placement and prompt`() = runTest {
         val url = testee.getDuckChatUrl(query = "query", autoPrompt = true, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?q=query&prompt=1&placement=sidebar&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?q=query&prompt=1&placement=sidebar&duckai=5")
     }
 
     @Test
     fun `when get duck chat url with empty query and sidebar then return correct url`() = runTest {
         val url = testee.getDuckChatUrl(query = "", autoPrompt = false, sidebar = true)
 
-        assertTrue(url == "https://duckduckgo.com/?placement=sidebar&q=DuckDuckGo%20AI%20Chat&ia=chat&duckai=5")
+        assertTrue(url == "https://duck.ai/chat?placement=sidebar&duckai=5")
     }
 
     @Test
@@ -1238,6 +1302,16 @@ class RealDuckChatTest {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai"))
         assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+    }
+
+    @Test
+    fun `when custom subdomain host is set then canHandleOnAiWebView matches custom host`() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai/somepath"))
+        assertTrue(testee.canHandleOnAiWebView("https://staging.duck.ai"))
+        assertTrue(testee.canHandleOnAiWebView("https://duckduckgo.com/revoke-duckai-access"))
+        assertFalse(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
+        assertFalse(testee.canHandleOnAiWebView("https://other.duck.ai/somepath"))
     }
 
     @Test
@@ -1293,6 +1367,33 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when multiple context attachments enabled, areMultipleContentAttachmentsEnabled returns true`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
+    fun `when multiple context attachments enabled and contextual mode disabled, areMultipleContentAttachmentsEnabled returns false`() = runTest {
+        duckChatFeature.contextualMode().setRawStoredState(State(enable = false))
+        duckChatFeature.supportsMultipleContexts().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.areMultipleContentAttachmentsEnabled())
+    }
+
+    @Test
     fun `when migration cookie present and kill switch enabled then isDuckChatContextualModeEnabled returns true`() = runTest {
         val cookieManager = mock<CookieManager>()
         whenever(cookiesManager.get()).thenReturn(cookieManager)
@@ -1328,6 +1429,64 @@ class RealDuckChatTest {
         whenever(cookiesManager.get()).thenReturn(null)
 
         assertFalse(testee.isStandaloneMigrationCompleted())
+    }
+
+    @Test
+    fun `when duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository).recordSingleChatDeletion("abc-123")
+        verify(mockSyncEngine).triggerSync(SyncEngine.SyncTrigger.DATA_CHANGE)
+    }
+
+    @Test
+    fun `when duck ai url without chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when non duck ai url with chatID param then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://example.com/?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when duck ai url with blank chatID then deleteChat returns false`() = runTest {
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter, never()).deleteChat(any())
+    }
+
+    @Test
+    fun `when legacy duckduckgo duck ai url with chatID then deleteChat delegates to deleter`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(true)
+
+        val result = testee.deleteChat("https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5&chatID=abc-123")
+
+        assertTrue(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+    }
+
+    @Test
+    fun `when deleteChat and deleter returns false then deleteChat returns false`() = runTest {
+        whenever(mockDuckChatDeleter.deleteChat("abc-123")).thenReturn(false)
+
+        val result = testee.deleteChat("https://duck.ai/chat?chatID=abc-123")
+
+        assertFalse(result)
+        verify(mockDuckChatDeleter).deleteChat("abc-123")
+        verify(mockDuckChatSyncRepository, never()).recordSingleChatDeletion(any())
+        verify(mockSyncEngine, never()).triggerSync(any())
     }
 
     companion object {

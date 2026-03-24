@@ -45,6 +45,8 @@ class InputScreenButtons @JvmOverloads constructor(
             binding.actionSend.setOnClickListener { value?.invoke() }
         }
 
+    var onStopClick: (() -> Unit)? = null
+
     var onNewLineClick: (() -> Unit)? = null
         set(value) {
             field = value
@@ -69,6 +71,25 @@ class InputScreenButtons @JvmOverloads constructor(
 
     fun setSendButtonIcon(iconResId: Int) {
         binding.actionSend.setImageResource(iconResId)
+    }
+
+    fun setStopButton() {
+        binding.actionSend.setImageResource(R.drawable.ic_stop_16)
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
+        binding.actionSend.setOnClickListener { onStopClick?.invoke() }
+    }
+
+    fun clearStopButton(iconResId: Int) {
+        binding.actionSend.setImageResource(iconResId)
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonPrimaryContainer)
+        binding.actionSend.setOnClickListener { onSendClick?.invoke() }
+    }
+
+    private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
+        val attributes = context.obtainStyledAttributes(intArrayOf(attr))
+        val colorStateList = attributes.getColorStateList(0)
+        attributes.recycle()
+        return colorStateList
     }
 
     fun setSendButtonVisible(visible: Boolean) {

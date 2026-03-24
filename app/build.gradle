@@ -1,4 +1,7 @@
 import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 plugins {
     id 'com.android.application'
@@ -218,24 +221,30 @@ fulladleModuleConfig {
     variant.set("playDebug")
 }
 
+def privacyTestDefaults = { config ->
+    config.async.set(false)
+    config.useOrchestrator.set(true)
+    config.environmentVariables.set(["clearPackageData": "true"])
+    config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
+    config.localResultsDir.set("fladleResults")
+    config.flakyTestAttempts.set(2)
+    config.testShards.set(1)
+}
+
 fladle {
     configs {
         privacyTests {
-            async.set(false)
+            privacyTestDefaults(it)
             flankVersion.set("21.+")
-            useOrchestrator.set(true)
-            environmentVariables.set([
-                    "clearPackageData": "true"
-            ])
-            testTargets.set([
-                    "annotation com.duckduckgo.espresso.PrivacyTest"
-            ])
-            devices.set([
-                    ["model": "MediumPhone.arm", "version": "34"],
-            ])
-            localResultsDir.set("fladleResults")
-            flakyTestAttempts.set(2)
-            testShards.set(1)
+            testTargets.set(["annotation com.duckduckgo.espresso.PrivacyTest"])
+        }
+        internalPrivacyTests {
+            privacyTestDefaults(it)
+            flankVersion.set("21.+")
+            testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
+            debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
+            instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/duckduckgo-${buildVersionName()}-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
+            additionalTestApks.set([])
         }
     }
 }
@@ -243,6 +252,7 @@ fladle {
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
@@ -305,6 +315,11 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
+    implementation project(':tracker-detection-api')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
@@ -377,6 +392,12 @@ dependencies {
     implementation project(':sync-settings-api')
     implementation project(':sync-settings-impl')
 
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -398,11 +419,19 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':event-hub-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
     playImplementation project(':subscriptions-impl')
     fdroidImplementation project(':subscriptions-dummy-impl')
+
+    implementation project(':persistent-storage-api')
+
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
 
     internalImplementation project(':subscriptions-internal')
 
@@ -559,6 +588,7 @@ dependencies {
 
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
@@ -579,6 +609,17 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Export Android connected test results to Develocity
+afterEvaluate {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_CONNECTED
+        )
+    }
 }
 
 tasks.register('fastlaneVersionCode') {
@@ -609,6 +650,10 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('internalAndroidTestsBuild') {
+    dependsOn 'assembleInternalDebug', 'assembleInternalDebugAndroidTest'
 }
 
 tasks.register('releaseTestLocal', Exec) {

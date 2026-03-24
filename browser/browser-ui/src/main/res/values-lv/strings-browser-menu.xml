@@ -54,4 +54,5 @@
     <string name="browserMenuBack">Atpakaļ</string>
     <string name="browserMenuForward">Uz priekšu</string>
     <string name="browserMenuRefresh">Atsvaidzināt</string>
+    <string name="browserMenuFire">Notīrīt cilnes un datus</string>
 </resources>
