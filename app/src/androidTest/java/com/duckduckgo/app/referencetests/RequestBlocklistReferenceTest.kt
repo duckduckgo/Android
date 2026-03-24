@@ -231,6 +231,7 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             appCoroutineScope = coroutinesTestRule.testScope,
             isMainProcess = true,
+            webTrackersBlockedDao = mockWebTrackersBlockedDao,
         )
     }
 
@@ -301,7 +302,6 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             userAllowlistDao,
             contentBlocking,
             trackerAllowlist,
-            mockWebTrackersBlockedDao,
             mockAdClickManager,
         )
         trackerDetector = trackerDetectorImpl

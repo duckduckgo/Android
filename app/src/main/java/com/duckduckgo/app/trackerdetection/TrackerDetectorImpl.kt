@@ -22,8 +22,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -48,7 +46,6 @@ class TrackerDetectorImpl @Inject constructor(
     private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
-    private val webTrackersBlockedDao: WebTrackersBlockedDao,
     private val adClickManager: AdClickManager,
 ) : TrackerDetector, TrackerDetectorClientProvider {
 
@@ -137,11 +134,6 @@ class TrackerDetectorImpl @Inject constructor(
         }
 
         val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
-
-        if (status == TrackerStatus.BLOCKED) {
-            val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
-        }
 
         logcat(VERBOSE) { "$documentUrlString resource $urlString WAS identified as a tracker and status=$status" }
 

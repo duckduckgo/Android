@@ -197,6 +197,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
+            webTrackersBlockedDao = mockWebTrackersBlockedDao,
         )
     }
 
@@ -243,7 +244,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             mockUserAllowListDao,
             mockContentBlocking,
             mockTrackerAllowlist,
-            mockWebTrackersBlockedDao,
             mockAdClickManager,
         )
         trackerDetector = trackerDetectorImpl
