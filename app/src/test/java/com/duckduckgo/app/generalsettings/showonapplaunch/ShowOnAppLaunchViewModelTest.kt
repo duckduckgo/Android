@@ -111,31 +111,31 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
-    fun whenNoSettingsThenDefaultTimeoutHoursIsOne() = runTest {
+    fun whenNoSettingsThenDefaultTimeoutMinutesIsFive() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(1, state.afterInactivityTimeoutHours)
+            assertEquals(5, state.afterInactivityTimeoutMinutes)
         }
     }
 
     @Test
-    fun whenSettingsHaveTimeoutMinutesThenTimeoutHoursIsCalculated() = runTest {
+    fun whenSettingsHaveDefaultIdleThresholdSecondsThenTimeoutMinutesIsCalculated() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"timeoutMinutes":120}"""),
+            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":600}"""),
         )
         testee = ShowOnAppLaunchViewModel(dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature)
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(2, state.afterInactivityTimeoutHours)
+            assertEquals(10, state.afterInactivityTimeoutMinutes)
         }
     }
 
     @Test
-    fun whenSettingsHaveInvalidJsonThenDefaultTimeoutHoursIsUsed() = runTest {
+    fun whenSettingsHaveInvalidJsonThenDefaultTimeoutMinutesIsUsed() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
             Toggle.State(true, settings = """invalid"""),
         )
@@ -143,7 +143,7 @@ class ShowOnAppLaunchViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(1, state.afterInactivityTimeoutHours)
+            assertEquals(5, state.afterInactivityTimeoutMinutes)
         }
     }
 

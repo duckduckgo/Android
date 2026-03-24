@@ -46,7 +46,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val selectedOption: ShowOnAppLaunchOption,
         val specificPageUrl: String,
         val showNTPAfterIdleReturn: Boolean = false,
-        val afterInactivityTimeoutHours: Int = DEFAULT_TIMEOUT_HOURS,
+        val afterInactivityTimeoutMinutes: Int = DEFAULT_TIMEOUT_MINUTES,
     )
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
@@ -66,7 +66,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
                 selectedOption = option,
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                afterInactivityTimeoutHours = getTimeoutHours(),
+                afterInactivityTimeoutMinutes = getTimeoutMinutes(),
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -85,16 +85,16 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         }
     }
 
-    private fun getTimeoutHours(): Int {
+    private fun getTimeoutMinutes(): Int {
         val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return DEFAULT_TIMEOUT_HOURS
+            ?: return DEFAULT_TIMEOUT_MINUTES
         return runCatching {
-            val timeoutMinutes = JSONObject(settings).getInt("timeoutMinutes")
-            timeoutMinutes / 60
-        }.getOrDefault(DEFAULT_TIMEOUT_HOURS)
+            val timeoutSeconds = JSONObject(settings).getInt("defaultIdleThresholdSeconds")
+            timeoutSeconds / 60
+        }.getOrDefault(DEFAULT_TIMEOUT_MINUTES)
     }
 
     companion object {
-        private const val DEFAULT_TIMEOUT_HOURS = 1
+        private const val DEFAULT_TIMEOUT_MINUTES = 5
     }
 }
