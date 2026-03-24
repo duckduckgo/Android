@@ -30,7 +30,8 @@ engineer a question if you are genuinely stuck rather than leaving a comment and
    If no Approach section is present, use your judgment — but stay strictly within the
    boundaries defined by the Context and Constraints sections
 5. Respect the task's Constraints; do not touch anything listed there
-6. Stay within a single module unless the task's Context explicitly justifies more
+6. Stay within a single module unless the task's Scope section explicitly justifies working
+   across multiple modules — if it does, honour that justification exactly as stated
 7. Make small, focused commits following the commit message rules in CLAUDE.md
 
 ## Verify the work
