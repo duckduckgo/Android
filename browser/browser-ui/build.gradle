@@ -51,6 +51,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':browser-api')
     implementation project(':design-system')
+    implementation project(':serp-logos-api')
     implementation "androidx.datastore:datastore-preferences:_"
 
     implementation AndroidX.appCompat
