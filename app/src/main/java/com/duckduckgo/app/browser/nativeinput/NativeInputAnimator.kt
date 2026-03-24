@@ -42,6 +42,7 @@ class RealNativeInputAnimator : NativeInputAnimator {
 
     private var runningAnimator: ValueAnimator? = null
     private var animationCleanup: (() -> Unit)? = null
+    private var animationGeneration: Long = 0
 
     override fun init(
         card: View,
@@ -73,12 +74,14 @@ class RealNativeInputAnimator : NativeInputAnimator {
         onComplete: () -> Unit,
     ) {
         cancelRunningAnimation()
+        val entranceGeneration = animationGeneration
         val startWidth = (card.layoutParams as FrameLayout.LayoutParams).width
         val startHeight = (card.layoutParams as FrameLayout.LayoutParams).height
 
         card.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 card.viewTreeObserver.removeOnPreDrawListener(this)
+                if (entranceGeneration != animationGeneration) return true
                 val omnibarSurface = visibleSurfacePosition(omnibarCard)
                 runEntranceAnimation(
                     card, startWidth, startHeight,
@@ -126,6 +129,7 @@ class RealNativeInputAnimator : NativeInputAnimator {
     }
 
     override fun cancelRunningAnimation() {
+        animationGeneration++
         animationCleanup?.invoke()
         animationCleanup = null
         runningAnimator?.cancel()
@@ -272,8 +276,10 @@ class RealNativeInputAnimator : NativeInputAnimator {
                 private var cancelled = false
                 override fun onAnimationCancel(animation: Animator) { cancelled = true }
                 override fun onAnimationEnd(animation: Animator) {
-                    runningAnimator = null
-                    animationCleanup = null
+                    if (runningAnimator === animation) {
+                        runningAnimator = null
+                        animationCleanup = null
+                    }
                     if (!cancelled) onEnd()
                 }
             })
