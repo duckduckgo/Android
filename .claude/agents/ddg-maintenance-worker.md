@@ -44,13 +44,6 @@ Also always run:
 If any check fails due to your changes, fix it and re-run before proceeding.
 Do not open a PR with known failures.
 
-After opening the PR, trigger the e2e test suites against the PR branch:
-    gh workflow run e2e-nightly-full-suite.yml --ref <branch-name>
-    gh workflow run e2e-nightly-non-blockers-suite.yml --ref <branch-name>
-
-Note the triggered run URLs and include them in the Asana task comment alongside the PR link,
-so the reviewer can check e2e results before merging.
-
 ## Open the draft PR
 
 Create a draft PR using the repo's PR template (.github/PULL_REQUEST_TEMPLATE.md) exactly.
@@ -83,7 +76,11 @@ To open the PR, use `gh api repos/duckduckgo/Android/pulls --method POST` rather
 
 After opening the PR:
     - Move the Asana task to "In Review"
-    - Leave a comment on the Asana task with the PR link
+    - Trigger the e2e test suites against the PR branch:
+          gh workflow run e2e-nightly-full-suite.yml --ref <branch-name>
+          gh workflow run e2e-nightly-non-blockers-suite.yml --ref <branch-name>
+    - Leave a comment on the Asana task with the PR link and the triggered e2e run URLs,
+      so the reviewer can check e2e results before merging
 
 ## If stuck
 
