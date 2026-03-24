@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -57,6 +58,7 @@ class RealSecureStorageKeyStoreTest {
 
     private val pixel: Pixel = mock()
     private lateinit var autofillFeature: AutofillFeature
+    private lateinit var autofillServiceFeature: AutofillServiceFeature
     private lateinit var sharedPreferencesProvider: SharedPreferencesProvider
 
     private lateinit var legacyPrefs: SharedPreferences
@@ -70,6 +72,7 @@ class RealSecureStorageKeyStoreTest {
     @Before
     fun setup() {
         autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+        autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
         sharedPreferencesProvider = mock()
 
         legacyEditor = mock {
@@ -99,6 +102,7 @@ class RealSecureStorageKeyStoreTest {
             coroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillFeature = autofillFeature,
+            autofillServiceFeature = autofillServiceFeature,
             sharedPreferencesProvider = sharedPreferencesProvider,
             pixel = pixel,
             encryptedPreferencesFactory = encryptedPreferencesFactory,
@@ -724,6 +728,7 @@ class RealSecureStorageKeyStoreTest {
             coroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillFeature = mockAutofillFeature,
+            autofillServiceFeature = autofillServiceFeature,
             sharedPreferencesProvider = sharedPreferencesProvider,
             pixel = pixel,
             encryptedPreferencesFactory = encryptedPreferencesFactory,
@@ -732,6 +737,93 @@ class RealSecureStorageKeyStoreTest {
         val result = testee.getKey(KEY_NAME)
 
         assertArrayEquals(TEST_VALUE, result)
+    }
+
+    // endregion
+
+    // region Multi-process mode (autofill service enabled)
+
+    @Test
+    fun whenMultiProcessModeEnabledThenGetKeyReadsOnlyFromHarmony() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        createTestee()
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertArrayEquals(TEST_VALUE, result)
+        // Legacy must never be touched
+        verify(legacyPrefs, never()).getString(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndKeyAbsentInHarmonyThenGetKeyReturnsNull() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertNull(result)
+        verify(legacyPrefs, never()).getString(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledThenUpdateKeyWritesOnlyToHarmony() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        verify(harmonyEditor).putString(eq(KEY_NAME), any())
+        verify(harmonyEditor).commit()
+        // Legacy must never be touched
+        verify(legacyEditor, never()).putString(any(), any())
+        verify(legacyEditor, never()).commit()
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndHarmonyNullOnGetKeyThenThrows() = runTest {
+        configureMultiProcessMode(harmonyPrefsReturnsNull = true)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.getKey(KEY_NAME)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndHarmonyNullOnUpdateKeyThenThrows() = runTest {
+        configureMultiProcessMode(harmonyPrefsReturnsNull = true)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeDisabledThenLegacyIsStillUsed() = runTest {
+        configureHarmonyDisabled()
+        createTestee()
+
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        verify(legacyEditor).putString(eq(KEY_NAME), any())
+        verify(legacyEditor).commit()
     }
 
     // endregion
@@ -754,6 +846,13 @@ class RealSecureStorageKeyStoreTest {
     private fun configureReadFromHarmonyEnabled(harmonyPrefsReturnsNull: Boolean = false) {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = true))
+        sharedPreferencesProvider.stub {
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
+        }
+    }
+
+    private fun configureMultiProcessMode(harmonyPrefsReturnsNull: Boolean = false) {
+        autofillServiceFeature.self().setRawStoredState(State(enable = true))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }

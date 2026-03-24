@@ -39,6 +39,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -79,6 +80,7 @@ class RealSecureStorageKeyStore(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
+    private val autofillServiceFeature: AutofillServiceFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val pixel: Pixel,
     private val encryptedPreferencesFactory: EncryptedPreferencesFactory,
@@ -89,19 +91,30 @@ class RealSecureStorageKeyStore(
 
     private var initialUseHarmonyValue: Boolean? = null
 
+    /**
+     * Evaluates all three harmony-related flags in a single consistent snapshot.
+     * [multiProcess] (autofill service enabled) implies both [useHarmony] and [readFromHarmony]:
+     * Harmony is the only multi-process-safe store, so it is treated as implicitly active regardless
+     * of the remote-config flag state. All three values are derived from one [isMultiProcessMode]
+     * call, guaranteeing they can never be mutually inconsistent.
+     */
     private data class HarmonyFlags(
         val useHarmony: Boolean,
         val readFromHarmony: Boolean,
+        val multiProcess: Boolean,
     )
 
     private suspend fun harmonyFlags(): HarmonyFlags {
         return withContext(dispatcherProvider.io()) {
+            val autofillServiceFlag = autofillServiceFeature.self().isEnabled()
             val useHarmonyFlag = autofillFeature.useHarmony().isEnabled()
             HarmonyFlags(
-                useHarmony = useHarmonyFlag,
-                readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()),
+                useHarmony = useHarmonyFlag || autofillServiceFlag,
+                readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()) || autofillServiceFlag,
+                multiProcess = autofillServiceFlag,
             )
         }
+
     }
 
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
@@ -125,35 +138,37 @@ class RealSecureStorageKeyStore(
 
     private val harmonyPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
         coroutineScope.async(dispatcherProvider.io()) {
-            harmonyFlags().let { harmonyFlags ->
-                try {
-                    harmonyMutex.withLock {
-                        initialUseHarmonyValue = harmonyFlags.useHarmony
-                        if (harmonyFlags.useHarmony) {
-                            getEncryptedPreferences()?.let { legacyPreferences ->
-                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(legacyPreferences, FILENAME_V3).also {
-                                    if (it == null) {
-                                        logcat { "autofill harmony preferences retrieval returned null" }
-                                    }
+            val harmonyFlags = harmonyFlags()
+            try {
+                harmonyMutex.withLock {
+                    initialUseHarmonyValue = harmonyFlags.useHarmony
+                    if (!harmonyFlags.useHarmony) {
+                        null
+                    } else {
+                        // Migration reads from legacy (safe in multi-process) and writes to harmony.
+                        // If both processes race to migrate, they read identical data and write
+                        // identical keys — idempotent and safe under Harmony's multi-process locking.
+                        getEncryptedPreferences()?.let { legacyPreferences ->
+                            sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(legacyPreferences, FILENAME_V3).also {
+                                if (it == null) {
+                                    logcat { "autofill harmony preferences retrieval returned null" }
                                 }
-                            } ?: run {
-                                logcat { "autofill legacy preferences retrieval returned null. Harmony will also return null" }
-                                null
                             }
-                        } else {
+                        } ?: run {
+                            logcat { "autofill legacy preferences retrieval returned null. Harmony will also return null" }
                             null
                         }
                     }
-                } catch (e: Exception) {
-                    coroutineContext.ensureActive()
-                    pixel.fire(
-                        AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
-                        getPixelParams(throwable = e, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
-                        type = Daily(),
-                    )
-                    logcat { "autofill harmony preferences retrieval failed: $e" }
-                    null
                 }
+            } catch (e: Exception) {
+                coroutineContext.ensureActive()
+                pixel.fire(
+                    AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED,
+                    getPixelParams(throwable = e, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                    type = Daily(),
+                )
+                logcat { "autofill harmony preferences retrieval failed: $e" }
+                null
             }
         }
     }
@@ -166,6 +181,7 @@ class RealSecureStorageKeyStore(
         return harmonyPreferencesDeferred.await()
     }
 
+
     @SuppressLint("UseKtx")
     override suspend fun updateKey(
         keyName: String,
@@ -173,14 +189,22 @@ class RealSecureStorageKeyStore(
     ) {
         withContext(dispatcherProvider.io()) {
             val harmonyFlags = harmonyFlags()
-            val legacyPrefs = getEncryptedPreferences()
-            if (legacyPrefs == null) {
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
-                    getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
-                    type = Daily(),
-                )
-                throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+
+            // In multi-process mode, skip legacy entirely — EncryptedSharedPreferences writes do not
+            // propagate between processes, so writing from two processes would produce divergent state.
+            val legacyPrefs: SharedPreferences? = if (harmonyFlags.multiProcess) {
+                null
+            } else {
+                getEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            type = Daily(),
+                        )
+                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
+                    }
+                }
             }
 
             val harmonyPrefs = if (!harmonyFlags.useHarmony) {
@@ -211,27 +235,29 @@ class RealSecureStorageKeyStore(
                 throw SecureStorageException.KeyAlreadyExistsException("Trying to overwrite already existing key")
             }
 
-            // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
-            val (legacyCommitted, error) = runCatching {
-                val editor = legacyPrefs.edit()
-                editor.putString(keyName, keyValue.toByteString().base64())
-                editor.commit() to null
-            }.getOrElse {
-                ensureActive()
-                false to it
-            }
-            if (!legacyCommitted) {
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    getPixelParams(
-                        keyName = keyName,
-                        throwable = error,
-                        useHarmony = harmonyFlags.useHarmony,
-                        readFromHarmony = harmonyFlags.readFromHarmony,
-                    ),
-                    type = Daily(),
-                )
-                throw SecureStorageException.InternalSecureStorageException("Legacy commit() returned false — write not persisted to disk", error)
+            if (legacyPrefs != null && !harmonyFlags.multiProcess) {
+                // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
+                val (legacyCommitted, error) = runCatching {
+                    val editor = legacyPrefs.edit()
+                    editor.putString(keyName, keyValue.toByteString().base64())
+                    editor.commit() to null
+                }.getOrElse {
+                    ensureActive()
+                    false to it
+                }
+                if (!legacyCommitted) {
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
+                        getPixelParams(
+                            keyName = keyName,
+                            throwable = error,
+                            useHarmony = harmonyFlags.useHarmony,
+                            readFromHarmony = harmonyFlags.readFromHarmony,
+                        ),
+                        type = Daily(),
+                    )
+                    throw SecureStorageException.InternalSecureStorageException("Legacy commit() returned false — write not persisted to disk", error)
+                }
             }
 
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
@@ -254,33 +280,36 @@ class RealSecureStorageKeyStore(
                         ),
                         type = Daily(),
                     )
-                    // Rollback legacy write so we don't cause a corrupted state with out-of-sync files
-                    runCatching {
-                        val editor = legacyPrefs.edit()
-                        editor.remove(keyName)
-                        val committed = editor.commit()
-                        if (!committed) {
+                    // Rollback legacy write so we don't cause a corrupted state with out-of-sync files.
+                    // In multi-process mode legacy was never written to, so no rollback is needed.
+                    if (legacyPrefs != null && !harmonyFlags.multiProcess) {
+                        runCatching {
+                            val editor = legacyPrefs.edit()
+                            editor.remove(keyName)
+                            val committed = editor.commit()
+                            if (!committed) {
+                                pixel.fire(
+                                    AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                                    getPixelParams(
+                                        keyName = keyName,
+                                        useHarmony = harmonyFlags.useHarmony,
+                                        readFromHarmony = harmonyFlags.readFromHarmony,
+                                    ),
+                                    type = Daily(),
+                                )
+                            }
+                        }.onFailure { rollbackError ->
                             pixel.fire(
                                 AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
                                 getPixelParams(
                                     keyName = keyName,
+                                    throwable = rollbackError,
                                     useHarmony = harmonyFlags.useHarmony,
                                     readFromHarmony = harmonyFlags.readFromHarmony,
                                 ),
                                 type = Daily(),
                             )
                         }
-                    }.onFailure { rollbackError ->
-                        pixel.fire(
-                            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
-                            getPixelParams(
-                                keyName = keyName,
-                                throwable = rollbackError,
-                                useHarmony = harmonyFlags.useHarmony,
-                                readFromHarmony = harmonyFlags.readFromHarmony,
-                            ),
-                            type = Daily(),
-                        )
                     }
                     throw SecureStorageException.InternalSecureStorageException(
                         "Error writing to harmony preferences",
@@ -328,19 +357,24 @@ class RealSecureStorageKeyStore(
         return withContext(dispatcherProvider.io()) {
             val harmonyFlags = harmonyFlags()
 
-            // Always read from legacy — source of truth
-
-            val legacyPrefs = getEncryptedPreferences().also {
-                if (it == null) {
-                    pixel.fire(
-                        AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
-                        getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
-                        type = Daily(),
-                    )
-                    if (harmonyFlags.readFromHarmony) {
-                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
+            // In multi-process mode, skip legacy reads — EncryptedSharedPreferences writes do not
+            // propagate between processes, so legacy may be stale. readFromHarmony() returns true
+            // in this mode, so the existing readFromHarmony path returns the harmony value below.
+            val legacyPrefs: SharedPreferences? = if (!harmonyFlags.multiProcess) {
+                getEncryptedPreferences().also {
+                    if (it == null) {
+                        pixel.fire(
+                            AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE,
+                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                            type = Daily(),
+                        )
+                        if (harmonyFlags.readFromHarmony) {
+                            throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on read")
+                        }
                     }
                 }
+            } else {
+                null
             }
 
             val harmonyPrefs = if (!harmonyFlags.useHarmony) {
@@ -360,23 +394,28 @@ class RealSecureStorageKeyStore(
                 }
             }
 
-            val legacyEncoded = runCatching {
-                legacyPrefs?.getString(keyName, null)
-            }.getOrElse {
-                ensureActive()
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_GET_KEY_FAILED,
-                    getPixelParams(
-                        keyName = keyName,
-                        throwable = it,
-                        useHarmony = harmonyFlags.useHarmony,
-                        readFromHarmony = harmonyFlags.readFromHarmony,
-                    ),
-                    type = Daily(),
-                )
-                throw it
+            val legacyEncoded = if (legacyPrefs != null) {
+                runCatching {
+                    legacyPrefs.getString(keyName, null)
+                }.getOrElse {
+                    ensureActive()
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_GET_KEY_FAILED,
+                        getPixelParams(
+                            keyName = keyName,
+                            throwable = it,
+                            useHarmony = harmonyFlags.useHarmony,
+                            readFromHarmony = harmonyFlags.readFromHarmony,
+                        ),
+                        type = Daily(),
+                    )
+                    throw it
+                }
+            } else {
+                null
             }
-            val legacyValue: ByteArray? = if (legacyEncoded != null) {
+
+            val legacyValue: ByteArray? = legacyEncoded?.let {
                 val decoded = legacyEncoded.decodeBase64()?.toByteArray()
                 if (decoded == null) {
                     pixel.fire(
@@ -387,10 +426,7 @@ class RealSecureStorageKeyStore(
                     throw SecureStorageException.InternalSecureStorageException("Legacy preferences key value is present but cannot be decoded")
                 }
                 decoded
-            } else {
-                null
             }
-
             // When useHarmony is ON, read Harmony and compare for diagnostic pixels
             if (harmonyFlags.useHarmony) {
                 val harmonyEncoded = runCatching {
@@ -476,10 +512,11 @@ class RealSecureStorageKeyStore(
     }
 
     override suspend fun canUseEncryption(): Boolean = withContext(dispatcherProvider.io()) {
-        if (harmonyFlags().useHarmony) {
-            getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
-        } else {
-            getEncryptedPreferences() != null
+        val harmonyFlags = harmonyFlags()
+        when {
+            harmonyFlags.multiProcess -> getHarmonyEncryptedPreferences() != null
+            harmonyFlags.useHarmony && !harmonyFlags.multiProcess -> getEncryptedPreferences() != null && getHarmonyEncryptedPreferences() != null
+            else -> getEncryptedPreferences() != null
         }
     }
 
