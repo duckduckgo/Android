@@ -26,7 +26,6 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
