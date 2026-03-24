@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -83,6 +84,9 @@ class SpecialUrlDetectorImplTest {
 
     val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
+    val appSchemeInterceptionFeature: AppSchemeInterceptionFeature =
+        FakeFeatureToggleFactory.create(AppSchemeInterceptionFeature::class.java)
+
     private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     @Before
@@ -99,6 +103,7 @@ class SpecialUrlDetectorImplTest {
                 aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
                 androidBrowserConfigFeature = androidBrowserConfigFeature,
                 duckAiFeatureState = mockDuckAiFeature,
+                appSchemeInterceptionFeature = appSchemeInterceptionFeature,
             ),
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
@@ -634,6 +639,42 @@ class SpecialUrlDetectorImplTest {
 
         assertTrue(result is NonHttpAppLink)
         assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoButHasFallbackUrlThenReturnNonHttpAppLinkWithFallback() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;S.browser_fallback_url=https%3A%2F%2Fexample.com;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is NonHttpAppLink)
+        val nonHttpAppLink = result as NonHttpAppLink
+        assertEquals("https://example.com", nonHttpAppLink.fallbackUrl)
+    }
+
+    @Test
+    fun whenAppSchemeInterceptionDisabledAndNoResolveInfoButHasFallbackUrlThenReturnUnknown() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        appSchemeInterceptionFeature.self().setRawStoredState(State(false))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;S.browser_fallback_url=https%3A%2F%2Fexample.com;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is Unknown)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoAndNoFallbackUrlThenReturnUnknown() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is Unknown)
     }
 
     private fun randomString(length: Int): String {
