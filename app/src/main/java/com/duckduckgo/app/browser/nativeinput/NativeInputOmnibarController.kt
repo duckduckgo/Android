@@ -98,6 +98,9 @@ class RealNativeInputOmnibarController(
             omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
             omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
             omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
+            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
+            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
         }
     }
 
