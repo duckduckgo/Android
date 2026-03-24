@@ -319,6 +319,7 @@ dependencies {
     implementation project(':request-interception-impl')
     implementation project(':sqlcipher-loader-api')
     implementation project(':sqlcipher-loader-impl')
+    implementation project(':tracker-detection-api')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')

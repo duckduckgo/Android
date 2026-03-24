@@ -31,6 +31,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.VERBOSE
@@ -39,25 +40,8 @@ import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-interface TrackerDetector {
-    fun addClient(client: Client)
-
-    fun evaluate(
-        url: Uri,
-        documentUrl: Uri,
-        checkFirstParty: Boolean = true,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent?
-
-    fun evaluate(
-        url: String,
-        documentUrl: Uri,
-        checkFirstParty: Boolean = true,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent?
-}
-
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = TrackerDetector::class)
+@ContributesBinding(AppScope::class, boundType = TrackerDetectorClientProvider::class)
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
@@ -66,7 +50,7 @@ class TrackerDetectorImpl @Inject constructor(
     private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
     private val adClickManager: AdClickManager,
-) : TrackerDetector {
+) : TrackerDetector, TrackerDetectorClientProvider {
 
     private val clients = CopyOnWriteArrayList<Client>()
 

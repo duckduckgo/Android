@@ -79,7 +79,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
@@ -104,6 +103,7 @@ import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
 import dagger.Provides

@@ -46,7 +46,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.RealUrlToTypeMapper
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
-import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -75,6 +75,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.impl.RealRequestBlocklist
 import com.duckduckgo.request.interception.impl.RequestBlocklistFeature
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
@@ -105,6 +106,7 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
     private lateinit var entityLookup: EntityLookup
     private lateinit var db: AppDatabase
     private lateinit var trackerDetector: TrackerDetector
+    private lateinit var trackerDetectorClientProvider: TrackerDetectorClientProvider
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
     private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
@@ -294,7 +296,7 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         tdsCnameEntityDao = db.tdsCnameEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
-        trackerDetector = TrackerDetectorImpl(
+        val trackerDetectorImpl = TrackerDetectorImpl(
             entityLookup,
             userAllowlistDao,
             contentBlocking,
@@ -302,6 +304,8 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
             mockWebTrackersBlockedDao,
             mockAdClickManager,
         )
+        trackerDetector = trackerDetectorImpl
+        trackerDetectorClientProvider = trackerDetectorImpl
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/request-blocklist/tds-reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -315,7 +319,7 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
         tdsCnameEntityDao.insertAll(cnameEntities)
-        trackerDetector.addClient(client)
+        trackerDetectorClientProvider.addClient(client)
     }
 
     private fun initialiseResourceSurrogates() {

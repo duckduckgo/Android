@@ -142,6 +142,7 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                                 && dependencyPath != ":js-messaging-api"
+                                && dependencyPath != ":browser-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"

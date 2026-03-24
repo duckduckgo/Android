@@ -47,7 +47,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.RealUrlToTypeMapper
 import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
-import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -67,6 +67,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
@@ -95,6 +96,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private lateinit var entityLookup: EntityLookup
     private lateinit var db: AppDatabase
     private lateinit var trackerDetector: TrackerDetector
+    private lateinit var trackerDetectorClientProvider: TrackerDetectorClientProvider
     private lateinit var tdsEntityDao: TdsEntityDao
     private lateinit var tdsDomainEntityDao: TdsDomainEntityDao
     private lateinit var tdsCnameEntityDao: TdsCnameEntityDao
@@ -236,15 +238,16 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         tdsCnameEntityDao = db.tdsCnameEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
-        trackerDetector =
-            TrackerDetectorImpl(
-                entityLookup,
-                mockUserAllowListDao,
-                mockContentBlocking,
-                mockTrackerAllowlist,
-                mockWebTrackersBlockedDao,
-                mockAdClickManager,
-            )
+        val trackerDetectorImpl = TrackerDetectorImpl(
+            entityLookup,
+            mockUserAllowListDao,
+            mockContentBlocking,
+            mockTrackerAllowlist,
+            mockWebTrackersBlockedDao,
+            mockAdClickManager,
+        )
+        trackerDetector = trackerDetectorImpl
+        trackerDetectorClientProvider = trackerDetectorImpl
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -258,7 +261,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)
         tdsCnameEntityDao.insertAll(cnameEntities)
-        trackerDetector.addClient(client)
+        trackerDetectorClientProvider.addClient(client)
     }
 
     private fun initialiseResourceSurrogates() {
