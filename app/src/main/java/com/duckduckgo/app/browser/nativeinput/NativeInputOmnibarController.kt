@@ -49,6 +49,7 @@ interface NativeInputOmnibarController : OmnibarState {
     fun hideBackground()
     fun showTabsAndMenuButtons()
     fun getButtonsWidth(): Int
+    fun getCardView(): View?
     fun restore()
     fun forceToTop()
 }
@@ -82,9 +83,6 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
         }
     }
 
@@ -100,9 +98,6 @@ class RealNativeInputOmnibarController(
             omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
             omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
             omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
         }
     }
 
@@ -146,6 +141,11 @@ class RealNativeInputOmnibarController(
     private fun removeLayoutListener(omnibarView: View) {
         layoutListener?.let { omnibarView.removeOnLayoutChangeListener(it) }
         layoutListener = null
+    }
+
+    override fun getCardView(): View? {
+        val omnibarView = omnibar.omnibarView as? View ?: return null
+        return omnibarView.findViewById(R.id.omniBarContainerShadow)
     }
 
     override fun getButtonsWidth(): Int {
