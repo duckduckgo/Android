@@ -251,7 +251,9 @@ class RealNativeInputManager @Inject constructor(
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
                     removeWidget()
-                    hideNtp()
+                    if (omnibarController.isBrowserMode()) {
+                        hideNtp()
+                    }
                     omnibarController.restore()
                     omnibarController.show()
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
@@ -368,7 +370,7 @@ class RealNativeInputManager @Inject constructor(
         }
 
         rootView.addView(widgetView, layoutCoordinator.buildWidgetLayoutParams())
-        widgetView.translationZ = WIDGET_ELEVATION
+        widgetView.translationZ = WIDGET_ELEVATION.toPx()
         if (layoutCoordinator.isWidgetBottom()) {
             rootView.findViewById<View?>(R.id.navigationBar)?.gone()
             rootView.findViewById<View?>(R.id.browserLayout)?.let {
