@@ -126,8 +126,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     // is good enough.
                     // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
                     ProcessLifecycleOwner.get().lifecycle.apply {
+                        logcat { "PIR-LIFECYCLE: New PIR process created with pid=${android.os.Process.myPid()}" }
                         pirLifecycleObserverPluginPoint.getPlugins().forEach {
-                            logcat { "PIR-LIFECYCLE: New PIR process created with pid=${android.os.Process.myPid()}" }
                             it.onPirProcessCreated()
                         }
                     }
