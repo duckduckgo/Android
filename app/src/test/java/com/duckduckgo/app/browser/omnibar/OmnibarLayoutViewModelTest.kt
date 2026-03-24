@@ -8,18 +8,9 @@ import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
-import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -33,6 +24,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.Search
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarLayoutCommand.LaunchInputScreen
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarViewState
+import com.duckduckgo.browser.ui.omnibar.model.StateChange
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -66,6 +64,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.reflect.KClass
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarLayoutCommand as Command
 
 @RunWith(AndroidJUnit4::class)
 class OmnibarLayoutViewModelTest {

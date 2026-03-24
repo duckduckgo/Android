@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar.animations.omnibaranimation
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.browser.ui.omnibar.animations.OmnibarAnimationManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -29,13 +30,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
-
-interface OmnibarAnimationManager {
-    fun isFeatureEnabled(): Boolean
-    fun getChangeBoundsDuration(): Long
-    fun getFadeDuration(): Long
-    fun getTension(): Float
-}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, OmnibarAnimationManager::class)

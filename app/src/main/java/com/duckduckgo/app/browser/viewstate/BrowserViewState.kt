@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.global.model.MaliciousSiteStatus
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
 import com.duckduckgo.savedsites.api.models.SavedSite
 
 data class BrowserViewState(
@@ -62,24 +63,3 @@ data class BrowserViewState(
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
     val useBottomSheetMenu: Boolean = false,
 )
-
-sealed class HighlightableButton {
-    data class Visible(
-        val enabled: Boolean = true,
-        val highlighted: Boolean = false,
-    ) : HighlightableButton()
-
-    data object Gone : HighlightableButton()
-
-    fun isHighlighted(): Boolean =
-        when (this) {
-            is Visible -> this.highlighted
-            is Gone -> false
-        }
-
-    fun isEnabled(): Boolean =
-        when (this) {
-            is Visible -> this.enabled
-            is Gone -> false
-        }
-}

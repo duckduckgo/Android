@@ -144,16 +144,16 @@ import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+import com.duckduckgo.app.browser.omnibar.FindInPageListener
+import com.duckduckgo.app.browser.omnibar.ItemPressedListener
+import com.duckduckgo.app.browser.omnibar.LogoClickListener
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.Omnibar.FindInPageListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.ItemPressedListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.LogoClickListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
-import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
+import com.duckduckgo.app.browser.omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.omnibar.TextListener
+import com.duckduckgo.app.browser.omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.ViewMode.*
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -171,10 +171,7 @@ import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
-import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
@@ -256,6 +253,9 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuBottomSheet
 import com.duckduckgo.browser.ui.browsermenu.BrowserPopupMenu
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+import com.duckduckgo.browser.ui.omnibar.model.FindInPageViewState
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -1503,7 +1503,7 @@ class BrowserTabFragment :
 
     private fun renderBrowserMenu(
         viewState: BrowserViewState,
-        omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode,
+        omnibarViewMode: ViewMode = omnibar.viewMode,
     ) {
         val currentSite = viewModel.siteLiveData.value
         val browseMenuState = browserMenuViewStateFactory.create(

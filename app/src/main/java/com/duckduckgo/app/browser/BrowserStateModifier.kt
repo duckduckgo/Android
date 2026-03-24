@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.global.model.MaliciousSiteStatus
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
 import io.reactivex.annotations.CheckReturnValue
 
 class BrowserStateModifier {

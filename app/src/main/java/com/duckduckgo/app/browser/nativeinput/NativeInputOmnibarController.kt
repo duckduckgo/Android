@@ -25,8 +25,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.DuckAI
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.ViewMode.DuckAI
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -34,6 +35,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.google.android.material.card.MaterialCardView
+import com.duckduckgo.browser.ui.R as BrowserUiR
 
 interface OmnibarState {
     fun isDuckAiMode(): Boolean
@@ -62,7 +64,7 @@ class RealNativeInputOmnibarController(
 
     override fun isDuckAiMode(): Boolean = omnibar.viewMode == DuckAI
 
-    override fun isBrowserMode(): Boolean = omnibar.viewMode is Omnibar.ViewMode.Browser
+    override fun isBrowserMode(): Boolean = omnibar.viewMode is ViewMode.Browser
 
     override fun isOmnibarBottom(): Boolean =
         omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM
@@ -82,9 +84,9 @@ class RealNativeInputOmnibarController(
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
             showDuckAiTitle(omnibarView)
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+            omnibarView.findViewById<View?>(BrowserUiR.id.fireIconMenu)?.show()
+            omnibarView.findViewById<View?>(BrowserUiR.id.tabsMenu)?.show()
+            omnibarView.findViewById<View?>(BrowserUiR.id.browserMenu)?.show()
         }
     }
 
@@ -97,35 +99,35 @@ class RealNativeInputOmnibarController(
         applyOnLayout(omnibarView) {
             makeOmnibarTransparent(omnibarView)
             hideOmnibarContent(omnibarView)
-            omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
-            omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
-            omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
-            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+            omnibarView.findViewById<View?>(BrowserUiR.id.duckAIHeader)?.gone()
+            omnibarView.findViewById<View?>(BrowserUiR.id.endIconsContainer)?.gone()
+            omnibarView.findViewById<View?>(BrowserUiR.id.duckAiSidebar)?.gone()
+            omnibarView.findViewById<View?>(BrowserUiR.id.fireIconMenu)?.gone()
+            omnibarView.findViewById<View?>(BrowserUiR.id.tabsMenu)?.show()
+            omnibarView.findViewById<View?>(BrowserUiR.id.browserMenu)?.show()
         }
     }
 
     private fun makeOmnibarTransparent(omnibarView: View) {
-        omnibarView.findViewById<View?>(R.id.toolbarContainer)?.setBackgroundColor(Color.TRANSPARENT)
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainerShadow)?.apply {
+        omnibarView.findViewById<View?>(BrowserUiR.id.toolbarContainer)?.setBackgroundColor(Color.TRANSPARENT)
+        omnibarView.findViewById<MaterialCardView?>(BrowserUiR.id.omniBarContainerShadow)?.apply {
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = 0f
         }
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.setCardBackgroundColor(Color.TRANSPARENT)
+        omnibarView.findViewById<MaterialCardView?>(BrowserUiR.id.omniBarContainer)?.setCardBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun hideOmnibarContent(omnibarView: View) {
-        omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.gone()
-        omnibarView.findViewById<View?>(R.id.shieldIcon)?.gone()
-        omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.gone()
-        omnibarView.findViewById<View?>(R.id.pageLoadingIndicator)?.gone()
+        omnibarView.findViewById<View?>(BrowserUiR.id.omnibarIconContainer)?.gone()
+        omnibarView.findViewById<View?>(BrowserUiR.id.shieldIcon)?.gone()
+        omnibarView.findViewById<View?>(BrowserUiR.id.omnibarTextInput)?.gone()
+        omnibarView.findViewById<View?>(BrowserUiR.id.pageLoadingIndicator)?.gone()
     }
 
     private fun showDuckAiTitle(omnibarView: View) {
-        val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
-        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
-        omnibarView.findViewById<View?>(R.id.aiIcon)?.gone()
+        val header = omnibarView.findViewById<android.widget.LinearLayout?>(BrowserUiR.id.duckAIHeader)
+        val aiTitle = omnibarView.findViewById<TextView?>(BrowserUiR.id.aiTitle)
+        omnibarView.findViewById<View?>(BrowserUiR.id.aiIcon)?.gone()
         header?.show()
         header?.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         header?.setBackgroundColor(Color.TRANSPARENT)
@@ -150,8 +152,8 @@ class RealNativeInputOmnibarController(
 
     override fun getButtonsWidth(): Int {
         val omnibarView = omnibar.omnibarView as? View ?: return 0
-        val tabsMenu = omnibarView.findViewById<View?>(R.id.tabsMenu)
-        val browserMenu = omnibarView.findViewById<View?>(R.id.browserMenu)
+        val tabsMenu = omnibarView.findViewById<View?>(BrowserUiR.id.tabsMenu)
+        val browserMenu = omnibarView.findViewById<View?>(BrowserUiR.id.browserMenu)
         return (tabsMenu?.width ?: 0) + (browserMenu?.width ?: 0)
     }
 
@@ -168,22 +170,22 @@ class RealNativeInputOmnibarController(
 
     private fun restoreOmnibarContent() {
         val omnibarView = omnibar.omnibarView as? View ?: return
-        omnibarView.findViewById<View?>(R.id.endIconsContainer)?.show()
-        omnibarView.findViewById<View?>(R.id.omnibarIconContainer)?.show()
-        omnibarView.findViewById<View?>(R.id.omnibarTextInput)?.show()
-        omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+        omnibarView.findViewById<View?>(BrowserUiR.id.endIconsContainer)?.show()
+        omnibarView.findViewById<View?>(BrowserUiR.id.omnibarIconContainer)?.show()
+        omnibarView.findViewById<View?>(BrowserUiR.id.omnibarTextInput)?.show()
+        omnibarView.findViewById<View?>(BrowserUiR.id.duckAIHeader)?.gone()
     }
 
     private fun restoreOmnibarColors() {
         val omnibarView = omnibar.omnibarView as? View ?: return
         val ctx = omnibarView.context
-        omnibarView.findViewById<View?>(R.id.toolbarContainer)
+        omnibarView.findViewById<View?>(BrowserUiR.id.toolbarContainer)
             ?.setBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar))
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainerShadow)?.apply {
+        omnibarView.findViewById<MaterialCardView?>(BrowserUiR.id.omniBarContainerShadow)?.apply {
             setCardBackgroundColor(ctx.getColorFromAttr(com.google.android.material.R.attr.colorSurface))
             cardElevation = 1f.toPx()
         }
-        omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
+        omnibarView.findViewById<MaterialCardView?>(BrowserUiR.id.omniBarContainer)
             ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
     }
 

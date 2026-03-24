@@ -194,13 +194,12 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
+import com.duckduckgo.app.browser.omnibar.ViewMode
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -214,13 +213,9 @@ import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
-import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState.Invalidated
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout
@@ -306,6 +301,10 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.omnibar.model.FindInPageViewState
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarViewState
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.AppUrl
@@ -3423,7 +3422,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun userLaunchingTabSwitcher(
-        viewMode: Omnibar.ViewMode,
+        viewMode: ViewMode,
         hasFocus: Boolean,
     ) {
         command.value = LaunchTabSwitcher
@@ -3434,11 +3433,11 @@ class BrowserTabViewModel @Inject constructor(
         fireDailyLaunchPixel()
 
         when (viewMode) {
-            is Omnibar.ViewMode.DuckAI -> {
+            is ViewMode.DuckAI -> {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_TAB_SWITCHER_OPENED)
             }
 
-            is Omnibar.ViewMode.NewTab -> {
+            is ViewMode.NewTab -> {
                 val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to hasFocus.toString())
                 pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
             }
@@ -4594,7 +4593,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = HideOnboardingDaxDialog(cta)
     }
 
-    fun onFireMenuSelected(viewMode: Omnibar.ViewMode) {
+    fun onFireMenuSelected(viewMode: ViewMode) {
         if (viewMode == ViewMode.DuckAI) {
             pixel.fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
         }

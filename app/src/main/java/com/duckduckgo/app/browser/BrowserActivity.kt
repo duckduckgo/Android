@@ -58,8 +58,6 @@ import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.newaddressbaroption.NewAddressBarOptionManager
@@ -102,6 +100,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
+import com.duckduckgo.browser.ui.databinding.IncludeOmnibarToolbarMockupBinding
+import com.duckduckgo.browser.ui.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.addBottomShadow

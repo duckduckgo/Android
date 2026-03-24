@@ -116,14 +116,13 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
+import com.duckduckgo.app.browser.omnibar.ViewMode
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
@@ -137,10 +136,7 @@ import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
-import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LearnMore
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockedWarningLayout.Action.ReportError
@@ -235,6 +231,9 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
+import com.duckduckgo.browser.ui.omnibar.model.FindInPageViewState
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
@@ -6540,7 +6539,7 @@ class BrowserTabViewModelTest {
                 )
             testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
+            testee.userLaunchingTabSwitcher(ViewMode.Browser(exampleUrl), false)
 
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
         }
@@ -6696,7 +6695,7 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
                 )
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(exampleUrl), false)
+            testee.userLaunchingTabSwitcher(ViewMode.Browser(exampleUrl), false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
@@ -6729,7 +6728,7 @@ class BrowserTabViewModelTest {
                     PixelParameter.TAB_INACTIVE_3W to inactive3w,
                 )
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.DuckAI, false)
+            testee.userLaunchingTabSwitcher(ViewMode.DuckAI, false)
 
             assertCommandIssued<Command.LaunchTabSwitcher>()
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
@@ -7014,7 +7013,7 @@ class BrowserTabViewModelTest {
             val domain = "https://www.example.com"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
+            testee.userLaunchingTabSwitcher(ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
         }
@@ -7025,7 +7024,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, false)
+            testee.userLaunchingTabSwitcher(ViewMode.NewTab, false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
         }
@@ -7036,7 +7035,7 @@ class BrowserTabViewModelTest {
             givenTabManagerData()
             setBrowserShowing(false)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.NewTab, true)
+            testee.userLaunchingTabSwitcher(ViewMode.NewTab, true)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
         }
@@ -7050,7 +7049,7 @@ class BrowserTabViewModelTest {
             val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
             givenCurrentSite(domain)
 
-            testee.userLaunchingTabSwitcher(Omnibar.ViewMode.Browser(domain), false)
+            testee.userLaunchingTabSwitcher(ViewMode.Browser(domain), false)
 
             verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
         }
@@ -7988,7 +7987,7 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndFireButtonHighlightedThenHighlightIsCleared() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = true))
 
-        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+        testee.onFireMenuSelected(ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
@@ -7999,7 +7998,7 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndFireButtonNotHighlightedThenStateUnchanged() = runTest {
         testee.browserViewState.value = browserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
 
-        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+        testee.onFireMenuSelected(ViewMode.Browser(exampleUrl))
 
         val viewState = testee.browserViewState.value
         assertNotNull(viewState)
@@ -8010,7 +8009,7 @@ class BrowserTabViewModelTest {
     fun whenFireMenuSelectedAndDuckAIModeThenPixelFired() = runTest {
         testee.browserViewState.value = browserViewState()
 
-        testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
+        testee.onFireMenuSelected(ViewMode.DuckAI)
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
     }

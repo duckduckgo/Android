@@ -174,8 +174,8 @@ class OmnibarLayout @JvmOverloads constructor(
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val leadingIconContainer: View by lazy { findViewById(R.id.omnibarIconContainer) }
-    private val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
-    private val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
+    val duckAIHeader: View by lazy { findViewById(R.id.duckAIHeader) }
+    val duckAISidebar: View by lazy { findViewById(R.id.duckAiSidebar) }
 
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener =
@@ -215,12 +215,12 @@ class OmnibarLayout @JvmOverloads constructor(
         IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
     }
     override val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
-    internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
-    internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
-    internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
+    val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
+    val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
+    val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
-    internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
-    internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
+    val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
+    val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val animatedIconBackgroundView: View by lazy { findViewById(R.id.animatedIconBackgroundView) }
     internal val cookieAnimation: LottieAnimationView by lazy { findViewById(R.id.cookieAnimation) }
     internal val sceneRoot: ViewGroup by lazy { findViewById(R.id.sceneRoot) }
@@ -242,7 +242,7 @@ class OmnibarLayout @JvmOverloads constructor(
     internal val addressBarTrackersBlockedAnimationShieldIcon: LottieAnimationView by lazy {
         findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
     }
-    internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
     internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }

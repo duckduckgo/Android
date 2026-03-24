@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.text.Editable
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
@@ -30,19 +29,19 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.model.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.FindInPageViewState
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.browser.ui.omnibar.OmnibarLayout
+import com.duckduckgo.browser.ui.omnibar.model.FindInPageViewState
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarViewState
+import com.duckduckgo.browser.ui.omnibar.model.StateChange
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -62,100 +61,7 @@ class Omnibar(
     val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) {
-    interface ItemPressedListener {
-        fun onTabsButtonPressed()
-
-        fun onTabsButtonLongPressed()
-
-        fun onFireButtonPressed()
-
-        fun onBrowserMenuPressed()
-
-        fun onPrivacyShieldPressed()
-
-        fun onCustomTabClosePressed()
-
-        fun onCustomTabPrivacyDashboardPressed()
-
-        fun onVoiceSearchPressed()
-
-        fun onDuckChatButtonPressed()
-
-        fun onBackButtonPressed()
-
-        fun onDuckAISidebarButtonPressed()
-    }
-
-    interface FindInPageListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
-        fun onPreviousSearchItemPressed()
-
-        fun onNextSearchItemPressed()
-
-        fun onClosePressed()
-
-        fun onFindInPageTextChanged(query: String)
-    }
-
-    interface TextListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
-        fun onBackKeyPressed()
-
-        fun onEnterPressed()
-
-        fun onTouchEvent(event: MotionEvent)
-
-        fun onOmnibarTextChanged(state: OmnibarTextState)
-
-        fun onShowSuggestions(state: OmnibarTextState)
-
-        fun onTrackersCountFinished()
-    }
-
-    fun interface InputScreenLaunchListener {
-        fun launchInputScreen(query: String)
-    }
-
-    interface LogoClickListener {
-        fun onClick(url: String)
-    }
-
-    data class OmnibarTextState(
-        val text: String,
-        val hasFocus: Boolean,
-    )
-    sealed class ViewMode {
-        data object Error : ViewMode()
-
-        data object SSLWarning : ViewMode()
-
-        data object MaliciousSiteWarning : ViewMode()
-
-        data object NewTab : ViewMode()
-
-        data class Browser(
-            val url: String?,
-        ) : ViewMode()
-
-        data class CustomTab(
-            val toolbarColor: Int,
-            val title: String?,
-            val domain: String? = null,
-            val showDuckPlayerIcon: Boolean = false,
-        ) : ViewMode()
-
-        data object DuckAI : ViewMode()
-    }
-
-    val omnibarView: OmnibarView by lazy {
+    val omnibarView: OmnibarLayout by lazy {
         if (omnibarType == OmnibarType.SPLIT) {
             binding.bottomBrowserOutlineStroke.gone()
             binding.includeNewBrowserTab.bottomNtpOutlineStroke.gone()
@@ -219,7 +125,7 @@ class Omnibar(
         }
     }
 
-    private val findInPage: IncludeFindInPageBinding by lazy {
+    private val findInPage by lazy {
         omnibarView.findInPage
     }
 

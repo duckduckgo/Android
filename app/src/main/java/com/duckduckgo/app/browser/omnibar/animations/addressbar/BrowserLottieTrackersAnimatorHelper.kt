@@ -32,7 +32,9 @@ import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.TrackersAnimatorListener
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.browser.ui.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -221,7 +223,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         context: Context,
         omnibarViews: List<View>,
     ) {
-        if (omnibarViews.any { it.id == R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
+        if (omnibarViews.any { it.id == com.duckduckgo.browser.ui.R.id.customTabDomain }) return // Do not show cookies animation in custom tabs
         isCookiesAnimationRunning = true
 
         if (cookieCosmeticHide) {

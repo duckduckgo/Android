@@ -26,29 +26,17 @@ import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.SSLWarning
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Dax
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
+import com.duckduckgo.app.browser.omnibar.ViewMode.Browser
+import com.duckduckgo.app.browser.omnibar.ViewMode.CustomTab
+import com.duckduckgo.app.browser.omnibar.ViewMode.Error
+import com.duckduckgo.app.browser.omnibar.ViewMode.MaliciousSiteWarning
+import com.duckduckgo.app.browser.omnibar.ViewMode.NewTab
+import com.duckduckgo.app.browser.omnibar.ViewMode.SSLWarning
 import com.duckduckgo.app.browser.omnibar.model.Decoration
 import com.duckduckgo.app.browser.omnibar.model.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.Decoration.LaunchTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.model.StateChange
-import com.duckduckgo.app.browser.omnibar.model.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
-import com.duckduckgo.app.browser.viewstate.LoadingViewState
-import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -56,8 +44,19 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.Dax
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.DuckPlayer
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.EasterEggLogo
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.Globe
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.PrivacyShield
+import com.duckduckgo.browser.ui.omnibar.model.LeadingIconState.Search
+import com.duckduckgo.browser.ui.omnibar.model.LoadingViewState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarViewState
+import com.duckduckgo.browser.ui.omnibar.model.StateChange
+import com.duckduckgo.browser.ui.omnibar.model.StateChange.OmnibarStateChange
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -91,6 +90,8 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarLayoutCommand as Command
+import com.duckduckgo.browser.ui.omnibar.model.OmnibarLayoutViewState as ViewState
 
 @ContributesViewModel(FragmentScope::class)
 class OmnibarLayoutViewModel @Inject constructor(
@@ -142,19 +143,20 @@ class OmnibarLayoutViewModel @Inject constructor(
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
     private fun getViewMode(state: ViewState): ViewMode {
-        return if (state.viewMode is CustomTab) {
+        val currentViewMode = state.viewMode
+        return if (currentViewMode is CustomTab) {
             val domain = if (state.url.isBlank()) state.omnibarText else state.url.extractDomain()
-            if (domain != state.viewMode.domain) {
+            if (domain != currentViewMode.domain) {
                 val isDuckPlayerUrl = duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isDuckPlayerUri(state.url)
-                state.viewMode.copy(
+                currentViewMode.copy(
                     domain = domain,
                     showDuckPlayerIcon = isDuckPlayerUrl,
                 )
             } else {
-                state.viewMode
+                currentViewMode
             }
         } else {
-            state.viewMode
+            currentViewMode
         }
     }
 
@@ -189,80 +191,6 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    data class ViewState(
-        val viewMode: ViewMode = Browser(null),
-        val leadingIconState: LeadingIconState = Search,
-        val previousLeadingIconState: LeadingIconState? = null,
-        val privacyShield: PrivacyShieldState = PrivacyShieldState.UNKNOWN,
-        val hasFocus: Boolean = false,
-        val query: String = "",
-        val omnibarText: String = "",
-        val url: String = "",
-        val expanded: Boolean = false,
-        val expandedAnimated: Boolean = false,
-        val updateOmnibarText: Boolean = false,
-        val tabCount: Int = 0,
-        val hasUnreadTabs: Boolean = false,
-        val shouldUpdateTabsCount: Boolean = false,
-        val showVoiceSearch: Boolean = false,
-        val showClearButton: Boolean = false,
-        val showTabsMenu: Boolean = true,
-        val showFireIcon: Boolean = true,
-        val showBrowserMenu: Boolean = true,
-        val showChatMenu: Boolean = true,
-        val showBrowserMenuHighlight: Boolean = false,
-        val scrollingEnabled: Boolean = true,
-        val isLoading: Boolean = false,
-        val loadingProgress: Int = 0,
-        val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
-        val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val trackersBlocked: Int = 0,
-        val previouslyTrackersBlocked: Int = 0,
-        val showShadows: Boolean = false,
-        val showTextInputClickCatcher: Boolean = false,
-        val showFindInPage: Boolean = false,
-        val showDuckAIHeader: Boolean = false,
-        val showDuckAISidebar: Boolean = false,
-        val isAddressBarTrackersAnimationEnabled: Boolean = false,
-    ) {
-        fun shouldUpdateOmnibarText(
-            isFullUrlEnabled: Boolean,
-        ): Boolean {
-            val updateOmnibarText =
-                this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
-            return updateOmnibarText && url.isNotEmpty()
-        }
-    }
-
-    sealed class Command {
-        data object CancelAnimations : Command()
-        data class StartTrackersAnimation(
-            val entities: List<Entity>?,
-            val isCustomTab: Boolean,
-            val isAddressBarTrackersAnimationEnabled: Boolean,
-        ) : Command()
-
-        data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
-        data object MoveCaretToFront : Command()
-        data class LaunchInputScreen(val query: String) : Command()
-        data class EasterEggLogoClicked(val url: String) : Command()
-        data object FocusInputField : Command()
-        data object CancelEasterEggLogoAnimation : Command()
-    }
-
-    sealed class LeadingIconState {
-        object Search : LeadingIconState()
-        object PrivacyShield : LeadingIconState()
-        object Dax : LeadingIconState()
-        object DuckPlayer : LeadingIconState()
-        object Globe : LeadingIconState()
-        data class EasterEggLogo(
-            val logoUrl: String,
-            val serpUrl: String,
-            val isFavourite: Boolean,
-        ) : LeadingIconState()
-    }
 
     init {
         logVoiceSearchAvailability()
@@ -406,7 +334,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     }
                 }
 
-                val isFavouriteEasterEggLogo = it.previousLeadingIconState is EasterEggLogo && it.previousLeadingIconState.isFavourite
+                val isFavouriteEasterEggLogo = (it.previousLeadingIconState as? EasterEggLogo)?.isFavourite == true
 
                 it.copy(
                     hasFocus = false,
@@ -605,7 +533,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasFocus = hasFocus,
                                 url = _viewState.value.url,
                                 serpLogoUrl = currentLogoUrl,
-                                isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
+                                isFavouriteSerpLogo = (it.leadingIconState as? EasterEggLogo)?.isFavourite == true,
                             ),
                             scrollingEnabled = scrollingEnabled,
                             showVoiceSearch = shouldShowVoiceSearch(
@@ -832,13 +760,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                         urlLoaded = _viewState.value.url,
                     ),
                     leadingIconState = when (omnibarViewState.serpLogo) {
-                        is SerpLogo.EasterEgg -> getLeadingIconState(
-                            viewMode = _viewState.value.viewMode,
-                            hasFocus = omnibarViewState.isEditing,
-                            url = _viewState.value.url,
-                            serpLogoUrl = omnibarViewState.serpLogo.logoUrl,
-                            isFavouriteSerpLogo = omnibarViewState.serpLogo.isFavourite,
-                        )
+                        is SerpLogo.EasterEgg -> {
+                            val easterEgg = omnibarViewState.serpLogo as SerpLogo.EasterEgg
+                            getLeadingIconState(
+                                viewMode = _viewState.value.viewMode,
+                                hasFocus = omnibarViewState.isEditing,
+                                url = _viewState.value.url,
+                                serpLogoUrl = easterEgg.logoUrl,
+                                isFavouriteSerpLogo = easterEgg.isFavourite,
+                            )
+                        }
 
                         SerpLogo.Normal -> getLeadingIconState(
                             viewMode = _viewState.value.viewMode,
@@ -860,7 +791,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                                     hasFocus = omnibarViewState.isEditing,
                                     url = _viewState.value.url,
                                     serpLogoUrl = currentLogoUrl,
-                                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
+                                    isFavouriteSerpLogo = (it.leadingIconState as? EasterEggLogo)?.isFavourite == true,
                                 )
                             } else {
                                 // previous behaviour for null
@@ -902,7 +833,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = it.hasFocus,
                     url = loadingState.url,
                     serpLogoUrl = currentLogoUrl,
-                    isFavouriteSerpLogo = it.leadingIconState is EasterEggLogo && it.leadingIconState.isFavourite,
+                    isFavouriteSerpLogo = (it.leadingIconState as? EasterEggLogo)?.isFavourite == true,
                 ),
                 showVoiceSearch = shouldShowVoiceSearch(
                     viewMode = _viewState.value.viewMode,

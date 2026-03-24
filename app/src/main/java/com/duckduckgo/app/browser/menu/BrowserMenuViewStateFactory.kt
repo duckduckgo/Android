@@ -18,11 +18,12 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.omnibar.Omnibar
+import com.duckduckgo.app.browser.omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.ViewMode.*
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
-import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
+import com.duckduckgo.browser.ui.omnibar.model.HighlightableButton
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,7 +32,7 @@ import javax.inject.Inject
 
 interface BrowserMenuViewStateFactory {
     fun create(
-        omnibarViewMode: Omnibar.ViewMode,
+        omnibarViewMode: ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
         tabId: String,
@@ -48,7 +49,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : BrowserMenuViewStateFactory {
     override fun create(
-        omnibarViewMode: Omnibar.ViewMode,
+        omnibarViewMode: ViewMode,
         viewState: BrowserViewState,
         customTabsMode: Boolean,
         tabId: String,
@@ -60,11 +61,11 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             createCustomTabsViewState(viewState, title, tabId, shortUrl, omnibarText)
         } else {
             when (omnibarViewMode) {
-                Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, title, tabId)
-                Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
+                NewTab -> createNewTabPageViewState(viewState)
+                DuckAI -> createDuckAiViewState(viewState, title, tabId)
+                Error -> createNewTabPageViewState(viewState)
+                SSLWarning -> createNewTabPageViewState(viewState)
+                MaliciousSiteWarning -> createNewTabPageViewState(viewState)
                 else -> createBrowserViewState(viewState, title, tabId, shortUrl, omnibarText)
             }
         }
