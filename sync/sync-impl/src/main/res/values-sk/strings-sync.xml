@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Získajte prehliadač pre desktop PC</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pre Mac a Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Obnoviť</string>
+    <string name="sync_settings_download_recovery_code_item">Stiahnuť kód na obnovenie ako PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Použi tento kód na obnovu svojich údajov, keď stratíš prístup k tomuto zariadeniu – udržiavaj ho v bezpečí.</string>
+    <string name="sync_settings_data_expiration">Ak je Sync &amp; Backup neaktívne 18 mesiacov, údaje nie je možné obnoviť. <annotation type="learn_more_link">Zistiť viac</annotation></string>
 </resources>
