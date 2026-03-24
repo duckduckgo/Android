@@ -84,10 +84,10 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
 
-            if (message.isCosmetic) {
-                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
-            } else {
-                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+            when {
+                message.cmp == HEURISTIC_CMP -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_HEURISTIC_DAILY)
+                message.isCosmetic -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+                else -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
             }
 
             message.url.toUri().host ?: return
@@ -132,5 +132,6 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     companion object {
         const val OPT_OUT = "optOutResult"
         const val RESULT_MESSAGE = "autoconsentDone"
+        private const val HEURISTIC_CMP = "HEURISTIC"
     }
 }

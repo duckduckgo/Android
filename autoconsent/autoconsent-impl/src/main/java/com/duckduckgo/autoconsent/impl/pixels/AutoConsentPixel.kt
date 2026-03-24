@@ -30,6 +30,7 @@ enum class AutoConsentPixel(override val pixelName: String) : Pixel.PixelName {
     AUTOCONSENT_ERROR_OPTOUT_DAILY("m_autoconsent_error_optout_daily"),
     AUTOCONSENT_DONE_DAILY("m_autoconsent_done_daily"),
     AUTOCONSENT_DONE_COSMETIC_DAILY("m_autoconsent_done_cosmetic_daily"),
+    AUTOCONSENT_DONE_HEURISTIC_DAILY("m_autoconsent_done_heuristic_daily"),
     AUTOCONSENT_ANIMATION_SHOWN_DAILY("m_autoconsent_animation-shown_daily"),
     AUTOCONSENT_ANIMATION_SHOWN_COSMETIC_DAILY("m_autoconsent_animation-shown_cosmetic_daily"),
     AUTOCONSENT_SELF_TEST_OK_DAILY("m_autoconsent_self-test-ok_daily"),
