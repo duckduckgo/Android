@@ -62,6 +62,9 @@ class RealNativeInputOmnibarController(
 ) : NativeInputOmnibarController {
 
     private var layoutListener: View.OnLayoutChangeListener? = null
+    private var originalShadowOutlineProvider: ViewOutlineProvider? = null
+    private var originalOutlineAmbientShadowColor: Int? = null
+    private var originalOutlineSpotShadowColor: Int? = null
 
     override fun isDuckAiMode(): Boolean = omnibar.viewMode == DuckAI
 
@@ -106,11 +109,26 @@ class RealNativeInputOmnibarController(
     private fun makeOmnibarTransparent(omnibarView: View) {
         omnibarView.findViewById<View?>(R.id.toolbarContainer)?.setBackgroundColor(Color.TRANSPARENT)
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainerShadow)?.apply {
+            cacheCustomShadow()
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = 0f
             removeCustomShadow()
         }
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)?.setCardBackgroundColor(Color.TRANSPARENT)
+    }
+
+    private fun View.cacheCustomShadow() {
+        if (originalShadowOutlineProvider == null) {
+            originalShadowOutlineProvider = outlineProvider
+        }
+        if (Build.VERSION.SDK_INT >= 28) {
+            if (originalOutlineAmbientShadowColor == null) {
+                originalOutlineAmbientShadowColor = outlineAmbientShadowColor
+            }
+            if (originalOutlineSpotShadowColor == null) {
+                originalOutlineSpotShadowColor = outlineSpotShadowColor
+            }
+        }
     }
 
     private fun View.removeCustomShadow() {
@@ -195,6 +213,11 @@ class RealNativeInputOmnibarController(
             setCardBackgroundColor(ctx.getColorFromAttr(com.google.android.material.R.attr.colorSurface))
             val isTop = omnibar.omnibarType == OmnibarType.SINGLE_TOP || omnibar.omnibarType == OmnibarType.SPLIT
             cardElevation = if (isTop) 6f.toPx() else 3f.toPx()
+            originalShadowOutlineProvider?.let { outlineProvider = it }
+            if (Build.VERSION.SDK_INT >= 28) {
+                originalOutlineAmbientShadowColor?.let { outlineAmbientShadowColor = it }
+                originalOutlineSpotShadowColor?.let { outlineSpotShadowColor = it }
+            }
         }
         omnibarView.findViewById<MaterialCardView?>(R.id.omniBarContainer)
             ?.setCardBackgroundColor(ctx.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
