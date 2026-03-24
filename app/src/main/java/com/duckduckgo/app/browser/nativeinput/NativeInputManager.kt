@@ -250,12 +250,7 @@ class RealNativeInputManager @Inject constructor(
                     animator.cancelRunningAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
-                    removeWidget()
-                    omnibarController.restore()
-                    omnibarController.show()
-                    if (omnibarController.isBrowserMode()) {
-                        hideNtp()
-                    }
+                    finishHide()
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
             },
