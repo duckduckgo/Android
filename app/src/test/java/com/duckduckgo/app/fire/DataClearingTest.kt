@@ -23,6 +23,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -100,13 +102,19 @@ class DataClearingTest {
     @Mock
     private lateinit var mockContextualDataStore: DuckChatContextualDataStore
 
+    @Mock
+    private lateinit var mockShowOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore
+
     private val showClearDuckAIChatHistoryFlow = MutableStateFlow(true)
+    private val showOnAppLaunchOptionFlow = MutableStateFlow<ShowOnAppLaunchOption>(ShowOnAppLaunchOption.LastOpenedTab)
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
         showClearDuckAIChatHistoryFlow.value = true
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.LastOpenedTab
         whenever(mockDuckAiFeatureState.showClearDuckAIChatHistory).thenReturn(showClearDuckAIChatHistoryFlow)
+        whenever(mockShowOnAppLaunchOptionDataStore.optionFlow).thenReturn(showOnAppLaunchOptionFlow)
         runBlocking {
             whenever(mockClearDataAction.clearDataForSpecificDomains(any())).thenReturn(ClearDataResult.Success)
             whenever(mockFireDataStore.getManualClearOptions()).thenReturn(emptySet())
@@ -124,6 +132,7 @@ class DataClearingTest {
             tabRepository = mockTabRepository,
             duckChat = mockDuckChat,
             contextualDataStore = mockContextualDataStore,
+            showOnAppLaunchOptionDataStore = mockShowOnAppLaunchOptionDataStore,
         )
     }
 
@@ -884,10 +893,11 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataWithNonDuckChatUrl_thenReplaceTabWithNullUrl() = runTest {
+    fun whenClearSingleTabDataWithNonDuckChatUrlAndLastOpenedTab_thenReplaceTabWithNullUrl() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.LastOpenedTab
 
         testee.clearSingleTabData("tab1")
 
@@ -895,13 +905,66 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataWithNullUrl_thenReplaceTabWithNullUrl() = runTest {
+    fun whenClearSingleTabDataWithNonDuckChatUrlAndNewTabPage_thenReplaceTabWithNullUrl() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
-        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.NewTabPage
 
         testee.clearSingleTabData("tab1")
 
         verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), isNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNonDuckChatUrlAndSpecificPage_thenReplaceTabWithSpecificPageUrl() = runTest {
+        val specificUrl = "https://example.org/"
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.SpecificPage(specificUrl)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab("tab1", specificUrl)
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNullUrlAndLastOpenedTab_thenReplaceTabWithNullUrl() = runTest {
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.LastOpenedTab
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab(eq("tab1"), isNull())
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithNullUrlAndSpecificPage_thenReplaceTabWithSpecificPageUrl() = runTest {
+        val specificUrl = "https://example.org/"
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(null)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.SpecificPage(specificUrl)
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab("tab1", specificUrl)
+    }
+
+    @Test
+    fun whenClearSingleTabDataWithDuckChatUrlAndSpecificPage_thenDuckChatUrlTakesPrecedence() = runTest {
+        val duckChatUrl = "https://duck.ai/chat?chatID=xyz"
+        val freshDuckChatUrl = "https://duck.ai/chat?dprompt=&autoPrompt=false"
+        whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(emptySet())
+        whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = duckChatUrl, position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockDuckChat.getDuckChatUrl("", autoPrompt = false)).thenReturn(freshDuckChatUrl)
+        showOnAppLaunchOptionFlow.value = ShowOnAppLaunchOption.SpecificPage("https://example.org/")
+
+        testee.clearSingleTabData("tab1")
+
+        verify(mockTabOperations).replaceTabWithNewTab("tab1", freshDuckChatUrl)
     }
 
     private suspend fun configureManualOptions(options: Set<FireClearOption>) {
