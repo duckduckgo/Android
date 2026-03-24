@@ -103,3 +103,5 @@ If the engineer is present, ask your question directly before doing any of the a
 - No new dependencies without discussion
 - No breaking changes — if a change could break existing behaviour, stop and ask
 - Every PR and Asana comment must include the 🤖 Android Maintenance Worker disclosure
+- Asana operations: use the `anthropic-skills:ddg-asana` skill for all Asana reads and writes
+  (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls

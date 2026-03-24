@@ -51,6 +51,11 @@ and justify it. Cross-module tasks without justification will be sent back for s
 
 ---
 
+## Guidelines
+
+- Asana operations: use the `anthropic-skills:ddg-asana` skill for all Asana reads and writes
+  (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls
+
 ## Checklist before handing off
 
 Before telling the team member the task is ready, verify:
