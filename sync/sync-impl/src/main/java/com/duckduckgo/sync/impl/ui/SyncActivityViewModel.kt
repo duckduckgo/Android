@@ -234,6 +234,7 @@ class SyncActivityViewModel @Inject constructor(
         data object ShowDeviceUnsupported : Command()
         data object RequestSetupAuthentication : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
+        data class LaunchLearnMore(val url: String) : Command()
     }
 
     fun onSyncWithAnotherDevice() {
@@ -477,6 +478,12 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onLearnMoreClicked() {
+        viewModelScope.launch {
+            command.send(Command.LaunchLearnMore(LEARN_MORE_URL))
+        }
+    }
+
     private fun showAccountDetailsIfNeeded() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
@@ -551,5 +558,7 @@ class SyncActivityViewModel @Inject constructor(
 
     companion object {
         private const val SETTINGS_REFRESH_RATE_MS = 5_000L
+        private const val LEARN_MORE_URL =
+            "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/recovery-codes-and-troubleshooting#data-expiration"
     }
 }

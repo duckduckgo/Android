@@ -48,6 +48,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
@@ -677,6 +678,30 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.ShowDeviceUnsupported::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLearnMoreClickedThenEmitLaunchLearnMoreCommand() = runTest {
+        testee.onLearnMoreClicked()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(LaunchLearnMore::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLearnMoreClickedThenCommandContainsCorrectUrl() = runTest {
+        testee.onLearnMoreClicked()
+
+        testee.commands().test {
+            val command = awaitItem() as LaunchLearnMore
+            assertEquals(
+                "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/recovery-codes-and-troubleshooting#data-expiration",
+                command.url,
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

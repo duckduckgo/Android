@@ -17,13 +17,17 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
@@ -58,6 +62,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
@@ -103,6 +108,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     private val syncedDevicesAdapter = SyncedDevicesAdapter(
         object : ConnectedDeviceClickListener {
@@ -234,6 +242,17 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onTurnOffClicked()
         }
 
+        binding.viewSyncEnabled.dataExpirationText.addClickableSpan(
+            textSequence = getText(R.string.sync_settings_data_expiration),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+
         binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
             viewModel.onSaveRecoveryCodeClicked()
         }
@@ -345,6 +364,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(command.source)
             is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
+            is LaunchLearnMore -> startActivity(browserNav.openInNewTab(this, command.url))
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,

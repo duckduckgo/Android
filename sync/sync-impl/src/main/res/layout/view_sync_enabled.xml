@@ -143,6 +143,7 @@
         app:secondaryText="@string/sync_settings_download_recovery_code_item_hint" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/dataExpirationText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/keyline_4"
