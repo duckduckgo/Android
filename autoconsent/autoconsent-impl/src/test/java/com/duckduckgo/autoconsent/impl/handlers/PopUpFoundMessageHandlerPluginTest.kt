@@ -91,19 +91,19 @@ class PopUpFoundMessageHandlerPluginTest {
     }
 
     @Test
-    fun whenUserSettingIsTrueThenDetectReloadLoopShouldNotBeCalled() {
+    fun whenUserSettingIsTrueThenDetectReloadLoopShouldBeCalled() {
         repository.userSetting = true
 
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp"), webView, mockCallback)
 
-        verify(mockReloadLoopDetector, never()).detectReloadLoop(any(), any())
+        verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp")
     }
 
     @Test
-    fun whenCmpEndsWithTopSuffixThenDetectReloadLoopShouldNotBeCalled() {
+    fun whenCmpEndsWithTopSuffixThenDetectReloadLoopShouldBeCalled() {
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp-top"), webView, mockCallback)
 
-        verify(mockReloadLoopDetector, never()).detectReloadLoop(any(), any())
+        verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp-top")
     }
 
     private fun message(cmp: String): String {
