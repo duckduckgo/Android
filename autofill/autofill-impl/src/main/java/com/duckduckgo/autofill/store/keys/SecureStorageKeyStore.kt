@@ -118,7 +118,7 @@ class RealSecureStorageKeyStore(
                         initialUseHarmonyValue = useHarmony
                         if (useHarmony) {
                             getEncryptedPreferences()?.let { legacyPreferences ->
-                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferencesUnwrapped(legacyPreferences, FILENAME_V2).also {
+                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferencesUnwrapped(legacyPreferences, FILENAME_V3).also {
                                     if (it == null) {
                                         logcat { "autofill harmony preferences retrieval returned null" }
                                     }
@@ -450,10 +450,12 @@ class RealSecureStorageKeyStore(
     companion object {
         /*
          * Legacy EncryptedSharedPreferences file. Always used as the source of truth for reads.
-         * The original Harmony file with this name might be corrupted, which is why
-         * FILENAME_V2 is used as the Harmony destination instead.
+         * FILENAME_V2: Harmony destination for minSupportedVersion 5.271.0 — potentially stale for
+         * users whose harmony was disabled mid-rollout while legacy continued to receive writes.
+         * FILENAME_V3: Harmony destination for minSupportedVersion 5.274.0 — always freshly migrated
+         * from legacy, ensuring a consistent starting state regardless of prior rollout history.
          */
         const val FILENAME = "com.duckduckgo.securestorage.store"
-        private const val FILENAME_V2 = "${FILENAME}_v2"
+        private const val FILENAME_V3 = "${FILENAME}_v3"
     }
 }
