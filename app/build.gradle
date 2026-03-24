@@ -259,6 +259,8 @@ dependencies {
 	implementation project(":custom-tabs-api")
 	implementation project(":duckplayer-impl")
 	implementation project(":duckplayer-api")
+	implementation project(":youtube-ad-blocking-impl")
+	implementation project(":youtube-ad-blocking-api")
 	implementation project(":history-impl")
 	implementation project(":history-api")
 	implementation project(":data-store-impl")
