@@ -375,6 +375,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         isAnimating = false
 
         binding.daxDialogCta.daxCtaContainer.animate().cancel()
+        binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
 
         binding.logoAnimation.apply {
             removeAllAnimatorListeners()
@@ -445,25 +446,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
                             }
                             fadeInDialog {
-                                val animators = mutableListOf<Animator>(
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.root, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                )
-                                if (showSecondaryCta) {
-                                    binding.daxDialogCta.secondaryCta.isVisible = true
-                                    animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                                }
-                                AnimatorSet().apply {
-                                    playTogether(animators)
-                                    addListener(object : AnimatorListenerAdapter() {
-                                        override fun onAnimationEnd(animation: Animator) {
-                                            isAnimating = false
-                                        }
-                                    })
-                                    start()
+                                binding.daxDialogCta.welcomeContent.titleText.apply {
+                                    typingDelayInMs = TYPING_DELAY_MS
+                                    delayAfterAnimationInMs = TYPING_POST_DELAY_MS
+                                }.startTypingAnimation(
+                                    getString(R.string.preOnboardingWelcomeDialogTitle),
+                                    isCancellable = true,
+                                ) {
+                                    val animators = mutableListOf<Animator>(
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    if (showSecondaryCta) {
+                                        binding.daxDialogCta.secondaryCta.isVisible = true
+                                        animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                    }
+                                    AnimatorSet().apply {
+                                        playTogether(animators)
+                                        addListener(object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                isAnimating = false
+                                            }
+                                        })
+                                        start()
+                                    }
                                 }
                             }
                         },
@@ -530,6 +539,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
                 binding.daxDialogCta.welcomeContent.root.alpha = 1f
+                binding.daxDialogCta.welcomeContent.titleText.cancelAnimation()
+                binding.daxDialogCta.welcomeContent.titleText.text = getString(R.string.preOnboardingWelcomeDialogTitle)
+                binding.daxDialogCta.welcomeContent.bodyText.alpha = 1f
                 binding.daxDialogCta.primaryCta.alpha = 1f
                 if (onboardingDialogType == INITIAL_REINSTALL_USER) {
                     binding.daxDialogCta.secondaryCta.isVisible = true
@@ -677,6 +689,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         private const val DIALOG_FADE_IN_DURATION = 400L
         private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+        private const val TYPING_DELAY_MS = 20L
+        private const val TYPING_POST_DELAY_MS = 20L
 
         private const val WALKING_DAX_DELAY = 400L
         private const val WALKING_DAX_FADE_DURATION = 100L
