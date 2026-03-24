@@ -72,7 +72,7 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useExpandableBarcodeConnectSyncLayout(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun syncAutoRestore(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
