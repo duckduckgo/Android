@@ -424,7 +424,7 @@
         ]
     },
     "m_dbp_search_stage_main_status_no_results": {
-        "description": "Pixel for PIR monthly active users.",
+        "description": "Pixel emitted when the scan is completed with no results found.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -496,7 +496,7 @@
         ]
     },
     "m_dbp_search_stage_main_status_error": {
-        "description": "Pixel for PIR monthly active users.",
+        "description": "Pixel emitted when the scan is completed with an error.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
