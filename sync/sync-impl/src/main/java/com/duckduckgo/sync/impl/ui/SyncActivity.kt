@@ -69,19 +69,24 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAut
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.OriginalFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
+import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
+import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyContract
+import com.duckduckgo.sync.impl.ui.setup.SyncPreviousSessionReadyResult
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.LoginSuccess
@@ -149,6 +154,26 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private var pendingOriginalFlow: OriginalFlow? = null
+
+    private val recoverAccountLauncher = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onDeviceConnected()
+        } else {
+            viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val previousSessionReadyLauncher = registerForActivityResult(SyncPreviousSessionReadyContract()) { result ->
+        when (result) {
+            is SyncPreviousSessionReadyResult.Resumed -> viewModel.onDeviceConnected()
+            is SyncPreviousSessionReadyResult.ContinueSetup -> {
+                launchOriginalFlow(pendingOriginalFlow).also { pendingOriginalFlow = null }
+            }
+            is SyncPreviousSessionReadyResult.Cancelled -> viewModel.onConnectionCancelled()
+        }
+    }
+
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
@@ -174,6 +199,10 @@ class SyncActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        savedInstanceState?.getString(KEY_PENDING_ORIGINAL_FLOW)?.let { name ->
+            pendingOriginalFlow = OriginalFlow.valueOf(name)
+        }
+
         binding.viewSyncDisabled.otherOptionsHeader.setText(R.string.sync_setup_other_options_title)
 
         observeUiEvents()
@@ -187,6 +216,11 @@ class SyncActivity : DuckDuckGoActivity() {
         syncSetupUrl()?.let { setupUrl ->
             viewModel.processSetupDeepLink(setupUrl)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        pendingOriginalFlow?.let { outState.putString(KEY_PENDING_ORIGINAL_FLOW, it.name) }
     }
 
     private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
@@ -365,6 +399,12 @@ class SyncActivity : DuckDuckGoActivity() {
                 this,
                 SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
             )
+            is ShowPreviousSessionReady -> {
+                pendingOriginalFlow = command.originalFlow
+                authenticate {
+                    previousSessionReadyLauncher.launch(extractSource())
+                }
+            }
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,
@@ -555,6 +595,20 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun extractSource(): String? {
         return intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
+    }
+
+    private fun launchOriginalFlow(originalFlow: OriginalFlow?) {
+        val source = extractSource()
+        when (originalFlow) {
+            OriginalFlow.SYNC_THIS_DEVICE -> syncIntroLauncher.launch(SyncIntroContractInput(SYNC_INTRO, source))
+            OriginalFlow.SYNC_WITH_ANOTHER -> connectFlow.launch(ConnectFlowContractInput(source))
+            OriginalFlow.RECOVER_SYNCED_DATA -> recoverAccountLauncher.launch(null)
+            null -> {}
+        }
+    }
+
+    companion object {
+        private const val KEY_PENDING_ORIGINAL_FLOW = "pendingOriginalFlow"
     }
 }
 
