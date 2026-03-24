@@ -46,13 +46,13 @@ class PopUpFoundMessageHandlerPlugin @Inject constructor(
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
 
                 val message: PopUpFoundMessage = parseMessage(jsonString) ?: return
-                reloadLoopDetector.detectReloadLoop(webView, message.cmp)
 
                 // Opt-in flow below, if user setting is true, do nothing
                 if (repository.userSetting) return
                 // for complex multi-frame CMPs, trigger opt-in flow only on -frame rules
                 if (message.cmp.endsWith(IGNORE_CMP_SUFFIX, ignoreCase = true)) return
 
+                reloadLoopDetector.detectReloadLoop(webView, message.cmp)
                 autoconsentCallback.onFirstPopUpHandled()
             }
         } catch (e: Exception) {
