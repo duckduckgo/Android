@@ -41,4 +41,8 @@ class FakeSharedPreferencesProvider : SharedPreferencesProvider {
     ): SharedPreferences? {
         return getSharedPreferences(name, true)
     }
+
+    override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(origin: SharedPreferences, name: String): SharedPreferences? {
+        return getSharedPreferences(name, true)
+    }
 }
