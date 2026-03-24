@@ -105,6 +105,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var skipOnboardingFadeOutAnimatorSet: AnimatorSet? = null
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
+    private var addressBarFadeInAnimatorSet: AnimatorSet? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
@@ -138,9 +139,55 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         return inflater.cloneInContext(contextThemeWrapper)
     }
 
-    private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
-        context?.let { ctx ->
-            // TODO
+    private fun setAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false) {
+        val isLightMode = appTheme.isLightModeEnabled()
+
+        with(binding.daxDialogCta.addressBarContent) {
+            topOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SINGLE_TOP, selectedOption, isLightMode))
+            topOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_TOP
+            bottomOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SINGLE_BOTTOM, selectedOption, isLightMode))
+            bottomOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_BOTTOM
+            splitOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SPLIT, selectedOption, isLightMode))
+            splitOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SPLIT
+
+            splitOmnibarContainer.isVisible = showSplitOption
+
+            topOmnibarToggleImage.setOnClickListener {
+                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
+                setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
+            }
+            bottomOmnibarToggleImage.setOnClickListener {
+                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+                setAddressBarPositionOptions(OmnibarType.SINGLE_BOTTOM, showSplitOption)
+            }
+            splitOmnibarToggleImage.setOnClickListener {
+                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+                setAddressBarPositionOptions(OmnibarType.SPLIT, showSplitOption)
+            }
+        }
+    }
+
+    private fun omnibarToggleImageRes(type: OmnibarType, selected: OmnibarType, isLightMode: Boolean): Int {
+        val isActive = type == selected
+        return when (type) {
+            OmnibarType.SINGLE_TOP -> when {
+                isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_brand_design_update_light
+                isActive -> R.drawable.mobile_toolbar_top_selected_brand_design_update_dark
+                isLightMode -> R.drawable.mobile_toolbar_top_unselected_brand_design_update_light
+                else -> R.drawable.mobile_toolbar_top_unselected_brand_design_update_dark
+            }
+            OmnibarType.SINGLE_BOTTOM -> when {
+                isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_brand_design_update_light
+                isActive -> R.drawable.mobile_toolbar_bottom_selected_brand_design_update_dark
+                isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_brand_design_update_light
+                else -> R.drawable.mobile_toolbar_bottom_unselected_brand_design_update_dark
+            }
+            OmnibarType.SPLIT -> when {
+                isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_brand_design_update_light
+                isActive -> R.drawable.mobile_toolbar_split_selected_brand_design_update_dark
+                isLightMode -> R.drawable.mobile_toolbar_split_unselected_brand_design_update_light
+                else -> R.drawable.mobile_toolbar_split_unselected_brand_design_update_dark
+            }
         }
     }
 
@@ -387,7 +434,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         configureDaxCta(dialog, state.showSplitOption)
                     }
                 }
-                // TODO: react to state.selectedAddressBarPosition for address bar toggle UI
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -432,6 +478,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         changeBoundsTransitionListener = null
         changeBoundsTransition = null
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
+        addressBarFadeInAnimatorSet?.cancel()
+        addressBarFadeInAnimatorSet = null
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -700,7 +748,46 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
-                    // TODO
+                    backgroundAnimator?.transitionTo(
+                        step = OnboardingBackgroundStep.AddressBar,
+                    )
+
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = true
+                    binding.daxDialogCta.addressBarContent.root.alpha = 0f
+
+                    binding.daxDialogCta.stepIndicator.animateToNextStep()
+
+                    val transition = androidx.transition.ChangeBounds().apply {
+                        duration = DIALOG_TRANSITION_DURATION
+                    }
+                    transition.addListener(object : TransitionListenerAdapter() {
+                        override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            addressBarFadeInAnimatorSet = AnimatorSet().apply {
+                                playTogether(
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.addressBarContent.root, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                )
+                                addListener(object : AnimatorListenerAdapter() {
+                                    override fun onAnimationEnd(animation: Animator) {
+                                        isAnimating = false
+                                    }
+                                })
+                                start()
+                            }
+                        }
+                    })
+
+                    val cardView = binding.daxDialogCta.cardView
+                    TransitionManager.beginDelayedTransition(cardView as ViewGroup, transition)
+
+                    binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                    binding.daxDialogCta.primaryCta.alpha = 0f
+
+                    setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
                 }
 
                 INPUT_SCREEN -> {
@@ -858,8 +945,50 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             ADDRESS_BAR_POSITION -> {
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                // If the dialog is already showing, just update the selection without re-running the full setup.
+                // The click handlers already update the UI immediately, so this only needs to sync the options.
+                if (binding.daxDialogCta.addressBarContent.root.isVisible) {
+                    setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
+                    return
+                }
+
                 binding.bottomWingAnimation.isVisible = false
-                // TODO
+
+                binding.logoAnimation.alpha = 0f
+                binding.welcomeTitle.alpha = 0f
+
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
+
+                binding.welcomeScreenWalkingDax.isVisible = false
+                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    verticalBias = 0f
+                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                }
+                val cardView = binding.daxDialogCta.cardView
+                cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
+                cardView.setArrowAnimationFraction(1f)
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+
+                binding.daxDialogCta.addressBarContent.root.isVisible = true
+                binding.daxDialogCta.addressBarContent.root.alpha = 1f
+
+                binding.daxDialogCta.stepIndicator.isVisible = true
+                binding.daxDialogCta.stepIndicator.alpha = 1f
+                binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 2)
+                binding.daxDialogCta.primaryCta.alpha = 1f
+                binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
+                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+
+                binding.daxDialogCta.root.isVisible = true
+                binding.daxDialogCta.daxCtaContainer.alpha = 1f
+
+                setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
             }
 
             INPUT_SCREEN -> {
@@ -1022,58 +1151,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         withAi: Boolean,
     ) {
         // TODO
-    }
-
-    private sealed class OmnibarTypeToggleButton(
-        isActive: Boolean,
-    ) {
-        abstract val imageRes: Int
-
-        val checkRes: Int =
-            if (isActive) {
-                CommonR.drawable.ic_check_accent_24
-            } else {
-                CommonR.drawable.ic_shape_circle_disabled_24
-            }
-
-        class Top(
-            isActive: Boolean,
-            isLightMode: Boolean,
-        ) : OmnibarTypeToggleButton(isActive) {
-            override val imageRes: Int =
-                when {
-                    isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_light
-                    isActive && !isLightMode -> R.drawable.mobile_toolbar_top_selected_dark
-                    !isActive && isLightMode -> R.drawable.mobile_toolbar_top_unselected_light
-                    else -> R.drawable.mobile_toolbar_top_unselected_dark
-                }
-        }
-
-        class Bottom(
-            isActive: Boolean,
-            isLightMode: Boolean,
-        ) : OmnibarTypeToggleButton(isActive) {
-            override val imageRes: Int =
-                when {
-                    isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_light
-                    isActive && !isLightMode -> R.drawable.mobile_toolbar_bottom_selected_dark
-                    !isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_light
-                    else -> R.drawable.mobile_toolbar_bottom_unselected_dark
-                }
-        }
-
-        class Split(
-            isActive: Boolean,
-            isLightMode: Boolean,
-        ) : OmnibarTypeToggleButton(isActive) {
-            override val imageRes: Int =
-                when {
-                    isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_light
-                    isActive && !isLightMode -> R.drawable.mobile_toolbar_split_selected_dark
-                    !isActive && isLightMode -> R.drawable.mobile_toolbar_split_unselected_light
-                    else -> R.drawable.mobile_toolbar_split_unselected_dark
-                }
-        }
     }
 
     companion object {

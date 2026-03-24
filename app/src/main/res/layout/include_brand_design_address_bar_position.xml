@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alpha="0"
+    android:orientation="vertical"
+    tools:alpha="1">
+
+    <!-- Title -->
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/addressBarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:text="@string/preOnboardingAddressBarTitle"
+        app:typography="onboarding_title" />
+
+    <!-- Address Bar Position Options -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addressBarPositionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_2">
+
+        <LinearLayout
+            android:id="@+id/topOmnibarContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/bottomOmnibarContainer"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="160dp">
+
+            <ImageView
+                android:id="@+id/topOmnibarToggleImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/preOnboardingAddressBarPositionTop"
+                android:foreground="@drawable/selectable_rounded_ripple"
+                android:scaleType="fitCenter"
+                android:src="@drawable/mobile_toolbar_top_selected_light" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/preOnboardingAddressBarPositionTop"
+                app:textType="primary"
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.button.RadioButton
+                android:id="@+id/topOmnibarToggleCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:checked="true"
+                android:clickable="false"
+                android:focusable="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:buttonTint="@color/onboarding_radio_button_tint"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomOmnibarContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/splitOmnibarContainer"
+            app:layout_constraintStart_toEndOf="@+id/topOmnibarContainer"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="160dp">
+
+            <ImageView
+                android:id="@+id/bottomOmnibarToggleImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/preOnboardingAddressBarPositionBottom"
+                android:foreground="@drawable/selectable_rounded_ripple"
+                android:scaleType="fitCenter"
+                android:src="@drawable/mobile_toolbar_bottom_unselected_light" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/preOnboardingAddressBarPositionBottom"
+                app:textType="primary"
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.button.RadioButton
+                android:id="@+id/bottomOmnibarToggleCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:buttonTint="@color/onboarding_radio_button_tint"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/splitOmnibarContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/keyline_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/bottomOmnibarContainer"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="160dp">
+
+            <ImageView
+                android:id="@+id/splitOmnibarToggleImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/preOnboardingAddressBarPositionSplit"
+                android:foreground="@drawable/selectable_rounded_ripple"
+                android:scaleType="fitCenter"
+                android:src="@drawable/mobile_toolbar_split_unselected_light" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/preOnboardingAddressBarPositionSplit"
+                app:textType="primary"
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.button.RadioButton
+                android:id="@+id/splitOmnibarToggleCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:buttonTint="@color/onboarding_radio_button_tint"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

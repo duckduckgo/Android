@@ -26,6 +26,7 @@
     <attr name="onboardingAccentContentPrimary" format="color" />
     <attr name="onboardingAccentPrimary" format="color" />
     <attr name="onboardingAccentSecondary" format="color" />
+    <attr name="onboardingIconsTertiary" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
 
     <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
@@ -41,10 +42,14 @@
         <item name="onboardingAccentContentPrimary">@color/white</item>
         <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
+        <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
         <item name="daxColorContainer">?attr/onboardingSurfaceDecorationPrimary</item>
+
+        <!--Accent-->
+        <item name="daxColorAccentBlue">?attr/onboardingAccentPrimary</item>
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
@@ -86,10 +91,14 @@
         <item name="onboardingAccentContentPrimary">@color/pollen100</item>
         <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
+        <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
 
         <!--Surface-->
         <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
         <item name="daxColorContainer">?attr/onboardingSurfaceDecorationPrimary</item>
+
+        <!--Accent-->
+        <item name="daxColorAccentBlue">?attr/onboardingAccentPrimary</item>
 
         <!--Text-->
         <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
