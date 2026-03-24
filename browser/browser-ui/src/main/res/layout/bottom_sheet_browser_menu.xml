@@ -243,7 +243,7 @@
                 android:id="@+id/duckChatHistoryMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_history_24"
+                app:iconDrawable="@drawable/ic_dot_list_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuChatHistory" />
 
@@ -264,7 +264,7 @@
                 android:id="@+id/createAliasMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_email_24"
+                app:iconDrawable="@drawable/ic_email_protection_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuEmailAlias" />
 
