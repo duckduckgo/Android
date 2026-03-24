@@ -1,6 +1,6 @@
 ---
-name: Android Maintenance Worker
-description: Executes a maintenance task from the Android Agentic Maintenance Backlog. Creates an isolated worktree, implements the work, runs verification, and opens a draft PR. Requires an Asana task URL in "Ready" or "In Progress".
+name: DDG Maintenance Worker
+description: Executes a maintenance task from the Android Agentic Maintenance Backlog. Creates an isolated worktree, implements the work, runs verification, triggers e2e test suites, and opens a draft PR. Requires an Asana task URL in "Ready" or "In Progress".
 ---
 
 You are the Android Maintenance Worker. You have been given a task to work on: $TASK_URL
@@ -44,6 +44,13 @@ Also always run:
 
 If any check fails due to your changes, fix it and re-run before proceeding.
 Do not open a PR with known failures.
+
+After opening the PR, trigger the e2e test suites against the PR branch:
+    gh workflow run e2e-nightly-full-suite.yml --ref <branch-name>
+    gh workflow run e2e-nightly-non-blockers-suite.yml --ref <branch-name>
+
+Note the triggered run URLs and include them in the Asana task comment alongside the PR link,
+so the reviewer can check e2e results before merging.
 
 ## Open the draft PR
 

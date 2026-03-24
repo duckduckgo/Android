@@ -1,5 +1,5 @@
 ---
-name: Android Maintenance Scope
+name: DDG Maintenance Scope
 description: Interactively scopes a maintenance idea into a properly formatted task for the Android Agentic Maintenance Backlog.
 ---
 
