@@ -18,26 +18,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:alpha="0"
-    android:orientation="vertical"
-    tools:alpha="1">
+    android:orientation="vertical">
 
-    <!-- Title -->
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/comparisonChartTitle"
+    <!-- Title: FrameLayout with hidden DaxTextView for measurement + TypeAnimationTextView for typing -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:paddingHorizontal="12dp"
-        android:text="@string/preOnboardingDaxDialog2Title"
-        app:typography="onboarding_title" />
+        android:paddingHorizontal="12dp">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/comparisonChartTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="invisible"
+            android:text="@string/preOnboardingDaxDialog2Title"
+            app:typography="onboarding_title" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/comparisonChartTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:textColor="?attr/daxColorPrimaryText" />
+
+    </FrameLayout>
 
     <!-- Comparison Table -->
     <LinearLayout
+        android:id="@+id/comparisonTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:alpha="0"
+        android:orientation="vertical"
+        tools:alpha="1">
 
         <!-- Header Row: Chrome + DDG logos -->
         <LinearLayout
