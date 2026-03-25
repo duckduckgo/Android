@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Gjenoppretting</string>
     <string name="sync_settings_download_recovery_code_item">Last ned gjenopprettingskoden som PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Bruk denne koden til å gjenopprette dataene dine hvis du mister tilgang til denne enheten. Oppbevar den på et trygt sted.</string>
-    <string name="sync_settings_data_expiration">Hvis Sync &amp; Backup har vært inaktiv i 18 måneder, kan ikke dataene gjenopprettes. <annotation type="learn_more_link">Finn ut mer</annotation></string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-data kan ikke gjenopprettes etter 18 måneder med inaktivitet. <annotation type="learn_more_link">Finn ut mer</annotation></string>
 </resources>
