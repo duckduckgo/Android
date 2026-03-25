@@ -4952,13 +4952,15 @@ class BrowserTabViewModelTest {
             optOutFailed = true,
             selfTestFailed = true,
             isCosmetic = true,
-            consentRule = null,
-            consentReloadLoop = false,
+            consentRule = "someCMP",
+            consentReloadLoop = true,
         )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertEquals("someCMP", testee.siteLiveData.value?.consentRule)
+        assertTrue(testee.siteLiveData.value?.consentReloadLoop!!)
     }
 
     @Test
