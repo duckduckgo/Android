@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -374,12 +375,25 @@ class TabSwitcherAdapter(
         if (url.isNullOrBlank()) {
             glide.clear(view)
             glide.load(AndroidR.drawable.ic_dax_icon).into(view)
+        } else if (isDuckAiUrl(url)) {
+            glide.clear(view)
+            glide.load(R.drawable.ic_duckai_default).into(view)
         } else {
             holder.trackJob(
                 lifecycleOwner.lifecycleScope.launch {
                     faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
                 },
             )
+        }
+    }
+
+    private fun isDuckAiUrl(url: String): Boolean {
+        return try {
+            val uri = Uri.parse(url)
+            val host = uri.host ?: return false
+            host == "duck.ai" || host.endsWith(".duck.ai")
+        } catch (e: Exception) {
+            false
         }
     }
 
