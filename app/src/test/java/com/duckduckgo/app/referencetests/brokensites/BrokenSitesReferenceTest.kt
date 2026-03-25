@@ -157,6 +157,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             webViewVersionProvider,
             ampLinks = mock(),
             inventory,
+            sitePermissionsPreferences = mock(),
         )
     }
 

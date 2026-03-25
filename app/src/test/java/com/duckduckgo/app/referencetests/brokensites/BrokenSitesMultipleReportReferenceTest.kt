@@ -160,6 +160,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             webViewVersionProvider,
             ampLinks = mock(),
             inventory,
+            sitePermissionsPreferences = mock(),
         )
     }
 

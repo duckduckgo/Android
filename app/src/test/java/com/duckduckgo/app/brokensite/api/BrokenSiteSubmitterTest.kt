@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -108,6 +109,8 @@ class BrokenSiteSubmitterTest {
 
     private val ampLinks: AmpLinks = mock()
 
+    private val sitePermissionsPreferences: SitePermissionsPreferences = mock()
+
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
 
@@ -126,6 +129,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(true)
 
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -163,6 +167,7 @@ class BrokenSiteSubmitterTest {
             webViewVersionProvider,
             ampLinks,
             inventory,
+            sitePermissionsPreferences,
         )
     }
 
