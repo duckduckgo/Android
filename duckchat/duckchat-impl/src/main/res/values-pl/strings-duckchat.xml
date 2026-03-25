@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Wyczyść dane</string>
+    <string name="duckChatBrowserMenuContentDescription">Więcej opcji</string>
 </resources>

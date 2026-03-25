@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Automaticky odoslať obsah stránky</string>
     <string name="duckAIContextualAutomaticContextMessage">Automaticky odoslať obsah stránky do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Pripoj obsah stránky</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Vymazať údaje</string>
+    <string name="duckChatBrowserMenuContentDescription">Ďalšie možnosti</string>
 </resources>

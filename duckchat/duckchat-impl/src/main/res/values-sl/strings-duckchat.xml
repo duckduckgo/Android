@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
     <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Počisti podatke</string>
+    <string name="duckChatBrowserMenuContentDescription">Več možnosti</string>
 </resources>

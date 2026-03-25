@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Saada lehe sisu automaatselt</string>
     <string name="duckAIContextualAutomaticContextMessage">Saada lehe sisu automaatselt Duck.ai-le</string>
     <string name="duckAIContextualAttachPageContent">Lisa lehe sisu</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Kustuta andmed</string>
+    <string name="duckChatBrowserMenuContentDescription">Veel valikuid</string>
 </resources>
