@@ -59,8 +59,10 @@ class NativeCrashInit @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
     private val webViewVersionProvider: WebViewVersionProvider,
-    @ProcessName private val processName: String,
+    @ProcessName processName: String,
 ) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
+
+    private val processName: String = processName.removePrefix(":")
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
 
