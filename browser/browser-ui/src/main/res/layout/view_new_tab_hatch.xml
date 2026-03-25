@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 app:textType="secondary"
                 app:typography="caption"
-                android:text="Return to..." />
+                android:text="@string/newTabReturnHatchText" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/returnHatchSiteTitle"

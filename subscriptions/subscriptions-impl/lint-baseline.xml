@@ -211,28 +211,6 @@
     </issue>
 
     <issue
-        id="MissingTranslation"
-        message="&quot;subscriptionExpiredStatusIconContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;subscriptionExpiredStatusIconContentDescription&quot;>Subscription expired&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-subscriptions.xml"
-            line="215"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;subscriptionActiveStatusIconContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;subscriptionActiveStatusIconContentDescription&quot;>Subscription active&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-subscriptions.xml"
-            line="216"
-            column="13"/>
-    </issue>
-
-    <issue
         id="Untranslatable"
         message="The resource string &quot;privacyPro&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
         errorLine1="    &lt;string name=&quot;privacyPro&quot; translatable=&quot;false&quot;>Privacy Pro&lt;/string>"

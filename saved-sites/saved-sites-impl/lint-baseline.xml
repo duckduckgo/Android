@@ -288,50 +288,6 @@
     </issue>
 
     <issue
-        id="MissingTranslation"
-        message="&quot;bookmarksSearchMenuContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;bookmarksSearchMenuContentDescription&quot;>Search bookmarks&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-saved-sites.xml"
-            line="121"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;bookmarksAddFolderMenuContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;bookmarksAddFolderMenuContentDescription&quot;>Add folder&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-saved-sites.xml"
-            line="122"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;bookmarksMenuContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;bookmarksMenuContentDescription&quot;>More options&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-saved-sites.xml"
-            line="123"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;newTabFavoritesToggleContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;newTabFavoritesToggleContentDescription&quot;>Toggle favorites visibility&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-saved-sites.xml"
-            line="124"
-            column="13"/>
-    </issue>
-
-    <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;bookmarks&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;importBookmarksSuccess&quot; instruction=&quot;Placeholder is a number&quot;>Successfully imported %1$d bookmarks&lt;/string>"

@@ -387,28 +387,6 @@
     </issue>
 
     <issue
-        id="MissingTranslation"
-        message="&quot;closeButtonContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;closeButtonContentDescription&quot;>Close&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-common-ui.xml"
-            line="45"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;bookmarkFavoriteContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;bookmarkFavoriteContentDescription&quot;>Favorite&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-common-ui.xml"
-            line="46"
-            column="13"/>
-    </issue>
-
-    <issue
         id="VectorPath"
         message="Very long vector path (1111 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M11.53,3.256a1.995,1.995 0,0 1,1.747 1.338l0.055,0.184 0.43,1.717a5.145,5.145 0,0 0,3.743 3.743l1.717,0.43c1.022,0.256 1.535,1.148 1.528,1.974 -0.007,0.816 -0.521,1.688 -1.528,1.94l-1.717,0.43a5.145,5.145 0,0 0,-3.743 3.743l-0.43,1.717C13.078,21.486 12.196,22 11.375,22c-0.821,0 -1.703,-0.514 -1.957,-1.528l-0.43,-1.717a5.145,5.145 0,0 0,-3.743 -3.743l-1.717,-0.43C2.521,14.33 2.007,13.458 2,12.642c-0.007,-0.826 0.506,-1.718 1.528,-1.974l1.717,-0.43a5.145,5.145 0,0 0,3.743 -3.743l0.43,-1.717 0.055,-0.184c0.309,-0.893 1.132,-1.344 1.902,-1.344l0.154,0.006ZM11.374,4.5a0.75,0.75 0,0 0,-0.744 0.581L10.2,6.8l-0.057,0.213a6.394,6.394 0,0 1,-4.595 4.44l-1.718,0.429a0.75,0.75 0,0 0,-0.58 0.75,0.75 0.75,0 0,0 0.58,0.738l1.718,0.43a6.394,6.394 0,0 1,4.652 4.65l0.43,1.718c0.085,0.339 0.343,0.53 0.623,0.572l0.121,0.009a0.75,0.75 0,0 0,0.698 -0.445l0.046,-0.136 0.43,-1.718a6.394,6.394 0,0 1,4.44 -4.595l0.212,-0.057 1.718,-0.43a0.745,0.745 0,0 0,0.571 -0.617l0.01,-0.12a0.75,0.75 0,0 0,-0.444 -0.704l-0.137,-0.047 -1.718,-0.43a6.394,6.394 0,0 1,-4.595 -4.44l-0.055,-0.21 -0.43,-1.718a0.75,0.75 0,0 0,-0.744 -0.581Z&quot;>"

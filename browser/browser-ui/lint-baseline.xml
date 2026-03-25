@@ -24,17 +24,6 @@
     </issue>
 
     <issue
-        id="HardcodedText"
-        message="Hardcoded string &quot;Return to...&quot;, should use `@string` resource"
-        errorLine1="                android:text=&quot;Return to...&quot; />"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_new_tab_hatch.xml"
-            line="60"
-            column="17"/>
-    </issue>
-
-    <issue
         id="RtlEnabled"
         message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
         <location
