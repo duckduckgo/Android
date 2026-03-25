@@ -24,7 +24,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
@@ -39,6 +38,7 @@ import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
@@ -109,9 +109,6 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var browserNav: BrowserNav
-
     private val syncedDevicesAdapter = SyncedDevicesAdapter(
         object : ConnectedDeviceClickListener {
             override fun onEditDeviceClicked(device: ConnectedDevice) {
@@ -169,7 +166,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (isFinishing) viewModel.onScreenExit()
+        viewModel.onScreenExit()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -364,7 +361,10 @@ class SyncActivity : DuckDuckGoActivity() {
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(command.source)
             is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
-            is LaunchLearnMore -> startActivity(browserNav.openInNewTab(this, command.url))
+            is LaunchLearnMore -> globalActivityStarter.start(
+                this,
+                SettingsWebViewScreenWithParams(url = it.url, screenTitle = getString(R.string.sync_screen_title)),
+            )
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
                     displayTitleResource = R.string.deep_link_auth_prompt_title,

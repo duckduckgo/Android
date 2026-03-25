@@ -366,7 +366,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onAutoRestoreToggleChanged(enabled: Boolean) {
-        logcat { "Sync-Recovery: restore on reinstall toggle changed to $enabled (pending until screen exit)" }
+        logcat { "Sync-Recovery: restore on reinstall toggle changed to $enabled (pending until screen stopped)" }
         viewState.value = viewState.value.copy(autoRestoreEnabled = enabled)
     }
 
@@ -390,6 +390,7 @@ class SyncActivityViewModel @Inject constructor(
                         val deviceId = syncAccountRepository.getThisConnectedDevice()?.deviceId
                         logcat { "Sync-Recovery: saving recovery payload to Block Store (deviceId=$deviceId)" }
                         syncAutoRestoreManager.saveAutoRestoreData(authCode.rawCode, deviceId)
+                        initialAutoRestoreEnabled = true
                     }
                     .onFailure { error ->
                         logcat(LogPriority.ERROR) { "Sync-Recovery: failed to get recovery code, preference not written - ${error.reason}" }
@@ -397,6 +398,7 @@ class SyncActivityViewModel @Inject constructor(
             } else {
                 logcat { "Sync-Recovery: clearing recovery payload from Block Store" }
                 syncAutoRestoreManager.clearAutoRestoreData()
+                initialAutoRestoreEnabled = false
             }
         }
     }

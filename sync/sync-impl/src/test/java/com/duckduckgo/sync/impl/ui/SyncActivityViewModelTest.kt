@@ -73,6 +73,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.lang.String.format
@@ -906,6 +907,46 @@ class SyncActivityViewModelTest {
         testee.onScreenExit()
 
         verify(syncAutoRestoreManager).clearAutoRestoreData()
+    }
+
+    @Test
+    fun whenScreenExitsTwiceWithAutoRestoreEnabledThenSavesPayloadOnlyOnce() = runTest {
+        val authCode = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "rawCode")
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+        whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
+        givenAuthenticatedUser()
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCode))
+
+        testee.viewState().test {
+            expectMostRecentItem()
+            testee.onAutoRestoreToggleChanged(true)
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onScreenExit()
+        testee.onScreenExit()
+
+        verify(syncAutoRestoreManager, times(1)).saveAutoRestoreData(eq("rawCode"), anyOrNull())
+    }
+
+    @Test
+    fun whenScreenExitsTwiceWithAutoRestoreDisabledThenClearsPayloadOnlyOnce() = runTest {
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+        whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            expectMostRecentItem()
+            testee.onAutoRestoreToggleChanged(false)
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.onScreenExit()
+        testee.onScreenExit()
+
+        verify(syncAutoRestoreManager, times(1)).clearAutoRestoreData()
     }
 
     @Test
