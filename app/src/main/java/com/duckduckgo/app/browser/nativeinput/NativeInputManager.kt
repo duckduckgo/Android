@@ -274,6 +274,8 @@ class RealNativeInputManager @Inject constructor(
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     marginAnimator = null
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT
+                    card.layoutParams = params
                     if (widgetView != null) {
                         animator.applyLayoutTransitions(widgetView)
                     }
