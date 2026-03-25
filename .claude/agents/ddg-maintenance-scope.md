@@ -53,7 +53,8 @@ and justify it. Cross-module tasks without justification will be sent back for s
 ## Guidelines
 
 - Asana operations: use the `ddg-asana` skill for all Asana reads and writes
-  (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls
+  (task updates, section moves, comments); if the skill is not available, fall back to the
+  Asana API directly — do not use raw curl/bash
 
 ## Checklist before handing off
 

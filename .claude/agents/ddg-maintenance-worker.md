@@ -96,4 +96,5 @@ If you cannot proceed:
 - No new dependencies without discussion
 - No breaking changes — if a change could break existing behaviour, stop and ask
 - Asana operations: use the `ddg-asana` skill for all Asana reads and writes
-  (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls
+  (task updates, section moves, comments); if the skill is not available, fall back to the
+  Asana API directly — do not use raw curl/bash
