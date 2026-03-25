@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Palautus</string>
     <string name="sync_settings_download_recovery_code_item">Lataa palautuskoodi PDF-muodossa</string>
     <string name="sync_settings_download_recovery_code_item_hint">Käytä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen – pidä se turvassa.</string>
-    <string name="sync_settings_data_expiration">Jos Sync &amp; Backup -toimintoa ei käytetä 18 kuukauteen, tietoja ei voi palauttaa. <annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden toimettomuuden jälkeen. <annotation type="learn_more_link">Lue lisää</annotation></string>
 </resources>
