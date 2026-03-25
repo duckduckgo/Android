@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Herstellen</string>
     <string name="sync_settings_download_recovery_code_item">Herstelcode downloaden als PDF-bestand</string>
     <string name="sync_settings_download_recovery_code_item_hint">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest — bewaar hem veilig.</string>
-    <string name="sync_settings_data_expiration">Als \'Sync &amp; Backup\' 18 maanden inactief is, kunnen de gegevens niet worden hersteld. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit. <annotation type="learn_more_link">Meer informatie</annotation></string>
 </resources>
