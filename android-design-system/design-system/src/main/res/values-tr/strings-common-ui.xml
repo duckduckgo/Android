@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Daha Fazla Bilgi</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Kapat</string>
+    <string name="bookmarkFavoriteContentDescription">Favori</string>
+
 </resources>
