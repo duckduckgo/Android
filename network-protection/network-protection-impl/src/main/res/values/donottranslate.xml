@@ -15,4 +15,6 @@
   -->
 
 <resources>
+    <string name="netpCloseButtonContentDescription">Close</string>
+    <string name="netpVpnIndicatorContentDescription">VPN status indicator</string>
 </resources>

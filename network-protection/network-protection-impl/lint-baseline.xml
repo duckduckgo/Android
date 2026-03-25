@@ -310,28 +310,6 @@
     </issue>
 
     <issue
-        id="MissingTranslation"
-        message="&quot;netpCloseButtonContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;netpCloseButtonContentDescription&quot;>Close&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-netp.xml"
-            line="261"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="MissingTranslation"
-        message="&quot;netpVpnIndicatorContentDescription&quot; is not translated in &quot;de&quot; (German), &quot;fi&quot; (Finnish), &quot;ru&quot; (Russian), &quot;sv&quot; (Swedish), &quot;pt&quot; (Portuguese), &quot;bg&quot; (Bulgarian), &quot;el&quot; (Greek), &quot;lt&quot; (Lithuanian), &quot;hr&quot; (Croatian), &quot;lv&quot; (Latvian), &quot;it&quot; (Italian), &quot;fr&quot; (French), &quot;hu&quot; (Hungarian), &quot;es&quot; (Spanish), &quot;et&quot; (Estonian), &quot;cs&quot; (Czech), &quot;nb&quot; (Norwegian Bokmål), &quot;sk&quot; (Slovak), &quot;sl&quot; (Slovenian), &quot;pl&quot; (Polish), &quot;da&quot; (Danish), &quot;ro&quot; (Romanian), &quot;nl&quot; (Dutch), &quot;tr&quot; (Turkish)"
-        errorLine1="    &lt;string name=&quot;netpVpnIndicatorContentDescription&quot;>VPN status indicator&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-netp.xml"
-            line="262"
-            column="13"/>
-    </issue>
-
-    <issue
         id="Typos"
         message="Repeated word &quot;nem&quot; in message: possible typo"
         errorLine1="    &lt;string name=&quot;netpFaqAnswerOne&quot;>A VPN a nyílt forráskódú WireGuard protokollt használja, hogy virtuális magánhálózatot (VPN) állítson be az eszközödön. Ha engedélyezve van, az eszközöd teljes internetes forgalma először titkosításra kerül, majd átirányításra kerül a legközelebbi VPN-szerveren keresztül. Az internetszolgáltatók így nem tudják nyomon követni a böngészési tevékenységedet, az alkalmazások és az általad meglátogatott webhelyek pedig nem nem láthatják a tartózkodási helyedet.&lt;/string>"

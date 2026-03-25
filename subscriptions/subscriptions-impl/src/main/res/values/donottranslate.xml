@@ -23,6 +23,9 @@
 
     <!-- Black Friday offer-->
     <string name="subscriptionSettingBlackFridayOffer">Save 40% on First Year</string>
+    <string name="subscriptionExpiredStatusIconContentDescription">Subscription expired</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Subscription active</string>
+
     <!-- VPN Reminder Notification -->
     <string name="vpnReminderNotificationChannelName">VPN Reminders</string>
     <string name="vpnReminderNotificationTitle">Don\'t forget to set up your VPN</string>
