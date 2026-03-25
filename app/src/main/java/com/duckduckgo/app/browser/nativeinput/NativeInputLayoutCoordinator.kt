@@ -146,31 +146,38 @@ class NativeInputLayoutCoordinator(
             )
         }
 
+        fun isLogoVisible(view: View): Boolean {
+            return view == newTabContent &&
+                rootView.findViewById<View?>(R.id.ddgLogo)?.visibility == View.VISIBLE
+        }
+
+        fun computeDeltaTop(view: View, isBottom: Boolean, anchorBottomInWindow: Int): Int {
+            if (isBottom || isLogoVisible(view)) return 0
+            val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
+            return maxOf(0, anchorBottomInWindow - viewLocation[1])
+        }
+
+        fun computeDeltaBottom(isBottom: Boolean): Int {
+            if (!isBottom) return 0
+            return if (omnibarState.isOmnibarBottom()) {
+                maxOf(0, overlap)
+            } else {
+                maxOf(0, anchor.height - overlap)
+            }
+        }
+
         fun applyOffset() {
             if (!widgetView.isShown) {
-                targets.forEach { target ->
-                    applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
-                }
+                targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
                 return
             }
             val isBottom = isWidgetBottom()
             val anchorLocation = IntArray(2).also { anchor.getLocationInWindow(it) }
             val anchorBottomInWindow = anchorLocation[1] + anchor.height
+            val deltaBottom = computeDeltaBottom(isBottom)
             targets.forEach { target ->
-                val view = target.view
-                val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
-                val deltaTop = if (isBottom) 0 else maxOf(0, anchorBottomInWindow - viewLocation[1])
-                val deltaBottom =
-                    if (isBottom) {
-                        if (omnibarState.isOmnibarBottom()) {
-                            maxOf(0, overlap)
-                        } else {
-                            maxOf(0, anchor.height - overlap)
-                        }
-                    } else {
-                        0
-                    }
-                applyPadding(view, target.basePadding, deltaTop, deltaBottom)
+                val deltaTop = computeDeltaTop(target.view, isBottom, anchorBottomInWindow)
+                applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
         }
 
