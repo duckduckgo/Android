@@ -7,11 +7,15 @@ appId: com.duckduckgo.mobile.android
 - launchApp:
     stopApp: true
 
-- tapOn:
-    id: "omnibarTextInput"
-
-- inputText: "${output.websites.urls[output.websites.counter]}"
-- pressKey: Enter
+# Wait for the page reload to start before checking for completion.
+# Without this, notVisible below would be true immediately at launch
+# (before the indicator has had a chance to appear) and the app would stop
+# before the page has loaded.
+- extendedWaitUntil:
+    visible:
+      id: pageLoadingIndicator
+    timeout: 10000
+    optional: true
 
 - extendedWaitUntil:
     notVisible:
