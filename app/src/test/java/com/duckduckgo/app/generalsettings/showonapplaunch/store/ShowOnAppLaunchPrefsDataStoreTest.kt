@@ -61,8 +61,8 @@ class ShowOnAppLaunchPrefsDataStoreTest {
     }
 
     @Test
-    fun whenOptionIsNullThenShouldReturnLastOpenedPage() = runTest {
-        assertEquals(LastOpenedTab, testee.optionFlow.first())
+    fun whenOptionIsNullThenShouldReturnNewTabPage() = runTest {
+        assertEquals(NewTabPage, testee.optionFlow.first())
     }
 
     @Test
@@ -101,11 +101,11 @@ class ShowOnAppLaunchPrefsDataStoreTest {
         testee.optionFlow.test {
             val defaultOption = awaitItem()
 
-            assertEquals(LastOpenedTab, defaultOption)
+            assertEquals(NewTabPage, defaultOption)
 
-            testee.setShowOnAppLaunchOption(NewTabPage)
+            testee.setShowOnAppLaunchOption(LastOpenedTab)
 
-            assertEquals(NewTabPage, awaitItem())
+            assertEquals(LastOpenedTab, awaitItem())
 
             testee.setShowOnAppLaunchOption(SpecificPage("example.com"))
 
