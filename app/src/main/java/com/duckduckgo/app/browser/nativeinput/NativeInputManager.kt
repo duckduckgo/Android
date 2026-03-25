@@ -96,6 +96,9 @@ class RealNativeInputManager @Inject constructor(
     override fun hideNativeInput(): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
+        marginAnimator?.cancel()
+        marginAnimator = null
+
         val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
             ?: rootView.findViewById(R.id.inputModeBottomRoot)
             ?: return false
@@ -181,8 +184,15 @@ class RealNativeInputManager @Inject constructor(
                 card.layoutParams = params
             }
             addListener(object : android.animation.AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: android.animation.Animator) {
+                    cancelled = true
+                }
+
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     marginAnimator = null
+                    if (cancelled) return
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT
                     card.layoutParams = params
                     animator.applyLayoutTransitions(widgetRoot)
@@ -270,8 +280,15 @@ class RealNativeInputManager @Inject constructor(
                 card.layoutParams = params
             }
             addListener(object : android.animation.AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: android.animation.Animator) {
+                    cancelled = true
+                }
+
                 override fun onAnimationEnd(animation: android.animation.Animator) {
                     marginAnimator = null
+                    if (cancelled) return
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT
                     card.layoutParams = params
                     animator.applyLayoutTransitions(widgetView)
