@@ -1,25 +1,5 @@
 # AGENTS.md — DuckDuckGo Android Browser
 
-## Available Agents
-
-Agents in `.claude/agents/` are invoked automatically when their trigger conditions match.
-Always delegate to the agent — do not apply its instructions inline.
-
-### `ddg-api-proposal-reviewer`
-
-**Command:** `/review-public-api <url-or-code>`
-
-Use this when someone asks for a review of a DuckDuckGo Android public API proposal.
-
-Triggers:
-- An Asana task URL that is confirmed to be an API proposal (title contains "API Proposal", or the task is in the API Proposals board, or the description proposes changes to a `-api` module)
-- Pasted Kotlin code from or intended for a `-api` module, with a design question
-- A file containing a proposal, with a review request
-
-Do **not** trigger on general Asana URLs paired with "review", impl-only changes, or general Kotlin questions.
-
-When this agent returns output, relay it to the user verbatim and in full — do not summarize, shorten, or paraphrase.
-
 ## Detailed Rules
 
 The following rule files contain detailed guidance for specific topics. Read them before working in those areas — do not rely on summaries here.
@@ -44,6 +24,7 @@ DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The ap
 **Build:** Gradle 7.6, AGP via refreshVersions, Anvil (Dagger2)
 
 ---
+
 ## Build System
 
 ### Module Discovery
@@ -78,6 +59,7 @@ maestro test .maestro/autofill/1_autofill_shown_in_overflow.yaml   # single test
 maestro test .maestro/autofill                                      # all in directory
 maestro test .maestro --include-tags releaseTest                    # by tag
 ```
+
 Note: `jvm_tests` and `jvm_checks` resolve to `testPlayDebugUnitTest` in `:app` and `testDebugUnitTest` in library modules. To run a single test class, use `--tests`:
 ```bash
 ./gradlew :my-feature-impl:testDebugUnitTest --tests "com.duckduckgo.my.feature.RealFooTest"
