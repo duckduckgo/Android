@@ -28,13 +28,13 @@
         <item quantity="one">Your bookmark for %1$s can’t sync because one of its fields exceeds the character limit.\n\n</item>
         <item quantity="other">Your bookmarks for %1$s and %2$d other sites can’t sync because some of their fields exceed the character limit.\n\n</item>
     </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
 
     <!-- Content Descriptions -->
     <string name="bookmarksSearchMenuContentDescription">Search bookmarks</string>
     <string name="bookmarksAddFolderMenuContentDescription">Add folder</string>
     <string name="bookmarksMenuContentDescription">More options</string>
     <string name="newTabFavoritesToggleContentDescription">Toggle favorites visibility</string>
-    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
