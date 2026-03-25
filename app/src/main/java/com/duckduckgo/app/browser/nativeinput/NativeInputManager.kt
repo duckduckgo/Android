@@ -300,10 +300,7 @@ class RealNativeInputManager @Inject constructor(
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query)
                 } else {
-                    animator.cancelAnimation()
-                    rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
-                    rootView.findViewById<View?>(R.id.focusedView)?.gone()
-                    onHide()
+                    hideNativeInput()
                     callbacks.onSearchSubmitted(duckChat.getDuckChatUrl(query, true))
                 }
             },
