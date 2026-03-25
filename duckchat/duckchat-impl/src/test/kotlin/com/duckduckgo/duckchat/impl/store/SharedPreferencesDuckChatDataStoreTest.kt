@@ -391,4 +391,32 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.setUserAcceptedTerms()
         assertTrue(testee.hasUserAcceptedTerms())
     }
+
+    @Test
+    fun `when observeDefaultTogglePosition then receive updates`() = runTest {
+        val results = mutableListOf<String?>()
+        val job = launch {
+            testee.observeDefaultTogglePosition()
+                .take(2)
+                .toList(results)
+        }
+        testee.setDefaultTogglePosition("DUCK_AI")
+        job.join()
+
+        assertEquals(listOf(null, "DUCK_AI"), results)
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then observeLastUsedTogglePosition receives update`() = runTest {
+        val results = mutableListOf<String?>()
+        val job = launch {
+            testee.observeLastUsedTogglePosition()
+                .take(2)
+                .toList(results)
+        }
+        testee.setLastUsedTogglePosition("DUCK_AI")
+        job.join()
+
+        assertEquals(listOf(null, "DUCK_AI"), results)
+    }
 }

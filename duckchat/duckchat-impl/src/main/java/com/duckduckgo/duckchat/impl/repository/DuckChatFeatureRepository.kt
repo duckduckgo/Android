@@ -97,9 +97,11 @@ interface DuckChatFeatureRepository {
 
     suspend fun setDefaultTogglePosition(position: String)
 
-    suspend fun getDefaultTogglePosition(): String?
-
     fun observeDefaultTogglePosition(): Flow<String?>
+
+    suspend fun setLastUsedTogglePosition(position: String)
+
+    fun observeLastUsedTogglePosition(): Flow<String?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -210,9 +212,13 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setDefaultTogglePosition(position)
     }
 
-    override suspend fun getDefaultTogglePosition(): String? = duckChatDataStore.getDefaultTogglePosition()
-
     override fun observeDefaultTogglePosition(): Flow<String?> = duckChatDataStore.observeDefaultTogglePosition()
+
+    override suspend fun setLastUsedTogglePosition(position: String) {
+        duckChatDataStore.setLastUsedTogglePosition(position)
+    }
+
+    override fun observeLastUsedTogglePosition(): Flow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
