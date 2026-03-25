@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Управление на отметки</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Търсене на отметки</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Добавяне на папка</string>
+    <string name="bookmarksMenuContentDescription">Още опции</string>
+    <string name="newTabFavoritesToggleContentDescription">Превключване на видимостта на любимите</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>
     <string name="bookmarksActivityTitle">Отметки</string>

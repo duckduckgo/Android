@@ -32,6 +32,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Správa záložiek</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Vyhľadávanie v záložkách</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pridať priečinok</string>
+    <string name="bookmarksMenuContentDescription">Ďalšie možnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Prepnúť viditeľnosť obľúbených</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>

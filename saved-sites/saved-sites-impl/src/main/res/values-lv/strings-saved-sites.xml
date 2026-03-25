@@ -31,6 +31,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Meklēt grāmatzīmes</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pievienot mapi</string>
+    <string name="bookmarksMenuContentDescription">Citas iespējas</string>
+    <string name="newTabFavoritesToggleContentDescription">Pārslēgt izlases redzamību</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>
     <string name="bookmarksActivityTitle">Grāmatzīmes</string>

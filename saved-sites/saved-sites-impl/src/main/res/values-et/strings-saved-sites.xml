@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Halda järjehoidjaid</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Otsi järjehoidjaid</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lisa kaust</string>
+    <string name="bookmarksMenuContentDescription">Veel valikuid</string>
+    <string name="newTabFavoritesToggleContentDescription">Lülita lemmikute nähtavust</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
     <string name="bookmarksActivityTitle">Järjehoidjad</string>

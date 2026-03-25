@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Könyvjelzők keresése</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Mappa hozzáadása</string>
+    <string name="bookmarksMenuContentDescription">További lehetőségek</string>
+    <string name="newTabFavoritesToggleContentDescription">Kedvencek láthatóságának váltása</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
     <string name="bookmarksActivityTitle">Könyvjelzők</string>

@@ -32,6 +32,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Upravljanje knjižnim oznakama</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Pretraži knjižne oznake</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Dodaj mapu</string>
+    <string name="bookmarksMenuContentDescription">Dodatne mogućnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Uključi/isključi vidljivost favorita</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Knjižne oznake</string>
     <string name="bookmarksActivityTitle">Knjižne oznake</string>

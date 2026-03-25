@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Administrer bogmærker</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Søg i bogmærker</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Tilføj mappe</string>
+    <string name="bookmarksMenuContentDescription">Flere muligheder</string>
+    <string name="newTabFavoritesToggleContentDescription">Skift synligheden af favoritter</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>
     <string name="bookmarksActivityTitle">Bogmærker</string>

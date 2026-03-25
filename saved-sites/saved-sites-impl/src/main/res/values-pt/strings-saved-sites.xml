@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Pesquisar marcadores</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Adicionar pasta</string>
+    <string name="bookmarksMenuContentDescription">Mais opções</string>
+    <string name="newTabFavoritesToggleContentDescription">Alternar visibilidade dos favoritos</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
     <string name="bookmarksActivityTitle">Marcadores</string>

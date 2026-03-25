@@ -258,4 +258,9 @@
     <string name="netpExclusionListLabelAutoExclude">Ei ühildu VPN-idega</string>
     <string name="netpExclusionListAutoExcludeDescription">Mõned rakendused, nagu pangandus- või voogedastusrakendused, ei tööta VPN-idega hästi. Kui see seade on lubatud, välistame need rakendused automaatselt.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Sulge</string>
+    <string name="netpVpnIndicatorContentDescription">VPN-i oleku indikaator</string>
+
 </resources>

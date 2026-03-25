@@ -30,6 +30,12 @@
     </plurals>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
 
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Αναζήτηση σελιδοδεικτών</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Προσθήκη φακέλου</string>
+    <string name="bookmarksMenuContentDescription">Περισσότερες επιλογές</string>
+    <string name="newTabFavoritesToggleContentDescription">Εναλλαγή ορατότητας αγαπημένων</string>
+
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>
     <string name="bookmarksActivityTitle">Σελιδοδείκτες</string>
