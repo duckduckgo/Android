@@ -160,7 +160,7 @@ class RealSecureStorageKeyStore(
     ) {
         withContext(dispatcherProvider.io()) {
             val useHarmony = useHarmony()
-            val readFromHarmony = readFromHarmony()
+            val readFromHarmony = useHarmony && autofillFeature.readFromHarmony().isEnabled()
             val legacyPrefs = getEncryptedPreferences()
             if (legacyPrefs == null) {
                 pixel.fire(
@@ -302,7 +302,7 @@ class RealSecureStorageKeyStore(
     override suspend fun getKey(keyName: String): ByteArray? {
         return withContext(dispatcherProvider.io()) {
             val useHarmony = useHarmony()
-            val readFromHarmony = readFromHarmony()
+            val readFromHarmony = useHarmony && autofillFeature.readFromHarmony().isEnabled()
 
             // Always read from legacy — source of truth
 
