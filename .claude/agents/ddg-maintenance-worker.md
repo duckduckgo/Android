@@ -54,6 +54,8 @@ Fill in the template sections as follows:
 
 Use `gh api repos/duckduckgo/Android/pulls --method POST` to open the PR as a draft —
 do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
+If `gh` is not available, fall back to the GitHub REST API directly:
+    POST https://api.github.com/repos/duckduckgo/Android/pulls
 
 After opening the PR:
     - Move the Asana task to "In Review"
