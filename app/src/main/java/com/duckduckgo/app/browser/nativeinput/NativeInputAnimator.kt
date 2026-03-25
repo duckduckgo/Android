@@ -253,9 +253,11 @@ class RealNativeInputAnimator : NativeInputAnimator {
                 card.layoutParams = params
             }
             addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
+                override fun onAnimationCancel(animation: Animator) { cancelled = true }
                 override fun onAnimationEnd(animation: Animator) {
                     cardWidthAnimator = null
-                    onCardWidthAnimated(params, card, widgetView, onComplete)
+                    if (!cancelled) onCardWidthAnimated(params, card, widgetView, onComplete)
                 }
             })
             start()
