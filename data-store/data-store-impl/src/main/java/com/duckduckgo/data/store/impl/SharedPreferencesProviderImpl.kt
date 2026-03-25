@@ -105,16 +105,6 @@ class SharedPreferencesProviderImpl @Inject constructor(
         name: String,
     ): SharedPreferences? {
         logcat { "Migrate and return encrypted preferences to Harmony" }
-        return migrateEncryptedToHarmonyIfNecessary(origin, name)?.let {
-            SafeSharedPreferences(it, crashLogger.get())
-        }
-    }
-
-    override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(
-        origin: SharedPreferences,
-        name: String,
-    ): SharedPreferences? {
-        logcat { "Migrate and return encrypted preferences to Harmony" }
         return migrateEncryptedToHarmonyIfNecessary(origin, name)
     }
 
