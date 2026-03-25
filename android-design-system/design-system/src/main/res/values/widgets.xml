@@ -298,6 +298,15 @@
         <item name="android:layout_margin">@dimen/keyline_4</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.Hatch">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
+    </style>
+
     <!-- Dialogs -->
     <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
