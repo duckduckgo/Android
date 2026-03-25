@@ -1,0 +1,22 @@
+appId: com.duckduckgo.mobile.android
+---
+# Performs a single warm page load for the current website in the iteration.
+# Relaunches without clearing state so the HTTP cache from the preceding cold
+# load is retained.
+
+- launchApp:
+    stopApp: true
+
+- tapOn:
+    id: "omnibarTextInput"
+
+- inputText: "${output.websites.urls[output.websites.counter]}"
+- pressKey: Enter
+
+- extendedWaitUntil:
+    notVisible:
+      id: pageLoadingIndicator
+    timeout: 30000
+    optional: true
+
+- stopApp

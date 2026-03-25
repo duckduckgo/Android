@@ -1,19 +1,9 @@
 output.websites = {
     urls: [
-        'foxnews.com',
-        'allrecipes.com',
-        'stackoverflow.com',
-        'apmex.com',
-        'linktr.ee',
-        'es.wikipedia.org',
-        'rottentomatoes.com',
-        'medicalnewstoday.com',
-        'costco.com',
-        'bing.com',
-        'speedtest.net'
+        'es.wikipedia.org'
     ],
     counter: 0,
-    coldIterations: 40,
-    warmIterations: 40,
+    coldIterations: 1,
+    warmIterations: 1,
     iterationCounter: 0
 }

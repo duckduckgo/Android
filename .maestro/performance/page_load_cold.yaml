@@ -18,29 +18,7 @@ tags:
           while:
             true: ${output.websites.iterationCounter < output.websites.coldIterations}
           commands:
-            - launchApp:
-                clearState: true
-                stopApp: true
-
-            - runFlow: ../shared/skip_all_onboarding.yaml
-
-            - extendedWaitUntil:
-                visible: "Search"
-                timeout: 5000
-
-            - tapOn:
-                id: "omnibarTextInput"
-
-            - inputText: "${output.websites.urls[output.websites.counter]}"
-            - pressKey: Enter
-
-            - extendedWaitUntil:
-                notVisible:
-                  id: pageLoadingIndicator
-                timeout: 30000
-                optional: true
-
-            - stopApp
+            - runFlow: steps/cold_load.yaml
             - evalScript: ${output.websites.iterationCounter++}
 
       - evalScript: ${output.websites.counter++}
