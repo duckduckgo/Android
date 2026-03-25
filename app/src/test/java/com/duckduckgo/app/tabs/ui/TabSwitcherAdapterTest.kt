@@ -33,6 +33,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Assert.assertEquals
@@ -52,6 +53,7 @@ class TabSwitcherAdapterTest {
     private val dispatchers: DispatcherProvider = mock()
     private val trackerCountAnimator: TrackerCountAnimator = mock()
     private val duckChat: DuckChat = mock()
+    private val addressDisplayFormatter: AddressDisplayFormatter = mock()
 
     private lateinit var adapter: TabSwitcherAdapter
 
@@ -65,6 +67,7 @@ class TabSwitcherAdapterTest {
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             duckChat = duckChat,
+            addressDisplayFormatter = addressDisplayFormatter,
         )
     }
 

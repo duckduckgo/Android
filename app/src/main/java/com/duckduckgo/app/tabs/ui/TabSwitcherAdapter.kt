@@ -80,6 +80,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -100,10 +101,13 @@ class TabSwitcherAdapter(
     private val dispatchers: DispatcherProvider,
     private val trackerCountAnimator: TrackerCountAnimator,
     private val duckChat: DuckChat,
+    private val addressDisplayFormatter: AddressDisplayFormatter,
 ) : Adapter<ViewHolder>() {
 
     @Volatile
     private var isDragging: Boolean = false
+    @Volatile
+    var isFullUrlEnabled: Boolean = true
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -229,7 +233,7 @@ class TabSwitcherAdapter(
         val context = holder.rootView.context
         val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab.tabEntity, context)
-        holder.url.text = tab.tabEntity.url ?: ""
+        holder.url.text = formatUrl(tab.tabEntity.url)
         holder.url.visibility = if (tab.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab.tabEntity)
         loadFavicon(tab.tabEntity, glide, holder.favicon, holder)
@@ -336,6 +340,11 @@ class TabSwitcherAdapter(
         return title
     }
 
+    private fun formatUrl(url: String?): String {
+        if (url.isNullOrEmpty()) return ""
+        return if (isFullUrlEnabled) url else addressDisplayFormatter.getShortUrl(url)
+    }
+
     private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
         holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
     }
@@ -422,7 +431,7 @@ class TabSwitcherAdapter(
 
             bundle.getString(DIFF_KEY_URL)?.let {
                 viewHolder.url.show()
-                viewHolder.url.text = it
+                viewHolder.url.text = formatUrl(it)
                 loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon, viewHolder)
             }
 

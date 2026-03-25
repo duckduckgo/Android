@@ -132,6 +132,12 @@ class TabSwitcherActivity :
     lateinit var duckChat: com.duckduckgo.duckchat.api.DuckChat
 
     @Inject
+    lateinit var addressDisplayFormatter: com.duckduckgo.app.browser.AddressDisplayFormatter
+
+    @Inject
+    lateinit var urlDisplayRepository: com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
+
+    @Inject
     lateinit var fireDialogProvider: FireDialogProvider
 
     @Inject
@@ -148,6 +154,7 @@ class TabSwitcherActivity :
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
             duckChat = duckChat,
+            addressDisplayFormatter = addressDisplayFormatter,
         )
     }
 
@@ -411,6 +418,12 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             viewModel.layoutType.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).filterNotNull().collect {
                 updateLayoutType(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            urlDisplayRepository.isFullUrlEnabled.flowWithLifecycle(lifecycle).collect {
+                tabsAdapter.isFullUrlEnabled = it
             }
         }
 
