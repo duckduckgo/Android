@@ -67,6 +67,8 @@ class CohortPixelInterceptor @Inject constructor(
         val pixel = chain.request().url.pathSegments.last()
 
         val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            // IF there is no cohort for ATP we just drop the pixel request
+            // ELSE we add the cohort param
             cohortStore.getCohortStoredLocalDate()?.let {
                 chain.request().url.newBuilder().addQueryParameter(COHORT_PARAM, cohortCalculator.calculateCohortForDate(it)).build()
             } ?: return dummyResponse(chain)

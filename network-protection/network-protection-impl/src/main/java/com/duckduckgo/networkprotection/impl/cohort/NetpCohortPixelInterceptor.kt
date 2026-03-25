@@ -59,6 +59,7 @@ class NetpCohortPixelInterceptor @Inject constructor(
         val pixel = chain.request().url.pathSegments.last()
 
         val url = if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            // IF there is no cohort for NetP we just drop the pixel request
             cohortStore.cohortLocalDate?.let {
                 chain.request().url.newBuilder().build()
             } ?: return dummyResponse(chain)
