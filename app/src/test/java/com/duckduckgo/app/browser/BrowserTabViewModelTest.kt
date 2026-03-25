@@ -733,7 +733,7 @@ class BrowserTabViewModelTest {
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockDisabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
             whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
             whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
@@ -3068,32 +3068,6 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun whenCtaRefreshedAndPromoOnboardingDialogShowingThenIsOnboardingCompleteInNewTabPageFalse() =
-        runTest {
-            whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
-            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-            whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(false)
-            whenever(mockDismissedCtaDao.exists(DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
-            whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
-            whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
-            whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-            whenever(subscriptions.isEligible()).thenReturn(true)
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
-            testee.refreshCta()
-            assertTrue(
-                "When promo dialog is showable, refreshCta returns DaxPrivacyProCta",
-                testee.ctaViewState.value!!.cta is DaxBubbleCta.DaxPrivacyProCta,
-            )
-            assertFalse(
-                "When promo onboarding dialog is showing, isOnboardingCompleteInNewTabPage should be false so NTP can show the dialog",
-                testee.ctaViewState.value!!.isOnboardingCompleteInNewTabPage,
-            )
-        }
-
-    @Test
     fun whenCtaRefreshedAndMaliciousSiteBlockedThenViewStateUpdated() =
         runTest {
             whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
@@ -3188,7 +3162,6 @@ class BrowserTabViewModelTest {
             DaxBubbleCta.DaxPrivacyProCta(
                 mockOnboardingStore,
                 mockAppInstallStore,
-                onboardingSkipped = false,
                 isFreeTrialCopy = false,
             )
         setCta(cta)
@@ -8264,7 +8237,7 @@ class BrowserTabViewModelTest {
             whenever(ctaViewModelMockSettingsStore.hideTips).thenReturn(true)
             whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
             whenever(mockDismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
-            whenever(mockExtendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
+            whenever(mockExtendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
             whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
             whenever(subscriptions.isEligible()).thenReturn(true)
             whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)

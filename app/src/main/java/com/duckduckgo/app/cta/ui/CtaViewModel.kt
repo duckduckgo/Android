@@ -262,19 +262,13 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxPrivacyProCta(
                     onboardingStore,
                     appInstallStore,
-                    onboardingSkipped = false,
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                 )
             }
 
             // Privacy Pro onboarding for returning users who skipped onboarding
             canShowPrivacyProCtaForSkippedOnboarding() -> {
-                DaxBubbleCta.DaxPrivacyProCta(
-                    onboardingStore,
-                    appInstallStore,
-                    onboardingSkipped = true,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                )
+                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
             // Add Widget
@@ -313,7 +307,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
-        extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding().isEnabled() &&
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
             hideTips() &&
             appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
             !daxDialogPrivacyProShown() &&
