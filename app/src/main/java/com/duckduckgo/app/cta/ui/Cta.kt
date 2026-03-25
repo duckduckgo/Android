@@ -807,7 +807,7 @@ sealed class DaxBubbleCta(
         appInstallStore = appInstallStore,
     )
 
-    data class DaxPrivacyProCta(
+    data class DaxSubscriptionCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         val isFreeTrialCopy: Boolean,
@@ -819,7 +819,7 @@ sealed class DaxBubbleCta(
         primaryCta = if (isFreeTrialCopy) R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton else R.string.onboardingPrivacyProDaxDialogOkButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
+        ctaPixelParam = Pixel.PixelValues.DAX_SUBSCRIPTION,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
     )

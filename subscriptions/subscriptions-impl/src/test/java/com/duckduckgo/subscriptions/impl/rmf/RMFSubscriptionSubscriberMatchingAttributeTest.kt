@@ -8,11 +8,11 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class RMFPProSubscriberMatchingAttributeTest {
+class RMFSubscriptionSubscriberMatchingAttributeTest {
 
     private val subscriptions: Subscriptions = mock()
 
-    private val attribute = RMFPProSubscriberMatchingAttribute(subscriptions)
+    private val attribute = RMFSubscriptionSubscriberMatchingAttribute(subscriptions)
 
     @Test
     fun evaluateWithWrongAttributeThenNull() = runTest {

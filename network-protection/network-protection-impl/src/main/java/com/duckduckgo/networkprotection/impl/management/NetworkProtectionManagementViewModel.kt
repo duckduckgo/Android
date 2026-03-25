@@ -75,8 +75,8 @@ import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -101,7 +101,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val netpDataVolumeStore: NetpDataVolumeStore,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludePrompt: AutoExcludePrompt,
@@ -359,7 +359,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onReportIssuesClicked() {
         viewModelScope.launch {
-            if (privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_MANAGEMENT)) {
+            if (subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = VPN_MANAGEMENT)) {
                 sendCommand(ShowUnifiedFeedback)
             } else {
                 sendCommand(

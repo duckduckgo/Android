@@ -21,7 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
@@ -125,7 +125,7 @@ class AuthClientImpl @Inject constructor(
     private val authService: AuthService,
     private val appBuildConfig: AppBuildConfig,
     private val timeProvider: CurrentTimeProvider,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatchers: DispatcherProvider,
 ) : AuthClient {
 
@@ -199,7 +199,7 @@ class AuthClientImpl @Inject constructor(
 
     override suspend fun getJwks(): String {
         val useCache = withContext(dispatchers.io()) {
-            privacyProFeature.get().authApiV2JwksCache().isEnabled()
+            subscriptionsFeature.get().authApiV2JwksCache().isEnabled()
         }
 
         return if (useCache) {

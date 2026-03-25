@@ -21,7 +21,7 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -35,34 +35,35 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProBillingPeriodMatchingAttribute @Inject constructor(
-    private val subscriptionsManager: SubscriptionsManager,
+class RMFSubscriptionSubscriberMatchingAttribute @Inject constructor(
+    private val subscriptions: Subscriptions,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
-        if (matchingAttribute is PProBillingPeriodMatchingAttribute) {
-            return matchingAttribute.value == subscriptionsManager.getSubscription()?.billingPeriod
+        return when (matchingAttribute) {
+            is ProSubscriberMatchingAttribute -> subscriptions.isSignedIn() == matchingAttribute.remoteValue
+            else -> null
         }
-        return null
     }
 
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
-        if (key == PProBillingPeriodMatchingAttribute.KEY) {
-            val value = jsonMatchingAttribute.value as? String
-            return value.takeIf { !it.isNullOrEmpty() }?.let {
-                PProBillingPeriodMatchingAttribute(value = it)
+        return when (key) {
+            ProSubscriberMatchingAttribute.KEY -> {
+                jsonMatchingAttribute.value?.let {
+                    ProSubscriberMatchingAttribute(jsonMatchingAttribute.value as Boolean)
+                }
             }
+            else -> null
         }
-        return null
     }
 }
 
-internal data class PProBillingPeriodMatchingAttribute(
-    val value: String,
+private data class ProSubscriberMatchingAttribute(
+    val remoteValue: Boolean,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "pproBillingPeriod"
+        const val KEY = "pproSubscriber"
     }
 }

@@ -24,7 +24,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -56,7 +56,7 @@ internal class AboutDuckDuckGoViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
-    private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
+    private lateinit var subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback
 
     @Before
     fun before() {
@@ -68,7 +68,7 @@ internal class AboutDuckDuckGoViewModelTest {
         testee = AboutDuckDuckGoViewModel(
             mockAppBuildConfig,
             mockPixel,
-            privacyProUnifiedFeedback,
+            subscriptionUnifiedFeedback,
         )
     }
 
@@ -154,7 +154,7 @@ internal class AboutDuckDuckGoViewModelTest {
 
     @Test
     fun whenOnProvideFeedbackClickedThenCommandLaunchFeedbackIsSent() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         testee.commands().test {
             testee.onProvideFeedbackClicked()
 
@@ -167,11 +167,11 @@ internal class AboutDuckDuckGoViewModelTest {
 
     @Test
     fun whenOnProvideFeedbackClickedAndUnifiedFeedbackEnabledThenCommandLaunchUnifiedFeedbackIsSent() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         testee.commands().test {
             testee.onProvideFeedbackClicked()
 
-            assertEquals(Command.LaunchPproUnifiedFeedback, awaitItem())
+            assertEquals(Command.LaunchSubscriptionUnifiedFeedback, awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
 
             cancelAndConsumeRemainingEvents()

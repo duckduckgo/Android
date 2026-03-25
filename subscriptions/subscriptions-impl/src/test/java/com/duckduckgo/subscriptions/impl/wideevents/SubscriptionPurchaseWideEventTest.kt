@@ -24,7 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -39,9 +39,9 @@ class SubscriptionPurchaseWideEventTest {
     private val wideEventClient: WideEventClient = mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendSubscriptionPurchaseWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEventImpl
@@ -51,7 +51,7 @@ class SubscriptionPurchaseWideEventTest {
         subscriptionPurchaseWideEvent =
             SubscriptionPurchaseWideEventImpl(
                 wideEventClient = wideEventClient,
-                privacyProFeature = { privacyProFeature },
+                subscriptionsFeature = { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
             )
     }
@@ -154,7 +154,7 @@ class SubscriptionPurchaseWideEventTest {
     @Test
     fun `feature disabled results in no interactions`() =
         runTest {
-            privacyProFeature.sendSubscriptionPurchaseWideEvent().setRawStoredState(Toggle.State(false))
+            subscriptionsFeature.sendSubscriptionPurchaseWideEvent().setRawStoredState(Toggle.State(false))
 
             subscriptionPurchaseWideEvent.onPurchaseFlowStarted("id", true, null)
             subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()

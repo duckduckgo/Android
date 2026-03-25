@@ -59,9 +59,9 @@ class FakeVPNStore(
 
     override fun isNotifyMeInAppTpDismissed(): Boolean = _notifyMeInAppTpDismissed
 
-    override fun dismissPproUpsellBanner() {
+    override fun dismissSubscriptionUpsellBanner() {
         _pproUpsellBannerDismissed = true
     }
 
-    override fun isPproUpsellBannerDismised(): Boolean = _pproUpsellBannerDismissed
+    override fun isSubscriptionUpsellBannerDismised(): Boolean = _pproUpsellBannerDismissed
 }

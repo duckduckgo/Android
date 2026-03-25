@@ -26,10 +26,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="50"
             column="9"/>
     </issue>
@@ -37,10 +37,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="56"
             column="9"/>
     </issue>
@@ -48,10 +48,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="62"
             column="9"/>
     </issue>
@@ -59,10 +59,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="68"
             column="9"/>
     </issue>
@@ -70,10 +70,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="75"
             column="9"/>
     </issue>
@@ -81,10 +81,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="82"
             column="9"/>
     </issue>
@@ -92,10 +92,10 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        privacyProFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        subscriptionsFeature.useUnifiedFeedback().setRawStoredState(Toggle.State(enable = true))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealPrivacyProUnifiedFeedbackTest.kt"
+            file="src/test/java/com/duckduckgo/subscriptions/impl/feedback/RealSubscriptionUnifiedFeedbackTest.kt"
             line="89"
             column="9"/>
     </issue>
@@ -2396,17 +2396,6 @@
         <location
             file="src/main/res/drawable/ic_subs_toolbar_logo.xml"
             line="15"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="VectorPath"
-        message="Very long vector path (1486 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
-        errorLine1="      android:pathData=&quot;m106.57,34 l-1.54,-0.4a0.88,0.88 0,0 1,-0.63 -0.63l-0.4,-1.54a0.84,0.84 0,0 0,-0.8 -0.63c-0.4,0 -0.74,0.29 -0.8,0.63l-0.4,1.54a0.88,0.88 0,0 1,-0.63 0.63l-1.54,0.4a0.84,0.84 0,0 0,-0.63 0.8c0,0.4 0.29,0.74 0.63,0.8l1.54,0.4a0.88,0.88 0,0 1,0.63 0.63l0.4,1.54a0.84,0.84 0,0 0,0.8 0.63c0.4,0 0.74,-0.29 0.8,-0.63l0.4,-1.54a0.88,0.88 0,0 1,0.63 -0.63l1.54,-0.4a0.84,0.84 0,0 0,0.63 -0.8c0,-0.4 -0.29,-0.74 -0.63,-0.8M112,54c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2m-85.94,8.8 l-2.31,-0.6c-0.43,-0.09 -0.86,-0.51 -0.94,-0.94l-0.6,-2.31c-0.17,-0.6 -0.69,-0.94 -1.2,-0.94 -0.6,0 -1.11,0.43 -1.2,0.94l-0.6,2.31c-0.09,0.43 -0.51,0.86 -0.94,0.94l-2.31,0.6c-0.6,0.17 -0.94,0.69 -0.94,1.2 0,0.6 0.43,1.11 0.94,1.2l2.31,0.6c0.43,0.09 0.86,0.51 0.94,0.94l0.6,2.31c0.17,0.6 0.69,0.94 1.2,0.94 0.6,0 1.11,-0.43 1.2,-0.94l0.6,-2.31c0.09,-0.43 0.51,-0.86 0.94,-0.94l2.31,-0.6c0.6,-0.17 0.94,-0.69 0.94,-1.2 0,-0.6 -0.43,-1.11 -0.94,-1.2M7.37,42.2l-1.54,-0.4a0.88,0.88 0,0 1,-0.63 -0.63l-0.4,-1.54A0.84,0.84 0,0 0,4 39c-0.4,0 -0.74,0.29 -0.8,0.63l-0.4,1.54a0.88,0.88 0,0 1,-0.63 0.63l-1.54,0.4A0.84,0.84 0,0 0,0 43c0,0.4 0.29,0.74 0.63,0.8l1.54,0.4a0.88,0.88 0,0 1,0.63 0.63l0.4,1.54c0.11,0.4 0.46,0.63 0.8,0.63 0.4,0 0.74,-0.29 0.8,-0.63l0.4,-1.54a0.88,0.88 0,0 1,0.63 -0.63l1.54,-0.4A0.84,0.84 0,0 0,8 43c0,-0.4 -0.29,-0.74 -0.63,-0.8M126.5,45c-0.82,0 -1.5,0.68 -1.5,1.5s0.68,1.5 1.5,1.5 1.5,-0.68 1.5,-1.5 -0.68,-1.5 -1.5,-1.5M23,27c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2&quot;"
-        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/drawable/ic_subscription_128.xml"
-            line="8"
             column="25"/>
     </issue>
 

@@ -7,13 +7,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -51,8 +51,8 @@ class SubscriptionSettingsViewModelTest {
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback = mock()
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -61,8 +61,8 @@ class SubscriptionSettingsViewModelTest {
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
-            privacyProUnifiedFeedback,
-            privacyProFeature,
+            subscriptionUnifiedFeedback,
+            subscriptionsFeature,
         )
     }
 
@@ -76,7 +76,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenUseUnifiedFeedbackThenViewStateShowFeeedbackTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(true)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -106,7 +106,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionThenFormatDateCorrectly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -136,7 +136,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionMonthlyThenReturnMonthly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -166,7 +166,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionYearlyThenReturnYearly() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -243,7 +243,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSwitchPlanAvailableThenViewStateIncludesIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -273,7 +273,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSwitchPlanNotAvailableThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -326,7 +326,7 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenOnSwitchPlanSuccessThenRefreshSubscriptionData() = runTest {
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(true)
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN_US,
@@ -374,8 +374,8 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenProTierEnabledThenViewStateReflectsIt() = runTest {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -405,8 +405,8 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenProTierDisabledThenViewStateReflectsIt() = runTest {
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -436,7 +436,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionIsPlusTierThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -466,7 +466,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionIsProTierThenViewStateReflectsIt() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -496,7 +496,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasPendingPlanThenViewStateIncludesPendingPlan() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val pendingPlan = PendingPlan(
@@ -539,7 +539,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsTierDowngradeThenIsPendingDowngradeIsTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val pendingPlan = PendingPlan(
@@ -582,7 +582,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsTierUpgradeThenIsPendingDowngradeIsFalse() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val pendingPlan = PendingPlan(
@@ -625,7 +625,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsBillingPeriodDowngradeThenIsPendingDowngradeIsTrue() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val pendingPlan = PendingPlan(
@@ -668,7 +668,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenPendingPlanIsBillingPeriodUpgradeThenIsPendingDowngradeIsFalse() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val pendingPlan = PendingPlan(
@@ -711,7 +711,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenNoPendingPlanThenIsPendingDowngradeIsNull() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         whenever(subscriptionsManager.getSubscription()).thenReturn(
@@ -745,7 +745,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasNoPendingPlanThenViewStateHasNullPendingPlan() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
@@ -779,7 +779,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenSubscriptionHasMultiplePendingPlansThenViewStateUsesFirst() = runTest {
-        whenever(privacyProUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
+        whenever(subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(any())).thenReturn(false)
         whenever(subscriptionsManager.isSwitchPlanAvailable()).thenReturn(false)
 
         val firstPendingPlan = PendingPlan(

@@ -67,17 +67,17 @@ interface Subscriptions {
     /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
-    fun shouldLaunchPrivacyProForUrl(url: String): Boolean
+    fun shouldLaunchSubscriptionForUrl(url: String): Boolean
 
     /**
-     * Launches Privacy Pro with Settings as the parent activity
+     * Launches the Subscription flow with Settings as the parent activity
      */
-    fun launchPrivacyPro(context: Context, uri: Uri?)
+    fun launchSubscription(context: Context, uri: Uri?)
 
     /**
-     * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
+     * @return `true` if the given Uri leads to the Subscription page, or `false` otherwise
      */
-    fun isPrivacyProUrl(uri: Uri): Boolean
+    fun isSubscriptionUrl(uri: Uri): Boolean
 
     /**
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise

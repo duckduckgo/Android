@@ -63,7 +63,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_A
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_REDIRECT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -112,7 +112,7 @@ interface SubscriptionPixelSender {
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
-    fun reportPrivacyProRedirect()
+    fun reportSubscriptionRedirect()
     fun reportAuthV2InvalidRefreshTokenDetected()
     fun reportAuthV2InvalidRefreshTokenSignedOut()
     fun reportAuthV2InvalidRefreshTokenRecovered()
@@ -258,8 +258,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportAddEmailSuccess() =
         fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
 
-    override fun reportPrivacyProRedirect() =
-        fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
+    override fun reportSubscriptionRedirect() =
+        fire(SUBSCRIPTION_REDIRECT)
 
     override fun reportAuthV2InvalidRefreshTokenDetected() {
         fire(AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED)
