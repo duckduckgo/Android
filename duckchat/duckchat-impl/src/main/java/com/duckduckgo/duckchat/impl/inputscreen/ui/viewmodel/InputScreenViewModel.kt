@@ -45,8 +45,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -85,6 +85,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.pixel.fireCountAndDaily
 import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -138,7 +139,7 @@ class InputScreenViewModel @AssistedInject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
-    private val duckChat: DuckChat,
+    private val duckChat: DuckChatInternal,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatFeature: DuckChatFeature,
     private val pixel: Pixel,
@@ -202,6 +203,22 @@ class InputScreenViewModel @AssistedInject constructor(
     private var cachedTabs: List<TabAttachmentItem> = emptyList()
 
     private val refreshSuggestions = MutableSharedFlow<Unit>()
+
+    private val defaultTogglePosition: StateFlow<DefaultTogglePosition> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            duckChat.observeDefaultTogglePosition()
+                .stateIn(appCoroutineScope, SharingStarted.Eagerly, DefaultTogglePosition.SEARCH)
+        } else {
+            MutableStateFlow(DefaultTogglePosition.SEARCH)
+        }
+
+    private val lastUsedTogglePosition: StateFlow<String?> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            duckChat.observeLastUsedTogglePosition()
+                .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
+        } else {
+            MutableStateFlow(null)
+        }
 
     /**
      * This becomes true when either:
@@ -394,6 +411,7 @@ class InputScreenViewModel @AssistedInject constructor(
         if (visibilityState.value.fullScreenMode) {
             onChatSubmitted(prompt)
         } else {
+            saveLastUsedTogglePosition()
             duckChatJSHelper.clearTabContextPromptEvent()
             command.value = Command.SubmitChat(prompt)
             duckChat.openDuckChatWithAutoPrompt(prompt)
@@ -438,6 +456,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onUserSubmittedQuery(query: String) {
+        saveLastUsedTogglePosition()
         command.value = Command.UserSubmittedQuery(query)
         _visibilityState.update {
             it.copy(
@@ -475,6 +494,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSubmitted(query: String) {
+        saveLastUsedTogglePosition()
         val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
         command.value = Command.SubmitSearch(sanitizedQuery)
         val params =
@@ -493,6 +513,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatSubmitted(query: String) {
+        saveLastUsedTogglePosition()
         viewModelScope.launch {
             if (queryUrlPredictor.isUrl(query)) {
                 command.value = Command.SubmitSearch(query)
@@ -784,6 +805,7 @@ class InputScreenViewModel @AssistedInject constructor(
         omnibarRepository.omnibarType != OmnibarType.SPLIT
 
     fun onChatSuggestionSelected(chatId: String, pinned: Boolean) {
+        saveLastUsedTogglePosition()
         duckChatJSHelper.clearTabContextPromptEvent()
         viewModelScope.launch {
             val url = duckChat.getDuckChatUrl("", false)
@@ -914,6 +936,25 @@ class InputScreenViewModel @AssistedInject constructor(
         duckChatJSHelper.storeTabContextPromptEvent(query, enrichedContexts)
 
         return true
+    }
+
+    fun getNewTabTogglePosition(): DefaultTogglePosition {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return DefaultTogglePosition.SEARCH
+
+        val position = defaultTogglePosition.value
+        return if (position == DefaultTogglePosition.LAST_USED) {
+            DefaultTogglePosition.fromName(lastUsedTogglePosition.value)
+        } else {
+            position
+        }
+    }
+
+    private fun saveLastUsedTogglePosition() {
+        if (!duckChatFeature.rememberTogglePosition().isEnabled()) return
+        val position = if (isSearchModeFlow.value) DefaultTogglePosition.SEARCH else DefaultTogglePosition.DUCK_AI
+        appCoroutineScope.launch(dispatchers.io()) {
+            duckChat.saveLastUsedTogglePosition(position.name)
+        }
     }
 
     override fun onCleared() {

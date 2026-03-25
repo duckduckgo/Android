@@ -117,6 +117,16 @@ interface DuckChatInternal : DuckChat {
     fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition>
 
     /**
+     * Saves the last used toggle position. Called on submission from the input screen.
+     */
+    suspend fun saveLastUsedTogglePosition(position: String)
+
+    /**
+     * Observes the last used toggle position.
+     */
+    fun observeLastUsedTogglePosition(): Flow<String?>
+
+    /**
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
@@ -773,6 +783,13 @@ class RealDuckChat @Inject constructor(
     override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
         duckChatFeatureRepository.observeDefaultTogglePosition()
             .map { DefaultTogglePosition.fromName(it) }
+
+    override suspend fun saveLastUsedTogglePosition(position: String) {
+        duckChatFeatureRepository.setLastUsedTogglePosition(position)
+    }
+
+    override fun observeLastUsedTogglePosition(): Flow<String?> =
+        duckChatFeatureRepository.observeLastUsedTogglePosition()
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()

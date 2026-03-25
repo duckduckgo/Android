@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -56,6 +57,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -1535,5 +1537,46 @@ class RealDuckChatTest {
             "addressBarTension": 7.8
         }
         """.trimIndent()
+    }
+
+    @Test
+    fun `when setDefaultTogglePosition then repository is called with name`() = runTest {
+        testee.setDefaultTogglePosition(DefaultTogglePosition.DUCK_AI)
+
+        verify(mockDuckChatFeatureRepository).setDefaultTogglePosition("DUCK_AI")
+    }
+
+    @Test
+    fun `when observeDefaultTogglePosition then maps string to enum`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(flowOf("DUCK_AI"))
+
+        val result = testee.observeDefaultTogglePosition().first()
+
+        assertEquals(DefaultTogglePosition.DUCK_AI, result)
+    }
+
+    @Test
+    fun `when observeDefaultTogglePosition with null then maps to SEARCH`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeDefaultTogglePosition()).thenReturn(flowOf(null))
+
+        val result = testee.observeDefaultTogglePosition().first()
+
+        assertEquals(DefaultTogglePosition.SEARCH, result)
+    }
+
+    @Test
+    fun `when saveLastUsedTogglePosition then repository is called`() = runTest {
+        testee.saveLastUsedTogglePosition("DUCK_AI")
+
+        verify(mockDuckChatFeatureRepository).setLastUsedTogglePosition("DUCK_AI")
+    }
+
+    @Test
+    fun `when observeLastUsedTogglePosition then delegates to repository`() = runTest {
+        whenever(mockDuckChatFeatureRepository.observeLastUsedTogglePosition()).thenReturn(flowOf("SEARCH"))
+
+        val result = testee.observeLastUsedTogglePosition().first()
+
+        assertEquals("SEARCH", result)
     }
 }
