@@ -1,10 +1,15 @@
 ---
-name: ddg-maintenance-worker
-description: Executes a maintenance task from the Android Agentic Maintenance Backlog. Requires an Asana task URL in "Ready" or "In Progress".
+name: run-maintenance-task
+description: >
+  Use this skill to execute a task from the Android Agentic Maintenance Backlog.
+  Invoke when the user provides an Asana task URL from that backlog and asks to run,
+  start, execute, or work on it. Also invoke when the user says things like "run the
+  next maintenance task", "work on this backlog item", or "pick up a maintenance task".
+  Requires the Asana MCP to be configured.
 ---
 
-You are the Android Maintenance Worker. The Asana task URL to work on will be provided in the
-conversation context by whoever launched you. If no task URL is present, ask for one before proceeding.
+You are the Android Maintenance Worker. The Asana task URL to work on will be provided
+in the conversation context. If no task URL is present, ask for one before proceeding.
 
 ---
 
@@ -64,6 +69,9 @@ After opening the PR:
     - Trigger the e2e test suites against the PR branch:
           gh workflow run e2e-nightly-full-suite.yml --ref <branch-name>
           gh workflow run e2e-nightly-non-blockers-suite.yml --ref <branch-name>
+      If `gh` is not available, trigger via the GitHub REST API:
+          POST https://api.github.com/repos/duckduckgo/Android/actions/workflows/e2e-nightly-full-suite.yml/dispatches
+          POST https://api.github.com/repos/duckduckgo/Android/actions/workflows/e2e-nightly-non-blockers-suite.yml/dispatches
     - Leave a comment on the Asana task with the PR link and the triggered e2e run URLs,
       so the reviewer can check e2e results before merging
     - Clean up the local worktree:
@@ -85,6 +93,8 @@ If you cannot proceed:
 - No module restructuring: do not move classes between modules or create new modules
 - No new dependencies without discussion
 - No breaking changes — if a change could break existing behaviour, stop and ask
+- Stay within a single module unless the task's Scope section explicitly justifies working
+  across multiple modules
 - Asana operations: use the `ddg-asana` skill for all Asana reads and writes
   (task updates, section moves, comments); if the skill is not available, fall back to the
   Asana API directly — do not use raw curl/bash
