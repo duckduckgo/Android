@@ -372,13 +372,14 @@ class DuckChatContextualFragment :
                             }
 
                             SUBSCRIPTIONS_FEATURE_NAME -> {
+                                val currentActivity = activity ?: return
                                 appCoroutineScope.launch(dispatcherProvider.io()) {
                                     subscriptionsJSHelper.processJsCallbackMessage(
                                         featureName,
                                         method,
                                         id,
                                         data,
-                                        requireActivity(),
+                                        currentActivity,
                                     )?.let { response ->
                                         withContext(dispatcherProvider.main()) {
                                             contentScopeScripts.onResponse(response)
