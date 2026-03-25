@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class PproPurchasePlatformSurveyParameterPlugin @Inject constructor(
+class SubscriptionPurchasePlatformSurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
     override fun matches(paramKey: String): Boolean = paramKey == "ppro_platform"
@@ -34,7 +34,7 @@ class PproPurchasePlatformSurveyParameterPlugin @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class PproBillingParameterPlugin @Inject constructor(
+class SubscriptionBillingParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
     override fun matches(paramKey: String): Boolean = paramKey == "ppro_billing"
@@ -45,7 +45,7 @@ class PproBillingParameterPlugin @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class PproDaysSincePurchaseSurveyParameterPlugin @Inject constructor(
+class SubscriptionDaysSincePurchaseSurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : SurveyParameterPlugin {
@@ -60,7 +60,7 @@ class PproDaysSincePurchaseSurveyParameterPlugin @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class PproDaysUntilExpirySurveyParameterPlugin @Inject constructor(
+class SubscriptionDaysUntilExpirySurveyParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : SurveyParameterPlugin {
@@ -75,7 +75,7 @@ class PproDaysUntilExpirySurveyParameterPlugin @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class PproStatusParameterPlugin @Inject constructor(
+class SubscriptionStatusParameterPlugin @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : SurveyParameterPlugin {
     private val invalidCharRegex = Regex("[ -]")

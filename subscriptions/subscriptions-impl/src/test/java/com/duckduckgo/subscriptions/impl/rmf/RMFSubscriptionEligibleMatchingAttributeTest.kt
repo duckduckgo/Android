@@ -10,11 +10,11 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class RMFPProEligibleMatchingAttributeTest {
+class RMFSubscriptionEligibleMatchingAttributeTest {
 
     private val subscriptions: Subscriptions = mock()
 
-    private val attribute = RMFPProEligibleMatchingAttribute(subscriptions)
+    private val attribute = RMFSubscriptionEligibleMatchingAttribute(subscriptions)
 
     @Test
     fun evaluateWithWrongAttributeThenNull() = runTest {

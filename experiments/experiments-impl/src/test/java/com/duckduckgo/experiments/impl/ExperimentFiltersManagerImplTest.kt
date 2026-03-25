@@ -85,17 +85,17 @@ class ExperimentFiltersManagerImplTest {
     }
 
     @Test
-    fun whenVariantComplyWithPrivacyProEligibleFilterThenComputeFiltersReturnsTrue() = runTest {
+    fun whenVariantComplyWithSubscriptionEligibleFilterThenComputeFiltersReturnsTrue() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        val testEntity = addActiveVariant(privacyProEligible = true)
+        val testEntity = addActiveVariant(subscriptionEligible = true)
 
         assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithPrivacyProEligibleFilterThenComputeFiltersReturnsFalse() = runTest {
+    fun whenVariantDoesNotComplyWithSubscriptionEligibleFilterThenComputeFiltersReturnsFalse() = runTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
-        val testEntity = addActiveVariant(privacyProEligible = true)
+        val testEntity = addActiveVariant(subscriptionEligible = true)
 
         assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
     }
@@ -109,7 +109,7 @@ class ExperimentFiltersManagerImplTest {
         val testEntity = addActiveVariant(
             localeFilter = listOf("en_US"),
             androidVersionFilter = listOf("33", "34"),
-            privacyProEligible = false,
+            subscriptionEligible = false,
         )
 
         assertTrue(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
@@ -136,7 +136,7 @@ class ExperimentFiltersManagerImplTest {
     }
 
     @Test
-    fun whenVariantComplyWithLocaleAndAndroidVersionFiltersAndDoesNotComplyWithPrivacyProEligibleThenComputeFiltersReturnsFalse() = runTest {
+    fun whenVariantComplyWithLocaleAndAndroidVersionFiltersAndDoesNotComplyWithSubscriptionEligibleThenComputeFiltersReturnsFalse() = runTest {
         val locale = Locale("en", "US")
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(locale)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(33)
@@ -144,7 +144,7 @@ class ExperimentFiltersManagerImplTest {
         val testEntity = addActiveVariant(
             localeFilter = listOf("en_US"),
             androidVersionFilter = listOf("33", "34"),
-            privacyProEligible = false,
+            subscriptionEligible = false,
         )
 
         assertFalse(testee.computeFilters(testEntity).invoke(mockAppBuildConfig))
@@ -153,8 +153,8 @@ class ExperimentFiltersManagerImplTest {
     private fun addActiveVariant(
         localeFilter: List<String> = listOf(),
         androidVersionFilter: List<String> = listOf(),
-        privacyProEligible: Boolean? = null,
+        subscriptionEligible: Boolean? = null,
     ): VariantConfig {
-        return VariantConfig("key", 1.0, VariantFilters(localeFilter, androidVersionFilter, privacyProEligible))
+        return VariantConfig("key", 1.0, VariantFilters(localeFilter, androidVersionFilter, subscriptionEligible))
     }
 }

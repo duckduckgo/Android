@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl.feedback
+package com.duckduckgo.subscriptions.api
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+interface SubscriptionUnifiedFeedback {
+    /**
+     * @return `true` if for the given source, we should allow the usage of unified feedback flow or `false` otherwise
+     */
+    suspend fun shouldUseUnifiedFeedback(source: SubscriptionFeedbackSource): Boolean
 
-@ContributesBinding(AppScope::class)
-class DummyPrivacyProUnifiedFeedback @Inject constructor() : PrivacyProUnifiedFeedback {
-    override suspend fun shouldUseUnifiedFeedback(source: PrivacyProFeedbackSource): Boolean {
-        return false
+    enum class SubscriptionFeedbackSource {
+        DDG_SETTINGS,
+        SUBSCRIPTION_SETTINGS,
+        VPN_MANAGEMENT,
+        VPN_EXCLUDED_APPS,
+        PIR_DASHBOARD,
+        UNKNOWN,
     }
 }

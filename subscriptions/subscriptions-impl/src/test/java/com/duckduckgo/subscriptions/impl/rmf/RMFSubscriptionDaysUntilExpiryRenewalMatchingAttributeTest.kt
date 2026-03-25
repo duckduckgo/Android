@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit.DAYS
 
-class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
+class RMFSubscriptionDaysUntilExpiryRenewalMatchingAttributeTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -27,7 +27,7 @@ class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
     @Mock
     private lateinit var currentTimeProvider: CurrentTimeProvider
 
-    private lateinit var matcher: RMFPProDaysUntilExpiryRenewalMatchingAttribute
+    private lateinit var matcher: RMFSubscriptionDaysUntilExpiryRenewalMatchingAttribute
 
     private val testSubscription = Subscription(
         productId = "productId",
@@ -42,7 +42,7 @@ class RMFPProDaysUntilExpiryRenewalMatchingAttributeTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        matcher = RMFPProDaysUntilExpiryRenewalMatchingAttribute(
+        matcher = RMFSubscriptionDaysUntilExpiryRenewalMatchingAttribute(
             subscriptionsManager,
             currentTimeProvider,
         )

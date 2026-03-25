@@ -14,10 +14,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSetting
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
@@ -42,10 +42,10 @@ class RealSubscriptionsJSHelperTest {
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
     private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private val testee =
-        RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature, mockGlobalActivityStarter, coroutineRule.testDispatcherProvider)
+        RealSubscriptionsJSHelper(mockSubscriptionsManager, subscriptionsFeature, mockGlobalActivityStarter, coroutineRule.testDispatcherProvider)
 
     private val featureName = "subscriptions"
 
@@ -243,8 +243,8 @@ class RealSubscriptionsJSHelperTest {
         val usePaidDuckAi = true
         val useProTier = true
 
-        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
+        subscriptionsFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
@@ -268,8 +268,8 @@ class RealSubscriptionsJSHelperTest {
         val usePaidDuckAi = false
         val useProTier = false
 
-        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
+        subscriptionsFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
@@ -293,8 +293,8 @@ class RealSubscriptionsJSHelperTest {
         val usePaidDuckAi = true
         val useProTier = false
 
-        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
+        subscriptionsFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
         val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 

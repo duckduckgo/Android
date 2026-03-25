@@ -115,8 +115,8 @@ class OnboardingDevSettingsViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProNotRequiredThenVisibleCtaIdsExcludesPrivacyPro() = runTest {
-        val requiredWithoutPrivacyPro = listOf(
+    fun whenSubscriptionNotRequiredThenVisibleCtaIdsExcludesSubscriptionCta() = runTest {
+        val requiredWithoutSubscription = listOf(
             CtaId.DAX_INTRO,
             CtaId.DAX_DIALOG_SERP,
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -125,7 +125,7 @@ class OnboardingDevSettingsViewModelTest {
         )
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(settingsDataStore.hideTips).thenReturn(false)
-        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredWithoutPrivacyPro)
+        whenever(ctaViewModel.requiredDaxOnboardingCtas()).thenReturn(requiredWithoutSubscription)
         allCtaIds.forEach { ctaId -> whenever(dismissedCtaDao.exists(ctaId)).thenReturn(false) }
 
         testee.start()

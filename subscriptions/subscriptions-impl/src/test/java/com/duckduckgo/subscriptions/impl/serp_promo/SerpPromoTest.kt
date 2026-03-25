@@ -7,7 +7,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -25,13 +25,13 @@ class SerpPromoTest {
     private val cookieManager: CookieManagerWrapper = mock()
     private val subscriptions: Subscriptions = mock()
     private val lifecycleOwner: LifecycleOwner = TestLifecycleOwner()
-    private var privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private var subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
-    private val serpPromo = RealSerpPromo(cookieManager, coroutineRule.testDispatcherProvider, { privacyProFeature }, { subscriptions })
+    private val serpPromo = RealSerpPromo(cookieManager, coroutineRule.testDispatcherProvider, { subscriptionsFeature }, { subscriptions })
 
     @Test
     fun whenInjectCookieThenSetCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
 
         serpPromo.injectCookie("value")
 
@@ -40,7 +40,7 @@ class SerpPromoTest {
 
     @Test
     fun whenKillSwitchedInjectCookieThenNoop() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
 
         serpPromo.injectCookie("value")
 
@@ -49,7 +49,7 @@ class SerpPromoTest {
 
     @Test
     fun whenOnStartThenSetEmptyCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
 
         serpPromo.onStart(lifecycleOwner)
 
@@ -58,7 +58,7 @@ class SerpPromoTest {
 
     @Test
     fun whenKillSwitchedOnStartThenNoop() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
 
         serpPromo.onStart(lifecycleOwner)
 
@@ -67,7 +67,7 @@ class SerpPromoTest {
 
     @Test
     fun whenOnStartAndPromoCookieSetThenSetEmptyCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
         whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
 
         serpPromo.onStart(lifecycleOwner)
@@ -76,7 +76,7 @@ class SerpPromoTest {
 
     @Test
     fun whenOnStartAndPromoCookieSetAndAccessTokenThenSetEmptyCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
         whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
         whenever(subscriptions.getAccessToken()).thenReturn("value")
 
@@ -86,7 +86,7 @@ class SerpPromoTest {
 
     @Test
     fun whenKillSwitchedOnStartAndPromoCookieSetThenNoop() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
         whenever(cookieManager.getCookie(any())).thenReturn("privacy_pro_access_token=value;")
 
         serpPromo.onStart(lifecycleOwner)
@@ -95,7 +95,7 @@ class SerpPromoTest {
 
     @Test
     fun whenOnStartAndOtherCookiesSetThenSetEmptyCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
         whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
 
         serpPromo.onStart(lifecycleOwner)
@@ -104,7 +104,7 @@ class SerpPromoTest {
 
     @Test
     fun whenOnStartAndOtherCookiesSetAndAccessTokenThenSetAccessTokenCookie() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = true))
         whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
         whenever(subscriptions.getAccessToken()).thenReturn("value")
 
@@ -114,7 +114,7 @@ class SerpPromoTest {
 
     @Test
     fun whenKillSwitchedOnStartAndOtherCookiesSetThenNoop() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
         whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
 
         serpPromo.onStart(lifecycleOwner)
@@ -123,7 +123,7 @@ class SerpPromoTest {
 
     @Test
     fun whenKillSwitchedOnStartAndOtherCookiesSetAndAccessTokenThenNoop() = runTest {
-        privacyProFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.serpPromoCookie().setRawStoredState(Toggle.State(enable = false))
         whenever(cookieManager.getCookie(any())).thenReturn("another_cookie=value;")
         whenever(subscriptions.getAccessToken()).thenReturn("value")
 

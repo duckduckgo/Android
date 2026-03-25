@@ -35,12 +35,12 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProEligibleMatchingAttribute @Inject constructor(
+class RMFIsSubscriberMatchingAttribute @Inject constructor(
     private val subscriptions: Subscriptions,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         return when (matchingAttribute) {
-            is ProEligibleMatchingAttribute -> subscriptions.isEligible() == matchingAttribute.remoteValue
+            is ProSubscriberMatchingAttribute -> subscriptions.isSignedIn() == matchingAttribute.remoteValue
             else -> null
         }
     }
@@ -50,9 +50,9 @@ class RMFPProEligibleMatchingAttribute @Inject constructor(
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
         return when (key) {
-            ProEligibleMatchingAttribute.KEY -> {
+            ProSubscriberMatchingAttribute.KEY -> {
                 jsonMatchingAttribute.value?.let {
-                    ProEligibleMatchingAttribute(jsonMatchingAttribute.value as Boolean)
+                    ProSubscriberMatchingAttribute(jsonMatchingAttribute.value as Boolean)
                 }
             }
             else -> null
@@ -60,10 +60,10 @@ class RMFPProEligibleMatchingAttribute @Inject constructor(
     }
 }
 
-private data class ProEligibleMatchingAttribute(
+private data class ProSubscriberMatchingAttribute(
     val remoteValue: Boolean,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "pproEligible"
+        const val KEY = "pproSubscriber"
     }
 }

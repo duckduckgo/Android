@@ -63,7 +63,7 @@ class PProUpsellBannerPluginTest {
     fun whenBannerDismissedThenGetViewReturnsNull() = runTest {
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
-        vpnStore.dismissPproUpsellBanner()
+        vpnStore.dismissSubscriptionUpsellBanner()
 
         val result = plugin.getView(context, VpnState(state = ENABLED)) {}
 

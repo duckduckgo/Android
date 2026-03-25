@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.Companion.PRIORITY_DISABLED
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PproUpsellDisabledMessagePlugin.Companion.PRIORITY_PPRO_DISABLED
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.SubscriptionUpsellDisabledMessagePlugin.Companion.PRIORITY_SUBSCRIPTION_DISABLED
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -38,11 +38,11 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
-    priority = PRIORITY_PPRO_DISABLED,
+    priority = PRIORITY_SUBSCRIPTION_DISABLED,
     featureName = "pluginPproUpsellDisabledMessagePlugin",
     parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
-class PproUpsellDisabledMessagePlugin @Inject constructor(
+class SubscriptionUpsellDisabledMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,
     private val vpnDetector: ExternalVpnDetector,
     private val browserNav: BrowserNav,
@@ -65,11 +65,11 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
             }
             AppTpDisabledInfoPanel(context).apply {
                 setClickableLink(
-                    PPRO_UPSELL_ANNOTATION,
+                    SUBSCRIPTION_UPSELL_ANNOTATION,
                     context.getText(messageRes),
-                ) { context.launchPPro() }
+                ) { context.launchSubscription() }
                 doOnAttach {
-                    deviceShieldPixels.reportPproUpsellDisabledInfoShown()
+                    deviceShieldPixels.reportSubscriptionUpsellDisabledInfoShown()
                 }
             }
         } else {
@@ -77,14 +77,14 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
         }
     }
 
-    private fun Context.launchPPro() {
-        deviceShieldPixels.reportPproUpsellDisabledInfoLinkClicked()
-        startActivity(browserNav.openInNewTab(this, PPRO_UPSELL_URL))
+    private fun Context.launchSubscription() {
+        deviceShieldPixels.reportSubscriptionUpsellDisabledInfoLinkClicked()
+        startActivity(browserNav.openInNewTab(this, SUBSCRIPTION_UPSELL_URL))
     }
 
     companion object {
-        internal const val PRIORITY_PPRO_DISABLED = PRIORITY_DISABLED - 1
-        private const val PPRO_UPSELL_ANNOTATION = "ppro_upsell_link"
-        private const val PPRO_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_apptrackingprotection_android__disabled"
+        internal const val PRIORITY_SUBSCRIPTION_DISABLED = PRIORITY_DISABLED - 1
+        private const val SUBSCRIPTION_UPSELL_ANNOTATION = "ppro_upsell_link"
+        private const val SUBSCRIPTION_UPSELL_URL = "https://duckduckgo.com/pro?origin=funnel_apptrackingprotection_android__disabled"
     }
 }

@@ -47,14 +47,14 @@ class SubscriptionFeaturesFetcherTest {
     private val playBillingManager: PlayBillingManager = mock()
     private val subscriptionsCachedService: SubscriptionsCachedService = mock()
     private val authRepository: AuthRepository = mock()
-    private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private val subscriptionFeaturesFetcher = SubscriptionFeaturesFetcher(
         appCoroutineScope = coroutineRule.testScope,
         playBillingManager = playBillingManager,
         subscriptionsCachedService = subscriptionsCachedService,
         authRepository = authRepository,
-        privacyProFeature = privacyProFeature,
+        subscriptionsFeature = subscriptionsFeature,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
@@ -198,17 +198,17 @@ class SubscriptionFeaturesFetcherTest {
 
     @SuppressLint("DenyListedApi")
     private fun givenIsFeaturesApiEnabled(value: Boolean) {
-        privacyProFeature.featuresApi().setRawStoredState(State(value))
+        subscriptionsFeature.featuresApi().setRawStoredState(State(value))
     }
 
     @SuppressLint("DenyListedApi")
     private fun givenRefreshSubscriptionPlanFeaturesEnabled(value: Boolean) {
-        privacyProFeature.refreshSubscriptionPlanFeatures().setRawStoredState(State(value))
+        subscriptionsFeature.refreshSubscriptionPlanFeatures().setRawStoredState(State(value))
     }
 
     @SuppressLint("DenyListedApi")
     private fun givenTierMessagingEnabled(value: Boolean) {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(State(value))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(State(value))
     }
 
     private fun mockProductDetails(): List<ProductDetails> {

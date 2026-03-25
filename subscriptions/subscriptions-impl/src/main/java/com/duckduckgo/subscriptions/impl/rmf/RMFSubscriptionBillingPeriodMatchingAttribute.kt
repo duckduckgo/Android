@@ -35,50 +35,34 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProPurchasePlatformMatchingAttribute @Inject constructor(
+class RMFSubscriptionBillingPeriodMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
-
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
-        return when (matchingAttribute) {
-            is PProPurchasePlatformMatchingAttribute -> {
-                assert(matchingAttribute.supportedPlatforms.isNotEmpty())
-                val purchasePlatform = subscriptionsManager.getSubscription()?.platform
-                return !purchasePlatform.isNullOrEmpty() && matchingAttribute.supportedPlatforms.contains(purchasePlatform, ignoreCase = true)
-            }
-
-            else -> null
+        if (matchingAttribute is PProBillingPeriodMatchingAttribute) {
+            return matchingAttribute.value == subscriptionsManager.getSubscription()?.billingPeriod
         }
-    }
-
-    private fun List<String>.contains(
-        s: String,
-        ignoreCase: Boolean = false,
-    ): Boolean {
-        return any { it.equals(s, ignoreCase) }
+        return null
     }
 
     override fun map(
         key: String,
         jsonMatchingAttribute: JsonMatchingAttribute,
     ): MatchingAttribute? {
-        return when (key) {
-            PProPurchasePlatformMatchingAttribute.KEY -> {
-                val value = jsonMatchingAttribute.value as? List<String>
-                value.takeUnless { it.isNullOrEmpty() }?.let { platforms ->
-                    PProPurchasePlatformMatchingAttribute(platforms)
-                }
+        if (key == PProBillingPeriodMatchingAttribute.KEY) {
+            val value = jsonMatchingAttribute.value as? String
+            return value.takeIf { !it.isNullOrEmpty() }?.let {
+                PProBillingPeriodMatchingAttribute(value = it)
             }
-
-            else -> null
         }
+        return null
     }
 }
 
-internal data class PProPurchasePlatformMatchingAttribute(
-    val supportedPlatforms: List<String>,
+internal data class PProBillingPeriodMatchingAttribute(
+    val value: String,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "pproPurchasePlatform"
+        const val KEY = "pproBillingPeriod"
     }
 }

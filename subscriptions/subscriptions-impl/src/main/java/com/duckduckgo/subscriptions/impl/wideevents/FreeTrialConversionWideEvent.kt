@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -58,7 +58,7 @@ interface FreeTrialConversionWideEvent {
 @ContributesBinding(AppScope::class)
 class FreeTrialConversionWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val authRepository: AuthRepository,
     private val timeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
@@ -186,7 +186,7 @@ class FreeTrialConversionWideEventImpl @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean = withContext(dispatchers.io()) {
-        privacyProFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
+        subscriptionsFeature.get().sendFreeTrialConversionWideEvent().isEnabled()
     }
 
     private suspend fun getCurrentWideEventId(): Long? {

@@ -31,7 +31,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -58,12 +58,12 @@ class PaywallNotSeenWorker(
     lateinit var subscriptions: Subscriptions
 
     @Inject
-    lateinit var privacyProFeature: PrivacyProFeature
+    lateinit var subscriptionFeature: SubscriptionsFeature
 
     override suspend fun doWork(): Result {
         val dayBucket = inputData.getString(KEY_DAY_BUCKET) ?: return Result.failure()
 
-        if (!privacyProFeature.schedulePaywallNotSeenPixels().isEnabled()) return Result.success()
+        if (!subscriptionFeature.schedulePaywallNotSeenPixels().isEnabled()) return Result.success()
         if (!subscriptions.isEligible()) return Result.success()
         if (subscriptions.getSubscriptionStatus().isActive()) return Result.success()
 
@@ -104,13 +104,13 @@ class PaywallNotSeenWorker(
 class PaywallNotSeenScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val paywallMetricsManager: PaywallMetricsManager,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
-        if (!privacyProFeature.schedulePaywallNotSeenPixels().isEnabled()) return
+        if (!subscriptionsFeature.schedulePaywallNotSeenPixels().isEnabled()) return
         if (paywallMetricsManager.paywallEverSeen) return
 
         appCoroutineScope.launch(dispatcherProvider.io()) {

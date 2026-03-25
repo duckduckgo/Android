@@ -16,18 +16,16 @@
 
 package com.duckduckgo.subscriptions.api
 
-interface PrivacyProUnifiedFeedback {
-    /**
-     * @return `true` if for the given source, we should allow the usage of unified feedback flow or `false` otherwise
-     */
-    suspend fun shouldUseUnifiedFeedback(source: PrivacyProFeedbackSource): Boolean
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource
 
-    enum class PrivacyProFeedbackSource {
-        DDG_SETTINGS,
-        SUBSCRIPTION_SETTINGS,
-        VPN_MANAGEMENT,
-        VPN_EXCLUDED_APPS,
-        PIR_DASHBOARD,
-        UNKNOWN,
-    }
+sealed class SubscriptionFeedbackScreens {
+    data class SubscriptionFeedbackScreenWithParams(val feedbackSource: SubscriptionFeedbackSource) : ActivityParams
+
+    data object GeneralSubscriptionFeedbackScreenNoParams : ActivityParams
+
+    data class SubscriptionAppFeedbackScreenWithParams(
+        val appName: String,
+        val appPackageName: String,
+    ) : ActivityParams
 }

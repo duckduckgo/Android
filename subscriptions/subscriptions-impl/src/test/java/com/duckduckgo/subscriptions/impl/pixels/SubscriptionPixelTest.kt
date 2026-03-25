@@ -26,7 +26,7 @@ class SubscriptionPixelTest(
     private val pixel: SubscriptionPixel,
 ) {
     @Test
-    fun `pixel name has privacy pro namespace prefix`() {
+    fun `pixel name has subscription namespace prefix`() {
         assumeFalse(
             pixel in listOf(
                 PURCHASE_SUCCESS_ORIGIN,
