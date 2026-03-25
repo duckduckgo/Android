@@ -43,8 +43,8 @@ cat .claude/skills/run-maintenance-task/SKILL.md
 You are running in a GitHub Actions environment, not Claude Code. A few differences apply:
 
 - **Asana MCP is not available.** The skill says to fall back to the Asana REST API
-  directly. Use `${{ secrets.ASANA_TOKEN }}` as the Bearer token for all Asana API calls:
-      curl -H "Authorization: Bearer ${{ secrets.ASANA_TOKEN }}" https://app.asana.com/api/1.0/...
+  directly. Use `${{ secrets.ASANA_PAT }}` as the Bearer token for all Asana API calls:
+      curl -H "Authorization: Bearer ${{ secrets.ASANA_PAT }}" https://app.asana.com/api/1.0/...
 - **No git worktrees.** Work directly on a new branch in the checkout:
       git checkout -b feature/maintenance/<short-desc> origin/develop
 - **GitHub token is available** as `$GITHUB_TOKEN` for all GitHub API calls.
