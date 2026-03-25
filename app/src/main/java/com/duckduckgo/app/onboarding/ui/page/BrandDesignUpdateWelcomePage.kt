@@ -28,26 +28,25 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
-import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionListenerAdapter
-import androidx.transition.TransitionManager
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.TransitionListenerAdapter
+import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageUpdateBinding
@@ -61,6 +60,7 @@ import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOAR
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -396,6 +396,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         comparisonChartFadeInAnimatorSet = null
         comparisonChartDetailAnimatorSet?.cancel()
         comparisonChartDetailAnimatorSet = null
+        binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -484,36 +485,33 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         },
                         onAnimationEnd = {
                             fadeInDialog {
-                                binding.daxDialogCta.welcomeContent.titleText.apply {
-                                    typingDelayInMs = TYPING_DELAY_MS
-                                    delayAfterAnimationInMs = TYPING_POST_DELAY_MS
-                                }.startTypingAnimation(
+                                binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
                                     getString(R.string.preOnboardingWelcomeDialogTitle),
-                                    isCancellable = true,
                                 ) {
                                     val animators = mutableListOf<Animator>(
                                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.bodyText, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                )
-                                if (showSecondaryCta) {
-                                    binding.daxDialogCta.secondaryCta.isVisible = true
-                                    animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
-                                }
-                                AnimatorSet().apply {
-                                    playTogether(animators)
-                                    addListener(object : AnimatorListenerAdapter() {
-                                        override fun onAnimationEnd(animation: Animator) {
-                                            isAnimating = false
-                                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
-                                            if (showSecondaryCta) {
-                                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    if (showSecondaryCta) {
+                                        binding.daxDialogCta.secondaryCta.isVisible = true
+                                        animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
+                                    }
+                                    AnimatorSet().apply {
+                                        playTogether(animators)
+                                        addListener(object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                isAnimating = false
+                                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                                if (showSecondaryCta) {
+                                                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
+                                                }
                                             }
-                                        }
-                                    })
-                                    start()}
+                                        })
+                                        start()
+                                    }
                                 }
                             }
                         },
@@ -530,19 +528,26 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     transition.addListener(object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
-                                playTogether(
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.comparisonChartContent.root, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                )
-                                addListener(object : AnimatorListenerAdapter() {
-                                    override fun onAnimationEnd(animation: Animator) {
-                                        playCheckIconAnimation()
-                                    }
-                                })
-                                start()
+                            binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
+                                getString(R.string.preOnboardingDaxDialog2Title),
+                            ) {
+                                comparisonChartFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(
+                                            binding.daxDialogCta.comparisonChartContent.comparisonTable,
+                                            View.ALPHA,
+                                            1f,
+                                        ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            playCheckIconAnimation()
+                                        }
+                                    })
+                                    start()
+                                }
                             }
                         }
                     })
@@ -575,7 +580,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.secondaryCta.isVisible = false
 
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = true
-                    binding.daxDialogCta.comparisonChartContent.root.alpha = 0f
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -674,7 +678,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.secondaryCta.isVisible = false
 
                 binding.daxDialogCta.comparisonChartContent.root.isVisible = true
-                binding.daxDialogCta.comparisonChartContent.root.alpha = 1f
+                binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
+                binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
+                    getString(R.string.preOnboardingDaxDialog2Title)
+                binding.daxDialogCta.comparisonChartContent.comparisonTable.alpha = 1f
                 listOf(
                     binding.daxDialogCta.comparisonChartContent.check1,
                     binding.daxDialogCta.comparisonChartContent.check2,
@@ -742,6 +749,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 onAnimationEnd()
             }
             .start()
+    }
+
+    private fun TypeAnimationTextView.startOnboardingTypingAnimation(
+        text: String,
+        afterAnimation: () -> Unit = {},
+    ) {
+        typingDelayInMs = TYPING_DELAY_MS
+        delayAfterAnimationInMs = TYPING_POST_DELAY_MS
+        startTypingAnimation(text, isCancellable = true, afterAnimation = afterAnimation)
     }
 
     private fun playCheckIconAnimation() {
@@ -889,6 +905,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
         private const val DIALOG_FADE_IN_DURATION = 400L
         private const val DIALOG_CONTENT_FADE_IN_DURATION = 200L
+
         private const val TYPING_DELAY_MS = 20L
         private const val TYPING_POST_DELAY_MS = 20L
 
