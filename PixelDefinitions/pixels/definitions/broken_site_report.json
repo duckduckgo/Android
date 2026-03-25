@@ -188,6 +188,11 @@
                 "enum": ["false", "true"]
             },
             {
+                "key": "drmEnabled",
+                "description": "Whether Ask for DRM is enabled in site permissions.",
+                "enum": ["false", "true"]
+            },
+            {
                 "key": "urlParametersRemoved",
                 "description": "Whether URL parameters were removed.",
                 "enum": ["0", "1"]
@@ -310,6 +315,11 @@
             {
                 "key": "vpnOn",
                 "description": "True if the user has the DuckDuckGo VPN enabled.",
+                "enum": ["false", "true"]
+            },
+            {
+                "key": "drmEnabled",
+                "description": "Whether Ask for DRM is enabled in site permissions.",
                 "enum": ["false", "true"]
             },
             {
