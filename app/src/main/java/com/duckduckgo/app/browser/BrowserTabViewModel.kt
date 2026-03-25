@@ -1493,6 +1493,7 @@ class BrowserTabViewModel @Inject constructor(
                 }?.tabId
                 if (emptyTab != null) {
                     tabRepository.select(tabId = emptyTab)
+                    command.value = ShowKeyboard
                 } else {
                     command.value = LaunchNewTab
                 }

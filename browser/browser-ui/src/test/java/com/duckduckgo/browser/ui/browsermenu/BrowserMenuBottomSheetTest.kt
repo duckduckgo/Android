@@ -266,6 +266,14 @@ class BrowserMenuBottomSheetTest {
         assertFalse(dialog.downloadsMenuItem.showDotIndicator)
     }
 
+    @Test
+    fun whenDialogShownThenPeekHeightIsEightyPercentOfScreenHeight() {
+        val screenHeight = dialog.context.resources.displayMetrics.heightPixels
+        val expectedHeight = screenHeight * BrowserMenuBottomSheet.PEEK_HEIGHT_PERCENT / 100
+
+        assertEquals(expectedHeight, dialog.computePeekHeight())
+    }
+
     // region Helpers
 
     private val menuHeader: View

@@ -42,13 +42,14 @@
                 android:layout_height="48dp"
                 android:background="@drawable/background_favicon_tile">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/headerFavicon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.DuckDuckGo.SmallComponent" />
 
             </FrameLayout>
 
