@@ -54,13 +54,6 @@ class AppTpRemoteFeaturesStoreTest {
                     TODO("Not yet implemented")
                 }
 
-                override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(
-                    origin: SharedPreferences,
-                    name: String,
-                ): SharedPreferences? {
-                    TODO("Not yet implemented")
-                }
-
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
@@ -126,13 +119,6 @@ class AppTpRemoteFeaturesStoreTest {
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
-
-                override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(
-                    origin: SharedPreferences,
-                    name: String,
-                ): SharedPreferences? {
-                    TODO("Not yet implemented")
-                }
             },
             Moshi.Builder().build(),
         )
@@ -182,13 +168,6 @@ class AppTpRemoteFeaturesStoreTest {
                 }
 
                 override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
-                    TODO("Not yet implemented")
-                }
-
-                override suspend fun getMigratedEncryptedSharedPreferencesUnwrapped(
-                    origin: SharedPreferences,
-                    name: String,
-                ): SharedPreferences? {
                     TODO("Not yet implemented")
                 }
             },

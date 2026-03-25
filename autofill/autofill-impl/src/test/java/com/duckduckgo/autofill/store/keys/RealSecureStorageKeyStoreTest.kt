@@ -571,7 +571,7 @@ class RealSecureStorageKeyStoreTest {
             on { edit() } doReturn failingHarmonyEditor
         }
         sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferencesUnwrapped(any(), any()) } doReturn failingHarmonyPrefs
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn failingHarmonyPrefs
         }
         createTestee()
 
@@ -623,7 +623,7 @@ class RealSecureStorageKeyStoreTest {
             on { getString(any(), anyOrNull()) } doReturn null // key absent — write guard passes
         }
         sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferencesUnwrapped(any(), any()) } doReturn failingHarmonyPrefs
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn failingHarmonyPrefs
         }
         createTestee()
 
@@ -652,7 +652,7 @@ class RealSecureStorageKeyStoreTest {
             on { edit() } doReturn failingHarmonyEditor
         }
         sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferencesUnwrapped(any(), any()) } doReturn failingHarmonyPrefs
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn failingHarmonyPrefs
         }
         createTestee()
 
@@ -813,7 +813,7 @@ class RealSecureStorageKeyStoreTest {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = false))
         sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferencesUnwrapped(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
     }
 
@@ -821,7 +821,7 @@ class RealSecureStorageKeyStoreTest {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = true))
         sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferencesUnwrapped(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
     }
 
