@@ -86,6 +86,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -283,7 +284,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureLogoAnimation()
         configureKeyboardListener()
 
-        val launchOnChat = params?.launchOnChat ?: false
+        val launchOnChat = if (duckChatFeature.rememberTogglePosition().isEnabled() && params?.isNewTab == true) {
+            viewModel.getNewTabTogglePosition() == DefaultTogglePosition.DUCK_AI
+        } else {
+            params?.launchOnChat ?: false
+        }
         if (launchOnChat) {
             inputModeWidget.initOnChat()
         } else {
