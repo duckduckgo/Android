@@ -28,6 +28,12 @@
         <item quantity="one">Sivuston %1$s kirjanmerkkejä ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
         <item quantity="other">Sivuston %1$s ja %2$d muun kirjanmerkkejä ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Hae kirjanmerkkejä</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lisää kansio</string>
+    <string name="bookmarksMenuContentDescription">Lisää vaihtoehtoja</string>
+    <string name="newTabFavoritesToggleContentDescription">Suosikkien näkyvyys päälle/pois</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Hallitse kirjanmerkkejä</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -117,9 +123,4 @@
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Valitse kirjanmerkkitiedosto…</string>
     <string name="bookmarksImportDialogClose">Sulje</string>
 
-    <!-- Content Descriptions -->
-    <string name="bookmarksSearchMenuContentDescription">Hae kirjanmerkkejä</string>
-    <string name="bookmarksAddFolderMenuContentDescription">Lisää kansio</string>
-    <string name="bookmarksMenuContentDescription">Lisää vaihtoehtoja</string>
-    <string name="newTabFavoritesToggleContentDescription">Suosikkien näkyvyyden vaihto</string>
 </resources>
