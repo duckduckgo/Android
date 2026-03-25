@@ -66,11 +66,11 @@ interface NativeInputManager {
 @ContributesBinding(FragmentScope::class)
 class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
+    private val animator: NativeInputAnimator,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
-    private lateinit var animator: NativeInputAnimator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
 
@@ -80,7 +80,6 @@ class RealNativeInputManager @Inject constructor(
 
     override fun init(omnibar: Omnibar, rootView: ViewGroup, lifecycleOwner: LifecycleOwner, onDisabled: () -> Unit) {
         this.omnibarController = RealNativeInputOmnibarController(omnibar, rootView)
-        this.animator = RealNativeInputAnimator()
         this.rootView = rootView
         this.layoutCoordinator = NativeInputLayoutCoordinator(rootView, this.omnibarController)
         duckChat.observeNativeInputFieldUserSettingEnabled()
@@ -225,13 +224,13 @@ class RealNativeInputManager @Inject constructor(
         return false
     }
 
-    private fun setWidgetCardEndMargin(margin: Int) {
+    private fun setWidgetCardEndMargin(endInset: Int) {
         val card = rootView.findViewById<View?>(R.id.inputModeWidgetCard) ?: return
         val widgetView = rootView.findViewById(R.id.inputModeTopRoot)
             ?: rootView.findViewById<View?>(R.id.inputModeBottomRoot)
             ?: return
         val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
-        val targetMarginEnd = params.marginStart + margin
+        val targetMarginEnd = params.marginStart + endInset
         if (params.marginEnd == targetMarginEnd) return
         val parentWidth = (card.parent as? View)?.width ?: return
 

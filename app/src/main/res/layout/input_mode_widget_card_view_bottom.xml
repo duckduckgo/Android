@@ -21,6 +21,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom">
 
+    <!-- Negative bottom margin pulls the card down to account for the shadow -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/inputModeWidgetCard"
         android:layout_width="match_parent"

@@ -27,7 +27,10 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.card.MaterialCardView
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 data class Margins(val top: Int, val bottom: Int)
 
@@ -48,7 +51,8 @@ interface NativeInputAnimator {
     fun clearLayoutTransitions(widgetView: View)
 }
 
-class RealNativeInputAnimator : NativeInputAnimator {
+@ContributesBinding(FragmentScope::class)
+class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
 
     private var transitionAnimator: ValueAnimator? = null
     private var cardWidthAnimator: ValueAnimator? = null
@@ -138,7 +142,6 @@ class RealNativeInputAnimator : NativeInputAnimator {
         val visibleBounds = stripCompatPadding(widgetCard)
 
         val params = widgetCard.layoutParams as FrameLayout.LayoutParams
-        params.marginEnd = 0
 
         return ExitSnapshot(
             preSurface = preSurface,
@@ -394,6 +397,7 @@ class RealNativeInputAnimator : NativeInputAnimator {
         params.height = visibleHeight
         params.topMargin = 0
         params.bottomMargin = 0
+        params.marginEnd = 0
         card.layoutParams = params
 
         card.translationX = 0f
