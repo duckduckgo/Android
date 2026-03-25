@@ -17,4 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <!-- Content Descriptions -->
+    <string name="newTabEditOptionsContentDescription">Edit new tab page</string>
+    <string name="newTabShortcutSelectedContentDescription">Shortcut selection state</string>
 </resources>

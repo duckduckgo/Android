@@ -25,7 +25,6 @@
     <string name="newTabPageSettingsShortcuts">Shortcuts</string>
     <string name="newTabPageWelcomeTitle">Your New Tab Page is… New!</string>
     <string name="newTabPageWelcomeMessage">Customize your Favorites and go-to features. Reorder things or hide them to keep it clean.</string>
-    <string name="newTabEditOptionsContentDescription">Edit new tab page</string>
-    <string name="newTabShortcutSelectedContentDescription">Shortcut selection state</string>
+
 </resources>
 

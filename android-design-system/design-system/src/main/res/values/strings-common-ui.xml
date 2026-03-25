@@ -41,4 +41,8 @@
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Learn More</string>
 
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Close</string>
+    <string name="bookmarkFavoriteContentDescription">Favorite</string>
+
 </resources>
