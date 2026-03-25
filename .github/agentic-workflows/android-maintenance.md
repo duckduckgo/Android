@@ -9,6 +9,11 @@ on:
 
 permissions: read-all
 
+network:
+  allowed:
+    - defaults
+    - "api.asana.com"
+
 tools:
   github:
     toolsets: [default]
