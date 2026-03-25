@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Hent browser til computeren</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo til Mac og Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Gendannelse</string>
+    <string name="sync_settings_download_recovery_code_item">Download gendannelseskoden som PDF-fil</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Brug denne kode til at gendanne dine data, hvis du mister adgang til denne enhed – opbevar den sikkert.</string>
+    <string name="sync_settings_data_expiration">Hvis Sync &amp; Backup er inaktiv i 18 måneder, kan dataene ikke gendannes. <annotation type="learn_more_link">Læs mere</annotation></string>
 </resources>
