@@ -21,12 +21,14 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom">
 
+    <!-- Negative bottom margin pulls the card down to account for the shadow -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/inputModeWidgetCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
         app:cardBackgroundColor="?attr/daxColorSurface"
-        app:cardElevation="4dp"
+        app:cardElevation="3dp"
         app:cardUseCompatPadding="false">
 
         <com.duckduckgo.duckchat.impl.ui.NativeInputModeWidget
