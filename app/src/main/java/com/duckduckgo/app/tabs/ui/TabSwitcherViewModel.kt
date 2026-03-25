@@ -37,6 +37,8 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import android.net.Uri
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
@@ -597,26 +599,27 @@ class TabSwitcherViewModel @Inject constructor(
         isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
-        val normalTabs = tabEntities.map {
-            NormalTab(it, isActive = it.tabId == activeTab?.tabId)
-        }
-
-        suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (!isTrackersAnimationInfoPanelHidden) {
-                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-
-                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
-            } else {
-                normalTabs
-            }
-        }
-
-        return if (mode is Selection) {
-            tabEntities.map {
+        if (mode is Selection) {
+            return tabEntities.map {
                 SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
             }
+        }
+
+        val tabs = tabEntities.map { entity ->
+            val isActive = entity.tabId == activeTab?.tabId
+            val uri = entity.url?.let { Uri.parse(it) }
+            if (uri != null && duckChat.isDuckChatUrl(uri)) {
+                DuckAiTab(entity, isActive)
+            } else {
+                NormalTab(entity, isActive)
+            }
+        }
+
+        return if (!isTrackersAnimationInfoPanelHidden) {
+            val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + tabs
         } else {
-            getNormalTabItemsWithOptionalAnimationTile()
+            tabs
         }
     }
 

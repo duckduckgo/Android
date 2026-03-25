@@ -731,6 +731,8 @@
     <string name="tabSelectionTitle" tools:ignore="MissingInstruction">%1$d Selected</string>
     <string name="tabSelectedIndicator">Tab selected indicator</string>
     <string name="tabNotSelectedIndicator">Tab not selected indicator</string>
+    <string name="duck_ai_tab_label">Duck.ai</string>
+    <string name="duck_ai_tab_icon_content_description">Duck.ai icon</string>
 
     <string name="shareMultipleLinksTitle" tools:ignore="MissingInstruction">%1$d links from DuckDuckGo</string>
     <plurals name="shareLinksMenuItem" tools:ignore="ImpliedQuantity,MissingInstruction">

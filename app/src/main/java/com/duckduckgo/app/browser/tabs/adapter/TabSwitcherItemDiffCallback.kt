@@ -40,7 +40,8 @@ class TabSwitcherItemDiffCallback(
     ): Boolean {
         return when {
             oldItem is TabSwitcherItem.Tab && newItem is TabSwitcherItem.Tab -> {
-                oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
+                oldItem::class == newItem::class &&
+                    oldItem.tabEntity.tabPreviewFile == newItem.tabEntity.tabPreviewFile &&
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
@@ -53,7 +54,11 @@ class TabSwitcherItemDiffCallback(
     override fun getChangePayload(
         oldItem: TabSwitcherItem,
         newItem: TabSwitcherItem,
-    ): Bundle {
+    ): Bundle? {
+        if (oldItem is TabSwitcherItem.Tab && newItem is TabSwitcherItem.Tab && oldItem::class != newItem::class) {
+            return null
+        }
+
         val diffBundle = Bundle()
 
         when {
