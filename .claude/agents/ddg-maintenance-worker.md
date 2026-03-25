@@ -95,5 +95,5 @@ If you cannot proceed:
 - No module restructuring: do not move classes between modules or create new modules
 - No new dependencies without discussion
 - No breaking changes — if a change could break existing behaviour, stop and ask
-- Asana operations: use the `anthropic-skills:ddg-asana` skill for all Asana reads and writes
+- Asana operations: use the `ddg-asana` skill for all Asana reads and writes
   (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls

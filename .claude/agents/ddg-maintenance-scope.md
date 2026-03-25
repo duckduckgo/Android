@@ -12,7 +12,7 @@ Work through the idea interactively:
 3. Suggest a single-module scope; if the work naturally spans modules, ask the team member
    to confirm and split it into separate tasks if possible
 4. Produce a complete task description using the required sections below
-5. When done, use the `anthropic-skills:ddg-asana` skill to create the task directly in the
+5. When done, use the `ddg-asana` skill to create the task directly in the
    "Ready" section of the Android Agentic Maintenance Backlog
    (project GID: 1213746476312668)
 
@@ -52,7 +52,7 @@ and justify it. Cross-module tasks without justification will be sent back for s
 
 ## Guidelines
 
-- Asana operations: use the `anthropic-skills:ddg-asana` skill for all Asana reads and writes
+- Asana operations: use the `ddg-asana` skill for all Asana reads and writes
   (task updates, section moves, comments) — do not use raw curl/bash for Asana API calls
 
 ## Checklist before handing off
