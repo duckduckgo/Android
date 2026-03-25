@@ -332,4 +332,36 @@ class DuckChatFeatureRepositoryTest {
         assertTrue(results[0])
         assertFalse(results[1])
     }
+
+    @Test
+    fun `when setDefaultTogglePosition then set in data store`() = runTest {
+        testee.setDefaultTogglePosition("DUCK_AI")
+
+        verify(mockDataStore).setDefaultTogglePosition("DUCK_AI")
+    }
+
+    @Test
+    fun `when observeDefaultTogglePosition then observe data store`() = runTest {
+        whenever(mockDataStore.observeDefaultTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+
+        val results = testee.observeDefaultTogglePosition().take(2).toList()
+        assertNull(results[0])
+        assertEquals("DUCK_AI", results[1])
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then set in data store`() = runTest {
+        testee.setLastUsedTogglePosition("SEARCH")
+
+        verify(mockDataStore).setLastUsedTogglePosition("SEARCH")
+    }
+
+    @Test
+    fun `when observeLastUsedTogglePosition then observe data store`() = runTest {
+        whenever(mockDataStore.observeLastUsedTogglePosition()).thenReturn(flowOf(null, "DUCK_AI"))
+
+        val results = testee.observeLastUsedTogglePosition().take(2).toList()
+        assertNull(results[0])
+        assertEquals("DUCK_AI", results[1])
+    }
 }
