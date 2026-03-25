@@ -29,6 +29,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':js-messaging-api')
     implementation project(':app-build-config-api')
+    implementation AndroidX.webkit
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
