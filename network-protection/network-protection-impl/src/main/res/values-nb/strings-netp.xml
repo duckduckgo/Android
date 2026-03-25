@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatible med VPN-er</string>
     <string name="netpExclusionListAutoExcludeDescription">Noen apper, som bank- eller strømmeapper, fungerer ikke så godt med VPN. Når denne innstillingen er aktivert, ekskluderer vi disse appene automatisk.</string>
 
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Lukk</string>
+    <string name="netpVpnIndicatorContentDescription">Indikator for VPN-status</string>
+
 </resources>
