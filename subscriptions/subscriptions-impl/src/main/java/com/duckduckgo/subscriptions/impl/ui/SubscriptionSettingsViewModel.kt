@@ -40,7 +40,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowSwitchPlanDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
@@ -102,13 +101,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
             else -> Yearly
         }
 
-        val switchPlanAvailable = subscriptionsManager.isSwitchPlanAvailable()
-        val savingsPercentage = if (switchPlanAvailable && type == Monthly) {
-            subscriptionsManager.getSwitchPlanPricing(isUpgrade = true)?.savingsPercentage
-        } else {
-            null
-        }
-
         // Use firstOrNull() for UI display
         val pendingPlan = if (privacyProFeature.showPendingPlanHint().isEnabled()) {
             subscription.pendingPlans.firstOrNull()
@@ -146,8 +138,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
-                switchPlanAvailable = switchPlanAvailable,
-                savingsPercentage = savingsPercentage,
                 isProTierEnabled = privacyProFeature.allowProTierPurchase().isEnabled(),
                 subscriptionTier = subscription.tier,
                 pendingPlan = pendingPlan,
@@ -184,22 +174,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             subscriptionsManager.signOut()
             command.send(FinishSignOut)
-        }
-    }
-
-    fun onSwitchPlanClicked(currentDuration: SubscriptionDuration) {
-        viewModelScope.launch {
-            val switchType = when (currentDuration) {
-                Monthly -> SwitchPlanType.UPGRADE_TO_YEARLY
-                Yearly -> SwitchPlanType.DOWNGRADE_TO_MONTHLY
-            }
-            command.send(ShowSwitchPlanDialog(switchType))
-        }
-    }
-
-    fun onSwitchPlanSuccess() {
-        viewModelScope.launch {
-            emitChanges()
         }
     }
 
@@ -251,12 +225,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToEditEmailScreen : Command()
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
-        data class ShowSwitchPlanDialog(val switchType: SwitchPlanType) : Command()
-    }
-
-    enum class SwitchPlanType {
-        UPGRADE_TO_YEARLY,
-        DOWNGRADE_TO_MONTHLY,
     }
 
     sealed class ViewState {
@@ -270,8 +238,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val email: String?,
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
-            val switchPlanAvailable: Boolean,
-            val savingsPercentage: Int?,
             val isProTierEnabled: Boolean,
             val subscriptionTier: SubscriptionTier,
             val pendingPlan: PendingPlan? = null,
