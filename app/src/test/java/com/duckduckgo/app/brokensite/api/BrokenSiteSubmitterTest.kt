@@ -611,6 +611,30 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
+    fun whenDrmSettingIsEnabledThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(true)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("true", paramsCaptor.lastValue["drmEnabled"])
+    }
+
+    @Test
+    fun whenDrmSettingIsDisabledThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(false)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("false", paramsCaptor.lastValue["drmEnabled"])
+    }
+
+    @Test
     fun whenSubmitReportAndActiveContentScopeExperimentsThenIncludeParam() = runTest {
         val brokenSite = getBrokenSite()
         val contentScopeExperiments = listOf(
