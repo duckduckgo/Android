@@ -17,7 +17,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.DuckDuckGo.MessageCta"
+    style="@style/Widget.DuckDuckGo.Hatch"
     android:id="@+id/returnHatchRoot"
     android:clipChildren="false"
     android:visibility="gone">
