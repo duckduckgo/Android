@@ -50,10 +50,10 @@ import com.duckduckgo.common.ui.compose.tools.PreviewBox
 @Composable
 fun DaxSurface(
     modifier: Modifier = Modifier,
-    shape: Shape = DuckDuckGoTheme.shapes.medium,
-    color: Color = DuckDuckGoTheme.colors.backgrounds.window,
-    contentColor: Color = DuckDuckGoTheme.colors.text.primary,
-    shadowElevation: Dp = 1.dp,
+    shape: Shape = DaxSurfaceDefaults.shape,
+    color: Color = DaxSurfaceDefaults.color,
+    contentColor: Color = DaxSurfaceDefaults.contentColor,
+    shadowElevation: Dp = DaxSurfaceDefaults.shadowElevation,
     border: BorderStroke? = null,
     content: @Composable () -> Unit,
 ) {
@@ -91,10 +91,10 @@ fun DaxSurface(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = DuckDuckGoTheme.shapes.medium,
-    color: Color = DuckDuckGoTheme.colors.backgrounds.window,
-    contentColor: Color = DuckDuckGoTheme.colors.text.primary,
-    shadowElevation: Dp = 1.dp,
+    shape: Shape = DaxSurfaceDefaults.shape,
+    color: Color = DaxSurfaceDefaults.color,
+    contentColor: Color = DaxSurfaceDefaults.contentColor,
+    shadowElevation: Dp = DaxSurfaceDefaults.shadowElevation,
     border: BorderStroke? = null,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit,
@@ -111,6 +111,22 @@ fun DaxSurface(
         interactionSource = interactionSource,
         content = content,
     )
+}
+
+object DaxSurfaceDefaults {
+    val shape: Shape
+        @Composable
+        get() = DuckDuckGoTheme.shapes.medium
+
+    val color: Color
+        @Composable
+        get() = DuckDuckGoTheme.colors.backgrounds.window
+
+    val contentColor: Color
+        @Composable
+        get() = DuckDuckGoTheme.colors.text.primary
+
+    val shadowElevation: Dp = 1.dp
 }
 
 @Composable
