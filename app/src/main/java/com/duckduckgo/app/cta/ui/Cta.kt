@@ -822,7 +822,17 @@ sealed class DaxBubbleCta(
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+        override fun pixelOkParameters(): Map<String, String> = mapOf(
+            Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam,
+            Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
+        )
+
+        override fun pixelShownParameters(): Map<String, String> = mapOf(
+            Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam),
+            Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
+        )
+    }
 
     data class DaxDialogIntroOption(
         val optionText: String,
