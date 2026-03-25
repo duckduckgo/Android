@@ -258,6 +258,7 @@ class RealNativeInputManager @Inject constructor(
 
         if (omnibarController.isDuckAiMode() && rootView.findViewById<View?>(R.id.inputModeWidget) != null) return
 
+        isExiting = false
         animator.cancelAnimation()
         if (omnibarController.isDuckAiMode()) {
             omnibarController.forceToTop()
