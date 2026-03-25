@@ -18,6 +18,7 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -50,12 +51,14 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor(
                 }
 
                 autoconsentCallback.onResultReceived(
-                    consentManaged = true,
-                    optOutFailed = false,
-                    selfTestFailed = message.result,
-                    isCosmetic = null,
-                    consentRule = message.cmp,
-                    consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    AutoconsentResult(
+                        consentManaged = true,
+                        optOutFailed = false,
+                        selfTestFailed = message.result,
+                        isCosmetic = null,
+                        consentRule = message.cmp,
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    ),
                 )
             } catch (e: Exception) {
                 logcat { e.localizedMessage }

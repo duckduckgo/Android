@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -65,12 +66,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
             if (!message.result) {
                 autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
                 autoconsentCallback.onResultReceived(
-                    consentManaged = true,
-                    optOutFailed = true,
-                    selfTestFailed = false,
-                    isCosmetic = null,
-                    consentRule = message.cmp,
-                    consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    AutoconsentResult(
+                        consentManaged = true,
+                        optOutFailed = true,
+                        selfTestFailed = false,
+                        isCosmetic = null,
+                        consentRule = message.cmp,
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    ),
                 )
             } else if (message.scheduleSelfTest) {
                 selfTest = true
@@ -96,12 +99,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
 
             autoconsentCallback.onPopUpHandled(message.isCosmetic)
             autoconsentCallback.onResultReceived(
-                consentManaged = true,
-                optOutFailed = false,
-                selfTestFailed = false,
-                isCosmetic = message.isCosmetic,
-                consentRule = message.cmp,
-                consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                AutoconsentResult(
+                    consentManaged = true,
+                    optOutFailed = false,
+                    selfTestFailed = false,
+                    isCosmetic = message.isCosmetic,
+                    consentRule = message.cmp,
+                    consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                ),
             )
 
             if (selfTest) {

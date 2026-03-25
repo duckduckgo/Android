@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
@@ -73,12 +74,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = true,
-            selfTestFailed = false,
-            isCosmetic = null,
-            consentRule = "test",
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = true,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
         )
     }
 
@@ -87,12 +90,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = true,
-            consentRule = "test",
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = true,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
         )
     }
 
@@ -101,12 +106,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = false,
-            consentRule = "test",
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
         )
     }
 
@@ -176,12 +183,14 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = false,
-            consentRule = "test",
-            consentReloadLoop = true,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = "test",
+                consentReloadLoop = true,
+            ),
         )
     }
 

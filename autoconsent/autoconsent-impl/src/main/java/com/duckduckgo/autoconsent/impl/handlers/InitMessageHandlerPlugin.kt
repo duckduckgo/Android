@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -86,12 +87,14 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     // Reset site
                     autoconsentCallback.onResultReceived(
-                        consentManaged = false,
-                        optOutFailed = false,
-                        selfTestFailed = false,
-                        isCosmetic = false,
-                        consentRule = reloadLoopDetector.getLastHandledCMP(webView),
-                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                        AutoconsentResult(
+                            consentManaged = false,
+                            optOutFailed = false,
+                            selfTestFailed = false,
+                            isCosmetic = false,
+                            consentRule = reloadLoopDetector.getLastHandledCMP(webView),
+                            consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                        ),
                     )
 
                     val settings = settingsCache.getSettings() ?: return@launch

@@ -21,6 +21,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
@@ -239,12 +240,14 @@ class InitMessageHandlerPluginTest {
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = false,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = false,
-            consentRule = null,
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = false,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = null,
+                consentReloadLoop = false,
+            ),
         )
     }
 
@@ -275,12 +278,14 @@ class InitMessageHandlerPluginTest {
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = false,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = false,
-            consentRule = null,
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = false,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = null,
+                consentReloadLoop = false,
+            ),
         )
     }
 

@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
@@ -67,12 +68,14 @@ class SelfTestResultMessageHandlerPluginTest {
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = true,
-            isCosmetic = null,
-            consentRule = "test",
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = true,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
         )
 
         val anotherMessage = """
@@ -82,12 +85,14 @@ class SelfTestResultMessageHandlerPluginTest {
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), anotherMessage, webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = null,
-            consentRule = "test",
-            consentReloadLoop = false,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
         )
     }
 
@@ -112,12 +117,14 @@ class SelfTestResultMessageHandlerPluginTest {
         selfTestPlugin.process(selfTestPlugin.supportedTypes.first(), message, webView, mockCallback)
 
         verify(mockCallback).onResultReceived(
-            consentManaged = true,
-            optOutFailed = false,
-            selfTestFailed = false,
-            isCosmetic = null,
-            consentRule = "test",
-            consentReloadLoop = true,
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = true,
+            ),
         )
     }
 
