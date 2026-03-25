@@ -332,6 +332,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.bookmarks.FaviconPromptSheet
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogoScreens.EasterEggLogoScreen
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
@@ -1506,6 +1507,7 @@ class BrowserTabFragment :
         omnibarViewMode: Omnibar.ViewMode = omnibar.viewMode,
     ) {
         val currentSite = viewModel.siteLiveData.value
+        val omnibarState = viewModel.omnibarViewState.value
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
@@ -1513,7 +1515,8 @@ class BrowserTabFragment :
             title = currentSite?.title,
             shortUrl = currentSite?.url?.let { addressDisplayFormatter.getShortUrl(it) },
             tabId = tabId,
-            omnibarText = viewModel.omnibarViewState.value?.omnibarText,
+            omnibarText = omnibarState?.omnibarText,
+            serpLogoUrl = (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false

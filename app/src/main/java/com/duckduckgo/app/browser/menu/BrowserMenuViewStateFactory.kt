@@ -38,6 +38,7 @@ interface BrowserMenuViewStateFactory {
         title: String?,
         shortUrl: String?,
         omnibarText: String?,
+        serpLogoUrl: String? = null,
     ): BrowserMenuViewState
 }
 
@@ -55,6 +56,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         title: String?,
         shortUrl: String?,
         omnibarText: String?,
+        serpLogoUrl: String?,
     ): BrowserMenuViewState {
         return if (customTabsMode) {
             createCustomTabsViewState(viewState, title, tabId, shortUrl, omnibarText)
@@ -65,7 +67,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
-                else -> createBrowserViewState(viewState, title, tabId, shortUrl, omnibarText)
+                else -> createBrowserViewState(viewState, title, tabId, shortUrl, omnibarText, serpLogoUrl)
             }
         }
     }
@@ -122,6 +124,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         tabId: String,
         shortUrl: String?,
         omnibarText: String?,
+        serpLogoUrl: String? = null,
     ): BrowserMenuViewState.Browser {
         val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
@@ -151,7 +154,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showAutofill = browserViewState.showAutofill,
             isSSLError = browserViewState.sslError != NONE,
             canPrintPage = browserViewState.canPrintPage,
-            pageContextHeader = createBrowserHeaderContextState(browserViewState, title, tabId, shortUrl, omnibarText),
+            pageContextHeader = createBrowserHeaderContextState(browserViewState, title, tabId, shortUrl, omnibarText, serpLogoUrl),
         )
     }
 
@@ -161,6 +164,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         tabId: String,
         shortUrl: String?,
         omnibarText: String?,
+        serpLogoUrl: String? = null,
     ): PageContextHeaderState {
         val isErrorMode = viewState.browserError != OMITTED
         return if (shortUrl != null) {
@@ -171,6 +175,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
                     title = title,
                     shortUrl = shortUrl,
                     tabId = tabId,
+                    serpLogoUrl = serpLogoUrl,
                 )
             }
         } else if (isErrorMode && omnibarText != null) {

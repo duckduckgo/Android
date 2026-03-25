@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
+import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.databinding.BottomSheetBrowserMenuBinding
@@ -394,12 +395,20 @@ class BrowserMenuBottomSheet(
                 binding.menuHeader.headerTitle.text = pageContextHeaderState.title
                 binding.menuHeader.headerShortUrl.isVisible = true
                 binding.menuHeader.headerShortUrl.text = pageContextHeaderState.shortUrl
-                lifecycle.coroutineScope.launch {
-                    faviconManager.loadToViewFromLocalWithPlaceholder(
-                        tabId = pageContextHeaderState.tabId,
-                        url = pageContextHeaderState.shortUrl,
-                        view = binding.menuHeader.headerFavicon,
-                    )
+                val serpLogoUrl = pageContextHeaderState.serpLogoUrl
+                if (serpLogoUrl != null) {
+                    Glide.with(binding.menuHeader.headerFavicon)
+                        .load(serpLogoUrl)
+                        .placeholder(drawable.ic_dax_icon)
+                        .into(binding.menuHeader.headerFavicon)
+                } else {
+                    lifecycle.coroutineScope.launch {
+                        faviconManager.loadToViewFromLocalWithPlaceholder(
+                            tabId = pageContextHeaderState.tabId,
+                            url = pageContextHeaderState.shortUrl,
+                            view = binding.menuHeader.headerFavicon,
+                        )
+                    }
                 }
                 binding.menuHeader.headerCloseButton.setOnClickListener { performDismiss() }
             }

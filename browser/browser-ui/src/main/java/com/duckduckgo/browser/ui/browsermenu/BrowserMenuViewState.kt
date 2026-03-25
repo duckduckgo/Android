@@ -85,6 +85,7 @@ sealed class PageContextHeaderState {
         val title: String?,
         val shortUrl: String,
         val tabId: String,
+        val serpLogoUrl: String? = null,
     ) : PageContextHeaderState()
 
     data class DuckAi(
