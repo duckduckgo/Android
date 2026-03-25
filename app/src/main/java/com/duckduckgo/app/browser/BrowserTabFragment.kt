@@ -4614,7 +4614,7 @@ class BrowserTabFragment :
             )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation && !URLUtil.isDataUrl(url))
+            downloadFile(requestUserConfirmation)
         } else {
             requestWriteStoragePermission()
         }
