@@ -12,6 +12,8 @@ conversation context by whoever launched you. If no task URL is present, ask for
 
 1. Fetch the Asana task and confirm it is in "Ready" or "In Progress"
 2. If the task is not in one of those states, tell the user and stop
+3. Move the task to "In Progress" before doing any work — this prevents another agent or
+   engineer from picking up the same task concurrently
 
 ## Implement the task
 
