@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Récupération</string>
     <string name="sync_settings_download_recovery_code_item">Télécharger le code de récupération au format PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Utilisez ce code pour récupérer vos données si vous perdez l\'accès à cet appareil ; gardez-le en lieu sûr.</string>
-    <string name="sync_settings_data_expiration">Si Sync &amp; Backup est inactif pendant 18 mois, les données ne peuvent pas être restaurées. <annotation type="learn_more_link">En savoir plus</annotation></string>
+    <string name="sync_settings_data_expiration">Les données Sync &amp; Backup ne peuvent pas être récupérées après 18 mois d\'inactivité. <annotation type="learn_more_link">En savoir plus</annotation></string>
 </resources>
