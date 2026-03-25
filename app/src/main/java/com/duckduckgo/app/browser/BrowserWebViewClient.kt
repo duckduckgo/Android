@@ -551,7 +551,6 @@ class BrowserWebViewClient @Inject constructor(
                 start?.let { safeStart ->
                     val concurrentRequestsOnFinish = decrementLoadCountAndGet()
                     webViewClientListener?.getCurrentTabId()?.let { tabId ->
-                        logcat { "onPageFinished URL: $url, duration: ${currentTimeProvider.elapsedRealtime() - safeStart}ms" }
                         pageLoadWideEvent.onPageLoadFinished(
                             tabId = tabId,
                             url = url,
