@@ -90,10 +90,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val isFirePictogramVisible: Boolean = true,
     ) {
         val isDeleteThisTabButtonVisible: Boolean
-            get() = isSingleTabEnabled && dialogOrigin == BROWSER && (isDuckAiTab || tabCount > 1)
+            get() = isSingleTabEnabled && dialogOrigin == BROWSER
 
-        val isDuckAiSubtitleVisible: Boolean
-            get() = isDuckAiTab && !isDuckAiChatsSelected && dialogOrigin == BROWSER
+        val isDeleteAllButtonVisible: Boolean
+            get() = !(isDuckAiTab && isSingleTabEnabled && dialogOrigin == BROWSER)
     }
 
     sealed class Command {
@@ -133,8 +133,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
                     isSingleTabEnabled = isDeleteBrowsingDataSupported,
                     isDuckAiTab = isDuckAiTab,
                     tabCount = tabCount,
-                    isSiteDataSubtitleVisible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
-                    isDownloadsSubtitleVisible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
+                    isSiteDataSubtitleVisible = !isDuckAiTab && shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
+                    isDownloadsSubtitleVisible = !isDuckAiTab && downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
                     isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
                 )
             }
@@ -152,7 +152,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 hasFiredDialogShownPixel = true
                 pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
                 withContext(dispatcherProvider.io()) {
-                    if (settingsDataStore.singleTabFireDialogShownCount <= DIALOG_WARNING_MESSAGE_SHOWN_LIMIT) {
+                    if (viewState.value.isSiteDataSubtitleVisible) {
                         settingsDataStore.singleTabFireDialogShownCount++
                     }
                 }
@@ -173,13 +173,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
-
-            _viewState.value.apply {
-                if (isSingleTabEnabled && dialogOrigin == BROWSER && !isDuckAiTab && tabCount == 1) {
-                    pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY)
-                    pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_ALL_BUTTON_ONLY_DAILY, type = Daily())
-                }
-            }
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled

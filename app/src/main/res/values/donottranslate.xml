@@ -89,4 +89,8 @@
     <string name="afterInactivityOptionTitle">After Inactivity</string>
     <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
 
+    <!-- Single tab dialog -->
+    <string name="singleTabFireDialogDeleteChat">Delete Chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Delete this chat?</string>
+
 </resources>

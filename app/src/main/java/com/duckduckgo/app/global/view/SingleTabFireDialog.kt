@@ -159,7 +159,11 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     }
 
     private fun setupLayout() {
-        binding.deleteAllButton.setOnClickListener {
+        binding.deleteAllPrimaryButton.setOnClickListener {
+            hideDialog()
+            viewModel.onDeleteAllClicked()
+        }
+        binding.deleteAllSecondaryButton.setOnClickListener {
             hideDialog()
             viewModel.onDeleteAllClicked()
         }
@@ -237,7 +241,9 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             binding.fireIcon.gone()
         }
 
-        val titleRes = if (state.isDuckAiChatsSelected) {
+        val titleRes = if (state.isDuckAiTab && state.isDeleteThisTabButtonVisible) {
+            R.string.singleTabFireDialogTitleDuckAi
+        } else if (state.isDuckAiChatsSelected) {
             R.string.singleTabFireDialogTitleWithChats
         } else {
             R.string.singleTabFireDialogTitle
@@ -247,10 +253,23 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
             if (state.isDuckAiTab) {
-                binding.deleteThisTabButton.text = requireContext().getString(R.string.singleTabFireDialogDeleteThisChat)
+                binding.deleteThisTabButton.text = requireContext().getString(R.string.singleTabFireDialogDeleteChat)
             }
         } else {
             binding.deleteThisTabButton.gone()
+        }
+
+        if (state.isDeleteAllButtonVisible) {
+            if (state.isDeleteThisTabButtonVisible) {
+                binding.deleteAllSecondaryButton.show()
+                binding.deleteAllPrimaryButton.gone()
+            } else {
+                binding.deleteAllPrimaryButton.show()
+                binding.deleteAllSecondaryButton.gone()
+            }
+        } else {
+            binding.deleteAllPrimaryButton.gone()
+            binding.deleteAllSecondaryButton.gone()
         }
 
         val subtitleParts = buildList {
@@ -259,9 +278,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
             }
             if (state.isDownloadsSubtitleVisible) {
                 add(getString(R.string.singleTabFireDialogSubtitleDownloads))
-            }
-            if (state.isDuckAiSubtitleVisible) {
-                add(getString(R.string.singleTabFireDialogSubtitleDuckAi))
             }
         }
         if (subtitleParts.isNotEmpty()) {
