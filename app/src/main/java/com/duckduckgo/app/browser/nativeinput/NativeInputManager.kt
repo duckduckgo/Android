@@ -120,7 +120,9 @@ class RealNativeInputManager @Inject constructor(
         omnibarController.restore()
         omnibarController.show()
 
-        val widgetCard = rootView.findViewById<View?>(R.id.inputModeWidgetCard)
+        val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
+            ?: rootView.findViewById(R.id.inputModeBottomRoot)
+        val widgetCard = widgetView?.findViewById<View?>(R.id.inputModeWidgetCard)
         if (widgetCard != null) {
             (widgetCard as? MaterialCardView)?.cardElevation = 0f
             widgetCard.animate()
@@ -128,15 +130,15 @@ class RealNativeInputManager @Inject constructor(
                 .setDuration(FADE_OUT_DURATION_MS)
                 .withEndAction {
                     widgetCard.alpha = 1f
-                    removeWidget()
-                    if (omnibarController.isBrowserMode()) {
+                    val removed = widgetView?.let { removeWidget(it) } == true
+                    if (removed && omnibarController.isBrowserMode()) {
                         hideNtp()
                     }
                 }
                 .start()
         } else {
-            removeWidget()
-            if (omnibarController.isBrowserMode()) {
+            val removed = widgetView?.let { removeWidget(it) } ?: removeWidget()
+            if (removed && omnibarController.isBrowserMode()) {
                 hideNtp()
             }
         }
@@ -339,6 +341,13 @@ class RealNativeInputManager @Inject constructor(
             removed = true
         }
         return removed
+    }
+
+    private fun removeWidget(widgetView: View): Boolean {
+        val parent = widgetView.parent as? ViewGroup ?: return false
+        if (parent !== rootView) return false
+        rootView.removeView(widgetView)
+        return true
     }
 
     private fun createWidgetView(layoutInflater: LayoutInflater): View {
