@@ -118,7 +118,7 @@ class RealSecureStorageKeyStore(
                         initialUseHarmonyValue = useHarmony
                         if (useHarmony) {
                             getEncryptedPreferences()?.let { legacyPreferences ->
-                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferencesUnwrapped(legacyPreferences, FILENAME_V3).also {
+                                sharedPreferencesProvider.getMigratedEncryptedSharedPreferences(legacyPreferences, FILENAME_V3).also {
                                     if (it == null) {
                                         logcat { "autofill harmony preferences retrieval returned null" }
                                     }
