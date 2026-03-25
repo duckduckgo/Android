@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importálás a Google-ból</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Válaszd ki a könyvjelzőfájlt…</string>
     <string name="bookmarksImportDialogClose">Bezárás</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Könyvjelzők keresése</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Mappa hozzáadása</string>
+    <string name="bookmarksMenuContentDescription">További lehetőségek</string>
+    <string name="newTabFavoritesToggleContentDescription">Kedvencek láthatóságának váltása</string>
 </resources>

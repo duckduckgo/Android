@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Tuo Googlesta</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Valitse kirjanmerkkitiedosto…</string>
     <string name="bookmarksImportDialogClose">Sulje</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Hae kirjanmerkkejä</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lisää kansio</string>
+    <string name="bookmarksMenuContentDescription">Lisää vaihtoehtoja</string>
+    <string name="newTabFavoritesToggleContentDescription">Suosikkien näkyvyyden vaihto</string>
 </resources>

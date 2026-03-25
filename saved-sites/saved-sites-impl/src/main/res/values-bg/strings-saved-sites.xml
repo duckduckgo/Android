@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортиране от Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки...</string>
     <string name="bookmarksImportDialogClose">Затваряне</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Търсене на отметки</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Добавяне на папка</string>
+    <string name="bookmarksMenuContentDescription">Още опции</string>
+    <string name="newTabFavoritesToggleContentDescription">Превключване на видимостта на любимите</string>
 </resources>

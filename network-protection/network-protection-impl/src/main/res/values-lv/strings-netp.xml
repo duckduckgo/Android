@@ -261,4 +261,8 @@
     <string name="netpExclusionListLabelAutoExclude">Nesaderīgs ar VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Dažas lietotnes, piemēram, banku vai straumēšanas lietotnes, nedarbojas labi ar VPN. Kad šis iestatījums ir ieslēgts, mēs automātiski izslēgsim šādas lietotnes.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Aizvērt</string>
+    <string name="netpVpnIndicatorContentDescription">VPN statusa indikators</string>
 </resources>

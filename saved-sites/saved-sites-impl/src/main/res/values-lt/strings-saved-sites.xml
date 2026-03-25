@@ -124,4 +124,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuok iš „Google“</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Pasirinkite žymių failą…</string>
     <string name="bookmarksImportDialogClose">Uždaryti</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Ieškoti žymių</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pridėti aplanką</string>
+    <string name="bookmarksMenuContentDescription">Daugiau parinkčių</string>
+    <string name="newTabFavoritesToggleContentDescription">Perjungti parankinių matomumą</string>
 </resources>

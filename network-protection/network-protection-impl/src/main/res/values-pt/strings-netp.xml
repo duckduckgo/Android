@@ -258,4 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatível com VPNs</string>
     <string name="netpExclusionListAutoExcludeDescription">Algumas aplicações, como aplicações bancárias ou de streaming, não funcionam bem com VPNs. Quando esta definição estiver ativada, vamos excluir automaticamente essas aplicações.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Fechar</string>
+    <string name="netpVpnIndicatorContentDescription">Indicador de estado da VPN</string>
 </resources>

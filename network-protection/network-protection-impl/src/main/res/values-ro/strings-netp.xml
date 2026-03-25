@@ -261,4 +261,8 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatibilă cu VPN-urile</string>
     <string name="netpExclusionListAutoExcludeDescription">Unele aplicații, cum ar fi cele bancare sau de streaming, nu funcționează bine cu VPN-urile. Când această setare este activată, vom exclude automat acele aplicații.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Închidere</string>
+    <string name="netpVpnIndicatorContentDescription">Indicator de stare VPN</string>
 </resources>

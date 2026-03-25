@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer fra Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Velg bokmerkefil…</string>
     <string name="bookmarksImportDialogClose">Lukk</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Søk i bokmerker</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Legg til mappe</string>
+    <string name="bookmarksMenuContentDescription">Flere alternativer</string>
+    <string name="newTabFavoritesToggleContentDescription">Bytt synlighet for favoritter</string>
 </resources>

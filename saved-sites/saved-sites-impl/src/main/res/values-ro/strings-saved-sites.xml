@@ -120,4 +120,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importă din Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje...</string>
     <string name="bookmarksImportDialogClose">Închidere</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Caută marcaje</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Adaugă dosar</string>
+    <string name="bookmarksMenuContentDescription">Mai multe opțiuni</string>
+    <string name="newTabFavoritesToggleContentDescription">Comută vizibilitatea favoritelor</string>
 </resources>

@@ -124,4 +124,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvezi s Googlea</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Odaberi datoteku knjižnih oznaka…</string>
     <string name="bookmarksImportDialogClose">Zatvori</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Pretraži knjižne oznake</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Dodaj mapu</string>
+    <string name="bookmarksMenuContentDescription">Dodatne mogućnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Uključi/isključi vidljivost favorita</string>
 </resources>

@@ -124,4 +124,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
     <string name="bookmarksImportDialogClose">Zamknij</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Wyszukaj zakładki</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Dodaj folder</string>
+    <string name="bookmarksMenuContentDescription">Więcej opcji</string>
+    <string name="newTabFavoritesToggleContentDescription">Przełącz widoczność ulubionych</string>
 </resources>

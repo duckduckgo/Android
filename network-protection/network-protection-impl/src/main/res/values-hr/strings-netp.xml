@@ -264,4 +264,8 @@
     <string name="netpExclusionListLabelAutoExclude">Nekompatibilno s VPN-ovima</string>
     <string name="netpExclusionListAutoExcludeDescription">Neke aplikacije, poput bankarskih ili streaming aplikacija, ne funkcioniraju dobro s VPN-ovima. Kad je ova postavka omogućena, automatski ćemo izuzeti (isključiti) te aplikacije.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Zatvori</string>
+    <string name="netpVpnIndicatorContentDescription">Indikator statusa VPN-a</string>
 </resources>

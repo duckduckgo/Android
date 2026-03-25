@@ -124,4 +124,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importovať z Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber súbor záložiek…</string>
     <string name="bookmarksImportDialogClose">Zatvoriť</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Vyhľadávanie v záložkách</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pridať priečinok</string>
+    <string name="bookmarksMenuContentDescription">Ďalšie možnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Prepnutie viditeľnosti obľúbených</string>
 </resources>

@@ -264,4 +264,8 @@
     <string name="netpExclusionListLabelAutoExclude">Nesuderinama su VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Kai kurios programėlės, pavyzdžiui, bankininkystės ar transliacijos programėlės, neveikia gerai su VPN. Įjungus šį nustatymą, mes automatiškai pašalinsime tas programas.</string>
 
+
+    <!-- Content Descriptions -->
+    <string name="netpCloseButtonContentDescription">Uždaryti</string>
+    <string name="netpVpnIndicatorContentDescription">VPN būsenos indikatorius</string>
 </resources>

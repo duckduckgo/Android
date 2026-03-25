@@ -120,4 +120,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
     <string name="bookmarksImportDialogClose">Aizvērt</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Meklēt grāmatzīmes</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pievienot mapi</string>
+    <string name="bookmarksMenuContentDescription">Citas iespējas</string>
+    <string name="newTabFavoritesToggleContentDescription">Pārslēgt izlases redzamību</string>
 </resources>

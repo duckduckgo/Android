@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
     <string name="bookmarksImportDialogClose">Κλείσιμο</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Αναζήτηση σελιδοδεικτών</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Προσθήκη φακέλου</string>
+    <string name="bookmarksMenuContentDescription">Περισσότερες επιλογές</string>
+    <string name="newTabFavoritesToggleContentDescription">Εναλλαγή ορατότητας αγαπημένων</string>
 </resources>

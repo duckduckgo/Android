@@ -116,4 +116,10 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Impordi Google\'ist</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
     <string name="bookmarksImportDialogClose">Sulge</string>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Otsi järjehoidjaid</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lisa kaust</string>
+    <string name="bookmarksMenuContentDescription">Veel valikuid</string>
+    <string name="newTabFavoritesToggleContentDescription">Lülita lemmikute nähtavust</string>
 </resources>
