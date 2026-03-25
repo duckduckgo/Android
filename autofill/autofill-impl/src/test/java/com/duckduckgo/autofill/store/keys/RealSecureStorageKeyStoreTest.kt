@@ -775,7 +775,6 @@ class RealSecureStorageKeyStoreTest {
     @Test
     fun whenUseHarmonyFlipsDuringGetKeyCallThenSnapshotPreventsReturningNull() = runTest {
         // Simulate TOCTOU: useHarmony() returns false on the first call (snapshot), true on all subsequent calls.
-        // Without Fix 5 this would cause getKey() to enter the harmony block with harmonyPrefs=null,
         // then readFromHarmony()=true would return harmonyValue (null) instead of legacyValue.
         val useHarmonyToggle: Toggle = mock()
         whenever(useHarmonyToggle.isEnabled()).thenReturn(false, true)
