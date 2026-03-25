@@ -1288,7 +1288,7 @@ class BrowserTabFragment :
         )
     }
 
-    private fun launchInputScreen(query: String) {
+    private fun launchInputScreen(query: String, isNewTab: Boolean = false) {
         logcat { "Duck.ai: launchInputScreen" }
         val isTopOmnibar = omnibar.omnibarType != OmnibarType.SINGLE_BOTTOM
         val intent =
@@ -1299,6 +1299,7 @@ class BrowserTabFragment :
                     isTopOmnibar = isTopOmnibar,
                     browserButtonsConfig = InputScreenBrowserButtonsConfig.Enabled(tabs = viewModel.tabs.value?.size ?: 0),
                     launchOnChat = omnibar.viewMode == ViewMode.DuckAI,
+                    isNewTab = isNewTab,
                     useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false,
                     showReturnHatch = androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled(),
                 ),
@@ -2793,7 +2794,7 @@ class BrowserTabFragment :
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
                 if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
-                    launchInputScreen(query = "")
+                    launchInputScreen(query = "", isNewTab = true)
                 }
             }
 
