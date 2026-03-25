@@ -21,7 +21,9 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -124,6 +126,7 @@ class AppTPBlockListInterceptorApiPluginTest {
             moshi,
             deviceShieldPixels,
             appTrackingProtection,
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
         )
 
         runBlocking {

@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.pixels
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_EXCELLENT_LATENCY
@@ -39,10 +40,14 @@ import javax.inject.Inject
 class VpnLatencyPixelInterceptor @Inject constructor(
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val appBuildConfig: AppBuildConfig,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun getInterceptor(): Interceptor = this
 
     override fun intercept(chain: Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
         val originalRequest = chain.request()
         val pixel = originalRequest.url.pathSegments.last()
 
@@ -56,6 +61,21 @@ class VpnLatencyPixelInterceptor @Inject constructor(
             .build()
 
         return chain.proceed(originalRequest.newBuilder().url(url).build())
+    }
+
+    private fun interceptLegacy(chain: Chain): Response {
+        val request = chain.request().newBuilder()
+        val pixel = chain.request().url.pathSegments.last()
+        val url = if (LATENCY_PIXELS.any { pixel.startsWith(it) }) {
+            chain.request().url.newBuilder()
+                .addQueryParameter(PARAM_LOCATION, getLocationParamValue())
+                .addQueryParameter(PARAM_OSABOVE15, isOsAbove15().toString())
+                .build()
+        } else {
+            chain.request().url
+        }
+
+        return chain.proceed(request.url(url).build())
     }
 
     private fun getLocationParamValue(): String {

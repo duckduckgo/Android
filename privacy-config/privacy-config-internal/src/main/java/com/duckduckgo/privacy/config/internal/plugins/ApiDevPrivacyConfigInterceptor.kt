@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.internal.plugins
 
 import android.webkit.URLUtil
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
@@ -33,9 +34,13 @@ import javax.inject.Inject
 )
 class ApiDevPrivacyConfigInterceptor @Inject constructor(
     private val devSettingsDataStore: DevPrivacyConfigSettingsDataStore,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
         val originalRequest = chain.request()
         val storedUrl = devSettingsDataStore.remotePrivacyConfigUrl
         val isCustomSettingEnabled = devSettingsDataStore.useCustomPrivacyConfigUrl
@@ -48,6 +53,23 @@ class ApiDevPrivacyConfigInterceptor @Inject constructor(
         }
 
         return chain.proceed(originalRequest)
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+
+        val url = chain.request().url
+        val storedUrl = devSettingsDataStore.remotePrivacyConfigUrl
+        val isCustomSettingEnabled = devSettingsDataStore.useCustomPrivacyConfigUrl
+        val validHost = runCatching { URI(storedUrl).host.isNotEmpty() }.getOrDefault(false)
+        val canUrlBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl) && validHost
+
+        if (url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
+            request.url(storedUrl!!)
+            return chain.proceed(request.build())
+        }
+
+        return chain.proceed(chain.request())
     }
 
     override fun getInterceptor(): Interceptor {

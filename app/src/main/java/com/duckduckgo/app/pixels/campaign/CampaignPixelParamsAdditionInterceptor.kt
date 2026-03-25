@@ -17,6 +17,7 @@
 package com.duckduckgo.app.pixels.campaign
 
 import com.duckduckgo.app.pixels.campaign.params.AdditionalPixelParamsGenerator
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -36,8 +37,12 @@ class CampaignPixelParamsAdditionInterceptor @Inject constructor(
     private val additionalPixelParamsGenerator: AdditionalPixelParamsGenerator,
     private val additionalPixelParamsFeature: AdditionalPixelParamsFeature,
     private val additionalPixelParamsDataStore: AdditionalPixelParamsDataStore,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
         val originalRequest = chain.request()
 
         if (!additionalPixelParamsFeature.self().isEnabled()) {
@@ -74,6 +79,32 @@ class CampaignPixelParamsAdditionInterceptor @Inject constructor(
         }
 
         return chain.proceed(originalRequest.newBuilder().url(urlBuilder.build()).build())
+    }
+
+    private fun interceptLegacy(chain: Chain): Response {
+        val request = chain.request().newBuilder()
+        val url = chain.request().url.newBuilder()
+
+        if (additionalPixelParamsFeature.self().isEnabled()) {
+            val queryParamsString = chain.request().url.query
+            if (queryParamsString != null) {
+                val pixel = chain.request().url.pathSegments.last()
+                pixelsPlugin.getPlugins().forEach { plugin ->
+                    if (plugin.names().any { pixel.startsWith(it) }) {
+                        val queryParams = queryParamsString.toParamsMap()
+                        if (plugin.isEligible(queryParams)) {
+                            runBlocking {
+                                additionalPixelParamsGenerator.generateAdditionalParams().forEach { (key, value) ->
+                                    url.addQueryParameter(key, value)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return chain.proceed(request.url(url.build()).build())
     }
 
     private fun CampaignPixelParamsAdditionPlugin.isEligible(queryParams: Map<String, String>): Boolean {

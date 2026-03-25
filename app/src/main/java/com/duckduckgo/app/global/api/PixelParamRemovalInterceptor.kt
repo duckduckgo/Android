@@ -25,6 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
@@ -49,6 +50,7 @@ import javax.inject.Inject
 )
 class PixelParamRemovalInterceptor @Inject constructor(
     private val pixelsPlugin: PluginPoint<PixelParamRemovalPlugin>,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : Interceptor, PixelInterceptorPlugin {
 
     val pixels by lazy {
@@ -56,6 +58,9 @@ class PixelParamRemovalInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
         val originalRequest = chain.request()
         val pixel = originalRequest.url.pathSegments.last()
 
@@ -78,6 +83,23 @@ class PixelParamRemovalInterceptor @Inject constructor(
         }.build()
 
         return chain.proceed(originalRequest.newBuilder().url(url).build())
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+        val pixel = chain.request().url.pathSegments.last()
+        val url = chain.request().url.newBuilder().apply {
+            val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
+            val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
+            if (atbs.any { pixel.startsWith(it) }) {
+                removeAllQueryParameters(AppUrl.ParamKey.ATB)
+            }
+            if (versions.any { pixel.startsWith(it) }) {
+                removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
+            }
+        }.build()
+
+        return chain.proceed(request.url(url).build())
     }
 
     override fun getInterceptor(): Interceptor {

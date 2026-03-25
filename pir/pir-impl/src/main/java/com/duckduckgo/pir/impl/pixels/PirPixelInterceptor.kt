@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.pixels
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -30,8 +31,12 @@ import javax.inject.Inject
 )
 class PirPixelInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
         val originalRequest = chain.request()
         val pixel = originalRequest.url.pathSegments.last()
 
@@ -44,6 +49,23 @@ class PirPixelInterceptor @Inject constructor(
         } else {
             chain.proceed(originalRequest)
         }
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+        val pixel = chain.request().url.pathSegments.last()
+
+        val url = if (ALLOWLIST.any { prefix -> pixel.startsWith(prefix) }) {
+            chain.request().url.newBuilder()
+                .addQueryParameter(
+                    KEY_MANUFACTURER,
+                    appBuildConfig.manufacturer,
+                ).build()
+        } else {
+            chain.request().url
+        }
+
+        return chain.proceed(request.url(url).build())
     }
 
     override fun getInterceptor(): Interceptor = this
