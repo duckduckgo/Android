@@ -18,8 +18,11 @@ package com.duckduckgo.duckchat.impl
 
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.localserver.api.DuckAiLocalServer
+import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -34,7 +37,19 @@ import org.mockito.kotlin.whenever
 class DuckAiMigrationJsPluginTest {
 
     private val localServer: DuckAiLocalServer = mock()
-    private val plugin = DuckAiMigrationJsPlugin(localServer)
+    private val feature: DuckChatFeature = mock()
+    private val bridgeMigrationToggle: Toggle = mock()
+    private val httpServerMigrationToggle: Toggle = mock()
+    private val plugin = DuckAiMigrationJsPlugin(localServer, feature)
+
+    @Before
+    fun setUp() {
+        whenever(feature.bridgeMigration()).thenReturn(bridgeMigrationToggle)
+        whenever(feature.httpServerMigration()).thenReturn(httpServerMigrationToggle)
+        // Default: HTTP path active, bridge off — preserves existing test assertions
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(false)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(true)
+    }
 
     @Test
     fun `script is injected for duck ai URL`() {
@@ -156,5 +171,102 @@ class DuckAiMigrationJsPluginTest {
         val captor = argumentCaptor<String>()
         verify(webView).evaluateJavascript(captor.capture(), isNull())
         assertTrue(captor.firstValue.contains("reader.result"))
+    }
+
+    @Test
+    fun `bridge flag on, HTTP flag off — bridge script injected`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(false)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("postMessage"))
+        assertTrue(captor.firstValue.contains("isDone"))
+        assertTrue(captor.firstValue.contains("markDone"))
+    }
+
+    @Test
+    fun `HTTP flag on, bridge flag off — HTTP script injected`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(false)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(localServer.port).thenReturn(8080)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("/migration"))
+    }
+
+    @Test
+    fun `both flags off — no script injected`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(false)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(false)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        verify(webView, never()).evaluateJavascript(any(), any())
+    }
+
+    @Test
+    fun `both flags on — bridge script injected (bridge wins)`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(true)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("postMessage"))
+        assertTrue(captor.firstValue.contains("isDone"))
+        assertTrue(captor.firstValue.contains("markDone"))
+    }
+
+    @Test
+    fun `bridge script uses SettingsBridge postMessage for replaceAllSettings`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(false)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("SettingsBridge"))
+        assertTrue(captor.firstValue.contains("replaceAllSettings"))
+    }
+
+    @Test
+    fun `bridge script uses ChatsBridge postMessage for putChat`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(false)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("ChatsBridge"))
+        assertTrue(captor.firstValue.contains("putChat"))
+    }
+
+    @Test
+    fun `bridge script uses ImagesBridge postMessage for putImage`() {
+        whenever(bridgeMigrationToggle.isEnabled()).thenReturn(true)
+        whenever(httpServerMigrationToggle.isEnabled()).thenReturn(false)
+        val webView: WebView = mock()
+
+        plugin.onPageStarted(webView, "https://duck.ai/", null)
+
+        val captor = argumentCaptor<String>()
+        verify(webView).evaluateJavascript(captor.capture(), isNull())
+        assertTrue(captor.firstValue.contains("ImagesBridge"))
+        assertTrue(captor.firstValue.contains("putImage"))
     }
 }

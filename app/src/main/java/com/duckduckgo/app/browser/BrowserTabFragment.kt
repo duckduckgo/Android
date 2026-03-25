@@ -302,6 +302,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.bridge.api.DuckAiBridgeManager
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
@@ -588,6 +589,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject
+    lateinit var duckAiBridgeManager: DuckAiBridgeManager
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -3753,6 +3757,7 @@ class BrowserTabFragment :
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
         webView?.let {
+            duckAiBridgeManager.attachToWebView(it)
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()

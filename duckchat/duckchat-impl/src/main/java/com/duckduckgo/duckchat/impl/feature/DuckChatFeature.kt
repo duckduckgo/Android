@@ -212,4 +212,20 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun rememberTogglePosition(): Toggle
+
+    /**
+     * @return `true` when bridge-based migration is enabled.
+     * Defaults to `INTERNAL` — active in debug/internal builds for testing; remote config
+     * promotes to TRUE when validated in production.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun bridgeMigration(): Toggle
+
+    /**
+     * @return `true` when HTTP loopback migration is enabled.
+     * Defaults to `FALSE` — re-enable remotely as a rollback mechanism if the bridge path
+     * needs to be temporarily disabled. If both flags are on, bridge takes priority.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun httpServerMigration(): Toggle
 }

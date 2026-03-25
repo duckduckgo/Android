@@ -66,6 +66,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.bridge.api.DuckAiBridgeManager
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
@@ -120,6 +121,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
+
+    @Inject
+    lateinit var bridgeManager: DuckAiBridgeManager
 
     @Inject
     @Named("ContentScopeScripts")
@@ -201,6 +205,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         cookieManager.setAcceptCookie(true)
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
+        bridgeManager.attachToWebView(simpleWebview)
         simpleWebview.let {
             it.webViewClient = webViewClient
             it.webChromeClient = object : WebChromeClient() {
