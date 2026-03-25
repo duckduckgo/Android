@@ -231,7 +231,7 @@ class BrowserMenuBottomSheet(
             },
         )
         fireproofWebsiteMenuItem.label(fireproofLabel)
-        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_24 else drawable.ic_fireproof_solid_24)
+        fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fireproof_solid_24 else drawable.ic_fireproof_24)
         duckChatHistoryMenuItem.isVisible = false
 
         createAliasMenuItem.isVisible = viewState.isEmailSignedIn

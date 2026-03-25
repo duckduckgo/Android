@@ -93,7 +93,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     android:visibility="gone"
-                    app:menuActionLabel="@string/browserMenuNewAIChat"
+                    app:menuActionLabel="@string/browserMenuNewChat"
                     app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
@@ -243,9 +243,9 @@
                 android:id="@+id/duckChatHistoryMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_history_24"
+                app:iconDrawable="@drawable/ic_dot_list_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuChatHistory" />
+                app:primaryText="@string/browserMenuDuckChatHistory" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/privacyToolsSectionDivider"
@@ -264,7 +264,7 @@
                 android:id="@+id/createAliasMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_email_24"
+                app:iconDrawable="@drawable/ic_email_protection_24"
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuEmailAlias" />
 
@@ -313,7 +313,7 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_print_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuPrint" />
+                app:primaryText="@string/browserMenuPrintSite" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/chatSettings"
