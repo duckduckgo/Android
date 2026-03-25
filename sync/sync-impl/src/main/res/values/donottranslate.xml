@@ -49,7 +49,7 @@
     <string name="sync_settings_recovery_section_header">Recovery</string>
     <string name="sync_settings_download_recovery_code_item">Download Recovery Code as PDF</string>
     <string name="sync_settings_download_recovery_code_item_hint">Use this code to recover your data if you lose access to this device — keep it safe.</string>
-    <string name="sync_settings_data_expiration">If Sync &amp; Backup is inactive for 18 months, the data cannot be restored. <annotation type="learn_more_link">Learn more</annotation></string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup data can\'t be recovered after 18 months of inactivity. <annotation type="learn_more_link">Learn more</annotation></string>
 
     <!-- Block Store -->
     <string name="sync_internal_block_store_header">Persistent Storage / Block Store</string>

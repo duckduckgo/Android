@@ -59,6 +59,7 @@ import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -853,6 +854,28 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSyncStateReEmitsAfterToggleChangedThenPendingToggleStatePreserved() = runTest {
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+        whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            expectMostRecentItem()
+            testee.onAutoRestoreToggleChanged(false)
+            assertFalse(awaitItem().autoRestoreEnabled)
+
+            // Sync state re-emits (e.g. a background sync completes) — toggle should not revert.
+            // MutableStateFlow only emits when value changes, so if toggle is correctly preserved
+            // (state unchanged) we expect no new emission.
+            stateFlow.value = IN_PROGRESS
+            stateFlow.value = READY
+            advanceUntilIdle()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenScreenExitsWithAutoRestoreEnabledThenSavesPayloadAndSetsPreference() = runTest {
         val authCode = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "rawCode")
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
@@ -1008,6 +1031,29 @@ class SyncActivityViewModelTest {
             val reSignedInState = awaitItem()
             assertTrue(reSignedInState.showAutoRestoreToggle)
 
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutoRestorePreferenceWrittenDuringSetupThenResubscribingToViewStateShowsCorrectToggleState() = runTest {
+        // Simulate the race: account created (signed-in state fires) before the setup screen writes
+        // the preference. The first viewState() collection reads 'false' from DataStore.
+        whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
+        whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().autoRestoreEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Setup flow now writes 'true' to DataStore (user allowed auto-restore).
+        whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
+
+        // SyncActivity returns to foreground — viewState() is re-subscribed.
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().autoRestoreEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }

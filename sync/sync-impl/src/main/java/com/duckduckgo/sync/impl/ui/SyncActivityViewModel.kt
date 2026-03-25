@@ -103,7 +103,8 @@ class SyncActivityViewModel @Inject constructor(
     // onScreenExit() reads them from a different coroutine launched on the IO dispatcher.
     @Volatile private var autoRestoreAvailable = false
 
-    @Volatile private var initialAutoRestoreEnabled = false
+    // null until the first load from preference; used by onScreenExit() to detect changes.
+    @Volatile private var initialAutoRestoreEnabled: Boolean? = null
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
@@ -117,12 +118,17 @@ class SyncActivityViewModel @Inject constructor(
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
+        // Reset so the next signedInState() call re-reads from DataStore. This is necessary because
+        // the setup flow writes the auto-restore preference AFTER account creation, but the
+        // syncStateMonitor can fire the signed-in event (and cache initialAutoRestoreEnabled=false)
+        // while SetupAccountActivity is still on top and the user hasn't confirmed their preference yet.
+        initialAutoRestoreEnabled = null
         syncStateObserverJob += syncStateMonitor.syncState()
             .onEach { syncState ->
                 val state = if (syncState == OFF) {
                     signedOutState()
                 } else {
-                    signedInState(loadAutoRestoreState())
+                    signedInState()
                 }
                 viewState.value = state
             }.onStart {
@@ -154,9 +160,14 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private fun signedInState(autoRestoreState: AutoRestoreState): ViewState {
-        val connectedDevices = viewState.value.syncedDevices
-        val syncedDevices = connectedDevices.ifEmpty {
+    private suspend fun signedInState(): ViewState {
+        val currentState = viewState.value
+        val autoRestoreState = if (initialAutoRestoreEnabled == null) {
+            loadAutoRestoreState()
+        } else {
+            AutoRestoreState(showToggle = autoRestoreAvailable, enabled = currentState.autoRestoreEnabled)
+        }
+        val syncedDevices = currentState.syncedDevices.ifEmpty {
             val thisDevice = syncAccountRepository.getThisConnectedDevice() ?: return signedOutState()
             listOf(SyncedDevice(thisDevice))
         }
@@ -177,7 +188,7 @@ class SyncActivityViewModel @Inject constructor(
             if (!syncAccountRepository.isSignedIn()) {
                 signedOutState()
             } else {
-                signedInState(loadAutoRestoreState())
+                signedInState()
             }
         }
 
@@ -372,15 +383,16 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onScreenExit() {
         val current = viewState.value
-        if (!autoRestoreAvailable) {
+        val initial = initialAutoRestoreEnabled
+        if (!autoRestoreAvailable || initial == null) {
             logcat { "Sync-Recovery: screen exit — auto-restore not available, nothing to write" }
             return
         }
-        if (current.autoRestoreEnabled == initialAutoRestoreEnabled) {
+        if (current.autoRestoreEnabled == initial) {
             logcat { "Sync-Recovery: screen exit — restore on reinstall unchanged (${current.autoRestoreEnabled}), nothing to write" }
             return
         }
-        logcat { "Sync-Recovery: screen exit — committing restore on reinstall: $initialAutoRestoreEnabled -> ${current.autoRestoreEnabled}" }
+        logcat { "Sync-Recovery: screen exit — committing restore on reinstall: $initial -> ${current.autoRestoreEnabled}" }
 
         // appCoroutineScope as we don't want this cancelled even if the activity / view model lifecycle ends
         appCoroutineScope.launch(dispatchers.io()) {
@@ -388,7 +400,6 @@ class SyncActivityViewModel @Inject constructor(
                 syncAccountRepository.getRecoveryCode()
                     .onSuccess { authCode ->
                         val deviceId = syncAccountRepository.getThisConnectedDevice()?.deviceId
-                        logcat { "Sync-Recovery: saving recovery payload to Block Store (deviceId=$deviceId)" }
                         syncAutoRestoreManager.saveAutoRestoreData(authCode.rawCode, deviceId)
                         initialAutoRestoreEnabled = true
                     }

@@ -363,7 +363,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskSetupSyncDeepLink -> askSetupSyncDeepLink(command.syncBarcodeUrl)
             is LaunchLearnMore -> globalActivityStarter.start(
                 this,
-                SettingsWebViewScreenWithParams(url = it.url, screenTitle = getString(R.string.sync_screen_title)),
+                SettingsWebViewScreenWithParams(url = command.url, screenTitle = getString(R.string.sync_screen_title)),
             )
             is DeepLinkIntoSetup -> {
                 val authConfig = AuthConfiguration(
