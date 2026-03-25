@@ -40,34 +40,20 @@ Do not open a PR with known failures.
 
 ## Open the draft PR
 
-Create a draft PR using the repo's PR template (.github/PULL_REQUEST_TEMPLATE.md) exactly.
-Do not add any content above the first line of the template.
+Read `.github/PULL_REQUEST_TEMPLATE.md` and use it as the PR body exactly — do not skip
+or reorder sections, do not add content above the first line of the template.
 
-Title: [Android Maintenance] <brief description of what was fixed>
+Title: `[Android Maintenance] <brief description of what was fixed>`
 
-Body (follow the template exactly — replace the placeholder sections):
+Fill in the template sections as follows:
+- **Task/Issue URL**: the Asana task URL
+- **Description**: start with `🤖 Android Maintenance Worker (on-demand via /run-maintenance-task)`,
+  then summarise what was changed and why, drawn from the task's Context and Approach
+- **Steps to test**: use the commands from the task's Validation section as the checklist items
+- **UI changes**: `No UI changes` in both columns (maintenance tasks do not touch UI)
 
-    Task/Issue URL: <Asana task URL>
-
-    ### Description
-    🤖 Android Maintenance Worker (on-demand via /run-maintenance-task)
-
-    <What was changed and why — drawn from the task's Context and Approach (if present)>
-
-    ### Steps to test this PR
-
-    _Lint / formatting_
-    - [ ] <module-specific lint command from the task's Validation section>
-    - [ ] ./gradlew spotlessCheck
-
-    ### UI changes
-    | Before  | After |
-    | ------ | ----- |
-    | No UI changes | No UI changes |
-
-To open the PR, use `gh api repos/duckduckgo/Android/pulls --method POST` rather than
-`gh pr create` — `gh pr create` fails with a Projects Classic deprecation warning that
-breaks automated execution.
+Use `gh api repos/duckduckgo/Android/pulls --method POST` to open the PR as a draft —
+do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
 
 After opening the PR:
     - Move the Asana task to "In Review"
