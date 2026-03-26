@@ -95,8 +95,8 @@ class RealSecureStorageKeyStore(
      * Evaluates all three harmony-related flags in a single consistent snapshot.
      * [multiProcess] (autofill service enabled) implies both [useHarmony] and [readFromHarmony]:
      * Harmony is the only multi-process-safe store, so it is treated as implicitly active regardless
-     * of the remote-config flag state. All three values are derived from one [isMultiProcessMode]
-     * call, guaranteeing they can never be mutually inconsistent.
+     * of the remote-config flag state. All three values are derived from one check of each flag,
+     * guaranteeing they can never be mutually inconsistent.
      */
     private data class HarmonyFlags(
         val useHarmony: Boolean,

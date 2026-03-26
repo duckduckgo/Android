@@ -29,7 +29,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 interface AutofillServiceFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @InternalAlwaysEnabled
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)

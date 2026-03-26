@@ -60,24 +60,23 @@ class RealSecureStorageKeyProvider @Inject constructor(
     override suspend fun getl1Key(): ByteArray {
         l1KeyMutex.withLock {
             // If no key exists in the keystore, we generate a new one and store it
-            return if (secureStorageKeyRepository.getL1Key() == null) {
-                val newKey = randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE)
-                try {
-                    secureStorageKeyRepository.setL1Key(newKey)
-                    newKey
-                } catch (e: SecureStorageException.KeyAlreadyExistsException) {
-                    // Another process wrote the key between our read and write — use theirs
-                    secureStorageKeyRepository.getL1Key() ?: throw e
-                }
-            } else {
-                secureStorageKeyRepository.getL1Key()!!
+            secureStorageKeyRepository.getL1Key()?.let {
+                return it
+            }
+            val newKey = randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE)
+            return try {
+                secureStorageKeyRepository.setL1Key(newKey)
+                newKey
+            } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+                // Another process wrote the key between our read and write — use theirs
+                secureStorageKeyRepository.getL1Key() ?: throw e
             }
         }
     }
 
     override suspend fun getl2Key(): Key {
         l2KeyMutex.withLock {
-            val userPassword = if (secureStorageKeyRepository.getPassword() == null) {
+            val userPassword = secureStorageKeyRepository.getPassword() ?: run {
                 val newPassword = randomBytesGenerator.generateBytes(PASSWORD_SIZE)
                 try {
                     secureStorageKeyRepository.setPassword(newPassword)
@@ -86,8 +85,6 @@ class RealSecureStorageKeyProvider @Inject constructor(
                     // Another process wrote the password between our read and write — use theirs
                     secureStorageKeyRepository.getPassword() ?: throw e
                 }
-            } else {
-                secureStorageKeyRepository.getPassword()
             }
 
             return getl2Key(userPassword!!.toByteString().base64())
@@ -95,7 +92,16 @@ class RealSecureStorageKeyProvider @Inject constructor(
     }
 
     private suspend fun getl2Key(password: String): Key {
-        val keyMaterial = if (secureStorageKeyRepository.getEncryptedL2Key() == null) {
+        val (encryptedL2Key, encryptedL2KeyIV) = secureStorageKeyRepository.getEncryptedL2Key() to secureStorageKeyRepository.getEncryptedL2KeyIV()
+        val keyMaterial = if (encryptedL2Key != null && encryptedL2KeyIV != null) {
+            encryptionHelper.decrypt(
+                EncryptedBytes(
+                    encryptedL2Key,
+                    encryptedL2KeyIV,
+                ),
+                deriveKeyFromPassword(password),
+            )
+        } else {
             val keyBytes = secureStorageKeyGenerator.generateKey().encoded
             try {
                 encryptAndStoreL2Key(keyBytes, password)
@@ -110,14 +116,6 @@ class RealSecureStorageKeyProvider @Inject constructor(
                     deriveKeyFromPassword(password),
                 )
             }
-        } else {
-            encryptionHelper.decrypt(
-                EncryptedBytes(
-                    secureStorageKeyRepository.getEncryptedL2Key()!!,
-                    secureStorageKeyRepository.getEncryptedL2KeyIV()!!,
-                ),
-                deriveKeyFromPassword(password),
-            )
         }
         return secureStorageKeyGenerator.generateKeyFromKeyMaterial(keyMaterial)
     }
@@ -135,8 +133,8 @@ class RealSecureStorageKeyProvider @Inject constructor(
         }.data
 
     private suspend fun getPasswordSalt(): ByteArray {
-        if (secureStorageKeyRepository.getPasswordSalt() != null) {
-            return secureStorageKeyRepository.getPasswordSalt()!!
+        secureStorageKeyRepository.getPasswordSalt()?.let {
+            return it
         }
         val newSalt = randomBytesGenerator.generateBytes(PASSWORD_KEY_SALT_SIZE)
         return try {
