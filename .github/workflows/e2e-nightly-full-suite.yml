@@ -275,7 +275,7 @@ jobs:
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() && inputs.create_asana_tasks }}
+        if: ${{ failure() && fromJSON(inputs.create_asana_tasks) }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
