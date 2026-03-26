@@ -346,6 +346,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -968,12 +969,17 @@ class BrowserTabFragment :
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
                     when (val result = it.result) {
                         is VoiceSearchLauncher.VoiceRecognitionResult.SearchResult -> {
+                            nativeInputManager.hideNativeInput(animate = false)
                             omnibar.setText(result.query)
                             userEnteredQuery(result.query)
                         }
 
                         is VoiceSearchLauncher.VoiceRecognitionResult.DuckAiResult -> {
-                            duckChat.openDuckChatWithAutoPrompt(result.query)
+                            if (nativeInputManager.isNativeInputEnabled()) {
+                                nativeInputManager.handleDuckAiVoiceResult(result.query)
+                            } else {
+                                duckChat.openDuckChatWithAutoPrompt(result.query)
+                            }
                         }
                     }
                     resumeWebView()
@@ -1283,6 +1289,12 @@ class BrowserTabFragment :
                             params = JSONObject("{}"),
                         ),
                     )
+                },
+                onVoiceSearchPressed = { isChatTab ->
+                    val mode = if (isChatTab) VoiceSearchMode.DUCK_AI else VoiceSearchMode.SEARCH
+                    webView?.onPause()
+                    hideKeyboard()
+                    voiceSearchLauncher.launch(requireActivity(), mode)
                 },
             ),
         )
