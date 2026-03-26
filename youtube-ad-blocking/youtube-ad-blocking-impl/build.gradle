@@ -26,6 +26,7 @@ dependencies {
     implementation project(':youtube-ad-blocking-api')
     implementation project(':feature-toggles-api')
     implementation project(':common-utils')
+    implementation project(':browser-api')
     implementation project(':app-build-config-api')
 
     anvil project(path: ':anvil-compiler')

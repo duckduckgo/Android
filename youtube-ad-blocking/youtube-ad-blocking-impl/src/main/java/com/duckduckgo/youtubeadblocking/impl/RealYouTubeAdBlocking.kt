@@ -25,6 +25,7 @@ import com.duckduckgo.youtubeadblocking.api.YouTubeAdBlocking
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -45,7 +46,11 @@ class RealYouTubeAdBlocking @Inject constructor(
         request: WebResourceRequest,
         url: Uri,
     ): WebResourceResponse? {
-        if (!isEnabled()) return null
+        val enabled = isEnabled()
+        if (!enabled) {
+            logcat { "YouTubeAdBlocking: Feature disabled, skipping interception for ${url.host}" }
+            return null
+        }
         return requestInterceptor.intercept(request, url)
     }
 }
