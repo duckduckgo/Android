@@ -24,6 +24,7 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -692,6 +693,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     checkView.alpha = 1f
                     checkView.scaleX = 1f
                     checkView.scaleY = 1f
+                    checkView.setImageResource(CommonR.drawable.ic_check_green_24)
                 }
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
@@ -762,13 +764,14 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     private fun playCheckIconAnimation() {
         val overshoot = OvershootInterpolator(CHECK_ICON_OVERSHOOT_TENSION)
+        val comparisonTable = binding.daxDialogCta.comparisonChartContent.comparisonTable
         val checkViews = listOf(
             binding.daxDialogCta.comparisonChartContent.check1,
             binding.daxDialogCta.comparisonChartContent.check2,
             binding.daxDialogCta.comparisonChartContent.check3,
             binding.daxDialogCta.comparisonChartContent.check4,
             binding.daxDialogCta.comparisonChartContent.check5,
-        )
+        ).sortedBy { comparisonTable.indexOfChild(it.parent as View) }
 
         val iconAnimators = checkViews.mapIndexed { index, checkView ->
             AnimatorSet().apply {
@@ -786,6 +789,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     },
                 )
                 startDelay = index * CHECK_ICON_STAGGER_DELAY
+            }
+        }
+
+        checkViews.forEachIndexed { index, checkView ->
+            checkView.postDelayed(index * CHECK_ICON_STAGGER_DELAY + CHECK_ICON_AVD_START_DELAY) {
+                (checkView.drawable as? AnimatedVectorDrawable)?.start()
             }
         }
 
@@ -913,6 +922,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val CHECK_ICON_FADE_DURATION = 130L
         private const val CHECK_ICON_STAGGER_DELAY = 130L
         private const val CHECK_ICON_OVERSHOOT_TENSION = 2.4f
+        private const val CHECK_ICON_AVD_START_DELAY = 180L
 
         private const val DIALOG_TRANSITION_DURATION = 400L
         private const val ARROW_TARGET_OFFSET_END_DP = 80
