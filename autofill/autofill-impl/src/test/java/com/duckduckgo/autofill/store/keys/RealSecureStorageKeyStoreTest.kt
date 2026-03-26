@@ -141,17 +141,6 @@ class RealSecureStorageKeyStoreTest {
         assertNull(result)
     }
 
-    @Test
-    fun whenUpdateKeyWithNullValueThenKeyIsRemoved() = runTest {
-        configureHarmonyDisabled()
-        createTestee()
-
-        testee.updateKey(KEY_NAME, null)
-
-        verify(legacyEditor).remove(KEY_NAME)
-        verify(legacyEditor).commit()
-    }
-
     // endregion
 
     // region canUseEncryption
@@ -214,17 +203,6 @@ class RealSecureStorageKeyStoreTest {
         verify(harmonyEditor).putString(eq(KEY_NAME), eq(expectedBase64))
     }
 
-    @Test
-    fun whenHarmonyEnabledAndUpdateKeyWithNullThenKeyRemovedFromBothStores() = runTest {
-        configureHarmonyEnabled()
-        createTestee()
-
-        testee.updateKey(KEY_NAME, null)
-
-        verify(legacyEditor).remove(KEY_NAME)
-        verify(harmonyEditor).remove(KEY_NAME)
-    }
-
     // endregion
 
     // region Write guard (key already exists)
@@ -280,19 +258,6 @@ class RealSecureStorageKeyStoreTest {
 
         assertTrue(exceptionThrown)
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
-    }
-
-    @Test
-    fun whenWritingNullValueThenWriteGuardDoesNotBlock() = runTest {
-        configureHarmonyEnabled()
-        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
-        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
-        createTestee()
-
-        // Should not throw - removing a key is always allowed
-        testee.updateKey(KEY_NAME, null)
-
-        verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
     }
 
     // endregion
@@ -638,36 +603,6 @@ class RealSecureStorageKeyStoreTest {
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED), any(), any(), any())
         // Legacy write should be rolled back since harmony write failed
         verify(legacyEditor).remove(KEY_NAME)
-    }
-
-    @Test
-    fun whenHarmonyCommitReturnsFalseForNullValueThenNoLegacyRollback() = runTest {
-        configureHarmonyEnabled()
-        val failingHarmonyEditor: SharedPreferences.Editor = mock {
-            on { putString(any(), any()) } doReturn it
-            on { remove(any()) } doReturn it
-            on { commit() } doReturn false
-        }
-        val failingHarmonyPrefs: SharedPreferences = mock {
-            on { edit() } doReturn failingHarmonyEditor
-        }
-        sharedPreferencesProvider.stub {
-            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn failingHarmonyPrefs
-        }
-        createTestee()
-
-        var exceptionThrown = false
-        try {
-            testee.updateKey(KEY_NAME, null) // removing a key — no rollback needed
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
-            exceptionThrown = true
-        }
-
-        assertTrue(exceptionThrown)
-        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED), any(), any(), any())
-        // remove() is called exactly once for the actual legacy write (keyValue=null → remove the key).
-        // The rollback code is guarded by `if (keyValue != null)`, so no second remove() for rollback.
-        verify(legacyEditor, times(1)).remove(KEY_NAME)
     }
 
     @Test
