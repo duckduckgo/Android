@@ -18,6 +18,7 @@ package com.duckduckgo.youtubeadblocking.impl
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -137,6 +138,10 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
             return null
         }
 
+        // Sync Set-Cookie headers into WebView's CookieManager so cookies are persisted.
+        // WebView doesn't process Set-Cookie from synthetic WebResourceResponse objects.
+        syncCookies(url.toString(), response.headers)
+
         // Inject script into <head>
         val injectedBody = injectScript(originalBody, probeScript)
 
@@ -174,6 +179,18 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 
         // Fallback: prepend before <!DOCTYPE> or at the start
         return scriptTag + html
+    }
+
+    private fun syncCookies(url: String, headers: okhttp3.Headers) {
+        try {
+            val cookieManager = CookieManager.getInstance() ?: return
+            headers.values("Set-Cookie").forEach { cookie ->
+                cookieManager.setCookie(url, cookie)
+            }
+            cookieManager.flush()
+        } catch (e: Exception) {
+            logcat(ERROR) { "YouTubeAdBlocking: Failed to sync cookies: ${e.message}" }
+        }
     }
 
     private fun buildResponseHeaders(originalHeaders: okhttp3.Headers): Map<String, String> {
