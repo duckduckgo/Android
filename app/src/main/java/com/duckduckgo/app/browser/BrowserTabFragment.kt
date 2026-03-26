@@ -1284,6 +1284,9 @@ class BrowserTabFragment :
                         ),
                     )
                 },
+                onImageButtonPressed = {
+                    // To be implemented
+                },
             ),
         )
     }

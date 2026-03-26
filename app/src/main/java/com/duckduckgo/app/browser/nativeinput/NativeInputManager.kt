@@ -47,6 +47,7 @@ class NativeInputCallbacks(
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    val onImageButtonPressed: () -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -371,6 +372,7 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
+            onImageClick = { callbacks.onImageButtonPressed() }
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)

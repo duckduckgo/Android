@@ -21,8 +21,11 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -57,6 +60,7 @@ interface NativeInputWidget {
     var onChatSelected: (() -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
+    var onImageClick: (() -> Unit)?
 
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
@@ -67,6 +71,7 @@ interface NativeInputWidget {
     fun selectChatTab()
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
+    fun setImageButtonVisible(visible: Boolean)
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -113,9 +118,13 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     override var onStopTapped: (() -> Unit)? = null
+    override var onImageClick: (() -> Unit)? = null
+
+    private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        imageButton.setOnClickListener { onImageClick?.invoke() }
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -176,6 +185,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         setBackgroundColor(Color.TRANSPARENT)
         hideBackArrow()
         hideInputFieldBackground()
+        removeMargins()
         if (duckChatInternal.isEnabled()) {
             setToggleMatchParent()
         } else {
@@ -183,6 +193,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
         prepareSubmitButtons()
         configureMainButtonsVisibility()
+    }
+
+    private fun removeMargins() {
+        findViewById<EditText?>(R.id.inputField)?.updateLayoutParams<MarginLayoutParams> {
+            marginStart = 0
+        }
+        findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.updateLayoutParams<MarginLayoutParams> {
+            marginEnd = 0
+        }
     }
 
     private fun prepareSubmitButtons() {
@@ -395,15 +414,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (streaming) {
             submitButtons?.setStopButton()
         } else {
-            submitButtons?.clearStopButton(com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24)
+            submitButtons?.clearStopButton(R.drawable.ic_arrow_up_24)
         }
     }
 
     private fun updateDuckAiSubmitButton() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
+        setImageButtonVisible(isChatTab)
         if (isChatTab) {
-            submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24)
+            submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             submitButtons?.setSendButtonVisible(true)
             if (!canExpand) {
                 inputField.minLines = 1
@@ -415,6 +435,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
             submitButtons?.setSendButtonIcon(com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
             submitButtons?.setSendButtonVisible(false)
         }
+    }
+
+    override fun setImageButtonVisible(visible: Boolean) {
+        imageButton.isVisible = visible
     }
 
     private fun ensureSubmitButtons() {
