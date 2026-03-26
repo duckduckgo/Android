@@ -51,11 +51,14 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -131,13 +134,16 @@ class InputScreenViewModelTest {
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
         }
 
-    private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
+    private fun createViewModel(
+        currentOmnibarText: String = "",
+        appCoroutineScope: CoroutineScope = coroutineRule.testScope,
+    ): InputScreenViewModel =
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
             autoCompleteFactory = autoCompleteFactory,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
-            appCoroutineScope = coroutineRule.testScope,
+            appCoroutineScope = appCoroutineScope,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
             pixel = pixel,
@@ -2868,6 +2874,19 @@ class InputScreenViewModelTest {
         }
 
     @Test
+    fun `getNewTabTogglePosition returns DUCK_AI immediately when app scope dispatcher has pending work`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            val pausedAppScope = TestScope(StandardTestDispatcher(testScheduler))
+
+            val viewModel = createViewModel(appCoroutineScope = pausedAppScope)
+
+            assertEquals(DefaultTogglePosition.DUCK_AI, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
     fun `getNewTabTogglePosition returns SEARCH when setting is LAST_USED and last used is null`() =
         runTest {
             @Suppress("DenyListedApi")
@@ -2968,6 +2987,20 @@ class InputScreenViewModelTest {
             viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("test prompt"))
 
             verify(duckChat).saveLastUsedTogglePosition(DefaultTogglePosition.DUCK_AI.name)
+        }
+
+    @Test
+    fun `saveLastUsedTogglePosition called once on fullscreen duck ai prompt autocomplete`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("test prompt"))
+
+            verify(duckChat, times(1)).saveLastUsedTogglePosition(DefaultTogglePosition.DUCK_AI.name)
         }
 
     @Test

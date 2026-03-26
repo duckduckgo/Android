@@ -207,7 +207,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val defaultTogglePosition: StateFlow<DefaultTogglePosition> =
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             duckChat.observeDefaultTogglePosition()
-                .stateIn(appCoroutineScope, SharingStarted.Eagerly, DefaultTogglePosition.SEARCH)
+                .stateIn(viewModelScope, SharingStarted.Eagerly, DefaultTogglePosition.SEARCH)
         } else {
             MutableStateFlow(DefaultTogglePosition.SEARCH)
         }
@@ -215,7 +215,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val lastUsedTogglePosition: StateFlow<String?> =
         if (duckChatFeature.rememberTogglePosition().isEnabled()) {
             duckChat.observeLastUsedTogglePosition()
-                .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
+                .stateIn(viewModelScope, SharingStarted.Eagerly, null)
         } else {
             MutableStateFlow(null)
         }
@@ -404,7 +404,6 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
-        saveLastUsedTogglePosition()
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
@@ -412,6 +411,7 @@ class InputScreenViewModel @AssistedInject constructor(
         if (visibilityState.value.fullScreenMode) {
             onChatSubmitted(prompt)
         } else {
+            saveLastUsedTogglePosition()
             duckChatJSHelper.clearTabContextPromptEvent()
             command.value = Command.SubmitChat(prompt)
             duckChat.openDuckChatWithAutoPrompt(prompt)
