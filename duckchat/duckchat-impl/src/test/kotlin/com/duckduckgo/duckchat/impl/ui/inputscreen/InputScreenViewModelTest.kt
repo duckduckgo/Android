@@ -2849,6 +2849,7 @@ class InputScreenViewModelTest {
             @Suppress("DenyListedApi")
             duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
 
             val viewModel = createViewModel()
 
@@ -2861,6 +2862,7 @@ class InputScreenViewModelTest {
             @Suppress("DenyListedApi")
             duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
             whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
 
             val viewModel = createViewModel()
 
