@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Atgūšana</string>
     <string name="sync_settings_download_recovery_code_item">Lejupielādēt atkopšanas kodu PDF formātā</string>
     <string name="sync_settings_download_recovery_code_item_hint">Izmanto šo kodu, lai atgūtu datus, ja zaudēsi piekļuvi šai ierīcei — glabā to drošībā.</string>
-    <string name="sync_settings_data_expiration">Ja Sync &amp; Backup 18 mēnešus nav aktīvs, datus nevar atjaunot. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup datus nevar atgūt pēc 18 mēnešu neaktivitātes. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
 </resources>
