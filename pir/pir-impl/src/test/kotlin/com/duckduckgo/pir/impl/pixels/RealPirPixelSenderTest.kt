@@ -66,7 +66,7 @@ class RealPirPixelSenderTest {
     fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
         val totalTimeInMillis = 12345L
 
-        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false)
+        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false, totalScanJobs = 5, totalOptOutJobs = 3)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -80,6 +80,10 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "12345")
         assert(paramsCaptor.firstValue.containsKey("battery-optimizations"))
         assert(paramsCaptor.firstValue["battery-optimizations"] == "false")
+        assert(paramsCaptor.firstValue.containsKey("total_scan"))
+        assert(paramsCaptor.firstValue["total_scan"] == "5")
+        assert(paramsCaptor.firstValue.containsKey("total_optout"))
+        assert(paramsCaptor.firstValue["total_optout"] == "3")
     }
 
     @Test

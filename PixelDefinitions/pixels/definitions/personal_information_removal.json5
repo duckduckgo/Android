@@ -1232,6 +1232,16 @@
                 "key": "battery-optimizations",
                 "description": "Whether battery optimizations are enabled for the app",
                 "type": "string"
+            },
+            {
+                "key": "total_scan",
+                "description": "The number of scan jobs executed during the run",
+                "type": "string"
+            },
+            {
+                "key": "total_optout",
+                "description": "The number of opt-out jobs executed during the run",
+                "type": "string"
             }
         ]
     },

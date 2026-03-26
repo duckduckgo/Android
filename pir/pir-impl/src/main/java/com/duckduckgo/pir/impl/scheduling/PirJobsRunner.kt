@@ -94,19 +94,19 @@ class RealPirJobsRunner @Inject constructor(
 
         if (profileQueries.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis)
+            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
         }
 
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis)
+            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
         }
 
         storeScanStats(startTimeInMillis, executionType)
         attemptCreateScanJobs(activeBrokers, profileQueries)
-        executeScanJobs(context, executionType, activeBrokers)
+        val totalScanJobs = executeScanJobs(context, executionType, activeBrokers)
 
         // We emit a pixel after the scans are completed from the foreground scan
         if (executionType == MANUAL) {
@@ -121,15 +121,15 @@ class RealPirJobsRunner @Inject constructor(
 
         if (activeFormOptOutBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
-            emitCompletedPixel(context, executionType, startTimeInMillis)
+            emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
         }
 
         attemptCreateOptOutJobs(activeFormOptOutBrokers)
-        executeOptOutJobs(context, activeFormOptOutBrokers)
+        val totalOptOutJobs = executeOptOutJobs(context, activeFormOptOutBrokers)
 
         logcat { "PIR-JOB-RUNNER: Completed." }
-        emitCompletedPixel(context, executionType, startTimeInMillis)
+        emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs, totalOptOutJobs)
         return@withContext Result.success(Unit)
     }
 
@@ -169,11 +169,13 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         startTimeInMillis: Long,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
     ) {
         val totalTimeMillis = currentTimeProvider.currentTimeMillis() - startTimeInMillis
         if (executionType == MANUAL) {
             val batteryOptimizationsEnabled = !context.isIgnoringBatteryOptimizations()
-            pixelSender.reportManualScanCompleted(totalTimeMillis, batteryOptimizationsEnabled)
+            pixelSender.reportManualScanCompleted(totalTimeMillis, batteryOptimizationsEnabled, totalScanJobs, totalOptOutJobs)
         } else {
             pixelSender.reportScheduledScanCompleted(totalTimeMillis)
         }
@@ -219,23 +221,21 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         activeBrokers: Set<String>,
-    ) {
-        eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+    ): Int {
+        val eligibleJobs = eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
             .filter { it.brokerName in activeBrokers }
-            .also {
-                val runType = if (executionType == MANUAL) {
-                    RunType.MANUAL
-                } else {
-                    RunType.SCHEDULED
-                }
-
-                if (it.isNotEmpty()) {
-                    logcat { "PIR-JOB-RUNNER: Executing scan for ${it.size} eligible scan jobs." }
-                    pirScan.executeScanForJobs(it, context, runType)
-                } else {
-                    logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
-                }
-            }
+        val runType = if (executionType == MANUAL) {
+            RunType.MANUAL
+        } else {
+            RunType.SCHEDULED
+        }
+        if (eligibleJobs.isNotEmpty()) {
+            logcat { "PIR-JOB-RUNNER: Executing scan for ${eligibleJobs.size} eligible scan jobs." }
+            pirScan.executeScanForJobs(eligibleJobs, context, runType)
+        } else {
+            logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+        }
+        return eligibleJobs.size
     }
 
     private suspend fun attemptCreateOptOutJobs(activeFormOptOutBrokers: Set<String>) {
@@ -268,18 +268,16 @@ class RealPirJobsRunner @Inject constructor(
     private suspend fun executeOptOutJobs(
         context: Context,
         activeFormOptOutBrokers: Set<String>,
-    ) {
-        eligibleOptOutJobProvider.getAllEligibleOptOutJobs(currentTimeProvider.currentTimeMillis())
-            .filter {
-                activeFormOptOutBrokers.contains(it.brokerName)
-            }.also {
-                if (it.isNotEmpty()) {
-                    logcat { "PIR-JOB-RUNNER: Executing opt-outs for ${it.size} eligible optout jobs." }
-                    pirOptOut.executeOptOutForJobs(it, context)
-                } else {
-                    logcat { "PIR-JOB-RUNNER: No eligible opt-out jobs to execute." }
-                }
-            }
+    ): Int {
+        val eligibleJobs = eligibleOptOutJobProvider.getAllEligibleOptOutJobs(currentTimeProvider.currentTimeMillis())
+            .filter { activeFormOptOutBrokers.contains(it.brokerName) }
+        if (eligibleJobs.isNotEmpty()) {
+            logcat { "PIR-JOB-RUNNER: Executing opt-outs for ${eligibleJobs.size} eligible optout jobs." }
+            pirOptOut.executeOptOutForJobs(eligibleJobs, context)
+        } else {
+            logcat { "PIR-JOB-RUNNER: No eligible opt-out jobs to execute." }
+        }
+        return eligibleJobs.size
     }
 
     override fun stop() {

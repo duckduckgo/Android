@@ -110,10 +110,14 @@ interface PirPixelSender {
      *
      * @param totalTimeInMillis - how long it took for the scan to complete
      * @param batteryOptimizationsEnabled - whether battery optimizations are enabled for the app
+     * @param totalScanJobs - the number of scan jobs executed during the run
+     * @param totalOptOutJobs - the number of opt-out jobs executed during the run
      */
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
     )
 
     /**
@@ -626,10 +630,14 @@ class RealPirPixelSender @Inject constructor(
     override fun reportManualScanCompleted(
         totalTimeInMillis: Long,
         batteryOptimizationsEnabled: Boolean,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
             PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
+            PARAM_KEY_TOTAL_SCAN to totalScanJobs.toString(),
+            PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -1509,6 +1517,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_VPN_STATE = "vpn_connection_state"
         private const val PARAM_KEY_POWER_SAVING = "power_saving"
         private const val PARAM_KEY_BATTERY_OPTIMIZATIONS = "battery-optimizations"
+        private const val PARAM_KEY_TOTAL_SCAN = "total_scan"
+        private const val PARAM_KEY_TOTAL_OPTOUT = "total_optout"
         private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
     }
 }
