@@ -1487,8 +1487,7 @@ class BrowserTabFragment :
     }
 
     private fun recreateBrowserMenu() {
-        popupMenu?.dismiss()
-        bottomSheetMenu?.dismiss()
+        dismissBrowserMenu()
         createBrowserMenu()
     }
 
@@ -2419,6 +2418,15 @@ class BrowserTabFragment :
         webView?.reload()
         viewModel.onWebViewRefreshed()
         viewModel.resetErrors()
+    }
+
+    /**
+     * Dismisses any open browser menu, whether it's a popup menu or a bottom sheet menu.
+     * This is used to ensure that only one menu is open at a time and to clean up the UI when necessary.
+     */
+    fun dismissBrowserMenu() {
+        popupMenu?.dismiss()
+        bottomSheetMenu?.dismiss()
     }
 
     fun getOmnibar(): Omnibar? {
@@ -4582,8 +4590,7 @@ class BrowserTabFragment :
         logcat { "Duck.ai: onDestroy" }
         dismissAppLinkSnackBar()
         supervisorJob.cancel()
-        popupMenu?.dismiss()
-        bottomSheetMenu?.dismiss()
+        dismissBrowserMenu()
         widgetBottomSheetDialogJob?.cancel()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
