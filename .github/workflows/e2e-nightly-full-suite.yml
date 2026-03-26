@@ -102,7 +102,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Custom Tabs
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -123,7 +123,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Internal Privacy (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -144,7 +144,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Onboarding (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -165,7 +165,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Deeplink (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -186,7 +186,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Ad Click (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -207,7 +207,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Privacy (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -228,7 +228,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Security (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -249,7 +249,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Release Tests (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
@@ -270,7 +270,7 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Notification Permissions (Nightly)
           create_asana_error_task: ${{ inputs.create_asana_tasks }}
-          is_release_blocker: ${{ inputs.create_asana_tasks }}
+          is_release_blocker: 'true'
           asana_releases_project_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
           asana_releases_blocker_section_id: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
 
