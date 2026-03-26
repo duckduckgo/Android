@@ -26,7 +26,24 @@ data class PrivacyPassChallenge(
     val issuerUrl: String,
     val challenge: String,
     val tokenKey: String? = null,
-)
+    val redemptionContext: ByteArray? = null,
+    val rawTokenChallenge: ByteArray? = null,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PrivacyPassChallenge) return false
+        return tokenType == other.tokenType && issuerUrl == other.issuerUrl && challenge == other.challenge &&
+            tokenKey == other.tokenKey
+    }
+
+    override fun hashCode(): Int {
+        var result = tokenType
+        result = 31 * result + issuerUrl.hashCode()
+        result = 31 * result + challenge.hashCode()
+        result = 31 * result + (tokenKey?.hashCode() ?: 0)
+        return result
+    }
+}
 
 interface PrivacyPassManager {
 

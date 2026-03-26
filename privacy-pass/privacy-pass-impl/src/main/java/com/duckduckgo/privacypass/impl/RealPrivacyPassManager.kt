@@ -17,6 +17,7 @@
 package com.duckduckgo.privacypass.impl
 
 import android.content.Context
+import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
 import com.duckduckgo.privacypass.api.PrivacyPassManager
@@ -30,6 +31,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.nio.ByteBuffer
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -100,16 +104,29 @@ class RealPrivacyPassManager @Inject constructor(
         val params = wwwAuthenticateHeader.substringAfter(PRIVATE_TOKEN_SCHEME).trim()
         val paramMap = parseAuthParams(params)
 
-        val challenge = paramMap["challenge"] ?: return null
-        val issuerUrl = paramMap["issuer"] ?: return null
-        val tokenKey = paramMap["token-key"]
-        val tokenType = paramMap["token-type"]?.let { parseTokenType(it) } ?: TOKEN_TYPE_ACT
+        val challengeB64url = paramMap["challenge"] ?: return null
+        val tokenKeyB64url = paramMap["token-key"]
+
+        val challengeBytes = base64urlDecode(challengeB64url) ?: return null
+
+        if (challengeBytes.size < 4) return null
+
+        val tokenType = ((challengeBytes[0].toInt() and 0xFF) shl 8) or (challengeBytes[1].toInt() and 0xFF)
+        val issuerNameLen = ((challengeBytes[2].toInt() and 0xFF) shl 8) or (challengeBytes[3].toInt() and 0xFF)
+
+        if (challengeBytes.size < 4 + issuerNameLen + 32) return null
+
+        val issuerUrl = String(challengeBytes, 4, issuerNameLen, Charsets.UTF_8)
+        val redemptionStart = 4 + issuerNameLen
+        val redemptionContext = challengeBytes.copyOfRange(redemptionStart, redemptionStart + 32)
 
         return PrivacyPassChallenge(
             tokenType = tokenType,
             issuerUrl = issuerUrl,
-            challenge = challenge,
-            tokenKey = tokenKey,
+            challenge = challengeB64url,
+            tokenKey = tokenKeyB64url,
+            redemptionContext = redemptionContext,
+            rawTokenChallenge = challengeBytes,
         )
     }
 
@@ -120,9 +137,14 @@ class RealPrivacyPassManager @Inject constructor(
 
             val paramsId = nativeCreateParams()
 
-            val publicKeyCborBase64 = fetchIssuerPublicKeyCborBase64(challenge.issuerUrl)
-                ?: return PrivacyPassResult.Failure("Failed to fetch issuer public key")
-            logcat { "PrivacyPass: fetched issuer public key" }
+            val publicKeyCborBase64 = if (challenge.tokenKey != null) {
+                val pkBytes = base64urlDecode(challenge.tokenKey) ?: return PrivacyPassResult.Failure("Invalid token-key base64url")
+                Base64.encodeToString(pkBytes, Base64.NO_WRAP)
+            } else {
+                fetchIssuerPublicKeyCborBase64(challenge.issuerUrl)
+                    ?: return PrivacyPassResult.Failure("Failed to fetch issuer public key")
+            }
+            logcat { "PrivacyPass: resolved issuer public key" }
 
             val publicKeyId = nativeParsePublicKey(publicKeyCborBase64)
 
@@ -158,7 +180,6 @@ class RealPrivacyPassManager @Inject constructor(
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
     private fun spendAndAuthorize(
         challenge: PrivacyPassChallenge,
         credential: StoredCredential,
@@ -191,7 +212,11 @@ class RealPrivacyPassManager @Inject constructor(
                 credentialStore.remove(credential.issuerUrl)
             }
 
-            val authHeader = "$PRIVATE_TOKEN_SCHEME token=$spendProofCborBase64"
+            val spendProofBytes = Base64.decode(spendProofCborBase64, Base64.DEFAULT)
+            val tokenStruct = buildTokenStruct(challenge, spendProofBytes)
+            val tokenB64url = base64urlEncode(tokenStruct)
+
+            val authHeader = "$PRIVATE_TOKEN_SCHEME token=$tokenB64url"
             PrivacyPassResult.Success(authHeader)
         } catch (e: ActCoreException) {
             logcat(ERROR) { "PrivacyPass: spend FFI error: ${e.message}" }
@@ -200,6 +225,25 @@ class RealPrivacyPassManager @Inject constructor(
             logcat(ERROR) { "PrivacyPass: spend failed: ${e.message}" }
             PrivacyPassResult.Failure("Spend error: ${e.message}")
         }
+    }
+
+    private fun buildTokenStruct(challenge: PrivacyPassChallenge, spendProofCbor: ByteArray): ByteArray {
+        val buf = ByteBuffer.allocate(2 + 32 + 32 + spendProofCbor.size)
+        buf.putShort(challenge.tokenType.toShort())
+
+        val nonce = ByteArray(32)
+        SecureRandom().nextBytes(nonce)
+        buf.put(nonce)
+
+        val challengeDigest = if (challenge.rawTokenChallenge != null) {
+            MessageDigest.getInstance("SHA-256").digest(challenge.rawTokenChallenge)
+        } else {
+            ByteArray(32)
+        }
+        buf.put(challengeDigest)
+
+        buf.put(spendProofCbor)
+        return buf.array()
     }
 
     private fun nativeCreateParams(): Long {
@@ -343,6 +387,18 @@ class RealPrivacyPassManager @Inject constructor(
         } catch (_: NumberFormatException) {
             TOKEN_TYPE_ACT
         }
+    }
+
+    private fun base64urlDecode(input: String): ByteArray? {
+        return try {
+            Base64.decode(input, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
+
+    private fun base64urlEncode(data: ByteArray): String {
+        return Base64.encodeToString(data, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
     data class StoredCredential(
