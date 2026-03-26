@@ -263,6 +263,7 @@
     <string name="singleTabFireDialogDeleteAll">Delete All</string>
     <string name="singleTabFireDialogDeleteThisTab">Delete This Tab</string>
     <string name="singleTabFireDialogDeleteThisChat">Delete This Chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Delete All\" will not delete your Duck.ai chat history.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Deleting site data can sign you out of accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">This will cancel downloads in progress.</string>
     <plurals name="tabsClearedSnackbarMessage">
