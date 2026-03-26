@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
+
+apply from: "$rootProject.projectDir/code-formatting.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
