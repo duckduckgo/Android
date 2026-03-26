@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Διαγραφή καρτελών, δεδομένων ιστότοπου και συνομιλιών;</string>
     <string name="singleTabFireDialogDeleteAll">Διαγραφή όλων</string>
     <string name="singleTabFireDialogDeleteThisTab">Διαγραφή αυτής της καρτέλας</string>
-    <string name="singleTabFireDialogDeleteChat">Διαγραφή συνομιλίας</string>
-    <string name="singleTabFireDialogTitleDuckAi">Διαγραφή αυτής της συνομιλίας;</string>
+    <string name="singleTabFireDialogDeleteThisChat">Διαγραφή αυτής της συνομιλίας</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Η επιλογή «Διαγραφή όλων» δεν θα διαγράψει το ιστορικό συνομιλιών σας στο Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
     <plurals name="tabsClearedSnackbarMessage">

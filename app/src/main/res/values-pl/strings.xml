@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Usunąć karty, dane witryny i czaty?</string>
     <string name="singleTabFireDialogDeleteAll">Usuń wszystko</string>
     <string name="singleTabFireDialogDeleteThisTab">Usuń tę kartę</string>
-    <string name="singleTabFireDialogDeleteChat">Usuń czat</string>
-    <string name="singleTabFireDialogTitleDuckAi">Usunąć ten czat?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Usuń ten czat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Opcja „Usuń wszystkie” nie usunie Twojej historii czatów Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
     <plurals name="tabsClearedSnackbarMessage">

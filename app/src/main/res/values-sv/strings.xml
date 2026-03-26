@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Vill du ta bort flikar, webbplatsdata och chattar?</string>
     <string name="singleTabFireDialogDeleteAll">Radera allt</string>
     <string name="singleTabFireDialogDeleteThisTab">Ta bort denna flik</string>
-    <string name="singleTabFireDialogDeleteChat">Radera chatt</string>
-    <string name="singleTabFireDialogTitleDuckAi">Radera den här chatten?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Radera den här chatten</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Din Duck.ai-chatthistorik raderas inte om du väljer Radera alla.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
     <plurals name="tabsClearedSnackbarMessage">
