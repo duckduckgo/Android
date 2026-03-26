@@ -215,6 +215,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
@@ -770,13 +771,8 @@ class BrowserTabFragment :
                 viewModel.onAutoConsentPopUpHandled(isCosmetic)
             }
 
-            override fun onResultReceived(
-                consentManaged: Boolean,
-                optOutFailed: Boolean,
-                selfTestFailed: Boolean,
-                isCosmetic: Boolean?,
-            ) {
-                viewModel.onAutoconsentResultReceived(consentManaged, optOutFailed, selfTestFailed, isCosmetic)
+            override fun onResultReceived(result: AutoconsentResult) {
+                viewModel.onAutoconsentResultReceived(result)
             }
         }
 

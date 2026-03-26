@@ -216,6 +216,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.AutoconsentResult
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -4925,26 +4926,50 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOnAutoconsentResultReceivedThenSiteUpdated() {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true)
+        testee.onAutoconsentResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = true,
+                selfTestFailed = true,
+                isCosmetic = true,
+                consentRule = "someCMP",
+                consentReloadLoop = true,
+            ),
+        )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertEquals("someCMP", testee.siteLiveData.value?.consentRule)
+        assertTrue(testee.siteLiveData.value?.consentReloadLoop!!)
     }
 
     @Test
     fun whenOnPageChangeThenAutoconsentReset() {
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        testee.onAutoconsentResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = true, isCosmetic = true)
+        testee.onAutoconsentResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = true,
+                selfTestFailed = true,
+                isCosmetic = true,
+                consentRule = "someCMP",
+                consentReloadLoop = true,
+            ),
+        )
         assertTrue(testee.siteLiveData.value?.consentManaged!!)
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertEquals("someCMP", testee.siteLiveData.value?.consentRule)
+        assertTrue(testee.siteLiveData.value?.consentReloadLoop!!)
         testee.onWebViewRefreshed()
         assertFalse(testee.siteLiveData.value?.consentManaged!!)
         assertFalse(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertFalse(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertFalse(testee.siteLiveData.value?.consentCosmeticHide!!)
+        assertNull(testee.siteLiveData.value?.consentRule)
+        assertFalse(testee.siteLiveData.value?.consentReloadLoop!!)
     }
 
     @Test

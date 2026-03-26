@@ -20,6 +20,8 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
@@ -49,6 +51,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     private val settingsCache: AutoconsentSettingsCache,
     private val autoconsentFeature: AutoconsentFeature,
     private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -70,6 +73,8 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
+                    reloadLoopDetector.updateUrl(webView, url)
+
                     // Remove comment to promote feature and remove @Ignore from tests
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
@@ -81,10 +86,19 @@ class InitMessageHandlerPlugin @Inject constructor(
                     autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_INIT_DAILY)
 
                     // Reset site
-                    autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+                    autoconsentCallback.onResultReceived(
+                        AutoconsentResult(
+                            consentManaged = false,
+                            optOutFailed = false,
+                            selfTestFailed = false,
+                            isCosmetic = false,
+                            consentRule = reloadLoopDetector.getLastHandledCMP(webView),
+                            consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                        ),
+                    )
 
                     val settings = settingsCache.getSettings() ?: return@launch
-                    val autoAction = getAutoAction()
+                    val autoAction = getAutoAction(webView)
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20
                     val disabledCmps = settings.disabledCMPs
@@ -98,6 +112,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                             isMainWorld = true,
                             enableCosmeticRules = true,
                             enableHeuristicDetection = true,
+                            enableHeuristicAction = autoconsentFeature.heuristicAction().isEnabled(),
                         )
                     val initResp = if (autoconsentFeature.ruleFiltering().isEnabled()) {
                         InitResp(config = config, rules = filterCompactRules(settings.compactRuleList, url))
@@ -119,7 +134,10 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     override val supportedTypes: List<String> = listOf("init")
 
-    private fun getAutoAction(): String {
+    private fun getAutoAction(webView: WebView): String? {
+        if (reloadLoopDetector.isReloadLoopDetected(webView)) {
+            return null
+        }
         // Remove comment to promote feature
         // return if (!settingsRepository.firstPopupHandled) null else "optOut"
         return "optOut"
@@ -227,6 +245,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val isMainWorld: Boolean,
         val enableCosmeticRules: Boolean,
         val enableHeuristicDetection: Boolean,
+        val enableHeuristicAction: Boolean,
     )
 
     data class AutoconsentRuleset(val compact: Any?)

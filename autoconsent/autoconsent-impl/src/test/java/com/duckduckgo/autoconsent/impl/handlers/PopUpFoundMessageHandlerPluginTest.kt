@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
@@ -34,10 +35,11 @@ class PopUpFoundMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val mockPixelManager: AutoconsentPixelManager = mock()
+    private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val repository = FakeSettingsRepository()
 
-    private val popupFoundHandler = PopUpFoundMessageHandlerPlugin(repository, mockPixelManager)
+    private val popupFoundHandler = PopUpFoundMessageHandlerPlugin(repository, mockPixelManager, mockReloadLoopDetector)
 
     @Test
     fun whenProcessIfMessageTypeIsNotPopUpFoundThenDoNothing() {
@@ -78,6 +80,29 @@ class PopUpFoundMessageHandlerPluginTest {
         popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("test"), webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_POPUP_FOUND_DAILY)
+    }
+
+    @Test
+    fun whenProcessPopupFoundThenDetectReloadLoopCalled() {
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp"), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp")
+    }
+
+    @Test
+    fun whenUserSettingIsTrueThenDetectReloadLoopShouldBeCalled() {
+        repository.userSetting = true
+
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp"), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp")
+    }
+
+    @Test
+    fun whenCmpEndsWithTopSuffixThenDetectReloadLoopShouldBeCalled() {
+        popupFoundHandler.process(popupFoundHandler.supportedTypes.first(), message("testCmp-top"), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).detectReloadLoop(webView, "testCmp-top")
     }
 
     private fun message(cmp: String): String {
