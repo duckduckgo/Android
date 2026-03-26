@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Vissza</string>
     <string name="browserMenuForward">Előre</string>
     <string name="browserMenuRefresh">Frissítés</string>
-    <string name="browserMenuFire">Lapok és adatok törlése</string>
+    <string name="browserMenuFireTabsData">Lapok és adatok törlése</string>
 </resources>

@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Tilbake</string>
     <string name="browserMenuForward">Frem</string>
     <string name="browserMenuRefresh">Oppdater</string>
-    <string name="browserMenuFire">Lukk faner og slett data</string>
+    <string name="browserMenuFireTabsData">Slett faner og data</string>
 </resources>

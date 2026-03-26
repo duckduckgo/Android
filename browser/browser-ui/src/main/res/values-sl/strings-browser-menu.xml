@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Nazaj</string>
     <string name="browserMenuForward">Naprej</string>
     <string name="browserMenuRefresh">Osveži</string>
-    <string name="browserMenuFire">Počisti zavihke in podatke</string>
+    <string name="browserMenuFireTabsData">Izbriši zavihke in podatke</string>
 </resources>

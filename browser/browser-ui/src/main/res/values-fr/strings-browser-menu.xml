@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Retour</string>
     <string name="browserMenuForward">Avancer</string>
     <string name="browserMenuRefresh">Actualiser</string>
-    <string name="browserMenuFire">Effacer les onglets et données</string>
+    <string name="browserMenuFireTabsData">Supprimer les onglets et les données</string>
 </resources>
