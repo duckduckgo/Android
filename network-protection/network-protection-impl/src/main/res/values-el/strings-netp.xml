@@ -258,8 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Μη συμβατό με VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Κάποιες εφαρμογές, όπως οι τραπεζικές ή οι εφαρμογές streaming, δεν λειτουργούν καλά με VPN. Όταν έχει ενεργοποιηθεί η ρύθμιση αυτή, θα εξαιρούμε αυτόματα τις εφαρμογές αυτές.</string>
 
-
     <!-- Content Descriptions -->
     <string name="netpCloseButtonContentDescription">Κλείσιμο</string>
     <string name="netpVpnIndicatorContentDescription">Ένδειξη κατάστασης VPN</string>
+
 </resources>
