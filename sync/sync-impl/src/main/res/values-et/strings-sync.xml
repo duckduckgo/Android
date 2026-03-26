@@ -225,5 +225,5 @@
     <string name="sync_settings_recovery_section_header">Taastamine</string>
     <string name="sync_settings_download_recovery_code_item">Laadi taastekood alla PDF-failina</string>
     <string name="sync_settings_download_recovery_code_item_hint">Kasuta seda koodi oma andmete taastamiseks, kui kaotad juurdepääsu sellele seadmele – hoia seda turvalises kohas.</string>
-    <string name="sync_settings_data_expiration">Kui Sync &amp; Backup on 18 kuud passiivne, ei saa andmeid taastada. <annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="sync_settings_data_expiration">Funktsiooni Sync &amp; Backup andmeid ei saa taastada pärast 18-kuulist mitteaktiivsust. <annotation type="learn_more_link">Lisateave</annotation></string>
 </resources>
