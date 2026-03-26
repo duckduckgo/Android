@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Späť</string>
     <string name="browserMenuForward">Ďalej</string>
     <string name="browserMenuRefresh">Obnoviť</string>
-    <string name="browserMenuFire">Vymazať karty a údaje</string>
+    <string name="browserMenuFireTabsData">Odstrániť karty a údaje</string>
 </resources>

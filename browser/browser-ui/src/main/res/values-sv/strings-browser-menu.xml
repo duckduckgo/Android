@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Tillbaka</string>
     <string name="browserMenuForward">Framåt</string>
     <string name="browserMenuRefresh">Uppdatera</string>
-    <string name="browserMenuFire">Rensa flikar och data</string>
+    <string name="browserMenuFireTabsData">Ta bort flikar och data</string>
 </resources>

@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Zurück</string>
     <string name="browserMenuForward">Weiter</string>
     <string name="browserMenuRefresh">Aktualisieren</string>
-    <string name="browserMenuFire">Tabs und Daten löschen</string>
+    <string name="browserMenuFireTabsData">Tabs und Daten löschen</string>
 </resources>

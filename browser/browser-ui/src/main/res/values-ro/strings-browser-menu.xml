@@ -56,5 +56,5 @@
     <string name="browserMenuBack">Înapoi</string>
     <string name="browserMenuForward">Înainte</string>
     <string name="browserMenuRefresh">Reîncărcare</string>
-    <string name="browserMenuFire">Șterge filele și datele</string>
+    <string name="browserMenuFireTabsData">Șterge filele și datele</string>
 </resources>
