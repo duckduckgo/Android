@@ -22,6 +22,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -68,6 +70,8 @@ class RealPirJobsRunner @Inject constructor(
     private val pirOptOut: PirOptOut,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pixelSender: PirPixelSender,
+    private val brokerJsonUpdater: BrokerJsonUpdater,
+    private val pirRemoteFeatures: PirRemoteFeatures,
 ) : PirJobsRunner {
     override suspend fun runEligibleJobs(
         context: Context,
@@ -77,7 +81,7 @@ class RealPirJobsRunner @Inject constructor(
 
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
-        val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
+        var activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
         emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
         // Clean up any already running scan jobs before starting new ones as this function can be called
@@ -95,6 +99,15 @@ class RealPirJobsRunner @Inject constructor(
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
             emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
+        }
+
+        // If no active brokers found, attempt to load broker data before giving up.
+        // This handles a race condition where the scan starts before broker data has been downloaded
+        // (e.g., on first scan after feature flag enablement, or with slow network/VPN).
+        if (activeBrokers.isEmpty() && pirRemoteFeatures.ensureBrokerDataBeforeScan().isEnabled()) {
+            logcat { "PIR-JOB-RUNNER: No active brokers, attempting to ensure broker data is loaded..." }
+            brokerJsonUpdater.update()
+            activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
         }
 
         if (activeBrokers.isEmpty()) {

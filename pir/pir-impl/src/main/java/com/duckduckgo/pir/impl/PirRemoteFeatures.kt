@@ -48,6 +48,9 @@ interface PirRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun trackerBlocking(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun ensureBrokerDataBeforeScan(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)
