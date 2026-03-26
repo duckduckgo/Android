@@ -77,6 +77,8 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .cookieJar(WebViewCookieJar())
+            .followRedirects(false)
+            .followSslRedirects(false)
             .build()
     }
 
@@ -130,6 +132,14 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 
         val okHttpRequest = requestBuilder.build()
         val response = okHttpClient.newCall(okHttpRequest).execute()
+
+        // For redirects, let the WebView handle them natively. Returning null causes
+        // the WebView to re-request the URL, which will trigger shouldInterceptRequest
+        // again for the redirect target (and we'll intercept that if it's YouTube HTML).
+        if (response.isRedirect) {
+            response.close()
+            return null
+        }
 
         if (!response.isSuccessful) {
             response.close()
