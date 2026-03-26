@@ -4294,6 +4294,17 @@ class BrowserTabFragment :
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
+            // Handle copy link text separately — requires async JS evaluation
+            if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
+                lifecycleScope.launch {
+                    val text = extractLinkTextAtPoint()
+                    if (text != null) {
+                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, text))
+                    }
+                }
+                return true
+            }
+
             runCatching {
                 webView?.safeHitTestResult?.let {
                     val target = getLongPressTarget(it)
