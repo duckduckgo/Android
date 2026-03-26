@@ -3251,7 +3251,7 @@ class BrowserTabViewModel @Inject constructor(
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
                         ctaViewModel.onUserDismissedCta(cta)
-                        val origin = ctaViewModel.getPrivacyProOnboardingOrigin()
+                        val origin = "funnel_reinstallmodal_android"
                         command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
                     }
                     null
@@ -4570,7 +4570,7 @@ class BrowserTabViewModel @Inject constructor(
         when (cta) {
             is DaxBubbleCta.DaxPrivacyProCta -> {
                 viewModelScope.launch {
-                    val origin = ctaViewModel.getPrivacyProOnboardingOrigin()
+                    val origin = "funnel_onboarding_android"
                     command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
                 }
             }

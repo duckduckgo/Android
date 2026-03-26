@@ -494,18 +494,6 @@ class CtaViewModel @Inject constructor(
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
-    suspend fun getPrivacyProOnboardingOrigin(): String =
-        withContext(dispatchers.io()) {
-            val skippedOnboarding = hideTips()
-            val isFreeTrialCopy = freeTrialCopyAvailable()
-            when {
-                skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_reinstall_tryfreecopy"
-                skippedOnboarding && !isFreeTrialCopy -> "funnel_onboarding_android_reinstall_subscribecopy"
-                !skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_newinstall_tryfreecopy"
-                else -> "funnel_onboarding_android_newinstall_subscribecopy"
-            }
-        }
-
     suspend fun isPromoOnboardingDialogShowing(): Boolean =
         withContext(dispatchers.io()) {
             canShowPrivacyProCtaForSkippedOnboarding()
