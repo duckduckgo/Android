@@ -36,6 +36,7 @@ import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.let
 
 /**
  * Implementation that provides granular data clearing capabilities for both manual and automatic clearing.
@@ -76,26 +78,22 @@ class DataClearing @Inject constructor(
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
         logcat { "Performing single tab clear for tab: $tabId" }
 
+        val tabUrl = tabRepository.getTab(tabId)?.url
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
         val clearDataResult = clearDataAction.clearDataForSpecificDomains(visitedSites)
-        val tabUrl = tabRepository.getTab(tabId)?.url
 
         navigationHistory.removeHistoryForTab(tabId)
 
-        val types = buildSet<ClearableData> {
-            add(DataType.Tabs.Single(tabId))
-
-            val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
-                .contains(FireClearOption.DUCKAI_CHATS)
-            if (isDuckAiChatHistoryClearingEnabled) {
+        val clearableData = buildSet {
+            add(ClearableData.Tabs.Single(tabId))
+            if (FireClearOption.DUCKAI_CHATS in fireDataStore.getManualClearOptions()) {
                 tabUrl?.let { add(ClearableData.DuckChats.Single(it)) }
                 add(ClearableData.DuckChats.Contextual(tabId))
             }
         }
-        dataClearingTrigger.clearData(types)
+        dataClearingTrigger.clearData(clearableData)
 
-        val url = getNewTabUrl(tabUrl)
-        tabOperations.replaceTabWithNewTab(tabId, url)
+        tabOperations.replaceTabWithNewTab(tabId, getNewTabUrl(tabUrl))
 
         logcat { "Single tab clear completed for tab: $tabId" }
         return clearDataResult
