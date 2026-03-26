@@ -27,6 +27,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -108,6 +109,7 @@ class RealDuckChatTest {
     private val mockDuckChatSyncRepository: DuckChatSyncRepository = mock()
     private val mockSyncEngine: SyncEngine = mock()
     private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: RealDuckChat
 
@@ -149,6 +151,7 @@ class RealDuckChatTest {
                 mockDuckChatSyncRepository,
                 mockSyncEngine,
                 mockDuckAiHostProvider,
+                mockAppBuildConfig,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -1578,5 +1581,55 @@ class RealDuckChatTest {
         val result = testee.observeLastUsedTogglePosition().first()
 
         assertEquals("SEARCH", result)
+    }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `when new user then default toggle position is set to LAST_USED`() = runTest {
+        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository).setDefaultTogglePosition(DefaultTogglePosition.LAST_USED.name)
+    }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `when existing user then default toggle position is set to SEARCH`() = runTest {
+        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
+        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository).setDefaultTogglePosition(DefaultTogglePosition.SEARCH.name)
+    }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `when default toggle position already set then do not overwrite`() = runTest {
+        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn("DUCK_AI")
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
+    }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `when feature flag off then default toggle position is not set`() = runTest {
+        duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+        whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
+
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockDuckChatFeatureRepository, never()).setDefaultTogglePosition(any())
     }
 }
