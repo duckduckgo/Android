@@ -44,19 +44,14 @@ def gprKey = findProperty("ducksans.gpr.key") ?: providers.environmentVariable("
 def hasGprCredentials = gprUser && gprKey
 def useProprietaryFontProp = findProperty("useProprietaryFont")
 ext.proprietaryFontAvailable = hasGprCredentials && useProprietaryFontProp?.toBoolean() != false
+ext.proprietaryFontOptOut = useProprietaryFontProp?.toBoolean() == false
 
 if (proprietaryFontAvailable) {
     logger.lifecycle("DUCKSANS: Using proprietary font AAR from GitHub Packages")
-} else if (useProprietaryFontProp?.toBoolean() == false) {
+} else if (proprietaryFontOptOut) {
     logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (opted out via -PuseProprietaryFont=false)")
 } else {
-    throw new GradleException(
-        "DUCKSANS: No font credentials found and no explicit opt-out.\n" +
-        "Either provide credentials (DUCKSANS_PACKAGE_AUTH_USER / DUCKSANS_PACKAGE_AUTH_TOKEN env vars,\n" +
-        "or ducksans.gpr.user / ducksans.gpr.key in gradle.properties),\n" +
-        "or pass -PuseProprietaryFont=false to use placeholder fallback fonts.\n" +
-        "Example: ./gradlew assembleInternalDebug -PuseProprietaryFont=false"
-    )
+    logger.lifecycle("DUCKSANS: Using placeholder fallback fonts (no credentials found)")
 }
 
 allprojects {
