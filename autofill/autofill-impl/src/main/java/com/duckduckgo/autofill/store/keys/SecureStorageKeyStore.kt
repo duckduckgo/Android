@@ -393,6 +393,7 @@ class RealSecureStorageKeyStore(
 
             // When useHarmony is ON, read Harmony and compare for diagnostic pixels
             if (harmonyFlags.useHarmony) {
+                var harmonyDecodeFailed = false
                 val harmonyEncoded = runCatching {
                     harmonyPrefs?.getString(keyName, null)
                 }.getOrElse {
@@ -415,6 +416,7 @@ class RealSecureStorageKeyStore(
                 val harmonyValue: ByteArray? = if (harmonyEncoded != null) {
                     val decoded = harmonyEncoded.decodeBase64()?.toByteArray()
                     if (decoded == null) {
+                        harmonyDecodeFailed = true
                         pixel.fire(
                             AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED,
                             getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
@@ -434,7 +436,7 @@ class RealSecureStorageKeyStore(
                 }
 
                 when {
-                    harmonyPrefs != null && harmonyValue == null && legacyValue != null -> {
+                    harmonyPrefs != null && harmonyValue == null && legacyValue != null && !harmonyDecodeFailed -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
                             getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),

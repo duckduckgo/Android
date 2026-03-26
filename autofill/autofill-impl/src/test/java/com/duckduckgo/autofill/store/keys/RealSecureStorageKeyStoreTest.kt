@@ -770,6 +770,7 @@ class RealSecureStorageKeyStoreTest {
 
         assertArrayEquals(TEST_VALUE, result)
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED), any(), any(), any())
+        verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_KEY_MISSING), any(), any(), any())
     }
 
     @Test
