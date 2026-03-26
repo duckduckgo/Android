@@ -28,13 +28,13 @@
         <item quantity="one">Ο σελιδοδείκτης σας για τον %1$s δεν μπορεί να συγχρονιστεί επειδή ορισμένα από τα πεδία του υπερβαίνει το όριο χαρακτήρων.</item>
         <item quantity="other">Οι σελιδοδείκτες σας για τον %1$s και %2$d ακόμα ιστότοπους δεν μπορούν να συγχρονιστούν επειδή ορισμένα από τα πεδία τους υπερβαίνουν το όριο χαρακτήρων.</item>
     </plurals>
-    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
 
     <!-- Content Descriptions -->
     <string name="bookmarksSearchMenuContentDescription">Αναζήτηση σελιδοδεικτών</string>
     <string name="bookmarksAddFolderMenuContentDescription">Προσθήκη φακέλου</string>
     <string name="bookmarksMenuContentDescription">Περισσότερες επιλογές</string>
     <string name="newTabFavoritesToggleContentDescription">Εναλλαγή ορατότητας αγαπημένων</string>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>
@@ -122,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Εισαγωγή από το Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Επιλογή αρχείου σελιδοδεικτών...</string>
     <string name="bookmarksImportDialogClose">Κλείσιμο</string>
+
 </resources>
