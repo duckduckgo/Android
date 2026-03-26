@@ -177,6 +177,12 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
+    fun whenUserLongPressesWithAnchorTypeAndHttpsThenCopyLinkTextOptionAdded() {
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        verifyCopyLinkTextMenuOptionAdded()
+    }
+
+    @Test
     fun whenUserLongPressesWithAnchorTypeAndDataUrlThenCorrectOptionsAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         // Show "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
@@ -326,6 +332,10 @@ class WebViewLongPressHandlerTest {
             anyInt(),
             eq(R.string.shareLink),
         )
+    }
+
+    private fun verifyCopyLinkTextMenuOptionAdded() {
+        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT), anyInt(), eq(R.string.copyText))
     }
 
     private fun verifyMenuNotAltered() {
