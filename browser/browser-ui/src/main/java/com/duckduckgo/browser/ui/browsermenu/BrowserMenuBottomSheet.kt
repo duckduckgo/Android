@@ -400,6 +400,7 @@ class BrowserMenuBottomSheet(
                     Glide.with(binding.menuHeader.headerFavicon)
                         .load(serpLogoUrl)
                         .placeholder(drawable.ic_dax_icon)
+                        .error(drawable.ic_dax_icon)
                         .into(binding.menuHeader.headerFavicon)
                 } else if (pageContextHeaderState.isDuckDuckGo) {
                     binding.menuHeader.headerFavicon.setImageResource(drawable.ic_dax_icon)
