@@ -189,7 +189,7 @@
             },
             {
                 "key": "drmEnabled",
-                "description": "Whether Ask for DRM is enabled in site permissions.",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
                 "enum": ["false", "true"]
             },
             {
@@ -319,7 +319,7 @@
             },
             {
                 "key": "drmEnabled",
-                "description": "Whether Ask for DRM is enabled in site permissions.",
+                "description": "Whether DRM is effectively enabled for the reported site load.",
                 "enum": ["false", "true"]
             },
             {

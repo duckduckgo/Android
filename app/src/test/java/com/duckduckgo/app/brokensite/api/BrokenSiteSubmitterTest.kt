@@ -43,7 +43,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -109,7 +109,7 @@ class BrokenSiteSubmitterTest {
 
     private val ampLinks: AmpLinks = mock()
 
-    private val sitePermissionsPreferences: SitePermissionsPreferences = mock()
+    private val sitePermissionsRepository: SitePermissionsRepository = mock()
 
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
@@ -129,7 +129,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
-        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(true)
+        runBlocking { whenever(sitePermissionsRepository.isDrmEnabledForSite(url = any())).thenReturn(true) }
 
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -167,7 +167,7 @@ class BrokenSiteSubmitterTest {
             webViewVersionProvider,
             ampLinks,
             inventory,
-            sitePermissionsPreferences,
+            sitePermissionsRepository,
         )
     }
 
@@ -611,8 +611,8 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDrmSettingIsEnabledThenIncludeDrmEnabledParam() = runTest {
-        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(true)
+    fun whenDrmIsEnabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(true)
 
         testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
 
@@ -623,8 +623,8 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDrmSettingIsDisabledThenIncludeDrmEnabledParam() = runTest {
-        whenever(sitePermissionsPreferences.askDrmEnabled).thenReturn(false)
+    fun whenDrmIsDisabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(false)
 
         testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
 

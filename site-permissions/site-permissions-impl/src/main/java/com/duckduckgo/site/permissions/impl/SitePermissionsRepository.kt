@@ -42,6 +42,7 @@ interface SitePermissionsRepository {
     var askMicEnabled: Boolean
     var askDrmEnabled: Boolean
     var askLocationEnabled: Boolean
+    suspend fun isDrmEnabledForSite(url: String): Boolean
     suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     suspend fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
@@ -94,6 +95,11 @@ class SitePermissionsRepositoryImpl @Inject constructor(
         }
 
     private val drmSessions = mutableMapOf<String, Boolean>()
+
+    override suspend fun isDrmEnabledForSite(url: String): Boolean {
+        return isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) ||
+            isDomainGranted(url, "", PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+    }
 
     override suspend fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
