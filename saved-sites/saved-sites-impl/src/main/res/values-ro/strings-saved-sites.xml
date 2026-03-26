@@ -29,6 +29,12 @@
         <item quantity="few">Marcajele tale pentru %1$s și încă %2$d alte site-uri nu se pot sincroniza, deoarece unele dintre câmpuri depășesc limita de caractere.</item>
         <item quantity="other">Marcajele tale pentru %1$s și încă %2$d de alte site-uri nu se pot sincroniza, deoarece unele dintre câmpuri depășesc limita de caractere.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Caută marcaje</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Adaugă dosar</string>
+    <string name="bookmarksMenuContentDescription">Mai multe opțiuni</string>
+    <string name="newTabFavoritesToggleContentDescription">Comută vizibilitatea favoritelor</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gestionează marcajele</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -121,9 +127,4 @@
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Selectează fișierul cu marcaje...</string>
     <string name="bookmarksImportDialogClose">Închidere</string>
 
-    <!-- Content Descriptions -->
-    <string name="bookmarksSearchMenuContentDescription">Caută marcaje</string>
-    <string name="bookmarksAddFolderMenuContentDescription">Adaugă dosar</string>
-    <string name="bookmarksMenuContentDescription">Mai multe opțiuni</string>
-    <string name="newTabFavoritesToggleContentDescription">Comută vizibilitatea favoritelor</string>
 </resources>
