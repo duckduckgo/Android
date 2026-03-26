@@ -1826,6 +1826,7 @@ class BrowserTabFragment :
     }
 
     private fun launchBottomSheetMenu(addExtraDelay: Boolean) {
+        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
         val delay = if (addExtraDelay) BOTTOM_SHEET_MENU_DELAY * 2 else BOTTOM_SHEET_MENU_DELAY
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(delay) {
@@ -1846,6 +1847,7 @@ class BrowserTabFragment :
                 } else {
                     pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISPLAYED)
                 }
+                fireMenuOpenedPixels(isFocusedNtp, viewState)
             }
         }
     }
@@ -1874,21 +1876,25 @@ class BrowserTabFragment :
                     popupMenu?.show(binding.rootView, omnibar.toolbar)
                 }
                 viewModel.onPopupMenuLaunched()
-                if (isActiveCustomTab()) {
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
-                } else if (omnibar.viewMode == ViewMode.DuckAI) {
-                    pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName)
-                } else {
-                    val vpnStatus = currentViewState?.vpnMenuState?.pixelParam.toString()
-                    val params = mapOf(
-                        PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
-                        PixelParameter.STATUS to vpnStatus,
-                    )
-                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
-                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
-                    pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName, type = Daily())
-                }
+                fireMenuOpenedPixels(isFocusedNtp, currentViewState)
             }
+        }
+    }
+
+    private fun fireMenuOpenedPixels(isFocusedNtp: Boolean, viewState: BrowserViewState?) {
+        if (isActiveCustomTab()) {
+            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+        } else if (omnibar.viewMode == ViewMode.DuckAI) {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName)
+        } else {
+            val vpnStatus = viewState?.vpnMenuState?.pixelParam.toString()
+            val params = mapOf(
+                PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString(),
+                PixelParameter.STATUS to vpnStatus,
+            )
+            pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED.pixelName)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_MENU_OPENED_DAILY.pixelName, type = Daily())
         }
     }
 
