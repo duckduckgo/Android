@@ -23,6 +23,8 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearDataResult
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -37,6 +39,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -67,6 +70,7 @@ class DataClearing @Inject constructor(
     private val tabRepository: TabRepository,
     private val duckChat: DuckChat,
     private val contextualDataStore: DuckChatContextualDataStore,
+    private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
@@ -87,11 +91,13 @@ class DataClearing @Inject constructor(
         return clearDataResult
     }
 
-    private fun getNewTabUrl(tabUrl: String?): String? = tabUrl?.toUri()?.let {
-        if (duckChat.isDuckChatUrl(it)) {
-            duckChat.getDuckChatUrl("", autoPrompt = false)
-        } else {
-            null
+    private suspend fun getNewTabUrl(tabUrl: String?): String? {
+        val option = showOnAppLaunchOptionDataStore.optionFlow.firstOrNull()
+        val isDuckChat = tabUrl?.toUri()?.let { duckChat.isDuckChatUrl(it) } == true
+        return when {
+            isDuckChat -> duckChat.getDuckChatUrl("", autoPrompt = false)
+            option is ShowOnAppLaunchOption.SpecificPage -> option.url
+            else -> null
         }
     }
 

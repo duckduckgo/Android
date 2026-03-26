@@ -39,20 +39,20 @@
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "from_focused_ntp",
+                "description": "Whether the fire button was tapped while the address bar was focused on the new tab page",
+                "type": "boolean"
+            }
+        ]
     },
     "m_fire_button_tapped_tab_switcher_daily": {
         "description": "The fire button was tapped from the tab switcher (daily)",
         "owners": ["0nko"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
-    },
-    "m_fire_dialog_clear_all_button_only": {
-        "description": "The Delete All button was pressed when it is the only button shown in the fire dialog",
-        "owners": ["0nko"],
-        "triggers": ["other"],
-        "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
         "parameters": ["appVersion"]
     }
 }
