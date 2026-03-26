@@ -16,10 +16,12 @@
 
 package com.duckduckgo.browser.ui.newtab.hatch
 
+import android.net.Uri
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -28,16 +30,21 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class NewTabReturnHatchViewModelTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockTabRepository: TabRepository = mock()
+    private val mockDuckChat: DuckChat = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
 
     private lateinit var testee: NewTabReturnHatchViewModel
@@ -49,6 +56,7 @@ class NewTabReturnHatchViewModelTest {
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
+            duckChat = mockDuckChat,
         )
     }
 
