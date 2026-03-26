@@ -700,6 +700,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true
         currentTab?.inContextEmailProtectionShowing = false
 
+        // ensure any open browser menu is dismissed before processing the intent, to avoid out to date menu being shown after the intent is processed
+        currentTab?.dismissBrowserMenu()
+
         if (launchNewSearch(intent)) {
             logcat(WARN) { "new tab requested" }
             if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
