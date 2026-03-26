@@ -137,8 +137,9 @@ class RealPrivacyPassManager @Inject constructor(
 
             val paramsId = nativeCreateParams()
 
-            val publicKeyCborBase64 = if (challenge.tokenKey != null) {
-                val pkBytes = base64urlDecode(challenge.tokenKey) ?: return PrivacyPassResult.Failure("Invalid token-key base64url")
+            val tokenKey = challenge.tokenKey
+            val publicKeyCborBase64 = if (tokenKey != null) {
+                val pkBytes = base64urlDecode(tokenKey) ?: return PrivacyPassResult.Failure("Invalid token-key base64url")
                 Base64.encodeToString(pkBytes, Base64.NO_WRAP)
             } else {
                 fetchIssuerPublicKeyCborBase64(challenge.issuerUrl)
