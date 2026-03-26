@@ -76,6 +76,7 @@
         android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
         android:visibility="gone"
         android:elevation="2dp"
+        android:clipToOutline="true"
         android:clickable="true"
         android:focusable="true"
         app:layout_goneMarginTop="114dp"
@@ -87,7 +88,7 @@
         <FrameLayout
             android:id="@+id/newTabContainerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true" />
 
