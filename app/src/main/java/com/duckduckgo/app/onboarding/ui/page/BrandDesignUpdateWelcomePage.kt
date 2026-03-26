@@ -436,15 +436,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
+                    if (showSecondaryCta) {
+                        binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
+                    }
+
                     playOutroAnimation(
                         nextStep = OnboardingBackgroundStep.Welcome,
                         onAnimationStart = {
                             if (showWalkingDax) playWalkingDaxAnimation()
                         },
                         onAnimationEnd = {
-                            if (showSecondaryCta) {
-                                binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
-                            }
                             fadeInDialog {
                                 binding.daxDialogCta.welcomeContent.titleText.apply {
                                     typingDelayInMs = TYPING_DELAY_MS
