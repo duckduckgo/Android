@@ -52,6 +52,7 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -127,18 +128,34 @@ class SingleTabFireDialogViewModelTest {
     // region Initialization
 
     @Test
-    fun `when initialized then viewState emits default values`() = runTest {
+    fun `when initialized without origin then viewState emits Loading`() = runTest {
         testee = createViewModel()
 
         testee.viewState.test {
             val state = awaitItem()
 
-            assertFalse(state.isDuckAiChatsSelected)
-            assertFalse(state.isSingleTabEnabled)
-            assertEquals(FireDialogOrigin.BROWSER, state.dialogOrigin)
+            assertTrue(state is SingleTabFireDialogViewModel.ViewState.Loading)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with origin then viewState emits init values`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.stateData.isDuckAiChatsSelected)
+            assertFalse(state.stateData.isSingleTabEnabled)
+            assertEquals(FireDialogOrigin.BROWSER, state.origin)
             assertTrue(state.isSiteDataSubtitleVisible)
             assertFalse(state.isDownloadsSubtitleVisible)
-            assertTrue(state.shouldRestartAfterClearing)
+            assertTrue(testee.shouldRestartAfterClearing)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -147,13 +164,15 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when duck ai chats selected in data store then viewState reflects selection`() = runTest {
         whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertTrue(state.isDuckAiChatsSelected)
+            assertTrue(state.stateData.isDuckAiChatsSelected)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -162,13 +181,15 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when duck ai chats not selected in data store then viewState reflects deselection`() = runTest {
         whenever(mockFireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertFalse(state.isDuckAiChatsSelected)
+            assertFalse(state.stateData.isDuckAiChatsSelected)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -177,13 +198,15 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when delete browsing data is supported then single tab is enabled`() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertTrue(state.isSingleTabEnabled)
+            assertTrue(state.stateData.isSingleTabEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -192,13 +215,15 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when delete browsing data is not supported then single tab is disabled`() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertFalse(state.isSingleTabEnabled)
+            assertFalse(state.stateData.isSingleTabEnabled)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -207,10 +232,12 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when shown count is 0 then showSiteDataSubtitle is true`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isSiteDataSubtitleVisible)
@@ -222,10 +249,12 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when shown count is 1 then showSiteDataSubtitle is true`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(1)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isSiteDataSubtitleVisible)
@@ -237,10 +266,12 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when shown count is 2 then showSiteDataSubtitle is false`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(2)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isSiteDataSubtitleVisible)
@@ -252,10 +283,12 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when shown count is greater than 2 then showSiteDataSubtitle is false`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(5)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isSiteDataSubtitleVisible)
@@ -278,10 +311,12 @@ class SingleTabFireDialogViewModelTest {
                 ),
             ),
         )
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDownloadsSubtitleVisible)
@@ -304,10 +339,12 @@ class SingleTabFireDialogViewModelTest {
                 ),
             ),
         )
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDownloadsSubtitleVisible)
@@ -319,10 +356,12 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when downloads list is empty then showDownloadsSubtitle is false`() = runTest {
         whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDownloadsSubtitleVisible)
@@ -332,16 +371,18 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when duck ai tab then showSiteDataSubtitle is false even with low shown count`() = runTest {
+    fun `when duck ai tab from browser then showSiteDataSubtitle is false even with low shown count`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isSiteDataSubtitleVisible)
@@ -351,7 +392,8 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when duck ai tab then showDownloadsSubtitle is false even with active downloads`() = runTest {
+    fun `when duck ai tab from browser then showDownloadsSubtitle is false even with active downloads`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
@@ -370,8 +412,9 @@ class SingleTabFireDialogViewModelTest {
         )
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDownloadsSubtitleVisible)
@@ -381,15 +424,70 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when fire animation enabled then isFirePictogramVisible is true`() = runTest {
-        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+    fun `when duck ai tab from settings then showSiteDataSubtitle is true`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertTrue(state.isFirePictogramVisible)
+            assertTrue(state.isSiteDataSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when duck ai tab from tab switcher then showDownloadsSubtitle is true with active downloads`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(
+            listOf(
+                DownloadItem(
+                    downloadId = 1L,
+                    downloadStatus = DownloadStatus.STARTED,
+                    fileName = "file.zip",
+                    contentLength = 1000L,
+                    createdAt = "2025-12-15",
+                    filePath = "/path/file.zip",
+                ),
+            ),
+        )
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.isDownloadsSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when fire animation enabled then isFirePictogramVisible is true`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.stateData.isFirePictogramVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -398,13 +496,15 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when fire animation disabled then isFirePictogramVisible is false`() = runTest {
         whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertFalse(state.isFirePictogramVisible)
+            assertFalse(state.stateData.isFirePictogramVisible)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -426,7 +526,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteThisTabButtonVisible)
@@ -447,7 +547,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteThisTabButtonVisible)
@@ -468,7 +568,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteThisTabButtonVisible)
@@ -485,7 +585,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDeleteThisTabButtonVisible)
@@ -502,7 +602,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDeleteThisTabButtonVisible)
@@ -519,7 +619,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.SETTINGS)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDeleteThisTabButtonVisible)
@@ -544,7 +644,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertFalse(state.isDeleteAllButtonVisible)
@@ -565,7 +665,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteAllButtonVisible)
@@ -577,6 +677,7 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when duck ai tab from settings then isDeleteAllButtonVisible is true`() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(true)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
@@ -585,7 +686,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.SETTINGS)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteAllButtonVisible)
@@ -597,6 +698,7 @@ class SingleTabFireDialogViewModelTest {
     @Test
     fun `when duck ai tab with single tab disabled then isDeleteAllButtonVisible is true`() = runTest {
         whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
@@ -605,7 +707,7 @@ class SingleTabFireDialogViewModelTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
             assertTrue(state.isDeleteAllButtonVisible)
@@ -620,14 +722,15 @@ class SingleTabFireDialogViewModelTest {
 
     @Test
     fun `when origin is tab switcher then viewState reflects tab switcher origin`() = runTest {
-        testee = createViewModel()
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
+        testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.TAB_SWITCHER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.TAB_SWITCHER, state.dialogOrigin)
+            assertEquals(FireDialogOrigin.TAB_SWITCHER, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -635,14 +738,15 @@ class SingleTabFireDialogViewModelTest {
 
     @Test
     fun `when origin is browser then viewState reflects browser origin`() = runTest {
-        testee = createViewModel()
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
+        testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.BROWSER, state.dialogOrigin)
+            assertEquals(FireDialogOrigin.BROWSER, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -650,14 +754,15 @@ class SingleTabFireDialogViewModelTest {
 
     @Test
     fun `when origin is settings then viewState reflects settings origin`() = runTest {
-        testee = createViewModel()
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
+        testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.SETTINGS)
 
-        testee.viewState.test {
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
             val state = awaitItem()
 
-            assertEquals(FireDialogOrigin.SETTINGS, state.dialogOrigin)
+            assertEquals(FireDialogOrigin.SETTINGS, state.origin)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -665,15 +770,16 @@ class SingleTabFireDialogViewModelTest {
 
     // endregion
 
-    // region onShow
+    // region onShow (triggered via flow when dialogOrigin != null and tabCount > 0)
 
     @Test
-    fun `when onShow called then OnShow command is sent`() = runTest {
+    fun `when dialog is ready then OnShow command is sent`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
         testee.commands().test {
-            testee.onShow()
-
             assertEquals(Command.OnShow, awaitItem())
 
             cancelAndConsumeRemainingEvents()
@@ -681,68 +787,76 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when onShow called then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
-        testee = createViewModel()
+    fun `when dialog is ready then FIRE_DIALOG_SHOWN pixel is fired`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
-        testee.onShow()
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
         verify(mockPixel).fire(FIRE_DIALOG_SHOWN)
     }
 
     @Test
-    fun `when onShow called multiple times then FIRE_DIALOG_SHOWN pixel is fired only once`() = runTest {
-        testee = createViewModel()
+    fun `when state updates multiple times then FIRE_DIALOG_SHOWN pixel is fired only once`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
-        testee.onShow()
-        testee.onShow()
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
 
         verify(mockPixel, times(1)).fire(FIRE_DIALOG_SHOWN)
     }
 
     @Test
-    fun `when onShow called then shown count is incremented once`() = runTest {
+    fun `when site data subtitle is visible then shown count is incremented`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
-        testee = createViewModel()
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
 
-        testee.onShow()
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
         verify(mockSettingsDataStore).singleTabFireDialogShownCount = 1
     }
 
     @Test
-    fun `when onShow called multiple times then shown count is incremented only once`() = runTest {
-        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+    fun `when site data subtitle is not eligible then shown count is not incremented`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(2)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
-        testee.onShow()
-        testee.onShow()
-
-        verify(mockSettingsDataStore, times(1)).singleTabFireDialogShownCount = 1
+        verify(mockSettingsDataStore, never()).singleTabFireDialogShownCount = any()
     }
 
     @Test
-    fun `when onShow called on duck ai tab then shown count is not incremented`() = runTest {
+    fun `when duck ai tab from browser then shown count is not incremented`() = runTest {
         whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
         )
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee = createViewModel()
-
-        testee.onShow()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
         verify(mockSettingsDataStore, never()).singleTabFireDialogShownCount = any()
     }
 
     @Test
-    fun `when onShow called with subtitle already hidden then shown count is not incremented`() = runTest {
-        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(2)
+    fun `when duck ai tab from settings then shown count is incremented`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.SETTINGS)
 
-        testee.onShow()
-
-        verify(mockSettingsDataStore, never()).singleTabFireDialogShownCount = any()
+        verify(mockSettingsDataStore).singleTabFireDialogShownCount = 1
     }
 
     // endregion
@@ -934,19 +1048,15 @@ class SingleTabFireDialogViewModelTest {
         whenever(mockTabRepository.getSelectedTab()).thenReturn(
             TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
         )
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
         testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.BROWSER)
 
         testee.onDeleteThisTabClicked()
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        testee.viewState.test {
-            val state = awaitItem()
-
-            assertFalse(state.shouldRestartAfterClearing)
-
-            cancelAndConsumeRemainingEvents()
-        }
+        assertFalse(testee.shouldRestartAfterClearing)
     }
 
     @Test

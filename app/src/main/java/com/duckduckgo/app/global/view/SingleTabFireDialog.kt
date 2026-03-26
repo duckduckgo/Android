@@ -55,6 +55,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -143,11 +144,6 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.onShow()
-    }
-
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
         viewModel.onCancel()
@@ -183,7 +179,11 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.viewState.collect { render(it) }
+                viewModel.viewState.collectLatest { state ->
+                    if (state is SingleTabFireDialogViewModel.ViewState.Loaded) {
+                        render(state)
+                    }
+                }
             }
         }
 
@@ -208,7 +208,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 dismiss()
             }
             is Command.OnClearStarted -> {
-                if (viewModel.viewState.value.shouldRestartAfterClearing) {
+                if (viewModel.shouldRestartAfterClearing) {
                     sendFragmentResult(FireDialog.EVENT_ON_CLEAR_STARTED)
                 } else {
                     sendFragmentResult(FireDialog.EVENT_CLEAR_WITHOUT_RESTART_STARTED)
@@ -236,14 +236,14 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         )
     }
 
-    private fun render(state: SingleTabFireDialogViewModel.ViewState) {
-        if (!state.isFirePictogramVisible) {
+    private fun render(state: SingleTabFireDialogViewModel.ViewState.Loaded) {
+        if (!state.stateData.isFirePictogramVisible) {
             binding.fireIcon.gone()
         }
 
-        val titleRes = if (state.isDuckAiTab && state.isDeleteThisTabButtonVisible) {
+        val titleRes = if (state.stateData.isDuckAiTab && state.isDeleteThisTabButtonVisible) {
             R.string.singleTabFireDialogTitleDuckAi
-        } else if (state.isDuckAiChatsSelected) {
+        } else if (state.stateData.isDuckAiChatsSelected) {
             R.string.singleTabFireDialogTitleWithChats
         } else {
             R.string.singleTabFireDialogTitle
@@ -252,7 +252,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
 
         if (state.isDeleteThisTabButtonVisible) {
             binding.deleteThisTabButton.show()
-            if (state.isDuckAiTab) {
+            if (state.stateData.isDuckAiTab) {
                 binding.deleteThisTabButton.text = requireContext().getString(R.string.singleTabFireDialogDeleteChat)
             }
         } else {
@@ -356,11 +356,12 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            if (viewModel.viewState.value.shouldRestartAfterClearing) {
+            if (viewModel.shouldRestartAfterClearing) {
+                val loaded = viewModel.viewState.value as? SingleTabFireDialogViewModel.ViewState.Loaded
                 clearDataAction.killAndRestartProcess(
                     notifyDataCleared = false,
                     enableTransitionAnimation = false,
-                    deletedTabCount = viewModel.viewState.value.tabCount,
+                    deletedTabCount = loaded?.stateData?.tabCount ?: 0,
                 )
             } else {
                 pendingFragmentResultEvent?.let { sendFragmentResult(it) }
