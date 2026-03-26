@@ -272,7 +272,10 @@ class SyncSetupWideEventImplTest {
 
         wideEvent.onUserAuthCancelled()
 
-        verify(wideEventClient).flowAbort(wideEventId = 1L)
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+        )
     }
 
     @Test
