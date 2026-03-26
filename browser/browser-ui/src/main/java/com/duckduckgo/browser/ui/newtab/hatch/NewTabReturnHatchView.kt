@@ -33,7 +33,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.browser.ui.R
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.R as CommonR
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -92,11 +94,16 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     fun render(state: NewTabReturnHatchViewModel.ViewState) {
         if (state.shouldShow) {
             binding.returnHatchSiteTitle.text = state.tabTitle
-            binding.returnHatchSiteURL.text = state.url.extractDomain()
-            binding.returnHatchRoot.show()
-            viewModel.viewModelScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(state.tabId, state.url, binding.returnHatchFavicon)
+            if (state.isDuckChat) {
+                binding.returnHatchSiteURL.text = context.getString(R.string.input_mode_chat_tab)
+                binding.returnHatchFavicon.setImageResource(CommonR.drawable.ic_duckai)
+            } else {
+                binding.returnHatchSiteURL.text = state.url.extractDomain()
+                viewModel.viewModelScope.launch {
+                    faviconManager.loadToViewFromLocalWithPlaceholder(state.tabId, state.url, binding.returnHatchFavicon)
+                }
             }
+            binding.returnHatchRoot.show()
         } else {
             binding.returnHatchRoot.gone()
         }
