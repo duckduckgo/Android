@@ -23,7 +23,6 @@ import android.webkit.WebResourceResponse
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -33,7 +32,6 @@ import okhttp3.Request
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * Intercepts YouTube HTML document requests via shouldInterceptRequest and injects
@@ -62,8 +60,14 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
     private val dispatcherProvider: DispatcherProvider,
-    @Named("api") private val okHttpClient: Lazy<OkHttpClient>,
 ) : YouTubeAdBlockingRequestInterceptor {
+
+    /**
+     * Plain OkHttpClient without API interceptors. The @Named("api") client adds a DDG API
+     * User-Agent header that causes YouTube to reject the request ("device not supported").
+     * We need to forward the WebView's original headers (including its browser User-Agent) faithfully.
+     */
+    private val okHttpClient: OkHttpClient by lazy { OkHttpClient() }
 
     private var cachedProbeScript: String? = null
 
@@ -114,7 +118,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
         }
 
         val okHttpRequest = requestBuilder.build()
-        val response = okHttpClient.get().newCall(okHttpRequest).execute()
+        val response = okHttpClient.newCall(okHttpRequest).execute()
 
         if (!response.isSuccessful) {
             response.close()
