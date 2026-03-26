@@ -54,6 +54,7 @@ class ContentScopePrivacyFeatureProcessor(
                 it.annotationType.resolve().declaration.qualifiedName?.asString() == annotationName
             }
             val featureName = annotation.arguments.first { it.name?.asString() == "featureName" }.value as String
+            val preferencesName = annotation.arguments.firstOrNull { it.name?.asString() == "preferencesName" }?.value as? String ?: ""
 
             if (featureName.isBlank()) {
                 logger.error("@ContentScopePrivacyFeature featureName must not be blank", symbol)
@@ -63,7 +64,11 @@ class ContentScopePrivacyFeatureProcessor(
             val pascalName = featureName.replaceFirstChar { it.uppercase() }
             val containingFiles = listOfNotNull(symbol.containingFile)
 
-            generateRepository(featureName, pascalName, containingFiles)
+            val resolvedPrefsName = preferencesName.ifBlank {
+                "com.duckduckgo.contentscopeprivacyfeatures.$featureName"
+            }
+
+            generateRepository(featureName, pascalName, containingFiles, resolvedPrefsName)
             generatePlugin(featureName, pascalName, containingFiles)
             generateConfigPlugin(featureName, pascalName, containingFiles)
         }
@@ -71,7 +76,7 @@ class ContentScopePrivacyFeatureProcessor(
         return unprocessed
     }
 
-    private fun generateRepository(featureName: String, pascalName: String, containingFiles: List<KSFile>) {
+    private fun generateRepository(featureName: String, pascalName: String, containingFiles: List<KSFile>, preferencesName: String) {
         val className = "${pascalName}ContentScopePrivacyFeatureRepository"
         val code = """
             |package $generatedPackage
@@ -99,7 +104,7 @@ class ContentScopePrivacyFeatureProcessor(
             |    private var jsonData: String = "{}"
             |
             |    private val preferences: SharedPreferences by lazy {
-            |        sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.contentscopeprivacyfeatures.$featureName")
+            |        sharedPreferencesProvider.getSharedPreferences("$preferencesName")
             |    }
             |
             |    init {

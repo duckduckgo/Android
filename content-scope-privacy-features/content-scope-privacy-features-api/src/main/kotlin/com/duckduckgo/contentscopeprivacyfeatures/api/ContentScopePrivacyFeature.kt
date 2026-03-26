@@ -20,4 +20,5 @@ package com.duckduckgo.contentscopeprivacyfeatures.api
 @Retention(AnnotationRetention.SOURCE)
 annotation class ContentScopePrivacyFeature(
     val featureName: String,
+    val preferencesName: String = "",
 )

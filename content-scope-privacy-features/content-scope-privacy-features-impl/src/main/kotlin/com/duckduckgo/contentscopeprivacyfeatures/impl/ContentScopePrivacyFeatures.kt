@@ -19,5 +19,8 @@ package com.duckduckgo.contentscopeprivacyfeatures.impl
 import com.duckduckgo.contentscopeprivacyfeatures.api.ContentScopePrivacyFeature
 
 // featureName must match the feature name in remote privacy config
-@ContentScopePrivacyFeature(featureName = "browserUiLock")
+@ContentScopePrivacyFeature(
+    featureName = "browserUiLock",
+    preferencesName = "com.duckduckgo.contentscopescripts.browseruilock.store",
+)
 interface BrowserUiLockContentScopePrivacyFeature
