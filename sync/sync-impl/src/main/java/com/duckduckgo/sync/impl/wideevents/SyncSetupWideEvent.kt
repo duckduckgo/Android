@@ -132,7 +132,10 @@ class SyncSetupWideEventImpl @Inject constructor(
         if (!isFeatureEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
-        wideEventClient.flowAbort(wideEventId = id)
+        wideEventClient.flowFinish(
+            wideEventId = id,
+            status = FlowStatus.Cancelled,
+        )
         cachedFlowId = null
     }
 
