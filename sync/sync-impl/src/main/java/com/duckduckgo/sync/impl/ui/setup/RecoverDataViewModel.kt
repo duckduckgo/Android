@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.Command.RecoveryCo
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.RecoverDataViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -59,6 +60,7 @@ class RecoverDataViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val syncPixels: SyncPixels,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -77,13 +79,17 @@ class RecoverDataViewModel @Inject constructor(
         }
 
         syncAccountRepository.getRecoveryCode().getOrNull()?.let { recoveryCode ->
+            syncSetupWideEvent.onRecoveryCodeShown()
             viewState.emit(
                 ViewState(
                     viewMode = SignedIn(b64RecoveryCode = recoveryCode.rawCode),
                     showRestoreOnReinstall = showRestore,
                 ),
             )
-        } ?: command.send(Command.FinishWithError)
+        } ?: run {
+            syncSetupWideEvent.onRecoveryCodeGenerationFailed()
+            command.send(Command.FinishWithError)
+        }
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()

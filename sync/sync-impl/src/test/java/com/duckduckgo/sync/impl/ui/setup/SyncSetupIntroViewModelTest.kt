@@ -26,11 +26,14 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.Recover
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 class SyncSetupIntroViewModelTest {
 
@@ -38,8 +41,9 @@ class SyncSetupIntroViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val syncFeatureToggle: SyncFeatureToggle = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
-    private val testee = SyncSetupIntroViewModel(syncFeatureToggle, coroutineTestRule.testDispatcherProvider)
+    private val testee = SyncSetupIntroViewModel(syncFeatureToggle, coroutineTestRule.testDispatcherProvider, syncSetupWideEvent)
 
     @Test
     fun whenSyncIntroArgumentThenIntroCreateAccountScreenShown() = runTest {
@@ -68,6 +72,31 @@ class SyncSetupIntroViewModelTest {
             Assert.assertTrue(command is StartSetupFlow)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenSyncIntroScreenThenOnIntroScreenShownCalled() = runTest {
+        testee.viewState(SYNC_INTRO).test {
+            awaitItem()
+            verify(syncSetupWideEvent).onIntroScreenShown()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoveryIntroScreenThenOnIntroScreenShownNotCalled() = runTest {
+        testee.viewState(RECOVERY_INTRO).test {
+            awaitItem()
+            verifyNoInteractions(syncSetupWideEvent)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnTurnSyncOnClickedThenOnSyncEnabledCalled() = runTest {
+        testee.onTurnSyncOnClicked()
+
+        verify(syncSetupWideEvent).onSyncEnabled()
     }
 
     @Test
