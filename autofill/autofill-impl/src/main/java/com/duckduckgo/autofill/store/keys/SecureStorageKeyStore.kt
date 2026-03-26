@@ -181,62 +181,6 @@ class RealSecureStorageKeyStore(
                 throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
             }
 
-            fun onLegacyWriteFailure(message: String, cause: Throwable? = null): Nothing {
-                pixel.fire(
-                    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
-                    getPixelParams(
-                        keyName = keyName,
-                        throwable = cause,
-                        useHarmony = harmonyFlags.useHarmony,
-                        readFromHarmony = harmonyFlags.readFromHarmony,
-                    ),
-                    type = Daily(),
-                )
-                throw SecureStorageException.InternalSecureStorageException(message, cause)
-            }
-
-            fun onHarmonyWriteFailure(message: String, cause: Throwable? = null): Nothing {
-                pixel.fire(
-                    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
-                    getPixelParams(
-                        keyName = keyName,
-                        throwable = cause,
-                        useHarmony = harmonyFlags.useHarmony,
-                        readFromHarmony = harmonyFlags.readFromHarmony,
-                    ),
-                    type = Daily(),
-                )
-                // Rollback legacy write so we don't cause a corrupted state with out-of-sync files
-                runCatching {
-                    val editor = legacyPrefs.edit()
-                    editor.remove(keyName)
-                    val committed = editor.commit()
-                    if (!committed) {
-                        pixel.fire(
-                            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
-                            getPixelParams(
-                                keyName = keyName,
-                                useHarmony = harmonyFlags.useHarmony,
-                                readFromHarmony = harmonyFlags.readFromHarmony,
-                            ),
-                            type = Daily(),
-                        )
-                    }
-                }.onFailure { rollbackError ->
-                    pixel.fire(
-                        AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
-                        getPixelParams(
-                            keyName = keyName,
-                            throwable = rollbackError,
-                            useHarmony = harmonyFlags.useHarmony,
-                            readFromHarmony = harmonyFlags.readFromHarmony,
-                        ),
-                        type = Daily(),
-                    )
-                }
-                throw SecureStorageException.InternalSecureStorageException(message, cause)
-            }
-
             val harmonyPrefs = if (!harmonyFlags.useHarmony) {
                 null
             } else {
@@ -272,10 +216,19 @@ class RealSecureStorageKeyStore(
                 editor.commit()
             }.getOrElse {
                 ensureActive()
-                onLegacyWriteFailure("Error writing to legacy preferences", it)
+                false
             }
             if (!legacyCommitted) {
-                onLegacyWriteFailure("Legacy commit() returned false — write not persisted to disk")
+                pixel.fire(
+                    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
+                    getPixelParams(
+                        keyName = keyName,
+                        useHarmony = harmonyFlags.useHarmony,
+                        readFromHarmony = harmonyFlags.readFromHarmony,
+                    ),
+                    type = Daily(),
+                )
+                throw SecureStorageException.InternalSecureStorageException("Legacy commit() returned false — write not persisted to disk")
             }
 
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
@@ -285,10 +238,47 @@ class RealSecureStorageKeyStore(
                     editor.commit()
                 }.getOrElse {
                     ensureActive()
-                    onHarmonyWriteFailure("Error writing to harmony preferences", it)
+                    false
                 }
                 if (!harmonyCommitted) {
-                    onHarmonyWriteFailure("Harmony commit() returned false — write not persisted to disk")
+                    pixel.fire(
+                        AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
+                        getPixelParams(
+                            keyName = keyName,
+                            useHarmony = harmonyFlags.useHarmony,
+                            readFromHarmony = harmonyFlags.readFromHarmony,
+                        ),
+                        type = Daily(),
+                    )
+                    // Rollback legacy write so we don't cause a corrupted state with out-of-sync files
+                    runCatching {
+                        val editor = legacyPrefs.edit()
+                        editor.remove(keyName)
+                        val committed = editor.commit()
+                        if (!committed) {
+                            pixel.fire(
+                                AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                                getPixelParams(
+                                    keyName = keyName,
+                                    useHarmony = harmonyFlags.useHarmony,
+                                    readFromHarmony = harmonyFlags.readFromHarmony,
+                                ),
+                                type = Daily(),
+                            )
+                        }
+                    }.onFailure { rollbackError ->
+                        pixel.fire(
+                            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                            getPixelParams(
+                                keyName = keyName,
+                                throwable = rollbackError,
+                                useHarmony = harmonyFlags.useHarmony,
+                                readFromHarmony = harmonyFlags.readFromHarmony,
+                            ),
+                            type = Daily(),
+                        )
+                    }
+                    throw SecureStorageException.InternalSecureStorageException("Harmony commit() returned false — write not persisted to disk")
                 }
             }
         }
