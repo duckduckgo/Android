@@ -54,7 +54,7 @@ We use Graphite for stacked pull requests. For any non-trivial task, plan a stac
 Structure the stack around the evolution of the work, not the module layout:
 
 1. **Feature flag** (if needed) — remote feature toggle gating the new behaviour
-2. **Implementation** — the feature itself, including UI, logic, and unit tests
+2. **Implementation** (one or more PRs) — the feature itself, including UI, logic, and unit tests; split into multiple PRs if the feature is large enough to benefit from independent review
 3. **Pixels** — analytics events for the feature
 4. **Translations** — any new strings added for the feature
 
