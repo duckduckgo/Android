@@ -215,6 +215,72 @@
             }
         ]
     },
+    "autofill_preferences_get_key_decode_failed": {
+        "description": "Legacy preferences returned a non-null value for a key but it could not be base64-decoded (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key whose value failed to decode from legacy",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "autofill_harmony_preferences_get_key_decode_failed": {
+        "description": "Harmony preferences returned a non-null value for a key but it could not be base64-decoded (daily unique)",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "key",
+                "description": "The name of the key whose value failed to decode from Harmony",
+                "type": "string",
+                "enum": ["KEY_GENERATED_PASSWORD", "KEY_L1KEY", "KEY_PASSWORD_SALT", "KEY_ENCRYPTED_L2KEY", "KEY_ENCRYPTED_L2KEY_IV"]
+            },
+            {
+                "key": "useHarmony",
+                "description": "Whether the useHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "initialHarmonyValue",
+                "description": "The value of useHarmony flag when harmony preferences were first initialized",
+                "type": "string",
+                "enum": ["true", "false", "null"]
+            },
+            {
+                "key": "readFromHarmony",
+                "description": "Whether the readFromHarmony feature flag is enabled",
+                "type": "string",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
     "autofill_harmony_key_mismatch": {
         "description": "Harmony and legacy preferences both have non-null values for the same key but they differ (daily unique)",
         "owners": ["CrisBarreiro"],
