@@ -27,3 +27,20 @@ PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
 **Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
 
 **UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
+
+## Stacked PRs (Graphite)
+
+We use Graphite for stacked pull requests. For any non-trivial task, plan a stack of PRs before writing code. Each PR in the stack must build and pass `./gradlew jvm_checks` independently.
+
+### Stack ordering
+
+Because of the `-api` / `-impl` module split and Dagger constraints, sequence work in this order:
+
+1. **Interfaces / data classes** — changes to `-api` modules
+2. **Implementation** — changes to `-impl` modules, DI bindings
+3. **UI** — ViewModel, layouts, Compose screens
+4. **Tests** — unit tests per layer; never add tests before their dependencies exist
+
+### Creating stacked PRs
+
+If the GT MCP is available, use it to create and submit stacked PRs. Otherwise, create branches and PRs manually using `gh`.
