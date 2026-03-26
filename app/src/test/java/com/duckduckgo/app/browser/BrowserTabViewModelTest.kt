@@ -162,6 +162,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
+import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -3168,6 +3169,30 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchPrivacyPro>()
+    }
+
+    @Test
+    fun whenUserClickedDaxPrivacyProCtaThenLaunchPrivacyProWithOnboardingOrigin() {
+        val cta = DaxBubbleCta.DaxPrivacyProCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            isFreeTrialCopy = false,
+        )
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("funnel_onboarding_android", uri.getQueryParameter("origin"))
+        }
+    }
+
+    @Test
+    fun whenUserClickedSubscriptionPromoModalCtaThenLaunchPrivacyProWithReinstallModalOrigin() {
+        val cta = SubscriptionPromoModalCta(isFreeTrialCopy = false)
+        setCta(cta)
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("funnel_reinstallmodal_android", uri.getQueryParameter("origin"))
+        }
     }
 
     @Test
@@ -8906,6 +8931,19 @@ class BrowserTabViewModelTest {
             AppPixelName.MENU_ACTION_VPN_PRESSED,
             mapOf(PixelParameter.STATUS to VpnMenuState.Subscribed(isVpnEnabled = true).pixelParam),
         )
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateThenLaunchPrivacyProWithAppMenuOrigin() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked()
+
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("funnel_appmenu_android", uri.getQueryParameter("origin"))
+        }
     }
 
     @Test
