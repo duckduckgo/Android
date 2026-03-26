@@ -128,8 +128,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
             keyBytes,
             deriveKeyFromPassword(password),
         ).also {
-            secureStorageKeyRepository.setEncryptedL2Key(it.data)
-            secureStorageKeyRepository.setEncryptedL2KeyIV(it.iv)
+            secureStorageKeyRepository.setEncryptedL2Key(it)
         }.data
 
     private suspend fun getPasswordSalt(): ByteArray {
