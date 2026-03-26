@@ -210,41 +210,43 @@ class RealSecureStorageKeyStore(
             }
 
             // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
-            val legacyCommitted = runCatching {
+            val (legacyCommitted, error) = runCatching {
                 val editor = legacyPrefs.edit()
                 editor.putString(keyName, keyValue.toByteString().base64())
-                editor.commit()
+                editor.commit() to null
             }.getOrElse {
                 ensureActive()
-                false
+                false to it
             }
             if (!legacyCommitted) {
                 pixel.fire(
                     AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED,
                     getPixelParams(
                         keyName = keyName,
+                        throwable = error,
                         useHarmony = harmonyFlags.useHarmony,
                         readFromHarmony = harmonyFlags.readFromHarmony,
                     ),
                     type = Daily(),
                 )
-                throw SecureStorageException.InternalSecureStorageException("Legacy commit() returned false — write not persisted to disk")
+                throw SecureStorageException.InternalSecureStorageException("Legacy commit() returned false — write not persisted to disk", error)
             }
 
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
-                val harmonyCommitted = runCatching {
+                val (harmonyCommitted, error) = runCatching {
                     val editor = harmonyPrefs.edit()
                     editor.putString(keyName, keyValue.toByteString().base64())
-                    editor.commit()
+                    editor.commit() to null
                 }.getOrElse {
                     ensureActive()
-                    false
+                    false to it
                 }
                 if (!harmonyCommitted) {
                     pixel.fire(
                         AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED,
                         getPixelParams(
                             keyName = keyName,
+                            throwable = error,
                             useHarmony = harmonyFlags.useHarmony,
                             readFromHarmony = harmonyFlags.readFromHarmony,
                         ),
@@ -278,7 +280,10 @@ class RealSecureStorageKeyStore(
                             type = Daily(),
                         )
                     }
-                    throw SecureStorageException.InternalSecureStorageException("Harmony commit() returned false — write not persisted to disk")
+                    throw SecureStorageException.InternalSecureStorageException(
+                        "Error writing to harmony preferences",
+                        error,
+                    )
                 }
             }
         }
