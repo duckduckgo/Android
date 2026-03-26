@@ -22,7 +22,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.PirConstants
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
@@ -181,9 +180,7 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return pirRepository.getAllUserProfileQueries().ifEmpty {
-            PirConstants.DEFAULT_PROFILE_QUERIES
-        }
+        return pirRepository.getAllUserProfileQueries()
     }
 
     private suspend fun attemptCreateScanJobs(

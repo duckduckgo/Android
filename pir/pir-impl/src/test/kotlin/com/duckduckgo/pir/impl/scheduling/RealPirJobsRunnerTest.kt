@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.PowerManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
@@ -174,91 +173,23 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
-    fun whenEmptyProfileQueriesUsesDefaultProfileQueries() = runTest {
+    fun whenEmptyProfileQueriesThenCompletesQuick() = runTest {
         // Given
         whenever(mockPirRepository.getAllActiveBrokers()).thenReturn(testActiveBrokers)
         whenever(mockPirRepository.getAllUserProfileQueries()).thenReturn(emptyList())
-        whenever(mockPirRepository.getBrokersForOptOut(true)).thenReturn(emptyList())
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName,
-                DEFAULT_PROFILE_QUERIES[0].id,
-            ),
-        ).thenReturn(null)
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName2,
-                DEFAULT_PROFILE_QUERIES[0].id,
-            ),
-        ).thenReturn(null)
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName,
-                DEFAULT_PROFILE_QUERIES[1].id,
-            ),
-        ).thenReturn(null)
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName2,
-                DEFAULT_PROFILE_QUERIES[1].id,
-            ),
-        ).thenReturn(null)
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName,
-                DEFAULT_PROFILE_QUERIES[2].id,
-            ),
-        ).thenReturn(null)
-        whenever(
-            mockPirSchedulingRepository.getValidScanJobRecord(
-                testBrokerName2,
-                DEFAULT_PROFILE_QUERIES[2].id,
-            ),
-        ).thenReturn(null)
-        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
-            emptyList(),
-        )
-        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
-        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
-            emptyList(),
-        )
-        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
-        whenever(mockPirRepository.latestBackgroundScanRunInMs()).thenReturn(testCurrentTime)
 
         // When
         val result = testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
         assertTrue(result.isSuccess)
-        // Should create scan jobs for all active brokers and all default profiles
-        verify(mockPirSchedulingRepository).saveScanJobRecords(
-            listOf(
-                ScanJobRecord(
-                    brokerName = testBrokerName,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[0].id,
-                ),
-                ScanJobRecord(
-                    brokerName = testBrokerName2,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[0].id,
-                ),
-                ScanJobRecord(
-                    brokerName = testBrokerName,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[1].id,
-                ),
-                ScanJobRecord(
-                    brokerName = testBrokerName2,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[1].id,
-                ),
-                ScanJobRecord(
-                    brokerName = testBrokerName,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[2].id,
-                ),
-                ScanJobRecord(
-                    brokerName = testBrokerName2,
-                    userProfileId = DEFAULT_PROFILE_QUERIES[2].id,
-                ),
-            ),
-        )
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any())
+        verifyNoMoreInteractions(mockPixelSender)
+        verifyNoInteractions(mockPirSchedulingRepository)
+        verifyNoInteractions(mockEligibleScanJobProvider)
+        verifyNoInteractions(mockEligibleOptOutJobProvider)
+        verifyNoInteractions(mockPirOptOut)
     }
 
     @Test
