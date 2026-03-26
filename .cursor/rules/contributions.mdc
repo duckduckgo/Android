@@ -47,7 +47,7 @@ _Feature 1_
 
 ## Stacked PRs (Graphite)
 
-We use Graphite for stacked pull requests. For any non-trivial task, plan a stack of PRs before writing code. Each PR in the stack must build and pass `./gradlew jvm_checks` independently.
+We use Graphite for stacked pull requests. When asked to build a complete feature, plan a stack of PRs following the ordering below before writing any code. For any other task, follow the engineer's instructions on how to structure the work. Each PR in the stack must build and pass `./gradlew jvm_checks` independently.
 
 ### Stack ordering
 
