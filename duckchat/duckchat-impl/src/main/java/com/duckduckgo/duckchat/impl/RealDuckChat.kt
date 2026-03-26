@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -67,6 +68,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -103,6 +105,16 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether the native input field should be used.
      */
     suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
+
+    /**
+     * Sets the user's preferred default toggle position.
+     */
+    suspend fun setDefaultTogglePosition(position: DefaultTogglePosition)
+
+    /**
+     * Observes the user's preferred default toggle position.
+     */
+    fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition>
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -753,6 +765,14 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSuggestionsFeatureAvailable(): Boolean =
         duckChatFeature.aiChatSuggestions().isEnabled()
+
+    override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
+        duckChatFeatureRepository.setDefaultTogglePosition(position.name)
+    }
+
+    override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
+        duckChatFeatureRepository.observeDefaultTogglePosition()
+            .map { DefaultTogglePosition.fromName(it) }
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()

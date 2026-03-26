@@ -41,6 +41,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
@@ -49,6 +50,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -182,6 +185,19 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
         )
 
+        binding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
+        binding.duckAiDefaultTogglePosition.setSecondaryText(
+            when (viewState.defaultTogglePosition) {
+                DefaultTogglePosition.SEARCH -> getString(R.string.duckAiDefaultTogglePositionSearch)
+                DefaultTogglePosition.DUCK_AI -> getString(R.string.duckAiDefaultTogglePositionDuckAi)
+                DefaultTogglePosition.LAST_USED -> getString(R.string.duckAiDefaultTogglePositionLastUsed)
+            },
+        )
+        binding.duckAiDefaultTogglePosition.setOnClickListener {
+            viewModel.onDefaultTogglePositionClicked()
+        }
+        binding.duckAiDefaultTogglePosition.updatePadding(left = offset)
+
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
@@ -276,7 +292,33 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.LaunchFeedback -> {
                 globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
             }
+
+            is DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog -> {
+                showDefaultTogglePositionDialog(command.currentPosition)
+            }
         }
+    }
+
+    private fun showDefaultTogglePositionDialog(currentPosition: DefaultTogglePosition) {
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiDefaultTogglePositionTitle)
+            .setOptions(
+                listOf(
+                    R.string.duckAiDefaultTogglePositionSearch,
+                    R.string.duckAiDefaultTogglePositionDuckAi,
+                    R.string.duckAiDefaultTogglePositionLastUsed,
+                ),
+                currentPosition.getOptionIndex(),
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        viewModel.onDefaultTogglePositionSelected(selectedItem.getDefaultTogglePositionForIndex())
+                    }
+                },
+            ).show()
     }
 
     private fun configureInputScreenToggle(

@@ -94,6 +94,12 @@ interface DuckChatFeatureRepository {
     suspend fun isAIChatHistoryEnabled(): Boolean
 
     suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    suspend fun setDefaultTogglePosition(position: String)
+
+    suspend fun getDefaultTogglePosition(): String?
+
+    fun observeDefaultTogglePosition(): Flow<String?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -199,6 +205,14 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
         duckChatDataStore.setChatSuggestionsUserSetting(enabled)
     }
+
+    override suspend fun setDefaultTogglePosition(position: String) {
+        duckChatDataStore.setDefaultTogglePosition(position)
+    }
+
+    override suspend fun getDefaultTogglePosition(): String? = duckChatDataStore.getDefaultTogglePosition()
+
+    override fun observeDefaultTogglePosition(): Flow<String?> = duckChatDataStore.observeDefaultTogglePosition()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

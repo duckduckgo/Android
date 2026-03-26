@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_AUTOMATIC_CONTEXT_ATTACHMENT
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_DEFAULT_TOGGLE_POSITION
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_COSMETIC_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_INPUT_SCREEN_USER_SETTING
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_AI_NATIVE_INPUT_FIELD_SETTING
@@ -138,6 +139,12 @@ interface DuckChatDataStore {
     suspend fun hasUserAcceptedTerms(): Boolean
 
     suspend fun setUserAcceptedTerms()
+
+    suspend fun setDefaultTogglePosition(position: String)
+
+    suspend fun getDefaultTogglePosition(): String?
+
+    fun observeDefaultTogglePosition(): Flow<String?>
 }
 
 @ContributesBinding(AppScope::class)
@@ -166,6 +173,7 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_NATIVE_INPUT_FIELD_SETTING = booleanPreferencesKey(name = "DUCK_AI_NATIVE_INPUT_FIELD_SETTING")
         val DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING = booleanPreferencesKey(name = "DUCK_AI_CHAT_SUGGESTIONS_USER_SETTING")
         val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
+        val DUCK_AI_DEFAULT_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_DEFAULT_TOGGLE_POSITION")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -236,6 +244,12 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
             .map { prefs -> prefs[DUCK_CHAT_SHOW_IN_VOICE_SEARCH] ?: true }
             .distinctUntilChanged()
             .stateIn(appCoroutineScope, SharingStarted.Eagerly, true)
+
+    private val defaultTogglePositionFlow: StateFlow<String?> =
+        store.data
+            .map { prefs -> prefs[DUCK_AI_DEFAULT_TOGGLE_POSITION] }
+            .distinctUntilChanged()
+            .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
 
     private val chatSuggestionsUserSettingEnabled: StateFlow<Boolean> =
         store.data
@@ -385,4 +399,13 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     override suspend fun setUserAcceptedTerms() {
         store.edit { prefs -> prefs[DUCK_AI_TERMS_ACCEPTED] = true }
     }
+
+    override suspend fun setDefaultTogglePosition(position: String) {
+        store.edit { prefs -> prefs[DUCK_AI_DEFAULT_TOGGLE_POSITION] = position }
+    }
+
+    override suspend fun getDefaultTogglePosition(): String? =
+        store.data.firstOrNull()?.let { it[DUCK_AI_DEFAULT_TOGGLE_POSITION] }
+
+    override fun observeDefaultTogglePosition(): Flow<String?> = defaultTogglePositionFlow
 }
