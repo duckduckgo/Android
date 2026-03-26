@@ -46,7 +46,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
-        testee.reportManualScanStarted(isPowerSavingEnabled = true)
+        testee.reportManualScanStarted(isPowerSavingEnabled = true, profileQueryCount = 3, brokerCount = 10)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender, times(2)).fire(
@@ -58,13 +58,17 @@ class RealPirPixelSenderTest {
 
         assert(paramsCaptor.firstValue.containsKey("power_saving"))
         assert(paramsCaptor.firstValue["power_saving"] == "true")
+        assert(paramsCaptor.firstValue.containsKey("profile_queries"))
+        assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test
     fun whenReportManualScanCompletedThenFiresPixelWithTotalTimeAndBatteryOptimizations() = runTest {
         val totalTimeInMillis = 12345L
 
-        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false)
+        testee.reportManualScanCompleted(totalTimeInMillis, batteryOptimizationsEnabled = false, totalScanJobs = 5, totalOptOutJobs = 3)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -78,6 +82,10 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["totalTimeInMillis"] == "12345")
         assert(paramsCaptor.firstValue.containsKey("battery-optimizations"))
         assert(paramsCaptor.firstValue["battery-optimizations"] == "false")
+        assert(paramsCaptor.firstValue.containsKey("total_scan"))
+        assert(paramsCaptor.firstValue["total_scan"] == "5")
+        assert(paramsCaptor.firstValue.containsKey("total_optout"))
+        assert(paramsCaptor.firstValue["total_optout"] == "3")
     }
 
     @Test

@@ -1203,6 +1203,16 @@
                 "key": "power_saving",
                 "description": "Whether the device is in power saving mode",
                 "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
@@ -1227,6 +1237,16 @@
                 "key": "battery-optimizations",
                 "description": "Whether battery optimizations are enabled for the app",
                 "type": "string"
+            },
+            {
+                "key": "total_scan",
+                "description": "The number of scan jobs executed during the run",
+                "type": "integer"
+            },
+            {
+                "key": "total_optout",
+                "description": "The number of opt-out jobs executed during the run",
+                "type": "integer"
             }
         ]
     },
