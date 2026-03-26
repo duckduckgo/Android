@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Скачать настольный браузер</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo для Mac и Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Восстановление данных</string>
+    <string name="sync_settings_download_recovery_code_item">Скачать код восстановления (PDF)</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Этот код позволит восстановить данные, если вы утратите доступ к устройству.</string>
+    <string name="sync_settings_data_expiration">Резервные копии Sync &amp; Backup не восстанавливаются после 18 месяцев бездействия. <annotation type="learn_more_link">Подробнее...</annotation></string>
 </resources>
