@@ -225,9 +225,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val showMainButtons = inputScreenConfigResolver.mainButtonsEnabled()
         inputModeWidget.provideInitialInputState(initialText, showMainButtons)
 
-        configureHatchView(params?.showReturnHatch)
-
         val useTopBar = inputScreenConfigResolver.useTopBar()
+
+        configureHatchView(params?.showReturnHatch, useTopBar)
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
@@ -539,8 +539,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         exitInputScreen()
     }
 
-    private fun configureHatchView(showReturnHatch: Boolean?) {
+    private fun configureHatchView(showReturnHatch: Boolean?, useTopBar: Boolean) {
         binding.inputScreenHatch.isVisible = showReturnHatch ?: false
+        binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = if (useTopBar) {
+                resources.getDimensionPixelSize(R.dimen.inputScreenHatchTopMarginWithTopBar)
+            } else {
+                resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
+            }
+        }
         binding.inputScreenHatch.setHatchPressedListener(
             object : NewTabReturnHatchView.ItemPressedListener {
                 override fun onHatchPressed() {

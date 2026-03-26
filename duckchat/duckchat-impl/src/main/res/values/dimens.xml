@@ -23,4 +23,5 @@
     <dimen name="inputScreenContentSeparatorHeight">0.5dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
     <dimen name="inputScreenLogoBottomBarTopMargin">114dp</dimen>
+    <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
 </resources>
