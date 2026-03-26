@@ -20,7 +20,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Title: FrameLayout with hidden DaxTextView for measurement + TypeAnimationTextView for typing -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,8 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:visibility="invisible"
             android:text="@string/preOnboardingDaxDialog2Title"
+            android:visibility="invisible"
             app:typography="onboarding_title" />
 
         <com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -41,14 +40,13 @@
             style="@style/Typography.DuckDuckGo.Onboarding.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:textColor="?attr/daxColorPrimaryText" />
 
     </FrameLayout>
 
-    <!-- Comparison Table -->
     <LinearLayout
         android:id="@+id/comparisonTable"
         android:layout_width="match_parent"
@@ -57,7 +55,6 @@
         android:orientation="vertical"
         tools:alpha="1">
 
-        <!-- Header Row: Chrome + DDG logos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +87,6 @@
 
         </LinearLayout>
 
-        <!-- Row 1: Search privately by default (highlighted) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -98,6 +94,7 @@
             android:gravity="center_vertical"
             android:minHeight="56dp"
             android:orientation="horizontal"
+            android:paddingVertical="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
@@ -113,7 +110,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="@string/preOnboardingComparisonChartItem1"
-                app:typography="onboarding_body" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -144,13 +141,13 @@
 
         </LinearLayout>
 
-        <!-- Row 2: Block 3rd-party trackers (transparent) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="56dp"
             android:gravity="center_vertical"
+            android:minHeight="56dp"
             android:orientation="horizontal"
+            android:paddingVertical="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
@@ -158,15 +155,15 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_shield" />
+                app:srcCompat="@drawable/temp_ic_duckai" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingComparisonChartItem2"
-                app:typography="onboarding_body" />
+                android:text="@string/preOnboardingComparisonChartDuckAi"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -197,14 +194,15 @@
 
         </LinearLayout>
 
-        <!-- Row 3: Block cookie requests & pop-ups (highlighted) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
+            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:minHeight="56dp"
             android:orientation="horizontal"
+            android:paddingVertical="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
@@ -220,7 +218,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="@string/preOnboardingBrandDesignComparisonChartItem3"
-                app:typography="onboarding_body" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -251,13 +249,13 @@
 
         </LinearLayout>
 
-        <!-- Row 4: Block targeted ads (transparent) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="56dp"
             android:gravity="center_vertical"
+            android:minHeight="56dp"
             android:orientation="horizontal"
+            android:paddingVertical="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
@@ -273,7 +271,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="@string/preOnboardingComparisonChartItem4"
-                app:typography="onboarding_body" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
                 android:layout_width="40dp"
@@ -304,14 +302,15 @@
 
         </LinearLayout>
 
-        <!-- Row 5: Erase browsing data swiftly (highlighted) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
+            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:minHeight="56dp"
             android:orientation="horizontal"
+            android:paddingVertical="8dp"
             android:paddingStart="12dp"
             android:paddingEnd="4dp">
 
@@ -326,8 +325,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
+                android:background="@drawable/background_comparison_chart_row_highlighted"
                 android:text="@string/preOnboardingBrandDesignComparisonChartItem5"
-                app:typography="onboarding_body" />
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
                 android:layout_width="40dp"
