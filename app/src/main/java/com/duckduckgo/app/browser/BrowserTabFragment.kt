@@ -360,6 +360,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -374,6 +375,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
 import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
@@ -711,6 +713,8 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
+    private var lastTouchX: Float = 0f
+    private var lastTouchY: Float = 0f
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -3795,6 +3799,8 @@ class BrowserTabFragment :
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         isWebViewGestureInProgress = true
+                        lastTouchX = event.x / it.resources.displayMetrics.density
+                        lastTouchY = event.y / it.resources.displayMetrics.density
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -4275,8 +4281,8 @@ class BrowserTabFragment :
         return message.data.getString(URL_BUNDLE_KEY)
     }
 
-    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? =
-        when {
+    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
+        return when {
             hitTestResult.extra == null -> null
             hitTestResult.type == UNKNOWN_TYPE -> null
             hitTestResult.type == IMAGE_TYPE ->
@@ -4293,15 +4299,26 @@ class BrowserTabFragment :
                     type = hitTestResult.type,
                 )
 
-            else ->
-                LongPressTarget(
-                    url = hitTestResult.extra,
-                    type = hitTestResult.type,
-                )
+            else -> LongPressTarget(
+                url = hitTestResult.extra,
+                type = hitTestResult.type,
+            )
         }
+    }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
+            // Handle copy link text separately — requires async JS evaluation
+            if (item.itemId == WebViewLongPressHandler.CONTEXT_MENU_ID_COPY_TEXT) {
+                lifecycleScope.launch {
+                    val text = extractLinkTextAtPoint()
+                    if (text != null) {
+                        clipboardManager.setPrimaryClip(ClipData.newPlainText(null, text))
+                    }
+                }
+                return true
+            }
+
             runCatching {
                 webView?.safeHitTestResult?.let {
                     val target = getLongPressTarget(it)
@@ -4314,6 +4331,24 @@ class BrowserTabFragment :
             }
         }
         return super.onContextItemSelected(item)
+    }
+
+    private suspend fun extractLinkTextAtPoint(): String? {
+        val wv = webView ?: return null
+        return suspendCancellableCoroutine { continuation ->
+            val js = """
+                (function() {
+                    var el = document.elementFromPoint($lastTouchX, $lastTouchY);
+                    while (el && el.tagName !== 'A') { el = el.parentElement; }
+                    if (el && el.innerText) { return el.innerText.trim(); }
+                    return '';
+                })()
+            """.trimIndent()
+            wv.evaluateJavascript(js) { result ->
+                val text = result?.trim('"')?.takeIf { it.isNotEmpty() && it != "null" }
+                continuation.resume(text) {}
+            }
+        }
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
