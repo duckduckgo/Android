@@ -3471,10 +3471,14 @@ class BrowserTabFragment :
             newTabReturnHatchView.gone()
         }
 
-        newTabReturnHatchView.setHatchPressedListener(
-            object : NewTabReturnHatchView.ItemPressedListener {
+        newTabReturnHatchView.setHatchListener(
+            object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
+                }
+
+                override fun onHatchRendered(visible: Boolean) {
+                    // no-op
                 }
             },
         )

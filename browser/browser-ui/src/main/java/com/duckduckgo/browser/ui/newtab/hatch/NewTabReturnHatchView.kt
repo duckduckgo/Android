@@ -47,8 +47,9 @@ class NewTabReturnHatchView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
 
-    interface ItemPressedListener {
+    interface HatchListener {
         fun onHatchPressed()
+        fun onHatchRendered(visible: Boolean)
     }
 
     @Inject
@@ -61,7 +62,7 @@ class NewTabReturnHatchView @JvmOverloads constructor(
 
     private val conflatedJob = ConflatedJob()
 
-    private var hatchItemPressedListener: ItemPressedListener? = null
+    private var hatchHatchListener: HatchListener? = null
 
     private val viewModel: NewTabReturnHatchViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabReturnHatchViewModel::class.java]
@@ -99,12 +100,13 @@ class NewTabReturnHatchView @JvmOverloads constructor(
         } else {
             binding.returnHatchRoot.gone()
         }
+        hatchHatchListener?.onHatchRendered(state.shouldShow)
     }
 
-    fun setHatchPressedListener(itemPressedListener: ItemPressedListener) {
-        hatchItemPressedListener = itemPressedListener
+    fun setHatchListener(hatchListener: HatchListener) {
+        hatchHatchListener = hatchListener
         binding.returnHatchRoot.setOnClickListener {
-            hatchItemPressedListener?.onHatchPressed()
+            hatchHatchListener?.onHatchPressed()
         }
     }
 }

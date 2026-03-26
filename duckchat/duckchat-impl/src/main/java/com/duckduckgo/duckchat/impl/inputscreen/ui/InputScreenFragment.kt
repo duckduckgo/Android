@@ -268,13 +268,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         if (!useTopBar) {
             binding.autoCompleteBottomFadeContainer.isVisible = false
             binding.chatSuggestionsBottomFadeContainer.isVisible = false
-        }
-
-        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            topMargin = if (useTopBar) {
-                resources.getDimensionPixelSize(CommonR.dimen.keyline_7)
-            } else {
-                resources.getDimensionPixelSize(R.dimen.inputScreenLogoBottomBarTopMargin)
+            binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin -= resources.getDimensionPixelSize(R.dimen.inputScreenLogoBottomBarTopMargin)
             }
         }
 
@@ -545,22 +540,33 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         exitInputScreen()
     }
 
-    private fun configureHatchView(showReturnHatch: Boolean?, useTopBar: Boolean) {
+    private fun configureHatchView(
+        showReturnHatch: Boolean?,
+        useTopBar: Boolean
+    ) {
         binding.inputScreenHatch.isVisible = showReturnHatch ?: false
         binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             topMargin = if (useTopBar) {
-                resources.getDimensionPixelSize(R.dimen.inputScreenHatchTopMarginWithTopBar)
+                resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
             } else {
                 resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
             }
         }
-        binding.inputScreenHatch.setHatchPressedListener(
-            object : NewTabReturnHatchView.ItemPressedListener {
+        binding.inputScreenHatch.setHatchListener(
+            object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
                     exitInputScreen()
+                }
+
+                override fun onHatchRendered(visible: Boolean) {
+                    if (useTopBar && visible) {
+                        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                            topMargin = resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
+                        }
+                    }
                 }
             },
         )
