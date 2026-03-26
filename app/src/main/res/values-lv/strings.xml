@@ -267,8 +267,8 @@
     <string name="singleTabFireDialogTitleWithChats">Vai dzēst cilnes, vietnes datus un tērzēšanas sarunas?</string>
     <string name="singleTabFireDialogDeleteAll">Dzēst visus</string>
     <string name="singleTabFireDialogDeleteThisTab">Dzēst šo cilni</string>
-    <string name="singleTabFireDialogDeleteThisChat">Dzēst šo tērzēšanas sarunu</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">\"Dzēst visu\" neizdzēsīs tavu Duck.ai tērzēšanas vēsturi.</string>
+    <string name="singleTabFireDialogDeleteChat">Dzēst tērzēšanas sarunu</string>
+    <string name="singleTabFireDialogTitleDuckAi">Dzēst šo tērzēšanas sarunu?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Dzēšot vietnes datus, tu vari tikt izrakstīts no kontiem.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tas atcels notiekošās lejupielādes.</string>
     <plurals name="tabsClearedSnackbarMessage">

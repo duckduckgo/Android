@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Да изтрием ли раздели, данни от сайтове и чатове?</string>
     <string name="singleTabFireDialogDeleteAll">Изтриване на всички</string>
     <string name="singleTabFireDialogDeleteThisTab">Изтриване на този раздел</string>
-    <string name="singleTabFireDialogDeleteThisChat">Изтриване на този чат</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">„Изтриване на всички“ няма да изтрие историята на чатовете в Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Изтриване на чата</string>
+    <string name="singleTabFireDialogTitleDuckAi">Да бъде ли изтрит този чат?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
     <plurals name="tabsClearedSnackbarMessage">

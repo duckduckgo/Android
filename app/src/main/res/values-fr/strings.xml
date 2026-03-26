@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Supprimer les onglets, les données du site et les discussions ?</string>
     <string name="singleTabFireDialogDeleteAll">Tout supprimer</string>
     <string name="singleTabFireDialogDeleteThisTab">Supprimer cet onglet</string>
-    <string name="singleTabFireDialogDeleteThisChat">Supprimer cette discussion</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">« Tout supprimer » ne supprimera pas l\'historique de vos discussions Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Supprimer la discussion</string>
+    <string name="singleTabFireDialogTitleDuckAi">Supprimer cette discussion ?</string>
     <string name="singleTabFireDialogSubtitleSiteData">La suppression des données de site peut vous déconnecter des comptes.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Cela annulera les téléchargements en cours.</string>
     <plurals name="tabsClearedSnackbarMessage">

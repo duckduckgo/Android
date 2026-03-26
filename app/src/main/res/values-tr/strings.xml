@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Sekmeleri, site verilerini ve sohbetleri silmek mi istiyorsunuz?</string>
     <string name="singleTabFireDialogDeleteAll">Tümünü Sil</string>
     <string name="singleTabFireDialogDeleteThisTab">Bu Sekmeyi Sil</string>
-    <string name="singleTabFireDialogDeleteThisChat">Bu Sohbeti Sil</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">\"Tümünü Sil\" seçeneği Duck.ai sohbet geçmişini silmeyecek.</string>
+    <string name="singleTabFireDialogDeleteChat">Sohbeti Sil</string>
+    <string name="singleTabFireDialogTitleDuckAi">Bu sohbet silinsin mi?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Site verilerini silmek, hesaplarınızdan çıkış yapmanıza neden olabilir.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Bu işlem devam eden indirmeleri iptal edecektir.</string>
     <plurals name="tabsClearedSnackbarMessage">
