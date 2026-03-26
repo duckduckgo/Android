@@ -713,6 +713,8 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
     private var isWebViewGestureInProgress = false
+    private var lastTouchX: Float = 0f
+    private var lastTouchY: Float = 0f
 
     private val tabSwitcherActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
@@ -3832,6 +3834,8 @@ class BrowserTabFragment :
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
                         isWebViewGestureInProgress = true
+                        lastTouchX = event.x / it.resources.displayMetrics.density
+                        lastTouchY = event.y / it.resources.displayMetrics.density
                     }
 
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
