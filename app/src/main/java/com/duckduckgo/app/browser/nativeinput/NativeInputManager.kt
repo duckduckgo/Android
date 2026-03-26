@@ -49,6 +49,7 @@ class NativeInputCallbacks(
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
     val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
+    val onImageButtonPressed: () -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -403,6 +404,7 @@ class RealNativeInputManager @Inject constructor(
                 setVoiceButtonVisible(true)
                 onVoiceClick = { callbacks.onVoiceSearchPressed(isChatTabSelected()) }
             }
+            onImageClick = { callbacks.onImageButtonPressed() }
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
