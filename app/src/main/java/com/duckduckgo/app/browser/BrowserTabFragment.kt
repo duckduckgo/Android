@@ -2148,7 +2148,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
-        newBrowserTab.newTabContainerLayout.show()
+        newBrowserTab.newTabRootLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
@@ -2163,7 +2163,7 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         newBrowserTab.newTabLayout.gone()
-        newBrowserTab.newTabContainerLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
         binding.browserLayout.show()
         webViewContainer.show()
         webView?.show()
@@ -2181,7 +2181,7 @@ class BrowserTabFragment :
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
-        newBrowserTab.newTabContainerLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
@@ -2213,7 +2213,7 @@ class BrowserTabFragment :
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
-        newBrowserTab.newTabContainerLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
         sslErrorView.gone()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
@@ -2305,7 +2305,7 @@ class BrowserTabFragment :
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
-        newBrowserTab.newTabContainerLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
         webView?.onPause()
         webView?.hide()
         omnibar.setViewMode(ViewMode.SSLWarning)
@@ -5423,7 +5423,7 @@ class BrowserTabFragment :
                         )
                     }
                 }.launchIn(lifecycleScope)
-            newBrowserTab.newTabContainerLayout.show()
+            newBrowserTab.newTabRootLayout.show()
             newBrowserTab.newTabLayout.show()
 
             omnibar.setViewMode(ViewMode.NewTab)
@@ -5435,7 +5435,7 @@ class BrowserTabFragment :
         }
 
         private fun hideNewTab() {
-            newBrowserTab.newTabContainerLayout.gone()
+            newBrowserTab.newTabRootLayout.gone()
         }
 
         private fun hideDaxCta() {
