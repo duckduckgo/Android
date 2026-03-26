@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacypass.impl
 
-import android.util.Base64
+import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
 import com.duckduckgo.privacypass.api.PrivacyPassManager
@@ -33,18 +33,30 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
+private const val ACT_ORG = "duckduckgo"
+private const val ACT_SERVICE = "privacy-pass"
+private const val ACT_DEPLOYMENT = "prototype"
+private const val ACT_VERSION = "2026-03"
+
 private const val TOKEN_TYPE_ACT = 0xDA15
 private const val PRIVATE_TOKEN_SCHEME = "PrivateToken"
 private const val WWW_AUTHENTICATE = "WWW-Authenticate"
 
+class ActCoreException(message: String) : Exception(message)
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPrivacyPassManager @Inject constructor(
+    private val context: Context,
     @PrivacyPassClient private val okHttpClient: OkHttpClient,
 ) : PrivacyPassManager {
 
     private val credentialStore = ConcurrentHashMap<String, StoredCredential>()
-    private val actCore = ActCoreWrapper()
+    private val native = ActCoreNative()
+
+    private fun ensureNativeReady() {
+        ActCoreNative.init(context)
+    }
 
     override fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean {
         if (statusCode != 401) return false
@@ -103,21 +115,35 @@ class RealPrivacyPassManager @Inject constructor(
 
     private fun runActProtocol(challenge: PrivacyPassChallenge): PrivacyPassResult {
         return try {
+            ensureNativeReady()
             logcat { "PrivacyPass: starting ACT protocol with issuer ${challenge.issuerUrl}" }
 
-            val publicKeyCbor = fetchIssuerPublicKey(challenge.issuerUrl)
-                ?: return PrivacyPassResult.Failure("Failed to fetch issuer public key")
-            logcat { "PrivacyPass: fetched issuer public key (${publicKeyCbor.size} bytes CBOR)" }
+            val paramsId = nativeCreateParams()
 
-            val issuanceResult = actCore.performIssuance(publicKeyCbor) { requestCborBase64 ->
-                postIssuanceRequest(challenge.issuerUrl, requestCborBase64)
-            }
-            logcat { "PrivacyPass: issuance complete, token ${issuanceResult.tokenCbor.size} bytes" }
+            val publicKeyCborBase64 = fetchIssuerPublicKeyCborBase64(challenge.issuerUrl)
+                ?: return PrivacyPassResult.Failure("Failed to fetch issuer public key")
+            logcat { "PrivacyPass: fetched issuer public key" }
+
+            val publicKeyId = nativeParsePublicKey(publicKeyCborBase64)
+
+            val issuanceReqJson = parseNativeResult(native.createIssuanceRequest(paramsId))
+            val preIssuanceId = issuanceReqJson.getLong("preIssuanceId")
+            val requestCborBase64 = issuanceReqJson.getString("requestCborBase64")
+            logcat { "PrivacyPass: created issuance request" }
+
+            val responseCborBase64 = postIssuanceRequest(challenge.issuerUrl, requestCborBase64)
+                ?: return PrivacyPassResult.Failure("Issuance POST request failed")
+
+            val completeJson = parseNativeResult(
+                native.completeIssuance(preIssuanceId, paramsId, publicKeyId, requestCborBase64, responseCborBase64),
+            )
+            val tokenCborBase64 = completeJson.getString("tokenCborBase64")
+            logcat { "PrivacyPass: issuance complete" }
 
             val credential = StoredCredential(
                 issuerUrl = challenge.issuerUrl,
-                tokenCbor = issuanceResult.tokenCbor,
-                publicKeyCbor = issuanceResult.publicKeyCbor,
+                tokenCborBase64 = tokenCborBase64,
+                publicKeyCborBase64 = publicKeyCborBase64,
             )
             credentialStore[challenge.issuerUrl] = credential
             logcat { "PrivacyPass: stored credential for ${challenge.issuerUrl}" }
@@ -138,33 +164,35 @@ class RealPrivacyPassManager @Inject constructor(
         credential: StoredCredential,
     ): PrivacyPassResult {
         return try {
-            val spendResult = actCore.spend(credential.tokenCbor)
-            logcat { "PrivacyPass: spend proof generated (${spendResult.spendProofCbor.size} bytes)" }
+            ensureNativeReady()
 
-            try {
-                val spendProofBase64 = Base64.encodeToString(spendResult.spendProofCbor, Base64.NO_WRAP)
-                val refundCborBase64 = postSpendProof(credential.issuerUrl, spendProofBase64)
+            val paramsId = nativeCreateParams()
+            val publicKeyId = nativeParsePublicKey(credential.publicKeyCborBase64)
 
-                if (refundCborBase64 != null) {
-                    val refundCbor = Base64.decode(refundCborBase64, Base64.DEFAULT)
-                    val newTokenCbor = actCore.completeRefund(
-                        spendResult.preRefundPtr,
-                        spendResult.spendProofCbor,
-                        refundCbor,
-                        credential.publicKeyCbor,
-                    )
-                    credentialStore[credential.issuerUrl] = credential.copy(tokenCbor = newTokenCbor)
-                    logcat { "PrivacyPass: refund complete, updated stored credential" }
-                } else {
-                    logcat { "PrivacyPass: no refund response, credential will not be refreshed" }
-                    credentialStore.remove(credential.issuerUrl)
-                }
+            val loadJson = parseNativeResult(native.loadCreditToken(credential.tokenCborBase64))
+            val creditTokenId = loadJson.getLong("creditTokenId")
 
-                val authHeader = "$PRIVATE_TOKEN_SCHEME token=$spendProofBase64"
-                PrivacyPassResult.Success(authHeader)
-            } finally {
-                actCore.freePreRefund(spendResult.preRefundPtr)
+            val spendJson = parseNativeResult(native.spend(creditTokenId, paramsId, 1L))
+            val spendProofCborBase64 = spendJson.getString("spendProofCborBase64")
+            val preRefundId = spendJson.getLong("preRefundId")
+            logcat { "PrivacyPass: spend proof generated" }
+
+            val refundCborBase64 = postSpendProof(credential.issuerUrl, spendProofCborBase64)
+
+            if (refundCborBase64 != null) {
+                val refundJson = parseNativeResult(
+                    native.completeRefund(preRefundId, paramsId, publicKeyId, spendProofCborBase64, refundCborBase64),
+                )
+                val newTokenCborBase64 = refundJson.getString("tokenCborBase64")
+                credentialStore[credential.issuerUrl] = credential.copy(tokenCborBase64 = newTokenCborBase64)
+                logcat { "PrivacyPass: refund complete, updated stored credential" }
+            } else {
+                logcat { "PrivacyPass: no refund response, credential will not be refreshed" }
+                credentialStore.remove(credential.issuerUrl)
             }
+
+            val authHeader = "$PRIVATE_TOKEN_SCHEME token=$spendProofCborBase64"
+            PrivacyPassResult.Success(authHeader)
         } catch (e: ActCoreException) {
             logcat(ERROR) { "PrivacyPass: spend FFI error: ${e.message}" }
             PrivacyPassResult.Failure("Spend FFI error: ${e.message}")
@@ -174,7 +202,25 @@ class RealPrivacyPassManager @Inject constructor(
         }
     }
 
-    private fun fetchIssuerPublicKey(issuerUrl: String): ByteArray? {
+    private fun nativeCreateParams(): Long {
+        val json = parseNativeResult(native.createParams(ACT_ORG, ACT_SERVICE, ACT_DEPLOYMENT, ACT_VERSION))
+        return json.getLong("paramsId")
+    }
+
+    private fun nativeParsePublicKey(cborBase64: String): Long {
+        val json = parseNativeResult(native.parsePublicKey(cborBase64))
+        return json.getLong("publicKeyId")
+    }
+
+    private fun parseNativeResult(jsonString: String): JSONObject {
+        val json = JSONObject(jsonString)
+        if (json.has("error")) {
+            throw ActCoreException(json.getString("error"))
+        }
+        return json
+    }
+
+    private fun fetchIssuerPublicKeyCborBase64(issuerUrl: String): String? {
         val url = "${issuerUrl.trimEnd('/')}/public-key"
         logcat { "PrivacyPass: GET $url" }
 
@@ -190,7 +236,7 @@ class RealPrivacyPassManager @Inject constructor(
             val json = JSONObject(body)
             val cborBase64 = json.optString("cbor").takeIf { it.isNotEmpty() }
             if (cborBase64 != null) {
-                return Base64.decode(cborBase64, Base64.DEFAULT)
+                return cborBase64
             }
 
             logcat(ERROR) { "PrivacyPass: public-key response missing 'cbor' field" }
@@ -301,7 +347,7 @@ class RealPrivacyPassManager @Inject constructor(
 
     data class StoredCredential(
         val issuerUrl: String,
-        val tokenCbor: ByteArray,
-        val publicKeyCbor: ByteArray,
+        val tokenCborBase64: String,
+        val publicKeyCborBase64: String,
     )
 }
