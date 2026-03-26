@@ -28,6 +28,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -341,6 +342,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val userBrowserProperties: UserBrowserProperties,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -905,6 +907,19 @@ class RealDuckChat @Inject constructor(
                     .isEnabled() && duckChatFeatureRepository.isAutomaticPageContextAttachmentUserSettingEnabled()
 
             areMultipleContentAttachmentsEnabled = isContextualModeEnabled && duckChatFeature.supportsMultipleContexts().isEnabled()
+
+            if (duckChatFeature.rememberTogglePosition().isEnabled() && duckChatFeatureRepository.getDefaultTogglePosition() == null) {
+                val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
+
+                // Workaround to account for the race condition where we might reach this point before we set installTimestamp (defaults to 0).
+                // So depending on which coroutine runs first on the IO dispatcher, daysSinceInstalled can either be 0 or days since 1970.
+                // Both could apply for new users so we check on > 0 and < days_since_epoch - some buffer
+                val maxValidDays = System.currentTimeMillis() / 86_400_000 - 365
+                val isExistingUser = daysSinceInstalled in 1..<maxValidDays
+
+                val default = if (isExistingUser) DefaultTogglePosition.SEARCH else DefaultTogglePosition.LAST_USED
+                duckChatFeatureRepository.setDefaultTogglePosition(default.name)
+            }
         }
 
     companion object {
