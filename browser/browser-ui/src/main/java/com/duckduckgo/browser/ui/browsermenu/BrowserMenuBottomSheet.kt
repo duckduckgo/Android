@@ -205,6 +205,7 @@ class BrowserMenuBottomSheet(
         forwardMenuItem.isEnabled = viewState.canGoForward
         newDuckChatTabMenuItem.isEnabled = viewState.showNewDuckChatTabOption
         newDuckChatTabMenuItem.isVisible = viewState.showNewDuckChatTabOption
+        newDuckChatMenuItem.setIcon(drawable.ic_ai_chat_24)
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
         newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         newTabMenuItem.isEnabled = true
@@ -290,6 +291,7 @@ class BrowserMenuBottomSheet(
         newTabMenuItem.isEnabled = true
         newDuckChatTabMenuItem.isEnabled = false
         newDuckChatTabMenuItem.isVisible = false
+        newDuckChatMenuItem.setIcon(drawable.ic_ai_chat_add_24)
         newDuckChatMenuItem.isEnabled = viewState.showDuckChatOption
         newDuckChatMenuItem.isVisible = viewState.showDuckChatOption
         settingsMenuItem.isEnabled = true
