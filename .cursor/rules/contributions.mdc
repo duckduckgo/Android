@@ -18,32 +18,15 @@ Use the imperative mood in the subject line (e.g. "Add feature X", not "Added fe
 
 ## PR body
 
-Every PR must use the exact format from `.github/PULL_REQUEST_TEMPLATE.md`. This applies when creating PRs via `gh`, `gt submit`, or the GT MCP — always populate the body from this template:
+Read `.github/PULL_REQUEST_TEMPLATE.md` and use it as the PR body exactly — do not skip or reorder sections, do not add content above the first line of the template.
 
-```
-Task/Issue URL: <Asana task URL>
+Fill in the template sections as follows:
+- **Task/Issue URL**: the Asana task URL
+- **Description**: summarise what was changed and why
+- **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
+- **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
-### Description
-
-### Steps to test this PR
-
-_Feature 1_
-- [ ]
-- [ ]
-
-### UI changes
-| Before  | After |
-| ------ | ----- |
-!(Upload before screenshot)|(Upload after screenshot)|
-```
-
-**Task/Issue URL** — Plain text line (no heading), link to the Asana task.
-
-**Description** — A short summary of what changed and why.
-
-**Steps to test this PR** — Reviewer-facing steps per scenario. Be specific enough that someone unfamiliar with the code can follow them.
-
-**UI changes** — Before/After screenshots or recordings. Omit the table and write "N/A" only for pure logic/backend changes with no visual impact.
+Use `gh api repos/duckduckgo/Android/pulls --method POST` to open PRs — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
 
 ## Stacked PRs (Graphite)
 
