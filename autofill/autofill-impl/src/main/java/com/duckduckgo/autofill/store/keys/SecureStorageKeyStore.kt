@@ -114,7 +114,6 @@ class RealSecureStorageKeyStore(
                 multiProcess = autofillServiceFlag,
             )
         }
-
     }
 
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
@@ -180,7 +179,6 @@ class RealSecureStorageKeyStore(
     private suspend fun getHarmonyEncryptedPreferences(): SharedPreferences? {
         return harmonyPreferencesDeferred.await()
     }
-
 
     @SuppressLint("UseKtx")
     override suspend fun updateKey(
