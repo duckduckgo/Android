@@ -421,7 +421,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun updateDuckAiSubmitButton() {
         val toggle = findViewById<TabLayout?>(R.id.inputModeSwitch) ?: return
         val isChatTab = toggle.selectedTabPosition == 1
-        setImageButtonVisible(isChatTab)
+        setImageButtonVisible(isChatTab && onImageClick != null)
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             submitButtons?.setSendButtonVisible(true)
