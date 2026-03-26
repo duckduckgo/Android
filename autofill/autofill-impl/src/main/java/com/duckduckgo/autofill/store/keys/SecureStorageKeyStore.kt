@@ -437,7 +437,7 @@ class RealSecureStorageKeyStore(
                 }
 
                 when {
-                    harmonyPrefs != null && harmonyValue == null && legacyValue != null -> {
+                    harmonyPrefs != null && harmonyEncoded == null && legacyValue != null -> {
                         pixel.fire(
                             AUTOFILL_HARMONY_KEY_MISSING,
                             getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
@@ -447,7 +447,7 @@ class RealSecureStorageKeyStore(
                             throw SecureStorageException.InternalSecureStorageException("Harmony key missing")
                         }
                     }
-                    legacyPrefs != null && harmonyValue != null && legacyValue == null -> {
+                    legacyPrefs != null && harmonyValue != null && legacyEncoded == null -> {
                         pixel.fire(
                             AUTOFILL_PREFERENCES_KEY_MISSING,
                             getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
