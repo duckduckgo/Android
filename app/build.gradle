@@ -209,6 +209,32 @@ android {
     }
 }
 
+if (!rootProject.ext.proprietaryFontAvailable && !rootProject.ext.proprietaryFontOptOut) {
+    def protectedVariants = ['PlayRelease', 'InternalRelease']
+
+    protectedVariants.each { variantName ->
+        tasks.register("validateDuckSansFont${variantName}") {
+            doLast {
+                throw new GradleException(
+                    "DUCKSANS: ${variantName} builds require the proprietary DuckSans font.\n" +
+                    "Set DUCKSANS_PACKAGE_AUTH_USER and DUCKSANS_PACKAGE_AUTH_TOKEN environment variables,\n" +
+                    "or ducksans.gpr.user and ducksans.gpr.key in gradle.properties,\n" +
+                    "or pass -PuseProprietaryFont=false to use placeholder fallback fonts.\n" +
+                    "Example: ./gradlew assembleInternalDebug -PuseProprietaryFont=false"
+                )
+            }
+        }
+    }
+
+    tasks.configureEach { task ->
+        protectedVariants.each { variantName ->
+            if (task.name == "assemble${variantName}" || task.name == "bundle${variantName}") {
+                task.dependsOn("validateDuckSansFont${variantName}")
+            }
+        }
+    }
+}
+
 static def isValidSigningConfig(signingConfig) {
     return signingConfig != null &&
             signingConfig.storeFile?.exists() &&
