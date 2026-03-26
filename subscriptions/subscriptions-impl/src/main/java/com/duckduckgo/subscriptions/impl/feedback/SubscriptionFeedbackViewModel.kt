@@ -431,6 +431,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
             is SubscriptionFeedbackSubsSubCategory -> {
                 when (this) {
                     ONE_TIME_PASSWORD -> R.string.feedbackSubCategorySubsOtp
+                    SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES -> R.string.feedbackSubCategorySubsUnableToAccessProFeatures
                     OTHER -> R.string.feedbackSubCategorySubsOther
                 }
             }

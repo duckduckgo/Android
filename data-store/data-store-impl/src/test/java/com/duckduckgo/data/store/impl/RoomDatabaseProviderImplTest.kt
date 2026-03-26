@@ -29,12 +29,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -43,6 +43,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
@@ -91,18 +92,15 @@ class RoomDatabaseProviderImplTest {
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
-        verify(mockRoomBuilder).setQueryExecutor(
-            argThat {
-                (this as ThreadPoolExecutor).let {
-                    it.corePoolSize == 4 && it.maximumPoolSize == 4
-                }
-            },
-        )
-        verify(mockRoomBuilder).setTransactionExecutor(
-            argThat {
-                this is ExecutorService
-            },
-        )
+        val queryCaptor = argumentCaptor<Executor>()
+        val transactionCaptor = argumentCaptor<Executor>()
+        verify(mockRoomBuilder).setQueryExecutor(queryCaptor.capture())
+        verify(mockRoomBuilder).setTransactionExecutor(transactionCaptor.capture())
+        ((queryCaptor.firstValue as LazyExecutor).delegate as ThreadPoolExecutor).let {
+            assertEquals(4, it.corePoolSize)
+            assertEquals(4, it.maximumPoolSize)
+        }
+        assertTrue((transactionCaptor.firstValue as LazyExecutor).delegate is ExecutorService)
     }
 
     @Test
@@ -116,32 +114,28 @@ class RoomDatabaseProviderImplTest {
             queryQueueSize = 10,
         )
         val config = RoomDatabaseConfig(executor = customExecutor)
-        val queryArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
-        val transactionArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
+        val queryArgumentCaptor = argumentCaptor<Executor>()
+        val transactionArgumentCaptor = argumentCaptor<Executor>()
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
         verify(mockRoomBuilder).setQueryExecutor(queryArgumentCaptor.capture())
-        with(queryArgumentCaptor.firstValue) {
-            this.let {
-                assertEquals(customExecutor.queryPoolSize, it.corePoolSize)
-                assertEquals(customExecutor.queryPoolSize, it.maximumPoolSize)
-                assertTrue(it.queue is ArrayBlockingQueue)
-                assertEquals(customExecutor.queryQueueSize, it.queue.size + it.queue.remainingCapacity())
-                assertTrue(it.allowsCoreThreadTimeOut())
-                assertEquals(CUSTOM_KEEP_ALIVE, it.getKeepAliveTime(SECONDS))
-            }
+        with((queryArgumentCaptor.firstValue as LazyExecutor).delegate as ThreadPoolExecutor) {
+            assertEquals(customExecutor.queryPoolSize, corePoolSize)
+            assertEquals(customExecutor.queryPoolSize, maximumPoolSize)
+            assertTrue(queue is ArrayBlockingQueue)
+            assertEquals(customExecutor.queryQueueSize, queue.size + queue.remainingCapacity())
+            assertTrue(allowsCoreThreadTimeOut())
+            assertEquals(CUSTOM_KEEP_ALIVE, getKeepAliveTime(SECONDS))
         }
         verify(mockRoomBuilder).setTransactionExecutor(transactionArgumentCaptor.capture())
-        with(transactionArgumentCaptor.firstValue) {
-            this.let {
-                assertEquals(customExecutor.transactionPoolSize, it.corePoolSize)
-                assertEquals(customExecutor.transactionPoolSize, it.maximumPoolSize)
-                assertTrue(it.queue is ArrayBlockingQueue)
-                assertEquals(customExecutor.transactionQueueSize, it.queue.size + it.queue.remainingCapacity())
-                assertTrue(it.allowsCoreThreadTimeOut())
-                assertEquals(CUSTOM_KEEP_ALIVE, it.getKeepAliveTime(SECONDS))
-            }
+        with((transactionArgumentCaptor.firstValue as LazyExecutor).delegate as ThreadPoolExecutor) {
+            assertEquals(customExecutor.transactionPoolSize, corePoolSize)
+            assertEquals(customExecutor.transactionPoolSize, maximumPoolSize)
+            assertTrue(queue is ArrayBlockingQueue)
+            assertEquals(customExecutor.transactionQueueSize, queue.size + queue.remainingCapacity())
+            assertTrue(allowsCoreThreadTimeOut())
+            assertEquals(CUSTOM_KEEP_ALIVE, getKeepAliveTime(SECONDS))
         }
     }
 
@@ -152,16 +146,12 @@ class RoomDatabaseProviderImplTest {
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
-        verify(mockRoomBuilder).setQueryExecutor(
-            argThat {
-                this is ExecutorService
-            },
-        )
-        verify(mockRoomBuilder).setTransactionExecutor(
-            argThat {
-                this is ExecutorService
-            },
-        )
+        val queryCaptor = argumentCaptor<Executor>()
+        val transactionCaptor = argumentCaptor<Executor>()
+        verify(mockRoomBuilder).setQueryExecutor(queryCaptor.capture())
+        verify(mockRoomBuilder).setTransactionExecutor(transactionCaptor.capture())
+        assertTrue((queryCaptor.firstValue as LazyExecutor).delegate is ExecutorService)
+        assertTrue((transactionCaptor.firstValue as LazyExecutor).delegate is ExecutorService)
     }
 
     @Test
@@ -171,8 +161,14 @@ class RoomDatabaseProviderImplTest {
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
-        verify(mockRoomBuilder, never()).setTransactionExecutor(any())
-        verify(mockRoomBuilder, never()).setQueryExecutor(any())
+        val queryCaptor = argumentCaptor<Executor>()
+        val transactionCaptor = argumentCaptor<Executor>()
+        verify(mockRoomBuilder).setQueryExecutor(queryCaptor.capture())
+        verify(mockRoomBuilder).setTransactionExecutor(transactionCaptor.capture())
+        // When feature flag is disabled and executor is Default, the delegate resolves to null
+        // and LazyExecutor falls back to its own cached thread pool.
+        assertNull((queryCaptor.firstValue as LazyExecutor).delegate)
+        assertNull((transactionCaptor.firstValue as LazyExecutor).delegate)
     }
 
     @Test
@@ -257,8 +253,8 @@ class RoomDatabaseProviderImplTest {
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
-        verify(mockRoomBuilder, never()).setQueryExecutor(any())
-        verify(mockRoomBuilder, never()).setTransactionExecutor(any())
+        verify(mockRoomBuilder).setQueryExecutor(any())
+        verify(mockRoomBuilder).setTransactionExecutor(any())
         verify(mockRoomBuilder, never()).addMigrations(any())
         verify(mockRoomBuilder, never()).fallbackToDestructiveMigration()
         verify(mockRoomBuilder, never()).openHelperFactory(any())
@@ -271,30 +267,26 @@ class RoomDatabaseProviderImplTest {
     fun whenDefaultExecutorUsedThenThreadPoolExecutorIsCreatedWithDefaultConfig() = runTest {
         prepareSubject(flagEnabled = true)
         val config = RoomDatabaseConfig(executor = DatabaseExecutor.Default)
-        val queryArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
-        val transactionArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
+        val queryArgumentCaptor = argumentCaptor<Executor>()
+        val transactionArgumentCaptor = argumentCaptor<Executor>()
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
         verify(mockRoomBuilder).setQueryExecutor(queryArgumentCaptor.capture())
-        with(queryArgumentCaptor.firstValue) {
-            this.let {
-                assertEquals(DEFAULT_POOL_SIZE, it.corePoolSize)
-                assertEquals(DEFAULT_POOL_SIZE, it.maximumPoolSize)
-                assertEquals(DEFAULT_KEEP_ALIVE, it.getKeepAliveTime(SECONDS))
-                assertTrue(it.queue is ArrayBlockingQueue)
-                assertEquals(DEFAULT_QUEUE_SIZE, it.queue.remainingCapacity() + it.queue.size)
-            }
+        with((queryArgumentCaptor.firstValue as LazyExecutor).delegate as ThreadPoolExecutor) {
+            assertEquals(DEFAULT_POOL_SIZE, corePoolSize)
+            assertEquals(DEFAULT_POOL_SIZE, maximumPoolSize)
+            assertEquals(DEFAULT_KEEP_ALIVE, getKeepAliveTime(SECONDS))
+            assertTrue(queue is ArrayBlockingQueue)
+            assertEquals(DEFAULT_QUEUE_SIZE, queue.remainingCapacity() + queue.size)
         }
         verify(mockRoomBuilder).setTransactionExecutor(transactionArgumentCaptor.capture())
-        with(transactionArgumentCaptor.firstValue) {
-            this.let {
-                assertEquals(DEFAULT_POOL_SIZE, it.corePoolSize)
-                assertEquals(DEFAULT_POOL_SIZE, it.maximumPoolSize)
-                assertEquals(DEFAULT_KEEP_ALIVE, it.getKeepAliveTime(SECONDS))
-                assertTrue(it.queue is ArrayBlockingQueue)
-                assertEquals(DEFAULT_QUEUE_SIZE, it.queue.remainingCapacity() + it.queue.size)
-            }
+        with((transactionArgumentCaptor.firstValue as LazyExecutor).delegate as ThreadPoolExecutor) {
+            assertEquals(DEFAULT_POOL_SIZE, corePoolSize)
+            assertEquals(DEFAULT_POOL_SIZE, maximumPoolSize)
+            assertEquals(DEFAULT_KEEP_ALIVE, getKeepAliveTime(SECONDS))
+            assertTrue(queue is ArrayBlockingQueue)
+            assertEquals(DEFAULT_QUEUE_SIZE, queue.remainingCapacity() + queue.size)
         }
     }
 
@@ -303,16 +295,22 @@ class RoomDatabaseProviderImplTest {
         prepareSubject(flagEnabled = true)
         val customExecutor = DatabaseExecutor.Custom(transactionPoolSize = 2, queryPoolSize = 4)
         val config = RoomDatabaseConfig(executor = customExecutor)
-        val queryArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
-        val transactionArgumentCaptor = argumentCaptor<ThreadPoolExecutor>()
+        val queryArgumentCaptor = argumentCaptor<Executor>()
+        val transactionArgumentCaptor = argumentCaptor<Executor>()
 
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
         subject.buildRoomDatabase(TestDatabase::class.java, "test.db", config)
 
         verify(mockRoomBuilder, times(2)).setQueryExecutor(queryArgumentCaptor.capture())
         verify(mockRoomBuilder, times(2)).setTransactionExecutor(transactionArgumentCaptor.capture())
-        assertNotEquals(queryArgumentCaptor.firstValue, queryArgumentCaptor.secondValue)
-        assertNotEquals(transactionArgumentCaptor.firstValue, transactionArgumentCaptor.secondValue)
+        assertNotEquals(
+            (queryArgumentCaptor.firstValue as LazyExecutor).delegate,
+            (queryArgumentCaptor.secondValue as LazyExecutor).delegate,
+        )
+        assertNotEquals(
+            (transactionArgumentCaptor.firstValue as LazyExecutor).delegate,
+            (transactionArgumentCaptor.secondValue as LazyExecutor).delegate,
+        )
     }
 
     // Test entity for testing purposes

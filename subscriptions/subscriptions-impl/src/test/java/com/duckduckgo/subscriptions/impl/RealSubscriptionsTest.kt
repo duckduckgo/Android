@@ -36,6 +36,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
 import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -76,8 +77,9 @@ class RealSubscriptionsTest {
         SubscriptionOffer(
             planId = "test",
             offerId = null,
+            tier = "plus",
             pricingPhases = emptyList(),
-            features = setOf(SubscriptionsConstants.NETP),
+            entitlements = setOf(Entitlement("plus", SubscriptionsConstants.NETP)),
         ),
     )
 
@@ -181,7 +183,23 @@ class RealSubscriptionsTest {
     }
 
     @Test
+    fun whenIsEligibleIfAllowPurchaseDisabledAndNoActiveSubscriptionThenReturnFalse() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfAllowPurchaseDisabledButHasActiveSubscriptionThenReturnTrue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
     fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         assertTrue(subscriptions.isEligible())
@@ -189,24 +207,28 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnFalseIfNotActiveOrWaiting() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         assertFalse(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfWaiting() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(WAITING)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfActive() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         assertTrue(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotEncryptionThenReturnTrueIfActive() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -215,6 +237,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenIsEligibleIfNotEncryptionAndNotActiveThenReturnFalse() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
@@ -223,6 +246,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
@@ -238,6 +262,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnTrue() = runTest {
+        subscriptionFeature.allowPurchase().setRawStoredState(State(true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 

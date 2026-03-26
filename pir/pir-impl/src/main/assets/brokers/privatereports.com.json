@@ -1,0 +1,390 @@
+{
+  "name": "PrivateReports",
+  "url": "privatereports.com",
+  "version": "0.995.0",
+  "optOutUrl": "https://www.privatereports.com/api/helper/optOutLight/search",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.privatereports.com/api/helper/optOutLight/search",
+          "id": "cb59ed9a-70d7-40d5-83ff-9ed41bfa3d8b"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#pageForm"
+            }
+          ],
+          "id": "62945c1a-e655-4b9d-9562-866a5640d735"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#pageForm",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "input[name='fname']"
+            },
+            {
+              "type": "lastName",
+              "selector": "input[name='lname']"
+            },
+            {
+              "type": "city",
+              "selector": "input[name='city']"
+            },
+            {
+              "type": "state",
+              "selector": "select[name='state']"
+            }
+          ],
+          "id": "70ed8428-0f1c-4dab-a271-7b886d2581a2"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#pageFormSubmitBtn"
+            }
+          ],
+          "id": "e803ba82-782e-4f19-a2ac-f25ef1a654f2"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "99db0f13-8684-4e59-ba7a-56d994f3e37e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "id": "6d9a398c-b73d-496a-bd2d-38d725f89b5e"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "captcha is not always present at this stage",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "getCaptchaInfo",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+              "id": "1f123c7a-aef4-ae11-bccc-0a11b2c3d4e5"
+            },
+            {
+              "actionType": "solveCaptcha",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+              "id": "8793bcd5-e0a6-4c23-a202-26441c35ff6a"
+            },
+            {
+              "actionType": "click",
+              "failSilently": true,
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
+                }
+              ],
+              "id": "b12b0603-0ef9-4de6-97e9-0fd426b7cae1"
+            }
+          ],
+          "id": "9b7a7b96-9ef5-470d-8479-1bedca58b188"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "cc46f244-d6c8-421b-8e94-02bcde556f5b"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//h2[contains(text(), 'Select the person')]/following-sibling::div/div",
+          "noResultsSelector": "//p[contains(text(), 'unable to find')]|//p[contains(text(), 'Too many')]",
+          "profile": {
+            "name": {
+              "selector": ".//span[contains(text(), 'Name')]/following-sibling::span[1]"
+            },
+            "age": {
+              "selector": ".//span[contains(text(), 'Age')]/following-sibling::span[1]"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
+              "separator": "/(?<=, [A-Z]{2}), /"
+            }
+          },
+          "id": "9d919f33-30f6-4433-9eb4-6e3139a13a08"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.privatereports.com/api/helper/optOutLight/search",
+          "id": "14fbe352-5ff1-4b48-a50a-454aa1c8aec4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#pageForm"
+            }
+          ],
+          "id": "75f9fc71-1f4d-495a-b0c8-5b8df0f24e98"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#pageForm",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "input[name='fname']"
+            },
+            {
+              "type": "lastName",
+              "selector": "input[name='lname']"
+            },
+            {
+              "type": "city",
+              "selector": "input[name='city']"
+            },
+            {
+              "type": "state",
+              "selector": "select[name='state']"
+            }
+          ],
+          "id": "a541b4f0-1d03-40f4-8bef-dd6edba7e0c3"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#pageFormSubmitBtn"
+            }
+          ],
+          "id": "c91a389d-3079-4537-9d39-f7b8a49ebec4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "0af33833-87a8-40d8-835e-347bcf1d0f00"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]"
+            }
+          ],
+          "id": "d059eb01-9fda-46d2-8759-50370c724392"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "captcha is not always present at this stage",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "getCaptchaInfo",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//*[local-name()='svg']",
+              "id": "8fcffef9-0af4-47b4-9fee-55f7c7ca0079"
+            },
+            {
+              "actionType": "solveCaptcha",
+              "captchaType": "image",
+              "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//input",
+              "id": "a1978d37-638a-4917-b7b6-39504adcb803"
+            },
+            {
+              "actionType": "click",
+              "failSilently": true,
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "//div[.//*[local-name()='svg'] and .//input and .//button]//button"
+                }
+              ],
+              "id": "e94074e2-930a-442f-970e-10e088a9002f"
+            }
+          ],
+          "id": "35643322-f1fd-45fd-83e6-9b7c63d62053"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "4d557643-bf75-4fdc-9f1d-1f47723293bd"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "selector": "//button[contains(text(), 'REMOVE')]",
+              "type": "button",
+              "parent": {
+                "profileMatch": {
+                  "selector": "//h2[contains(text(), 'Select the person')]/following-sibling::div/div",
+                  "profile": {
+                    "name": {
+                      "selector": ".//span[contains(text(), 'Name')]/following-sibling::span[1]"
+                    },
+                    "age": {
+                      "selector": ".//span[contains(text(), 'Age')]/following-sibling::span[1]"
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//span[contains(text(), 'Locations')]/following-sibling::span[1]",
+                      "separator": "/(?<=, [A-Z]{2}), /"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "36cdec3e-f747-40bb-baaf-89cf5a1e114f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h2[contains(text(), 'Remove My Information')]"
+            }
+          ],
+          "id": "9a22d3f9-be47-4066-8310-5b23128f5349"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": "#pageForm",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='email']"
+            }
+          ],
+          "id": "8bf53d04-e912-4ac0-9f4c-328ad562b6e3"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#pageForm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "input[name='fullName']"
+            },
+            {
+              "type": "$generated_street_address$",
+              "selector": "input[name='address']"
+            },
+            {
+              "type": "$generated_phone_number$",
+              "selector": "input[name='phone']"
+            }
+          ],
+          "id": "4a58a7c1-e8d5-461b-8d42-b1ae0fa86b58"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#pageFormSubmitBtn"
+            }
+          ],
+          "id": "d9a240ff-2e91-4232-b247-6764d5b7db8f"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//p[contains(text(), 'Confirmation email sent')]"
+            }
+          ],
+          "id": "5b37b71a-fb86-4b35-978e-8ca06e085324"
+        },
+        {
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "d0cf178e-ffb5-4966-9312-25eef0f78731"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".header"
+            }
+          ],
+          "id": "7e8a82ae-d3b9-4c29-999a-1e2c25a04416"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//h1[contains(text(), 'Opt-out Confirmed')]"
+            }
+          ],
+          "id": "c9eceb12-c82c-495c-9003-0eb7ca7cdbda"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  },
+  "addedDatetime": 1737035696264,
+  "removedAt": null
+}

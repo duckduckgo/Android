@@ -22,6 +22,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayState
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
@@ -38,6 +40,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,6 +73,9 @@ internal class AppearanceViewModelTest {
     private lateinit var mockUrlDisplayRepository: UrlDisplayRepository
 
     @Mock
+    private lateinit var mockBrowserMenuDisplayRepository: BrowserMenuDisplayRepository
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     @Mock
@@ -80,6 +87,9 @@ internal class AppearanceViewModelTest {
     @Mock
     private lateinit var mockOmnibarFeatureRepository: OmnibarRepository
 
+    @Mock
+    private lateinit var mockAddressBarTrackersAnimationManager: com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+
     @SuppressLint("DenyListedApi")
     @Before
     fun before() {
@@ -90,8 +100,13 @@ internal class AppearanceViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(mockAppSettingsDataStore.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
         whenever(mockUrlDisplayRepository.isFullUrlEnabled).thenReturn(flowOf(true))
+        whenever(mockBrowserMenuDisplayRepository.browserMenuState)
+            .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
         whenever(mockTabSwitcherDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(mockOmnibarFeatureRepository.isSplitOmnibarAvailable).thenReturn(false)
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+        }
 
         initializeViewModel()
     }
@@ -102,9 +117,11 @@ internal class AppearanceViewModelTest {
                 mockThemeSettingsDataStore,
                 mockAppSettingsDataStore,
                 mockUrlDisplayRepository,
+                mockBrowserMenuDisplayRepository,
                 mockPixel,
                 coroutineTestRule.testDispatcherProvider,
                 mockTabSwitcherDataStore,
+                mockAddressBarTrackersAnimationManager,
                 mockOmnibarFeatureRepository,
             )
     }
@@ -316,6 +333,118 @@ internal class AppearanceViewModelTest {
         }
 
     @Test
+    fun `when tracker count in address bar is enabled then setting enabled`() =
+        runTest {
+            val enabled = true
+            testee.onShowTrackersCountInAddressBarChanged(enabled)
+            verify(mockAppSettingsDataStore).showTrackersCountInAddressBar = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when tracker count in address bar is disabled then setting disabled`() =
+        runTest {
+            val enabled = false
+            testee.onShowTrackersCountInAddressBarChanged(enabled)
+            verify(mockAppSettingsDataStore).showTrackersCountInAddressBar = enabled
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+            verify(mockPixel).fire(
+                AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED,
+                params,
+                emptyMap(),
+                Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun `when address bar trackers animation feature is disabled then toggle should be hidden`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(false, value.shouldShowAddressBarTrackersAnimationItem)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when address bar trackers animation feature is enabled then toggle should be visible`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar setting is stored then it persists correctly`() =
+        runTest {
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(false, value.isAddressBarTrackersAnimationEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when tracker count in address bar is enabled by default then viewState reflects it`() =
+        runTest {
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.isAddressBarTrackersAnimationEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when both feature flag and user preference are enabled then viewState shows both enabled`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(true)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem)
+                assertEquals(true, value.isAddressBarTrackersAnimationEnabled)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when feature flag is enabled but user preference is disabled then toggle is visible but unchecked`() =
+        runTest {
+            whenever(mockAddressBarTrackersAnimationManager.isFeatureEnabled()).thenReturn(true)
+            whenever(mockAppSettingsDataStore.showTrackersCountInAddressBar).thenReturn(false)
+            initializeViewModel()
+
+            testee.viewState().test {
+                val value = expectMostRecentItem()
+                assertEquals(true, value.shouldShowAddressBarTrackersAnimationItem) // Toggle visible
+                assertEquals(false, value.isAddressBarTrackersAnimationEnabled) // But unchecked
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() =
         runTest {
             whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
@@ -523,4 +652,130 @@ internal class AppearanceViewModelTest {
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
         initializeViewModel()
     }
+
+    @Test
+    fun whenBrowserMenuOptionDisabledThenViewStateHasOptionFalse() =
+        runTest {
+            // Given
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState)
+                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = false, isEnabled = false)))
+
+            // When
+            initializeViewModel()
+
+            // Then
+            testee.viewState().test {
+                val state = awaitItem()
+                assertFalse(state.hasExperimentalBrowserMenuOption)
+                assertFalse(state.useBottomSheetMenuEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenBrowserMenuEnabledThenViewStateReflectsIt() =
+        runTest {
+            // Given
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState)
+                .thenReturn(flowOf(BrowserMenuDisplayState(hasOption = true, isEnabled = true)))
+
+            // When
+            initializeViewModel()
+
+            // Then
+            testee.viewState().test {
+                val state = awaitItem()
+                assertTrue(state.hasExperimentalBrowserMenuOption)
+                assertTrue(state.useBottomSheetMenuEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenBrowserMenuStateChangesThenViewStateUpdates() =
+        runTest {
+            // Given
+            val stateFlow = MutableStateFlow(BrowserMenuDisplayState(hasOption = true, isEnabled = false))
+            whenever(mockBrowserMenuDisplayRepository.browserMenuState).thenReturn(stateFlow)
+
+            initializeViewModel()
+
+            // When/Then
+            testee.viewState().test {
+                val initialState = awaitItem()
+                assertFalse(initialState.useBottomSheetMenuEnabled)
+
+                // When state changes
+                stateFlow.value = BrowserMenuDisplayState(hasOption = true, isEnabled = true)
+
+                val updatedState = awaitItem()
+                assertTrue(updatedState.useBottomSheetMenuEnabled)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenOnUseBottomSheetMenuChangedThenRepositoryUpdated() =
+        runTest {
+            // Given
+            initializeViewModel()
+
+            // When
+            testee.onUseBottomSheetMenuChanged(true)
+
+            // Then
+            verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(true)
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Daily(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Unique(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_ENABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Count,
+            )
+        }
+
+    @Test
+    fun whenOnUseBottomSheetMenuChangedToFalseThenRepositoryUpdated() =
+        runTest {
+            // Given
+            initializeViewModel()
+
+            // When
+            testee.onUseBottomSheetMenuChanged(false)
+
+            // Then
+            verify(mockBrowserMenuDisplayRepository).setExperimentalMenuEnabled(false)
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Daily(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Unique(),
+            )
+            verify(mockPixel).fire(
+                pixel = AppPixelName.EXPERIMENTAL_MENU_DISABLED,
+                parameters = emptyMap(),
+                encodedParameters = emptyMap(),
+                type = Pixel.PixelType.Count,
+            )
+        }
 }

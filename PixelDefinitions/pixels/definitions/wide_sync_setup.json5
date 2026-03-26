@@ -1,0 +1,79 @@
+// Wide event pixel for Sync setup flow monitoring
+{
+    "wide_sync-setup": {
+        "description": "User attempts to set up Sync via 'Sync and Back Up This Device'",
+        "owners": ["LukasPaczos"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide pixel",
+                "enum": ["sync-setup"]
+            },
+            {
+                "key": "context.name",
+                "description": "Entry point to the Sync setup flow, if available",
+                "enum": ["promotion_passwords", "promotion_bookmarks"]
+            },
+            {
+                "key": "feature.data.ext.user_auth_required",
+                "description": "Whether device authentication is required for this Sync setup flow",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.account_creation_latency_ms_bucketed",
+                "description": "Latency of the account creation API call in milliseconds, bucketed",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.initial_sync_latency_ms_bucketed",
+                "description": "Latency of the initial sync in milliseconds, bucketed",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.failure_reason",
+                "description": "Reason for failure. Only present on FAILURE events.",
+                "enum": ["account_creation_failed", "recovery_code_generation_failed"]
+            },
+            {
+                "key": "feature.data.ext.step.device_auth_not_enrolled",
+                "description": "Parameter present if the device was detected as not having authentication enrolled",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.user_auth",
+                "description": "Parameter present if the user was successfully authenticated via device auth",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.intro_screen_shown",
+                "description": "Parameter present if the sync intro screen was displayed",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.sync_enabled",
+                "description": "Parameter present if the user opted to enable sync",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.account_created",
+                "description": "Parameter present if the account was successfully created and initial sync completed",
+                "enum": ["true"]
+            },
+            {
+                "key": "feature.data.ext.step.recovery_code_shown",
+                "description": "Parameter present if the recovery code screen was displayed",
+                "enum": ["true"]
+            }
+        ]
+    }
+}

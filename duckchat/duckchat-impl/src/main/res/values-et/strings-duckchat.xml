@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
     <string name="input_screen_chat_hint">Küsi privaatselt</string>
     <string name="input_screen_user_pref_without_ai">Ainult otsi</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Otsi ja Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">\"Proovi meie uut valikut küsida Duck.ai käest otse aadressiribalt.\" <annotation type="share_feedback">Jaga tagasisidet</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Peida AI loodud pildid</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Eemaldab tehisintellekti loodud pildid pildiotsingu tulemustest</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Luba tehisintellekti funktsioonide seadetes</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Halda tehisintellekti funktsioonide seadetes</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigureerige Duck.ai tehisintellekti funktsioonide seadetes.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Loo lehekülje kokkuvõte</string>
+    <string name="duckAIContextualAutomaticContextTitle">Saada lehe sisu automaatselt</string>
+    <string name="duckAIContextualAutomaticContextMessage">Saada lehe sisu automaatselt Duck.ai-le</string>
+    <string name="duckAIContextualAttachPageContent">Lisa lehe sisu</string>
 </resources>

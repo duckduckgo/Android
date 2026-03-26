@@ -2808,5 +2808,25 @@
         "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=search&new_set_atb=v410-3&count_as_wau=true&count_as_mau_n=tttt&segments_today=current_user_mau_0%2Ccurrent_user_mau_1%2Ccurrent_user_mau_3%2Creactivated_mau_2%2Creactivated_wau&segments_prev_month_0=current_user_mau_0&segments_prev_month_1=current_user_mau_1%2Cintermittent&segments_prev_month_3=current_user_mau_3%2Creinstaller&test=1"
       }
     ]
+  },
+  {
+    "client": {
+      "atb": "v122-1",
+      "activity_type": "duckai",
+      "usage": [
+        "v123-1",
+        "v123-1"
+      ]
+    },
+    "results": [
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": "https://improving.duckduckgo.com/t/m_retention_segments_d_android_phone?appVersion=5.205.0&activity_type=duckai&new_set_atb=v123-1&count_as_wau=true&count_as_mau_n=tttt&segments_today=first_month%2Csecond_week&test=1"
+      },
+      {
+        "set_atb": "v123-1",
+        "pixel_uri": null
+      }
+    ]
   }
 ]

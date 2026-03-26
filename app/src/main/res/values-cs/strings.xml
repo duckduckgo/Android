@@ -121,8 +121,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Vymazat data</string>
-    <string name="fireClearAll">Vymazat karty a data</string>
-    <string name="fireClearAllPlusDuckChats">Vymazat karty, data a chaty Duck.ai</string>
+    <string name="fireClearAll">Mazání karet a dat</string>
+    <string name="fireClearAllPlusDuckChats">Smazat karty, data a chaty Duck.ai</string>
     <string name="fireCancel">Zrušit</string>
     <string name="fireDataCleared">Data vymazána</string>
 
@@ -131,6 +131,7 @@
     <string name="settingsMenuItemTitle">Nastavení</string>
     <string name="settingsHeadingProtections">Ochrany</string>
     <string name="settingsHeadingAppearance">Vzhled</string>
+    <string name="settingsWhatsNew">Co je nového</string>
     <string name="settingsHeadingAbout">O nás</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
@@ -178,6 +179,8 @@
     <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
     <string name="openAutoCompleteSettings">Otevřít nastavení</string>
+    <string name="privateSearchChatSuggestionsToggle">Návrhy chatu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Při psaní do vyhledávacího pole si nech zobrazovat návrhy z historie, záložek a volitelně i historie chatu Duck.ai. Všechna vyhledávání jsou soukromá.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Obecné</string>
@@ -209,12 +212,78 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Celoplošná ochrana soukromí</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uplatní tvoje právo odmítnout předávání osobních údajů. Požádá za tebe weby, aby tyto údaje neprodávaly ani nesdílely.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Nainstalovat prohlížeč pro počítač</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pro Mac a Windows</string>
+    <string name="getDesktopBrowserTitle">Chraň své osobní údaje i na Macu a Windows!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo pro Mac nebo Windows si můžeš stáhnout na:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Sdílet odkaz ke stažení</string>
+    <string name="getDesktopBrowserNoThanks">Ne, děkuji</string>
+    <string name="getDesktopBrowserHideItem">Skrýt</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Odkaz se zkopíroval</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Vymazání dat</string>
+    <string name="dataClearingDescription">Smazání dat může pomoct chránit tvoje soukromí na internetu. Tlačítkem Fire Button vymažeš data ručně. Můžeš taky nastavit automatické mazání.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d web, kterého se vymazání netýká</item>
+        <item quantity="few">%1$d weby, kterých se vymazání netýká</item>
+        <item quantity="many">%1$d webu, kterého se vymazání netýká</item>
+        <item quantity="other">%1$d webů, kterých se vymazání netýká</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Aktivní</string>
+    <string name="dataClearingAutomaticClearingOff">Vypnout</string>
+    <string name="dataClearingClearBrowsingData">Vymazat údaje o prohlížení</string>
+    <string name="dataClearingAutomaticDataClearing">Automatické mazání dat</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatické mazání dat</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zavře všechny otevřené karty</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Smažou se všechna data webů včetně navštívených webů. Může tě to odhlásit z účtů.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Smažou se všechny chaty včetně připnutých</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vyber, co chceš smazat</string>
+    <string name="dataClearingOptionTabs">Karty</string>
+    <string name="dataClearingOptionData">Soubory cookie a data webu</string>
+    <string name="dataClearingDuckAiChats">Chaty Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Smazat všechny chaty</string>
+    <string name="fireDialogDeleteButton">Smazat</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zavřít kartu</item>
+        <item quantity="few">Zavřít %1$d karty</item>
+        <item quantity="many">Zavřít všech %1$d karet</item>
+        <item quantity="other">Zavřít všech %1$d karet</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Může tě to odhlásit z účtů.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Žádný</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Smazat z 1 webu. Může tě to odhlásit z účtů.</item>
+        <item quantity="few">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
+        <item quantity="many">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
+        <item quantity="other">Smazat z %1$d webů. Může tě to odhlásit z účtů.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Vymazat karty a data stránek?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vymazat karty, data stránek a chaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Smazat vše</string>
+    <string name="singleTabFireDialogDeleteThisTab">Vymazat tuto kartu</string>
+    <string name="singleTabFireDialogDeleteChat">Smazat chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Smazat tento chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Když vymažeš data stránek, může dojít ke tvému odhlášení z účtů.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Tím se zruší probíhající stahování.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">Došlo ke smazání %1$d karty a jejích dat</item>
+        <item quantity="few">Došlo ke smazání %1$d karet a jejich dat</item>
+        <item quantity="many">Došlo ke smazání %1$d karet a jejich dat</item>
+        <item quantity="other">Došlo ke smazání %1$d karet a jejich dat</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Data webu se nepodařilo smazat. Aktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Data webu se nepodařilo smazat kvůli chybě.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Oprávnění</string>
@@ -233,15 +302,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, data a chaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Vymazat po…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat po…</string>
+    <string name="settingsAutomaticallyClearWhen">Smazat…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Smazat…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ihned po ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
-    <string name="settingsClearAiDataTitle">Vymazat chaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Mazání chatů Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Tlačítko Fire Button taky smaže historii Duck.ai, včetně připnutých chatů.</string>
     <string name="settingsClearDataActionSecondaryText">Vymaže všechny karty a data všech webů, které nechrání funkce Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Vymaže všechny karty, chaty Duck.ai a data všech webů, které nechrání funkce Fireproof.</string>
@@ -793,7 +862,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Už se těšíš na rychlejší prohlížeč, který tě ochrání?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
     <string name="preOnboardingDaxDialog2Title">Ochrana je aktivní!</string>
     <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
@@ -805,6 +876,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
     <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
     <string name="preOnboardingAddressBarTitle">Kam mám umístit váš adresní řádek?</string>
     <string name="preOnboardingAddressBarOkButton">Další</string>
@@ -857,9 +929,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Víš, že…?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chceš mít soukromý AI chat hned po ruce?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Další</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkce AI jsou soukromé a volitelné. Změny můžeš provádět v <b>Nastavení > Funkce AI</b>.]]></string>
 
@@ -926,11 +1000,16 @@
     <string name="settingsHeadingCompleteSetup">Dokonči své nastavení</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Zobrazit počet trackerů v přepínači karet</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;Počet zablokovaných trackerů: %1$s &lt;/b&gt; za posledních 7 dní</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skrýt počet trackerů?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Tuhle funkci můžeš zase zapnout v Nastavení &gt; Vzhled.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skrýt</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechat</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animace zablokovaných trackerů</string>
+    <string name="showTrackerCountInAddressBar">Zobrazit v adresním řádku</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Zobrazit ve Správci karet</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Jen vyhledávání</string>

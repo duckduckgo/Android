@@ -37,4 +37,7 @@
     <string name="alwaysOn">Aina käytössä</string>
     <string name="on">Päällä</string>
     <string name="off">Pois</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Lue lisää</string>
 </resources>

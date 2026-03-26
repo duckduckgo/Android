@@ -119,7 +119,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Borrar datos</string>
-    <string name="fireClearAll">Borrar datos y pestañas</string>
+    <string name="fireClearAll">Eliminar pestañas y datos</string>
     <string name="fireClearAllPlusDuckChats">Borrar pestañas, datos y chats de Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Datos eliminados</string>
@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Ajustes</string>
     <string name="settingsHeadingProtections">Protecciones</string>
     <string name="settingsHeadingAppearance">Apariencia</string>
+    <string name="settingsWhatsNew">Novedades</string>
     <string name="settingsHeadingAbout">Sobre</string>
     <string name="settingsAboutDuckduckgo">Acerca de DuckDuckGo</string>
     <string name="settingsVersion">Versión</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Las sugerencias para autocompletar ahora incluyen los sitios visitados recientemente. Desactívalas en Ajustes o elimínalas en cualquier momento con el 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Misma privacidad.\n¡Mejores sugerencias de búsqueda!</string>
     <string name="openAutoCompleteSettings">Abrir configuración</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugerencias de chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Muestra sugerencias de tu historial, marcadores y (opcionalmente) el historial de chat de Duck.ai mientras escribes en la barra de búsqueda. Todas las búsquedas son privadas.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">General</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expresa el derecho de exclusión en tu nombre al decir a los sitios que no vendan ni compartan tu información personal.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obtén el navegador de escritorio</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo para Mac y Windows</string>
+    <string name="getDesktopBrowserTitle">¡Protege tu información personal en Mac y Windows también!</string>
+    <string name="getDesktopBrowserBody">Para descargar DuckDuckGo en Mac o Windows, visita:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Compartir enlace de descarga</string>
+    <string name="getDesktopBrowserNoThanks">No, gracias</string>
+    <string name="getDesktopBrowserHideItem">Ocultar</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Enlace copiado</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protección contra ventanas emergentes de cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Eliminación de datos</string>
+    <string name="dataClearingDescription">Eliminar tus datos puede ayudar a proteger tu privacidad en línea. Usa el Fire Button para eliminar los datos manualmente o configura la eliminación automática.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sitio excluido de la limpieza</item>
+        <item quantity="other">%1$d sitios excluidos de la limpieza</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Activado</string>
+    <string name="dataClearingAutomaticClearingOff">Desactivado</string>
+    <string name="dataClearingClearBrowsingData">Borrar datos de navegación</string>
+    <string name="dataClearingAutomaticDataClearing">Eliminar automáticamente los datos</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Eliminar automáticamente los datos</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Cierra todas las pestañas</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Elimina todos los datos del sitio, incluidos los sitios visitados. Puede que cierre sesión en tus cuentas.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Elimina todos los chats, incluidos los chats fijados</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Elige qué eliminar</string>
+    <string name="dataClearingOptionTabs">Pestañas</string>
+    <string name="dataClearingOptionData">Cookies y datos del sitio</string>
+    <string name="dataClearingDuckAiChats">Chats de Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todos los chats</string>
+    <string name="fireDialogDeleteButton">Eliminar</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Cerrar pestaña</item>
+        <item quantity="other">Cerrar todas las %1$d pestañas</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Puede que cierre sesión en tus cuentas.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ninguna</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Eliminar de 1 sitio. Puede que cierre sesión en tus cuentas.</item>
+        <item quantity="other">Eliminar de %1$d sitios. Puede que cierre sesión en tus cuentas.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">¿Eliminar pestañas y datos del sitio?</string>
+    <string name="singleTabFireDialogTitleWithChats">¿Eliminar pestañas, datos del sitio y chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Eliminar todo</string>
+    <string name="singleTabFireDialogDeleteThisTab">Eliminar esta pestaña</string>
+    <string name="singleTabFireDialogDeleteChat">Borrar chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">¿Borrar este chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Eliminar datos del sitio puede hacer que cierres sesión en tus cuentas.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Esta acción cancelará las descargas en curso.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d pestaña y sus datos eliminados</item>
+        <item quantity="other">%1$d pestañas y sus datos eliminados</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">No se ha podido borrar los datos del sitio. Actualiza WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Los datos del sitio no se han podido eliminar debido a un error.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisos</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Pestañas y datos</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Pestañas, datos y chats de Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Borrar al…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Borrar al…</string>
+    <string name="settingsAutomaticallyClearWhen">Eliminar el…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar el…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Salir de la aplicación</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Salir de la aplicación (5 segundos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Salir de la aplicación (5 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Salir de la aplicación (15 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Salir de la aplicación (30 minutos de inactividad)</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Salir de la aplicación (1 hora de inactividad)</string>
-    <string name="settingsClearAiDataTitle">Borra chats de Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Elimina los chats de Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button también eliminará el historial de Duck.ai, incluidos los chats anclados.</string>
     <string name="settingsClearDataActionSecondaryText">Borrar todas las pestañas y los datos de los sitios no protegidos con Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Borra todas las pestañas, los chats de Duck.ai y los datos de los sitios que no hayas protegido con Fireproof.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hola.<br/><br/>¿Todo listo para un navegador más rápido que mantiene tu protección?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">¡De acuerdo!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">He estado aquí antes</string>
     <string name="preOnboardingDaxDialog2Title">¡Protecciones activadas!</string>
     <string name="preOnboardingDaxDialog2Button">Elige tu navegador</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloqueo de ventanas emergentes de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloqueo de anuncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina los datos de navegación con un solo botón</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
     <string name="preOnboardingAddressBarTitle">¿Dónde debo poner tu barra de direcciones?</string>
     <string name="preOnboardingAddressBarOkButton">Siguiente</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Más información</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">¡Pruébalo gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Omitir</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">¿Sabías?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">¿Quieres un acceso fácil al chat privado de IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Siguiente</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Las funciones de IA son privadas y opcionales. Puedes realizar cambios en <b>Ajustes > Funciones de</b> IA.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Completa tu configuración</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Mostrar recuento de rastreadores en el selector de pestañas</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s rastreador bloqueado &lt;/b&gt; en los últimos 7 días</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">¿Ocultar el recuento de rastreadores?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Puedes volver a activarlo en Ajustes &gt; Apariencia.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Mantener</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animación de rastreadores bloqueados</string>
+    <string name="showTrackerCountInAddressBar">Mostrar en la barra de direcciones</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Mostrar en Gestor de pestañas</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Solo buscar</string>

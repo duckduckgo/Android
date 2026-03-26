@@ -63,6 +63,7 @@ class NotificationRegistrar @Inject constructor(
         const val AppFeature = 104
         const val SurveyAvailable = 109 // 105 to 108 were already used previously
         // 110 was already used previously
+        // 111 is being used in VpnReminderNotification
     }
 
     object ChannelType {

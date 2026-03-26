@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Wyszukaj lub wprowadź adres</string>
     <string name="input_screen_chat_hint">Zapytaj prywatnie</string>
     <string name="input_screen_user_pref_without_ai">Tylko wyszukiwanie</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Wyszukiwanie i Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Wypróbuj nową opcję umożliwiającą zapytanie Duck.ai bezpośrednio z paska adresu. <annotation type="share_feedback">Podziel się opinią</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Ukryj obrazy generowane przez AI</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtruje obrazy generowane przez AI z wyników wyszukiwania obrazów</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Włącz w ustawieniach funkcji AI</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Zarządzaj w ustawieniach funkcji AI</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Skonfiguruj Duck.ai w ustawieniach funkcji AI.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Podsumuj tę stronę</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatycznie wysyłaj zawartość strony</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatycznie wysyłaj zawartość strony do Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Dołącz zawartość strony</string>
 </resources>

@@ -56,7 +56,7 @@ class AuthCookiesAllowedDomainsRepository @Inject constructor(
 
     suspend fun deleteAll(exceptionList: List<String> = emptyList()) {
         withContext(dispatcherProvider.io()) {
-            authCookiesAllowedDomainsDao.deleteAll(exceptionList.joinToString(","))
+            authCookiesAllowedDomainsDao.deleteAll(exceptionList)
         }
     }
 }

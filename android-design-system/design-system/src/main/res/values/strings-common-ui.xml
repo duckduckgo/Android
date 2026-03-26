@@ -37,4 +37,7 @@
     <string name="alwaysOn">Always On</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Learn More</string>
 </resources>

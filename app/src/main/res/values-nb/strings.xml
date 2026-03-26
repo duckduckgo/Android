@@ -119,8 +119,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Slett data</string>
-    <string name="fireClearAll">Lukk faner og slett data</string>
-    <string name="fireClearAllPlusDuckChats">Fjern faner, data og Duck.ai-chatter</string>
+    <string name="fireClearAll">Slett faner og data</string>
+    <string name="fireClearAllPlusDuckChats">Slett faner, data og Duck.ai-chatter</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data slettet</string>
 
@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Innstillinger</string>
     <string name="settingsHeadingProtections">Beskyttelser</string>
     <string name="settingsHeadingAppearance">Utseende</string>
+    <string name="settingsWhatsNew">Dette er nytt</string>
     <string name="settingsHeadingAbout">Om</string>
     <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
     <string name="settingsVersion">Versjon</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Automatisk forslagsfullføring inkluderer nå nylig besøkte nettsteder. Slå dette av i innstillingene, eller slett dem når som helst med Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Samme personvern.\nBedre søkeforslag!</string>
     <string name="openAutoCompleteSettings">Åpne innstillinger</string>
+    <string name="privateSearchChatSuggestionsToggle">Forslag til chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Vis forslag fra historikken, bokmerkene og (valgfritt) Duck.ai-chattehistorikken din mens du skriver i søkefeltet. Alle søk er private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generelt</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uttrykker på dine vegne retten til å reservere seg, ved å be nettsteder om ikke å selge eller dele personopplysningene dine.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Skaff deg nettleseren for datamaskin</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac og Windows</string>
+    <string name="getDesktopBrowserTitle">Beskytt personopplysningene dine på Mac og Windows også!</string>
+    <string name="getDesktopBrowserBody">For å laste ned DuckDuckGo på Mac eller Windows kan du gå til:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Del nedlastingslenke</string>
+    <string name="getDesktopBrowserNoThanks">Nei takk</string>
+    <string name="getDesktopBrowserHideItem">Skjul</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Lenken er kopiert</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Sletting av data</string>
+    <string name="dataClearingDescription">Sletting av nettleserdata kan gi sterkere personvern på nettet. Bruk Fire Button til å slette data manuelt, eller sett opp automatisk sletting.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d nettsted er unntatt fra datafjerning</item>
+        <item quantity="other">%1$d nettsteder er unntatt fra datafjerning</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">På</string>
+    <string name="dataClearingAutomaticClearingOff">Av</string>
+    <string name="dataClearingClearBrowsingData">Fjern nettleserdata</string>
+    <string name="dataClearingAutomaticDataClearing">Slett data automatisk</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Slett data automatisk</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Lukk alle åpne faner</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Slett alle nettstedsdata, inkludert nettsteder du har vært på. Kan føre til at du blir logget ut av kontoer.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Slett alle chatter, inkludert festede chatter</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Velg hva som skal slettes</string>
+    <string name="dataClearingOptionTabs">Faner</string>
+    <string name="dataClearingOptionData">Informasjonskapsler og nettstedsdata</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-chatter</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Slett alle chatter</string>
+    <string name="fireDialogDeleteButton">Slett</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Lukk fanen</item>
+        <item quantity="other">Lukk alle %1$d fanene</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Kan føre til at du blir logget ut av kontoer.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Ingen</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Slett fra 1 nettsted. Kan føre til at du blir logget ut av kontoer.</item>
+        <item quantity="other">Slett fra %1$d nettsteder. Kan føre til at du blir logget ut av kontoer.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Vil du slette faner og nettstedsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vil du slette faner, nettstedsdata og chatter?</string>
+    <string name="singleTabFireDialogDeleteAll">Slett alt</string>
+    <string name="singleTabFireDialogDeleteThisTab">Slett denne fanen</string>
+    <string name="singleTabFireDialogDeleteChat">Slett chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Vil du slette denne chatten?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Hvis du sletter nettstedsdata, kan du bli logget ut av kontoer.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Dette avbryter pågående nedlastinger.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d fane og dens data er slettet</item>
+        <item quantity="other">%1$d faner og deres data er slettet</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Nettstedsdataene kunne ikke slettes. Oppdater WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Nettstedsdataene kunne ikke slettes på grunn av en feil.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Tillatelser</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Faner og data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Faner, data og Duck.ai-chatter</string>
 
-    <string name="settingsAutomaticallyClearWhen">Slett …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Slett …</string>
+    <string name="settingsAutomaticallyClearWhen">Slett den …</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Slett den ...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">kun når appen lukkes</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">når appen lukkes eller har vært inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">når appen lukkes eller har vært inaktiv i 5 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">når appen lukkes eller har vært inaktiv i 15 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">når appen lukkes eller har vært inaktiv i 30 minutter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">når appen lukkes eller har vært inaktiv i 1 time</string>
-    <string name="settingsClearAiDataTitle">Fjern Duck.ai-chatter</string>
+    <string name="settingsClearAiDataTitle">Slett Duck.ai-chatter</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button sletter også Duck.ai-historikken, inkludert festede chatter.</string>
     <string name="settingsClearDataActionSecondaryText">Fjerner alle faner og data for nettsteder du ikke har brukt Fireproof på.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Fjerner alle faner, Duck.ai-chatter og data for nettsteder du ikke har brukt Fireproof på.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Heisann.<br/><br/>Klar for en raskere nettleser som beskytter deg?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Sett i gang!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har vært her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelser er aktivert!</string>
     <string name="preOnboardingDaxDialog2Button">Velg nettleseren din</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokker popup-vinduer om informasjonskapsler</string>
     <string name="preOnboardingComparisonChartItem4">Blokker målrettede annonser</string>
     <string name="preOnboardingComparisonChartItem5">Slett nettleserdata med én knapp</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg plassere adressefeltet?</string>
     <string name="preOnboardingAddressBarOkButton">Neste</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Visste du?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du ha enklere tilgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Neste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funksjoner er private og valgfrie. Du kan gjøre endringer i <b>Innstillinger > AI-funksjoner</b>.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Fullfør oppsettet</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Vis antall sporere i fanebytteren</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s sporer blokkert &lt;/b&gt; de siste 7 dagene</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vil du skjule antall sporere?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå på dette igjen i Innstillinger &gt; Utseende.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animasjon av blokkerte sporere</string>
+    <string name="showTrackerCountInAddressBar">Vis i adressefeltet</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Vis i fanebehandleren</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Bare søk</string>

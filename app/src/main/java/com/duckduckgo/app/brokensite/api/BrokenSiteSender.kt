@@ -53,7 +53,6 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -80,7 +79,6 @@ class BrokenSiteSubmitter @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val contentBlocking: ContentBlocking,
     private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val networkProtectionState: NetworkProtectionState,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val ampLinks: AmpLinks,
@@ -127,6 +125,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 CONSENT_MANAGED to brokenSite.consentManaged.toBinaryString(),
                 CONSENT_OPT_OUT_FAILED to brokenSite.consentOptOutFailed.toBinaryString(),
                 CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
+                CONSENT_RULE to brokenSite.consentRule.orEmpty(),
+                CONSENT_RELOAD_LOOP to brokenSite.consentReloadLoop.toBinaryString(),
                 REMOTE_CONFIG_VERSION to privacyConfig.privacyConfigData()?.version.orEmpty(),
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
                 ERROR_CODES_KEY to brokenSite.errorCodes,
@@ -174,12 +174,12 @@ class BrokenSiteSubmitter @Inject constructor(
                 params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
             }
 
-            params += privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-
-            val encodedParams = mapOf(
+            val encodedParams = mutableMapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates,
             )
+            // breakageData is pre-encoded by content-scope-scripts, add to encodedParams to avoid re-encoding
+            brokenSite.breakageData?.let { encodedParams[BREAKAGE_DATA] = it }
             runCatching {
                 if (toggle) {
                     val unnecessaryKeys = listOf(CATEGORY_KEY, DESCRIPTION_KEY, PROTECTIONS_STATE)
@@ -230,6 +230,8 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val CONSENT_MANAGED = "consentManaged"
         private const val CONSENT_OPT_OUT_FAILED = "consentOptoutFailed"
         private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
+        private const val CONSENT_RULE = "consentRule"
+        private const val CONSENT_RELOAD_LOOP = "consentReloadLoop"
         private const val REMOTE_CONFIG_VERSION = "remoteConfigVersion"
         private const val REMOTE_CONFIG_ETAG = "remoteConfigEtag"
         private const val ERROR_CODES_KEY = "errorDescriptions"
@@ -246,6 +248,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val BLOCKLIST_EXPERIMENT = "blockListExperiment"
         private const val CONTENT_SCOPE_EXPERIMENTS = "contentScopeExperiments"
         private const val DEBUG_FLAGS = "debugFlags"
+        private const val BREAKAGE_DATA = "breakageData"
     }
 }
 

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.navigation.bar
 
+import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -75,6 +76,10 @@ class BrowserNavigationBarViewIntegration(
 
     fun configureFireButtonHighlight(highlighted: Boolean) {
         navigationBarView.setFireButtonHighlight(highlighted)
+    }
+
+    fun configureBrowserMenuIcon(@DrawableRes icon: Int) {
+        navigationBarView.setBrowserMenuIcon(icon)
     }
 
     fun onDestroyView() {

@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Előfizetésed az Apple App Store áruházban lett megvásárolva. A csomag vagy a számlázási beállítások módosításához lépj a Beállítások &gt; Apple-fiók &gt; Előfizetések menüpontra egy olyan eszközön, amely ugyanabba az Apple-fiókba van bejelentkezve, mint amellyel az előfizetés meg lett vásárolva.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Privacy Pro aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
-    <string name="pirDescription">A kezdéshez a DuckDuckGo böngésző asztali verziójában lépj a <b>Beállítások &gt; Privacy Pro</b> menüpontra, és kattints a <b>Van előfizetésem</b> lehetőségre.</string>
+    <string name="pirTitle">A DuckDuckGo-előfizetés aktiválása asztali számítógépen a Personal Information Removal beállításához</string>
+    <string name="pirDescription">A DuckDuckGo asztali böngészőjében lépj a <b>Beállítások &gt; Előfizetés a DuckDuckGóra</b> lehetőségre, majd a kezdéshez kattints erre: <b>Van előfizetésem</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Az ügyintézővel folytatott hívás nem volt hasznos</string>
     <string name="feedbackSubCategoryItrOther">Egyéb</string>
 
-    <string name="feedbackSubCategorySubsOtp">Egyszeri jelszó</string>
-    <string name="feedbackSubCategorySubsOther">Egyéb</string>
+    <string name="feedbackSubCategorySubsOtp">Egyszeri jelszóval kapcsolatos probléma</string>
+    <string name="feedbackSubCategorySubsOther">Valami más</string>
 
     <string name="feedbackSubmitVpnHeader">Olyan problémát találtál, amelyet a <annotation type="faqs_link">súgóközpont</annotation> nem tárgyal? Mindenképpen jelezd felénk!</string>
     <string name="feedbackSubmitVpnDescriptionHint">Mondd el, mit tapasztaltál…</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Előfizetések</string>
     <string name="activitySubscriptionSettings">Előfizetési beállítások</string>
     <string name="activityActivateSubscription">Van előfizetésem</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">A váltással %1$s/hó összegről %2$s/hó összegre emelkedik a havi díjad.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Éves csomag megtartása</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Váltás havi előfizetésre (%1$s/hó)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nem sikerült hozzáférni a Plusz vagy a Pro szintű funkciókhoz</string>
+    <string name="subscriptionsProUpgradeTitle">Váltás Pro előfizetésre</string>
+    <string name="subscriptionsProUpgradeMessage">Férj hozzá erősebb mesterséges intelligenciához</string>
+    <string name="subscriptionSettingSectionManageSubscription">Előfizetés kezelése</string>
+    <string name="subscriptionSettingViewAllPlans">Összes csomag megtekintése</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Fizetés kezelése vagy lemondása</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">A csomagod %2$s dátummal erre frissül: %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">A csomagod %2$s dátummal erre vált vissza: %1$s.</string>
+    <string name="planNamePlusMonthly">Plus – havi</string>
+    <string name="planNamePlusYearly">Plus – éves</string>
+    <string name="planNameProMonthly">Pro – havi</string>
+    <string name="planNameProYearly">Pro – éves</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

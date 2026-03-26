@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:SuppressLint("NoImplImportsInAppModule")
+
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
@@ -28,6 +30,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -37,12 +40,14 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INPUT_SCREEN
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SYNC_RESTORE
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
@@ -53,6 +58,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInputScreenDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSyncRestoreDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -64,6 +70,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import com.duckduckgo.duckchat.impl.R as DuckChatR
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(FragmentScope::class)
@@ -102,31 +109,48 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
-                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
-                is ShowInitialDialog -> configureDaxCta(INITIAL)
-                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowSyncRestoreDialog -> configureDaxCta(SYNC_RESTORE)
+                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER, showDuckAiCopy = it.showDuckAiCopy)
+                is ShowInitialDialog -> configureDaxCta(INITIAL, showDuckAiCopy = it.showDuckAiCopy)
+                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART, showDuckAiCopy = it.showDuckAiCopy)
                 is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
                 is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
-                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
-                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN)
+                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION, it.showSplitOption)
+                is ShowInputScreenDialog -> configureDaxCta(INPUT_SCREEN, showDuckAiCopy = it.showDuckAiCopy)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
-                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
+                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.selectedOption)
             }
         }.launchIn(lifecycleScope)
     }
 
-    private fun setAddressBarPositionOptions(defaultOption: Boolean) {
-        if (defaultOption) {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
-        } else {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+    private fun setAddressBarPositionOptions(selectedOption: OmnibarType) {
+        context?.let { ctx ->
+            val isLightMode = appTheme.isLightModeEnabled()
+
+            // Configure top option
+            val topButton = OmnibarTypeToggleButton.Top(
+                isActive = selectedOption == OmnibarType.SINGLE_TOP,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.topOmnibarToggleImage.setImageResource(topButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.topOmnibarToggleCheck.setImageResource(topButton.checkRes)
+
+            // Configure bottom option
+            val bottomButton = OmnibarTypeToggleButton.Bottom(
+                isActive = selectedOption == OmnibarType.SINGLE_BOTTOM,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.bottomOmnibarToggleImage.setImageResource(bottomButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.bottomOmnibarToggleCheck.setImageResource(bottomButton.checkRes)
+
+            // Configure split option
+            val splitButton = OmnibarTypeToggleButton.Split(
+                isActive = selectedOption == OmnibarType.SPLIT,
+                isLightMode = isLightMode,
+            )
+            binding.daxDialogCta.addressBarPosition.splitOmnibarToggleImage.setImageResource(splitButton.imageRes)
+            binding.daxDialogCta.addressBarPosition.splitOmnibarToggleCheck.setImageResource(splitButton.checkRes)
         }
     }
 
@@ -186,11 +210,37 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         }
     }
 
-    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
+    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType, showSplitOption: Boolean = false, showDuckAiCopy: Boolean = false) {
         context?.let {
             var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
+                SYNC_RESTORE -> {
+                    binding.daxDialogCta.root.show()
+                    binding.daxDialogCta.progressBarText.gone()
+                    binding.daxDialogCta.progressBar.gone()
+                    binding.daxDialogCta.descriptionCta.show()
+                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.daxDialogContentImage.gone()
+
+                    val ctaText = it.getString(R.string.syncRestoreDialogTitle)
+                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    val descriptionText = it.getString(R.string.syncRestoreDialogDescription)
+                    binding.daxDialogCta.descriptionCta.text = descriptionText.html(it)
+                    afterAnimation = {
+                        binding.daxDialogCta.dialogTextCta.finishAnimation()
+                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.setText(R.string.syncRestoreDialogPrimaryCta)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.syncRestoreDialogSecondaryCta)
+                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SYNC_RESTORE) }
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
+                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                }
+
                 INITIAL_REINSTALL_USER -> {
                     binding.daxDialogCta.root.show()
                     binding.daxDialogCta.progressBarText.gone()
@@ -198,12 +248,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
+                    val ctaText = it.getString(titleRes)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setText(
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                        )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
@@ -220,12 +273,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
+                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1TitleDuckAi else R.string.preOnboardingDaxDialog1Title
+                    val ctaText = it.getString(titleRes)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setText(
+                            if (showDuckAiCopy) R.string.preOnboardingDaxDialog1ButtonDuckAi else R.string.preOnboardingDaxDialog1Button,
+                        )
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -246,15 +302,23 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     val ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.comparisonChart.root.show()
+
+                    binding.daxDialogCta.comparisonChart.root.isVisible = !showDuckAiCopy
                     binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.isVisible = showDuckAiCopy
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.alpha = MIN_ALPHA
 
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        val comparisonChart = if (showDuckAiCopy) {
+                            binding.daxDialogCta.comparisonChartWithDuckAi
+                        } else {
+                            binding.daxDialogCta.comparisonChart
+                        }
+                        comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                     scheduleTypingAnimation(ctaText) { afterAnimation() }
                 }
@@ -291,6 +355,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.secondaryCta.gone()
                     binding.daxDialogCta.dialogTextCta.text = ""
                     binding.daxDialogCta.comparisonChart.root.gone()
+                    binding.daxDialogCta.comparisonChartWithDuckAi.root.gone()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     binding.daxDialogCta.progressBarText.show()
                     val maxPages = viewModel.getMaxPageCount()
@@ -304,17 +369,29 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.addressBarPosition.root.show()
                     binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
 
+                    // Show or hide split option based on feature toggle
+                    if (showSplitOption) {
+                        binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.show()
+                    } else {
+                        binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.gone()
+                    }
+
                     afterAnimation = {
                         binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        setAddressBarPositionOptions(true)
+                        setAddressBarPositionOptions(OmnibarType.SINGLE_TOP) // Default to top
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingAddressBarOkButton)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(true)
+                        binding.daxDialogCta.addressBarPosition.topOmnibarContainer.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_TOP)
                         }
-                        binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(false)
+                        binding.daxDialogCta.addressBarPosition.bottomOmnibarContainer.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(OmnibarType.SINGLE_BOTTOM)
+                        }
+                        if (showSplitOption) {
+                            binding.daxDialogCta.addressBarPosition.splitOmnibarContainer.setOnClickListener {
+                                viewModel.onAddressBarPositionOptionSelected(OmnibarType.SPLIT)
+                            }
                         }
                         binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
@@ -335,8 +412,27 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.max = maxPages
                     binding.daxDialogCta.progressBar.progress = 3
-                    val ctaText = it.getString(R.string.preOnboardingInputScreenTitle)
+                    val ctaText = it.getString(
+                        if (showDuckAiCopy) R.string.preOnboardingInputScreenTitleUpdated else R.string.preOnboardingInputScreenTitle,
+                    )
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_without_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_without_ai
+                        },
+                    )
+
+                    binding.daxDialogCta.duckAiInputScreenToggleWithAiCaption.setText(
+                        if (showDuckAiCopy) {
+                            DuckChatR.string.input_screen_user_pref_with_ai_updated
+                        } else {
+                            DuckChatR.string.input_screen_user_pref_with_ai
+                        },
+                    )
+
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.show()
                     binding.daxDialogCta.duckAiInputScreenToggleContainer.alpha = MIN_ALPHA
@@ -472,6 +568,58 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
         binding.daxDialogCta.duckAiInputScreenToggleWithoutAiCheck.setImageResource(withoutAiCheckRes)
         binding.daxDialogCta.duckAiInputScreenToggleWithAiCheck.setImageResource(withAiCheckRes)
+    }
+
+    private sealed class OmnibarTypeToggleButton(
+        isActive: Boolean,
+    ) {
+        abstract val imageRes: Int
+
+        val checkRes: Int =
+            if (isActive) {
+                CommonR.drawable.ic_check_accent_24
+            } else {
+                CommonR.drawable.ic_shape_circle_disabled_24
+            }
+
+        class Top(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_top_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_top_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_top_unselected_light
+                    else -> R.drawable.mobile_toolbar_top_unselected_dark
+                }
+        }
+
+        class Bottom(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_bottom_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_bottom_unselected_light
+                    else -> R.drawable.mobile_toolbar_bottom_unselected_dark
+                }
+        }
+
+        class Split(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : OmnibarTypeToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.mobile_toolbar_split_selected_light
+                    isActive && !isLightMode -> R.drawable.mobile_toolbar_split_selected_dark
+                    !isActive && isLightMode -> R.drawable.mobile_toolbar_split_unselected_light
+                    else -> R.drawable.mobile_toolbar_split_unselected_dark
+                }
+        }
     }
 
     companion object {

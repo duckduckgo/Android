@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
     <string name="input_screen_chat_hint">Klauskite privačiai</string>
     <string name="input_screen_user_pref_without_ai">Tik paieška</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Paieška ir „Duck.ai“</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Išbandykite naują parinktį ir užduokite klausimus „Duck.ai“ tiesiai iš adresų juostos. <annotation type="share_feedback">Bendrinti atsiliepimą</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Slėpti DI generuotus vaizdus</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Vaizdų paieškos rezultatuose nepalieka Di sukurtų vaizdų</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Įgalinti DI funkcijų nustatymuose</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Tvarkyti DI funkcijų nustatymuose</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigūruokite „Duck.ai“ DI funkcijų nustatymuose.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Apibendrinti šį puslapį</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automatiškai siųsti puslapio turinį</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automatiškai siųsti puslapio turinį į „Duck.ai“</string>
+    <string name="duckAIContextualAttachPageContent">Pridėkite puslapio turinį</string>
 </resources>

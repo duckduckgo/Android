@@ -84,6 +84,13 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     }
 
     private fun renderViewState(viewState: ViewState) {
+        val contentRes = if (viewState.aiChatSyncEnabled) {
+            string.sync_enable_sync_content_with_ai_chat
+        } else {
+            string.sync_enable_sync_content
+        }
+        binding.contentBody.text = getString(contentRes)
+
         when (viewState.viewMode) {
             is SignedIn -> {
                 listener?.launchRecoveryCodeScreen()

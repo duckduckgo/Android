@@ -34,6 +34,11 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -62,6 +67,9 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
+
+    // Image loading
+    implementation "com.github.bumptech.glide:glide:_"
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Beállítások</string>
     <string name="settingsHeadingProtections">Védelem</string>
     <string name="settingsHeadingAppearance">Megjelenés</string>
+    <string name="settingsWhatsNew">Újdonságok</string>
     <string name="settingsHeadingAbout">További információ</string>
     <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
     <string name="settingsVersion">Változat</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Az automatikus kiegészítési javaslatok között már a legutóbb meglátogatott webhelyek is szerepelnek. A Beállítások alatt kikapcsolhatod, vagy bármikor törölheted a 🔥 Tűz gombbal.</string>
     <string name="improvedAutoCompleteIAMTitle">Ugyanolyan adatvédelem.\nJobb keresési javaslatok!</string>
     <string name="openAutoCompleteSettings">Beállítások megnyitása</string>
+    <string name="privateSearchChatSuggestionsToggle">Csevegési javaslatok</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Az előzményekből, a könyvjelzőkből és (opcionálisan) a Duck.ai csevegési előzményekből származó javaslatok megjelenítése a keresősávba való gépeléskor. Minden keresés privát.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Általános</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Leiratkozási jogokat gyakorol a nevedben azáltal, hogy jelzi a webhelyeknek, hogy ne adják el vagy osszák meg a személyes adataidat.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Asztali böngésző letöltése</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac és Windows rendszerre</string>
+    <string name="getDesktopBrowserTitle">Védd a személyes adataidat Mac és Windows rendszeren is!</string>
+    <string name="getDesktopBrowserBody">A DuckDuckGo Mac vagy Windows rendszerre történő letöltéséhez látogass el ide:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Letöltési link megosztása</string>
+    <string name="getDesktopBrowserNoThanks">Nem, köszönöm</string>
+    <string name="getDesktopBrowserHideItem">Elrejtés</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link másolva</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Tűz gomb</string>
     <string name="dataClearingActivityTitle">Adattörlés</string>
+    <string name="dataClearingDescription">Az adatok törlése segíthet az online adatvédelemben. A Fire Button segítségével manuálisan törölhetők az adatok, illetve beállítható automatikus törlés is.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d webhely kizárva a törlésből</item>
+        <item quantity="other">%1$d webhely kizárva a törlésből</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Be</string>
+    <string name="dataClearingAutomaticClearingOff">Ki</string>
+    <string name="dataClearingClearBrowsingData">Böngészési adatok törlése</string>
+    <string name="dataClearingAutomaticDataClearing">Adatok automatikus törlése</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Adatok automatikus törlése</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Összes megnyitott lap bezárása</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Összes webhelyadat törlése, beleértve a meglátogatott webhelyeket is. Fiókokból való kijelentkezést eredményezhet.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Az összes csevegés törlése, beleértve a kitűzött csevegéseket is</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Törlendő elemek kiválasztása</string>
+    <string name="dataClearingOptionTabs">Lapok</string>
+    <string name="dataClearingOptionData">Sütik és webhelyadatok</string>
+    <string name="dataClearingDuckAiChats">Duck.ai-csevegések</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Minden csevegés törlése</string>
+    <string name="fireDialogDeleteButton">Törlés</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Lap bezárása</item>
+        <item quantity="other">Mind a(z) %1$d lap bezárása</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Fiókokból való kijelentkezést eredményezhet.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nincs</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Törlés 1 webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
+        <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Törlöd a lapokat és a webhelyadatokat?</string>
+    <string name="singleTabFireDialogTitleWithChats">Törlöd a lapokat, a webhelyadatokat és a csevegéseket?</string>
+    <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
+    <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
+    <string name="singleTabFireDialogDeleteChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogTitleDuckAi">Csevegés törlése?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d lap és adatai törölve</item>
+        <item quantity="other">%1$d lap és adataik törölve</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Lapok és adatok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Lapok, adatok és Duck.ai-csevegések</string>
 
-    <string name="settingsAutomaticallyClearWhen">Törlés ideje: …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ideje: …</string>
+    <string name="settingsAutomaticallyClearWhen">Törlés feltételei…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés feltételei…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kilépés csak az alkalmazásból</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Kilépés az alkalmazásból 5 másodperc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Kilépés az alkalmazásból 5 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Kilépés az alkalmazásból 15 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Kilépés az alkalmazásból 30 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
-    <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
+    <string name="settingsClearAiDataTitle">Duck.ai csevegések törlése</string>
     <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
     <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Szia!<br/><br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Csináljuk!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
     <string name="preOnboardingDaxDialog2Title">Védelem aktiválva!</string>
     <string name="preOnboardingDaxDialog2Button">Böngésző kiválasztása</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
     <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="preOnboardingAddressBarTitle">Hol helyezzem el a címsort?</string>
     <string name="preOnboardingAddressBarOkButton">Következő</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Tudtad?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Szeretnél könnyedén hozzáférni a privát AI-csevegéshez?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Következő</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Az AI-funkciók privátak és opcionálisak. Módosításokat a <b>Beállítások > AI-funkciók</b> menüpontban végezhetsz.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Beállítás végrehajtása</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Nyomkövető-számláló megjelenítése a lapváltóban</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Elrejted a nyomkövető-számlálót?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bármikor visszakapcsolhatod a Beállítások &gt; Megjelenés menüben.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Elrejtés</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Megtartás.</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokkolt nyomkövetők animációja</string>
+    <string name="showTrackerCountInAddressBar">Megjelenítés a címsorban</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Megjelenítés a Lapkezelőben</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Csak keresés</string>

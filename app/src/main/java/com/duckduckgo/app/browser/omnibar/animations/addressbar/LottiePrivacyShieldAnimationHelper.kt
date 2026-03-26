@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations.addressbar
 
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.global.model.PrivacyShield
@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import javax.inject.Inject
 
@@ -37,7 +38,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
-    private val addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val omnibarRepository: OmnibarRepository,
 ) : PrivacyShieldAnimationHelper {
 
@@ -53,7 +54,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             protectedShield = R.raw.protected_shield_custom_tab
             protectedShieldDark = R.raw.dark_protected_shield_custom_tab
         } else {
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (runBlocking { addressBarTrackersAnimationManager.isFeatureEnabled() }) {
                 protectedShield = R.raw.address_bar_trackers_animation_shield
                 protectedShieldDark = R.raw.address_bar_trackers_animation_shield
             } else {

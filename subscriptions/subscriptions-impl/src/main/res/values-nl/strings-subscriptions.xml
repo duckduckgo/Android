@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Je abonnement is aangeschaft via de Apple App Store. Om je abonnement of factureringsinstellingen te wijzigen, ga je naar \'Instellingen\' &gt; \'Apple-account\' &gt; \'Abonnementen\' op een apparaat dat is aangemeld bij hetzelfde Apple-account waarmee je het abonnement hebt gekocht.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activeer Privacy Pro op je desktop om Personal Information Removal in te stellen.</string>
-    <string name="pirDescription">Ga in de DuckDuckGo-browser op je desktop naar <b>Instellingen &gt; Privacy Pro</b> en klik op <b>Ik heb een abonnement</b> om te beginnen.</string>
+    <string name="pirTitle">Activeer het DuckDuckGo-abonnement op je desktop om Personal Information Removal in te stellen</string>
+    <string name="pirDescription">Ga in de DuckDuckGo-browser op je desktop naar <b>Instellingen &gt; Abonneren op DuckDuckGo</b> en klik op <b>Ik heb een abonnement</b> om te beginnen.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefoontje naar adviseur hielp niet</string>
     <string name="feedbackSubCategoryItrOther">Anders</string>
 
-    <string name="feedbackSubCategorySubsOtp">Eenmalig wachtwoord</string>
-    <string name="feedbackSubCategorySubsOther">Anders</string>
+    <string name="feedbackSubCategorySubsOtp">Probleem met eenmalig wachtwoord</string>
+    <string name="feedbackSubCategorySubsOther">Iets anders</string>
 
     <string name="feedbackSubmitVpnHeader">Heb je een probleem gevonden dat niet in ons <annotation type="faqs_link">helpcentrum</annotation> wordt besproken? We willen er zeker meer over weten.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Vertel ons wat er aan de hand is …</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnementen</string>
     <string name="activitySubscriptionSettings">Abonnementinstellingen</string>
     <string name="activityActivateSubscription">Ik heb een abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Verstuur feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnees krijgen onze VPN en geavanceerde AI-modellen in Duck.ai, Personal Information Removal en Identity Theft Restoration.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Overstappen zal je maandprijs verhogen van %1$s/maand naar %2$s/maand.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behoud je jaarabonnement</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Overschakelen naar een maandelijks (%1$s/maand)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Toegang tot Plus- of Pro-functies niet mogelijk</string>
+    <string name="subscriptionsProUpgradeTitle">Upgraden naar Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Ontgrendel krachtigere AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Abonnement beheren</string>
+    <string name="subscriptionSettingViewAllPlans">Bekijk alle abonnementen</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Betaling beheren of annuleren</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Je abonnement wordt op %2$s geüpgraded naar %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Je abonnement wordt op %2$s gedowngraded naar %1$s.</string>
+    <string name="planNamePlusMonthly">Plus Maandelijks</string>
+    <string name="planNamePlusYearly">Plus Jaarlijks</string>
+    <string name="planNameProMonthly">Pro Maandelijks</string>
+    <string name="planNameProYearly">Pro per jaar</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

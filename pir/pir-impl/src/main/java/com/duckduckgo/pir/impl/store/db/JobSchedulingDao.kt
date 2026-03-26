@@ -166,4 +166,11 @@ interface JobSchedulingDao {
         extractedProfileId: Long,
         newDate: Long,
     )
+
+    @Transaction
+    fun deleteAll() {
+        deleteAllScanJobRecords()
+        deleteAllOptOutJobRecords()
+        deleteAllEmailConfirmationJobRecords()
+    }
 }

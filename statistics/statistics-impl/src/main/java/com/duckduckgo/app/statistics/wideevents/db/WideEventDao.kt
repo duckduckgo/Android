@@ -36,6 +36,9 @@ interface WideEventDao {
     @Query("SELECT id FROM wide_events WHERE status is null ORDER BY id ASC")
     suspend fun getActiveWideEventIds(): List<Long>
 
+    @Query("SELECT id FROM wide_events WHERE status is not null ORDER BY id ASC")
+    suspend fun getCompletedWideEventIds(): List<Long>
+
     @Query("SELECT id FROM wide_events WHERE name = :name AND status is null ORDER BY id ASC")
     suspend fun getActiveWideEventIdsByName(name: String): List<Long>
 
@@ -45,6 +48,6 @@ interface WideEventDao {
     @Query("DELETE FROM wide_events WHERE id = :id")
     suspend fun deleteWideEvent(id: Long): Int
 
-    @Query("SELECT id FROM wide_events WHERE status is not null")
-    fun getCompletedWideEventIdsFlow(): Flow<List<Long>>
+    @Query("SELECT EXISTS(SELECT 1 FROM wide_events WHERE status is not null)")
+    fun hasCompletedWideEvents(): Flow<Boolean>
 }

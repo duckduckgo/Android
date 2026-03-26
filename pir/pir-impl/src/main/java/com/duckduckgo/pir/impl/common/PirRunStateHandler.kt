@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.common
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutConditionFound
@@ -42,6 +43,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanF
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanSuccess
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepActionFailed
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
@@ -131,10 +133,12 @@ interface PirRunStateHandler {
 
         data class BrokerRecordEmailConfirmationCompleted(
             override val broker: Broker,
-            val extractedProfileId: Long,
+            val extractedProfile: ExtractedProfile,
             val isSuccess: Boolean,
             val lastActionId: String,
             val totalTimeMillis: Long,
+            val emailPattern: String,
+            val attemptId: String,
         ) : PirRunState(broker)
 
         data class BrokerRecordOptOutStarted(
@@ -252,6 +256,11 @@ interface PirRunStateHandler {
             val actionID: String,
             val errorMessage: String,
         ) : PirRunState(broker)
+
+        data class BrokerStepInvalidEvent(
+            override val broker: Broker,
+            val runType: RunType,
+        ) : PirRunState(broker)
     }
 }
 
@@ -293,14 +302,28 @@ class RealPirRunStateHandler @Inject constructor(
                 is BrokerOptOutStageGenerateEmailReceived -> handleBrokerOptOutStageGenerateEmailReceived(pirRunState)
                 is BrokerOptOutStageSubmit -> handleBrokerOptOutStageSubmit(pirRunState)
                 is BrokerOptOutStageValidate -> handleBrokerOptOutStageValidate(pirRunState)
+                is BrokerStepInvalidEvent -> handleBrokerStepInvalidEvent(pirRunState)
             }
         }
+
+    private fun handleBrokerStepInvalidEvent(pirRunState: BrokerStepInvalidEvent) {
+        if (pirRunState.runType == RunType.MANUAL || pirRunState.runType == RunType.SCHEDULED) {
+            pixelSender.reportScanInvalidEvent(
+                brokerUrl = pirRunState.broker.url,
+                brokerVersion = pirRunState.broker.version,
+            )
+        } else {
+            pixelSender.reportOptOutInvalidEvent(
+                brokerUrl = pirRunState.broker.url,
+                brokerVersion = pirRunState.broker.version,
+            )
+        }
+    }
 
     private fun handleBrokerOptOutStageSubmit(pirRunState: BrokerOptOutStageSubmit) {
         pixelSender.reportOptOutStageSubmit(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
-            attemptId = pirRunState.attemptId,
             brokerVersion = pirRunState.broker.version,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
@@ -313,7 +336,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -325,7 +347,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -337,7 +358,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -349,7 +369,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -361,7 +380,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -373,7 +391,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -385,7 +402,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -397,7 +413,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = pirRunState.broker.url,
             parentUrl = pirRunState.broker.parent.orEmpty(),
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
             actionId = pirRunState.actionID,
@@ -502,16 +517,16 @@ class RealPirRunStateHandler @Inject constructor(
                 brokerUrl = pirRunState.broker.url,
                 brokerVersion = pirRunState.broker.version,
                 attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
-                attemptId = updatedRecord.emailData.attemptId,
                 actionId = pirRunState.firstActionId,
             )
         }
     }
 
     private suspend fun handleBrokerRecordEmailConfirmationCompleted(pirRunState: BrokerRecordEmailConfirmationCompleted) {
+        val extractedProfileId = pirRunState.extractedProfile.dbId
         if (pirRunState.isSuccess) {
             // The job we pass to the engine could have outdated info so we just re-fetch it
-            val updatedRecord = pirSchedulingRepository.getEmailConfirmationJob(pirRunState.extractedProfileId)
+            val updatedRecord = pirSchedulingRepository.getEmailConfirmationJob(extractedProfileId)
 
             if (updatedRecord != null) {
                 pixelSender.reportEmailConfirmationAttemptSuccess(
@@ -519,17 +534,28 @@ class RealPirRunStateHandler @Inject constructor(
                     brokerVersion = pirRunState.broker.version,
                     attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
                     actionId = pirRunState.lastActionId,
-                    attemptId = updatedRecord.emailData.attemptId,
                     durationMs = pirRunState.totalTimeMillis,
+                )
+                emitAndLogBrokerOptOutSubmitted(
+                    brokerUrl = pirRunState.broker.url,
+                    brokerName = pirRunState.broker.name,
+                    brokerParent = pirRunState.broker.parent.orEmpty(),
+                    attemptId = pirRunState.attemptId,
+                    attemptCount = updatedRecord.jobAttemptData.jobAttemptCount,
+                    emailPattern = pirRunState.emailPattern,
+                    extractedProfile = pirRunState.extractedProfile,
+                    startTimeInMillis = currentTimeProvider.currentTimeMillis() - pirRunState.totalTimeMillis,
+                    endTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 )
             }
 
-            jobRecordUpdater.recordEmailConfirmationCompleted(pirRunState.extractedProfileId)
+            jobRecordUpdater.recordEmailConfirmationCompleted(extractedProfileId)
 
             pixelSender.reportEmailConfirmationJobSuccess(
                 brokerUrl = pirRunState.broker.url,
                 brokerVersion = pirRunState.broker.version,
             )
+
             eventsRepository.saveEmailConfirmationLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 type = EMAIL_CONFIRMATION_SUCCESS,
@@ -537,7 +563,7 @@ class RealPirRunStateHandler @Inject constructor(
             )
         } else {
             val updatedRecord = jobRecordUpdater.recordEmailConfirmationFailed(
-                pirRunState.extractedProfileId,
+                extractedProfileId,
                 pirRunState.lastActionId,
             )
 
@@ -546,7 +572,6 @@ class RealPirRunStateHandler @Inject constructor(
                     brokerUrl = pirRunState.broker.url,
                     brokerVersion = pirRunState.broker.version,
                     attemptNumber = updatedRecord.jobAttemptData.jobAttemptCount,
-                    attemptId = updatedRecord.emailData.attemptId,
                     actionId = updatedRecord.jobAttemptData.lastJobAttemptActionId,
                     durationMs = pirRunState.totalTimeMillis,
                 )
@@ -570,7 +595,6 @@ class RealPirRunStateHandler @Inject constructor(
         pixelSender.reportStagePendingEmailConfirmation(
             brokerUrl = pirRunState.broker.url,
             brokerVersion = pirRunState.broker.version,
-            attemptId = pirRunState.attemptId,
             actionId = pirRunState.lastActionId,
             durationMs = pirRunState.durationMs,
             tries = pirRunState.currentActionAttemptCount,
@@ -656,31 +680,48 @@ class RealPirRunStateHandler @Inject constructor(
         pixelSender.reportOptOutStageStart(
             brokerUrl = state.broker.url,
             parentUrl = state.broker.parent.orEmpty(),
-            attemptId = state.attemptId,
-        )
-
-        pixelSender.reportOptOutStarted(
-            brokerName = state.broker.name,
         )
     }
 
     private suspend fun handleBrokerRecordOptOutSubmitted(state: BrokerRecordOptOutSubmitted) {
         val optOutJobRecord = updateOptOutRecord(true, state.extractedProfile.dbId) ?: return
-
-        pixelSender.reportOptOutSubmitted(
+        emitAndLogBrokerOptOutSubmitted(
             brokerUrl = state.broker.url,
-            parent = state.broker.parent.orEmpty(),
-            attemptId = state.attemptId,
-            durationMs = state.endTimeInMillis - state.startTimeInMillis,
-            optOutAttemptCount = optOutJobRecord.attemptCount,
-            emailPattern = state.emailPattern,
-        )
-
-        eventsRepository.saveOptOutCompleted(
             brokerName = state.broker.name,
+            brokerParent = state.broker.parent.orEmpty(),
+            attemptId = state.attemptId,
+            attemptCount = optOutJobRecord.attemptCount,
+            emailPattern = state.emailPattern.orEmpty(),
             extractedProfile = state.extractedProfile,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.endTimeInMillis,
+        )
+    }
+
+    private suspend fun emitAndLogBrokerOptOutSubmitted(
+        brokerUrl: String,
+        brokerName: String,
+        brokerParent: String,
+        attemptId: String,
+        attemptCount: Int,
+        emailPattern: String,
+        extractedProfile: ExtractedProfile,
+        startTimeInMillis: Long,
+        endTimeInMillis: Long,
+    ) {
+        pixelSender.reportOptOutSubmitted(
+            brokerUrl = brokerUrl,
+            parent = brokerParent,
+            durationMs = endTimeInMillis - startTimeInMillis,
+            optOutAttemptCount = attemptCount,
+            emailPattern = emailPattern,
+        )
+
+        eventsRepository.saveOptOutCompleted(
+            brokerName = brokerName,
+            extractedProfile = extractedProfile,
+            startTimeInMillis = startTimeInMillis,
+            endTimeInMillis = endTimeInMillis,
             isSubmitSuccess = true,
         )
     }
@@ -692,7 +733,6 @@ class RealPirRunStateHandler @Inject constructor(
             brokerUrl = state.broker.url,
             parent = state.broker.parent.orEmpty(),
             brokerJsonVersion = state.broker.version,
-            attemptId = state.attemptId,
             durationMs = state.endTimeInMillis - state.startTimeInMillis,
             tries = optOutJobRecord.attemptCount,
             emailPattern = state.emailPattern,

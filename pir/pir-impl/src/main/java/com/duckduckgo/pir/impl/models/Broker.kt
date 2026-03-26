@@ -24,4 +24,18 @@ data class Broker(
     val parent: String?,
     val addedDatetime: Long,
     val removedAt: Long,
-)
+) {
+    companion object {
+        fun unknown(): Broker {
+            return Broker(
+                name = "unknown",
+                fileName = "unknown",
+                url = "unknown",
+                version = "unknown",
+                parent = null,
+                addedDatetime = 0L,
+                removedAt = 0L,
+            )
+        }
+    }
+}

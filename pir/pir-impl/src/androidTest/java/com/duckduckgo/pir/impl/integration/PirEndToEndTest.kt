@@ -22,6 +22,9 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
@@ -53,12 +56,14 @@ import com.duckduckgo.pir.impl.integration.fakes.FakeCurrentTimeProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakeDbpService
 import com.duckduckgo.pir.impl.integration.fakes.FakeEventHandlerPluginPoint
 import com.duckduckgo.pir.impl.integration.fakes.FakeNativeBrokerActionHandler
+import com.duckduckgo.pir.impl.integration.fakes.FakeNetworkProtectionState
 import com.duckduckgo.pir.impl.integration.fakes.FakePirCssScriptLoader
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDataStore
 import com.duckduckgo.pir.impl.integration.fakes.FakePirDetachedWebViewProvider
 import com.duckduckgo.pir.impl.integration.fakes.FakePirMessagingInterface
 import com.duckduckgo.pir.impl.integration.fakes.FakePixel
 import com.duckduckgo.pir.impl.integration.fakes.FakePluginPoint
+import com.duckduckgo.pir.impl.integration.fakes.FakeWebViewDataCleaner
 import com.duckduckgo.pir.impl.integration.fakes.TestPirActionsRunnerFactory
 import com.duckduckgo.pir.impl.integration.fakes.TestPirSecureStorageDatabaseFactory
 import com.duckduckgo.pir.impl.models.Address
@@ -165,9 +170,13 @@ class PirEndToEndTest {
     private lateinit var fakePirDetachedWebViewProvider: FakePirDetachedWebViewProvider
     private lateinit var fakeNativeBrokerActionHandler: FakeNativeBrokerActionHandler
     private lateinit var fakePirCssScriptLoader: FakePirCssScriptLoader
+    private lateinit var fakePirWebViewDataCleaner: FakeWebViewDataCleaner
+    private lateinit var fakeNetworkProtectionState: FakeNetworkProtectionState
 
     private val activeBrokerName = "FakeBroker"
     private val removedBrokerName = "FakeRemovedBroker"
+    private val unknownScanActionBrokerName = "FakeBrokerScanUnknownAction"
+    private val unknownOptOutActionBrokerName = "FakeBrokerOptOutUnknownAction"
     private val testProfile = ProfileQuery(
         id = 1L,
         firstName = "John",
@@ -235,7 +244,9 @@ class PirEndToEndTest {
         fakeDbpService = FakeDbpService()
 
         fakePixel = FakePixel()
-        pixelSender = RealPirPixelSender(fakePixel)
+        fakeNetworkProtectionState = FakeNetworkProtectionState()
+        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState, FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
+        fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
 
         pirRepository = RealPirRepository(
             dispatcherProvider = dispatcherProvider,
@@ -316,6 +327,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirOptOut = RealPirOptOut(
@@ -327,6 +339,7 @@ class PirEndToEndTest {
             currentTimeProvider = fakeTimeProvider,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         eligibleScanJobProvider = RealEligibleScanJobProvider(
@@ -350,6 +363,10 @@ class PirEndToEndTest {
             pirOptOut = pirOptOut,
             currentTimeProvider = fakeTimeProvider,
             pixelSender = pixelSender,
+            brokerJsonUpdater = object : BrokerJsonUpdater {
+                override suspend fun update(): Boolean = true
+            },
+            pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(
@@ -359,6 +376,7 @@ class PirEndToEndTest {
             pirActionsRunnerFactory = pirActionsRunnerFactory,
             dispatcherProvider = dispatcherProvider,
             callbacks = pirCallbacksPluginPoint,
+            webViewDataCleaner = fakePirWebViewDataCleaner,
         )
 
         pirEmailConfirmationJobsRunner = RealPirEmailConfirmationJobsRunner(
@@ -492,19 +510,17 @@ class PirEndToEndTest {
         println("==========STEP 6: Verify all scan and opt-out pixels fired ==========")
         // Scan pixels
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
+            PirPixel.PIR_INITIAL_SCAN_DURATION,
         )
 
         // Opt-out pixels
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
             PirPixel.PIR_OPTOUT_STAGE_START,
-            PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED,
             PirPixel.PIR_OPTOUT_STAGE_FILLFORM,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
             PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_SEND,
@@ -560,6 +576,7 @@ class PirEndToEndTest {
             PirPixel.PIR_EMAIL_CONFIRMATION_LINK_RECEIVED,
             PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_START,
             PirPixel.PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS,
+            PirPixel.PIR_OPTOUT_SUBMIT_SUCCESS,
             PirPixel.PIR_EMAIL_CONFIRMATION_JOB_SUCCESS,
             PirPixel.PIR_EMAIL_CONFIRMATION_RUN_COMPLETED,
         )
@@ -578,7 +595,7 @@ class PirEndToEndTest {
         fakeTimeProvider.advanceByHours(73)
 
         // Run confirmation scan
-        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        val confirmationResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED)
         assertTrue("Confirmation scan should succeed", confirmationResult.isSuccess)
 
         // Verify navigate actions were pushed for active broker only
@@ -613,12 +630,169 @@ class PirEndToEndTest {
 
         // Verify confirmation scan pixels fired
         assertPixelsWereFired(
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED,
-            PirPixel.PIR_INTERNAL_SCAN_STATS,
+            PirPixel.PIR_SCHEDULED_RUN_STARTED,
             PirPixel.PIR_SCAN_STARTED,
             PirPixel.PIR_SCAN_STAGE,
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
-            PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED,
+            PirPixel.PIR_SCHEDULED_RUN_COMPLETED,
+        )
+    }
+
+    @Test
+    fun testScanGracefullyHandlesUnknownActions() = runBlocking {
+        println("==================== STEP 1: Setup broker with unknown scan action ====================")
+
+        // This broker has an unknown action in the scan step
+        loadBrokerWithScanUnknownAction()
+
+        // Save test profile
+        pirRepository.replaceUserProfile(testProfile)
+
+        // Verify broker is loaded
+        val activeBrokers = pirRepository.getAllActiveBrokers()
+        assertEquals("Should have 1 active broker", 1, activeBrokers.size)
+        assertTrue(
+            "Should be the unknown scan action broker",
+            activeBrokers.contains(unknownScanActionBrokerName),
+        )
+
+        println("==================== STEP 2: Run scan - should fail gracefully ====================")
+
+        // Run eligible jobs - should not crash even though scan step has unknown action
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        assertTrue("Scan should succeed overall (not crash)", scanResult.isSuccess)
+
+        // Verify scan job was created
+        val scanJobRecords = pirSchedulingRepository.getAllValidScanJobRecords()
+        val unknownActionBrokerScanJob =
+            scanJobRecords.find { it.brokerName == unknownScanActionBrokerName }
+
+        assertTrue(
+            "Unknown action broker should have scan job created",
+            unknownActionBrokerScanJob != null,
+        )
+
+        // The scan is not executed at all because the step parsing fails.
+        assertEquals(
+            "Unknown action broker scan job status should be NOT_EXECUTED (parsing failed)",
+            ScanJobStatus.NOT_EXECUTED,
+            unknownActionBrokerScanJob?.status,
+        )
+
+        // Verify no actions were pushed (since scan step parsing failed)
+        val pushedActions = fakePirMessagingInterface.pushedActions
+        val brokerActions = pushedActions.filterIsInstance<BrokerAction.Navigate>()
+            .filter { it.url.contains("fake-broker-scan-unknown-action") }
+        assertTrue(
+            "No actions should be pushed for broker with unknown scan action",
+            brokerActions.isEmpty(),
+        )
+
+        // Verify no extracted profiles (scan didn't run)
+        val extractedProfiles = pirRepository.getAllExtractedProfiles()
+        val brokerProfiles = extractedProfiles.filter { it.brokerName == unknownScanActionBrokerName }
+        assertTrue(
+            "Should have no extracted profiles from unknown action broker",
+            brokerProfiles.isEmpty(),
+        )
+
+        println("==================== STEP 3: Verify scan completed without crash ====================")
+
+        // Verify scan completion pixels were fired (indicating graceful completion)
+        assertPixelsWereFired(
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
+        )
+    }
+
+    @Test
+    fun testOptOutGracefullyHandlesUnknownActions() = runBlocking {
+        println("==================== STEP 1: Setup broker with unknown opt-out action ====================")
+
+        // This broker has a VALID scan step but INVALID opt-out step
+        loadBrokerWithOptOutUnknownAction()
+
+        // Save test profile
+        pirRepository.replaceUserProfile(testProfile)
+
+        // Verify broker is loaded
+        val activeBrokers = pirRepository.getAllActiveBrokers()
+        assertEquals("Should have 1 active broker", 1, activeBrokers.size)
+        assertTrue(
+            "Should be the unknown opt-out action broker",
+            activeBrokers.contains(unknownOptOutActionBrokerName),
+        )
+
+        println("==================== STEP 2: Run scan - should succeed (scan step is valid) ====================")
+
+        // Run scan - should succeed since the scan step is valid
+        val scanResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.MANUAL)
+        assertTrue("Scan should succeed", scanResult.isSuccess)
+
+        // Check scan job record
+        val scanJobRecords = pirSchedulingRepository.getAllValidScanJobRecords()
+        val unknownActionBrokerScanJob =
+            scanJobRecords.find { it.brokerName == unknownOptOutActionBrokerName }
+
+        assertTrue(
+            "Should have scan job for unknown opt-out action broker",
+            unknownActionBrokerScanJob != null,
+        )
+
+        // Scan should succeed with MATCHES_FOUND since scan step is valid
+        assertEquals(
+            "Unknown opt-out action broker scan should have MATCHES_FOUND",
+            ScanJobStatus.MATCHES_FOUND,
+            unknownActionBrokerScanJob?.status,
+        )
+
+        // Verify extracted profiles
+        val extractedProfiles = pirRepository.getAllExtractedProfiles()
+        val brokerProfiles = extractedProfiles.filter { it.brokerName == unknownOptOutActionBrokerName }
+        assertTrue(
+            "Should have extracted profiles from broker",
+            brokerProfiles.isNotEmpty(),
+        )
+
+        println("==================== STEP 3: Verify opt-out remains NOT_EXECUTED ====================")
+
+        // Opt-out jobs should be created but remain NOT_EXECUTED because opt-out step parsing fails
+        val optOutJobRecords = pirSchedulingRepository.getAllValidOptOutJobRecords()
+        val unknownBrokerOptOutJobs =
+            optOutJobRecords.filter { it.brokerName == unknownOptOutActionBrokerName }
+
+        assertTrue(
+            "Should have opt-out jobs for broker",
+            unknownBrokerOptOutJobs.isNotEmpty(),
+        )
+
+        // Verify opt-out remains NOT_EXECUTED because parsing the opt-out step fails
+        val unknownBrokerOptOutJob = unknownBrokerOptOutJobs.first()
+        assertEquals(
+            "Unknown action broker opt-out job should remain NOT_EXECUTED (opt-out parsing failed)",
+            OptOutJobStatus.NOT_EXECUTED,
+            unknownBrokerOptOutJob.status,
+        )
+
+        println("==================== STEP 4: Verify no opt-out actions pushed ====================")
+
+        // Verify that no opt-out actions were pushed (only scan actions)
+        val pushedActions = fakePirMessagingInterface.pushedActions
+        val optOutNavigateActions = pushedActions
+            .filterIsInstance<BrokerAction.Navigate>()
+            .filter { it.url.contains("/optout") }
+
+        assertTrue(
+            "Should not have pushed opt-out navigate actions",
+            optOutNavigateActions.isEmpty(),
+        )
+
+        println("==================== STEP 5: Verify the flow completed without crash ====================")
+
+        // Verify scan completion pixels were fired (indicating graceful completion)
+        assertPixelsWereFired(
+            PirPixel.PIR_FOREGROUND_RUN_STARTED,
+            PirPixel.PIR_FOREGROUND_RUN_COMPLETED,
         )
     }
 
@@ -628,7 +802,7 @@ class PirEndToEndTest {
             StartedEventHandler(),
             LoadUrlCompleteEventHandler(),
             LoadUrlFailedEventHandler(),
-            ErrorReceivedHandler(),
+            ErrorReceivedHandler(pirRunStateHandler),
             RetryGetCaptchaSolutionEventHandler(),
             RetryAwaitCaptchaSolutionEventHandler(),
             JsActionSuccessEventHandler(pirRunStateHandler, fakeTimeProvider),
@@ -643,46 +817,55 @@ class PirEndToEndTest {
     }
 
     private fun loadBrokers() {
-        // load active and removed brokers from JSON to database
+        val activeBroker = parseBrokerJson("fake-broker.json")
+        insertBrokerIntoDb(activeBroker, "fake-broker.json")
+
+        val removedBroker = parseBrokerJson("fake-removed-broker.json")
+        insertBrokerIntoDb(removedBroker, "fake-removed-broker.json")
+    }
+
+    private fun loadBrokerWithScanUnknownAction() {
+        val unknownActionBroker = parseBrokerJson("fake-broker-scan-unknown-action.json")
+        insertBrokerIntoDb(unknownActionBroker, "fake-broker-scan-unknown-action.json")
+    }
+
+    private fun loadBrokerWithOptOutUnknownAction() {
+        val unknownActionBroker = parseBrokerJson("fake-broker-optout-unknown-action.json")
+        insertBrokerIntoDb(unknownActionBroker, "fake-broker-optout-unknown-action.json")
+    }
+
+    private fun insertBrokerIntoDb(parsedBroker: ParsedBrokerConfig, fileName: String) {
         val db = databaseFactory.getDatabaseSync()
         val brokerDao = db.brokerDao()
 
-        fun insertIntoDb(parsedBroker: ParsedBrokerConfig, fileName: String) {
-            brokerDao.upsert(
-                broker = BrokerEntity(
-                    name = parsedBroker.name,
-                    url = parsedBroker.url,
-                    version = parsedBroker.version,
-                    parent = null,
-                    addedDatetime = parsedBroker.addedDatetime,
-                    fileName = fileName,
-                    removedAt = parsedBroker.removedAt ?: 0L,
-                ),
-                brokerScan = BrokerScan(
-                    brokerName = parsedBroker.name,
-                    stepsJson = parsedBroker.scanStepJson,
-                ),
-                brokerOptOut = BrokerOptOut(
-                    brokerName = parsedBroker.name,
-                    optOutUrl = parsedBroker.optOutUrl,
-                    stepsJson = parsedBroker.optOutStepJson,
-                ),
-                schedulingConfig = BrokerSchedulingConfigEntity(
-                    brokerName = parsedBroker.name,
-                    retryError = parsedBroker.schedulingConfig.retryError,
-                    confirmOptOutScan = parsedBroker.schedulingConfig.confirmOptOutScan,
-                    maintenanceScan = parsedBroker.schedulingConfig.maintenanceScan,
-                    maxAttempts = parsedBroker.schedulingConfig.maxAttempts,
-                ),
-                mirrorSiteEntity = emptyList(),
-            )
-        }
-
-        val activeBroker = parseBrokerJson("fake-broker.json")
-        insertIntoDb(activeBroker, "fake-broker.json")
-
-        val removedBroker = parseBrokerJson("fake-removed-broker.json")
-        insertIntoDb(removedBroker, "fake-removed-broker.json")
+        brokerDao.upsert(
+            broker = BrokerEntity(
+                name = parsedBroker.name,
+                url = parsedBroker.url,
+                version = parsedBroker.version,
+                parent = null,
+                addedDatetime = parsedBroker.addedDatetime,
+                fileName = fileName,
+                removedAt = parsedBroker.removedAt ?: 0L,
+            ),
+            brokerScan = BrokerScan(
+                brokerName = parsedBroker.name,
+                stepsJson = parsedBroker.scanStepJson,
+            ),
+            brokerOptOut = BrokerOptOut(
+                brokerName = parsedBroker.name,
+                optOutUrl = parsedBroker.optOutUrl,
+                stepsJson = parsedBroker.optOutStepJson,
+            ),
+            schedulingConfig = BrokerSchedulingConfigEntity(
+                brokerName = parsedBroker.name,
+                retryError = parsedBroker.schedulingConfig.retryError,
+                confirmOptOutScan = parsedBroker.schedulingConfig.confirmOptOutScan,
+                maintenanceScan = parsedBroker.schedulingConfig.maintenanceScan,
+                maxAttempts = parsedBroker.schedulingConfig.maxAttempts,
+            ),
+            mirrorSiteEntity = emptyList(),
+        )
     }
 
     private fun assertPixelsWereFired(vararg expectedPixels: PirPixel) {

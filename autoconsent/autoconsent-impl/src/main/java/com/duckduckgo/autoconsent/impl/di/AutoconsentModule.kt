@@ -17,7 +17,6 @@
 package com.duckduckgo.autoconsent.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.autoconsent.impl.pixels.RealAutoconsentPixelManager
@@ -25,6 +24,8 @@ import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -49,10 +50,12 @@ object AutoconsentModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAutoconsentDatabase(context: Context): AutoconsentDatabase {
-        return Room.databaseBuilder(context, AutoconsentDatabase::class.java, "autoconsent.db")
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAutoconsentDatabase(databaseProvider: DatabaseProvider): AutoconsentDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AutoconsentDatabase::class.java,
+            "autoconsent.db",
+            config = RoomDatabaseConfig(fallbackToDestructiveMigration = true),
+        )
     }
 
     @Provides

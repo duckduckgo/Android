@@ -20,9 +20,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.DrawableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -116,6 +118,23 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         doOnAttach {
             viewModel.setFireButtonHighlight(highlighted)
         }
+    }
+
+    fun setBrowserMenuIcon(@DrawableRes icon: Int) {
+        doOnAttach {
+            ContextCompat.getDrawable(this.context, icon)?.let {
+                binding.browserMenuImageView.setImageDrawable(it)
+            }
+        }
+    }
+
+    fun disableViewStateSaving() {
+        binding.browserMenuImageView.isSaveEnabled = false
+        binding.tabsButton.isSaveEnabled = false
+        binding.fireIconImageView.isSaveEnabled = false
+        binding.bookmarksImageView.isSaveEnabled = false
+        binding.autofillButtonImageView.isSaveEnabled = false
+        binding.newTabButtonImageView.isSaveEnabled = false
     }
 
     override fun onAttachedToWindow() {

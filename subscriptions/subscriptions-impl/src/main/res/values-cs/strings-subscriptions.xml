@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tvoje předplatné bylo zakoupeno prostřednictvím obchodu Apple App Store. Pokud chceš změnit tarif nebo nastavení fakturace, na zařízení, které je přihlášené ke stejnému účtu Apple, jaké jsi použil(a) k pořízení předplatného, přejdi do Nastavení &gt; Účet Apple &gt; Předplatná.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivuj si na počítači službu Privacy Pro a nastav si v ní funkci Personal Information Removal</string>
-    <string name="pirDescription">Začneš tak, že v prohlížeči DuckDuckGo pro počítače přejdeš do <b>Nastavení &gt; Privacy Pro</b> a klikneš na <b>Mám předplatné</b>.</string>
+    <string name="pirTitle">Pro nastavení služby Personal Information Removal si aktivuj předplatné DuckDuckGo na počítači</string>
+    <string name="pirDescription">V prohlížeči DuckDuckGo pro počítače přejdi do sekce <b>Nastavení &gt; Přihlásit se k odběru DuckDuckGo</b> a začni kliknutím na možnost <b>Mám předplatné</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Hovor s poradcem mi nepomohl</string>
     <string name="feedbackSubCategoryItrOther">Jiné</string>
 
-    <string name="feedbackSubCategorySubsOtp">Jednorázové heslo</string>
-    <string name="feedbackSubCategorySubsOther">Jiné</string>
+    <string name="feedbackSubCategorySubsOtp">Problém s jednorázovým heslem</string>
+    <string name="feedbackSubCategorySubsOther">Něco jiného</string>
 
     <string name="feedbackSubmitVpnHeader">Víš o problému, který není popsaný v našem <annotation type="faqs_link">centru nápovědy</annotation>? Chceme o tom vědět!</string>
     <string name="feedbackSubmitVpnDescriptionHint">Řekni nám, o co jde...</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Předplatné</string>
     <string name="activitySubscriptionSettings">Nastavení předplatného</string>
     <string name="activityActivateSubscription">Mám předplatné</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Přechodem se tvoje cena za měsíc zvýší z %1$s měsíčně na %2$s měsíčně.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Nechat roční tarif</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Přejít na měsíční tarif (%1$s za měsíc)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nemám přístup k funkcím úrovně Plus nebo Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Přejít na verzi Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Odemkni výkonnější umělou inteligenci</string>
+    <string name="subscriptionSettingSectionManageSubscription">Správa předplatného</string>
+    <string name="subscriptionSettingViewAllPlans">Zobrazit všechny tarify</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Správa platby nebo zrušení akce</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvůj tarif se dne %2$s změní na %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tvůj tarif se dne %2$s změní na %1$s.</string>
+    <string name="planNamePlusMonthly">Plus měsíčně</string>
+    <string name="planNamePlusYearly">Plus ročně</string>
+    <string name="planNameProMonthly">Pro měsíčně</string>
+    <string name="planNameProYearly">Pro ročně</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

@@ -33,8 +33,12 @@ class FakeDuckChat(
     private val openDuckChatWithAutoPromptCalls = mutableListOf<String>()
     private val openDuckChatWithPrefillCalls = mutableListOf<String>()
     private var wasOpenedBeforeValue: Boolean = false
-    private val inputScreenUserSettingEnabled = MutableStateFlow<Boolean>(false)
+    private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
+    private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
+    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
+    private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
+    var standaloneMigrationCompleted: Boolean = false
 
     override fun isEnabled(): Boolean = enabled
 
@@ -53,6 +57,7 @@ class FakeDuckChat(
     override fun getDuckChatUrl(
         query: String,
         autoPrompt: Boolean,
+        sidebar: Boolean,
     ): String {
         return "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
     }
@@ -60,6 +65,8 @@ class FakeDuckChat(
     override fun isDuckChatUrl(uri: Uri): Boolean {
         return uri.toString().contains("duckchat")
     }
+
+    override suspend fun deleteChat(url: String): Boolean = false
 
     override suspend fun wasOpenedBefore(): Boolean {
         return wasOpenedBeforeValue
@@ -84,6 +91,28 @@ class FakeDuckChat(
     override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> {
         return cosmeticInputScreenUserSettingEnabled
     }
+
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> {
+        return automaticContextAttachmentUserSettingEnabled
+    }
+
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
+        return nativeInputFieldUserSettingEnabled
+    }
+
+    override suspend fun isStandaloneMigrationCompleted(): Boolean {
+        return standaloneMigrationCompleted
+    }
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        chatSuggestionsUserSettingEnabled.value = enabled
+    }
+
+    override fun isChatSuggestionsFeatureAvailable(): Boolean = true
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
+
+    override fun openVoiceDuckChat() { }
 
     fun setEnabled(enabled: Boolean) {
         this.enabled = enabled

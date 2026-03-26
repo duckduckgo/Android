@@ -79,10 +79,10 @@ class RestoreSubscriptionViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun restoreFromStore() {
+    fun restoreFromStore(isOriginWeb: Boolean) {
         pixelSender.reportActivateSubscriptionRestorePurchaseClick()
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted()
+            subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStarted(isOriginWeb)
             when (val restoreResult = subscriptionsManager.recoverSubscriptionFromStore()) {
                 is RecoverSubscriptionResult.Success -> {
                     subscriptionsChecker.runChecker()
@@ -113,10 +113,10 @@ class RestoreSubscriptionViewModel @Inject constructor(
         }
     }
 
-    fun restoreFromEmail() {
+    fun restoreFromEmail(isOriginWeb: Boolean) {
         pixelSender.reportActivateSubscriptionEnterEmailClick()
         viewModelScope.launch {
-            subscriptionRestoreWideEvent.onEmailRestoreFlowStarted()
+            subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb)
             command.send(RestoreFromEmail)
         }
         warmUpJwksCache()

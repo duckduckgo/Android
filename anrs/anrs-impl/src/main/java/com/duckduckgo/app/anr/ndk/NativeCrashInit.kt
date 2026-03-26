@@ -20,7 +20,9 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
@@ -45,6 +47,10 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = VpnProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PirProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
     private val context: Context,
@@ -53,12 +59,18 @@ class NativeCrashInit @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
     private val webViewVersionProvider: WebViewVersionProvider,
-) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener {
+    @ProcessName private val processName: String,
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
-    private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
 
-    private val webViewVersion: String by lazy { webViewVersionProvider.getFullVersion() }
+    private val webViewVersion: String by lazy {
+        if (nativeCrashFeature.nativeCrashReportsFullWebViewVersion().isEnabled()) {
+            webViewVersionProvider.getFullVersion()
+        } else {
+            webViewVersionProvider.getMajorVersion()
+        }
+    }
 
     private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
 
@@ -83,7 +95,15 @@ class NativeCrashInit @Inject constructor(
         if (!isMainProcess) {
             asyncLoadNativeLibrary()
         } else {
-            logcat(ERROR) { "ndk-crash: onCreate wrongly called in the main process" }
+            logcat(ERROR) { "ndk-crash: onVpnProcessCreated wrongly called in the main process" }
+        }
+    }
+
+    override fun onPirProcessCreated() {
+        if (!isMainProcess) {
+            asyncLoadNativeLibrary()
+        } else {
+            logcat(ERROR) { "ndk-crash: onPirProcessCreated wrongly called in the main process" }
         }
     }
 

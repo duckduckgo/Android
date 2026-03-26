@@ -121,8 +121,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
-    <string name="fireClearAll">Obriši kartice i podatke</string>
-    <string name="fireClearAllPlusDuckChats">Izbriši kartice, podatke i razgovore s Duck.ai</string>
+    <string name="fireClearAll">Izbriši kartice i podatke</string>
+    <string name="fireClearAllPlusDuckChats">Izbriši kartice, podatke i razgovore s Duck.ai-om</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
 
@@ -131,6 +131,7 @@
     <string name="settingsMenuItemTitle">Postavke</string>
     <string name="settingsHeadingProtections">Zaštite</string>
     <string name="settingsHeadingAppearance">Izgled</string>
+    <string name="settingsWhatsNew">Što je novo</string>
     <string name="settingsHeadingAbout">O nama</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGou</string>
     <string name="settingsVersion">Verzija</string>
@@ -178,6 +179,8 @@
     <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
     <string name="openAutoCompleteSettings">Otvori postavke</string>
+    <string name="privateSearchChatSuggestionsToggle">Prijedlozi za čavrljanje</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Prikaži prijedloge iz tvoje povijesti, oznaka i (izborno) povijesti čavrljanja na Duck.ai dok tipkaš u traku za pretraživanje. Sva su pretraživanja privatna.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Općenito</string>
@@ -209,12 +212,78 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Izražava prava na isključenje u tvoje ime, govoreći stranicama da ne prodaju i ne dijele tvoje osobne podatke.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
+    <string name="getDesktopBrowserTitle">Zaštiti svoje osobne podatke na Macu i Windowsima!</string>
+    <string name="getDesktopBrowserBody">Za preuzimanje DuckDuckGo na Mac ili Windows, posjeti:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Podijeli poveznicu za preuzimanje</string>
+    <string name="getDesktopBrowserNoThanks">Ne, hvala</string>
+    <string name="getDesktopBrowserHideItem">Sakrij</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Poveznica je kopirana</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Brisanje podataka</string>
+    <string name="dataClearingDescription">Brisanje podataka može pomoći u zaštiti tvoje privatnosti na mreži. Pomoću Fire Buttona ručno izbriši podatke ili postavi automatsko brisanje.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d lokacija isključena iz brisanja</item>
+        <item quantity="few">%1$d lokacije isključene iz brisanja</item>
+        <item quantity="many">%1$d lokacija isključenih iz brisanja</item>
+        <item quantity="other">%1$d lokacija isključenih iz brisanja</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Uključeno</string>
+    <string name="dataClearingAutomaticClearingOff">Isključeno</string>
+    <string name="dataClearingClearBrowsingData">Izbriši podatke o pregledavanju</string>
+    <string name="dataClearingAutomaticDataClearing">Automatski izbrisati podatke</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatski izbrisati podatke</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zatvori sve otvorene kartice</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Izbriši sve podatke mrežne lokacije, uključujući posjećene mrežne lokacije. Možda će te odjaviti s računa.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Izbriši sve razgovore, uključujući prikvačene razgovore</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Odaberi što želiš izbrisati</string>
+    <string name="dataClearingOptionTabs">Kartice</string>
+    <string name="dataClearingOptionData">Kolačići i podaci mrežne lokacije</string>
+    <string name="dataClearingDuckAiChats">Duck.ai čavrljanja</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Izbriši sve čavrljanja</string>
+    <string name="fireDialogDeleteButton">Izbriši</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zatvori karticu</item>
+        <item quantity="few">Zatvori sve %1$d kartice</item>
+        <item quantity="many">Zatvori svih %1$d kartica</item>
+        <item quantity="other">Zatvori svih %1$d kartica</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Možda će te odjaviti s računa.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nijedno</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
+        <item quantity="few">Izbriši s %1$d mrežne lokacije. Možda će te odjaviti s računa.</item>
+        <item quantity="many">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
+        <item quantity="other">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Izbrisati kartice i podatke mrežne lokacije?</string>
+    <string name="singleTabFireDialogTitleWithChats">Izbrisati kartice, podatke mrežne lokacije i čavrljanja?</string>
+    <string name="singleTabFireDialogDeleteAll">Izbriši sve</string>
+    <string name="singleTabFireDialogDeleteThisTab">Izbriši ovu karticu</string>
+    <string name="singleTabFireDialogDeleteChat">Izbriši čavrljanje</string>
+    <string name="singleTabFireDialogTitleDuckAi">Izbrisati ovo čavrljanje?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="few">%1$d kartice i njihovi podaci izbrisani</item>
+        <item quantity="many">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="other">%1$d kartica i njihovi podaci izbrisani</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
@@ -233,15 +302,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Kartice, podaci i razgovori s Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Očisti na…</string>
+    <string name="settingsAutomaticallyClearWhen">Izbriši dana…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Izbriši dana…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izlaz iz aplikacije</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izlaz iz aplikacije, neaktivna 5 sekundi</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izlaz iz aplikacije, neaktivna 5 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izlaz iz aplikacije, neaktivna 15 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izlaz iz aplikacije, neaktivna 30 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivna 1 sat</string>
-    <string name="settingsClearAiDataTitle">Izbriši razgovore s Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Izbriši Duck.ai čavrljanja</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button će također izbrisati povijest Duck.ai, uključujući prikvačene razgovore.</string>
     <string name="settingsClearDataActionSecondaryText">Briše sve kartice i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Briše sve kartice, razgovore na Duck.ai i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>
@@ -793,7 +862,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
     <string name="preOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
     <string name="preOnboardingDaxDialog2Button">Odaberi preglednik</string>
@@ -805,6 +876,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
@@ -857,9 +929,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Isprobaj besplatno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Jeste li znali?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 
@@ -926,11 +1000,16 @@
     <string name="settingsHeadingCompleteSetup">Dovrši postavljanje</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Prikaži broj alata za praćenje (tragača) u prebacivaču kartica (Tab Switcher)</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s alat za praćenje blokiran &lt;/b&gt; u posljednjih 7 dana</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Sakrij broj tragača?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ovo možeš ponovno uključiti kroz Postavke &gt; Izgled.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Sakrij</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zadrži</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacija blokiranih alata za praćenje</string>
+    <string name="showTrackerCountInAddressBar">Prikaži u adresnoj traci</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Prikaži u upravitelju kartica</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Samo pretraživanje</string>

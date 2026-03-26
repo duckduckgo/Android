@@ -138,6 +138,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
             android:id="@+id/actionBottomSheetButton"
@@ -145,6 +152,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeActionBottomSheetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
@@ -154,6 +182,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeActionBottomSheetButtonWithTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
             android:id="@+id/promoBottomSheetButton"
@@ -161,6 +210,27 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composePromoBottomSheetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
@@ -170,6 +240,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composePromoBottomSheetButtonWithTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view"/>
+
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             app:daxButtonSize="large"
             android:id="@+id/promoBottomSheetButtonWithImage"
@@ -177,6 +268,20 @@
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose"/>
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composePromoBottomSheetButtonWithImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"

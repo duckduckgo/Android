@@ -86,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:leadingIcon="@drawable/ic_tabs_24"
-                    app:primaryText="@string/fireDialogOptionTabs"
+                    app:primaryText="@string/dataClearingOptionTabs"
                     app:secondaryText="Close all tabs"
                     app:showSwitch="true" />
 
@@ -107,7 +107,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:leadingIcon="@drawable/ic_cookie_24"
-                    app:primaryText="@string/fireDialogOptionData"
+                    app:primaryText="@string/dataClearingOptionData"
                     app:secondaryText="@string/fireDialogOptionDataDescriptionNoHistory"
                     app:showSwitch="true" />
 
@@ -129,7 +129,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:leadingIcon="@drawable/ic_ai_chat_24"
-                    app:primaryText="@string/fireDialogOptionDuckAiChats"
+                    app:primaryText="@string/dataClearingDuckAiChats"
                     app:secondaryText="@string/fireDialogOptionDuckAiChatsDescription"
                     app:showSwitch="true" />
 

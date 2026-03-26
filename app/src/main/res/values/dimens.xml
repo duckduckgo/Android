@@ -20,5 +20,6 @@
     <dimen name="recyclerViewOneFabBottomPadding">76dp</dimen>
     <dimen name="recyclerViewTwoFabsBottomPadding">136dp</dimen>
     <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
+    <dimen name="getDesktopBrowserMaxItemWidth">600dp</dimen>
     <bool name="show_wing_animation">false</bool>
 </resources>

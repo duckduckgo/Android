@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.pir.impl.store.PirRepository
@@ -38,8 +39,18 @@ interface PirRemoteFeatures {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    @InternalAlwaysEnabled
     fun pirBeta(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun useBundledBrokerJsons(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun trackerBlocking(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun ensureBrokerDataBeforeScan(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)

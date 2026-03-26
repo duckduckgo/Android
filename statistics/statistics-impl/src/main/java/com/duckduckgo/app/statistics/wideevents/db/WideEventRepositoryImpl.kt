@@ -90,11 +90,13 @@ class WideEventRepositoryImpl @Inject constructor(
 
     override suspend fun getActiveWideEventIds(): List<Long> = wideEventDao.getActiveWideEventIds()
 
+    override suspend fun getCompletedWideEventIds(): List<Long> = wideEventDao.getCompletedWideEventIds()
+
     override suspend fun getActiveWideEventIdsByName(eventName: String): List<Long> = wideEventDao.getActiveWideEventIdsByName(eventName)
 
     override suspend fun deleteWideEvent(eventId: Long): Boolean = wideEventDao.deleteWideEvent(eventId) > 0
 
-    override fun getCompletedWideEventIdsFlow(): Flow<Set<Long>> = wideEventDao.getCompletedWideEventIdsFlow().map { it.toSet() }
+    override fun hasCompletedWideEvents(): Flow<Boolean> = wideEventDao.hasCompletedWideEvents()
 
     override suspend fun getWideEvents(ids: Set<Long>): List<WideEventRepository.WideEvent> {
         if (ids.isEmpty()) return emptyList()
@@ -142,13 +144,17 @@ class WideEventRepositoryImpl @Inject constructor(
                 }
 
             duration = Duration.between(interval.startedAt, timeProvider.getCurrentTime())
-            val durationBucket = INTERVAL_BUCKETS.firstOrNull { it >= duration } ?: INTERVAL_BUCKETS.last()
+            val bucketValue = if (duration.isNegative) {
+                NEGATIVE_INTERVAL_BUCKET_VALUE
+            } else {
+                INTERVAL_BUCKETS.last { it <= duration }.toMillis().toString()
+            }
 
             event.copy(
                 metadata =
                 mergeMetadata(
                     existingMetadata = event.metadata,
-                    newMetadata = mapOf(interval.name to durationBucket.toMillis().toString()),
+                    newMetadata = mapOf(interval.name to bucketValue),
                 ),
                 activeIntervals = event.activeIntervals - interval,
             )
@@ -176,8 +182,11 @@ class WideEventRepositoryImpl @Inject constructor(
     }
 
     private companion object {
+        const val NEGATIVE_INTERVAL_BUCKET_VALUE = "-1"
+
         val INTERVAL_BUCKETS =
             listOf(
+                Duration.ZERO,
                 Duration.ofSeconds(1),
                 Duration.ofSeconds(5),
                 Duration.ofSeconds(10),

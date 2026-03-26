@@ -1,0 +1,66 @@
+{
+  "name": "SmartBackgroundChecks",
+  "url": "smartbackgroundchecks.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678082400000,
+  "optOutUrl": "https://www.smartbackgroundchecks.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "290d3add-c786-4ecf-a528-50b2a240f791",
+          "url": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${city}/${state}"
+        },
+        {
+          "actionType": "extract",
+          "id": "2e04c4da-5f4b-4ab3-bd9e-4d4300d51f63",
+          "selector": "//div[contains(@class, 'card-block') and not(.//text()[contains(., 'Paid Results')])]",
+          "noResultsFound": "//h1[contains(text(), '0 Results')]",
+          "profile": {
+            "name": {
+              "selector": ".name-list-title"
+            },
+            "age": {
+              "selector": ".//h2/span[@class='h2SubTitle']",
+              "afterText": "- Age"
+            },
+            "addressCityState": {
+              "selector": ".//h2/span[@class='h2SubTitle']",
+              "beforeText": "- Age",
+              "afterText": "-"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[contains(text(),'Used to live in')]",
+              "separator": "/Used to live in |, /"
+            },
+            "relativesList": {
+              "selector": ".//div[contains(text(), 'Related to')]/span//a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//h2//a",
+              "identifierType": "path",
+              "identifier": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

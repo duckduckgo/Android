@@ -41,6 +41,8 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_UPSELL_BANNER,
+    featureName = "pluginPProUpsellBannerPlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,

@@ -15,6 +15,7 @@
  */
 package com.duckduckgo.subscriptions.impl
 
+import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
@@ -29,6 +30,7 @@ class SubscriptionsJSHelperDummy @Inject constructor() : SubscriptionsJSHelper {
         method: String,
         id: String?,
         data: JSONObject?,
+        context: Context?,
     ): JsCallbackData? {
         return null
     }

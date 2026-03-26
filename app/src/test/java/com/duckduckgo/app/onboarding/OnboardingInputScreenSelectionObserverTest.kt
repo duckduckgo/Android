@@ -141,6 +141,28 @@ class OnboardingInputScreenSelectionObserverTest {
         }
 
     @Test
+    fun whenAppRestartsWithStageAlreadyEstablishedThenDoNotReApplyOnboardingSelection() =
+        runTest {
+            userAppStageFlow.value = AppStage.ESTABLISHED
+
+            whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)
+            whenever(mockOnboardingStore.getInputScreenSelection()).thenReturn(true)
+            whenever(mockDuckChat.observeInputScreenUserSettingEnabled()).thenReturn(inputScreenSettingFlow)
+            whenever(mockDuckChat.observeCosmeticInputScreenUserSettingEnabled()).thenReturn(cosmeticInputScreenSettingFlow)
+
+            OnboardingInputScreenSelectionObserver(
+                mockAppCoroutineScope,
+                dispatcherProvider,
+                mockUserStageStore,
+                mockOnboardingStore,
+                mockDuckChat,
+                mockInputScreenOnboardingWideEvent,
+            )
+
+            verify(mockDuckChat, never()).setInputScreenUserSetting(any())
+        }
+
+    @Test
     fun whenUserChangesInputScreenSettingBeforeEstablishedThenMarkAsOverriddenByUser() =
         runTest {
             whenever(mockUserStageStore.userAppStageFlow()).thenReturn(userAppStageFlow)

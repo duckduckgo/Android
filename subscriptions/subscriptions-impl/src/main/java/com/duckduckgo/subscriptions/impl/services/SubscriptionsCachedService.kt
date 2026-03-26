@@ -18,8 +18,22 @@ package com.duckduckgo.subscriptions.impl.services
 
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface SubscriptionsCachedService {
+    @Deprecated("Use featuresV2 instead")
     @GET("https://subscriptions.duckduckgo.com/api/products/{sku}/features")
     suspend fun features(@Path("sku") sku: String): FeaturesResponse
+
+    @GET("https://subscriptions.duckduckgo.com/api/v2/features")
+    suspend fun featuresV2(@Query("sku") sku: String): FeaturesV2Response
 }
+
+data class FeaturesV2Response(
+    val features: Map<String, List<TierFeatureResponse>>,
+)
+
+data class TierFeatureResponse(
+    val product: String,
+    val name: String, // e.g. "Plus", "Pro" (Tier)
+)

@@ -127,6 +127,14 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun omnibarAnimation(): Toggle
 
+    /**
+     * @return `true` when the remote config has the global "showNTPAfterIdleReturn" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun showNTPAfterIdleReturn(): Toggle
+
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
@@ -180,6 +188,14 @@ interface AndroidBrowserConfigFeature {
     fun vpnMenuItem(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "vpnMenuItemInternational" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun vpnMenuItemInternational(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "splitOmnibar" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -189,21 +205,22 @@ interface AndroidBrowserConfigFeature {
     fun splitOmnibar(): Toggle
 
     /**
+     * Controls whether the split omnibar option is shown in the welcome page onboarding flow.
+     * @return `true` when the remote config has the global "splitOmnibarWelcomePage" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.InternalAlwaysEnabled
+    fun splitOmnibarWelcomePage(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "repotWebViewCapabilities" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun reportWebViewCapabilities(): Toggle
-
-    /**
-     * @return `true` when the remote config has the global "handleAboutBlank" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
-    fun handleAboutBlank(): Toggle
 
     /**
      * @return `true` when the remote config has the global "useUrlPredictor" androidBrowserConfig
@@ -231,20 +248,100 @@ interface AndroidBrowserConfigFeature {
     fun showInputScreenOnboarding(): Toggle
 
     /**
-     * Controls default URL display for new users only.
-     * @return `true` when the remote config has the global "shorterUrlDefault" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `true`
+     * Controls the duck-ai related copy updates related to browser onboarding
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun shorterUrlDefault(): Toggle
+    fun onboardingDuckAiCopyUpdatesFeb26(): Toggle
 
     /**
      * Controls the fire dialog and data clearing options.
-     * @return `true` when the remote config has the global "moreGranularDataClearingOptions" androidBrowserConfig
+     * @return `true` when the remote config has the global "granularFireDialog" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun moreGranularDataClearingOptions(): Toggle
+    fun granularFireDialog(): Toggle
+
+    /**
+     * Controls the experimental browsing menu in appearance settings.
+     * @return `true` when the remote config has the global "experimentalBrowsingMenu" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun experimentalBrowsingMenu(): Toggle
+
+    /**
+     * Controls the rollout of the new browser bottom-sheet menu to 100% of users.
+     * Independent of the Settings visibility toggle ("experimentalBrowsingMenu").
+     * @return `true` when the remote config has the global "rolloutBrowsingMenu" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun rolloutBrowsingMenu(): Toggle
+
+    /**
+     * Controls whether verified install/update pixels are sent.
+     * @return `true` when the remote config has the global "sendVerifiedInstallPixels" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendVerifiedInstallPixels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshDuckAiOnSubscriptionChanges(): Toggle
+
+    /**
+     * Controls whether tracker animation is disabled when the app restarts.
+     * @return `true` when the remote config has the global "disableTrackerAnimationOnRestart" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun disableTrackerAnimationOnRestart(): Toggle
+
+    /**
+     * Controls whether data clearing wide events are sent.
+     * @return `true` when the remote config has the global "sendDataClearingWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendDataClearingWideEvent(): Toggle
+
+    /**
+     * Controls the single tab fire dialog that allows deleting a single tab's data.
+     * @return `true` when the remote config has the global "singleTabFireDialog" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun singleTabFireDialog(): Toggle
+
+    /**
+     * Controls whether the state saving for some of the views inside the BrowserTabFragment is disabled or not
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
+    fun reduceBrowserTabBundleSize(): Toggle
+
+    /**
+     * Controls whether page load wide events are sent.
+     * @return `true` when the remote config has the global "sendPageLoadWideEvent" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun sendPageLoadWideEvent(): Toggle
+
+    /**
+     * Controls whether page content is cached in Room for each tab.
+     * @return `true` when the remote config has the global "storePageContext" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun storePageContext(): Toggle
 }

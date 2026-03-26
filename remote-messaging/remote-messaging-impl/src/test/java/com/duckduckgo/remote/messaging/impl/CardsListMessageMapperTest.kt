@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
@@ -28,6 +29,7 @@ import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.*
@@ -96,7 +98,7 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(3, content.listItems.size)
 
-        val item1 = content.listItems[0]
+        val item1 = content.listItems[0] as CardItem.ListItem
         assertEquals("feature1", item1.id)
         assertEquals(CardItemType.TWO_LINE_LIST_ITEM, item1.type)
         assertEquals("Feature One", item1.titleText)
@@ -105,12 +107,12 @@ class CardsListMessageMapperTest {
         assertTrue(item1.primaryAction is Action.Url)
         assertEquals("https://example.com/feature1", (item1.primaryAction as Action.Url).value)
 
-        val item2 = content.listItems[1]
+        val item2 = content.listItems[1] as CardItem.ListItem
         assertEquals("feature2", item2.id)
         assertEquals("Feature Two", item2.titleText)
         assertEquals(Content.Placeholder.RADAR, item2.placeholder)
 
-        val item3 = content.listItems[2]
+        val item3 = content.listItems[2] as CardItem.ListItem
         assertEquals("feature3", item3.id)
         assertEquals("Feature Three", item3.titleText)
         assertEquals(Content.Placeholder.KEY_IMPORT, item3.placeholder)
@@ -232,6 +234,46 @@ class CardsListMessageMapperTest {
     }
 
     @Test
+    fun whenCardsListMessageWithImageUrlsThenMapCorrectly() {
+        val listItems = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature One",
+                descriptionText = "Description",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+                imageUrl = "https://example.com/image1.png",
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Feature Two",
+                descriptionText = "Description",
+                placeholder = "Radar",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+                imageUrl = null,
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(id = "cards-img", content = cardsListJsonContent(listItems = listItems)),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(2, content.listItems.size)
+
+        val item1 = content.listItems[0] as CardItem.ListItem
+        assertEquals("https://example.com/image1.png", item1.imageUrl)
+
+        val item2 = content.listItems[1] as CardItem.ListItem
+        assertNull(item2.imageUrl)
+    }
+
+    @Test
     fun whenCardsListMessageWithDifferentPlaceholdersThenMapCorrectly() {
         val listItemsWithDifferentPlaceholders = listOf(
             JsonListItem(
@@ -267,8 +309,8 @@ class CardsListMessageMapperTest {
         assertEquals(1, remoteMessages.size)
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(Content.Placeholder.DDG_ANNOUNCE, content.placeholder)
-        assertEquals(Content.Placeholder.DUCK_AI, content.listItems[0].placeholder)
-        assertEquals(Content.Placeholder.PRIVACY_SHIELD, content.listItems[1].placeholder)
+        assertEquals(Content.Placeholder.DUCK_AI, (content.listItems[0] as CardItem.ListItem).placeholder)
+        assertEquals(Content.Placeholder.PRIVACY_SHIELD, (content.listItems[1] as CardItem.ListItem).placeholder)
     }
 
     @Test
@@ -317,12 +359,93 @@ class CardsListMessageMapperTest {
         val content = remoteMessages.first().content as Content.CardsList
         assertEquals(3, content.listItems.size)
 
-        assertTrue(content.listItems[0].primaryAction is Action.Url)
-        assertTrue(content.listItems[1].primaryAction is Action.Dismiss)
-        assertTrue(content.listItems[2].primaryAction is Action.Share)
+        assertTrue((content.listItems[0] as CardItem.ListItem).primaryAction is Action.Url)
+        assertTrue((content.listItems[1] as CardItem.ListItem).primaryAction is Action.Dismiss)
+        assertTrue((content.listItems[2] as CardItem.ListItem).primaryAction is Action.Share)
 
-        val shareAction = content.listItems[2].primaryAction as Action.Share
+        val shareAction = (content.listItems[2] as CardItem.ListItem).primaryAction as Action.Share
         assertEquals("Share this!", shareAction.value)
         assertEquals("Share Title", shareAction.title)
+    }
+
+    @Test
+    fun whenCardsListMessageWithMatchingAndExclusionRulesThenMapCorrectly() {
+        val listItemsWithRules = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature One",
+                descriptionText = "First feature",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com/1", additionalParameters = null),
+                matchingRules = listOf(1, 2, 3),
+                exclusionRules = listOf(4, 5),
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Feature Two",
+                descriptionText = "Second feature",
+                placeholder = "Radar",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com/2", additionalParameters = null),
+                matchingRules = listOf(6),
+                exclusionRules = emptyList(),
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(
+                id = "cards10",
+                content = cardsListJsonContent(listItems = listItemsWithRules),
+            ),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(2, content.listItems.size)
+
+        val item1 = content.listItems[0] as CardItem.ListItem
+        assertEquals("item1", item1.id)
+        assertEquals(listOf(1, 2, 3), item1.matchingRules)
+        assertEquals(listOf(4, 5), item1.exclusionRules)
+
+        val item2 = content.listItems[1] as CardItem.ListItem
+        assertEquals("item2", item2.id)
+        assertEquals(listOf(6), item2.matchingRules)
+        assertEquals(emptyList<Int>(), item2.exclusionRules)
+    }
+
+    @Test
+    fun whenCardsListMessageWithoutRulesThenDefaultToEmptyLists() {
+        val listItemsWithoutRules = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Feature",
+                descriptionText = "Description",
+                placeholder = "ImageAI",
+                primaryAction = JsonMessageAction(type = "url", value = "https://example.com", additionalParameters = null),
+            ),
+        )
+
+        val jsonMessages = listOf(
+            aJsonMessage(
+                id = "cards11",
+                content = cardsListJsonContent(listItems = listItemsWithoutRules),
+            ),
+        )
+
+        val remoteMessages = jsonMessages.mapToRemoteMessage(Locale.US, messageActionPlugins)
+
+        assertEquals(1, remoteMessages.size)
+        val content = remoteMessages.first().content as Content.CardsList
+        assertEquals(1, content.listItems.size)
+
+        val item = content.listItems[0] as CardItem.ListItem
+        assertEquals("item1", item.id)
+        assertEquals(emptyList<Int>(), item.matchingRules)
+        assertEquals(emptyList<Int>(), item.exclusionRules)
     }
 }

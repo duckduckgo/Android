@@ -20,7 +20,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -29,6 +28,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -46,9 +46,11 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,6 +80,7 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
+    private val duckChat: DuckChat,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
@@ -101,11 +104,13 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun isPrivacyProCtaAvailable(): Boolean =
-        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+        subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
-    private suspend fun requiredDaxOnboardingCtas(): Array<CtaId> {
+    // Exposed for onboarding dev settings and tests. Used internally for completion checks
+    @VisibleForTesting
+    suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
         return if (isPrivacyProCtaAvailable()) {
-            arrayOf(
+            listOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -114,7 +119,7 @@ class CtaViewModel @Inject constructor(
                 CtaId.DAX_INTRO_PRIVACY_PRO,
             )
         } else {
-            arrayOf(
+            listOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
                 CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -252,17 +257,18 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            // Privacy Pro
+            // Privacy Pro onboarding
             canShowPrivacyProCta() -> {
-                val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
-                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
-                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
-                } else {
-                    R.string.onboardingPrivacyProDaxDialogOkButton
-                }
+                DaxBubbleCta.DaxPrivacyProCta(
+                    onboardingStore,
+                    appInstallStore,
+                    isFreeTrialCopy = freeTrialCopyAvailable(),
+                )
+            }
 
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
+            // Privacy Pro onboarding for returning users who skipped onboarding
+            canShowPrivacyProCtaForSkippedOnboarding() -> {
+                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
             // Add Widget
@@ -298,6 +304,14 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private suspend fun canShowPrivacyProCta(): Boolean =
         daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && isPrivacyProCtaAvailable()
+
+    @WorkerThread
+    private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
+            hideTips() &&
+            appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogPrivacyProShown() &&
+            isPrivacyProCtaAvailable()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -380,7 +394,7 @@ class CtaViewModel @Inject constructor(
 
         if (subscriptions.isPrivacyProUrl(uri)) return true
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoChatUrl(uri.toString())) return true
+        if (duckChat.isDuckChatUrl(uri)) return true
 
         val isDuckPlayerUrl =
             duckPlayer.getDuckPlayerState() == DuckPlayerState.ENABLED &&
@@ -474,14 +488,21 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    @Deprecated("New users won't have this option available since extended onboarding")
     private fun hideTips() = settingsDataStore.hideTips
 
     fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
+    suspend fun isPromoOnboardingDialogShowing(): Boolean =
+        withContext(dispatchers.io()) {
+            canShowPrivacyProCtaForSkippedOnboarding()
+        }
+
+    private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
+
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
+        private const val PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS = 7L
     }
 }

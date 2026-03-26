@@ -32,6 +32,7 @@
     <string name="browserMenuEmailAlias">Generate Duck Address</string>
     <string name="browserMenuFindInPage">Find in Page</string>
     <string name="browserMenuPrint">Print Page</string>
+    <string name="browserMenuPrintSite">Print</string>
     <string name="browserMenuOpenAppLink">Open in App</string>
     <string name="browserMenuAddToHome">Add to Home Screen</string>
     <string name="browserMenuReportBrokenSite">Report Broken Site</string>
@@ -44,11 +45,15 @@
     <string name="browserMenuNewChat">New Chat</string>
     <string name="browserMenuNewAIChat">New AI Chat</string>
     <string name="browserMenuChatHistory">Chat History</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai Chats</string>
     <string name="browserMenuChatSettings">Duck.ai Settings</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Try for free</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Back</string>
     <string name="browserMenuForward">Forward</string>
     <string name="browserMenuRefresh">Refresh</string>
+    <string name="browserMenuFire">Clear Tabs and Data</string>
 </resources>

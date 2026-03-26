@@ -258,4 +258,87 @@ class LoadUrlCompleteEventHandlerTest {
         assertEquals(0, result.nextState.actionRetryCount)
         assertEquals(1, result.nextState.currentActionIndex)
     }
+
+    @Test
+    fun whenLoadUrlCompleteWhilePreseedingThenClearsPendingUrlAndReturnsExecuteNextBrokerStep() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                currentBrokerStepIndex = 0,
+                currentActionIndex = 0,
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlComplete(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        assertNull(result.nextState.pendingUrl)
+        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        assertNull(result.sideEffect)
+        // Verify indices are not changed during preseeding completion
+        assertEquals(0, result.nextState.currentBrokerStepIndex)
+        assertEquals(0, result.nextState.currentActionIndex)
+    }
+
+    @Test
+    fun whenLoadUrlCompleteWhilePreseedingAndUrlIsRedirectedThenStillClearsAndProceeds() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com/original",
+                currentBrokerStepIndex = 1,
+                currentActionIndex = 2,
+                preseeding = true,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlComplete(url = "https://broker.com/redirected")
+
+        val result = testee.invoke(state, event)
+
+        assertNull(result.nextState.pendingUrl)
+        assertEquals(ExecuteNextBrokerStep, result.nextEvent)
+        // Verify preseeding state is preserved (not modified by this handler)
+        assertEquals(true, result.nextState.preseeding)
+    }
+
+    @Test
+    fun whenLoadUrlCompleteNotPreseedingThenProceedsToNextAction() = runTest {
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = emptyList(),
+                profileQuery = testProfileQuery,
+                pendingUrl = "https://broker.com",
+                currentBrokerStepIndex = 0,
+                currentActionIndex = 0,
+                preseeding = false,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = LoadUrlComplete(url = "https://broker.com")
+
+        val result = testee.invoke(state, event)
+
+        assertNull(result.nextState.pendingUrl)
+        // When not preseeding, it should proceed to next action
+        assertEquals(1, result.nextState.currentActionIndex)
+        assertEquals(
+            ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery)),
+            result.nextEvent,
+        )
+    }
 }

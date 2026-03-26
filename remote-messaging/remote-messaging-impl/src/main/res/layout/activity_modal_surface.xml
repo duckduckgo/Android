@@ -18,7 +18,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.remote.messaging.impl.ui.CardsListRemoteMessageView
+    <com.duckduckgo.remote.messaging.impl.modal.cardslist.CardsListRemoteMessageView
         android:id="@+id/cardsListRemoteMessageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

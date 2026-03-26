@@ -83,7 +83,7 @@
     <string name="subscriptionSettingSectionHelpAndSupport">Help and Support</string>
     <string name="subscriptionSettingSendFeedback">Send Feedback</string>
     <string name="subscriptionSettingActivating">Activating</string>
-    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% with a yearly plan</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Save %1$s%% With a Yearly Plan</string>
     <!-- smartling.character_limit = 10 -->
     <string name="subscriptionSettingSwitchUpgradePill">Best offer</string>
     <string name="subscriptionSettingSwitchDowngrade">Switch Plan</string>
@@ -107,8 +107,8 @@
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple Account > Subscriptions on a device signed in to the same Apple Account used to purchase your subscription.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
-    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
+    <string name="pirTitle">Activate the DuckDuckGo subscription on desktop to set up Personal Information Removal</string>
+    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Subscribe to DuckDuckGo</b> and click <b>I Have a Subscription</b> to get started.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -151,8 +151,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Call to advisor unhelpful</string>
     <string name="feedbackSubCategoryItrOther">Other</string>
 
-    <string name="feedbackSubCategorySubsOtp">One time password</string>
-    <string name="feedbackSubCategorySubsOther">Other</string>
+    <string name="feedbackSubCategorySubsOtp">Issue with one-time password</string>
+    <string name="feedbackSubCategorySubsOther">Something else</string>
 
     <string name="feedbackSubmitVpnHeader">Found an issue not covered in our <annotation type="faqs_link">help center</annotation> ? We definitely want to know about it.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Tell us what’s going on…</string>
@@ -168,7 +168,6 @@
     <string name="activitySubscriptions">Subscriptions</string>
     <string name="activitySubscriptionSettings">Subscription Settings</string>
     <string name="activityActivateSubscription">I Have a Subscription</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send Feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subscribers get our VPN, advanced AI models in Duck.ai, Personal Information Removal, and Identity Theft Restoration.</string>
@@ -193,5 +192,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Switching will increase your monthly price from %1$s/mo to %2$s/mo.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Keep Yearly Plan</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Switch to Monthly (%1$s/month)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Unable to access Plus or Pro tier features</string>
+    <string name="subscriptionsProUpgradeTitle">Upgrade to Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Unlock more powerful AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Manage Subscription</string>
+    <string name="subscriptionSettingViewAllPlans">View All Plans</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Manage Payment or Cancel</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will upgrade to %1$s on %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Your plan will downgrade to %1$s on %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Monthly</string>
+    <string name="planNamePlusYearly">Plus Yearly</string>
+    <string name="planNameProMonthly">Pro Monthly</string>
+    <string name="planNameProYearly">Pro Yearly</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

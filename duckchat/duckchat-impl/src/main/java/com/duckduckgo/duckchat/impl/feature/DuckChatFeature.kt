@@ -131,6 +131,12 @@ interface DuckChatFeature {
     fun showHideAiGeneratedImages(): Toggle
 
     /**
+     * @return `true` when the "Native Input Field" option should be visible in AI Features Settings.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun nativeInputField(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */
@@ -138,8 +144,72 @@ interface DuckChatFeature {
     fun sendInputScreenOnboardingWideEvent(): Toggle
 
     /**
+     * @return `true` when the contextual mode killswitch is enabled
+     * This overrules contextualMode and standaloneMigration
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun contextualModeKillSwitch(): Toggle
+
+    /**
      * @return `true` when the contextual mode is enabled
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun contextualMode(): Toggle
+
+    /**
+     * @return `true` when the feature flag for automatic page context attachment in contextual mode is enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun automaticContextAttachment(): Toggle
+
+    /**
+     * @return `true` when the contextual mode can attach more tha one context
+     * This is a capability flag, so it defaults to enabled unless remote config disables it.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun supportsMultipleContexts(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai Paid Settings status indicator and navigation features are enabled.
+     * This controls syncing the status indicator with DuckChat enabled state and showing the
+     * "Enable/Manage in AI Features Settings" item.
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAiPaidSettingsStatus(): Toggle
+
+    /**
+     * @return `true` when we can sync the deletion of duck chats to sync backend
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun supportsSyncChatsDeletion(): Toggle
+
+    /**
+     * @return `true` when the AI chat suggestions (pinned and recent chats) are enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun aiChatSuggestions(): Toggle
+
+    /**
+     * @return `true` when the tab attachment feature (@-mention tabs in chat) is enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun chatTabAttachments(): Toggle
+
+    /**
+     * @return `true` when the duck.ai voice entry point button is enabled in the input screen
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiVoiceEntryPoint(): Toggle
+
+    /**
+     * @return `true` when the "Default Toggle Position" setting should be visible in AI Features Settings.
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun rememberTogglePosition(): Toggle
 }

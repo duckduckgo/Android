@@ -23,8 +23,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.fragment.app.Fragment
+import com.duckduckgo.common.ui.compose.buttons.LargeSecondaryButton
+import com.duckduckgo.common.ui.compose.buttons.SmallGhostButton
+import com.duckduckgo.common.ui.compose.buttons.SmallPrimaryButton
+import com.duckduckgo.common.ui.compose.listitem.DaxOneLineListItem
+import com.duckduckgo.common.ui.compose.sheets.DaxActionBottomSheetDialog
+import com.duckduckgo.common.ui.compose.sheets.DaxPromoBottomSheetDialog
 import com.duckduckgo.common.ui.internal.R
+import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
+import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
 import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -36,11 +54,16 @@ import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
 import com.duckduckgo.mobile.android.R as CommonR
 
 /** Fragment to display a list of dialogs. */
 @SuppressLint("NoFragment") // we don't use DI here
 class DialogsFragment : Fragment() {
+    private val appComponentsViewModel by appComponentsViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,11 +73,14 @@ class DialogsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_components_dialogs, container, false)
     }
 
+    @Suppress("DenyListedApi")
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        val isDarkTheme = runBlocking { appComponentsViewModel.themeFlow.first() } == AppTheme.DARK
 
         view.findViewById<Button>(R.id.textAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
@@ -351,6 +377,38 @@ class DialogsFragment : Fragment() {
                         }
                     }
 
+                    view.setupThemedComposeView(R.id.composeActionBottomSheetButton, isDarkTheme) {
+                        val sheetState = rememberModalBottomSheetState()
+                        val scope = rememberCoroutineScope()
+                        var showBottomSheet by remember { mutableStateOf(false) }
+                        LargeSecondaryButton(
+                            text = "Action Bottom Sheet",
+                            onClick = { showBottomSheet = true },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (showBottomSheet) {
+                            DaxActionBottomSheetDialog(
+                                title = null,
+                                sheetState = sheetState,
+                                onDismissRequest = {
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) {
+                                            showBottomSheet = false
+                                        }
+                                    }
+                                },
+                                content = {
+                                    item {
+                                        DaxOneLineListItem("Primary Item")
+                                    }
+                                    item {
+                                        DaxOneLineListItem("Secondary Item")
+                                    }
+                                },
+                            )
+                        }
+                    }
+
                     view.findViewById<Button>(R.id.actionBottomSheetButtonWithTitle)?.let { button ->
                         button.setOnClickListener {
                             ActionBottomSheetDialog.Builder(requireContext())
@@ -369,6 +427,56 @@ class DialogsFragment : Fragment() {
                                     },
                                 )
                                 .show()
+                        }
+                    }
+
+                    view.setupThemedComposeView(R.id.composeActionBottomSheetButtonWithTitle, isDarkTheme) {
+                        val sheetState = rememberModalBottomSheetState()
+                        val scope = rememberCoroutineScope()
+                        var showBottomSheet by remember { mutableStateOf(false) }
+                        LargeSecondaryButton(
+                            text = "Action Bottom Sheet with title and icons",
+                            onClick = {
+                                showBottomSheet = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (showBottomSheet) {
+                            DaxActionBottomSheetDialog(
+                                title = "Title",
+                                sheetState = sheetState,
+                                onDismissRequest = {
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) {
+                                            showBottomSheet = false
+                                        }
+                                    }
+                                },
+                                content = {
+                                    item {
+                                        DaxOneLineListItem(
+                                            text = "Primary Item",
+                                            leadingIcon = {
+                                                DaxListItemTrailingIcon(
+                                                    painter = painterResource(CommonR.drawable.ic_add_24),
+                                                    contentDescription = null,
+                                                )
+                                            },
+                                        )
+                                    }
+                                    item {
+                                        DaxOneLineListItem(
+                                            text = "Secondary Item",
+                                            leadingIcon = {
+                                                DaxListItemTrailingIcon(
+                                                    painter = painterResource(CommonR.drawable.ic_add_24),
+                                                    contentDescription = null,
+                                                )
+                                            },
+                                        )
+                                    }
+                                },
+                            )
                         }
                     }
 
@@ -392,6 +500,38 @@ class DialogsFragment : Fragment() {
                                     },
                                 )
                                 .show()
+                        }
+                    }
+
+                    view.setupThemedComposeView(R.id.composePromoBottomSheetButton, isDarkTheme) {
+                        val sheetState = rememberModalBottomSheetState()
+                        val scope = rememberCoroutineScope()
+                        var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
+                        LargeSecondaryButton(
+                            text = "Promo Bottom Sheet",
+                            onClick = {
+                                showBottomSheet = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (showBottomSheet) {
+                            DaxPromoBottomSheetDialog(
+                                title = null,
+                                description = "Add our search widget to your home screen for quick, easy access.",
+                                promoIcon = null,
+                                onDismissRequest = dismiss::invoke,
+                                buttons = {
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                },
+                            )
                         }
                     }
 
@@ -419,6 +559,38 @@ class DialogsFragment : Fragment() {
                         }
                     }
 
+                    view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithTitle, isDarkTheme) {
+                        val sheetState = rememberModalBottomSheetState()
+                        val scope = rememberCoroutineScope()
+                        var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
+                        LargeSecondaryButton(
+                            text = "Promo Bottom Sheet with title",
+                            onClick = {
+                                showBottomSheet = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (showBottomSheet) {
+                            DaxPromoBottomSheetDialog(
+                                title = "Title",
+                                description = "Add our search widget to your home screen for quick, easy access.",
+                                promoIcon = null,
+                                onDismissRequest = dismiss::invoke,
+                                buttons = {
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                },
+                            )
+                        }
+                    }
+
                     view.findViewById<Button>(R.id.promoBottomSheetButtonWithImage)?.let { button ->
                         button.setOnClickListener {
                             PromoBottomSheetDialog.Builder(requireContext())
@@ -441,6 +613,38 @@ class DialogsFragment : Fragment() {
                                     },
                                 )
                                 .show()
+                        }
+                    }
+
+                    view.setupThemedComposeView(R.id.composePromoBottomSheetButtonWithImage, isDarkTheme) {
+                        val sheetState = rememberModalBottomSheetState()
+                        val scope = rememberCoroutineScope()
+                        var showBottomSheet by remember { mutableStateOf(false) }
+                        val dismiss = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
+                            }
+                        }
+                        LargeSecondaryButton(
+                            text = "Promo Bottom Sheet with image",
+                            onClick = {
+                                showBottomSheet = true
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        if (showBottomSheet) {
+                            DaxPromoBottomSheetDialog(
+                                title = "Title",
+                                description = "Add our search widget to your home screen for quick, easy access.",
+                                promoIcon = painterResource(CommonR.drawable.ic_bottom_sheet_promo_icon),
+                                onDismissRequest = dismiss::invoke,
+                                buttons = {
+                                    SmallGhostButton(text = "Button", onClick = dismiss::invoke)
+                                    SmallPrimaryButton(text = "Button", onClick = dismiss::invoke)
+                                },
+                            )
                         }
                     }
 

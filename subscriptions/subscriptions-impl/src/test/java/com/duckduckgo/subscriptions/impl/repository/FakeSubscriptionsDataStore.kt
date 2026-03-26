@@ -52,4 +52,6 @@ class FakeSubscriptionsDataStore(
     override var freeTrialActive: Boolean = false
     override fun canUseEncryption(): Boolean = supportEncryption
     override var subscriptionFeatures: String? = null
+    override var subscriptionEntitlements: String? = null
+    override var pendingPlans: String? = null
 }

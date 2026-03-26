@@ -430,6 +430,7 @@ class SubscriptionFeedbackViewModelTest {
     @Test
     fun whenSubCategoriesArePassedAsParamThenStringValuesShouldAlignSpec() = runTest {
         assertEquals("otp", SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD.asParams())
+        assertEquals("unableToAccessFeatures", SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES.asParams())
         assertEquals("somethingElse", SubscriptionFeedbackSubsSubCategory.OTHER.asParams())
 
         assertEquals(

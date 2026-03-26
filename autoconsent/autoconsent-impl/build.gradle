@@ -50,6 +50,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':settings-api') // temporary until we release new settings
+    implementation project(path: ':data-store-api')
 
     implementation AndroidX.appCompat
     implementation "com.squareup.logcat:logcat:_"

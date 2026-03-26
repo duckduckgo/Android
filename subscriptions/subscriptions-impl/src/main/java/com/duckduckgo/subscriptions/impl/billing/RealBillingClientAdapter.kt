@@ -42,6 +42,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -254,7 +255,12 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (result.responseCode) {
             BillingResponseCode.OK -> LaunchBillingFlowResult.Success
-            else -> LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
+            else -> {
+                logcat(priority = ERROR) {
+                    "Failed to launch subscription update flow: ${result.responseCode} ${result.debugMessage}"
+                }
+                LaunchBillingFlowResult.Failure(error = result.responseCode.toBillingError())
+            }
         }
     }
 

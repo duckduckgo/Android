@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.fire
 
+import com.duckduckgo.app.global.view.ClearDataResult
+
 /**
  * Interface for manual data clearing operations triggered by user actions (e.g., Fire button).
  */
@@ -26,4 +28,13 @@ interface ManualDataClearing {
      * @param wasAppUsedSinceLastClear whether the app was used since the last data clear
      */
     suspend fun clearDataUsingManualFireOptions(shouldRestartIfRequired: Boolean = false, wasAppUsedSinceLastClear: Boolean = false)
+
+    /**
+     * Clears all data associated with tab:
+     * site browsing data (via WebStorageCompat), tab-specific history,
+     * Duck.ai chat (if applicable), and the tab itself.
+     * @param tabId the tab to burn
+     * @return [ClearDataResult] indicating whether the operation succeeded or the feature is not supported
+     */
+    suspend fun clearSingleTabData(tabId: String): ClearDataResult
 }

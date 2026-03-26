@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.Editable
 import android.transition.ChangeBounds
@@ -57,12 +59,15 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
-import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationFeatureToggle
 import com.duckduckgo.app.browser.api.OmnibarRepository
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
@@ -76,7 +81,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.TextListener
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
-import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
@@ -97,6 +101,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -120,10 +125,12 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogoAnimator
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogos
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors.isColorLight
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
@@ -196,9 +203,6 @@ class OmnibarLayout @JvmOverloads constructor(
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var addressBarTrackersAnimationFeatureToggle: AddressBarTrackersAnimationFeatureToggle
-
-    @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
@@ -226,6 +230,8 @@ class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
     private var customTabToolbarColor: Int = 0
+    private var lastAnimatedLogoUrl: String? = null
+    private var easterEggLogoAnimator: ObjectAnimator? = null
 
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
@@ -591,10 +597,6 @@ class OmnibarLayout @JvmOverloads constructor(
         duckAISidebar.setOnClickListener {
             omnibarItemPressedListener?.onDuckAISidebarButtonPressed()
         }
-        newCustomTabToolbarContainer.customTabInnerContainer.setOnLongClickListener {
-            viewModel.onCustomTabUrlLongClicked()
-            true
-        }
     }
 
     override fun setLogoClickListener(logoClickListener: LogoClickListener) {
@@ -647,15 +649,6 @@ class OmnibarLayout @JvmOverloads constructor(
             if (Build.VERSION.SDK_INT < 28) {
                 omnibarCardShadow.cardElevation = 2f.toPx(context)
             }
-
-            shieldIconPulseAnimationContainer.updateLayoutParams {
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
-            }
         } else {
             // When omnibar is at the bottom, we're adding an additional space at the top
             omnibarCardShadow.updateLayoutParams {
@@ -675,12 +668,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
             shieldIconPulseAnimationContainer.updateLayoutParams {
                 flipOmnibarMargins()
-                (this as MarginLayoutParams).apply {
-                    if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
-                        // TODO when the animation is made permanent we should add this adjustment to the actual layout
-                        marginStart = 1.toPx()
-                    }
-                }
             }
 
             shieldIconPulseAnimationContainer.setPadding(
@@ -712,7 +699,7 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities, command.isCustomTab)
+                startTrackersAnimation(command.entities, command.isCustomTab, command.isAddressBarTrackersAnimationEnabled)
             }
 
             is LaunchInputScreen -> {
@@ -731,6 +718,8 @@ class OmnibarLayout @JvmOverloads constructor(
                     200,
                 )
             }
+
+            is Command.CancelEasterEggLogoAnimation -> cancelEasterEggLogoAnimation()
 
             is Command.CopyUrlToClipboard -> {
                 copyUrlToClipboardAndShowToast(command)
@@ -783,19 +772,16 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                if (serpEasterEggLogosToggles.feature().isEnabled()) {
-                    with(daxIcon) {
-                        setOnClickListener(null)
-                        show()
-                        Glide
-                            .with(this)
-                            .load(CommonR.drawable.ic_ddg_logo)
-                            .transition(withCrossFade())
-                            .placeholder(daxIcon.drawable)
-                            .into(this)
-                    }
-                } else {
-                    daxIcon.show()
+                with(daxIcon) {
+                    setOnClickListener(null)
+                    show()
+                    Glide
+                        .with(this)
+                        .load(CommonR.drawable.ic_ddg_logo)
+                        .transition(withCrossFade())
+                        .placeholder(daxIcon.drawable)
+                        .listener(null) // Clear any previous listener from EasterEggLogo
+                        .into(this)
                 }
                 shieldIcon.gone()
                 searchIcon.gone()
@@ -821,11 +807,13 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is EasterEggLogo -> {
                 daxIcon.show()
+                val logoUrl = leadingIconState.logoUrl
                 Glide
                     .with(daxIcon)
-                    .load(leadingIconState.logoUrl)
+                    .load(logoUrl)
                     .placeholder(daxIcon.drawable)
                     .transition(withCrossFade())
+                    .listener(EasterEggLogoListener(leadingIconState, logoUrl))
                     .into(daxIcon)
                 daxIcon.setOnClickListener {
                     viewModel.onLogoClicked()
@@ -912,6 +900,15 @@ class OmnibarLayout @JvmOverloads constructor(
 
         isScrollingEnabled = viewState.scrollingEnabled
 
+        if (viewState.isAddressBarTrackersAnimationEnabled) {
+            shieldIconPulseAnimationContainer.updateLayoutParams {
+                (this as MarginLayoutParams).apply {
+                    // TODO when the animation is made permanent we should add this adjustment to the actual layout
+                    marginStart = 1.toPx()
+                }
+            }
+        }
+
         renderTabIcon(viewState)
         renderPulseAnimation(viewState)
 
@@ -994,6 +991,8 @@ class OmnibarLayout @JvmOverloads constructor(
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
             }
+
+            is Decoration.CancelEasterEggLogoAnimation -> viewModel.onCancelAddressBarAnimations()
         }
     }
 
@@ -1058,9 +1057,19 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startTrackersAnimation(events: List<Entity>?, isCustomTab: Boolean) {
+    private fun cancelEasterEggLogoAnimation() {
+        easterEggLogoAnimator?.cancel()
+        easterEggLogoAnimator = null
+        daxIcon.rotation = 0f
+    }
+
+    private fun startTrackersAnimation(
+        events: List<Entity>?,
+        isCustomTab: Boolean,
+        isAddressBarTrackersAnimationEnabled: Boolean,
+    ) {
         if (!isCustomTab) {
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = addressBarTrackersBlockedAnimationShieldIcon,
@@ -1080,14 +1089,8 @@ class OmnibarLayout @JvmOverloads constructor(
                 )
             }
         } else if (omnibarRepository.isNewCustomTabEnabled) {
-            val (animationBackgroundColor, useLightAnimation) = if (!isDefaultToolbarColor(customTabToolbarColor)) {
-                val background = calculateAnimationBackgroundColor(customTabToolbarColor)
-                Pair(background, isColorLight(background))
-            } else {
-                Pair(customTabToolbarColor, null)
-            }
-
-            if (addressBarTrackersAnimationFeatureToggle.feature().isEnabled()) {
+            val animationBackgroundColor = calculateAnimationBackgroundColor(customTabToolbarColor)
+            if (isAddressBarTrackersAnimationEnabled) {
                 animatorHelper.startAddressBarTrackersAnimation(
                     context = context,
                     addressBarTrackersBlockedAnimationShieldIcon = newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon,
@@ -1105,7 +1108,7 @@ class OmnibarLayout @JvmOverloads constructor(
                     trackersAnimationView = newCustomTabToolbarContainer.trackersAnimation,
                     omnibarViews = customTabViews(),
                     entities = events,
-                    useLightAnimation = useLightAnimation,
+                    useLightAnimation = isColorLight(animationBackgroundColor),
                 )
             }
         }
@@ -1127,13 +1130,12 @@ class OmnibarLayout @JvmOverloads constructor(
                 }
 
             // For new custom tabs, determine light/dark variant based on container color
-            // Shield sits on secondaryToolbarColor background, so invert: light bg needs dark shield
+            // Shield sits on customTabToolbarColor background, so invert: light bg needs dark shield
             val useLightAnimation = if (viewMode is ViewMode.CustomTab &&
                 omnibarRepository.isNewCustomTabEnabled &&
                 !isDefaultToolbarColor(customTabToolbarColor)
             ) {
-                val secondaryToolbarColor = calculateAddressBarColor(customTabToolbarColor)
-                isColorLight(secondaryToolbarColor)
+                isColorLight(customTabToolbarColor)
             } else {
                 null // Use default theme-based selection
             }
@@ -1157,27 +1159,16 @@ class OmnibarLayout @JvmOverloads constructor(
                         }
                     }
 
-                    val animationBackgroundColor: Int
                     if (customTab.toolbarColor != 0 && !isDefaultToolbarColor(customTab.toolbarColor)) {
                         toolbar.background = customTab.toolbarColor.toDrawable()
                         toolbarContainer.background = customTab.toolbarColor.toDrawable()
 
                         val foregroundColor = calculateCustomTabForegroundColor(customTab.toolbarColor)
-                        val secondaryToolbarColor = calculateAddressBarColor(customTab.toolbarColor)
                         customTabCloseIcon.setColorFilter(foregroundColor)
-                        customTabDomain.setTextColor(calculateCustomTabForegroundColor(secondaryToolbarColor))
-                        customToolbarContainer.setCardBackgroundColor(secondaryToolbarColor)
                         browserMenuImageView.setColorFilter(foregroundColor)
-
-                        customToolbarContainer.setOnClickListener {
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
-                            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
-                        }
-
-                        animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
-                    } else {
-                        animationBackgroundColor = customTab.toolbarColor
+                        customTabDomain.setTextColor(foregroundColor)
                     }
+                    val animationBackgroundColor = calculateAnimationBackgroundColor(customTab.toolbarColor)
 
                     val iconBackground = newCustomTabToolbarContainer.animatedIconBackgroundView.background
                     if (iconBackground is android.graphics.drawable.GradientDrawable) {
@@ -1197,6 +1188,26 @@ class OmnibarLayout @JvmOverloads constructor(
 
                     customTabShieldIcon.setOnClickListener { _ ->
                         omnibarItemPressedListener?.onCustomTabPrivacyDashboardPressed()
+                    }
+
+                    customTabToolbar.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+                    }
+
+                    customTabToolbar.setOnLongClickListener {
+                        viewModel.onCustomTabUrlLongClicked()
+                        true
+                    }
+
+                    daxIcon.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY, type = PixelType.Daily())
+                    }
+
+                    customTabSceneRoot.setOnClickListener {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY, type = PixelType.Daily())
                     }
                 }
             }
@@ -1275,7 +1286,8 @@ class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun calculateAnimationBackgroundColor(mainToolbarColor: Int): Int {
-        return ColorUtils.blendARGB(mainToolbarColor, Color.WHITE, 0.12f)
+        val blendColor = if (isColorLight(mainToolbarColor)) Color.BLACK else Color.WHITE
+        return ColorUtils.blendARGB(mainToolbarColor, blendColor, 0.12f)
     }
 
     private fun renderCustomTab(viewMode: ViewMode.CustomTab) {
@@ -1392,7 +1404,9 @@ class OmnibarLayout @JvmOverloads constructor(
         translationY = y
     }
 
-    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled
+    override var isUiLocked: Boolean = false
+
+    override fun isOmnibarScrollingEnabled(): Boolean = isScrollingEnabled && !isUiLocked
 
     override fun isBottomNavEnabled(): Boolean = false
 
@@ -1409,6 +1423,33 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun disableViewStateSaving() {
+        customTabToolbarContainer.customTabDomainOnly.isSaveEnabled = false
+        customTabToolbarContainer.customTabDomain.isSaveEnabled = false
+        customTabToolbarContainer.customTabTitle.isSaveEnabled = false
+        customTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        customTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+
+        findInPage.findInPageContainer.isSaveEnabled = false
+        findInPage.findInPageMatches.isSaveEnabled = false
+        findInPage.nextSearchTermButton.isSaveEnabled = false
+        findInPage.previousSearchTermButton.isSaveEnabled = false
+        findInPage.findIcon.isSaveEnabled = false
+
+        newCustomTabToolbarContainer.customTabCloseIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.trackersAnimation.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.addressBarTrackersBlockedAnimationShieldIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDuckPlayerIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.daxIcon.isSaveEnabled = false
+        newCustomTabToolbarContainer.customTabDomain.isSaveEnabled = false
+
+        pageLoadingIndicator.isSaveEnabled = false
+        shieldIcon.isSaveEnabled = false
+        omnibarTextInput.isSaveEnabled = false
+    }
+
     override fun setExpanded(
         expanded: Boolean,
         animate: Boolean,
@@ -1416,6 +1457,12 @@ class OmnibarLayout @JvmOverloads constructor(
         when (omnibarType) {
             OmnibarType.SINGLE_TOP, OmnibarType.SPLIT -> super.setExpanded(expanded, animate)
             OmnibarType.SINGLE_BOTTOM -> (behavior as BottomAppBarBehavior).setExpanded(expanded)
+        }
+    }
+
+    override fun setMenuIcon(resId: Int) {
+        ContextCompat.getDrawable(context, resId)?.let {
+            browserMenuImageView.setImageDrawable(it)
         }
     }
 
@@ -1483,5 +1530,47 @@ class OmnibarLayout @JvmOverloads constructor(
 
     override fun gone() {
         visibility = View.GONE
+    }
+
+    /**
+     * Glide listener for Easter Egg logos that plays a wiggle animation once the image loads.
+     * Only animates once per unique logo URL, and skips animation for favourite logos.
+     */
+    private inner class EasterEggLogoListener(
+        private val leadingIconState: EasterEggLogo,
+        private val logoUrl: String,
+    ) : RequestListener<Drawable> {
+
+        override fun onLoadFailed(
+            e: GlideException?,
+            model: Any?,
+            target: Target<Drawable>,
+            isFirstResource: Boolean,
+        ): Boolean = false
+
+        override fun onResourceReady(
+            resource: Drawable,
+            model: Any,
+            target: Target<Drawable>?,
+            dataSource: DataSource,
+            isFirstResource: Boolean,
+        ): Boolean {
+            if (!leadingIconState.isFavourite && logoUrl != lastAnimatedLogoUrl) {
+                if (serpEasterEggLogosToggles.setFavourite().isEnabled()) {
+                    lastAnimatedLogoUrl = logoUrl
+                    daxIcon.postDelayed(
+                        {
+                            easterEggLogoAnimator = SerpEasterEggLogoAnimator.playWiggle(daxIcon)
+                        },
+                        EASTER_EGG_ANIMATION_DELAY_MS,
+                    )
+                }
+            }
+            return false
+        }
+    }
+
+    companion object {
+        private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
     }
 }

@@ -31,11 +31,14 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.PirJobConstants.BG_STATS_REPORT_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.CUSTOM_PIXEL_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.EMAIL_CONFIRMATION_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.common.PirJobConstants.SCHEDULED_SCAN_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker
 import com.duckduckgo.pir.impl.email.PirEmailConfirmationRemoteWorker.Companion.TAG_EMAIL_CONFIRMATION
+import com.duckduckgo.pir.impl.pixels.PirBackgroundScanStatsWorker
+import com.duckduckgo.pir.impl.pixels.PirBackgroundScanStatsWorker.Companion.TAG_PIR_BACKGROUND_STATS_DAILY
 import com.duckduckgo.pir.impl.pixels.PirCustomStatsWorker
 import com.duckduckgo.pir.impl.pixels.PirCustomStatsWorker.Companion.TAG_PIR_RECURRING_CUSTOM_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
@@ -71,6 +74,7 @@ class RealPirScanScheduler @Inject constructor(
         schedulePirScans()
         scheduleEmailConfirmation()
         scheduleRecurringPixelStats()
+        scheduleBackgroundScanStats()
     }
 
     private fun schedulePirScans() {
@@ -147,10 +151,24 @@ class RealPirScanScheduler @Inject constructor(
         )
     }
 
+    private fun scheduleBackgroundScanStats() {
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<PirBackgroundScanStatsWorker>(BG_STATS_REPORT_INTERVAL_HOURS, TimeUnit.HOURS)
+            .addTag(TAG_PIR_BACKGROUND_STATS_DAILY)
+            .setInitialDelay(BG_STATS_REPORT_INTERVAL_HOURS, TimeUnit.HOURS)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            TAG_PIR_BACKGROUND_STATS_DAILY,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            periodicWorkRequest,
+        )
+    }
+
     override fun cancelScheduledScans(context: Context) {
         workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
         workManager.cancelUniqueWork(TAG_EMAIL_CONFIRMATION)
         workManager.cancelUniqueWork(TAG_PIR_RECURRING_CUSTOM_STATS)
+        workManager.cancelUniqueWork(TAG_PIR_BACKGROUND_STATS_DAILY)
         context.stopService(Intent(context, PirRemoteWorkerService::class.java))
     }
 

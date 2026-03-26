@@ -25,14 +25,20 @@ import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.asLog
+import logcat.logcat
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 interface MediaPlaybackRepository {
     val exceptions: CopyOnWriteArrayList<FeatureException>
+    val exemptedDomains: CopyOnWriteArrayList<String>
 }
 
 @ContributesBinding(
@@ -52,6 +58,14 @@ class RealMediaPlaybackRepository @Inject constructor(
 ) : MediaPlaybackRepository, PrivacyConfigCallbackPlugin {
 
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
+    override val exemptedDomains = CopyOnWriteArrayList<String>()
+
+    private val jsonAdapter: JsonAdapter<MediaPlaybackSettingsJson> by lazy {
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(MediaPlaybackSettingsJson::class.java)
+    }
 
     init {
         loadToMemory()
@@ -66,7 +80,32 @@ class RealMediaPlaybackRepository @Inject constructor(
             if (isMainProcess) {
                 exceptions.clear()
                 exceptions.addAll(mediaPlaybackFeature.self().getExceptions())
+
+                exemptedDomains.clear()
+                loadExemptedDomains()
             }
         }
     }
+
+    private fun loadExemptedDomains() {
+        runCatching {
+            mediaPlaybackFeature.self().getSettings()?.let { settingsJson ->
+                jsonAdapter.fromJson(settingsJson)?.exemptedDomains?.map { it.domain }
+                    ?.let { domains ->
+                        exemptedDomains.addAll(domains)
+                    }
+            }
+        }.onFailure {
+            logcat { "Failed to load exempted domains: ${it.asLog()}" }
+        }
+    }
+
+    private data class MediaPlaybackSettingsJson(
+        val exemptedDomains: List<ExemptedDomainItem>?,
+    )
+
+    private data class ExemptedDomainItem(
+        val domain: String,
+        val reason: String?,
+    )
 }

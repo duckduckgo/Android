@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Sätted</string>
     <string name="settingsHeadingProtections">Kaitsed</string>
     <string name="settingsHeadingAppearance">Välimus</string>
+    <string name="settingsWhatsNew">Mida on uut</string>
     <string name="settingsHeadingAbout">Teave</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Automaatse täitmise soovitused hõlmavad nüüd sinu hiljuti külastatud saite. Saad selle välja lülitada seadetes või tühjendada igal ajal nupu 🔥 Fire Button abil.</string>
     <string name="improvedAutoCompleteIAMTitle">Sama privaatsus.\nParemad otsingusoovitused!</string>
     <string name="openAutoCompleteSettings">Ava sätted</string>
+    <string name="privateSearchChatSuggestionsToggle">Vestluse soovitused</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Kuva otsinguribale tippimise ajal soovitusi oma ajaloost, järjehoidjatest ja (valikuliselt) Duck.ai vestlusajaloo põhjal. Kõik otsingud on privaatsed.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Üldine</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Üleilmne privaatsuskontroll (Global Privacy Control)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Väljendab sinu nimel loobumisõigusi, käskides saitidel mitte müüa ega jagada sinu isiklikke andmeid.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Hangi töölaua brauser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Maci ja Windowsi jaoks</string>
+    <string name="getDesktopBrowserTitle">Kaitse oma isikuandmeid nii Macis kui ka Windowsis!</string>
+    <string name="getDesktopBrowserBody">DuckDuckGo allalaadimiseks Macile või Windowsile külasta:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Jaga allalaadimise linki</string>
+    <string name="getDesktopBrowserNoThanks">Ei, aitäh</string>
+    <string name="getDesktopBrowserHideItem">Peida</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link kopeeritud</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Andmete kustutamine</string>
+    <string name="dataClearingDescription">Andmete kustutamine aitab kaitsta sinu privaatsust veebis. Andmete käsitsi kustutamiseks kasuta nuppu Fire Button või seadista automaatne kustutamine.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d sait välistati kustutamisest</item>
+        <item quantity="other">%1$d saiti välistati kustutamisest</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Sees</string>
+    <string name="dataClearingAutomaticClearingOff">Väljas</string>
+    <string name="dataClearingClearBrowsingData">Kustuta sirvimisandmed</string>
+    <string name="dataClearingAutomaticDataClearing">Andmete automaatne kustutamine</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Andmete automaatne kustutamine</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Sule kõik avatud vahekaardid</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Kustuta kõik saidi andmed, sealhulgas külastatud saidid. Võib sind kontodelt välja logida.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Kustuta kõik vestlused, sh kinnitatud vestlused</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Vali, mida kustutada</string>
+    <string name="dataClearingOptionTabs">Vahelehed</string>
+    <string name="dataClearingOptionData">Küpsised ja saidi andmed</string>
+    <string name="dataClearingDuckAiChats">Duck.ai vestlused</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Kustuta kõik vestlused</string>
+    <string name="fireDialogDeleteButton">Kustuta</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Sule vahekaart</item>
+        <item quantity="other">Sule kõik %1$d vahekaarti</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Võib sind kontodelt välja logida.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Puudub</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
+        <item quantity="other">Kustuta %1$d saidilt. Võib sind kontodelt välja logida.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Kas kustutada vahekaardid ja saidi andmed?</string>
+    <string name="singleTabFireDialogTitleWithChats">Kas kustutada vahekaardid, saidi andmed ja vestlused?</string>
+    <string name="singleTabFireDialogDeleteAll">Kustuta kõik</string>
+    <string name="singleTabFireDialogDeleteThisTab">Kustuta see vahekaart</string>
+    <string name="singleTabFireDialogDeleteChat">Kustuta vestlus</string>
+    <string name="singleTabFireDialogTitleDuckAi">Kustutada see vestlus?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d vahekaart ja selle andmed kustutatud</item>
+        <item quantity="other">%1$d vahekaarti ja nende andmed kustutatud</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Saidi andmeid ei saanud kustutada. Värskendage WebView\'d.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Saidi andmeid ei saanud vea tõttu kustutada.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Load</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Vahekaardid, andmed ja Duck.ai vestlused</string>
 
-    <string name="settingsAutomaticallyClearWhen">Kustuta…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta…</string>
+    <string name="settingsAutomaticallyClearWhen">Kustuta...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta edasi...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ainult rakendusest väljumisel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Rakendusest väljumisel, 5-sekundilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Rakendusest väljumisel, 5-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Rakendusest väljumisel, 15-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Rakendusest väljumisel, 30-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
-    <string name="settingsClearAiDataTitle">Tühjenda Duck.ai vestlused</string>
+    <string name="settingsClearAiDataTitle">Kustuta Duck.ai vestlused</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button kustutab ka Duck.ai ajaloo, sealhulgas kinnitatud vestlused.</string>
     <string name="settingsClearDataActionSecondaryText">Kustutab kõik vahekaardid ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Kustutab kõik vahekaardid, Duck.ai vestlused ja andmed kõigi saitide kohta, mida sa pole tulekindlaks teinud.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Tere!<br/><br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Teeme ära!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
     <string name="preOnboardingDaxDialog2Title">Kaitsed aktiveeritud!</string>
     <string name="preOnboardingDaxDialog2Button">Vali oma brauser</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
     <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
     <string name="preOnboardingAddressBarTitle">Kuhu soovid oma aadressiriba paigutada?</string>
     <string name="preOnboardingAddressBarOkButton">Järgmine</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Kas teadsid?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Kas soovite lihtsat juurdepääsu privaatsele AI-vestlusele?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Järgmine</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Tehisintellekti funktsioonid on privaatsed ja valikulised. Saate muudatusi teha suvandis <b>Seaded > Tehisintellekti funktsioonid</b>.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Kuva jälgurite arv vahekaardi vahetajas</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s jälgija blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Kas peita jälgurite arv?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Saad selle uuesti sisse lülitada suvandis Seaded &gt; Välimus.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Jäta alles</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Blokeeritud jälgurite animatsioon</string>
+    <string name="showTrackerCountInAddressBar">Näita aadressiribal</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Näita vahelehtede halduris</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Ainult otsi</string>

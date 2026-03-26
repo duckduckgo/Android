@@ -72,6 +72,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R.string
@@ -93,11 +94,13 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionChangeSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.cancellable
@@ -131,7 +134,8 @@ data class SubscriptionsWebViewActivityWithParams(
     scope = ActivityScope::class,
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
-@ContributeToActivityStarter(SubscriptionPurchase::class)
+@ContributeToActivityStarter(SubscriptionPurchase::class, screenName = "subscriptions.purchase")
+@ContributeToActivityStarter(SubscriptionUpgrade::class, screenName = "subscriptions.upgrade")
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
@@ -181,6 +185,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var privacyProFeature: PrivacyProFeature
+
+    @Inject
+    lateinit var subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -252,6 +259,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 specialUrlDetector = specialUrlDetector,
                 context = this,
                 onRenderProcessCrash = ::recoverFromRenderProcessCrash,
+                subscriptionRestoreWideEvent = subscriptionRestoreWideEvent,
             )
             it.settings.apply {
                 userAgentString = CUSTOM_UA
@@ -270,6 +278,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
         }
 
+        logcat {
+            "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: ${params.url}"
+        }
         binding.webview.loadUrl(params.url)
 
         viewModel.start()
@@ -332,6 +343,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     webViewActivityWithParams
                 }
             }
+        }
+
+        intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
+            return SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.upgradeToProUrl,
+                origin = params.origin,
+            )
         }
 
         return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
@@ -486,6 +504,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experimentName, command.experimentCohort)
+            is SubscriptionChangeSelected -> changeSubscriptionPlan(command.planId, command.offerId, command.replacementMode)
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -604,6 +623,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         viewModel.purchaseSubscription(this, id, offerId, experimentName, experimentCohort, params.origin)
     }
 
+    private fun changeSubscriptionPlan(
+        planId: String,
+        offerId: String?,
+        replacementMode: com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode,
+    ) {
+        viewModel.switchSubscriptionPlan(
+            activity = this,
+            planId = planId,
+            offerId = offerId,
+            replacementMode = replacementMode,
+            origin = params.origin,
+        )
+    }
+
     private fun sendResponseToJs(data: JsCallbackData) {
         subscriptionJsMessaging.onResponse(data)
     }
@@ -639,6 +672,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         if (binding.webview.canGoBack()) {
             binding.webview.url?.let { url ->
                 val uri = url.toUri()
+                if (!uri.isHierarchical) return true
                 return uri.getQueryParameter("preventBackNavigation") != "true"
             }
             return false

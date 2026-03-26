@@ -92,8 +92,6 @@ interface PirSchedulingRepository {
 
     suspend fun saveOptOutJobRecords(optOutJobRecords: List<OptOutJobRecord>)
 
-    suspend fun deleteAllJobRecords()
-
     suspend fun deleteAllScanJobRecords()
 
     /**
@@ -145,6 +143,8 @@ interface PirSchedulingRepository {
         extractedProfileId: Long,
         timestampMs: Long,
     )
+
+    suspend fun clearAllData()
 }
 
 @ContributesBinding(
@@ -271,14 +271,6 @@ class RealPirSchedulingRepository @Inject constructor(
         }
     }
 
-    override suspend fun deleteAllJobRecords() {
-        withContext(dispatcherProvider.io()) {
-            jobSchedulingDao()?.deleteAllScanJobRecords()
-            jobSchedulingDao()?.deleteAllOptOutJobRecords()
-            jobSchedulingDao()?.deleteAllEmailConfirmationJobRecords()
-        }
-    }
-
     override suspend fun deleteAllScanJobRecords() {
         withContext(dispatcherProvider.io()) {
             jobSchedulingDao()?.deleteAllScanJobRecords()
@@ -373,6 +365,12 @@ class RealPirSchedulingRepository @Inject constructor(
     ) {
         withContext(dispatcherProvider.io()) {
             jobSchedulingDao()?.update42DayConfirmationReportSentDate(extractedProfileId, timestampMs)
+        }
+    }
+
+    override suspend fun clearAllData() {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao()?.deleteAll()
         }
     }
 

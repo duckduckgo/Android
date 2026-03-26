@@ -130,6 +130,7 @@
     <string name="settingsMenuItemTitle">Setări</string>
     <string name="settingsHeadingProtections">Protecții</string>
     <string name="settingsHeadingAppearance">Aspect</string>
+    <string name="settingsWhatsNew">Noutăți</string>
     <string name="settingsHeadingAbout">Despre</string>
     <string name="settingsAboutDuckduckgo">Despre DuckDuckGo</string>
     <string name="settingsVersion">Versiune</string>
@@ -177,6 +178,8 @@
     <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
     <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
     <string name="openAutoCompleteSettings">Deschide Setări</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestii de chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Afișează sugestii din istoricul tău, marcaje și (opțional) istoricul chaturilor Duck.ai pe măsură ce tastezi în bara de căutare. Toate căutările sunt private.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Generalități</string>
@@ -208,12 +211,74 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Controlul global al confidențialității</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Exprimă drepturile de retragere în numele tău, comunicând site-urilor să nu vândă sau să nu partajeze informațiile tale personale.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
+    <string name="getDesktopBrowserTitle">Protejează-ți informațiile personale și pe Mac și Windows!</string>
+    <string name="getDesktopBrowserBody">Pentru a descărca DuckDuckGo pe Mac sau Windows, vizitează:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Trimite linkul de descărcare</string>
+    <string name="getDesktopBrowserNoThanks">Nu, mulțumesc</string>
+    <string name="getDesktopBrowserHideItem">Ascunde</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiat</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
+    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității tale online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d site exclus de la ștergere</item>
+        <item quantity="few">%1$d site-uri excluse de la ștergere</item>
+        <item quantity="other">%1$d site-uri excluse de la ștergere</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Activat</string>
+    <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
+    <string name="dataClearingClearBrowsingData">Șterge datele de navigare</string>
+    <string name="dataClearingAutomaticDataClearing">Șterge automat datele</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Șterge automat datele</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Închide toate filele deschise</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Șterge toate datele privind site-urile, inclusiv site-urile vizitate. S-ar putea să fii deconectat de la conturi.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Șterge toate chaturile, inclusiv pe cele fixate</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Alege ce să ștergi</string>
+    <string name="dataClearingOptionTabs">File</string>
+    <string name="dataClearingOptionData">Date privind modulele cookie și site-ul</string>
+    <string name="dataClearingDuckAiChats">Chaturi Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Șterge toate chaturile</string>
+    <string name="fireDialogDeleteButton">Ștergere</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Închide fila</item>
+        <item quantity="few">Închide toate cele %1$d file</item>
+        <item quantity="other">Închide toate cele %1$d de file</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">S-ar putea să fii deconectat de la conturi.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Niciuna</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Șterge de pe un site. S-ar putea să fii deconectat de la conturi.</item>
+        <item quantity="few">Șterge de pe %1$d site-uri. S-ar putea să fii deconectat de la conturi.</item>
+        <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Dorești să ștergi filele și datele site-ului?</string>
+    <string name="singleTabFireDialogTitleWithChats">Dorești să ștergi filele, datele site-ului și chaturile?</string>
+    <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
+    <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
+    <string name="singleTabFireDialogDeleteChat">Șterge chatul</string>
+    <string name="singleTabFireDialogTitleDuckAi">Ștergi acest chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
+        <item quantity="few">%1$d file și datele aferente au fost șterse</item>
+        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>
@@ -232,8 +297,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
+    <string name="settingsAutomaticallyClearWhen">Șterge pe...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge pe…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar la ieșirea din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ieșire din aplicație, inactiv timp de 5 minute</string>
@@ -779,7 +844,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>
     <string name="preOnboardingDaxDialog2Title">Mecanismele de protecție au fost activate!</string>
     <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
@@ -791,6 +858,7 @@
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="preOnboardingAddressBarTitle">Unde ar trebui să îți pun bara de adrese?</string>
     <string name="preOnboardingAddressBarOkButton">Următorul</string>
@@ -841,9 +909,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Știai?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vrei acces ușor la chatul privat cu IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Următorul</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funcțiile IA sunt private și opționale. Poți face modificări în <b>Setări > Funcții IA</b>.]]></string>
 
@@ -910,11 +980,16 @@
     <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Afișează numărul de tehnologii de urmărire în comutatorul de file</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tehnologie de urmărire blocată &lt;/b&gt; în ultimele 7 zile</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ascunzi contorul tehnologiilor de urmărire?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Poți să activezi din nou această opțiune în Setări &gt; Aspect.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Păstrează</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animația de blocare a tehnologiilor de urmărire</string>
+    <string name="showTrackerCountInAddressBar">Afișează în bara de adrese</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Afișează în managerul de file</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Doar căutare</string>

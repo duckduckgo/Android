@@ -1,0 +1,59 @@
+{
+  "name": "USA Trace",
+  "url": "usatrace.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1674540000000,
+  "optOutUrl": "https://www.usatrace.com/contact-us/",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "06a2d15f-19ba-45b7-b606-fdd9c9cdb751",
+          "url": "https://www.usatrace.com/people-search/${firstName}-${lastName}/${city|hyphenated}-${state|upcase}"
+        },
+        {
+          "actionType": "extract",
+          "id": "3aecf1d1-458a-4252-b27d-0038ce15284d",
+          "selector": "//table/tbody/tr[position() > 1]",
+          "noResultsSelector": "//div[contains(@class, 'alert') and contains(text(), 'no results')]",
+          "profile": {
+            "name": {
+              "selector": ".//td[2]"
+            },
+            "age": {
+              "selector": ".//td[3]"
+            },
+            "addressCityStateList": {
+              "selector": ".//td[4]"
+            },
+            "relativesList": {
+              "selector": ".//td[7]/a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='btn red-btn']",
+              "identifierType": "param",
+              "identifier": "id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

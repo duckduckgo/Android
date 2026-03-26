@@ -55,4 +55,6 @@ sealed class Decoration {
     data class DisableVoiceSearch(
         val url: String,
     ) : Decoration()
+
+    data object CancelEasterEggLogoAnimation : Decoration()
 }

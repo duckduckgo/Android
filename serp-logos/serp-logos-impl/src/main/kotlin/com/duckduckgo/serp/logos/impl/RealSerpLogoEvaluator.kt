@@ -21,7 +21,9 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.serp.logos.api.SerpLogos
+import com.duckduckgo.serp.logos.impl.store.FavouriteSerpLogoDataStore
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import logcat.LogPriority
 import logcat.logcat
@@ -33,6 +35,7 @@ private const val LOGO_DELIMITER = "|"
 @ContributesBinding(FragmentScope::class)
 class RealSerpLogoEvaluator @Inject constructor(
     private val serpLogoJavascriptInterface: SerpLogoJavascriptInterface,
+    private val favouriteSerpLogoDataStore: FavouriteSerpLogoDataStore,
 ) : SerpLogos {
 
     override suspend fun extractSerpLogo(webView: WebView): SerpLogo = suspendCancellableCoroutine { continuation ->
@@ -40,6 +43,8 @@ class RealSerpLogoEvaluator @Inject constructor(
             continuation.resume(evaluateSerpLogoType(result))
         }
     }
+
+    override val favouriteSerpEasterEggLogoUrlFlow: Flow<String?> = favouriteSerpLogoDataStore.favouriteSerpEasterEggLogoUrlFlow
 
     private fun evaluateSerpLogoType(result: String?): SerpLogo {
         logcat { "Raw JS result: $result" }
@@ -52,7 +57,7 @@ class RealSerpLogoEvaluator @Inject constructor(
                 val logoUrl = parts[1]
                 logcat { "Parsed logo - type: $logoType, url: $logoUrl" }
                 when (logoType) {
-                    "easterEgg" -> SerpLogo.EasterEgg("${AppUrl.Url.API}$logoUrl")
+                    "easterEgg" -> SerpLogo.EasterEgg(logoUrl = "${AppUrl.Url.API}$logoUrl", isFavourite = false)
                     "normal" -> SerpLogo.Normal
                     else -> {
                         logcat(LogPriority.WARN) { "Unknown logo type: $logoType" }

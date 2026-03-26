@@ -49,12 +49,14 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.view.FireDialogProvider
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
@@ -382,7 +384,15 @@ class TabSwitcherActivity :
         lifecycleScope.launch {
             viewModel.viewState.flowWithLifecycle(lifecycle).collectLatest {
                 tabsRecycler.invalidateItemDecorations()
-                tabsAdapter.updateData(it.tabSwitcherItems)
+
+                val shouldScroll = firstTimeLoadingTabsList && it.tabs.isNotEmpty()
+
+                tabsAdapter.updateData(it.tabSwitcherItems) {
+                    if (shouldScroll) {
+                        firstTimeLoadingTabsList = false
+                        scrollToActiveTab()
+                    }
+                }
 
                 updateToolbarTitle(it.mode, it.tabs.size)
                 updateTabGridItemDecorator()
@@ -390,11 +400,6 @@ class TabSwitcherActivity :
                 tabTouchHelper.mode = it.mode
 
                 invalidateOptionsMenu()
-
-                if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
-                    firstTimeLoadingTabsList = false
-                    scrollToActiveTab()
-                }
             }
         }
 
@@ -618,7 +623,7 @@ class TabSwitcherActivity :
 
     private fun onFireButtonClicked() {
         lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog()
+            val dialog = fireDialogProvider.createFireDialog(TAB_SWITCHER)
             dialog.show(supportFragmentManager)
         }
     }
@@ -644,10 +649,11 @@ class TabSwitcherActivity :
     ) {
         tabsAdapter.getTabSwitcherItem(position)?.let { tab ->
             when (tab) {
-                is Tab -> {
+                is NormalTab -> {
                     viewModel.onTabCloseInNormalModeRequested(tab, swipeGestureUsed = deletedBySwipe)
                 }
                 is TrackersAnimationInfoPanel -> Unit
+                is SelectableTab -> Unit
             }
         }
     }

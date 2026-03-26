@@ -121,7 +121,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Wyczyść dane</string>
-    <string name="fireClearAll">Wyczyść karty i dane</string>
+    <string name="fireClearAll">Usuń karty i dane</string>
     <string name="fireClearAllPlusDuckChats">Wyczyść karty, dane i czaty Duck.ai</string>
     <string name="fireCancel">Anuluj</string>
     <string name="fireDataCleared">Dane zostały usunięte</string>
@@ -131,6 +131,7 @@
     <string name="settingsMenuItemTitle">Ustawienia</string>
     <string name="settingsHeadingProtections">Ochrona</string>
     <string name="settingsHeadingAppearance">Wygląd</string>
+    <string name="settingsWhatsNew">Co nowego</string>
     <string name="settingsHeadingAbout">Informacje</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Wersja</string>
@@ -178,6 +179,8 @@
     <string name="improvedAutoCompleteIAMContent">Obecnie sugestie autouzupełniania obejmują ostatnio odwiedzone witryny. Możesz je wyłączyć w ustawieniach lub w każdej chwili wyczyścić za pomocą przycisku 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ta sama prywatność.\nLepsze sugestie podczas wyszukiwania!</string>
     <string name="openAutoCompleteSettings">Otwórz ustawienia</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestie czatu</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Wyświetlaj sugestie z Twojej historii, zakładek i (opcjonalnie) historii czatu Duck.ai podczas wpisywania w pasku wyszukiwania. Wszystkie wyszukiwania są prywatne.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Ogólne</string>
@@ -209,12 +212,78 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Globalna Kontrola Prywatności</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Korzysta w Twoim imieniu z prawa do rezygnacji, informując witryny, aby nie sprzedawały ani nie udostępniały Twoich danych osobowych.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Pobierz przeglądarkę komputerową</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo dla komputerów Mac i Windows</string>
+    <string name="getDesktopBrowserTitle">Chroń swoje dane osobowe także na Macu i Windowsie!</string>
+    <string name="getDesktopBrowserBody">Aby pobrać DuckDuckGo na komputer Mac lub Windows, odwiedź stronę:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Udostępnij link pobierania</string>
+    <string name="getDesktopBrowserNoThanks">Nie, dziękuję</string>
+    <string name="getDesktopBrowserHideItem">Ukryj</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Skopiowano łącze</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Przycisk zabezpieczenia</string>
     <string name="dataClearingActivityTitle">Czyszczenie danych</string>
+    <string name="dataClearingDescription">Usunięcie danych może pomóc chronić Twoją prywatność w sieci. Użyj przycisku Fire Button, aby ręcznie usunąć dane, lub skonfiguruj automatyczne usuwanie.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d witryna wyłączona z czyszczenia</item>
+        <item quantity="few">%1$d witryny wyłączone z czyszczenia</item>
+        <item quantity="many">%1$d witryn wyłączonych z czyszczenia</item>
+        <item quantity="other">%1$d witryny wyłączonej z czyszczenia</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Wł.</string>
+    <string name="dataClearingAutomaticClearingOff">Wyłączone</string>
+    <string name="dataClearingClearBrowsingData">Wyczyść dane przeglądania</string>
+    <string name="dataClearingAutomaticDataClearing">Automatyczne usuwanie danych</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatyczne usuwanie danych</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Zamknij wszystkie otwarte karty</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Usuń wszystkie dane witryn, w tym odwiedzone strony. Może nastąpić wylogowanie z kont.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Usuń wszystkie czaty, w tym przypięte</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Wybierz, co chcesz usunąć</string>
+    <string name="dataClearingOptionTabs">Karty</string>
+    <string name="dataClearingOptionData">Pliki cookie i dane witryny</string>
+    <string name="dataClearingDuckAiChats">Czaty Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Usuń wszystkie czaty</string>
+    <string name="fireDialogDeleteButton">Usuń</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Zamknij kartę</item>
+        <item quantity="few">Zamknij wszystkie %1$d karty</item>
+        <item quantity="many">Zamknij wszystkie %1$d kart</item>
+        <item quantity="other">Zamknij wszystkie %1$d karty</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Może nastąpić wylogowanie z kont.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Brak</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Usuń z 1 witryny. Może spowodować wylogowanie z kont.</item>
+        <item quantity="few">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
+        <item quantity="many">Usuń z %1$d witryn. Może spowodować wylogowanie z kont.</item>
+        <item quantity="other">Usuń z %1$d witryny. Może spowodować wylogowanie z kont.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Usunąć karty i dane witryny?</string>
+    <string name="singleTabFireDialogTitleWithChats">Usunąć karty, dane witryny i czaty?</string>
+    <string name="singleTabFireDialogDeleteAll">Usuń wszystko</string>
+    <string name="singleTabFireDialogDeleteThisTab">Usuń tę kartę</string>
+    <string name="singleTabFireDialogDeleteChat">Usuń czat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Usunąć ten czat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Usunięcie danych witryny może spowodować wylogowanie z kont.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Spowoduje to anulowanie trwającego pobierania.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">Usunięto %1$d kartę wraz z danymi</item>
+        <item quantity="few">Usunięto %1$d karty wraz z danymi</item>
+        <item quantity="many">Usunięto %1$d kart wraz z danymi</item>
+        <item quantity="other">Usunięto %1$d karty wraz z danymi</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Dane strony nie mogły zostać usunięte. Zaktualizuj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Dane strony nie mogły zostać usunięte z powodu błędu.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Uprawnienia</string>
@@ -233,15 +302,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty i dane</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Karty, dane i czaty Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Usuń w terminie…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń w terminie…</string>
+    <string name="settingsAutomaticallyClearWhen">Usuń na...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Usuń na...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Wyłącznie zamknięcie aplikacji</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Zamknięcie aplikacji, brak aktywności przez 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Zamknięcie aplikacji, brak aktywności przez 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Zamknięcie aplikacji, brak aktywności przez 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Zamknięcie aplikacji, brak aktywności przez 30 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Zamknięcie aplikacji, nieaktywna przez 1 godzinę</string>
-    <string name="settingsClearAiDataTitle">Wyczyść czaty Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Usuń czaty Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Przycisk Fire Button usunie także historię Duck.ai, w tym przypięte czaty.</string>
     <string name="settingsClearDataActionSecondaryText">Czyści wszystkie karty i dane dla witryn, które nie zostały oznaczone jako Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Czyści wszystkie karty, czaty Duck.ai i dane dla wszystkich witryn, które nie zostały oznaczone jako Fireproof.</string>
@@ -793,7 +862,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Zróbmy to!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
     <string name="preOnboardingDaxDialog2Title">Ochrona aktywowana!</string>
     <string name="preOnboardingDaxDialog2Button">Wybierz przeglądarkę</string>
@@ -805,6 +876,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
     <string name="preOnboardingAddressBarTitle">Gdzie umieścić pasek adresu?</string>
     <string name="preOnboardingAddressBarOkButton">Dalej</string>
@@ -857,9 +929,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Czy wiesz?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Chcesz łatwego dostępu do prywatnego czatu AI?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Dalej</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Funkcje sztucznej inteligencji są prywatne i opcjonalne. Możesz dokonać zmian w obszarze <b>Ustawienia > Funkcje AI</b>.]]></string>
 
@@ -926,11 +1000,16 @@
     <string name="settingsHeadingCompleteSetup">Dokończ swoją konfigurację</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Pokaż liczbę mechanizmów śledzących w przełączniku kart</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s zablokowany mechanizm śledzący&lt;/b&gt; w ciągu ostatnich 7 dni</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ukryć liczbę mechanizmów śledzących?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Możesz to włączyć ponownie, wybierając kolejno Ustawienia &gt; Wygląd.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ukryj</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zachowaj</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animacja blokowania mechanizmów śledzących</string>
+    <string name="showTrackerCountInAddressBar">Pokaż na pasku adresu</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Pokaż w Menedżerze kart</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Tylko wyszukiwanie</string>

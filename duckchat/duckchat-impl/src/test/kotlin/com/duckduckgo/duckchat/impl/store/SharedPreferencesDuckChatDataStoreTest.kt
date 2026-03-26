@@ -122,6 +122,11 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when isNativeInputFieldUserSettingEnabled then return default value`() = runTest {
+        assertFalse(testee.isNativeInputFieldUserSettingEnabled())
+    }
+
+    @Test
     fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
         assertFalse(testee.isInputScreenUserSettingEnabled())
     }
@@ -171,6 +176,12 @@ class SharedPreferencesDuckChatDataStoreTest {
     fun `when setCosmeticInputScreenUserSetting then cosmetic value is stored`() = runTest {
         testee.setCosmeticInputScreenUserSetting(true)
         assertTrue(testee.isCosmeticInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun `when setNativeInputFieldUserSetting then return value`() = runTest {
+        testee.setNativeInputFieldUserSetting(true)
+        assertTrue(testee.isNativeInputFieldUserSettingEnabled())
     }
 
     @Test
@@ -304,9 +315,80 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when observeAutomaticContextAttachmentUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeAutomaticContextAttachmentUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+
+        testee.setAutomaticPageContextAttachment(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
+    fun `when observeNativeInputFieldUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeNativeInputFieldUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+
+        testee.setNativeInputFieldUserSetting(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
     fun whenRegisterOpenedThenWasOpenedBeforeThenReturnTrue() = runTest {
         assertFalse(testee.wasOpenedBefore())
         testee.registerOpened()
         assertTrue(testee.wasOpenedBefore())
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting then observe receives updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeChatSuggestionsUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setChatSuggestionsUserSetting(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun `when setChatSuggestionsUserSetting to true then observe emits true`() = runTest {
+        testee.setChatSuggestionsUserSetting(false)
+
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeChatSuggestionsUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setChatSuggestionsUserSetting(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
+    fun `when hasUserAcceptedTerms default then return false`() = runTest {
+        assertFalse(testee.hasUserAcceptedTerms())
+    }
+
+    @Test
+    fun `when setUserAcceptedTerms then hasUserAcceptedTerms returns true`() = runTest {
+        testee.setUserAcceptedTerms()
+        assertTrue(testee.hasUserAcceptedTerms())
     }
 }

@@ -33,11 +33,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
-import androidx.fragment.app.FragmentManager
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -45,6 +45,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING
+import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -79,6 +80,9 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
+    lateinit var dataClearingWideEvent: DataClearingWideEvent
+
+    @Inject
     lateinit var pixel: Pixel
 
     @Inject
@@ -104,7 +108,7 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            binding.fireAnimationView.let {
+            _binding?.fireAnimationView?.let {
                 it.speed += ANIMATION_SPEED_INCREMENT
                 if (it.speed > ANIMATION_MAX_SPEED) {
                     it.removeUpdateListener(this)
@@ -135,6 +139,10 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (savedInstanceState == null) {
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_SHOWN)
+        }
 
         canRestart = !animationEnabled()
 
@@ -178,10 +186,6 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun show(fragmentManager: FragmentManager, tag: String?) {
-        super.show(fragmentManager, tag)
     }
 
     private fun setupLayout() {
@@ -249,6 +253,10 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         hideClearDataOptions()
         if (animationEnabled()) {
             playAnimation()
+        } else {
+            // Animation was enabled when dialog opened but is now disabled.
+            // Update canRestart so ClearAllDataFinished can complete the flow.
+            canRestart = true
         }
         parentFragmentManager.setFragmentResult(
             FireDialog.REQUEST_KEY,
@@ -260,8 +268,19 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             fireButtonStore.incrementFireButtonUseCount()
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-            clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-            clearDataAction.setAppUsedSinceLastClearFlag(false)
+            dataClearingWideEvent.startLegacy(
+                entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_FIRE_DIALOG,
+                clearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA,
+                clearDuckAiData = settingsDataStore.clearDuckAiData,
+            )
+            try {
+                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+                clearDataAction.setAppUsedSinceLastClearFlag(false)
+                dataClearingWideEvent.finishSuccess()
+            } catch (e: Exception) {
+                dataClearingWideEvent.finishFailure(e)
+                throw e
+            }
             onFireDialogClearAllEvent(FireDialogClearAllEvent.ClearAllDataFinished)
         }
     }
@@ -301,13 +320,12 @@ class LegacyFireDialog : BottomSheetDialogFragment(), FireDialog {
 
     @Synchronized
     private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
-        if (!canRestart) {
+        if (!canRestart && _binding != null) {
             canRestart = true
             if (event is FireDialogClearAllEvent.ClearAllDataFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            // Both clearing and animation are done, now restart
             clearDataAction.killAndRestartProcess(notifyDataCleared = false, enableTransitionAnimation = false)
         }
     }

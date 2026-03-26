@@ -44,11 +44,13 @@ class RealOptOut24HourSubmissionSuccessRateReporter @Inject constructor(
     override suspend fun attemptFirePixel() {
         withContext(dispatcherProvider.io()) {
             logcat { "PIR-CUSTOM-STATS: Attempt to fire 24hour submission pixels" }
-            val startDate = pirRepository.getCustomStatsPixelsLastSentMs()
+            val lastSentMs = pirRepository.getCustomStatsPixelsLastSentMs()
             val now = currentTimeProvider.currentTimeMillis()
 
-            if (!shouldFirePixel(startDate, now)) return@withContext
+            if (!shouldFirePixel(lastSentMs, now)) return@withContext
             logcat { "PIR-CUSTOM-STATS: Should fire pixel - 24hrs passed since last send" }
+            // previous endDate was (lastSentMs - 24h) so that should be our new startDate
+            val startDate = if (lastSentMs == 0L) 0L else lastSentMs - TimeUnit.HOURS.toMillis(24)
             val endDate = now - TimeUnit.HOURS.toMillis(24)
             val activeBrokers = pirRepository.getAllActiveBrokerObjects()
             val hasUserProfiles = pirRepository.getAllUserProfileQueries().isNotEmpty()

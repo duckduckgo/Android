@@ -18,7 +18,8 @@ tags:
             - pressKey: Enter
             - assertVisible:
                   text: "Privacy Test Pages"
-            - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+            - tapOn:
+                id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
             - assertVisible:
                   text: "add bookmark"
             - tapOn:
@@ -29,7 +30,8 @@ tags:
             - pressKey: Enter
             - assertVisible:
                 text: "Search engine"
-            - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+            - tapOn:
+                id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
             - assertVisible:
                   text: "bookmarks"
             - tapOn:

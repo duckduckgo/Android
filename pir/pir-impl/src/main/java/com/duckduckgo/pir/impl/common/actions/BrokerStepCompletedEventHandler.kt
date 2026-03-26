@@ -199,7 +199,9 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                             currentOptOutStep.step.actions.getLastActionForFailure(state.currentActionIndex)
                         }.id,
                         totalTimeMillis = totalTimeMillis,
-                        extractedProfileId = currentBrokerStep.emailConfirmationJob.extractedProfileId,
+                        extractedProfile = currentOptOutStep.profileToOptOut,
+                        attemptId = state.attemptId,
+                        emailPattern = state.generatedEmailData?.pattern.orEmpty(),
                     ),
                 )
             }

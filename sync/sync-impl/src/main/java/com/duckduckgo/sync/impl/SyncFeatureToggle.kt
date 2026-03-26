@@ -52,6 +52,8 @@ interface SyncFeatureToggle {
     fun allowCreateAccountOnNewerVersion(): Boolean
 
     fun automaticallyUpdateSyncSettings(): Boolean
+
+    fun allowAiChatSync(): Boolean
 }
 
 @ContributesBinding(
@@ -115,6 +117,17 @@ class SyncRemoteFeatureToggle @Inject constructor(
 
     override fun automaticallyUpdateSyncSettings(): Boolean {
         return syncFeature.automaticallyUpdateSyncSettings().isEnabled()
+    }
+
+    override fun allowAiChatSync(): Boolean {
+        // Check ALL global sync levels (0-3) - disabled overrides enabled chat flags
+        if (!showSync()) return false // level0
+        if (!allowDataSyncing()) return false // level1
+        if (!allowSetupFlows()) return false // level2
+        if (!allowCreateAccount()) return false // level3
+
+        // Check the AI chat sync flag
+        return syncFeature.aiChatSync().isEnabled()
     }
 
     private fun isToggleEnabledOnNewerVersion(toggle: Toggle): Boolean {

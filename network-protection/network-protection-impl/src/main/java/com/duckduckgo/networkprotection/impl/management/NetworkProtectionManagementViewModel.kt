@@ -441,6 +441,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         networkProtectionPixels.reportExcludePromptExcludeAppClicked()
     }
 
+    fun onLaunchedFromNotification(pixelName: String) {
+        networkProtectionPixels.reportNotificationLaunched(pixelName)
+    }
+
     sealed class Command {
         data object CheckVPNPermission : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()

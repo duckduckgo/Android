@@ -21,6 +21,7 @@ import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -251,6 +252,12 @@ class Omnibar(
             omnibarView.isScrollingEnabled = value
         }
 
+    var isUiLocked: Boolean
+        get() = omnibarView.isUiLocked
+        set(value) {
+            omnibarView.isUiLocked = value
+        }
+
     var viewMode: ViewMode = ViewMode.Browser(null)
         private set
 
@@ -298,6 +305,10 @@ class Omnibar(
 
     fun addTextListener(listener: TextListener) {
         omnibarView.setOmnibarTextListener(listener)
+    }
+
+    fun disableViewStateSaving() {
+        omnibarView.disableViewStateSaving()
     }
 
     fun configureFindInPage(listener: FindInPageListener) {
@@ -394,6 +405,10 @@ class Omnibar(
         omnibarView.decorate(Decoration.CancelAnimations)
     }
 
+    fun cancelEasterEggLogoAnimation() {
+        omnibarView.decorate(Decoration.CancelEasterEggLogoAnimation)
+    }
+
     fun startTrackersAnimation(events: List<Entity>?) {
         omnibarView.decorate(Decoration.LaunchTrackersAnimation(events))
     }
@@ -424,5 +439,9 @@ class Omnibar(
 
     fun setDraftTextIfNtpOrSerp(query: String) {
         omnibarView.setDraftTextIfNtpOrSerp(query)
+    }
+
+    fun configureBrowserMenuIcon(@DrawableRes resId: Int) {
+        omnibarView.setMenuIcon(resId)
     }
 }

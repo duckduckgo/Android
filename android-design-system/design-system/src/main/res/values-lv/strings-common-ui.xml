@@ -37,4 +37,7 @@
     <string name="alwaysOn">Vienmēr ieslēgts</string>
     <string name="on">Ieslēgts</string>
     <string name="off">Izslēgts</string>
+
+    <!-- Page Header -->
+    <string name="pageHeaderLearnMore">Uzzināt vairāk</string>
 </resources>

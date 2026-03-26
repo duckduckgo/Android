@@ -241,7 +241,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         activity: Activity,
         url: String,
     ) {
-        sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
         val domain = url.extractDomain() ?: url
 
         // Check if user allowed or denied per session
@@ -284,6 +283,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 object : TextAlertDialogBuilder.EventListener() {
 
                     var rememberChoice = false
+
+                    override fun onDialogShown() {
+                        sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
+                    }
 
                     override fun onPositiveButtonClicked() {
                         if (rememberChoice) {

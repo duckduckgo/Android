@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 interface OmnibarView {
     val omnibarType: OmnibarType
     var isScrollingEnabled: Boolean
+    var isUiLocked: Boolean
     val isEditing: Boolean
     val isEditingFlow: Flow<Boolean>
     val findInPage: IncludeFindInPageBinding
@@ -50,10 +52,12 @@ interface OmnibarView {
     fun isPulseAnimationPlaying(): Boolean
     fun setDraftTextIfNtpOrSerp(query: String)
     fun setExpanded(expanded: Boolean)
+    fun disableViewStateSaving()
     fun setExpanded(
         expanded: Boolean,
         animate: Boolean,
     )
+    fun setMenuIcon(@DrawableRes resId: Int)
     fun show()
     fun gone()
 }

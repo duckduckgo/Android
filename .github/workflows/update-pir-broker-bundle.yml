@@ -1,0 +1,118 @@
+name: Update PIR Broker Bundle Update
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"  # Every Monday at 4AM UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-pir-brokers:
+    name: Update PIR broker JSON bundle
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r scripts/pir-broker-update/requirements.txt
+
+      - name: Run broker update script
+        id: broker-check
+        env:
+          PIR_API_AUTH_TOKEN: ${{ secrets.PIR_API_AUTH_TOKEN }}
+        run: |
+          python scripts/pir-broker-update/update_pir_brokers.py \
+            --brokers-dir pir/pir-impl/src/main/assets/brokers \
+            --output changes.txt
+          if [ -s changes.txt ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "changes_summary<<EOF"
+              cat changes.txt
+              echo "EOF"
+            } >> "$GITHUB_ENV"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Get current date
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
+        run: echo "current_date=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
+
+      - name: Create Pull Request
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
+        id: create-pr
+        uses: peter-evans/create-pull-request@v6.1.0
+        with:
+          base: develop
+          title: "Update PIR broker bundle - ${{ env.current_date }}"
+          author: daxmobile <daxmobile@users.noreply.github.com>
+          token: ${{ secrets.GT_DAXMOBILE }}
+          commit-message: "Update PIR broker bundle - ${{ env.current_date }}"
+          labels: pir, automated pr
+          branch: automated/update-pir-broker-bundle-${{ env.current_date }}
+          add-paths: pir/pir-impl/src/main/assets/brokers
+          body: |
+            ## PIR Broker Bundle Update
+
+            Automated update of PIR broker JSON files from the remote bundle.
+
+            ### Changes
+
+            ${{ env.changes_summary }}
+
+            ### Checklist
+
+            - [ ] Verify broker changes look correct
+            - [ ] All tests must pass
+
+      - name: Create Asana task
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
+        id: create-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: "Update PIR broker bundle - ${{ env.current_date }}"
+          asana-task-description: |
+            PIR broker JSON files have been updated and a PR has been created.
+
+            ${{ env.changes_summary }}
+
+            See ${{ steps.create-pr.outputs.pull-request-url }}
+          action: 'create-asana-task'
+
+      - name: Update PR description with Asana task
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' && steps.create-task.outputs.duplicate == 'false' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
+          github-repository: 'android'
+          github-org: 'duckduckgo'
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'add-task-pr-description'
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: "GH Workflow Failure - Update PIR Broker Bundle"
+          asana-task-description: |
+            The Update PIR Broker Bundle workflow has failed.
+
+            See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'

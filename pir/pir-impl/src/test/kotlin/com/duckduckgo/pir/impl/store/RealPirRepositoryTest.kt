@@ -864,4 +864,43 @@ class RealPirRepositoryTest {
         // Then
         verify(mockExtractedProfileDao).updateExtractedProfileDeprecated(extractedProfileId, true)
     }
+
+    @Test
+    fun whenGetFeatureReceivedMsThenReturnValueFromDataStore() = runTest {
+        whenever(mockPirDataStore.featureReceivedMs).thenReturn(12345L)
+
+        val result = testee.getFeatureReceivedMs()
+
+        assertEquals(12345L, result)
+    }
+
+    @Test
+    fun whenSetFeatureReceivedMsThenDelegateToDataStore() = runTest {
+        testee.setFeatureReceivedMs(12345L)
+
+        verify(mockPirDataStore).featureReceivedMs = 12345L
+    }
+
+    @Test
+    fun whenClearAllDataThenDeleteAllTables() = runTest {
+        testee.clearAllData()
+
+        verify(mockBrokerDao).deleteAll()
+        verify(mockBrokerJsonDao).deleteAll()
+        verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
+        verify(mockUserProfileDao).deleteAllProfiles()
+        verify(mockPirDataStore).reset()
+    }
+
+    @Test
+    fun whenClearAllUserDataOnlyThenDeleteAllUserTables() = runTest {
+        testee.clearUserData()
+
+        verify(mockExtractedProfileDao).deleteAllExtractedProfiles()
+        verify(mockUserProfileDao).deleteAllProfiles()
+        verify(mockPirDataStore).resetUserData()
+        verify(mockBrokerDao, never()).deleteAll()
+        verify(mockBrokerJsonDao, never()).deleteAll()
+        verify(mockPirDataStore, never()).reset()
+    }
 }

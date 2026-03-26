@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
     <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Prova la nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Nascondi le immagini generate dall\'IA</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtra le immagini generate dall\'intelligenza artificiale dai risultati di ricerca delle immagini</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Abilita nelle impostazioni delle funzionalità AI</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gestisci nelle impostazioni delle funzionalità AI</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configura Duck.ai nelle impostazioni delle funzionalità AI.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Riassumi questa pagina</string>
+    <string name="duckAIContextualAutomaticContextTitle">Invia automaticamente il contenuto della pagina</string>
+    <string name="duckAIContextualAutomaticContextMessage">Invia automaticamente il contenuto della pagina a Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Allega il contenuto della pagina</string>
 </resources>

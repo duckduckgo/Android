@@ -70,7 +70,7 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
                     SpecificPage(url, resolvedUrl)
                 }
             }
-        } ?: LastOpenedTab
+        } ?: NewTabPage
     }
 
     override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->

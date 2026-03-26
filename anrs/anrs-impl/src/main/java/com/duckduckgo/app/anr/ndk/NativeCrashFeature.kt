@@ -51,6 +51,9 @@ interface NativeCrashFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeCrashHandlingSecondaryProcess(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun nativeCrashReportsFullWebViewVersion(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

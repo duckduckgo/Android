@@ -132,6 +132,12 @@ class FakeSettingsDataStore :
             store["appBackgroundedTimestamp"] = value
         }
 
+    override var lastSessionBackgroundTimestamp: Long
+        get() = store["lastSessionBackgroundTimestamp"] as Long? ?: 0L
+        set(value) {
+            store["lastSessionBackgroundTimestamp"] = value
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true
         set(value) {
@@ -212,6 +218,36 @@ class FakeSettingsDataStore :
         get() = store["clearDuckAiData"] as Boolean? ?: false
         set(value) {
             store["clearDuckAiData"] = value
+        }
+
+    override var useBottomSheetMenu: Boolean
+        get() = store["useBottomSheetMenu"] as Boolean? ?: false
+        set(value) {
+            store["useBottomSheetMenu"] = value
+        }
+
+    override var showTrackersCountInAddressBar: Boolean
+        get() = store["showTrackersCountInAddressBar"] as Boolean? ?: true
+        set(value) {
+            store["showTrackersCountInAddressBar"] = value
+        }
+
+    override var hasNewDownload: Boolean
+        get() = store["hasNewDownload"] as Boolean? ?: false
+        set(value) {
+            store["hasNewDownload"] = value
+        }
+
+    override var singleTabFireDialogShownCount: Int
+        get() = store["singleTabFireDialogShownCount"] as Int? ?: 0
+        set(value) {
+            store["singleTabFireDialogShownCount"] = value
+        }
+
+    override var getDesktopBrowserSettingDismissed: Boolean
+        get() = store["getDesktopBrowserSettingDismissed"] as Boolean? ?: false
+        set(value) {
+            store["getDesktopBrowserSettingDismissed"] = value
         }
 
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {

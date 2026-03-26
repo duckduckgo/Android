@@ -20,7 +20,12 @@ class RealMediaPlaybackRepositoryTest {
 
     @Before
     fun before() {
-        mediaPlaybackFeature.self().setRawStoredState(Toggle.State(exceptions = exceptions))
+        mediaPlaybackFeature.self().setRawStoredState(
+            Toggle.State(
+                exceptions = exceptions,
+                settings = exemptedDomainsSettingsJson,
+            ),
+        )
     }
 
     @Test
@@ -33,10 +38,11 @@ class RealMediaPlaybackRepositoryTest {
         )
 
         assertEquals(exceptions, repository.exceptions)
+        assertEquals(exemptedDomains, repository.exemptedDomains)
     }
 
     @Test
-    fun whenRemoteConfigUpdateThenExceptionsUpdated() = runTest {
+    fun whenRemoteConfigUpdatedThenExceptionsUpdated() = runTest {
         val repository = RealMediaPlaybackRepository(
             mediaPlaybackFeature,
             TestScope(),
@@ -50,7 +56,109 @@ class RealMediaPlaybackRepositoryTest {
         assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }
 
+    @Test
+    fun whenRemoteConfigUpdatedThenExemptedDomainsUpdated() = runTest {
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
+        assertEquals(exemptedDomains, repository.exemptedDomains)
+
+        val updatedSettingsJson = """
+            {
+                "exemptedDomains": [
+                    {"domain": "domain.com", "reason": "reason"},
+                    {"domain": "another.com", "reason": "reason"}
+                ]
+            }
+        """.trimIndent()
+
+        mediaPlaybackFeature.self().setRawStoredState(
+            Toggle.State(
+                exceptions = exceptions,
+                settings = updatedSettingsJson,
+            ),
+        )
+        repository.onPrivacyConfigDownloaded()
+
+        assertEquals(listOf("domain.com", "another.com"), repository.exemptedDomains)
+    }
+
+    @Test
+    fun whenSettingsIsNullThenExemptedDomainsIsEmpty() = runTest {
+        mediaPlaybackFeature.self().setRawStoredState(
+            Toggle.State(
+                exceptions = exceptions,
+                settings = null,
+            ),
+        )
+
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
+        assertEquals(emptyList<String>(), repository.exemptedDomains)
+    }
+
+    @Test
+    fun whenSettingsHasEmptyExemptedDomainsThenExemptedDomainsIsEmpty() = runTest {
+        mediaPlaybackFeature.self().setRawStoredState(
+            Toggle.State(
+                exceptions = exceptions,
+                settings = emptyExemptedDomainsSettingsJson,
+            ),
+        )
+
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
+        assertEquals(emptyList<String>(), repository.exemptedDomains)
+    }
+
+    @Test
+    fun whenSettingsIsInvalidJsonThenExemptedDomainsIsEmpty() = runTest {
+        mediaPlaybackFeature.self().setRawStoredState(
+            Toggle.State(
+                exceptions = exceptions,
+                settings = "invalid json",
+            ),
+        )
+
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
+        assertEquals(emptyList<String>(), repository.exemptedDomains)
+    }
+
     companion object {
         val exceptions = listOf(FeatureException("example.com", "reason"))
+        val exemptedDomains = listOf("foo.com", "example.com")
+        val exemptedDomainsSettingsJson = """
+            {
+                "exemptedDomains": [
+                    {"domain": "foo.com", "reason": "reason"},
+                    {"domain": "example.com", "reason": "reason"}
+                ]
+            }
+        """.trimIndent()
+        val emptyExemptedDomainsSettingsJson = """
+            {
+                "exemptedDomains": []
+            }
+        """.trimIndent()
     }
 }

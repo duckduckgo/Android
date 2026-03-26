@@ -22,6 +22,7 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Companion.updatesAdapter
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse

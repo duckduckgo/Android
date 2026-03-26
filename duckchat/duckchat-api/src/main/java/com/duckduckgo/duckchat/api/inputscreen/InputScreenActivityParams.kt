@@ -37,6 +37,8 @@ data class InputScreenActivityParams(
     val showInstalledApps: Boolean = false,
     val launchWithVoice: Boolean = false,
     val launchOnChat: Boolean = false,
+    val useBottomSheetMenu: Boolean = false,
+    val showReturnHatch: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

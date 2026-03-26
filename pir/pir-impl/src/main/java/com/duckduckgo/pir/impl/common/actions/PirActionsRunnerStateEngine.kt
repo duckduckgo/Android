@@ -53,6 +53,7 @@ interface PirActionsRunnerStateEngine {
         val brokerStepStartTime: Long = -1L,
         val transactionID: String = "",
         val pendingUrl: String? = null,
+        val preseeding: Boolean = false,
         val actionRetryCount: Int = 0,
         val generatedEmailData: GeneratedEmailData? = null,
         val attemptId: String = "",
@@ -71,6 +72,8 @@ interface PirActionsRunnerStateEngine {
         data object Idle : Event()
 
         data object Started : Event()
+
+        data object PreSeedCookies : Event()
 
         data class LoadUrlComplete(
             val url: String,

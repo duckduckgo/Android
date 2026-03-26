@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/remoteMessage"
@@ -23,18 +22,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false"
-    tools:visibility="visible"
-    android:visibility="gone">
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/keyline_2"
         android:paddingBottom="@dimen/keyline_4">
 
         <ImageView
             android:id="@+id/close"
             android:layout_width="@dimen/messageCtaCloseButtonSize"
             android:layout_height="@dimen/messageCtaCloseButtonSize"
+            android:layout_marginTop="-8dp"
             android:background="?selectableItemBackground"
             android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_close_24"
@@ -46,11 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/keyline_2"
-            app:layout_constraintHeight_max="96dp"
             android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="96dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="false"
             app:lottie_loop="false" />
 
@@ -65,12 +66,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/topImage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/illustrationBarrier"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="topIllustration,topIllustrationAnimated" />
+            app:constraint_referenced_ids="topIllustration,topIllustrationAnimated,topImage" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/messageTitle"
@@ -83,7 +94,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
-            app:layout_goneMarginTop="@dimen/keyline_4"
             app:typography="h3"
             tools:text="Placeholder Title" />
 

@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Dein Abonnement wurde über den Apple App Store erworben. Um deinen Tarif oder deine Rechnungseinstellungen zu ändern, gehe auf einem Gerät, auf dem du mit derselben Apple-Konto angemeldet bist, die du für den Kauf deines Abonnements verwendet hast, zu Einstellungen &gt; Apple-Konto &gt; Abonnements.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktiviere Privacy Pro auf dem Desktop, um Personal Information Removal einzurichten</string>
-    <string name="pirDescription">Gehe im DuckDuckGo-Browser für den Desktop auf <b>Einstellungen &gt; Privacy Pro</b> und klicke auf <b>Ich habe ein Abonnement</b>, um loszulegen.</string>
+    <string name="pirTitle">Aktiviere DuckDuckGo-Abo auf dem Desktop, um Personal Information Removal einzurichten</string>
+    <string name="pirDescription">Gehe im DuckDuckGo-Browser für Desktop-Computer zu <b>Einstellungen &gt; DuckDuckGo abonnieren</b> und klicke auf <b>Ich habe ein Abonnement</b>, um loszulegen.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Telefonat mit Berater nicht hilfreich</string>
     <string name="feedbackSubCategoryItrOther">Sonstiges</string>
 
-    <string name="feedbackSubCategorySubsOtp">Einmal-Passwort</string>
-    <string name="feedbackSubCategorySubsOther">Sonstiges</string>
+    <string name="feedbackSubCategorySubsOtp">Problem mit dem Einmal-Passwort</string>
+    <string name="feedbackSubCategorySubsOther">Etwas anderes</string>
 
     <string name="feedbackSubmitVpnHeader">Hast du ein Problem, das in unserem <annotation type="faqs_link">Hilfecenter</annotation> nicht behandelt wird? Wir wollen auf jeden Fall davon erfahren.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Sag uns, worum es geht …</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnements</string>
     <string name="activitySubscriptionSettings">Abonnementeinstellungen</string>
     <string name="activityActivateSubscription">Ich habe ein Abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Rückmeldung senden</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenten erhalten unser VPN und fortschrittliche KI-Modelle in Duck.ai, Personal Information Removal und Identity Theft Restoration.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Durch den Wechsel erhöht sich dein monatlicher Preis von %1$s/Monat auf %2$s/Monat.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Jahrestarif behalten</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Zum Monatsabo wechseln (%1$s/Monat)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Kein Zugriff auf Plus- oder Pro-Funktionen möglich</string>
+    <string name="subscriptionsProUpgradeTitle">Upgrade auf Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Nutze leistungsfähigere KI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Abonnement verwalten</string>
+    <string name="subscriptionSettingViewAllPlans">Alle Tarife anzeigen</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Zahlung verwalten oder stornieren</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s hochgestuft.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Dein Abo wird am %2$s auf %1$s herabgestuft.</string>
+    <string name="planNamePlusMonthly">Plus monatlich</string>
+    <string name="planNamePlusYearly">Plus jährlich</string>
+    <string name="planNameProMonthly">Pro Monat</string>
+    <string name="planNameProYearly">Pro Jahr</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

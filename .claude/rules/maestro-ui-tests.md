@@ -1,0 +1,1 @@
+../../.cursor/rules/maestro-ui-tests.mdc

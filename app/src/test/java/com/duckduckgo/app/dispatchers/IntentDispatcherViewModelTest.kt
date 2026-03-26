@@ -78,10 +78,11 @@ class IntentDispatcherViewModelTest {
         val text = "url"
         val toolbarColor = 100
         configureHasSession(true)
+        whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR)).thenReturn(true)
         whenever(mockIntent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)).thenReturn(toolbarColor)
         whenever(mockIntent.intentText).thenReturn(text)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -92,18 +93,36 @@ class IntentDispatcherViewModelTest {
     }
 
     @Test
+    fun whenIntentReceivedWithSessionThenCustomTabIsRequestedWithNullToolbarColor() = runTest {
+        val text = "url"
+        configureHasSession(true)
+        whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR)).thenReturn(false)
+        whenever(mockIntent.intentText).thenReturn(text)
+
+        testee.onIntentReceived(mockIntent, isExternal = false)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
+            assertEquals(text, state.intentText)
+            assertEquals(null, state.toolbarColor)
+        }
+    }
+
+    @Test
     fun whenIntentReceivedWithoutSessionThenCustomTabIsNotRequested() = runTest {
         val text = "url"
         configureHasSession(false)
+        whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR)).thenReturn(false)
         whenever(mockIntent.intentText).thenReturn(text)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.customTabRequested)
             assertEquals(text, state.intentText)
-            assertEquals(DEFAULT_COLOR, state.toolbarColor)
+            assertEquals(null, state.toolbarColor)
         }
     }
 
@@ -112,7 +131,7 @@ class IntentDispatcherViewModelTest {
         configureHasSession(true)
         configureIsEmailProtectionLink(true)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -125,7 +144,7 @@ class IntentDispatcherViewModelTest {
         configureHasSession(true)
         configureIsEmailProtectionLink(false)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -146,7 +165,7 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.intentText).thenReturn(urlWithSpaces)
         configureHasSession(true)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -165,7 +184,7 @@ class IntentDispatcherViewModelTest {
         configureHasSession(false)
         configureIsEmailProtectionLink(false)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -183,7 +202,7 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.intentText).thenReturn(intentTextWithSpaces)
         configureHasSession(true)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -201,7 +220,7 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.intentText).thenReturn(text)
         whenever(duckDuckGoUrlDetector.isDuckDuckGoUrl(text)).thenReturn(true)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -214,7 +233,7 @@ class IntentDispatcherViewModelTest {
         val intentUrl = SyncBarcodeUrl.URL_BASE
         whenever(mockIntent.intentText).thenReturn(intentUrl)
         whenever(syncUrlIdentifier.shouldDelegateToSyncSetup(intentUrl)).thenReturn(true)
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = true)
+        testee.onIntentReceived(mockIntent, isExternal = true)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -229,7 +248,7 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.data).thenReturn(uri)
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -243,7 +262,7 @@ class IntentDispatcherViewModelTest {
         whenever(mockIntent.data).thenReturn(uri)
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        testee.onIntentReceived(mockIntent, DEFAULT_COLOR, isExternal = false)
+        testee.onIntentReceived(mockIntent, isExternal = false)
 
         testee.viewState.test {
             val state = awaitItem()

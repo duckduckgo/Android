@@ -29,6 +29,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
@@ -42,6 +44,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import java.time.Instant
 
 interface AuthRepository {
@@ -64,10 +67,14 @@ interface AuthRepository {
     suspend fun canSupportEncryption(): Boolean
     suspend fun setFeatures(basePlanId: String, features: Set<String>)
     suspend fun getFeatures(basePlanId: String): Set<String>
+    suspend fun setFeaturesV2(basePlanId: String, features: Set<Entitlement>)
+    suspend fun getFeaturesV2(basePlanId: String): Set<Entitlement>
     suspend fun isFreeTrialActive(): Boolean
     suspend fun registerLocalPurchasedAt()
     suspend fun getLocalPurchasedAt(): Long?
     suspend fun removeLocalPurchasedAt()
+    suspend fun setPendingPlans(pendingPlans: List<PendingPlan>)
+    suspend fun getPendingPlans(): List<PendingPlan>
 }
 
 @Module
@@ -79,8 +86,9 @@ object AuthRepositoryModule {
         dispatcherProvider: DispatcherProvider,
         sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
+        privacyProFeature: dagger.Lazy<PrivacyProFeature>,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo)
+        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, privacyProFeature)
     }
 }
 
@@ -88,6 +96,7 @@ internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
+    private val privacyProFeature: dagger.Lazy<PrivacyProFeature>,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -100,6 +109,25 @@ internal class RealAuthRepository constructor(
         )
         moshi.adapter<Map<String, Set<String>>>(type)
     }
+
+    private val featuresV2Adapter by lazy {
+        val entitlementSetType = Types.newParameterizedType(Set::class.java, Entitlement::class.java)
+        val mapType = Types.newParameterizedType(Map::class.java, String::class.java, entitlementSetType)
+        moshi.adapter<Map<String, Set<Entitlement>>>(mapType)
+    }
+
+    private val pendingPlansListAdapter by lazy {
+        val type = Types.newParameterizedType(List::class.java, PendingPlanJson::class.java)
+        moshi.adapter<List<PendingPlanJson>>(type)
+    }
+
+    private data class PendingPlanJson(
+        val productId: String,
+        val billingPeriod: String,
+        val effectiveAt: Long,
+        val status: String,
+        val tier: String,
+    )
 
     private inline fun <reified T> Moshi.listToJson(list: List<T>): String {
         return adapter<List<T>>(Types.newParameterizedType(List::class.java, T::class.java)).toJson(list)
@@ -165,6 +193,9 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun setSubscription(subscription: Subscription?) = withContext(dispatcherProvider.io()) {
+        logcat {
+            "setSubscription called with subscription: $subscription"
+        }
         with(subscriptionsDataStore) {
             productId = subscription?.productId
             billingPeriod = subscription?.billingPeriod
@@ -173,6 +204,25 @@ internal class RealAuthRepository constructor(
             status = subscription?.status?.statusName
             platform = subscription?.platform
             freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
+            pendingPlans = subscription?.pendingPlans?.let { plans ->
+                if (plans.isEmpty()) {
+                    null
+                } else {
+                    runCatching {
+                        pendingPlansListAdapter.toJson(
+                            plans.map { plan ->
+                                PendingPlanJson(
+                                    productId = plan.productId,
+                                    billingPeriod = plan.billingPeriod,
+                                    effectiveAt = plan.effectiveAt,
+                                    status = plan.status,
+                                    tier = plan.tier.value,
+                                )
+                            },
+                        )
+                    }.getOrNull()
+                }
+            }
         }
     }
 
@@ -184,6 +234,19 @@ internal class RealAuthRepository constructor(
         val status = subscriptionsDataStore.status?.toStatus() ?: return@withContext null
         val platform = subscriptionsDataStore.platform ?: return@withContext null
         val activeOffers = if (subscriptionsDataStore.freeTrialActive) listOf(ActiveOfferType.TRIAL) else listOf()
+        val pendingPlans = subscriptionsDataStore.pendingPlans?.let { json ->
+            runCatching {
+                pendingPlansListAdapter.fromJson(json)?.map { planJson ->
+                    PendingPlan(
+                        productId = planJson.productId,
+                        billingPeriod = planJson.billingPeriod,
+                        effectiveAt = planJson.effectiveAt,
+                        status = planJson.status,
+                        tier = SubscriptionTier.fromTierString(planJson.tier),
+                    )
+                }
+            }.getOrDefault(emptyList())
+        } ?: emptyList()
         Subscription(
             productId = productId,
             billingPeriod = billingPeriod,
@@ -192,6 +255,7 @@ internal class RealAuthRepository constructor(
             status = status,
             platform = platform,
             activeOffers = activeOffers,
+            pendingPlans = pendingPlans,
         )
     }
 
@@ -228,8 +292,34 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.subscriptionFeatures
+        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+            // When flag is ON, try v2 first
+            val v2Features = getFeaturesV2(basePlanId)
+            if (v2Features.isNotEmpty()) {
+                return@withContext v2Features.map { it.product }.toSet()
+            }
+            // Fallback to v1 for smooth runtime flag transitions (until fetcher runs on next app start)
+        }
+        // Use v1 storage
+        return@withContext subscriptionsDataStore.subscriptionFeatures
             ?.let(featuresAdapter::fromJson)
+            ?.get(basePlanId) ?: emptySet()
+    }
+
+    override suspend fun setFeaturesV2(
+        basePlanId: String,
+        features: Set<Entitlement>,
+    ) = withContext(dispatcherProvider.io()) {
+        val featuresMap = subscriptionsDataStore.subscriptionEntitlements
+            ?.let(featuresV2Adapter::fromJson)
+            ?.toMutableMap() ?: mutableMapOf()
+        featuresMap[basePlanId] = features
+        subscriptionsDataStore.subscriptionEntitlements = featuresV2Adapter.toJson(featuresMap)
+    }
+
+    override suspend fun getFeaturesV2(basePlanId: String): Set<Entitlement> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.subscriptionEntitlements
+            ?.let(featuresV2Adapter::fromJson)
             ?.get(basePlanId) ?: emptySet()
     }
 
@@ -253,6 +343,42 @@ internal class RealAuthRepository constructor(
     override suspend fun removeLocalPurchasedAt() {
         subscriptionsDataStore.localPurchasedAt = null
     }
+
+    override suspend fun setPendingPlans(pendingPlans: List<PendingPlan>) = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.pendingPlans = if (pendingPlans.isEmpty()) {
+            null
+        } else {
+            runCatching {
+                pendingPlansListAdapter.toJson(
+                    pendingPlans.map { plan ->
+                        PendingPlanJson(
+                            productId = plan.productId,
+                            billingPeriod = plan.billingPeriod,
+                            effectiveAt = plan.effectiveAt,
+                            status = plan.status,
+                            tier = plan.tier.value,
+                        )
+                    },
+                )
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getPendingPlans(): List<PendingPlan> = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.pendingPlans?.let { json ->
+            runCatching {
+                pendingPlansListAdapter.fromJson(json)?.map { planJson ->
+                    PendingPlan(
+                        productId = planJson.productId,
+                        billingPeriod = planJson.billingPeriod,
+                        effectiveAt = planJson.effectiveAt,
+                        status = planJson.status,
+                        tier = SubscriptionTier.fromTierString(planJson.tier),
+                    )
+                }
+            }.getOrDefault(emptyList())
+        } ?: emptyList()
+    }
 }
 
 data class AccessToken(
@@ -270,16 +396,35 @@ data class Account(
     val externalId: String,
 )
 
-data class Subscription(
+data class PendingPlan(
     val productId: String,
+    val billingPeriod: String,
+    val effectiveAt: Long,
+    val status: String,
+    val tier: SubscriptionTier,
+)
+
+data class Subscription(
+    val productId: String, // this is the plan id returned by the backend
     val billingPeriod: String,
     val startedAt: Long,
     val expiresOrRenewsAt: Long,
     val status: SubscriptionStatus,
     val platform: String,
     val activeOffers: List<ActiveOfferType>,
+    val pendingPlans: List<PendingPlan> = emptyList(),
 ) {
     fun isActive(): Boolean = status.isActive()
+
+    val tier: SubscriptionTier
+        get() = SubscriptionTier.fromPlanId(productId)
+
+    // Computed from first pending plan (if any)
+    val effectiveTier: SubscriptionTier
+        get() = pendingPlans.firstOrNull()?.tier ?: tier
+
+    val hasPendingChange: Boolean
+        get() = pendingPlans.isNotEmpty()
 }
 
 fun SubscriptionStatus.isActive(): Boolean {

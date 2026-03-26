@@ -161,6 +161,8 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_SHORTCUTS,
+    featureName = "pluginShortcutsNewTabSectionPlugin",
+    parentFeatureName = "pluginPointNewTabPageSectionPlugin",
 )
 class ShortcutsNewTabSectionPlugin @Inject constructor(
     private val setting: NewTabShortcutDataStore,

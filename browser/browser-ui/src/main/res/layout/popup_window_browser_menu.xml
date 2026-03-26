@@ -21,6 +21,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/popup_menu_bg"
+    tools:ignore="Overdraw"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout

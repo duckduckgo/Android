@@ -44,6 +44,17 @@ interface PirEmailConfirmationJobsRunner {
     suspend fun runEligibleJobs(context: Context): Result<Unit>
 
     /**
+     * Attempts to fetch the email confirmation link for the given job record.
+     * This is useful for debug scenarios where you want to manually trigger link fetching.
+     *
+     * @param jobRecord - The email confirmation job record to fetch the link for
+     * @return Result containing the updated job record with the link, or failure if not available
+     */
+    suspend fun debugFetchLinkForJob(
+        jobRecord: EmailConfirmationJobRecord,
+    ): Result<EmailConfirmationJobRecord>
+
+    /**
      * Stop any job that is in progress if any.
      */
     fun stop()
@@ -98,6 +109,52 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
     override fun stop() {
         logcat { "PIR-EMAIL-CONFIRMATION: Stopping runner." }
         emailConfirmation.stop()
+    }
+
+    override suspend fun debugFetchLinkForJob(
+        jobRecord: EmailConfirmationJobRecord,
+    ): Result<EmailConfirmationJobRecord> = withContext(dispatcherProvider.io()) {
+        logcat { "PIR-EMAIL-CONFIRMATION: Fetching link for job ${jobRecord.extractedProfileId}" }
+
+        val emailDataList = listOf(jobRecord.emailData)
+        val statusMap = pirRepository.getEmailConfirmationLinkStatus(emailDataList)
+
+        val status = statusMap[jobRecord.emailData]
+        if (status == null) {
+            logcat { "PIR-EMAIL-CONFIRMATION: No status returned for email ${jobRecord.emailData.email}" }
+            return@withContext Result.failure(IllegalStateException("No status returned"))
+        }
+
+        logcat { "PIR-EMAIL-CONFIRMATION: Status for ${jobRecord.emailData.email}: $status" }
+
+        when (status) {
+            is EmailConfirmationLinkFetchStatus.Ready -> {
+                val link = status.data[KEY_LINK]
+                if (link != null) {
+                    val updatedRecord = jobRecordUpdater.markEmailConfirmationWithLink(jobRecord.extractedProfileId, link)
+                    if (updatedRecord != null) {
+                        logcat { "PIR-EMAIL-CONFIRMATION: Link fetched and saved successfully" }
+                        return@withContext Result.success(updatedRecord)
+                    } else {
+                        return@withContext Result.failure(IllegalStateException("Failed to save link"))
+                    }
+                } else {
+                    return@withContext Result.failure(IllegalStateException("Link not found in response data"))
+                }
+            }
+
+            is EmailConfirmationLinkFetchStatus.Pending -> {
+                return@withContext Result.failure(IllegalStateException("Link is still pending"))
+            }
+
+            is EmailConfirmationLinkFetchStatus.Error -> {
+                return@withContext Result.failure(IllegalStateException("Error: ${status.error}"))
+            }
+
+            is EmailConfirmationLinkFetchStatus.Unknown -> {
+                return@withContext Result.failure(IllegalStateException("Unknown status: ${status.errorCode}"))
+            }
+        }
     }
 
     private suspend fun runEmailConfirmationFetch(activeBrokersMap: Map<String, Broker>) =
@@ -267,7 +324,6 @@ class RealPirEmailConfirmationJobsRunner @Inject constructor(
                     brokerUrl = broker.url,
                     brokerVersion = broker.version,
                     actionId = it.jobAttemptData.lastJobAttemptActionId,
-                    attemptId = it.emailData.attemptId,
                 )
 
                 jobRecordUpdater.recordEmailConfirmationAttemptMaxed(it.extractedProfileId)

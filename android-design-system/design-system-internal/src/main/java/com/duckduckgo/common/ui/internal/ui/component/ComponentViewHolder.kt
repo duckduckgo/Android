@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+import com.duckduckgo.common.ui.view.listitem.SettingsListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.card.MaterialCardView
@@ -99,7 +100,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val promoSingleMessage = Message(
-                middleIllustration = CommonR.drawable.desktop_promo_artwork,
+                middleIllustration = CommonR.drawable.promo_mac_and_windows,
                 title = "Promo Single Action Message",
                 subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
                 promoAction = "Promo Link",
@@ -349,7 +350,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     class SettingsListItemComponentViewHolder(parent: ViewGroup) :
-        ComponentViewHolder(inflate(parent, R.layout.component_settings))
+        ComponentViewHolder(inflate(parent, R.layout.component_settings)) {
+        override fun bind(component: Component) {
+            view.findViewById<SettingsListItem>(R.id.settingsListItemWithBetaTag).apply {
+                showPillIcon(true)
+            }
+        }
+    }
 
     companion object {
         fun create(

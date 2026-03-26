@@ -35,7 +35,6 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -62,7 +61,6 @@ class EnqueuedPixelWorker @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val customTabDetector: CustomTabDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
     private val appBuildConfig: AppBuildConfig,
     private val dispatchers: DispatcherProvider,
@@ -105,13 +103,10 @@ class EnqueuedPixelWorker @Inject constructor(
             }
         }.toMap()
 
-        val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-        val parameters = paramsMap + popupExperimentParams
-
         // app launch pixel
         pixel.get().fire(
             pixel = AppPixelName.APP_LAUNCH,
-            parameters = parameters,
+            parameters = paramsMap,
         )
         pixel.get().fire(
             pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU,
@@ -125,7 +120,7 @@ class EnqueuedPixelWorker @Inject constructor(
         if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
             pixel.get().fire(
                 pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
-                parameters = parameters,
+                parameters = paramsMap,
             )
         }
     }

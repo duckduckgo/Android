@@ -1,0 +1,13 @@
+name: 'End to End Tests - Strings Changed'
+
+on:
+  pull_request:
+    paths:
+      - '**/values/strings*.xml'
+
+jobs:
+  call-end-to-end:
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ github.event.pull_request.head.sha }}
+    secrets: inherit

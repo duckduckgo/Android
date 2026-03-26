@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Abonnementet ditt ble kjøpt gjennom Apple App Store. Hvis du vil endre abonnementet eller faktureringsinnstillingene, må du gå til Innstillinger &gt; Apple-konto &gt; Abonnementer på en enhet som er logget på samme Apple-konto som ble brukt til å kjøpe abonnementet.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktiver Privacy Pro på en datamaskin for å konfigurere Personal Information Removal</string>
-    <string name="pirDescription">I skrivebordsversjonen av DuckDuckGo-nettleseren går du til <b>Innstillinger &gt; Privacy Pro</b> og klikker på <b>Jeg har et abonnement</b> for å komme i gang.</string>
+    <string name="pirTitle">Aktiver DuckDuckGo-abonnementet på datamaskin for å konfigurere Personal Information Removal</string>
+    <string name="pirDescription">I skrivebordsversjonen av DuckDuckGo-nettleseren går du til <b>Innstillinger &gt; Abonner på DuckDuckGo</b> og klikker på <b>Jeg har et abonnement</b> for å komme i gang.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Det hjalp ikke å ringe til rådgiver</string>
     <string name="feedbackSubCategoryItrOther">Annet</string>
 
-    <string name="feedbackSubCategorySubsOtp">Engangspassord</string>
-    <string name="feedbackSubCategorySubsOther">Annet</string>
+    <string name="feedbackSubCategorySubsOtp">Problem med engangspassord</string>
+    <string name="feedbackSubCategorySubsOther">Noe annet</string>
 
     <string name="feedbackSubmitVpnHeader">Har du funnet et problem som ikke er dekket i <annotation type="faqs_link">hjelpesenteret</annotation>? Da vil vi svært gjerne høre om det.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Fortell oss hva som skjer …</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abonnementer</string>
     <string name="activitySubscriptionSettings">Abonnementsinnstillinger</string>
     <string name="activityActivateSubscription">Jeg har et abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbakemelding</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vår VPN, avanserte AI-modeller i Duck.ai, Personal Information Removal og Identity Theft Restoration.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Hvis du bytter, øker månedsprisen fra %1$s per måned til %2$s per måned.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årsabonnementet</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Bytt til månedlig (%1$s per måned)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Får ikke tilgang til Plus- eller Pro-nivåfunksjoner</string>
+    <string name="subscriptionsProUpgradeTitle">Oppgrader til Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Få tilgang til kraftigere AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Administrer abonnement</string>
+    <string name="subscriptionSettingViewAllPlans">Vis alle abonnementer</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Administrer betaling eller si opp</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Abonnementet ditt blir oppgradert til %1$s den %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Abonnementet ditt blir nedgradert til %1$s den %2$s.</string>
+    <string name="planNamePlusMonthly">Plus månedlig</string>
+    <string name="planNamePlusYearly">Plus årlig</string>
+    <string name="planNameProMonthly">Pro månedlig</string>
+    <string name="planNameProYearly">Pro årlig</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

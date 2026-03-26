@@ -52,6 +52,10 @@ class GlideFaviconDownloader @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : FaviconDownloader {
 
+    companion object {
+        private const val MAX_FAVICON_SIZE_PX = 512
+    }
+
     override suspend fun getFaviconFromDisk(file: File): Bitmap? = withContext(dispatcherProvider.io()) {
         if (androidBrowserConfigFeature.glideSuspend().isEnabled()) {
             getFaviconFromDiskAsync(file)
@@ -136,7 +140,7 @@ class GlideFaviconDownloader @Inject constructor(
 
     private suspend fun RequestBuilder<Bitmap>.awaitBitmap(context: Context): Bitmap? = suspendCancellableCoroutine { continuation ->
         kotlin.runCatching {
-            val target = object : CustomTarget<Bitmap>() {
+            val target = object : CustomTarget<Bitmap>(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX) {
                 override fun onResourceReady(
                     resource: Bitmap,
                     transition: Transition<in Bitmap>?,
@@ -170,7 +174,8 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     private fun getFaviconFromDiskSync(file: File): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).submit().get()
+        Glide.with(context).asBitmap().load(file).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+            .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 
     private fun getFaviconFromDiskSync(
@@ -190,6 +195,7 @@ class GlideFaviconDownloader @Inject constructor(
     }.getOrNull()
 
     private fun getFaviconFromUrlSync(uri: Uri): Bitmap? = runCatching {
-        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).submit().get()
+        Glide.with(context).asBitmap().load(uri).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true)
+            .submit(MAX_FAVICON_SIZE_PX, MAX_FAVICON_SIZE_PX).get()
     }.getOrNull()
 }

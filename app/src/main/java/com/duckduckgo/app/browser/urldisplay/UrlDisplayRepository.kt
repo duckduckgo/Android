@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.urldisplay
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -67,7 +66,6 @@ interface UrlDisplayRepository {
 @SingleInstanceIn(AppScope::class)
 class RealUrlDisplayRepository @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
-    private val browserConfigFeature: AndroidBrowserConfigFeature,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : UrlDisplayRepository {
@@ -96,11 +94,6 @@ class RealUrlDisplayRepository @Inject constructor(
             settingsDataStore.urlPreferenceSetByUser = true
             settingsDataStore.urlPreferenceMigrated = true
             return settingsDataStore.isFullUrlEnabled
-        }
-
-        // Feature flag disabled - rollback mode
-        if (!browserConfigFeature.shorterUrlDefault().isEnabled()) {
-            return true
         }
 
         // Preference was auto-assigned on first launch, we return cached value

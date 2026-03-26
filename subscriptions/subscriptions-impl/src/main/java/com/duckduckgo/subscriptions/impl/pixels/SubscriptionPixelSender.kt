@@ -35,6 +35,9 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRAT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_MIGRATION_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_STORE_ERROR
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.AUTH_V2_TOKEN_VALIDATION_ERROR
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_DUCK_AI_PAID_USED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -65,6 +68,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_S
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_DAY
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelParameter.ACTIVATION_PLATFORM
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -72,7 +77,11 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
-    fun reportPurchaseFailureOther(errorType: String, reason: String? = null)
+    fun reportPurchaseFailureOther(
+        errorType: String,
+        reason: String? = null,
+    )
+
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
@@ -114,6 +123,9 @@ interface SubscriptionPixelSender {
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
     fun reportSubscriptionsWebViewRenderProcessCrash(isRepeated: Boolean)
+    fun reportFreeTrialStart()
+    fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
+    fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -123,7 +135,13 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
-        fire(SUBSCRIPTION_ACTIVE)
+        fire(
+            SUBSCRIPTION_ACTIVE,
+            mapOf(
+                SubscriptionPixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString(),
+                SubscriptionPixelParameter.PETAL to "true",
+            ),
+        )
 
     override fun reportOfferScreenShown() =
         fire(OFFER_SCREEN_SHOWN)
@@ -131,7 +149,10 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
 
-    override fun reportPurchaseFailureOther(errorType: String, reason: String?) =
+    override fun reportPurchaseFailureOther(
+        errorType: String,
+        reason: String?,
+    ) =
         fire(
             PURCHASE_FAILURE_OTHER,
             mapOf(
@@ -280,9 +301,28 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH, mapOf("is_repeated" to isRepeated.toString()))
     }
 
-    private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
+    override fun reportFreeTrialStart() {
+        fire(FREE_TRIAL_START)
+    }
+
+    override fun reportFreeTrialVpnActivation(activationDay: String, platform: String) {
+        fire(FREE_TRIAL_VPN_ACTIVATION, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
+    }
+
+    override fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String) {
+        fire(FREE_TRIAL_DUCK_AI_PAID_USED, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
+    }
+
+    private fun fire(
+        pixel: SubscriptionPixel,
+        params: Map<String, String> = emptyMap(),
+    ) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            if (pixel.enqueue) {
+                pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
+            } else {
+                pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            }
         }
     }
 }

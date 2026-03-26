@@ -88,10 +88,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         binding.restoreSubscriptionGooglePlayTitle.setOnClickListener(null)
 
         binding.restoreSubscriptionEmailLayout.setOnClickListener {
-            viewModel.restoreFromEmail()
+            viewModel.restoreFromEmail(isOriginWeb)
         }
         binding.restoreSubscriptionGooglePlayLayout.setOnClickListener {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb)
         }
     }
 
@@ -102,13 +102,13 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToRestore() {
-        val intent = globalActivityStarter.startIntent(
+        globalActivityStarter.startForResult(
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.activateUrl,
             ),
+            startForResultRestore,
         )
-        startForResultRestore.launch(intent)
     }
 
     private fun onPurchaseRestored() {

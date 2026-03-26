@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -35,8 +36,12 @@ dependencies {
     implementation project(':data-store-api')
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
+    implementation project(':network-protection-api')
+    implementation project(':remote-messaging-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
+    implementation project(':tracker-detection-api')
+    implementation project(':user-agent-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"
@@ -45,6 +50,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation Google.dagger
+    implementation Google.android.material
     implementation KotlinX.coroutines.android
 
     // Room
@@ -60,7 +66,7 @@ dependencies {
 
     // Encryption
     implementation "net.zetetic:sqlcipher-android:_"
-    implementation project(':library-loader-api')
+    implementation project(':sqlcipher-loader-api')
     implementation AndroidX.security.crypto
 
     testImplementation Testing.junit4
@@ -82,6 +88,7 @@ dependencies {
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation project(path: ':common-test')
+    androidTestImplementation project(path: ':feature-toggles-test')
     androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
@@ -98,8 +105,8 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
     testOptions {
         unitTests {

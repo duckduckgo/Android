@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -32,6 +33,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
@@ -96,6 +98,12 @@ class OnboardingViewModelTest {
 
         verify(onboardingSkipper).markOnboardingAsCompleted()
         verify(newAddressBarOptionManager).setAsShown()
+    }
+
+    @Test
+    fun whenInitializePagesCalledThenBuildPageBlueprints() {
+        testee.initializePages()
+        verify(pageLayout).buildPageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

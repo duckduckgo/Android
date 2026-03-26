@@ -34,8 +34,10 @@ import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Signup
+import com.duckduckgo.sync.impl.TokenRescopeResponse
 import com.duckduckgo.sync.impl.encodeB64
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.json.JSONObject
 import retrofit2.Response
 import java.io.File
 
@@ -186,6 +188,30 @@ object TestSyncFixtures {
     val connectDeviceSuccess = Result.Success(encryptedRecoveryCode)
     val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
     val connectDeviceKeysGoneError = Result.Error(code = keysGoneCode, reason = keysNotFoundErr)
+
+    const val scopedToken = "scoped-token-123"
+    const val untilTimestamp = "2024-01-01T00:00:00Z"
+    val tokenRescopeResponseBody = TokenRescopeResponse(token = scopedToken)
+    val rescopeTokenSuccessResponse: Response<TokenRescopeResponse> = Response.success(tokenRescopeResponseBody)
+    val rescopeTokenErrorResponse: Response<TokenRescopeResponse> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+    val rescopeTokenEmptyErrorResponse: Response<TokenRescopeResponse> = Response.error(
+        invalidCodeErr,
+        "".toResponseBody(),
+    )
+    val rescopeTokenSuccess = Result.Success(scopedToken)
+    val rescopeTokenError = Result.Error(code = invalidCodeErr, reason = "unexpected status code")
+    val rescopeTokenEmptyError = Result.Error(code = invalidCodeErr, reason = "empty response")
+
+    val deleteAiChatsSuccessResponse: Response<JSONObject> = Response.success(JSONObject())
+    val deleteAiChatsErrorResponse: Response<JSONObject> = Response.error(
+        invalidCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
+    val deleteAiChatsSuccess = Result.Success(Unit)
+    val deleteAiChatsError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
 
     val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\"" +
         ",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\"" +

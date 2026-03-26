@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -37,6 +38,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -68,7 +70,9 @@ class TabDataRepository @Inject constructor(
     private val adClickManager: AdClickManager,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-) : TabRepository {
+    private val duckChatContextualDataStore: DuckChatContextualDataStore,
+    private val tabVisitedSitesRepository: TabVisitedSitesRepository,
+) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
@@ -163,7 +167,10 @@ class TabDataRepository @Inject constructor(
 
     private fun generateTabId() = UUID.randomUUID().toString()
 
-    private fun buildSiteDataSync(url: String?, tabId: String): MutableLiveData<Site> {
+    private fun buildSiteDataSync(
+        url: String?,
+        tabId: String,
+    ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
             val siteMonitor = siteFactory.buildSite(url = it, tabId = tabId)
@@ -172,7 +179,10 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    private suspend fun buildSiteData(url: String?, tabId: String): MutableLiveData<Site> {
+    private suspend fun buildSiteData(
+        url: String?,
+        tabId: String,
+    ): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url ?: return data
         val siteMonitor = siteFactory.buildSite(url = url, tabId = tabId)
@@ -252,7 +262,10 @@ class TabDataRepository @Inject constructor(
         return tabsDao.tabs().size
     }
 
-    override fun countTabsAccessedWithinRange(accessOlderThan: Long, accessNotMoreThan: Long?): Int {
+    override fun countTabsAccessedWithinRange(
+        accessOlderThan: Long,
+        accessNotMoreThan: Long?,
+    ): Int {
         val now = timeProvider.localDateTimeNow()
         val start = now.minusDays(accessOlderThan)
         val end = accessNotMoreThan?.let { now.minusDays(it).minusSeconds(1) } // subtracted a second to make the end limit inclusive
@@ -291,7 +304,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateTabPosition(from: Int, to: Int) {
+    override suspend fun updateTabPosition(
+        from: Int,
+        to: Int,
+    ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateTabsOrder(from, to)
         }
@@ -321,6 +337,7 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+        tabVisitedSitesRepository.clearTab(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -328,6 +345,16 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabsAndUpdateSelection(tabIds)
             clearAllSiteData(tabIds)
         }
+        tabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
+    }
+
+    override suspend fun replaceTabWithNewTab(tabId: String, url: String?) {
+        databaseExecutor().scheduleDirect {
+            val newTab = TabEntity(url = url, tabId = generateTabId())
+            tabsDao.replaceTab(tabId, newTab)
+            clearAllSiteData(listOf(tabId))
+        }
+        tabVisitedSitesRepository.clearTab(tabId)
     }
 
     private fun clearAllSiteData(tabIds: List<String>) {
@@ -337,6 +364,7 @@ class TabDataRepository @Inject constructor(
             deleteOldPreviewImages(tabId)
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
+            duckChatContextualDataStore.clearTabChatUrl(tabId)
         }
     }
 
@@ -358,14 +386,19 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun undoDeletable(tabIds: List<String>, moveActiveTabToEnd: Boolean) {
+    override suspend fun undoDeletable(
+        tabIds: List<String>,
+        moveActiveTabToEnd: Boolean,
+    ) {
         databaseExecutor().scheduleDirect {
             tabsDao.undoDeletableTabs(tabIds, moveActiveTabToEnd)
         }
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        clearAllSiteData(getDeletableTabIds())
+        val deletableTabIds = getDeletableTabIds()
+        clearAllSiteData(deletableTabIds)
+        deletableTabIds.forEach { tabVisitedSitesRepository.clearTab(it) }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
@@ -396,6 +429,7 @@ class TabDataRepository @Inject constructor(
                 }
             }
         }
+        tabVisitedSitesRepository.clearTab(tabId)
     }
 
     override suspend fun deleteAll() {
@@ -406,10 +440,18 @@ class TabDataRepository @Inject constructor(
         adClickManager.clearAll()
         webViewSessionStorage.deleteAllSessions()
         siteData.clear()
+        duckChatContextualDataStore.clearAll()
+        tabVisitedSitesRepository.clearAll()
     }
 
     override suspend fun getSelectedTab(): TabEntity? =
         withContext(dispatchers.io()) { tabsDao.selectedTab() }
+
+    override suspend fun getLastAccessedTab(): TabEntity? =
+        withContext(dispatchers.io()) { tabsDao.lastAccessedTab() }
+
+    override val flowLastAccessedTab: Flow<TabEntity?> = tabsDao.flowLastAccessedTab()
+        .distinctUntilChanged()
 
     override suspend fun select(tabId: String) {
         databaseExecutor().scheduleDirect {

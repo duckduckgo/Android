@@ -119,8 +119,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
-    <string name="fireClearAll">Изчистване на раздели и данни</string>
-    <string name="fireClearAllPlusDuckChats">Изчистване на раздели, данни и чатове с Duck.ai</string>
+    <string name="fireClearAll">Изтриване на раздели и данни</string>
+    <string name="fireClearAllPlusDuckChats">Изтриване на раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingProtections">Защити</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
+    <string name="settingsWhatsNew">Новости</string>
     <string name="settingsHeadingAbout">За нас</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
     <string name="openAutoCompleteSettings">Отвори Настройки</string>
+    <string name="privateSearchChatSuggestionsToggle">Предложения за чат</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Показване на предложения от историята, отметките и (по избор) историята на чата с Duck.ai, когато въвеждате в лентата за търсене. Всички търсения са поверителни.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Обща информация</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобален контрол на поверителността</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Упражнява правото Ви на отказ от Ваше име, като казва на сайтовете да не продават или споделят личната Ви информация.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
+    <string name="getDesktopBrowserTitle">Защитете личната си информация и на Mac, и на Windows!</string>
+    <string name="getDesktopBrowserBody">За да изтеглите DuckDuckGo за Mac или Windows, посетете:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Споделяне на връзка за изтегляне</string>
+    <string name="getDesktopBrowserNoThanks">Не, благодаря</string>
+    <string name="getDesktopBrowserHideItem">Скрий</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Изчистване на данни</string>
+    <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността Ви онлайн. Използвайте Fire Button, за да изтриете данните ръчно или задайте автоматично изтриване.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d сайт е изключен от изчистване</item>
+        <item quantity="other">%1$d сайта са изключени от изчистване</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Включен</string>
+    <string name="dataClearingAutomaticClearingOff">Изключено</string>
+    <string name="dataClearingClearBrowsingData">Изчистване на данните за сърфиране</string>
+    <string name="dataClearingAutomaticDataClearing">Автоматично изтриване на данни</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Автоматично изтриване на данни</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Затваряне на всички отворени раздели</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Изтрива всички данни от сайта, включително посетени сайтове. Може да Ви отпише от акаунтите.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Изтриване на всички чатове, включително закачените чатове</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Избери какво да изтриеш</string>
+    <string name="dataClearingOptionTabs">Раздели</string>
+    <string name="dataClearingOptionData">Бисквитки и данни за сайта</string>
+    <string name="dataClearingDuckAiChats">Чатове с Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Изтриване на всички чатове</string>
+    <string name="fireDialogDeleteButton">Изтрий</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на всички %1$d раздела</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Може да Ви отпише от акаунтите.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Няма</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Изтрий от 1 сайт. Може да те отпише от акаунтите.</item>
+        <item quantity="other">Изтрий от %1$d сайта. Може да те отпише от акаунтите.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Да изтрием ли разделите и данните от сайта?</string>
+    <string name="singleTabFireDialogTitleWithChats">Да изтрием ли раздели, данни от сайтове и чатове?</string>
+    <string name="singleTabFireDialogDeleteAll">Изтриване на всички</string>
+    <string name="singleTabFireDialogDeleteThisTab">Изтриване на този раздел</string>
+    <string name="singleTabFireDialogDeleteChat">Изтриване на чата</string>
+    <string name="singleTabFireDialogTitleDuckAi">Да бъде ли изтрит този чат?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d раздел и данните му са изтрити</item>
+        <item quantity="other">%1$d раздела и данните им са изтрити</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Раздели и данни</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Раздели, данни и чатове с Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Изчистване на…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Изчистване на…</string>
+    <string name="settingsAutomaticallyClearWhen">Изтриване на…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Изтриване на…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Само при изход от приложението</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Изход от приложението, неактивен за 5 секунди</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Изход от приложението, неактивен за 5 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Изход от приложението, неактивен за 15 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Изход от приложението, неактивен за 30 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
-    <string name="settingsClearAiDataTitle">Изчистване на чатовете с Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Изтриване на чатове с Duck.ai</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button ще изтрие също и историята на Duck.ai, включително закачените чатове.</string>
     <string name="settingsClearDataActionSecondaryText">Изчиства всички раздели и данни за всички сайтове, които не защитиш с Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Изчиства всички раздели, Duck.ai чатове и данни за всички сайтове, които не защитиш с Fireproof.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
     <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
     <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Пробвайте безплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли, че?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Следващ</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Завършете настройките</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Показване на броя на тракерите в превключвателя на раздели</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s блокиран тракер &lt;/b&gt; през последните 7 дни</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Искате ли да скриете брояча на тракери?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Можете да го включите отново в Настройки &gt; Външен вид.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Анимация за блокирани тракери</string>
+    <string name="showTrackerCountInAddressBar">Показване в адресната лента</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Показване в мениджъра на разделите</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Само търсене</string>

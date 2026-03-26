@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
@@ -157,9 +158,6 @@ interface AutofillFeature {
     fun settingsScreen(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
-    fun createAsyncPreferences(): Toggle
-
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canPromoteImportPasswordsInPasswordManagement(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -179,4 +177,13 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun prioritizeDomainMatchesOnSearch(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useHarmony(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun sendSanitizedStackTraces(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun readFromHarmony(): Toggle
 }

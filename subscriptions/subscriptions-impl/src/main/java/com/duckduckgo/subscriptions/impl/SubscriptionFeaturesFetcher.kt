@@ -21,11 +21,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
+import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
-import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
@@ -41,7 +42,6 @@ import javax.inject.Inject
 class SubscriptionFeaturesFetcher @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val playBillingManager: PlayBillingManager,
-    private val subscriptionsService: SubscriptionsService,
     private val subscriptionsCachedService: SubscriptionsCachedService,
     private val authRepository: AuthRepository,
     private val privacyProFeature: PrivacyProFeature,
@@ -68,11 +68,20 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     private suspend fun fetchSubscriptionFeatures() {
         playBillingManager.productsFlow
             .firstOrNull() { it.isNotEmpty() }
-            ?.find { it.productId == BASIC_SUBSCRIPTION }
-            ?.subscriptionOfferDetails
+            ?.filter {
+                if (privacyProFeature.fetchProTierEntitlements().isEnabled()) {
+                    it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
+                } else {
+                    it.productId == BASIC_SUBSCRIPTION
+                }
+            }
+            ?.flatMap { it.subscriptionOfferDetails ?: emptyList() }
             ?.map { it.basePlanId }
             ?.distinct()
             ?.let { basePlanIds ->
+                logcat {
+                    "fetchSubscriptionFeatures: found base plan ids: $basePlanIds"
+                }
                 if (privacyProFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
                     basePlanIds
                 } else {
@@ -82,14 +91,25 @@ class SubscriptionFeaturesFetcher @Inject constructor(
                 }
             }
             ?.forEach { basePlanId ->
-                val features = if (privacyProFeature.useClientWithCacheForFeatures().isEnabled()) {
-                    subscriptionsCachedService.features(basePlanId).features
-                } else {
-                    subscriptionsService.features(basePlanId).features
-                }
-                logcat { "Subscription features for base plan $basePlanId fetched: $features" }
-                if (features.isNotEmpty()) {
-                    authRepository.setFeatures(basePlanId, features.toSet())
+                runCatching {
+                    if (privacyProFeature.tierMessagingEnabled().isEnabled()) {
+                        val features = subscriptionsCachedService.featuresV2(basePlanId).features[basePlanId] ?: emptyList()
+                        logcat { "fetchSubscriptionFeatures: Subscription features for base plan $basePlanId fetched: $features" }
+                        if (features.isNotEmpty()) {
+                            val entitlements = features.map { Entitlement(name = it.name, product = it.product) }.toSet()
+                            authRepository.setFeaturesV2(basePlanId, entitlements)
+                        }
+                    } else {
+                        val features = subscriptionsCachedService.features(basePlanId).features
+                        logcat { "fetchSubscriptionFeatures: Subscription features for base plan $basePlanId fetched: $features" }
+                        if (features.isNotEmpty()) {
+                            authRepository.setFeatures(basePlanId, features.toSet())
+                        }
+                    }
+                }.onFailure {
+                    logcat {
+                        "fetchSubscriptionFeatures: Failed to fetch features for base plan $basePlanId: ${it.message}"
+                    }
                 }
             }
     }

@@ -810,15 +810,13 @@ sealed class DaxBubbleCta(
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val titleRes: Int,
-        val descriptionRes: Int,
-        val primaryCtaRes: Int,
+        val isFreeTrialCopy: Boolean,
     ) : DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO_PRIVACY_PRO,
-        title = titleRes,
-        description = descriptionRes,
+        title = R.string.onboardingPrivacyProDaxDialogTitle,
+        description = R.string.onboardingPrivacyProDaxDialogDescription,
         placeholder = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro_128,
-        primaryCta = primaryCtaRes,
+        primaryCta = if (isFreeTrialCopy) R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton else R.string.onboardingPrivacyProDaxDialogOkButton,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_PRIVACY_PRO,
@@ -928,6 +926,25 @@ class BrokenSitePromptDialogCta : Cta {
         binding.includeBrokenSitePromptDialog.dismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
         onCtaShown()
     }
+}
+
+class SubscriptionPromoModalCta(
+    val isFreeTrialCopy: Boolean,
+) : Cta {
+    override val ctaId: CtaId = CtaId.DAX_INTRO_PRIVACY_PRO
+    override val shownPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_SHOWN
+    override val okPixel: Pixel.PixelName = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON
+    override val cancelPixel: Pixel.PixelName? = null
+    override val closePixel: Pixel.PixelName? = null
+
+    private fun pixelParams(): Map<String, String> = mapOf(
+        Pixel.PixelParameter.RU to "true",
+        Pixel.PixelParameter.FREE_TRIAL to isFreeTrialCopy.toString(),
+    )
+
+    override fun pixelShownParameters(): Map<String, String> = pixelParams()
+    override fun pixelOkParameters(): Map<String, String> = pixelParams()
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {

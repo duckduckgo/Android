@@ -44,4 +44,13 @@
     <color name="searchWidgetBackgroundColorLight">#F2F2F2</color>
     <color name="searchWidgetBackgroundColorDark">#282828</color>
     <color name="searchWidgetSearchBarBackgroundColorDark">#474747</color>
+
+    <!--Rebranding Color Palette-->
+    <color name="greyscaleWhite">#FFFFFF</color>
+
+    <!--Surface-->
+    <color name="daxColorSurfaceBackdrop">@color/greyscaleWhite</color>
+
+    <!--Text-->
+    <color name="onboardingTextPrimary">#F5242323</color> <!--96%-->
 </resources>

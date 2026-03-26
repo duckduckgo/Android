@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Duck-cím létrehozása</string>
     <string name="browserMenuFindInPage">Keresés az oldalon</string>
     <string name="browserMenuPrint">Oldal nyomtatása</string>
+    <string name="browserMenuPrintSite">Nyomtatás</string>
     <string name="browserMenuOpenAppLink">Megnyitás az alkalmazásban</string>
     <string name="browserMenuAddToHome">Hozzáadás a kezdőlaphoz</string>
     <string name="browserMenuReportBrokenSite">Hibás weboldal jelentése</string>
@@ -45,11 +46,15 @@
     <string name="browserMenuNewChat">Új csevegés</string>
     <string name="browserMenuNewAIChat">Új AI-csevegés</string>
     <string name="browserMenuChatHistory">Csevegési előzmények</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai-csevegések</string>
     <string name="browserMenuChatSettings">A Duck.ai beállításai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Ingyenes próba</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Vissza</string>
     <string name="browserMenuForward">Előre</string>
     <string name="browserMenuRefresh">Frissítés</string>
+    <string name="browserMenuFire">Lapok és adatok törlése</string>
 </resources>

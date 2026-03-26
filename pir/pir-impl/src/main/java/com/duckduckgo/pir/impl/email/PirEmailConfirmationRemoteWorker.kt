@@ -23,6 +23,7 @@ import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
@@ -42,12 +43,16 @@ class PirEmailConfirmationRemoteWorker(
     @Inject
     lateinit var pirWorkHandler: PirWorkHandler
 
+    @Inject
+    lateinit var pirFeatureDataCleaner: PirFeatureDataCleaner
+
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
         return try {
             if (pirWorkHandler.canRunPir().firstOrNull() == false) {
                 logcat { "PIR-WORKER ($this}: PIR not allowed to run!" }
                 pirWorkHandler.cancelWork()
+                pirFeatureDataCleaner.removeAllData()
                 return Result.failure()
             }
 

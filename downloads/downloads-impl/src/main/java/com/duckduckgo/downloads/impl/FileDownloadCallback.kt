@@ -19,6 +19,7 @@ package com.duckduckgo.downloads.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
@@ -95,6 +96,8 @@ class FileDownloadCallback @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val mediaScanner: MediaScanner,
+    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
+    private val fileDownloadCallbackPlugins: PluginPoint<FileDownloadCallbackPlugin>,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -137,6 +140,7 @@ class FileDownloadCallback @Inject constructor(
                     ),
                 )
             }
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 
@@ -159,6 +163,7 @@ class FileDownloadCallback @Inject constructor(
                     mimeType = mimeType,
                 ),
             )
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 
@@ -201,8 +206,9 @@ class FileDownloadCallback @Inject constructor(
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
         val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(messageId = messageId)
-        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
         appCoroutineScope.launch(dispatchers.io()) {
+            url?.let { failedDownloadRetryUrlStore.saveRetryUrl(downloadId, it) }
+            fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
             command.send(downloadFailedMessage)
         }
     }

@@ -24,6 +24,6 @@ interface SerpSettingsFeature {
     @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun storeSerpSettings(): Toggle
 }

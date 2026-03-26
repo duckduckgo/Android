@@ -1,4 +1,4 @@
-name: Autofill Feature Critical Path End-to-End tests
+name: 'End to End Tests - Autofill Critical Path (Nightly)'
 
 on:
   schedule:
@@ -15,79 +15,63 @@ jobs:
     name: Autofill Critical Path End-to-End Tests
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
+      - name: Assemble APKs
+        id: assemble
+        uses: ./.github/actions/checkout-and-assemble
         with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
+          flavours: 'play'
+          release_properties: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          release_key: ${{ secrets.FAKE_RELEASE_KEY }}
+          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          gradle_flags: '-Pautofill-disable-auth-requirement'
+          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
-      - name: Create folder
-        if: always()
-        run: mkdir apk
-
-      - name: Decode keys
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
-          fileName: ddg_android_build.properties
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Decode key file
-        uses: davidSchuppa/base64Secret-toFile-action@v2
-        with:
-          secret: ${{ secrets.FAKE_RELEASE_KEY }}
-          fileName: android
-          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Assemble APK which does not require auth to use Autofill
-        run: ./gradlew assemblePlayRelease -Pautofill-disable-auth-requirement -Pforce-default-variant -Pskip-onboarding -x lint
-
-      - name: Move APK to new folder
-        if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
-
-      - name: Autofill Critical Path E2E Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      - name: Run Autofill Critical Path E2E Flows
+        id: maestro-critical-path
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: autofill_critical_path_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: autofillNoAuthTests
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: autofill_critical_path_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_include_tags: autofillNoAuthTests
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Autofill Critical Path
 
-      - name: Autofill web flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+      - name: Run Autofill Web Flows
+        id: maestro-web-flows
+        uses: ./.github/actions/maestro-cloud-asana-reporter
         timeout-minutes: 120
         with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: autofill_secondary_functionality_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/release.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: autofillBackfillingUsername,autofillPasswordGeneration
+          maestro_api_key: ${{ secrets.ROBIN_API_KEY }}
+          maestro_project_id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          maestro_test_name: autofill_secondary_functionality_${{ github.sha }}
+          maestro_timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          maestro_app_file: ${{ steps.assemble.outputs.play_apk_path }}
+          maestro_include_tags: autofillBackfillingUsername,autofillPasswordGeneration
+          asana_pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana_project_id: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          test_suite_name: Autofill Web Flows
 
       - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.maestro-critical-path.outputs.flow_summary_status != 'failure' && steps.maestro-web-flows.outputs.flow_summary_status != 'failure' }}
         id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Autofill E2E Flows (Robin)
-          asana-task-description: Autofill tests have failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Autofill Critical Path End to End Tests (Nightly)
+          asana-task-description: Workflow execution has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

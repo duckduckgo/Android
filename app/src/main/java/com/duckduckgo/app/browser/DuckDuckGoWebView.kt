@@ -419,7 +419,6 @@ class DuckDuckGoWebView :
         }
 
         enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
-        post(helper::computeBottomMarginIfNeeded)
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
@@ -443,7 +442,7 @@ class DuckDuckGoWebView :
         enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
-    private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+    internal fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
         if (!allowed) {
             enableSwipeRefresh(false)

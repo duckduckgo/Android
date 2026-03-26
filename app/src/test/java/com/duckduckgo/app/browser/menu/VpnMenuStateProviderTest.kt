@@ -56,15 +56,21 @@ class VpnMenuStateProviderTest {
     private val vpnMenuStore: VpnMenuStore = mock()
 
     @Mock
-    private val featureToggle: Toggle = mock()
+    private val vpnMenuItemToggle: Toggle = mock()
+
+    @Mock
+    private val vpnMenuItemInternationalToggle: Toggle = mock()
 
     private lateinit var testee: VpnMenuStateProviderImpl
 
     @Before
-    fun setUp() {
-        whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(featureToggle)
-        whenever(featureToggle.isEnabled()).thenReturn(true)
+    fun setUp() = runTest {
+        whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(vpnMenuItemToggle)
+        whenever(androidBrowserConfigFeature.vpnMenuItemInternational()).thenReturn(vpnMenuItemInternationalToggle)
+        whenever(vpnMenuItemToggle.isEnabled()).thenReturn(true)
+        whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(true)
         whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
+        whenever(subscriptions.isFreeTrialEligible()).thenReturn(true)
         testee = VpnMenuStateProviderImpl(
             subscriptions,
             networkProtectionState,
@@ -233,9 +239,10 @@ class VpnMenuStateProviderTest {
         }
 
     @Test
-    fun `when feature flag is disabled then return Hidden regardless of subscription status`() =
+    fun `when both feature flags are disabled then return Hidden regardless of subscription status`() =
         runTest {
-            whenever(featureToggle.isEnabled()).thenReturn(false)
+            whenever(vpnMenuItemToggle.isEnabled()).thenReturn(false)
+            whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(false)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(NetP)))
             whenever(connectionState.isConnected()).thenReturn(true)
@@ -249,9 +256,10 @@ class VpnMenuStateProviderTest {
         }
 
     @Test
-    fun `when feature flag is disabled and user not subscribed then return Hidden`() =
+    fun `when both feature flags are disabled and user not subscribed then return Hidden`() =
         runTest {
-            whenever(featureToggle.isEnabled()).thenReturn(false)
+            whenever(vpnMenuItemToggle.isEnabled()).thenReturn(false)
+            whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(false)
             whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
             whenever(connectionState.isConnected()).thenReturn(false)
@@ -260,6 +268,40 @@ class VpnMenuStateProviderTest {
             testee.getVpnMenuState().test {
                 val state = awaitItem()
                 assertEquals(VpnMenuState.Hidden, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when only vpnMenuItem is enabled then return NotSubscribed for inactive user`() =
+        runTest {
+            whenever(vpnMenuItemToggle.isEnabled()).thenReturn(true)
+            whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(false)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when only vpnMenuItemInternational is enabled then return NotSubscribed for inactive user`() =
+        runTest {
+            whenever(vpnMenuItemToggle.isEnabled()).thenReturn(false)
+            whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(true)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribed, state)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -288,6 +330,22 @@ class VpnMenuStateProviderTest {
             whenever(connectionState.isConnected()).thenReturn(false)
             whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
             whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(false)
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribedNoPill, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when user not subscribed and not free trial eligible then return NotSubscribedNoPill`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            whenever(subscriptions.isFreeTrialEligible()).thenReturn(false)
 
             testee.getVpnMenuState().test {
                 val state = awaitItem()

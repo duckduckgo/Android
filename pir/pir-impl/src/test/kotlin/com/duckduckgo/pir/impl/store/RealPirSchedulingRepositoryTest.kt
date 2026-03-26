@@ -621,10 +621,9 @@ class RealPirSchedulingRepositoryTest {
     @Test
     fun whenDeleteAllJobRecordsThenCallBothDeleteMethods() =
         runTest {
-            testee.deleteAllJobRecords()
+            testee.clearAllData()
 
-            verify(mockJobSchedulingDao).deleteAllScanJobRecords()
-            verify(mockJobSchedulingDao).deleteAllOptOutJobRecords()
+            verify(mockJobSchedulingDao).deleteAll()
         }
 
     // Edge cases

@@ -18,6 +18,7 @@ package com.duckduckgo.pir.impl.common.actions
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
@@ -27,6 +28,7 @@ import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.PirStageStatus
@@ -62,6 +64,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class JsActionSuccessEventHandlerTest {
@@ -77,7 +80,7 @@ class JsActionSuccessEventHandlerTest {
     private val testBrokerName = "test-broker"
     private val testProfileQueryId = 123L
     private val testCurrentTimeInMillis = 2000L
-    private val testCurrentActionIndex = 1
+    private val testCurrentActionIndex = 0
     private val testActionRetryCount = 3
 
     private val testProfileQuery =
@@ -174,7 +177,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(navigateResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -202,6 +205,7 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(testBroker1, capturedState.firstValue.broker)
         assertEquals(testProfileQueryId, capturedState.firstValue.profileQueryId)
         assertEquals(navigateResponse, capturedState.firstValue.pirSuccessResponse)
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -214,7 +218,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(fillFormResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -241,6 +245,7 @@ class JsActionSuccessEventHandlerTest {
         assertNull(result.sideEffect)
 
         verify(mockPirRunStateHandler).handleState(any<BrokerScanActionSucceeded>())
+        verifyNoMoreInteractions(mockPirRunStateHandler)
     }
 
     @Test
@@ -253,7 +258,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(clickResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -290,7 +295,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(expectationResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -328,7 +333,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(extractedResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -372,7 +377,7 @@ class JsActionSuccessEventHandlerTest {
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(testScanStep),
+                    brokerStepsToExecute = listOf(setupBrokerStep(captchaResponse.actionID)),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -420,7 +425,7 @@ class JsActionSuccessEventHandlerTest {
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(testScanStep),
+                    brokerStepsToExecute = listOf(setupBrokerStep(solveCaptchaResponse.actionID)),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -467,7 +472,7 @@ class JsActionSuccessEventHandlerTest {
             val state =
                 State(
                     runType = RunType.MANUAL,
-                    brokerStepsToExecute = listOf(testScanStep),
+                    brokerStepsToExecute = listOf(setupBrokerStep(conditionResponse.actionID)),
                     profileQuery = testProfileQuery,
                     currentBrokerStepIndex = 0,
                     currentActionIndex = testCurrentActionIndex,
@@ -501,7 +506,7 @@ class JsActionSuccessEventHandlerTest {
         val state =
             State(
                 runType = RunType.MANUAL,
-                brokerStepsToExecute = listOf(testScanStep),
+                brokerStepsToExecute = listOf(setupBrokerStep(conditionResponse.actionID)),
                 profileQuery = testProfileQuery,
                 currentBrokerStepIndex = 0,
                 currentActionIndex = testCurrentActionIndex,
@@ -540,7 +545,7 @@ class JsActionSuccessEventHandlerTest {
                 broker = testBroker1,
                 step = OptOutStepActions(
                     stepType = "optout",
-                    actions = listOf(testAction),
+                    actions = listOf(testAction.copy(navigateResponse.actionID)),
                     optOutType = "form",
                 ),
                 profileToOptOut = testExtractedProfile,
@@ -586,7 +591,7 @@ class JsActionSuccessEventHandlerTest {
                 broker = testBroker1,
                 step = OptOutStepActions(
                     stepType = "optout",
-                    actions = listOf(testAction),
+                    actions = listOf(testAction.copy(navigateResponse.actionID)),
                     optOutType = "form",
                 ),
                 emailConfirmationJob = testEmailConfirmationJob,
@@ -618,5 +623,126 @@ class JsActionSuccessEventHandlerTest {
         assertEquals(navigateResponse, capturedState.firstValue.result)
 
         assertEquals(LoadUrl(url = "https://example.com/result"), result.sideEffect)
+        verifyNoMoreInteractions(mockPirRunStateHandler)
+    }
+
+    @Test
+    fun whenBrokerStepIndexExceedsBrokerStepsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val navigateResponse =
+            NavigateResponse(
+                actionID = "navigate-1",
+                actionType = "navigate",
+                response = NavigateResponse.ResponseData(url = "https://example.com/result"),
+            )
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = listOf(testScanStep),
+                profileQuery = testProfileQuery,
+                currentBrokerStepIndex = 5, // Exceeds broker steps size (1)
+                currentActionIndex = 0,
+                actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0L,
+                ),
+            )
+        val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = Broker.unknown(),
+                runType = RunType.MANUAL,
+            ),
+        )
+    }
+
+    @Test
+    fun whenActionIndexExceedsActionsSizeThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val navigateResponse =
+            NavigateResponse(
+                actionID = "navigate-1",
+                actionType = "navigate",
+                response = NavigateResponse.ResponseData(url = "https://example.com/result"),
+            )
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = listOf(testScanStep),
+                profileQuery = testProfileQuery,
+                currentBrokerStepIndex = 0,
+                currentActionIndex = 10, // Exceeds actions size (1)
+                actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0L,
+                ),
+            )
+        val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testScanStep.broker,
+                runType = RunType.MANUAL,
+            ),
+        )
+    }
+
+    @Test
+    fun whenActionIdDoesNotMatchCurrentActionThenEventIsInvalidAndReturnsUnchangedState() = runTest {
+        val navigateResponse =
+            NavigateResponse(
+                actionID = "different-action-id", // Does not match testAction.id ("action-1")
+                actionType = "navigate",
+                response = NavigateResponse.ResponseData(url = "https://example.com/result"),
+            )
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStepsToExecute = listOf(testScanStep), // testScanStep uses testAction with id "action-1"
+                profileQuery = testProfileQuery,
+                currentBrokerStepIndex = 0,
+                currentActionIndex = 0,
+                actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0L,
+                ),
+            )
+        val event = JsActionSuccess(pirSuccessResponse = navigateResponse)
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(state, result.nextState)
+        assertNull(result.nextEvent)
+        assertNull(result.sideEffect)
+        verify(mockPirRunStateHandler).handleState(
+            BrokerStepInvalidEvent(
+                broker = testScanStep.broker,
+                runType = RunType.MANUAL,
+            ),
+        )
+    }
+
+    private fun setupBrokerStep(actionId: String): BrokerStep {
+        return testScanStep.copy(
+            step = testScanStep.step.copy(
+                actions = listOf(
+                    testAction.copy(
+                        id = actionId,
+                    ),
+                ),
+            ),
+        )
     }
 }

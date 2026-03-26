@@ -55,6 +55,7 @@ class BottomAppBarBehavior<V : View>(
         R.id.webViewFullScreenContainer,
         R.id.browserLayout,
         R.id.includeNewBrowserTab,
+        R.id.inputModeBottomRoot,
     )
 
     @SuppressLint("RestrictedApi")
@@ -82,6 +83,7 @@ class BottomAppBarBehavior<V : View>(
         axes: Int,
         type: Int,
     ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
         if (axes == ViewCompat.SCROLL_AXIS_VERTICAL) {
             lastStartedType = type
             offsetAnimator?.cancel()

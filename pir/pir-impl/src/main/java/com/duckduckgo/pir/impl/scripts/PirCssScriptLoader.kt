@@ -20,9 +20,11 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 
 interface PirCssScriptLoader {
@@ -30,14 +32,23 @@ interface PirCssScriptLoader {
      * Loads and returns a valid pir script ready to be loaded into a webview.
      */
     suspend fun getScript(): String
+
+    val secret: String
+    val javascriptInterface: String
+    val callbackName: String
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealPirCssScriptLoader @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
 ) : PirCssScriptLoader {
     private var contentScopeJS: String? = null
+
+    override val secret: String by lazy { generateRandomString() }
+    override val callbackName: String by lazy { generateRandomString() }
+    override val javascriptInterface: String by lazy { generateRandomString() }
 
     override suspend fun getScript(): String {
         return withContext(dispatcherProvider.io()) {
@@ -53,11 +64,13 @@ class RealPirCssScriptLoader @Inject constructor(
         }
     }
 
-    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"${PIRScriptConstants.SCRIPT_FEATURE_NAME}\""
+    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"$javascriptInterface\""
 
-    private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"messageCallback\""
+    private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"$callbackName\""
 
-    private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"messageSecret\""
+    private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"$secret\""
+
+    private fun generateRandomString(): String = UUID.randomUUID().toString().replace("-", "")
 
     private fun getContentScopeJson(): String {
         // TODO : Get this string from privacy config

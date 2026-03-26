@@ -41,6 +41,7 @@ import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
@@ -66,6 +67,8 @@ sealed class Command {
     class OpenInNewBackgroundTab(
         val query: String,
     ) : Command()
+
+    object NavigateBackInCustomTab : Command()
 
     data object LaunchNewTab : Command()
 
@@ -249,6 +252,7 @@ sealed class Command {
     data object LaunchAppTPOnboarding : Command()
 
     data object LaunchAddWidget : Command()
+    data object LaunchAddWidgetOnboardingExperiment : Command()
 
     class RequiresAuthentication(
         val request: BasicAuthenticationRequest,
@@ -410,6 +414,8 @@ sealed class Command {
 
     data object ScreenUnlock : Command()
 
+    data class UiLockChanged(val locked: Boolean) : Command()
+
     data object ShowFaviconsPrompt : Command()
 
     data class ShowSSLError(
@@ -500,5 +506,14 @@ sealed class Command {
     data object PageStarted : Command()
 
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
-    data class DisableDuckAIFullScreen(val url: String) : Command()
+    data class DuckAIFullScreenDisabled(val url: String) : Command()
+
+    data class ShowDuckAIContextualMode(val tabId: String) : Command()
+
+    data class StartAddressBarTrackersAnimation(val trackerEntities: List<Entity>?) : Command()
+
+    data class PageContextReceived(
+        val tabId: String,
+        val pageContext: String,
+    ) : Command()
 }

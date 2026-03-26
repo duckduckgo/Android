@@ -24,6 +24,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Disabled
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Hidden
@@ -35,6 +37,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -48,6 +51,8 @@ import javax.inject.Inject
 class DuckAiPlusSettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
+    private val duckChat: DuckChatInternal,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -56,7 +61,11 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val settingState: SettingState = Hidden) {
+    data class ViewState(
+        val settingState: SettingState = Hidden,
+        val isDuckAiEnabled: Boolean = true,
+        val isDuckAiPaidSettingsFeatureEnabled: Boolean = false,
+    ) {
 
         sealed class SettingState {
 
@@ -77,15 +86,38 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
         super.onCreate(owner)
 
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptions.getEntitlementStatus().map { entitlements ->
-                entitlements.any { product ->
-                    product == DuckAiPlus
-                }
-            }.onEach { hasValidEntitlement ->
-                val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
-                _viewState.update { it.copy(settingState = state) }
-            }.launchIn(viewModelScope)
+            val isFeatureEnabled = duckChatFeature.duckAiPaidSettingsStatus().isEnabled()
+
+            if (isFeatureEnabled) {
+                combine(
+                    subscriptions.getEntitlementStatus().map { entitlements ->
+                        entitlements.any { product ->
+                            product == DuckAiPlus
+                        }
+                    },
+                    duckChat.observeEnableDuckChatUserSetting(),
+                ) { hasValidEntitlement, isDuckAiEnabled ->
+                    val subscriptionStatus = subscriptions.getSubscriptionStatus()
+                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
+                    _viewState.update {
+                        it.copy(
+                            settingState = state,
+                            isDuckAiEnabled = isDuckAiEnabled,
+                            isDuckAiPaidSettingsFeatureEnabled = true,
+                        )
+                    }
+                }.launchIn(viewModelScope)
+            } else {
+                subscriptions.getEntitlementStatus().map { entitlements ->
+                    entitlements.any { product ->
+                        product == DuckAiPlus
+                    }
+                }.onEach { hasValidEntitlement ->
+                    val subscriptionStatus = subscriptions.getSubscriptionStatus()
+                    val state = getDuckAiProState(hasValidEntitlement, subscriptionStatus)
+                    _viewState.update { it.copy(settingState = state) }
+                }.launchIn(viewModelScope)
+            }
         }
     }
 

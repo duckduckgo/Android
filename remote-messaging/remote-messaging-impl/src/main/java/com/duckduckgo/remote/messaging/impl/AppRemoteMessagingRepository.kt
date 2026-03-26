@@ -19,7 +19,9 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
+import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULED
@@ -35,6 +37,7 @@ class AppRemoteMessagingRepository(
     private val remoteMessagesDao: RemoteMessagesDao,
     private val dispatchers: DispatcherProvider,
     private val messageMapper: MessageMapper,
+    private val remoteMessageImageStore: RemoteMessageImageStore,
 ) : RemoteMessagingRepository {
 
     override fun getMessageById(id: String): RemoteMessage? {
@@ -98,5 +101,13 @@ class AppRemoteMessagingRepository(
 
     override fun dismissedMessages(): List<String> {
         return remoteMessagesDao.dismissedMessages().map { it.id }.toList()
+    }
+
+    override suspend fun getRemoteMessageImageFile(surface: Surface): String? {
+        return remoteMessageImageStore.getLocalImageFilePath(surface)
+    }
+
+    override suspend fun clearMessageImage(surface: Surface) {
+        remoteMessageImageStore.clearStoredImageFile(surface)
     }
 }

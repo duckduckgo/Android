@@ -21,7 +21,9 @@ import android.webkit.WebHistoryItem
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.messaging.sync.SyncStatusChangedObserver
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewViewModel.Command
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -31,6 +33,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -50,14 +53,25 @@ class DuckChatWebViewViewModelTest {
 
     private val subscriptions: Subscriptions = mock()
     private val duckChat: DuckChatInternal = mock()
+    private val syncStatusChangedObserver: SyncStatusChangedObserver = mock()
     private val subscriptionStatusFlow = MutableSharedFlow<SubscriptionStatus>()
+    private val syncStatusChangedEventsFlow = MutableSharedFlow<JSONObject>()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private lateinit var viewModel: DuckChatWebViewViewModel
 
     @Before
     fun setup() {
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
-        viewModel = DuckChatWebViewViewModel(subscriptions, duckChat)
+        whenever(syncStatusChangedObserver.syncStatusChangedEvents).thenReturn(syncStatusChangedEventsFlow)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
+        viewModel = DuckChatWebViewViewModel(
+            subscriptions = subscriptions,
+            duckChat = duckChat,
+            syncStatusChangedObserver = syncStatusChangedObserver,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
+            mockDuckAiHostProvider,
+        )
     }
 
     @Test
@@ -111,6 +125,21 @@ class DuckChatWebViewViewModelTest {
             val command = awaitItem()
             assertTrue(command is Command.SendSubscriptionAuthUpdateEvent)
             expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionStatusSameButAccessTokenChangesThenCommandSent() = runTest {
+        viewModel.commands.test {
+            whenever(subscriptions.getAccessToken()).thenReturn("token_plus")
+            subscriptionStatusFlow.emit(AUTO_RENEWABLE)
+            val firstCommand = awaitItem()
+            assertTrue(firstCommand is Command.SendSubscriptionAuthUpdateEvent)
+
+            whenever(subscriptions.getAccessToken()).thenReturn("token_pro")
+            subscriptionStatusFlow.emit(AUTO_RENEWABLE)
+            val secondCommand = awaitItem()
+            assertTrue(secondCommand is Command.SendSubscriptionAuthUpdateEvent)
         }
     }
 
@@ -204,5 +233,22 @@ class DuckChatWebViewViewModelTest {
         whenever(history.currentItem).thenReturn(currentItem)
         whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
         assertFalse(viewModel.shouldCloseDuckChat(history))
+    }
+
+    @Test
+    fun `when custom subdomain host is set then shouldCloseDuckChat matches custom host`() {
+        whenever(duckChat.isStandaloneMigrationEnabled()).thenReturn(true)
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("staging.duck.ai")
+        val history = mock<WebBackForwardList>()
+
+        val currentItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://staging.duck.ai/somepath"
+        }
+        val firstItem = mock<WebHistoryItem> {
+            on { url } doReturn "https://duckduckgo.com/somepath"
+        }
+        whenever(history.currentItem).thenReturn(currentItem)
+        whenever(history.getItemAtIndex(0)).thenReturn(firstItem)
+        assertTrue(viewModel.shouldCloseDuckChat(history))
     }
 }

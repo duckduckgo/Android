@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Duck Address Oluştur</string>
     <string name="browserMenuFindInPage">Sayfada bul</string>
     <string name="browserMenuPrint">Sayfayı Yazdır</string>
+    <string name="browserMenuPrintSite">Yazdır</string>
     <string name="browserMenuOpenAppLink">Uygulamada Aç</string>
     <string name="browserMenuAddToHome">Ana ekrana ekle</string>
     <string name="browserMenuReportBrokenSite">Hatalı Siteyi Bildirin</string>
@@ -45,11 +46,15 @@
     <string name="browserMenuNewChat">Yeni Sohbet</string>
     <string name="browserMenuNewAIChat">Yeni Yapay Zeka Sohbeti</string>
     <string name="browserMenuChatHistory">Sohbet Geçmişi</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai Sohbetleri</string>
     <string name="browserMenuChatSettings">Duck.ai Ayarları</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Ücretsiz deneme</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Geri</string>
     <string name="browserMenuForward">İleri</string>
     <string name="browserMenuRefresh">Yenile</string>
+    <string name="browserMenuFire">Sekmeleri ve Verileri Temizle</string>
 </resources>

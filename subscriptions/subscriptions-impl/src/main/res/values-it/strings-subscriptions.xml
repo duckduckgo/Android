@@ -108,8 +108,8 @@
     <string name="changePlanDescription">L\'abbonamento è stato acquistato tramite l\'App Store di Apple. Per modificare il tuo piano o le impostazioni di fatturazione, vai su Impostazioni &gt; Account Apple &gt; Abbonamenti su un dispositivo che ha effettuato l\'accesso con lo stesso account Apple utilizzato per acquistare l\'abbonamento.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Attiva Privacy Pro sul desktop per impostare Personal Information Removal</string>
-    <string name="pirDescription">Nel browser DuckDuckGo per desktop, vai su <b>Impostazioni &gt; Privacy Pro</b> e fai clic su <b>Ho un abbonamento</b> per iniziare.</string>
+    <string name="pirTitle">Attiva l\'abbonamento DuckDuckGo sul desktop per impostare Personal Information Removal</string>
+    <string name="pirDescription">Nel browser DuckDuckGo per desktop, vai su <b>Impostazioni &gt; Abbonati a DuckDuckGo</b> e fai clic su <b>Ho un abbonamento</b> per iniziare.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Richiesta di assistenza al consulente non utile</string>
     <string name="feedbackSubCategoryItrOther">Altro</string>
 
-    <string name="feedbackSubCategorySubsOtp">Password una tantum</string>
-    <string name="feedbackSubCategorySubsOther">Altro</string>
+    <string name="feedbackSubCategorySubsOtp">Problema con la password monouso</string>
+    <string name="feedbackSubCategorySubsOther">Qualcos\'altro</string>
 
     <string name="feedbackSubmitVpnHeader">Hai riscontrato un problema che non è stato trattato nel nostro <annotation type="faqs_link">centro assistenza</annotation> ? Ci piacerebbe davvero saperlo.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Raccontaci cosa sta succedendo...</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Abbonamenti</string>
     <string name="activitySubscriptionSettings">Impostazioni dell\'abbonamento</string>
     <string name="activityActivateSubscription">Ho un abbonamento</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Invia feedback</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Gli abbonati ricevono la nostra VPN e modelli avanzati di intelligenza artificiale in Duck.ai, Personal Information Removal e Identity Theft Restoration.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Il passaggio comporterà un aumento del prezzo mensile da %1$s/mese a %2$s/mese.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Mantieni il piano annuale</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Passa al piano mensile (%1$s/mese)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Impossibile accedere alle funzionalità del livello Plus o Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Passa a Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Sblocca un\'AI più potente</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gestisci l\'abbonamento</string>
+    <string name="subscriptionSettingViewAllPlans">Visualizza tutti i piani</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gestisci il pagamento o Annulla</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Il tuo piano verrà aggiornato a %1$s il %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Il tuo piano passerà a %1$s il giorno %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Mensile</string>
+    <string name="planNamePlusYearly">Plus Annuale</string>
+    <string name="planNameProMonthly">Pro Mensile</string>
+    <string name="planNameProYearly">Pro Annuale</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

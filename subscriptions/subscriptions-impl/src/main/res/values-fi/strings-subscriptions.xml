@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivoi Privacy Pro tietokoneella Personal Information Removalin asentamiseksi</string>
-    <string name="pirDescription">Avaa ensin tietokoneen DuckDuckGo-selain, siirry kohtaan <b>Asetukset &gt; Privacy Pro</b> ja klikkaa <b>Minulla on tilaus</b>.</string>
+    <string name="pirTitle">Aktivoi DuckDuckGo-tilaus tietokoneella Personal Information Removalin asettamiseksi.</string>
+    <string name="pirDescription">Avaa tietokoneen DuckDuckGo-selaimessa <b>Asetukset &gt; DuckDuckGo-tilaus</b> ja aloita napsauttamalla <b>Minulla on tilaus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Soitto neuvonantajalle ei auttanut</string>
     <string name="feedbackSubCategoryItrOther">Muu</string>
 
-    <string name="feedbackSubCategorySubsOtp">Kertakäyttöinen salasana</string>
-    <string name="feedbackSubCategorySubsOther">Muu</string>
+    <string name="feedbackSubCategorySubsOtp">Ongelma kertakäyttöisen salasanan kanssa</string>
+    <string name="feedbackSubCategorySubsOther">Jotain muuta</string>
 
     <string name="feedbackSubmitVpnHeader">Kohtasitko ongelman, jota ei löydy <annotation type="faqs_link">ohjekeskuksestamme</annotation>? Me haluamme ehdottomasti tietää siitä.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Kerro meille, mitä tapahtuu...</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Tilaukset</string>
     <string name="activitySubscriptionSettings">Tilauksen asetukset</string>
     <string name="activityActivateSubscription">Minulla on tilaus</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Vaihtaminen nostaa kuukausihintasi %1$s/kk:sta %2$s/kk:een.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Säilytä vuosisuunnitelma</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Vaihda kuukausitilaukseen (%1$s/kk)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus- tai Pro-tason ominaisuuksia ei voi käyttää</string>
+    <string name="subscriptionsProUpgradeTitle">Päivitä Pro-versioon</string>
+    <string name="subscriptionsProUpgradeMessage">Ota käyttöön tehokkaampi tekoäly</string>
+    <string name="subscriptionSettingSectionManageSubscription">Hallitse tilausta</string>
+    <string name="subscriptionSettingViewAllPlans">Näytä kaikki tilaukset</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Hallitse maksua tai peruuta</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi päivittyy sopimukseen %1$s %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi alenee tasolle %1$s alkaen %2$s.</string>
+    <string name="planNamePlusMonthly">Plus kuukausittain</string>
+    <string name="planNamePlusYearly">Plus vuosittain</string>
+    <string name="planNameProMonthly">Pro kuukausittain</string>
+    <string name="planNameProYearly">Pro vuosittain</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

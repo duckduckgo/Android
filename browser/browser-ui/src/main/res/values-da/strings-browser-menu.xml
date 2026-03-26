@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Generér Duck-adresse</string>
     <string name="browserMenuFindInPage">Find på side</string>
     <string name="browserMenuPrint">Udskriv side</string>
+    <string name="browserMenuPrintSite">Print</string>
     <string name="browserMenuOpenAppLink">Åbn i app</string>
     <string name="browserMenuAddToHome">Tilføj til startskærm</string>
     <string name="browserMenuReportBrokenSite">Rapporter ødelagt websted</string>
@@ -45,11 +46,15 @@
     <string name="browserMenuNewChat">Ny chat</string>
     <string name="browserMenuNewAIChat">Ny AI-chat</string>
     <string name="browserMenuChatHistory">Chathistorik</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai-chats</string>
     <string name="browserMenuChatSettings">Duck.ai-indstillinger</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Prøv gratis</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Tilbage</string>
     <string name="browserMenuForward">Frem</string>
     <string name="browserMenuRefresh">Opdater</string>
+    <string name="browserMenuFire">Ryd faner og data</string>
 </resources>

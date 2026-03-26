@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
     <string name="input_screen_chat_hint">Kérdezz privátban</string>
     <string name="input_screen_user_pref_without_ai">Csak keresés</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Keresés és Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Próbáld ki azt az új lehetőséget, hogy közvetlenül a címsorban tehetsz fel kérdéseket a Duck.ai számára. <annotation type="share_feedback">Visszajelzés küldése</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">AI által generált képek elrejtése</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Kiszűri az AI által generált képeket a képkeresési találatokból</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Engedélyezés az AI-funkciók beállításaiban</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Kezelés az AI-funkciók beállításaiban</string>
+    <string name="duck_ai_paid_settings_manage_secondary">A Duck.ai az AI-funkciók beállításaiban konfigurálható.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Oldal összefoglalása</string>
+    <string name="duckAIContextualAutomaticContextTitle">Oldal tartalmának automatikus küldése</string>
+    <string name="duckAIContextualAutomaticContextMessage">Az oldal tartalmának automatikus küldése a Duck.ai részére</string>
+    <string name="duckAIContextualAttachPageContent">Oldal tartalmának csatolása</string>
 </resources>

@@ -22,6 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:windowBackground"
+    tools:ignore="Overdraw"
     android:paddingTop="@dimen/keyline_4"
     tools:text="Yesterday"
 />

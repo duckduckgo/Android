@@ -125,7 +125,7 @@ class SyncDevicesAttributeMetricTest {
         deviceCountExpectedBuckets.forEach { (devices, bucket) ->
             connectedDevicesFlow.emit(devices)
 
-            val realbucket = testee.getMetricParameters()["device_count"]
+            val realbucket = testee.getMetricParameters()["number_of_devices"]
 
             assertEquals(
                 "For $devices devices, should return bucket $bucket",

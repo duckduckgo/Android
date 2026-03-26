@@ -282,7 +282,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenOnErrorWithActionFailedThenDispatchesBrokerActionFailedWithRetry() = runTest {
-        val testError = PirError.ActionFailed("action-123", "Action execution failed")
+        val testError = PirError.ActionError.JsActionFailed("action-123", "Action execution failed")
         whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
             .thenReturn(mockWebView)
 
@@ -334,7 +334,7 @@ class RealPirActionsRunnerTest {
 
     @Test
     fun whenOnErrorWithCaptchaSolutionFailedThenDispatchesBrokerActionFailedWithoutRetry() = runTest {
-        val testError = PirError.CaptchaSolutionFailed("Captcha solution failed")
+        val testError = PirError.ActionError.CaptchaSolutionFailed("action-123", "Captcha solution failed")
         whenever(mockPirDetachedWebViewProvider.createInstance(any(), any(), any(), any()))
             .thenReturn(mockWebView)
 

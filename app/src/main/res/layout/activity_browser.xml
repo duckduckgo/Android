@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.app.browser.SafeStructureRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -67,4 +67,4 @@
         android:visibility="gone"
         android:layout_alignParentBottom="true"
         layout="@layout/view_browser_navigation_bar_mockup" />
-</RelativeLayout>
+</com.duckduckgo.app.browser.SafeStructureRelativeLayout>

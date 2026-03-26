@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOu
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaParsed
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageFillForm
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
+import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerStepInvalidEvent
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ConditionExpectationSucceeded
@@ -37,6 +38,7 @@ import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEf
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.pixels.PirStage
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
@@ -73,7 +75,24 @@ class JsActionSuccessEventHandler @Inject constructor(
          * - SolveCaptchaResponse -> we load the callback (js script) into the webview AND proceed to the next action.
          * - Else -> we proceed to the next action
          */
-        val pirSuccessResponse = (event as JsActionSuccess).pirSuccessResponse
+        if (!isEventValid(state, event as JsActionSuccess)) {
+            // Nothing to do here, the event is outdated
+            val broker = if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) {
+                Broker.unknown()
+            } else {
+                state.brokerStepsToExecute[state.currentBrokerStepIndex].broker
+            }
+
+            pirRunStateHandler.handleState(
+                BrokerStepInvalidEvent(
+                    broker = broker,
+                    runType = state.runType,
+                ),
+            )
+            return Next(nextState = state)
+        }
+
+        val pirSuccessResponse = event.pirSuccessResponse
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val baseSuccessState = state.copy(
             actionRetryCount = 0,
@@ -190,6 +209,25 @@ class JsActionSuccessEventHandler @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun isEventValid(
+        state: State,
+        jsActionSuccess: JsActionSuccess,
+    ): Boolean {
+        // Broker steps has probably been considered completed before the js response arrived
+        if (state.brokerStepsToExecute.size <= state.currentBrokerStepIndex) return false
+
+        // Broker step actions has probably been considered completed before the js response arrived
+        if (state.brokerStepsToExecute[state.currentBrokerStepIndex].step.actions.size <= state.currentActionIndex) return false
+
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStepAction = currentBrokerStep.step.actions[state.currentActionIndex]
+
+        // The action IDs don't match, the js response is probably for an outdated / old action
+        if (currentBrokerStepAction.id != jsActionSuccess.pirSuccessResponse.actionID) return false
+
+        return true
     }
 
     private suspend fun attemptFireOptOutStagePixel(

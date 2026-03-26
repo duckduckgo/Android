@@ -108,8 +108,8 @@
     <string name="changePlanDescription">Подписка приобретена в магазине приложений Apple App Store. Чтобы изменить тарифный план или платежные параметры, откройте раздел «Настройки &gt; Аккаунт Apple &gt; Подписки» на устройстве, где выполнен вход в ту же учетную запись Apple, через которую была оформлена подписка.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Чтобы включить функцию Personal Information Removal, активируйте подписку Privacy Pro на настольном компьютере</string>
-    <string name="pirDescription">Запустите браузер DuckDuckGo на настольном компьютере, откройте раздел «<b>Настройки &gt; Privacy Pro</b>» и нажмите на ссылку «<b>У меня уже есть подписка</b>».</string>
+    <string name="pirTitle">Чтобы настроить функцию Personal Information Removal, активируйте подписку DuckDuckGo на компьютере.</string>
+    <string name="pirDescription">В настольной версии браузера DuckDuckGo откройте раздел <b>Настройки &gt; Подписаться на DuckDuckGo</b> и нажмите на ссылку <b>У меня уже есть подписка</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -152,8 +152,8 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Мало толку от звонка консультанту</string>
     <string name="feedbackSubCategoryItrOther">Дополнительные настройки</string>
 
-    <string name="feedbackSubCategorySubsOtp">Одноразовый пароль</string>
-    <string name="feedbackSubCategorySubsOther">Дополнительные настройки</string>
+    <string name="feedbackSubCategorySubsOtp">Проблема с одноразовым паролем</string>
+    <string name="feedbackSubCategorySubsOther">Что-то другое</string>
 
     <string name="feedbackSubmitVpnHeader">Столкнулись с проблемой, которая не затронута в нашем <annotation type="faqs_link">справочном центре</annotation>? Мы просто обязаны о ней знать.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Сообщите нам, что происходит...</string>
@@ -169,7 +169,6 @@
     <string name="activitySubscriptions">Подписки</string>
     <string name="activitySubscriptionSettings">Настройки подписки</string>
     <string name="activityActivateSubscription">У меня уже есть подписка</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai, а также функциям удаления личной информации и восстановления после кражи данных.</string>
@@ -194,5 +193,23 @@
     <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Со сменой тарифа ваша ежемесячная плата увеличится с %1$s до %2$s.</string>
     <string name="switchBottomSheetPrimaryButtonDowngrade">Перейти на годовой тариф</string>
     <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Перейти на месячный план (%1$s/мес.)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Нет доступа к функциям уровня Plus или Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Перейти на Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Повышение тарифа открывает больше возможностей ИИ</string>
+    <string name="subscriptionSettingSectionManageSubscription">Управление подпиской</string>
+    <string name="subscriptionSettingViewAllPlans">Посмотреть все тарифы</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Управление оплатой или Отмена</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s ваш план будет повышен до %1$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">%2$s ваш план будет понижен до %1$s.</string>
+    <string name="planNamePlusMonthly">Plus с оплатой раз в месяц</string>
+    <string name="planNamePlusYearly">Plus с оплатой раз в год</string>
+    <string name="planNameProMonthly">Pro с оплатой раз в месяц</string>
+    <string name="planNameProYearly">Pro с оплатой раз в год</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

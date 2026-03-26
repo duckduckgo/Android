@@ -1,10 +1,16 @@
 package com.duckduckgo.subscriptions.impl.messaging
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
@@ -24,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -34,9 +41,11 @@ class RealSubscriptionsJSHelperTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
+    private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
-    private val testee = RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature, coroutineRule.testDispatcherProvider)
+    private val testee =
+        RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature, mockGlobalActivityStarter, coroutineRule.testDispatcherProvider)
 
     private val featureName = "subscriptions"
 
@@ -50,7 +59,7 @@ class RealSubscriptionsJSHelperTest {
         val method = "unknownMethod"
         val id = "123"
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         assertNull(result)
     }
@@ -59,7 +68,7 @@ class RealSubscriptionsJSHelperTest {
     fun whenHandshakeRequestAndIdIsNullThenReturnNull() = runTest {
         val method = "handshake"
 
-        val result = testee.processJsCallbackMessage(featureName, method, null, null)
+        val result = testee.processJsCallbackMessage(featureName, method, null, null, null)
 
         assertNull(result)
     }
@@ -69,7 +78,7 @@ class RealSubscriptionsJSHelperTest {
         val method = "handshake"
         val id = "123"
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put(
@@ -79,6 +88,7 @@ class RealSubscriptionsJSHelperTest {
                     put("getAuthAccessToken")
                     put("getFeatureConfig")
                     put("authUpdate")
+                    put("openSubscriptionUpgrade")
                 },
             )
             put("platform", "android")
@@ -109,7 +119,7 @@ class RealSubscriptionsJSHelperTest {
             ),
         )
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("isSubscribed", true)
@@ -135,7 +145,7 @@ class RealSubscriptionsJSHelperTest {
 
         whenever(mockSubscriptionsManager.getSubscription()).thenReturn(null)
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("isSubscribed", false)
@@ -166,7 +176,7 @@ class RealSubscriptionsJSHelperTest {
             ),
         )
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("isSubscribed", false)
@@ -193,7 +203,7 @@ class RealSubscriptionsJSHelperTest {
 
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success(expectedToken))
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("accessToken", expectedToken)
@@ -214,7 +224,7 @@ class RealSubscriptionsJSHelperTest {
 
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("Token not found"))
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject()
 
@@ -227,17 +237,20 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestThenReturnJsCallbackDataWithUsePaidDuckAiFlag() = runTest {
+    fun whenAllFeatureFlagsEnabledGetFeatureConfigRequestThenReturnJsCallbackDataWithExpectedFeatureFlags() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
         val usePaidDuckAi = true
+        val useProTier = true
 
         privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -249,17 +262,20 @@ class RealSubscriptionsJSHelperTest {
     }
 
     @Test
-    fun whenGetFeatureConfigRequestWithDisabledFlagThenReturnJsCallbackDataWithUsePaidDuckAiFalse() = runTest {
+    fun whenAllFeatureFlagsDisabledGetFeatureConfigRequestThenReturnJsCallbackDataWithExpectedFeatureFlags() = runTest {
         val method = "getFeatureConfig"
         val id = "123"
         val usePaidDuckAi = false
+        val useProTier = false
 
         privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
 
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
 
         val jsonPayload = JSONObject().apply {
             put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
         }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
@@ -268,5 +284,129 @@ class RealSubscriptionsJSHelperTest {
         assertEquals(expected.featureName, result?.featureName)
         assertEquals(expected.method, result?.method)
         assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenGetFeatureConfigRequestWithMixedFlagsThenReturnWithExpectedFeatureFlags() = runTest {
+        val method = "getFeatureConfig"
+        val id = "123"
+        val usePaidDuckAi = true
+        val useProTier = false
+
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+        privacyProFeature.allowProTierPurchase().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(useProTier))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("usePaidDuckAi", usePaidDuckAi)
+            put("useProTier", useProTier)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenBackToSettingsRequestThenLaunchSettingsAndReturnNull() = runTest {
+        val method = "backToSettings"
+        val id = "123"
+        val context: Context = mock()
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionsSettingsScreenWithEmptyParams)
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionActivationRequestThenLaunchRestoreFlowAndReturnNull() = runTest {
+        val method = "openSubscriptionActivation"
+        val id = "123"
+        val context: Context = mock()
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
+
+        verify(mockGlobalActivityStarter).start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = true))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionPurchaseRequestWithOriginThenLaunchPurchaseWithOrigin() = runTest {
+        val method = "openSubscriptionPurchase"
+        val id = "123"
+        val context: Context = mock()
+        val origin = "duckai-fullscreen"
+        val data = JSONObject().apply { put("origin", origin) }
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionPurchase(origin = origin, featurePage = "duckai"))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionPurchaseRequestWithoutOriginThenLaunchPurchaseWithDefaultParams() = runTest {
+        val method = "openSubscriptionPurchase"
+        val id = "123"
+        val context: Context = mock()
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithOriginThenLaunchUpgradeWithOrigin() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+        val origin = "duckai_upgrade_prompt"
+        val data = JSONObject().apply { put("origin", origin) }
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade(origin = origin))
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithoutOriginThenLaunchUpgradeWithDefaultParams() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade())
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithEmptyOriginThenLaunchUpgradeWithDefaultParams() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+        val context: Context = mock()
+        val data = JSONObject().apply { put("origin", "") }
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, data, context)
+
+        verify(mockGlobalActivityStarter).start(context, SubscriptionUpgrade())
+        assertNull(result)
+    }
+
+    @Test
+    fun whenOpenSubscriptionUpgradeRequestWithNullContextThenReturnNull() = runTest {
+        val method = "openSubscriptionUpgrade"
+        val id = "123"
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null, null)
+
+        assertNull(result)
     }
 }

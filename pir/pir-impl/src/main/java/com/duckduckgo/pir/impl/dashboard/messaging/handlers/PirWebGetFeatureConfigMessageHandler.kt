@@ -60,6 +60,7 @@ class PirWebGetFeatureConfigMessageHandler @Inject constructor(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.GetFeatureConfigResponse(
                     useUnifiedFeedback = useUnifiedFeedback,
+                    isBeta = true,
                 ),
             )
         }

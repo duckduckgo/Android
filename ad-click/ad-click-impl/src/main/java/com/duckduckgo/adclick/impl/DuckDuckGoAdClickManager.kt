@@ -37,8 +37,6 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickCollector: AdClickCollector,
 ) : AdClickManager {
 
-    private val publicSuffixDatabase = PublicSuffixDatabase()
-
     override fun detectAdClick(url: String?, isMainFrame: Boolean) {
         if (url == null) return
         if (!isMainFrame) return
@@ -132,7 +130,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private fun toTldPlusOne(url: String): String? {
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
-        return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
+        return kotlin.runCatching { PublicSuffixDatabase.get().getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
     }
 
     private fun adClicked(detectedAdDomain: String?) {

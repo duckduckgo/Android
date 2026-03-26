@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_hint">Spørg privat</string>
     <string name="input_screen_user_pref_without_ai">Kun søgning</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Søg &amp; Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Prøv den nye mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Skjul AI-genererede billeder</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtrerer AI-genererede billeder fra billedsøgeresultater</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Aktivér i indstillinger for AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Administrer i indstillinger for AI-funktioner</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurer Duck.ai i indstillingerne for AI-funktioner.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Sammenfat denne side</string>
+    <string name="duckAIContextualAutomaticContextTitle">Send automatisk sideindhold</string>
+    <string name="duckAIContextualAutomaticContextMessage">Send automatisk sideindhold til Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Vedhæft sideindhold</string>
 </resources>

@@ -202,12 +202,12 @@ class RealAdClickAttributedMetricTest {
             0.0 to 0, // 0 clicks -> bucket 0 (≤2)
             1.0 to 0, // 1 click -> bucket 0 (≤2)
             2.0 to 0, // 2 clicks -> bucket 0 (≤2)
-            2.1 to 0, // 2.1 clicks rounds to 2 -> bucket 0 (≤2)
-            2.5 to 1, // 2.5 clicks rounds to 3 -> bucket 1 (≤5)
-            2.7 to 1, // 2.7 clicks rounds to 3 -> bucket 1 (≤5)
+            2.1 to 1, // 2.1 > 2, >2 and ≤5 -> bucket 1
+            2.5 to 1, // >2 and ≤5 -> bucket 1
+            2.7 to 1, // >2 and ≤5 -> bucket 1
             3.0 to 1, // 3 clicks -> bucket 1 (≤5)
             5.0 to 1, // 5 clicks -> bucket 1 (≤5)
-            5.1 to 1, // 5.1 clicks rounds to 5 -> bucket 1 (≤5)
+            5.1 to 2, // 5.1 > 5, >5 -> bucket 2
             6.0 to 2, // 6 clicks -> bucket 2 (>5)
             10.0 to 2, // 10 clicks -> bucket 2 (>5)
         )

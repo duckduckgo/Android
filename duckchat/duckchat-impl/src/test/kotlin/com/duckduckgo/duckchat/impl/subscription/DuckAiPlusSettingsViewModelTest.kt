@@ -3,14 +3,20 @@ package com.duckduckgo.duckchat.impl.subscription
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Command.OpenDuckAiPlusSettings
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -22,11 +28,17 @@ class DuckAiPlusSettingsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
+    private val fakeDuckChatInternal = FakeDuckChatInternal(enabled = true)
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+        duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
+    }
 
     private val viewModel: DuckAiPlusSettingsViewModel by lazy {
         DuckAiPlusSettingsViewModel(
             subscriptions = subscriptions,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = fakeDuckChatInternal,
+            duckChatFeature = duckChatFeature,
         )
     }
 
@@ -197,6 +209,131 @@ class DuckAiPlusSettingsViewModelTest {
 
         viewModel.viewState.test {
             assertEquals(SettingState.Hidden, expectMostRecentItem().settingState)
+        }
+    }
+
+    @Test
+    fun `when duck chat is enabled and feature is enabled then isDuckAiEnabled is true`() = runTest {
+        val enabledFakeDuckChat = FakeDuckChatInternal(enabled = true)
+        val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+            duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
+        }
+
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val viewModel = DuckAiPlusSettingsViewModel(
+            subscriptions = subscriptions,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = enabledFakeDuckChat,
+            duckChatFeature = featureToggle,
+        )
+
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isDuckAiEnabled)
+        }
+    }
+
+    @Test
+    fun `when duck chat is disabled and feature is enabled then isDuckAiEnabled is false`() = runTest {
+        val disabledFakeDuckChat = FakeDuckChatInternal(enabled = false)
+        val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+            duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
+        }
+
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val viewModel = DuckAiPlusSettingsViewModel(
+            subscriptions = subscriptions,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = disabledFakeDuckChat,
+            duckChatFeature = featureToggle,
+        )
+
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            val state = expectMostRecentItem()
+            assertFalse(state.isDuckAiEnabled)
+        }
+    }
+
+    @Test
+    fun `when feature is disabled then isDuckAiEnabled defaults to true`() = runTest {
+        val disabledFakeDuckChat = FakeDuckChatInternal(enabled = false)
+        val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+            duckAiPaidSettingsStatus().setRawStoredState(State(enable = false))
+        }
+
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val viewModel = DuckAiPlusSettingsViewModel(
+            subscriptions = subscriptions,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = disabledFakeDuckChat,
+            duckChatFeature = featureToggle,
+        )
+
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isDuckAiEnabled)
+        }
+    }
+
+    @Test
+    fun `when feature is enabled then isDuckAiPaidSettingsFeatureEnabled is true`() = runTest {
+        val enabledFakeDuckChat = FakeDuckChatInternal(enabled = true)
+        val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+            duckAiPaidSettingsStatus().setRawStoredState(State(enable = true))
+        }
+
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val viewModel = DuckAiPlusSettingsViewModel(
+            subscriptions = subscriptions,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = enabledFakeDuckChat,
+            duckChatFeature = featureToggle,
+        )
+
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isDuckAiPaidSettingsFeatureEnabled)
+        }
+    }
+
+    @Test
+    fun `when feature is disabled then isDuckAiPaidSettingsFeatureEnabled is false`() = runTest {
+        val enabledFakeDuckChat = FakeDuckChatInternal(enabled = true)
+        val featureToggle = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).apply {
+            duckAiPaidSettingsStatus().setRawStoredState(State(enable = false))
+        }
+
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+
+        val viewModel = DuckAiPlusSettingsViewModel(
+            subscriptions = subscriptions,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            duckChat = enabledFakeDuckChat,
+            duckChatFeature = featureToggle,
+        )
+
+        viewModel.onCreate(mock())
+
+        viewModel.viewState.test {
+            val state = expectMostRecentItem()
+            assertFalse(state.isDuckAiPaidSettingsFeatureEnabled)
         }
     }
 }

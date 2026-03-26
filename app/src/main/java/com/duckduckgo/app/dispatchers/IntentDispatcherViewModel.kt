@@ -56,11 +56,11 @@ class IntentDispatcherViewModel @Inject constructor(
         val customTabRequested: Boolean = false,
         val intentText: String? = null,
         val activityParams: ActivityParams? = null,
-        val toolbarColor: Int = 0,
+        val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
     )
 
-    fun onIntentReceived(intent: Intent?, defaultColor: Int, isExternal: Boolean) {
+    fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
@@ -74,7 +74,13 @@ class IntentDispatcherViewModel @Inject constructor(
                 } else {
                     null
                 }
-                val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
+
+                val toolbarColor = if (intent?.hasExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR) == true) {
+                    intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)
+                } else {
+                    null
+                }
+
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
 

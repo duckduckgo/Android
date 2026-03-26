@@ -21,6 +21,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/selectableItemBackground"
+    tools:ignore="Overdraw"
     android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
     android:paddingStart="?attr/autocompleteListItemStartPadding"
     android:paddingEnd="?attr/autocompleteListItemWithoutTrailIconEndPadding">

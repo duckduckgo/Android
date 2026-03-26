@@ -22,8 +22,8 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
  * This class is used to provide one of the two different version of NewTabPage
- * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
- * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
+ * New Tab Page -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
+ * Configurable -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
  */
 interface NewTabPagePlugin : ActivePlugin {
 
@@ -41,7 +41,7 @@ interface NewTabPagePlugin : ActivePlugin {
     ): View
 
     companion object {
-        const val PRIORITY_LEGACY_NTP = 0
-        const val PRIORITY_NTP = 100
+        const val PRIORITY_NTP = 0
+        const val PRIORITY_CONFIGURABLE_NTP = 100
     }
 }

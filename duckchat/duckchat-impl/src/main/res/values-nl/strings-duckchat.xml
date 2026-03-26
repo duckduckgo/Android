@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Zoek of voer een adres in</string>
     <string name="input_screen_chat_hint">Vraag privé</string>
     <string name="input_screen_user_pref_without_ai">Alleen zoeken</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Zoeken en Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Probeer de nieuwe optie om direct een vraag te stellen aan Duck.ai vanuit de adresbalk. <annotation type="share_feedback">Feedback delen</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Verberg AI-gegenereerde afbeeldingen.</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Filtert AI-gegenereerde afbeeldingen uit de zoekresultaten van afbeeldingen.</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Inschakelen in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Beheren in de instellingen voor AI-functies</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configureer Duck.ai in de instellingen voor AI-functies.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Deze pagina samenvatten</string>
+    <string name="duckAIContextualAutomaticContextTitle">Pagina-inhoud automatisch verzenden</string>
+    <string name="duckAIContextualAutomaticContextMessage">Pagina-inhoud automatisch naar Duck.ai verzenden</string>
+    <string name="duckAIContextualAttachPageContent">Pagina-inhoud bijvoegen</string>
 </resources>

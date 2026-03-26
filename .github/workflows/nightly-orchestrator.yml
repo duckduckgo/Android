@@ -1,0 +1,83 @@
+name: Nightly orchestrator
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve-commit:
+    name: Resolve commit SHA
+    runs-on: android-large-runner
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+    steps:
+      - name: Resolve commit SHA
+        id: resolve
+        run: |
+          echo "Using commit: ${{ github.sha }}"
+          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  call-nightly:
+    needs: resolve-commit
+    uses: ./.github/workflows/nightly.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-end-to-end:
+    needs: [resolve-commit, call-nightly]
+    uses: ./.github/workflows/e2e-nightly-full-suite.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-privacy:
+    needs: [ resolve-commit, call-end-to-end ]
+    uses: ./.github/workflows/privacy.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-update-content-scope:
+    needs: [ resolve-commit, call-privacy ]
+    uses: ./.github/workflows/update-content-scope.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  call-update-ref-tests:
+    needs: [ resolve-commit, call-update-content-scope ]
+    uses: ./.github/workflows/update-ref-tests.yml
+    with:
+      commit: ${{ needs.resolve-commit.outputs.commit_sha }}
+    secrets: inherit
+
+  tag_lgc_when_successful:
+    name: Tag last good commit when successful
+    runs-on: ubuntu-latest
+    needs: [ resolve-commit, call-nightly, call-end-to-end, call-privacy, call-update-content-scope, call-update-ref-tests]
+    if: ${{ success() }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-commit.outputs.commit_sha }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up git config
+        run: |
+          git remote set-url origin https://${{ secrets.GT_DAXMOBILE }}@github.com/duckduckgo/Android.git/
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Create tag
+        run: |
+          TAG_NAME="LGC-$(date -u +'%Y-%m-%dT%H%M%S')"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"

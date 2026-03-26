@@ -45,7 +45,6 @@ private fun htmlDrawable(
 private const val HTTPS_PREFIX = "https://"
 private const val WWW_PREFIX = "www."
 private const val WWW_SUFFIX = "/"
-private val publicSuffixDatabase = PublicSuffixDatabase()
 
 fun String.websiteFromGeoLocationsApiOrigin(): String {
     val uri = Uri.parse(this)
@@ -60,7 +59,7 @@ fun String.asLocationPermissionOrigin(): String {
 }
 
 fun String.toTldPlusOne(): String? {
-    return runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(this) }.getOrNull()
+    return runCatching { PublicSuffixDatabase.get().getEffectiveTldPlusOne(this) }.getOrNull()
 }
 
 /**

@@ -24,13 +24,19 @@ import com.duckduckgo.lint.DenyListedApiDetector
 import com.duckduckgo.lint.NoDispatcherComputation.Companion.ISSUE_AVOID_COMPUTATION
 import com.duckduckgo.lint.NoFragmentDetector.Companion.NO_FRAGMENT_ISSUE
 import com.duckduckgo.lint.NoHardcodedCoroutineDispatcherDetector.Companion.NO_HARCODED_COROUTINE_DISPATCHER
+import com.duckduckgo.lint.NoImplImportsInAppModuleDetector.Companion.NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE
+import com.duckduckgo.lint.MetricsPixelNumericValueDetector.Companion.NUMERIC_VALUE_REQUIRED
+import com.duckduckgo.lint.NoMetricsPixelExtensionUsageDetector.Companion.NO_METRICS_PIXEL_EXTENSION_USAGE
 import com.duckduckgo.lint.NoLifecycleObserverDetector.Companion.NO_LIFECYCLE_OBSERVER_ISSUE
+import com.duckduckgo.lint.NoLifecycleScopeInFragmentDetector.Companion.NO_LIFECYCLE_SCOPE_IN_FRAGMENT
 import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETROFIT_CREATE_CALL
 import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECTRIC_TEST_RUNNER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
+import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
+import com.duckduckgo.lint.RemoteFeatureNameDetector.Companion.UNDERSCORE_IN_FEATURE_NAME
 import com.duckduckgo.lint.WrongPluginPointCollectorDetector.Companion.WRONG_PLUGIN_POINT_ISSUE
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.MissingSmartlingRequiredDirectivesDetector.Companion.MISSING_SMARTLING_REQUIRED_DIRECTIVES
@@ -38,6 +44,8 @@ import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MIS
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
+import com.duckduckgo.lint.ui.DaxTextFieldTrailingIconDetector.Companion.INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE
+import com.duckduckgo.lint.ui.DaxSecureTextFieldTrailingIconDetector.Companion.INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
 import com.duckduckgo.lint.ui.DeprecatedAndroidWidgetsUsedInXmlDetector.Companion.DEPRECATED_WIDGET_IN_XML
 import com.duckduckgo.lint.ui.MissingDividerDetector.Companion.MISSING_HORIZONTAL_DIVIDER
@@ -56,11 +64,15 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
     override val issues: List<Issue>
         get() = listOf(
             WRONG_PLUGIN_POINT_ISSUE,
+            UNDERSCORE_IN_FEATURE_NAME,
             NO_SINGLETON_ISSUE,
             NO_LIFECYCLE_OBSERVER_ISSUE,
             NO_FRAGMENT_ISSUE,
             NO_SYSTEM_LOAD_LIBRARY,
             NO_HARCODED_COROUTINE_DISPATCHER,
+            NO_IMPL_IMPORTS_IN_APP_MODULE_ISSUE,
+            NO_METRICS_PIXEL_EXTENSION_USAGE,
+            NUMERIC_VALUE_REQUIRED,
             MISSING_SMARTLING_REQUIRED_DIRECTIVES,
             MISSING_INSTRUCTION,
             PLACEHOLDER_MISSING_POSITION,
@@ -69,6 +81,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             ISSUE_NON_CANCELLABLE,
             ISSUE_AVOID_COMPUTATION,
             DenyListedApiDetector.ISSUE,
+            NO_LIFECYCLE_SCOPE_IN_FRAGMENT,
+            NO_POST_VALUE_ON_SINGLE_LIVE_EVENT,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
@@ -86,6 +100,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_COMPOSE_VIEW_USAGE,
             NO_SET_CONTENT_USAGE,
             INVALID_DAX_TEXT_COLOR_USAGE,
+            INVALID_DAX_TEXT_FIELD_TRAILING_ICON_USAGE,
+            INVALID_DAX_SECURE_TEXT_FIELD_TRAILING_ICON_USAGE,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

@@ -3,6 +3,9 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_DUCK_AI_PAID_USED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_START
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.FREE_TRIAL_VPN_ACTIVATION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH
 import org.junit.Assert.*
@@ -18,7 +21,16 @@ class SubscriptionPixelTest(
 ) {
     @Test
     fun `pixel name has privacy pro namespace prefix`() {
-        assumeFalse(pixel in listOf(PURCHASE_SUCCESS_ORIGIN, SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH))
+        assumeFalse(
+            pixel in listOf(
+                PURCHASE_SUCCESS_ORIGIN,
+                SUBSCRIPTION_WEBVIEW_RENDER_PROCESS_CRASH,
+                FREE_TRIAL_START,
+                FREE_TRIAL_VPN_ACTIVATION,
+                FREE_TRIAL_DUCK_AI_PAID_USED,
+            ),
+        )
+
         pixel.getPixelNames().values.forEach { pixelName ->
             assertTrue(pixelName.startsWith("m_privacy-pro_"))
         }

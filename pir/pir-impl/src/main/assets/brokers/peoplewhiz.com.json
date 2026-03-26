@@ -1,0 +1,148 @@
+{
+  "name": "PeopleWhiz.com",
+  "url": "peoplewhiz.com",
+  "version": "0.8.0",
+  "addedDatetime": 1676160000000,
+  "optOutUrl": "https://www.peoplewhiz.com/remove-my-info",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "581295d7-1fd9-4039-a207-e9b8216b3d0f",
+          "url": "https://www.peoplewhiz.com/flow/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "efa321f2-f214-411f-a87b-bc42feff7931",
+          "selector": "[class^='ResultsTable__Record-sc']",
+          "noResultsSelector": "div[class^=ResultNotFound__NoResults]",
+          "profile": {
+            "name": {
+              "selector": ".//div[contains(@class, 'ResultsTable__Name')]/text()"
+            },
+            "age": {
+              "selector": "[class^='ResultsTable__Age-sc']"
+            },
+            "addressCityState": {
+              "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".MuiGrid-item:nth-child(4) [class^='ResultsTable__AddressAndLocation-sc']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "2d9dd816-ec21-4210-91d1-3725837a11b1",
+          "url": "https://www.peoplewhiz.com/optout/results/${firstName}/${middleName|defaultIfEmpty:~}/${lastName}/${city}/${state}/${age}"
+        },
+        {
+          "actionType": "click",
+          "id": "327e4f66-a554-4aaa-9a99-f789740112a8",
+          "elements": [
+            {
+              "selector": "button",
+              "type": "button",
+              "parent": {
+                "profileMatch": {
+                  "selector": "[class^='ResultsTable__Record-sc']",
+                  "profile": {
+                    "name": {
+                      "selector": ".//div[contains(@class, 'ResultsTable__Name')]/text()"
+                    },
+                    "age": {
+                      "selector": "[class^='ResultsTable__Age-sc']"
+                    },
+                    "addressCityState": {
+                      "selector": ".MuiGrid-item:nth-child(3) [class^='ResultsTable__AddressAndLocation-sc']",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "4c088375-cd04-4ce3-ab05-0833b55b82b4",
+          "selector": "form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "input[name='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "checkbox",
+              "selector": "#altcha_checkbox"
+            }
+          ],
+          "id": "d04e9122-30e1-49fa-b684-2398b4f96213"
+        },
+        {
+          "actionType": "click",
+          "id": "0d61b830-c740-4d55-a32e-dcc370ff0cdc",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button[type='submit']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "5b261491-18ce-476d-9990-4afe2cbadfb3",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We have Received Your Request"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "86420965-0bd7-49ee-8034-bbea1d34c3d6",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "0884ae5d-b57b-4e62-92f5-01f4adf06005",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your request for optout is confirmed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1763741688379
+}

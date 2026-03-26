@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Генериране на Duck Address</string>
     <string name="browserMenuFindInPage">Намери в страницата</string>
     <string name="browserMenuPrint">Отпечатване на страницата</string>
+    <string name="browserMenuPrintSite">Отпечатване</string>
     <string name="browserMenuOpenAppLink">Отваряне в приложението</string>
     <string name="browserMenuAddToHome">Добавете към Начална Страница</string>
     <string name="browserMenuReportBrokenSite">Подаване на сигнал за повреден сайт</string>
@@ -45,11 +46,15 @@
     <string name="browserMenuNewChat">Нов чат</string>
     <string name="browserMenuNewAIChat">AI Chat</string>
     <string name="browserMenuChatHistory">История на чата</string>
+    <string name="browserMenuDuckChatHistory">Чатове с Duck.ai</string>
     <string name="browserMenuChatSettings">Настройки на Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
+    <!-- smartling.character_limit = 15 -->
+    <string name="browserMenuVpnTryForFree">Безплатна проба</string>
 
     <!-- Browser Menu Content Description -->
     <string name="browserMenuBack">Обратно</string>
     <string name="browserMenuForward">Напред</string>
     <string name="browserMenuRefresh">Опресняване</string>
+    <string name="browserMenuFire">Изчистване на раздели и данни</string>
 </resources>

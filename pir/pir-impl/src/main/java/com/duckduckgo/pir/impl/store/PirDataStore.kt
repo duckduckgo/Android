@@ -27,6 +27,12 @@ interface PirDataStore {
     var wauLastSentMs: Long
     var mauLastSentMs: Long
     var weeklyStatLastSentMs: Long
+    var hasBrokerConfigBeenManuallyUpdated: Boolean
+    var latestBackgroundScanRunInMs: Long
+    var featureReceivedMs: Long
+
+    fun reset()
+    fun resetUserData()
 }
 
 internal class RealPirDataStore(
@@ -87,6 +93,46 @@ internal class RealPirDataStore(
             }
         }
 
+    override var hasBrokerConfigBeenManuallyUpdated: Boolean
+        get() = preferences.getBoolean(KEY_BROKER_CONFIG_MANUALLY_UPDATED, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(KEY_BROKER_CONFIG_MANUALLY_UPDATED, value)
+            }
+        }
+
+    override var latestBackgroundScanRunInMs: Long
+        get() = preferences.getLong(KEY_LAST_BG_SCAN_RUN, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_LAST_BG_SCAN_RUN, value)
+            }
+        }
+
+    override var featureReceivedMs: Long
+        get() = preferences.getLong(KEY_FEATURE_RECEIVED_MS, 0L)
+        set(value) {
+            preferences.edit {
+                putLong(KEY_FEATURE_RECEIVED_MS, value)
+            }
+        }
+
+    override fun reset() {
+        mainConfigEtag = null
+        hasBrokerConfigBeenManuallyUpdated = false
+        featureReceivedMs = 0L
+        resetUserData()
+    }
+
+    override fun resetUserData() {
+        customStatsPixelsLastSentMs = 0L
+        dauLastSentMs = 0L
+        wauLastSentMs = 0L
+        mauLastSentMs = 0L
+        weeklyStatLastSentMs = 0L
+        latestBackgroundScanRunInMs = 0L
+    }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.pir.v1"
         private const val KEY_MAIN_ETAG = "KEY_MAIN_ETAG"
@@ -95,5 +141,8 @@ internal class RealPirDataStore(
         private const val KEY_ENGAGEMENT_WAU_LAST_MS = "KEY_ENGAGEMENT_WAU_LAST_MS"
         private const val KEY_ENGAGEMENT_MAU_LAST_MS = "KEY_ENGAGEMENT_MAU_LAST_MS"
         private const val KEY_WEEKLY_STATS_LAST_SENT_MS = "KEY_WEEKLY_STATS_LAST_SENT_MS"
+        private const val KEY_BROKER_CONFIG_MANUALLY_UPDATED = "KEY_BROKER_CONFIG_MANUALLY_UPDATED"
+        private const val KEY_LAST_BG_SCAN_RUN = "KEY_LAST_BG_SCAN_RUN_MS"
+        private const val KEY_FEATURE_RECEIVED_MS = "KEY_FEATURE_RECEIVED_MS"
     }
 }

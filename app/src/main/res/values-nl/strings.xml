@@ -119,7 +119,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Gegevens wissen</string>
-    <string name="fireClearAll">Tabbladen en gegevens wissen</string>
+    <string name="fireClearAll">Tabbladen en gegevens verwijderen</string>
     <string name="fireClearAllPlusDuckChats">Tabbladen, gegevens en Duck.ai-chats wissen</string>
     <string name="fireCancel">Annuleren</string>
     <string name="fireDataCleared">Gegevens gewist</string>
@@ -129,6 +129,7 @@
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingProtections">Bescherming</string>
     <string name="settingsHeadingAppearance">Uiterlijk</string>
+    <string name="settingsWhatsNew">Wat is er nieuw?</string>
     <string name="settingsHeadingAbout">Over</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
@@ -176,6 +177,8 @@
     <string name="improvedAutoCompleteIAMContent">Automatische suggesties bevatten nu ook je recent bezochte sites. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
     <string name="openAutoCompleteSettings">Open Instellingen</string>
+    <string name="privateSearchChatSuggestionsToggle">Chatsuggesties</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Toon suggesties uit je geschiedenis, bladwijzers en (optioneel) de chatgeschiedenis van Duck.ai terwijl je typt in de zoekbalk. Alle zoekopdrachten zijn privé.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Algemeen</string>
@@ -207,12 +210,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Kiest er namens jou voor om je af te melden door sites mee te delen je persoonlijke gegevens niet te verkopen of te delen.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
+    <string name="getDesktopBrowserTitle">Bescherm je persoonlijke informatie ook op Mac en Windows!</string>
+    <string name="getDesktopBrowserBody">Om DuckDuckGo te downloaden op Mac of Windows, bezoek:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Downloadlink delen</string>
+    <string name="getDesktopBrowserNoThanks">Nee, bedankt</string>
+    <string name="getDesktopBrowserHideItem">Verbergen</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link gekopieerd</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Gegevens wissen</string>
+    <string name="dataClearingDescription">Het verwijderen van je gegevens kan helpen om je privacy online te beschermen. Gebruik de Fire Button om gegevens handmatig te verwijderen of stel in dat gegevens automatisch worden verwijderd.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d locatie uitgesloten van gegevensverwijdering</item>
+        <item quantity="other">%1$d locaties uitgesloten van gegevensverwijdering</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Aan</string>
+    <string name="dataClearingAutomaticClearingOff">Uit</string>
+    <string name="dataClearingClearBrowsingData">Browsegegevens verwijderen</string>
+    <string name="dataClearingAutomaticDataClearing">Gegevens automatisch verwijderen</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Gegevens automatisch verwijderen</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Alle open tabbladen sluiten</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Verwijder alle sitegegevens, inclusief bezochte sites. Mogelijk word je uitgelegd bij accounts.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Alle chats verwijderen, inclusief vastgezette chats</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Kies wat je wilt verwijderen</string>
+    <string name="dataClearingOptionTabs">Tabbladen</string>
+    <string name="dataClearingOptionData">Cookies en sitegegevens</string>
+    <string name="dataClearingDuckAiChats">Duck.ai chats</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Alle chats verwijderen</string>
+    <string name="fireDialogDeleteButton">Verwijderen</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d tabblad sluiten</item>
+        <item quantity="other">Alle %1$d tabbladen sluiten</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Mogelijk word je uitgelegd bij accounts.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Geen</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Verwijder van 1 website. Je kan worden uitgelogd bij accounts.</item>
+        <item quantity="other">Verwijder van %1$d websites. Je kan worden uitgelogd bij accounts.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Tabbladen en sitegegevens verwijderen?</string>
+    <string name="singleTabFireDialogTitleWithChats">Tabbladen, sitegegevens en chats verwijderen?</string>
+    <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
+    <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
+    <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
+    <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d tabblad en bijbehorende gegevens verwijderd</item>
+        <item quantity="other">%1$d tabbladen en bijbehorende gegevens verwijderd</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">De sitegegevens kunnen niet worden verwijderd. Werk WebView bij.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">De sitegegevens kunnen niet worden verwijderd vanwege een fout.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Toestemmingen</string>
@@ -231,15 +292,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabbladen en gegevens</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Tabbladen, gegevens en Duck.ai-chats</string>
 
-    <string name="settingsAutomaticallyClearWhen">Wissen op…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Wissen op…</string>
+    <string name="settingsAutomaticallyClearWhen">Verwijderen op…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Verwijderen op…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Alleen app afsluiten</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App afsluiten, 5 seconden inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App afsluiten, 5 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App afsluiten, 15 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App afsluiten, 30 minuten inactief</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App afsluiten, 1 uur inactief</string>
-    <string name="settingsClearAiDataTitle">Duck.ai chats wissen</string>
+    <string name="settingsClearAiDataTitle">Duck.ai-chats verwijderen</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button verwijdert ook de Duck.ai-geschiedenis, inclusief vastgepinde chats.</string>
     <string name="settingsClearDataActionSecondaryText">Wist alle tabbladen en gegevens van sites die je niet Fireproof hebt gemaakt.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Sluit alle tabbladen, Duck.ai-chats en wist gegevens van sites die je niet Fireproof hebt gemaakt.</string>
@@ -765,7 +826,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
     <string name="preOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
@@ -777,6 +840,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
@@ -825,9 +889,11 @@
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Wist je dat?</string>
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 
@@ -894,11 +960,16 @@
     <string name="settingsHeadingCompleteSetup">Je instelling voltooien</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Aantal trackers in tabbladwisselaar</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s tracker geblokkeerd &lt;/b&gt; in de afgelopen 7 dagen</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Trackertelling verbergen?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Je kunt dit weer inschakelen in Instellingen &gt; Weergave.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Verbergen</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Bewaren</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animatie voor geblokkeerde trackers</string>
+    <string name="showTrackerCountInAddressBar">In adresbalk weergeven</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Weergeven in Tabbladbeheer</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Alleen zoeken</string>

@@ -54,6 +54,7 @@ import logcat.logcat
 import java.time.Duration
 import java.time.OffsetDateTime
 import javax.inject.Inject
+import kotlin.collections.mapNotNull
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
@@ -65,6 +66,7 @@ class RealSyncEngine @Inject constructor(
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
+    private val deletableDataManagerPlugins: PluginPoint<DeletableDataManager>,
     private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
@@ -130,7 +132,11 @@ class RealSyncEngine @Inject constructor(
             syncPixels.fireDailySuccessRatePixel()
             syncPixels.fireDailyPixel()
 
-            logcat(INFO) { "Sync-Engine: getChanges - performSync" }
+            // Process deletions first (DeletableTypes)
+            processDeletions()
+
+            // Then process changes (SyncableTypes)
+            logcat(INFO) { "Sync-Engine: processing changes" }
             val changes = getChanges()
             performFirstSync(changes.filter { it.isFirstSync() })
             performRegularSync(changes.filter { !it.isFirstSync() })
@@ -141,30 +147,35 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
-        regularSyncChanges.forEach { changes ->
-            if (changes.isEmpty()) {
-                logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
-                getRemoteChanges(changes, TIMESTAMP)
-            } else {
-                logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
-                patchLocalChanges(changes, TIMESTAMP)
+        regularSyncChanges
+            .forEach { changes ->
+                if (changes.isEmpty()) {
+                    if (changes.type.supports(SyncHttpMethod.GET)) {
+                        logcat(INFO) { "Sync-Engine: no changes to sync for $changes, asking for remote changes" }
+                        getRemoteChanges(changes, TIMESTAMP)
+                    }
+                } else if (changes.type.supports(SyncHttpMethod.PATCH)) {
+                    logcat(INFO) { "Sync-Engine: $changes changes to update $changes" }
+                    patchLocalChanges(changes, TIMESTAMP)
+                }
             }
-        }
     }
 
     private fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
         val types = firstSyncChanges.map { it.type }
 
-        firstSyncChanges.forEach { changes ->
-            logcat(INFO) { "Sync-Engine: first sync for ${changes.type}, asking for remote changes" }
-            getRemoteChanges(changes, DEDUPLICATION)
-        }
+        firstSyncChanges
+            .filter { it.type.supports(SyncHttpMethod.GET) }
+            .forEach { changes ->
+                logcat(INFO) { "Sync-Engine: first sync for ${changes.type}, asking for remote changes" }
+                getRemoteChanges(changes, DEDUPLICATION)
+            }
 
         // give a chance to send changes after dedup
         getChanges().filter { it.type in types }.forEach { changes ->
             if (changes.isEmpty()) {
                 logcat { "Sync-Engine: no changes to sync for $changes" }
-            } else {
+            } else if (changes.type.supports(SyncHttpMethod.PATCH)) {
                 logcat { "Sync-Engine: $changes changes to update $changes" }
                 patchLocalChanges(changes, LOCAL_WINS)
             }
@@ -197,7 +208,6 @@ class RealSyncEngine @Inject constructor(
                 persisterPlugins.getPlugins().forEach {
                     it.onError(SyncErrorResponse(changes.type, featureError))
                 }
-                return
             }
 
             is Success -> {
@@ -232,11 +242,54 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
+    private fun getDeletionRequests(): List<PendingDeletion> {
+        return deletableDataManagerPlugins.getPlugins().mapNotNull { manager ->
+            logcat { "Sync-Engine: asking for deletions in ${manager.javaClass}" }
+            kotlin.runCatching {
+                manager.getDeletions()?.let { deletionRequest ->
+                    PendingDeletion(deletionRequest, manager)
+                }
+            }.getOrElse { error ->
+                syncOperationErrorRecorder.record(
+                    manager.getDeletableType().field,
+                    DATA_PROVIDER_ERROR,
+                )
+                null
+            }
+        }
+    }
+    private fun processDeletions() {
+        val deletions = getDeletionRequests()
+        if (deletions.isEmpty()) {
+            return
+        }
+
+        logcat(INFO) { "Sync-Engine: processing ${deletions.size} deletions" }
+
+        deletions.forEach { (request, manager) ->
+            logcat { "Sync-Engine: processing deletion for ${request.type}" }
+            when (val result = syncApiClient.delete(request)) {
+                is Error -> {
+                    val featureError = result.featureError() ?: return@forEach
+                    manager.onDeleteError(SyncErrorResponse(request.type, featureError))
+                }
+                is Success -> {
+                    logcat { "Sync-Engine: deletion completed successfully for ${request.type}" }
+                    kotlin.runCatching {
+                        manager.onDeleteSuccess(result.data)
+                    }.getOrElse { error ->
+                        logcat { "Sync-Engine: error notifying deletable data manager of deletion success: $error" }
+                    }
+                }
+            }
+        }
+    }
+
     private fun persistChanges(
         remoteChanges: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ) {
-        persisterPlugins.getPlugins().map {
+        persisterPlugins.getPlugins().forEach {
             kotlin.runCatching {
                 when (val result = it.onSuccess(remoteChanges, conflictResolution)) {
                     is SyncMergeResult.Success -> {
@@ -261,7 +314,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun onSyncEnabled() {
         syncStateRepository.clearAll()
-        persisterPlugins.getPlugins().map {
+        persisterPlugins.getPlugins().forEach {
             it.onSyncEnabled()
         }
         lifecyclePlugins.getPlugins().forEach {
@@ -271,7 +324,7 @@ class RealSyncEngine @Inject constructor(
 
     override fun onSyncDisabled() {
         syncStateRepository.clearAll()
-        persisterPlugins.getPlugins().map {
+        persisterPlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
         lifecyclePlugins.getPlugins().forEach {
@@ -287,4 +340,9 @@ class RealSyncEngine @Inject constructor(
             else -> null
         }
     }
+
+    private data class PendingDeletion(
+        val request: SyncDeletionRequest,
+        val manager: DeletableDataManager,
+    )
 }

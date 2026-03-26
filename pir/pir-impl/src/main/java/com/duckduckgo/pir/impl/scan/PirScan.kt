@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.scan
 
 import android.content.Context
+import android.webkit.WebView
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -29,6 +30,7 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.Broker
@@ -72,6 +74,19 @@ interface PirScan {
     ): Result<Unit>
 
     /**
+     * This method should only be used if we want to debug scan and pass in a specific [webView] which will allow us to see the run in action.
+     * Do not use this for non-debug scenarios.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
+     *
+     * @param brokers - List of broker names
+     * @param webView - attached/visible WebView in which we will run the scan.
+     */
+    suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
+    ): Result<Unit>
+
+    /**
      * NOTE: This method should only be used for internal dev functionality only.
      * This method can be used to execute pir scan for all active brokers (from json).
      * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
@@ -102,6 +117,7 @@ class RealPirScan @Inject constructor(
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
@@ -175,6 +191,61 @@ class RealPirScan @Inject constructor(
         return@withContext Result.success(Unit)
     }
 
+    override suspend fun debugExecute(
+        brokers: List<String>,
+        webView: WebView,
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        onJobStarted()
+        if (runners.isNotEmpty()) {
+            cleanPreviousRun()
+        }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
+        val profileQueries = obtainProfiles()
+
+        logcat { "PIR-SCAN: Running debug scan for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
+
+        runners.add(
+            pirActionsRunnerFactory.create(
+                webView.context,
+                pirCssScriptLoader.getScript(),
+                RunType.MANUAL,
+            ),
+        )
+
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
+        // Prepare a list of all broker steps that need to be run
+        val brokerScanSteps = brokers.mapNotNull { brokerName ->
+            val broker = activeBrokers[brokerName] ?: return@mapNotNull null
+            repository.getBrokerScanSteps(brokerName)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.filter {
+            it.isNotEmpty()
+        }.flatten()
+
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
+            brokerScanSteps.map { scanStep ->
+                profileQuery to scanStep
+            }
+        }.flatten()
+
+        // Execute each step sequentially on the single runner
+        allSteps.forEach { (profileQuery, step) ->
+            logcat { "PIR-SCAN: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+            runners[0].startOn(webView, profileQuery, listOf(step))
+            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
+            logcat { "PIR-SCAN: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+        }
+
+        logcat { "PIR-SCAN: Debug scan completed for all profiles" }
+
+        onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
+        return@withContext Result.success(Unit)
+    }
+
     private suspend fun processJobRecords(
         jobRecords: List<ScanJobRecord>,
         activeBrokers: Map<String, Broker>,
@@ -230,6 +301,7 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ) {
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
+        webViewDataCleaner.cleanWebViewData()
         emitScanCompletedPixel(
             runType,
         )
@@ -329,6 +401,7 @@ class RealPirScan @Inject constructor(
         }
         runners.clear()
         onJobStopped()
+        webViewDataCleaner.cleanWebViewData()
     }
 
     private suspend fun emitScanStartPixel(runType: RunType) {

@@ -18,15 +18,12 @@ package com.duckduckgo.app.browser.ui.dialogs.widgetprompt
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
-import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.BottomSheetHomeScreenWidgetBinding
+import com.duckduckgo.common.ui.setRoundCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
 
 @SuppressLint("NoBottomSheetDialog")
 class AlternativeHomeScreenWidgetBottomSheetDialog(
@@ -47,7 +44,7 @@ class AlternativeHomeScreenWidgetBottomSheetDialog(
         this.behavior.isDraggable = false
 
         setOnShowListener { dialogInterface ->
-            setRoundCorners(dialogInterface)
+            (dialogInterface as BottomSheetDialog).setRoundCorners()
             eventListener?.onShown()
         }
         setOnCancelListener {
@@ -69,23 +66,6 @@ class AlternativeHomeScreenWidgetBottomSheetDialog(
             eventListener?.onNotNowButtonClicked()
             dismiss()
         }
-    }
-
-    /**
-     * By default, when bottom sheet dialog is expanded, the corners become squared.
-     * This function ensures that the bottom sheet dialog will have rounded corners even when in an expanded state.
-     */
-    private fun setRoundCorners(dialogInterface: DialogInterface) {
-        val bottomSheetDialog = dialogInterface as BottomSheetDialog
-        val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-
-        val shapeDrawable = MaterialShapeDrawable.createWithElevationOverlay(context)
-        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
-            .toBuilder()
-            .setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
-            .setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(com.duckduckgo.mobile.android.R.dimen.dialogBorderRadius))
-            .build()
-        bottomSheet?.background = shapeDrawable
     }
 
     interface EventListener {

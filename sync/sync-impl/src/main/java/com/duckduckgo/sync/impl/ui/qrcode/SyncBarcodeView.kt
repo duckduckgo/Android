@@ -30,11 +30,13 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -48,7 +50,6 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -66,11 +67,26 @@ constructor(
 ) :
     FrameLayout(context, attrs, defStyleAttr) {
 
+    private val minScanningAreaHeight: Int
+
+    init {
+        context.obtainStyledAttributes(attrs, R.styleable.SyncBarcodeView).apply {
+            try {
+                minScanningAreaHeight = getDimensionPixelSize(R.styleable.SyncBarcodeView_minScanningAreaHeight, MIN_SCANNING_AREA_HEIGHT_NOT_SET)
+            } finally {
+                recycle()
+            }
+        }
+    }
+
     @Inject
     lateinit var viewModelFactory: SquareDecoratedBarcodeViewModel.Factory
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val cameraBlockedDrawable by lazy {
         ContextCompat.getDrawable(context, R.drawable.camera_blocked)
@@ -93,6 +109,8 @@ constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
+        setupExpandedScanningArea()
+
         findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope!!
@@ -107,6 +125,35 @@ constructor(
 
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
+        }
+    }
+
+    /**
+     * The zxing library doesn't offer a way to define the scanning area independently
+     * from the visible scanner view. On small devices, to ensure a good scanning
+     * experience, we want to establish a minimum scanning area, so that a shorter
+     * scanner view doesn't limit the scanning area.
+     *
+     * Since we want to place additional views relative to the visible scanner view, we
+     * position them relative to a container that holds the scanning view. When the
+     * scanning area needs to be larger, we let the scanning view grow beyond the
+     * container bounds, with the overflow hidden.
+     */
+
+    private fun setupExpandedScanningArea() {
+        if (minScanningAreaHeight == MIN_SCANNING_AREA_HEIGHT_NOT_SET) return
+        binding.barcodeContainer.doOnNextLayout {
+            val containerHeight = binding.barcodeContainer.height
+
+            if (containerHeight >= minScanningAreaHeight) return@doOnNextLayout
+
+            binding.barcodeView.layoutParams = binding.barcodeView.layoutParams.apply {
+                height = minScanningAreaHeight
+            }
+
+            binding.barcodeView.doOnNextLayout {
+                binding.barcodeView.translationY = -((minScanningAreaHeight - containerHeight) / 2f)
+            }
         }
     }
 
@@ -216,5 +263,9 @@ constructor(
             context = context.baseContext
         }
         throw IllegalStateException("The ${this.javaClass.simpleName}'s Context is not an Activity.")
+    }
+
+    companion object {
+        private const val MIN_SCANNING_AREA_HEIGHT_NOT_SET = -1
     }
 }

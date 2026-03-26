@@ -95,6 +95,11 @@ class RealSubscriptions @Inject constructor(
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
+
+        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+            return isActive
+        }
+
         return isActive || (isEligible && supportsEncryption)
     }
 
@@ -244,9 +249,6 @@ interface PrivacyProFeature {
     fun refreshSubscriptionPlanFeatures(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useClientWithCacheForFeatures(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -272,6 +274,36 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendFreeTrialConversionWideEvent(): Toggle
+
+    /**
+     * When enabled, the native app will respond to the getSubscriptionTierOptions message
+     * with the new tier-based payload structure supporting Plus/Pro tiers.
+     * The flag is exposed to FE via getFeatureConfig.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun tierMessagingEnabled(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun allowProTierPurchase(): Toggle
+
+    /**
+     * When enabled, pending plan hint is displayed to users.
+     * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showPendingPlanHint(): Toggle
+
+    /**
+     * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun vpnReminderNotification(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun fetchProTierEntitlements(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

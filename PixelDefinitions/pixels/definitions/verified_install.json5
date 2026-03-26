@@ -1,0 +1,33 @@
+// Verified install pixels - only fire for verified Play Store installs
+{
+    "verified_app_install": {
+        "description": "Fires once ever on first app open for verified Play Store installs",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "returning_user",
+                "type": "string",
+                "description": "Whether the user was detected as a returning user on first install",
+                "enum": ["true", "false"]
+            }
+        ]
+    },
+    "verified_app_update": {
+        "description": "Fires once for every subsequent app update for verified Play Store installs",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "returning_user",
+                "type": "string",
+                "description": "Whether they were originally detected as a returning user on first install",
+                "enum": ["true", "false"]
+            }
+        ]
+    }
+}

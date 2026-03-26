@@ -20,11 +20,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadFailedMessage
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadSuccessMessage
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
 import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
@@ -57,6 +59,10 @@ class FileDownloadCallbackTest {
 
     private val mockMediaScanner: MediaScanner = mock()
 
+    private val mockFailedDownloadRetryUrlStore: FailedDownloadRetryUrlStore = mock()
+
+    private val mockFileDownloadCallbackPlugin: FileDownloadCallbackPlugin = mock()
+
     private lateinit var callback: FileDownloadCallback
 
     @Before
@@ -68,6 +74,8 @@ class FileDownloadCallbackTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = TestScope(),
             mediaScanner = mockMediaScanner,
+            failedDownloadRetryUrlStore = mockFailedDownloadRetryUrlStore,
+            fileDownloadCallbackPlugins = FakePluginPoint(listOf(mockFileDownloadCallbackPlugin)),
         )
     }
 
@@ -204,6 +212,95 @@ class FileDownloadCallbackTest {
         }
     }
 
+    @Test
+    fun whenOnProgressCalledThenNotificationUpdated() = runTest {
+        val downloadId = 1L
+        val filename = "file.jpg"
+        val progress = 50
+
+        callback.onProgress(downloadId, filename, progress)
+
+        verify(mockFileDownloadNotificationManager).showDownloadInProgressNotification(downloadId, filename, progress)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithUrlThenRetryUrlSavedToStore() = runTest {
+        val downloadId = 1L
+        val url = "https://example.com/file.txt"
+
+        callback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+
+        verify(mockFailedDownloadRetryUrlStore).saveRetryUrl(downloadId, url)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithoutUrlThenRetryUrlNotSavedToStore() = runTest {
+        callback.onError(downloadId = 1L, reason = DownloadFailReason.ConnectionRefused)
+
+        verifyNoInteractions(mockFailedDownloadRetryUrlStore)
+    }
+
+    @Test
+    fun whenOnErrorCalledWithDataUriParseExceptionThenGenericErrorMessageSent() = runTest {
+        callback.onError(url = "data:image/png;base64,abc", reason = DownloadFailReason.DataUriParseException)
+
+        verify(mockFileDownloadNotificationManager).showDownloadFailedNotification(any(), eq("data:image/png;base64,abc"))
+        callback.commands().test {
+            val actualItem = awaitItem()
+            assertTrue(actualItem is ShowDownloadFailedMessage)
+            assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
+        }
+    }
+
+    @Test
+    fun whenOnErrorCalledWithoutDownloadIdThenRepositoryDeleteNotCalled() = runTest {
+        callback.onError(url = "url", reason = DownloadFailReason.Other)
+
+        verify(mockDownloadsRepository, never()).delete(any<List<Long>>())
+    }
+
+    @Test
+    fun whenOnErrorCalledWithDownloadIdAndUrlThenBothDeleteAndRetrySaveHappen() = runTest {
+        val downloadId = 1L
+        val url = "https://example.com/file.txt"
+
+        callback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.Other)
+
+        verify(mockFailedDownloadRetryUrlStore).saveRetryUrl(downloadId, url)
+        verify(mockDownloadsRepository).delete(downloadIdList = listOf(downloadId))
+    }
+
+    @Test
+    fun whenOnCancelCalledThenNotificationCancelled() = runTest {
+        val downloadId = 1L
+        whenever(mockDownloadsRepository.getDownloadItem(downloadId)).thenReturn(null)
+
+        callback.onCancel(downloadId = downloadId)
+
+        verify(mockFileDownloadNotificationManager).cancelDownloadFileNotification(downloadId)
+    }
+
+    @Test
+    fun whenOnSuccessCalledForDownloadIdThenPluginsNotified() = runTest {
+        val item = oneItem()
+        whenever(mockDownloadsRepository.getDownloadItem(item.downloadId)).thenReturn(item)
+
+        val file: File = mock()
+        callback.onSuccess(item.downloadId, 20L, file, "type")
+
+        verify(mockFileDownloadCallbackPlugin).onFileDownloaded()
+    }
+
+    @Test
+    fun whenOnSuccessCalledForFileThenPluginsNotified() = runTest {
+        val item = oneItem()
+        val file = File(item.fileName)
+
+        callback.onSuccess(file = file, mimeType = "image/jpeg")
+
+        verify(mockFileDownloadCallbackPlugin).onFileDownloaded()
+    }
+
     private fun oneItem() =
         DownloadItem(
             downloadId = 10L,
@@ -213,4 +310,8 @@ class FileDownloadCallbackTest {
             createdAt = "2022-02-21T10:56:22",
             filePath = File("file.jpg").absolutePath,
         )
+}
+
+private class FakePluginPoint<T>(private val plugins: List<T>) : PluginPoint<T> {
+    override fun getPlugins(): Collection<T> = plugins
 }

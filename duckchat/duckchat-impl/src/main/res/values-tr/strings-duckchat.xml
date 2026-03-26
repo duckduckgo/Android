@@ -55,7 +55,9 @@
     <string name="input_screen_search_hint">Adres ara veya gir</string>
     <string name="input_screen_chat_hint">Özel olarak sor</string>
     <string name="input_screen_user_pref_without_ai">Yalnızca Arama</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Arama ve Duck.ai</string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Adres Çubuğundan doğrudan Duck.ai\'a soru sormanızı sağlayan yeni seçeneği deneyin. <annotation type="share_feedback">Geri Bildirim Paylaş</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -89,5 +91,14 @@
     <string name="duckAiHideAiGeneratedImagesTitle">Yapay Zeka Tarafından Oluşturulan Görselleri Gizle</string>
     <string name="duckAiHideAiGeneratedImagesDescription">Görsel arama sonuçlarından yapay zeka tarafından üretilmiş görselleri filtreler</string>
 
-    <!-- Duck AI Tabs Mode Toggle -->
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">AI Özellikleri Ayarlarında etkinleştir</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">AI Özellikleri Ayarlarında Yönet</string>
+    <string name="duck_ai_paid_settings_manage_secondary">AI Özellikleri ayarlarından Duck.ai\'ı yapılandırın.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Bu Sayfayı Özetle</string>
+    <string name="duckAIContextualAutomaticContextTitle">Sayfa İçeriğini Otomatik Olarak Gönder</string>
+    <string name="duckAIContextualAutomaticContextMessage">Sayfa içeriğini otomatik olarak Duck.ai\'a gönder</string>
+    <string name="duckAIContextualAttachPageContent">Sayfa İçeriğini Ekle</string>
 </resources>

@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
+import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
@@ -69,6 +70,9 @@ constructor(
                 R.drawable.ic_globe_16,
             ),
         )
+        val attrSizeValue = attributes.getInt(R.styleable.MenuItemView_menuSize, 0)
+        setSize(MenuItemViewSize.getMenuItemSize(attrSizeValue))
+        binding.dotIndicator.isVisible = attributes.getBoolean(R.styleable.MenuItemView_showDotIndicator, false)
         updateContentDescription()
         attributes.recycle()
     }
@@ -87,7 +91,46 @@ constructor(
         binding.icon.setImageResource(iconResId)
     }
 
+    var showDotIndicator: Boolean
+        get() = binding.dotIndicator.isVisible
+        set(value) { binding.dotIndicator.isVisible = value }
+
+    fun setSize(size: MenuItemViewSize) {
+        val dimensionSize = when (size) {
+            MenuItemViewSize.SMALL -> resources.getDimensionPixelSize(R.dimen.keyline_4)
+            MenuItemViewSize.MEDIUM -> resources.getDimensionPixelSize(R.dimen.keyline_5)
+        }
+        binding.icon.layoutParams = binding.icon.layoutParams.apply {
+            width = dimensionSize
+            height = dimensionSize
+        }
+        val marginStart = when (size) {
+            MenuItemViewSize.SMALL -> resources.getDimensionPixelSize(R.dimen.keyline_2)
+            MenuItemViewSize.MEDIUM -> resources.getDimensionPixelSize(R.dimen.keyline_4)
+        }
+        binding.label.layoutParams = (binding.label.layoutParams as MarginLayoutParams).apply {
+            this.marginStart = marginStart
+        }
+        invalidate()
+    }
+
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
+    }
+}
+
+enum class MenuItemViewSize {
+    SMALL,
+    MEDIUM,
+    ;
+
+    companion object {
+        fun getMenuItemSize(attrValue: Int): MenuItemViewSize {
+            return when (attrValue) {
+                0 -> SMALL
+                1 -> MEDIUM
+                else -> SMALL
+            }
+        }
     }
 }

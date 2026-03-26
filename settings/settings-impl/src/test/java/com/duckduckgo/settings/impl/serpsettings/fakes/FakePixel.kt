@@ -43,6 +43,7 @@ class FakePixel : Pixel {
         pixel: Pixel.PixelName,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: Pixel.PixelType,
     ) {
         firedPixels.add(pixel.pixelName)
     }
@@ -51,6 +52,7 @@ class FakePixel : Pixel {
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: Pixel.PixelType,
     ) {
         firedPixels.add(pixelName)
     }

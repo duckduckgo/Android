@@ -53,30 +53,30 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
         assertEquals(1, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
         verify(appTrackingProtection, times(1)).restart()
 
         // first restart
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
         assertEquals(2, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
         verify(appTrackingProtection, times(2)).restart()
 
         // second restart
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
         assertEquals(3, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
         verify(appTrackingProtection, times(3)).restart()
 
         // third restart
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
         verify(appTrackingProtection, times(3)).restart()
         verify(appTrackingProtection, times(1)).stop()
         assertEquals(0, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
@@ -88,12 +88,12 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
         appTpRemoteFeatures.restartOnConnectivityLoss().setRawStoredState(Toggle.State(enable = false))
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
         assertEquals(-1, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
@@ -104,12 +104,12 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
         assertEquals(-1, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
@@ -120,12 +120,12 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
         assertEquals(-1, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
@@ -136,10 +136,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnected(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnected(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
     }
@@ -149,10 +149,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnStarted(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnStarted(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
         assertEquals(0, sharedPreferences.getInt("RECONNECT_ATTEMPTS", -1))
@@ -163,10 +163,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnReconfigured(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnReconfigured(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
     }
@@ -176,10 +176,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnStarting(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnStarting(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, times(1)).restart()
     }
@@ -189,10 +189,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnStartFailed(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnStartFailed(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, times(1)).restart()
     }
@@ -202,10 +202,10 @@ class AppTPVpnConnectivityLossListenerTest {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnStopped(coroutinesTestRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
-        listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnConnectivityLoss(backgroundScope)
+        listener.onVpnStopped(backgroundScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
+        listener.onVpnConnectivityLoss(backgroundScope)
 
         verify(appTrackingProtection, never()).restart()
     }

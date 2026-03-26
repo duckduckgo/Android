@@ -493,6 +493,8 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
     priority = NewTabPageSectionPlugin.PRIORITY_FAVOURITES,
+    featureName = "pluginFavouritesNewTabSectionPlugin",
+    parentFeatureName = "pluginPointNewTabPageSectionPlugin",
 )
 class FavouritesNewTabSectionPlugin @Inject constructor(
     private val setting: NewTabFavouritesSectionSetting,

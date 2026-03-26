@@ -46,6 +46,17 @@ class AppTpRemoteFeaturesStoreTest {
                 ): SharedPreferences? {
                     return preferences
                 }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
             },
             Moshi.Builder().build(),
         )
@@ -97,6 +108,17 @@ class AppTpRemoteFeaturesStoreTest {
                 ): SharedPreferences? {
                     return preferences
                 }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
             },
             Moshi.Builder().build(),
         )
@@ -136,6 +158,17 @@ class AppTpRemoteFeaturesStoreTest {
                     multiprocess: Boolean,
                 ): SharedPreferences? {
                     throw IOException("test")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
                 }
             },
             Moshi.Builder().build(),

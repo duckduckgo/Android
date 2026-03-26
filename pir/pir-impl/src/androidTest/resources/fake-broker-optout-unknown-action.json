@@ -1,0 +1,115 @@
+{
+  "name": "FakeBrokerOptOutUnknownAction",
+  "url": "fake-broker-optout-unknown-action.com",
+  "version": "0.7.0",
+  "addedDatetime": 1692572400000,
+  "optOutUrl": "https://fake-broker-optout-unknown-action.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "unknown-nav-scan-1",
+          "url": "https://www.fake-broker-optout-unknown-action.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "unknown-extract-1",
+          "selector": "div[role='listitem']",
+          "noResultsSelector": ".no_results_container",
+          "profile": {
+            "name": {
+              "selector": "h3",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": "h3",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//div[contains(text(), 'Reside')]",
+              "afterText": "Resides in"
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://www.fake-broker-optout-unknown-action.com/${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "unknown-nav-optout-1",
+          "url": "https://www.fake-broker-optout-unknown-action.com/optout"
+        },
+        {
+          "actionType": "unknownFutureAction",
+          "id": "unknown-action-optout-1",
+          "anotherField": "anotherValue"
+        },
+        {
+          "actionType": "expectation",
+          "id": "unknown-expect-1",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#optout-form",
+              "parent": ".optout_container"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "unknown-fill-1",
+          "selector": ".optout_container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='email']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='url']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "unknown-click-1",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".submit-button"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "unknown-expect-2",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Request submitted"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

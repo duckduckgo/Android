@@ -25,6 +25,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -76,6 +77,7 @@ class AutomaticDataClearerTest {
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
         )
+    private val dataClearingWideEvent: DataClearingWideEvent = mock()
 
     @UiThreadTest
     @Before
@@ -91,6 +93,7 @@ class AutomaticDataClearerTest {
             dataClearerForegroundAppRestartPixel = dataClearerForegroundAppRestartPixel,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             fireDataStore = mockFireDataStore,
+            dataClearingWideEvent = dataClearingWideEvent,
         )
     }
 
@@ -636,7 +639,7 @@ class AutomaticDataClearerTest {
 
         verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @UiThreadTest
@@ -651,7 +654,7 @@ class AutomaticDataClearerTest {
 
         verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @UiThreadTest
@@ -667,7 +670,7 @@ class AutomaticDataClearerTest {
         verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
         verify(mockClearAction, never()).setAppUsedSinceLastClearFlag(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -770,11 +773,11 @@ class AutomaticDataClearerTest {
     }
 
     private fun enableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
     }
 
     private fun disableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.moreGranularDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
     }
 
     private suspend fun configureShouldClearAutomatically(shouldClear: Boolean) {
