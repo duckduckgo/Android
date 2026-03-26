@@ -49,7 +49,7 @@ interface PirRemoteFeatures {
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun trackerBlocking(): Toggle
 
-    @DefaultValue(DefaultFeatureValue.TRUE)
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun ensureBrokerDataBeforeScan(): Toggle
 }
 
