@@ -401,7 +401,7 @@ class RealNativeInputManager @Inject constructor(
             hideMainButtons()
             if (voiceSearchAvailability.isVoiceSearchAvailable) {
                 setVoiceButtonVisible(true)
-                onVoiceClick = { callbacks.onVoiceSearchPressed(true) }
+                onVoiceClick = { callbacks.onVoiceSearchPressed(isChatTabSelected()) }
             }
         }
         bindSearchCallbacks(widgetView, callbacks)
