@@ -1,0 +1,51 @@
+{
+    "manifest_version": 3,
+    "name": "DuckDuckGo Content Blocker Extension",
+    "version": "2026.3.24",
+    "minimum_chrome_version": "122.0",
+    "permissions": ["scripting"],
+    "host_permissions": [
+        "https://*.youtube.com/",
+        "https://youtube.com/",
+        "https://youtube-nocookie.com/*",
+        "https://www.youtube-nocookie.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["scriptlets/isolated/ublock-filters.js"],
+            "all_frames": true,
+            "match_origin_as_fallback": true,
+            "run_at": "document_start",
+            "world": "ISOLATED"
+        },
+        {
+            "matches": ["<all_urls>"],
+            "js": ["scriptlets/main/ublock-filters.js"],
+            "all_frames": true,
+            "match_origin_as_fallback": true,
+            "run_at": "document_start",
+            "world": "MAIN"
+        },
+        {
+            "matches": ["<all_urls>"],
+            "js": ["scriptlets/isolated/ublock-experimental.js"],
+            "all_frames": true,
+            "match_origin_as_fallback": true,
+            "run_at": "document_start",
+            "world": "ISOLATED"
+        },
+        {
+            "matches": ["<all_urls>"],
+            "js": ["scriptlets/main/ublock-experimental.js"],
+            "all_frames": true,
+            "match_origin_as_fallback": true,
+            "run_at": "document_start",
+            "world": "MAIN"
+        }
+    ]
+}
