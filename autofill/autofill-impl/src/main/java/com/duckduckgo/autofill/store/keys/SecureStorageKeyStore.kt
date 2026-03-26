@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.store.keys
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -208,14 +207,17 @@ class RealSecureStorageKeyStore(
                 )
                 // Rollback legacy write so we don't cause a corrupted state with out of sync files
                 if (keyValue != null) {
-                    runCatching {
-                        legacyPrefs?.edit(commit = true) { remove(keyName) }
-                    }.onFailure { rollbackError ->
+                    val rollbackCommitted = runCatching {
+                        val editor = legacyPrefs.edit()
+                        editor.remove(keyName)
+                        editor.commit()
+                    }
+                    if (rollbackCommitted.isFailure || rollbackCommitted.getOrNull() == false) {
                         pixel.fire(
                             AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
                             getPixelParams(
                                 keyName = keyName,
-                                throwable = rollbackError,
+                                throwable = rollbackCommitted.exceptionOrNull(),
                                 useHarmony = harmonyFlags.useHarmony,
                                 readFromHarmony = harmonyFlags.readFromHarmony,
                             ),
