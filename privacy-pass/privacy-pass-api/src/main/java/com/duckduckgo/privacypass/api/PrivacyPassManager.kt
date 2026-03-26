@@ -47,6 +47,8 @@ data class PrivacyPassChallenge(
 
 interface PrivacyPassManager {
 
+    fun isReady(): Boolean
+
     fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean
 
     suspend fun handlePrivateTokenChallenge(

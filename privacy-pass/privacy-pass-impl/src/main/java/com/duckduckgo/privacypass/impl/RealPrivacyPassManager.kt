@@ -62,6 +62,8 @@ class RealPrivacyPassManager @Inject constructor(
         ActCoreNative.init(context)
     }
 
+    override fun isReady(): Boolean = ActCoreNative.isReady()
+
     override fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean {
         if (statusCode != 401) return false
         val wwwAuth = headers.entries.firstOrNull {
@@ -218,6 +220,9 @@ class RealPrivacyPassManager @Inject constructor(
         }
     }
 
+    // Token struct per RFC 9577:
+    //   token_type (2) | nonce (32) | challenge_digest (32) | token_key_id[Nid] | authenticator
+    // For ACT token type 0xDA15, Nid=0 so token_key_id is empty.
     private fun buildTokenStruct(challenge: PrivacyPassChallenge, spendProofCbor: ByteArray): ByteArray {
         val buf = ByteBuffer.allocate(2 + 32 + 32 + spendProofCbor.size)
         buf.putShort(challenge.tokenType.toShort())
@@ -233,6 +238,7 @@ class RealPrivacyPassManager @Inject constructor(
         }
         buf.put(challengeDigest)
 
+        // token_key_id is empty for ACT (Nid=0)
         buf.put(spendProofCbor)
         return buf.array()
     }
