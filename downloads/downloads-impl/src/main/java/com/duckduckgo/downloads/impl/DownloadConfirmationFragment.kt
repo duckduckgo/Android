@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
 import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_BUNDLE_KEY
 import com.duckduckgo.downloads.impl.databinding.DownloadConfirmationBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -54,6 +55,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var filenameExtractor: FilenameExtractor
+
+    @Inject
+    lateinit var dataUriParser: DataUriParser
 
     private var file: File? = null
 
@@ -84,7 +88,10 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
                 is FilenameExtractor.FilenameExtractionResult.Extracted -> File(pendingDownload.directory, filenameExtraction.filename)
             }
         } else {
-            null
+            when (val parsed = dataUriParser.generate(pendingDownload.url, pendingDownload.fileName)) {
+                is ParseResult.ParsedDataUri -> File(pendingDownload.directory, parsed.filename.toString())
+                else -> null
+            }
         }
     }
 
