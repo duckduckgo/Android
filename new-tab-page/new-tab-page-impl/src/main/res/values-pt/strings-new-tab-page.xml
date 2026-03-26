@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Content Descriptions -->
-    <string name="newTabEditOptionsContentDescription">Editar página de novo separador</string>
-    <string name="newTabShortcutSelectedContentDescription">Estado de seleção do atalho</string>
+    <string name="newTabEditOptionsContentDescription">Edita a página do novo separador</string>
+    <string name="newTabShortcutSelectedContentDescription">Estado dos atalhos selecionados</string>
 </resources>
