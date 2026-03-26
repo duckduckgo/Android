@@ -206,9 +206,22 @@ class RealSecureStorageKeyStore(
                     ),
                     type = Daily(),
                 )
-                // Rollback legacy write so we don't cause a corrupted state with out of sync files
+                // Rollback legacy write so we don't cause a corrupted state with out-of-sync files
                 runCatching {
-                    legacyPrefs?.edit(commit = true) { remove(keyName) }
+                    val editor = legacyPrefs.edit()
+                    editor.remove(keyName)
+                    val committed = editor.commit()
+                    if (!committed) {
+                        pixel.fire(
+                            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                            getPixelParams(
+                                keyName = keyName,
+                                useHarmony = harmonyFlags.useHarmony,
+                                readFromHarmony = harmonyFlags.readFromHarmony,
+                            ),
+                            type = Daily(),
+                        )
+                    }
                 }.onFailure { rollbackError ->
                     pixel.fire(
                         AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
