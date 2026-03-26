@@ -458,6 +458,9 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
+    implementation project(':privacy-pass-api')
+    implementation project(':privacy-pass-impl')
+
     implementation project(':web-interference-detection-impl')
 
     implementation project(':web-detection-impl')
