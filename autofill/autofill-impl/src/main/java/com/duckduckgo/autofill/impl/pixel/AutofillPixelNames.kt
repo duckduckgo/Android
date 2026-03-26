@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
@@ -63,9 +64,16 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYNC_DESKTOP_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SYSTEM_AUTOFILL_USED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
@@ -171,6 +179,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_ERROR_PARSING("autofill_import_google_passwords_result_parsing"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH("autofill_import_google_passwords_webview_crash"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_USER_CANCELLED("autofill_import_google_passwords_result_user_cancelled"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS("autofill_import_google_passwords_result_success"),
 
@@ -209,6 +218,31 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU("autofill_reset_excluded_overflow_menu_tapped"),
 
     AUTOFILL_SYSTEM_AUTOFILL_USED("autofill_systemautofill_used"),
+
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED("bookmark_import_from_google_flow_started"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS("bookmark_import_from_google_flow_success"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR("bookmark_import_from_google_flow_error"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED("bookmark_import_from_google_flow_cancelled"),
+    BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT("bookmark_import_from_google_flow_extra_chrome_export"),
+    PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED("m_product_telemetry_surface_usage_passwords_page"),
+    PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY("m_product_telemetry_surface_usage_passwords_page_daily"),
+    AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED("autofill_harmony_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_RETRIEVAL_FAILED("autofill_preferences_retrieval_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_FAILED("autofill_preferences_get_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED("autofill_harmony_preferences_get_key_failed"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED("autofill_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED("autofill_harmony_preferences_update_key_failed"),
+    AUTOFILL_HARMONY_KEY_MISMATCH("autofill_harmony_key_mismatch"),
+    AUTOFILL_HARMONY_KEY_MISSING("autofill_harmony_key_missing"),
+    AUTOFILL_PREFERENCES_KEY_MISSING("autofill_preferences_key_missing"),
+    AUTOFILL_STORE_KEY_ALREADY_EXISTS("autofill_store_key_already_exists"),
+    AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_preferences_update_key_null_file"),
+    AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE("autofill_harmony_preferences_update_key_null_file"),
+    AUTOFILL_PREFERENCES_GET_KEY_NULL_FILE("autofill_preferences_get_key_null_file"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE("autofill_harmony_preferences_get_key_null_file"),
+    AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED("autofill_harmony_update_key_rollback_failed"),
+    AUTOFILL_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_preferences_get_key_decode_failed"),
+    AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED("autofill_harmony_preferences_get_key_decode_failed"),
 }
 
 object AutofillPixelParameters {
@@ -223,6 +257,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AUTOFILL_MANAGEMENT_SCREEN_OPENED.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED.pixelName to PixelParameter.removeAtb(),
+            PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
 
             EMAIL_USE_ALIAS.pixelName to PixelParameter.removeAll(),
             EMAIL_USE_ADDRESS.pixelName to PixelParameter.removeAll(),
@@ -285,6 +321,15 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
 
             AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SYSTEM_AUTOFILL_USED.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH.pixelName to PixelParameter.removeAtb(),
+
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_STARTED.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_ERROR.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_CANCELLED.pixelName to PixelParameter.removeAtb(),
+            BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT.pixelName to PixelParameter.removeAtb(),
+
         )
     }
 }

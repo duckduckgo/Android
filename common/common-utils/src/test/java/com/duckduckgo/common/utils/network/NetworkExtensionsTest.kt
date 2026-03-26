@@ -17,11 +17,11 @@
 package com.duckduckgo.common.utils.network
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import java.net.Inet4Address
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.net.Inet4Address
 
 @RunWith(AndroidJUnit4::class)
 class NetworkExtensionsTest {

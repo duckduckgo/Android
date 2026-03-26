@@ -17,8 +17,8 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.AndroidAppCacheClearer
@@ -29,6 +29,8 @@ import com.duckduckgo.app.fire.DataClearerTimeKeeper
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
+import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -47,8 +49,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -79,15 +81,16 @@ object PrivacyModule {
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
         thirdPartyCookieManager: ThirdPartyCookieManager,
-        adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
         deviceSyncState: DeviceSyncState,
         savedSitesRepository: SavedSitesRepository,
-        privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
         navigationHistory: NavigationHistory,
         dispatcherProvider: DispatcherProvider,
         webTrackingRepository: WebTrackersBlockedRepository,
+        tabVisitedSitesRepository: TabVisitedSitesRepository,
+        webViewCapabilityChecker: WebViewCapabilityChecker,
+        duckAiHostProvider: DuckAiHostProvider,
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -98,15 +101,16 @@ object PrivacyModule {
             cookieManager,
             appCacheClearer,
             thirdPartyCookieManager,
-            adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
             deviceSyncState,
             savedSitesRepository,
-            privacyProtectionsPopupDataClearer,
             navigationHistory,
             dispatcherProvider,
             webTrackingRepository,
+            tabVisitedSitesRepository,
+            webViewCapabilityChecker,
+            duckAiHostProvider,
         )
     }
 
@@ -128,8 +132,9 @@ object PrivacyModule {
         context: Context,
         fileDeleter: FileDeleter,
         exclusionPlugins: PluginPoint<AppCacheExclusionPlugin>,
+        dataClearingWideEvent: DataClearingWideEvent,
     ): AppCacheClearer {
-        return AndroidAppCacheClearer(context, fileDeleter, exclusionPlugins)
+        return AndroidAppCacheClearer(context, fileDeleter, exclusionPlugins, dataClearingWideEvent)
     }
 
     @Provides

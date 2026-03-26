@@ -25,8 +25,6 @@ import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -56,11 +54,13 @@ object SystemComponentsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
+    fun deviceAppsListProvider(packageManager: PackageManager, dispatcherProvider: DispatcherProvider): DeviceAppListProvider =
+        InstalledDeviceAppListProvider(packageManager, dispatcherProvider)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
+    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider, dispatcherProvider: DispatcherProvider): DeviceAppLookup =
+        InstalledDeviceAppLookup(deviceAppListProvider, dispatcherProvider)
 
     @Provides
     fun appIconModifier(
@@ -76,16 +76,12 @@ object SystemComponentsModule {
         settingsDataStore: SettingsDataStore,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
-        onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
     ): FireAnimationLoader {
         return LottieFireAnimationLoader(
             context = context,
             settingsDataStore = settingsDataStore,
             dispatchers = dispatcherProvider,
             appCoroutineScope = appCoroutineScope,
-            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
-            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
     }
 }

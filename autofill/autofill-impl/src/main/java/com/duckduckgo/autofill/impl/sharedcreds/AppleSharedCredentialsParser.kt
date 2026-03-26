@@ -27,13 +27,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
-import java.io.IOException
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.io.IOException
+import javax.inject.Inject
 
 interface SharedCredentialsParser {
     suspend fun read(): SharedCredentialConfig

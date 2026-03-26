@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    namespace 'com.duckduckgo.savedsites.internal'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
+    }
+}
+
+dependencies {
+    implementation project(path: ':autofill-api')
+    implementation project(':internal-features-api')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':navigation-api')
+    implementation project(':saved-sites-api')
+    implementation project(':saved-sites-impl')
+
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(':di')
+    implementation project(path: ':common-utils')
+
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.process
+    implementation Google.dagger
+    implementation AndroidX.fragment.ktx
+
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "androidx.appcompat:appcompat:_"
+    implementation "com.google.android.material:material:_"
+    implementation "androidx.constraintlayout:constraintlayout:_"
+    implementation project(path: ':design-system')
+}

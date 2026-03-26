@@ -24,9 +24,9 @@ import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
+import logcat.logcat
 import javax.inject.Inject
 import javax.inject.Named
-import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("deduplicationStrategy")

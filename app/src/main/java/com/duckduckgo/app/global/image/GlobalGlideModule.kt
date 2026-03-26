@@ -25,9 +25,9 @@ import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.BuildConfig
-import java.io.InputStream
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import java.io.InputStream
 
 @GlideModule
 class GlobalGlideModule : AppGlideModule() {

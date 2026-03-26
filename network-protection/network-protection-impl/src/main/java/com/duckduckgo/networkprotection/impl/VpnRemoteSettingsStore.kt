@@ -26,12 +26,12 @@ import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(VpnRemoteFeatures::class)

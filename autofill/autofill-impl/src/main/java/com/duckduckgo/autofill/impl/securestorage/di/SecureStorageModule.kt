@@ -16,22 +16,24 @@
 
 package com.duckduckgo.autofill.impl.securestorage.di
 
-import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
 import com.duckduckgo.autofill.store.RealSecureStorageKeyRepository
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
+import com.duckduckgo.autofill.store.keys.EncryptedPreferencesFactory
 import com.duckduckgo.autofill.store.keys.RealSecureStorageKeyStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -40,13 +42,22 @@ object SecureStorageModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageKeyStore(
-        context: Context,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         autofillFeature: AutofillFeature,
+        sharedPreferencesProvider: SharedPreferencesProvider,
+        pixel: Pixel,
+        encryptedPreferencesFactory: EncryptedPreferencesFactory,
     ): SecureStorageKeyRepository =
         RealSecureStorageKeyRepository(
-            RealSecureStorageKeyStore(context, coroutineScope, dispatcherProvider, autofillFeature),
+            RealSecureStorageKeyStore(
+                coroutineScope,
+                dispatcherProvider,
+                autofillFeature,
+                sharedPreferencesProvider,
+                pixel,
+                encryptedPreferencesFactory,
+            ),
         )
 }
 

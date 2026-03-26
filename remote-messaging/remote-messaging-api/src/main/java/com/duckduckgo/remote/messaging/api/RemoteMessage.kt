@@ -23,8 +23,10 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
 import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
+import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
@@ -36,17 +38,31 @@ data class RemoteMessage(
     val content: Content,
     val matchingRules: List<Int>,
     val exclusionRules: List<Int>,
+    val surfaces: List<Surface>,
 )
+
+enum class Surface(val jsonValue: String) {
+    MODAL("modal"),
+    NEW_TAB_PAGE("new_tab_page"),
+}
 
 sealed class Content(val messageType: MessageType) {
     data class Small(val titleText: String, val descriptionText: String) : Content(SMALL)
-    data class Medium(val titleText: String, val descriptionText: String, val placeholder: Placeholder) : Content(MEDIUM)
+
+    data class Medium(
+        val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val imageUrl: String? = null,
+    ) : Content(MEDIUM)
+
     data class BigSingleAction(
         val titleText: String,
         val descriptionText: String,
         val placeholder: Placeholder,
         val primaryActionText: String,
         val primaryAction: Action,
+        val imageUrl: String? = null,
     ) : Content(BIG_SINGLE_ACTION)
 
     data class BigTwoActions(
@@ -57,6 +73,7 @@ sealed class Content(val messageType: MessageType) {
         val primaryAction: Action,
         val secondaryActionText: String,
         val secondaryAction: Action,
+        val imageUrl: String? = null,
     ) : Content(BIG_TWO_ACTION)
 
     data class PromoSingleAction(
@@ -65,7 +82,18 @@ sealed class Content(val messageType: MessageType) {
         val placeholder: Placeholder,
         val actionText: String,
         val action: Action,
+        val imageUrl: String? = null,
     ) : Content(PROMO_SINGLE_ACTION)
+
+    data class CardsList(
+        val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val primaryActionText: String,
+        val primaryAction: Action,
+        val listItems: List<CardItem>,
+        val imageUrl: String? = null,
+    ) : Content(MessageType.CARDS_LIST)
 
     enum class MessageType {
         SMALL,
@@ -73,6 +101,7 @@ sealed class Content(val messageType: MessageType) {
         BIG_SINGLE_ACTION,
         BIG_TWO_ACTION,
         PROMO_SINGLE_ACTION,
+        CARDS_LIST,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -80,11 +109,18 @@ sealed class Content(val messageType: MessageType) {
         DDG_ANNOUNCE("DDGAnnounce"),
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
-        MAC_AND_WINDOWS("NewForMacAndWindows"),
+        MAC_AND_WINDOWS_NEW("NewForMacAndWindows"),
+        MAC_AND_WINDOWS("MacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
         DUCK_AI_OLD("Duck.ai"),
         DUCK_AI("DuckAi"),
         VISUAL_DESIGN_UPDATE("VisualDesignUpdate"),
+        IMAGE_AI("ImageAI"),
+        RADAR("Radar"),
+        KEY_IMPORT("KeyImport"),
+        SPLIT_BAR_SETTINGS("SplitBarSettings"),
+        BOOKMARKS_IMPORT("BookmarksImport"),
+        NEW_TAB_OPTIONS("NewTabOptions"),
         ;
 
         companion object {
@@ -95,8 +131,13 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action(val actionType: String, open val value: String, open val additionalParameters: Map<String, String>?) {
+sealed class Action(
+    val actionType: String,
+    open val value: String,
+    open val additionalParameters: Map<String, String>?,
+) {
     data class Url(override val value: String) : Action(URL.jsonValue, value, null)
+    data class UrlInContext(override val value: String) : Action(JsonActionType.URL_IN_CONTEXT.jsonValue, value, null)
     data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value, null)
     data object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
     data object Dismiss : Action(DISMISS.jsonValue, "", null)
@@ -112,6 +153,7 @@ sealed class Action(val actionType: String, open val value: String, open val add
             TITLE("title"),
         }
     }
+
     data class Navigation(
         override val value: String,
         override val additionalParameters: Map<String, String>?,
@@ -121,4 +163,48 @@ sealed class Action(val actionType: String, open val value: String, open val add
         override val value: String,
         override val additionalParameters: Map<String, String>?,
     ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
+
+    data object DefaultCredentialProvider : Action(DEFAULT_CREDENTIAL_PROVIDER.jsonValue, "", null)
+}
+
+sealed class CardItem {
+    abstract val id: String
+    abstract val type: CardItemType
+
+    abstract val titleText: String
+
+    /**
+     * Represents both TWO_LINE_LIST_ITEM and FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM.
+     * The [type] field determines the visual styling.
+     */
+    data class ListItem(
+        override val id: String,
+        override val type: CardItemType,
+        override val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val primaryAction: Action,
+        val primaryActionText: String = "",
+        val matchingRules: List<Int>,
+        val exclusionRules: List<Int>,
+        val imageUrl: String? = null,
+    ) : CardItem()
+
+    /**
+     * Represents a section header that groups related list items.
+     * If all items referenced by [itemIDs] are excluded,
+     * this section title should also be excluded.
+     */
+    data class SectionTitle(
+        override val id: String,
+        override val type: CardItemType,
+        override val titleText: String,
+        val itemIDs: List<String>,
+    ) : CardItem()
+}
+
+enum class CardItemType(val jsonValue: String) {
+    TWO_LINE_LIST_ITEM("two_line_list_item"),
+    LIST_SECTION_TITLE("section_title"),
+    FEATURED_TWO_LINE_SINGLE_ACTION_LIST_ITEM("featured_two_line_single_action_list_item"),
 }

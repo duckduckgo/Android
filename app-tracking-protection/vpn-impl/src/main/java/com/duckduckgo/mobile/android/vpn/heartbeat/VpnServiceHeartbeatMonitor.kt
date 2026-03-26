@@ -39,12 +39,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.android.AndroidInjection
 import dagger.multibindings.IntoSet
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)

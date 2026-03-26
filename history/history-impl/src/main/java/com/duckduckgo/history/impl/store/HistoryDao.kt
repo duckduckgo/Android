@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 @Dao
@@ -31,24 +32,36 @@ interface HistoryDao {
     @Query("SELECT * FROM history_entries")
     suspend fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
+    @Transaction
+    @Query("SELECT * FROM history_entries")
+    fun getHistoryEntriesWithVisitsFlow(): Flow<List<HistoryEntryWithVisits>>
+
     @Query("UPDATE history_entries SET title = :title WHERE id = :id")
     suspend fun updateTitle(id: Long, title: String)
 
     @Transaction
-    suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
+    suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime, tabId: String) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)
 
         if (existingHistoryEntry != null) {
             if (title.isNotBlank() && title != existingHistoryEntry.title) {
                 updateTitle(existingHistoryEntry.id, title)
             }
-            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = existingHistoryEntry.id)
+            val newVisit = VisitEntity(
+                timestamp = DatabaseDateFormatter.timestamp(date),
+                historyEntryId = existingHistoryEntry.id,
+                tabId = tabId,
+            )
             insertVisit(newVisit)
         } else {
             val newHistoryEntry = HistoryEntryEntity(url = url, title = title, query = query, isSerp = isSerp)
             val historyEntryId = insertHistoryEntry(newHistoryEntry)
 
-            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = historyEntryId)
+            val newVisit = VisitEntity(
+                timestamp = DatabaseDateFormatter.timestamp(date),
+                historyEntryId = historyEntryId,
+                tabId = tabId,
+            )
             insertVisit(newVisit)
         }
     }
@@ -91,6 +104,12 @@ interface HistoryDao {
 
     @Query("DELETE FROM history_entries WHERE id NOT IN (SELECT DISTINCT historyEntryId FROM visits_list)")
     suspend fun deleteEntriesWithNoVisits()
+
+    @Query("DELETE FROM visits_list WHERE tabId = :tabId")
+    suspend fun deleteVisitsByTabId(tabId: String)
+
+    @Query("DELETE FROM history_entries WHERE id IN (SELECT DISTINCT historyEntryId FROM visits_list WHERE tabId = :tabId)")
+    suspend fun deleteHistoryForTab(tabId: String)
 
     @Transaction
     suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime) {

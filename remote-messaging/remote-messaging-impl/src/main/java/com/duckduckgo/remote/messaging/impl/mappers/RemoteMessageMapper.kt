@@ -25,31 +25,48 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.BOOKMARKS_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.KEY_IMPORT
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS_NEW
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.NEW_TAB_OPTIONS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.SPLIT_BAR_SETTINGS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
-fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
+fun RemoteMessage.asMessage(
+    isLightModeEnabled: Boolean,
+    localImageFilePath: String? = null,
+): Message? {
+    // Use local file if available, otherwise fall back to imageUrl
+    fun getImageSource(imageUrl: String?): String? {
+        return localImageFilePath ?: imageUrl
+    }
     return when (val content = this.content) {
         is Small -> Message(
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
         )
+
         is BigSingleAction -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = getImageSource(content.imageUrl),
         )
+
         is BigTwoActions -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
@@ -57,30 +74,38 @@ fun RemoteMessage.asMessage(isLightModeEnabled: Boolean): Message {
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = getImageSource(content.imageUrl),
         )
+
         is Medium -> Message(
             topIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
+            imageUrl = getImageSource(content.imageUrl),
         )
+
         is PromoSingleAction -> Message(
             middleIllustration = content.placeholder.drawable(isLightModeEnabled),
             title = content.titleText,
             subtitle = content.descriptionText,
             promoAction = content.actionText,
             messageType = MessageType.REMOTE_PROMO_MESSAGE,
+            imageUrl = getImageSource(content.imageUrl),
         )
+
+        else -> null
     }
 }
 
-private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
+fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
-        MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
+        MAC_AND_WINDOWS_NEW -> R.drawable.desktop_promo_artwork
+        MAC_AND_WINDOWS -> R.drawable.promo_mac_and_windows
         PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
         DUCK_AI_OLD -> R.drawable.ic_duck_ai
         DUCK_AI -> R.drawable.ic_duckai
@@ -89,5 +114,12 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         } else {
             R.drawable.ic_visual_design_update_artwork_dark
         }
+
+        IMAGE_AI -> R.drawable.ic_image_ai
+        RADAR -> R.drawable.ic_radar
+        KEY_IMPORT -> R.drawable.ic_key_import
+        SPLIT_BAR_SETTINGS -> R.drawable.ic_split_bar_mobile_settings
+        BOOKMARKS_IMPORT -> R.drawable.bookmarks_import_96
+        NEW_TAB_OPTIONS -> R.drawable.newtab_options_96
     }
 }

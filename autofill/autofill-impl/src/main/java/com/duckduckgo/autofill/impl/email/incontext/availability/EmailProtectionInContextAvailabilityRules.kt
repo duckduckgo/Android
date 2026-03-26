@@ -24,9 +24,9 @@ import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextE
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface EmailProtectionInContextAvailabilityRules {
     suspend fun permittedToShow(url: String): Boolean

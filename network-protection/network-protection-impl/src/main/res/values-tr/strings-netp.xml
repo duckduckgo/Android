@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Şimdi Yeniden Bağlan</string>
     <string name="netpNotificationSnoozeTitle">VPN uyku modunda</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN %1$s itibarıyla yeniden bağlanacak</string>
-    <string name="netpNotificationVpnAccessRevoked">Abonelik süresi dolduğu için VPN bağlantısı kesildi. DuckDuckGo VPN\'e yeniden bağlanmak için Privacy Pro\'ya abone olun.</string>
+    <string name="netpNotificationVpnAccessRevoked">Abonelik süresi dolduğu için VPN bağlantısı kesildi. VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN Konumu</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">Abonelik süresi dolduğu için VPN bağlantısı kesildi</string>
-    <string name="netpDialogVpnAccessRevokedBody">DuckDuckGo VPN\'e yeniden bağlanmak için Privacy Pro\'ya abone olun.</string>
+    <string name="netpDialogVpnAccessRevokedBody">VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Abone ol</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Reddet</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">VPN\'lerle uyumlu değil</string>
     <string name="netpExclusionListAutoExcludeDescription">Bankacılık veya yayın uygulamaları gibi bazı uygulamalar VPN\'lerle iyi çalışmaz. Bu ayar etkinleştirildiğinde, bu uygulamalar otomatik olarak hariç tutulur.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">Abonelik süresi dolduğu için VPN bağlantısı kesildi. VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
 </resources>

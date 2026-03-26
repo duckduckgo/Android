@@ -29,12 +29,12 @@ import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(scope = AppScope::class, boundType = SyncStateMonitor::class)
 class RealSyncStateMonitor @Inject constructor(

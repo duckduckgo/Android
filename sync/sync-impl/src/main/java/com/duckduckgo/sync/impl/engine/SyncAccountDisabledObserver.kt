@@ -24,11 +24,11 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
-import javax.inject.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @ContributesMultibinding(
     scope = AppScope::class,

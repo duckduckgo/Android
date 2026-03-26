@@ -25,10 +25,14 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 	implementation project(":data-store-api")
+	implementation project(":anrs-api")
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
+    implementation project(':common-utils')
     implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':statistics-api')
     ksp AndroidX.room.compiler
 
     implementation KotlinX.coroutines.android
@@ -44,8 +48,15 @@ dependencies {
     // Security crypto
     implementation AndroidX.security.crypto
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
@@ -57,6 +68,7 @@ dependencies {
     }
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+    implementation "org.jetbrains.kotlin:kotlin-test:1.9.24"
 }
 
 android {

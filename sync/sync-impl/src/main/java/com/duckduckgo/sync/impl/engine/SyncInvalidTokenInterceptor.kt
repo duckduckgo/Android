@@ -24,11 +24,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.SyncService
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -51,7 +51,7 @@ class SyncInvalidTokenInterceptor @Inject constructor(
         val response = chain.proceed(chain.request())
 
         val method = chain.request().method
-        if (response.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code && (method == "PATCH" || method == "GET")) {
+        if (response.code == API_CODE.INVALID_LOGIN_CREDENTIALS.code && method in METHODS_TRIGGERING_LOGGED_OUT_NOTIFICATION) {
             logcat { "Sync-Engine: User logged out, invalid token detected." }
             notificationManager.checkPermissionAndNotify(
                 context,
@@ -66,5 +66,6 @@ class SyncInvalidTokenInterceptor @Inject constructor(
 
     companion object {
         internal const val SYNC_USER_LOGGED_OUT_NOTIFICATION_ID = 8451
+        private val METHODS_TRIGGERING_LOGGED_OUT_NOTIFICATION = listOf("GET", "PATCH", "DELETE", "POST")
     }
 }

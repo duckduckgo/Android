@@ -20,6 +20,7 @@
     <string name="cancel">Atcelt</string>
     <string name="ok">Labi</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo abonements</string>
     <string name="manageEmail">Pārvaldīt e-pastu</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Abonements nav atrasts</string>
     <string name="subscriptionNotFoundDescription">Ar šo Google Play kontu saistītais abonements vairs nav aktīvs.</string>
     <string name="purchaseRestored">Tavi pirkumi ir atjaunoti.</string>
-    <string name="restoreSubscriptionTitle">Pievieno šai ierīcei savu Privacy Pro abonementu</string>
+    <string name="restoreSubscriptionTitle">Pievieno savu abonementu šai ierīcei</string>
     <string name="restoreSubscriptionGooglePlayTitle">Pievieno ar Google Play kontu</string>
     <string name="restoreSubscriptionGooglePlayDescription">Atjauno abonementu Android ierīcēs, izmantojot savu Google Play kontu.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Atjaunot pirkumu</string>
     <string name="restoreSubscriptionEmailTitle">Pievieno, izmantojot e-pastu</string>
-    <string name="restoreSubscriptionEmailDescription">Piesaisti e-pasta adresi savam abonementam, lai pievienotu Privacy Pro šai ierīcei.</string>
+    <string name="restoreSubscriptionEmailDescription">Saisti e-pasta adresi ar savu abonementu, lai pievienotu to šai ierīcei.</string>
     <string name="restoreSubscriptionEmailGetStarted">Sākt darbu</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Noņemt abonementu</string>
     <string name="subscriptionRemoved">Tavs abonements ir noņemts no šīs ierīces</string>
     <string name="removeFromDevice">Vai noņemt no šīs ierīces?</string>
-    <string name="removeFromDeviceDescription">Šajā ierīcē vairs nevarēsi piekļūt savam Privacy Pro abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
+    <string name="removeFromDeviceDescription">Šajā ierīcē vairs nevarēsi piekļūt savam abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tavs mēneša abonements %1$s šajā datumā: %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tavs gada abonements %1$s šajā datumā: %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tavs abonements beidzās šajā datumā: %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Gada abonements</string>
     <string name="renews">atjaunojas</string>
     <string name="expires">beidzas</string>
-    <string name="activateOnOtherDevices">Pievieno Privacy Pro citām ierīcēm</string>
+    <string name="activateOnOtherDevices">Pievieno savu abonementu citām ierīcēm</string>
     <string name="addToDevicePrimaryText">Pievienot ierīcei</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Pievieno Privacy Pro citām ierīcēm ar Google Play vai piesaistot e-pasta adresi.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Dodies uz sadaļu \"Iestatījumi\" &gt; Privacy Pro &gt; \"Man ir abonements\".</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Pievieno savu abonementu citām ierīcēm, izmantojot Google Play vai piesaistot e-pasta adresi.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Iet uz Iestatījumi &gt; Abonementu iestatījumi &gt; Man ir abonements.</string>
     <string name="editEmailPrimaryText">Rediģēt e-pasta adresi</string>
     <string name="learnMore">Uzzināt vairāk</string>
-    <string name="privacyProFaq">Vai nepieciešama palīdzība saistībā ar Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar Privacy Pro atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
+    <string name="privacyProFaq">Nepieciešama palīdzība saistībā ar abonēšanu?</string>
+    <string name="privacyProFaqSecondary">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar abonēšanas atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
     <string name="subscriptionStatusSubscribed">Abonēts</string>
     <string name="privacyPolicyAndTermsOfService">Privātuma politika un Pakalpojumu sniegšanas noteikumi</string>
     <string name="subscriptionStatusFreeTrial">Bezmaksas izmēģinājuma periods ir aktīvs</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonementa iestatījumi</string>
-    <string name="subscriptionSettingSubscribe">Aizsargā savu savienojumu un identitāti ar Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Aizsargā savu savienojumu un identitāti ar vienu abonementu.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Abonenti saņem mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Abonenti saņem mūsu VPN un Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Iegūsti Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Izmēģināt Privacy Pro bez maksas</string>
+    <string name="subscriptionSettingGet">Abonē DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Izmēģini bez maksas</string>
     <string name="subscriptionSettingRestore">Man ir abonements</string>
-    <string name="subscriptionSettingExpired">Tavs Privacy Pro abonements ir beidzies</string>
+    <string name="subscriptionSettingExpired">Tavs DuckDuckGo abonements ir beidzies.</string>
     <string name="subscriptionSettingExpiredViewPlans">Skatīt plānus</string>
     <string name="subscriptionSettingSectionSubscription">Abonements</string>
     <string name="subscriptionSettingRemoveFromDevice">Noņemt no šīs ierīces</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Palīdzība un atbalsts</string>
     <string name="subscriptionSettingSendFeedback">Sūtīt atsauksmi</string>
     <string name="subscriptionSettingActivating">Notiek aktivizēšana</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ietaupi %1$s%% ar ikgadējo plānu</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Labākais piedāvājums</string>
+    <string name="subscriptionSettingSwitchDowngrade">Mainīt plānu</string>
+    <string name="subscriptionSettingManagePlan">Pārvaldīt maksājumu</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Viss ir gatavs.</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Tavs abonements tika iegādāts Apple App Store veikalā. Lai mainītu plāna vai norēķinu iestatījumus, atver sadaļu Iestatījumi &gt; Apple konts &gt; Abonementi ierīcē, kas pierakstīta tajā pašā Apple kontā, kas izmantots abonementa iegādei.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivizē Privacy Pro datorā, lai iestatītu Personal Information Removal</string>
-    <string name="pirDescription">DuckDuckGo pārlūkprogrammā galddatoram dodies uz <b>Iestatījumi &gt; Privacy Pro</b> un noklikšķini uz <b>Man ir abonements</b>, lai sāktu.</string>
+    <string name="pirTitle">Aktivizē DuckDuckGo abonementu datorā, lai iestatītu Personal Information Removal</string>
+    <string name="pirDescription">DuckDuckGo pārlūkprogrammā datora versijā atver <b>Iestatījumi &gt; Abonēt DuckDuckGo</b> un noklikšķini uz <b>Man ir abonements</b>, lai sāktu.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Zvans konsultantam nepalīdzēja</string>
     <string name="feedbackSubCategoryItrOther">Cits</string>
 
-    <string name="feedbackSubCategorySubsOtp">Vienreizēja parole</string>
-    <string name="feedbackSubCategorySubsOther">Cits</string>
+    <string name="feedbackSubCategorySubsOtp">Problēma ar vienreizējo paroli</string>
+    <string name="feedbackSubCategorySubsOther">Kaut kas cits</string>
 
     <string name="feedbackSubmitVpnHeader">Vai atradi problēmu, kas nav aplūkota mūsu <annotation type="faqs_link">palīdzības centrā</annotation> ? Mēs noteikti gribam par to uzzināt.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Pastāsti, kas notiek…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Papildus iepriekš ievadītajai informācijai mēs kopā ar tavām atsauksmēm nosūtām anonimizētu informāciju:\n\n• Vai ir aktīvas noteiktas pārlūkprogrammas funkcijas\n• Apkopoti lietotnes diagnostikas dati (piemēram, kļūdu kodi)\n\nNoklikšķinot uz Iesniegt, tu piekrīti, ka DuckDuckGo var izmantot iesniegto informāciju, lai uzlabotu lietotni."</string>
     <string name="feedbackSubmitVpnSubmit">Iesniegt</string>
     <string name="feedbackSubmitCompletedMessage">Paldies! Tava atsauksme ir iesniegta.</string>
-    <string name="feedbackSubmitFailedMessage">Kaut kas notika nepareizi</string>
-
-    <string name="feedbackSubmitEmailByLine">Norādi savu e-pasta adresi, ja vēlies, lai mēs ar tevi sazināmies par šo problēmu (iespējams, nevarēsim reaģēt uz visām problēmām):</string>
-    <string name="feedbackSubmitEmailHint">E-pasta adrese (neobligāti)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lūdzu, sniedz atsauksmes…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Kādu funkciju tu vēlētos redzēt?</string>
+    <string name="feedbackSubmitContactSupport">Vai tev vajadzīga palīdzība? <annotation type="support_link">Sazinies ar atbalsta dienestu</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonementi</string>
     <string name="activitySubscriptionSettings">Abonementa iestatījumi</string>
     <string name="activityActivateSubscription">Man ir abonements</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo abonements</string>
-    <string name="subscriptionSettingExpiredRebranding">Tavs DuckDuckGo abonements ir beidzies.</string>
-    <string name="privacyProFaqRebranding">Nepieciešama palīdzība saistībā ar abonēšanu?</string>
-    <string name="privacyProFaqSecondaryRebranding">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar abonēšanas atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
-    <string name="restoreSubscriptionTitleRebranding">Pievieno savu abonementu šai ierīcei</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Saisti e-pasta adresi ar savu abonementu, lai pievienotu to šai ierīcei.</string>
-    <string name="activateOnOtherDevicesRebranding">Pievieno savu abonementu citām ierīcēm</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pievieno savu abonementu citām ierīcēm, izmantojot Google Play vai piesaistot e-pasta adresi.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Iet uz Iestatījumi &gt; Abonementu iestatījumi &gt; Man ir abonements.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro tagad vienkārši sauc par DuckDuckGo abonementu</string>
-    <string name="subscriptionSettingSubscribeRebranding">Aizsargā savu savienojumu un identitāti ar vienu abonementu.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Šajā ierīcē vairs nevarēsi piekļūt savam abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonenti saņem mūsu VPN un uzlabotus mākslīgā intelekta modeļus Duck.ai. Personal Information Removal un Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonenti saņem mūsu VPN, uzlabotus MI modeļus Duck.ai un Identity Theft Restoration.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nevaru piekļūt Duck.ai ar savu abonementu citās pārlūkprogrammās.</string>
     <string name="feedbackSubCategoryDuckAiOther">Citas Duck.ai atsauksmes</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo abonements</string>
     <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
 
-    <string name="subscriptionSettingGetRebranding">Abonē DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Izmēģini bez maksas</string>
     <string name="feedbackGeneralSubscription">Abonements</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ietaupi %1$s%% ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Gada plāns ir tikai %1$s/mēnesī, salīdzinot ar tavu pašreizējo %2$s mēneša plānu.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Maini plānu uz ikgadējo (%1$s/gadā)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Atstāt ikmēneša plānu</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Tu ietaupi %1$s%% ar\nikgadējo plānu!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Pārejot tava mēneša maksa palielināsies no %1$s/mēn. līdz %2$s/mēn.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Atstāt ikgadējo plānu</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Maini plānu uz ikmēneša (%1$smēnesī)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Nevar piekļūt Plus vai Pro līmeņa funkcijām</string>
+    <string name="subscriptionsProUpgradeTitle">Jaunināt uz Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Piekļūsti jaudīgākam MI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Pārvaldīt abonementu</string>
+    <string name="subscriptionSettingViewAllPlans">Skatīt visus plānus</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Pārvaldīt maksājumu vai atcelt</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tavs plāns tiks jaunināts uz %1$s šādā datumā: %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tavs plāns tiks pazemināts uz %1$s šādā datumā: %2$s.</string>
+    <string name="planNamePlusMonthly">Plus ik mēnesi</string>
+    <string name="planNamePlusYearly">Plus katru gadu</string>
+    <string name="planNameProMonthly">Pro ik mēnesi</string>
+    <string name="planNameProYearly">Pro katru gadu</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

@@ -31,9 +31,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 class TrackerDataDevReceiver(
     context: Context,

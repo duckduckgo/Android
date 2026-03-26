@@ -26,9 +26,9 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface WebViewPasskeyInitializer {
     suspend fun configurePasskeySupport(webView: DuckDuckGoWebView)

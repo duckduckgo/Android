@@ -35,10 +35,12 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
@@ -55,14 +57,19 @@ import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
+import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.impl.notification.VpnReminderNotificationScheduler
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
@@ -73,19 +80,17 @@ import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.services.toEntitlements
+import com.duckduckgo.subscriptions.impl.wideevents.AuthTokenRefreshWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.FreeTrialConversionWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.io.IOException
-import java.time.Duration
-import java.time.Instant
-import java.time.Period
-import java.time.format.DateTimeParseException
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -101,11 +106,24 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
+import java.io.IOException
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.NumberFormat
+import java.time.Duration
+import java.time.Instant
+import java.time.Period
+import java.time.format.DateTimeParseException
+import java.util.Currency
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 interface SubscriptionsManager {
-
     /**
-     * Returns available purchase options retrieved from Play Store
+     * Returns available purchase options retrieved from Play Store.
+     * Works seamlessly regardless of whether tierMessagingEnabled flag is on or off.
+     * When flag is off, entitlements are constructed from legacy feature strings with default tier "plus".
+     * When flag is on, actual entitlements and tier information from the API are used.
      */
     suspend fun getSubscriptionOffer(): List<SubscriptionOffer>
 
@@ -118,6 +136,7 @@ interface SubscriptionsManager {
         offerId: String?,
         experimentName: String?,
         experimentCohort: String?,
+        origin: String?,
     )
 
     /**
@@ -231,6 +250,43 @@ interface SubscriptionsManager {
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
     suspend fun isFreeTrialEligible(): Boolean
+
+    /**
+     * Returns `true` if the user has an active subscription and the switch plan feature is enabled,
+     * `false` otherwise.
+     */
+    suspend fun isSwitchPlanAvailable(): Boolean
+
+    /**
+     * Switches the current subscription plan to a new one
+     *
+     * @param activity The activity context required for launching Google Play billing flow
+     * @param planId The new plan ID to switch to
+     * @param offerId The offer ID for the new plan (optional)
+     * @param replacementMode The replacement mode for the subscription switch
+     * @param origin The entry point where the switch was initiated (e.g., "subscription_settings", "dev_settings")
+     *
+     */
+    suspend fun switchSubscriptionPlan(
+        activity: Activity,
+        planId: String,
+        offerId: String? = null,
+        replacementMode: SubscriptionReplacementMode,
+        origin: String? = null,
+    )
+
+    /**
+     * Gets pricing information for switching between plans
+     *
+     * @param isUpgrade `true` if upgrading from monthly to yearly, `false` if downgrading from yearly to monthly
+     * @return [SwitchPlanPricingInfo] containing current price, target price, and yearly monthly equivalent, or null if unavailable
+     */
+    suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo?
+
+    /**
+     * @return `true` if the Black Friday offer is available, `false` otherwise
+     */
+    suspend fun blackFridayOfferAvailable(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -251,8 +307,13 @@ class RealSubscriptionsManager @Inject constructor(
     private val pkceGenerator: PkceGenerator,
     private val timeProvider: CurrentTimeProvider,
     private val backgroundTokenRefresh: BackgroundTokenRefresh,
+    private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
+    private val tokenRefreshWideEvent: AuthTokenRefreshWideEvent,
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
+    private val freeTrialConversionWideEvent: FreeTrialConversionWideEvent,
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
+    private val vpnReminderNotificationScheduler: VpnReminderNotificationScheduler,
 ) : SubscriptionsManager {
-
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
     private val _currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
@@ -326,8 +387,14 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             playBillingManager.purchaseState.collect {
                 when (it) {
-                    is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
+                    is PurchaseState.Purchased -> {
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseSuccess()
+                        subscriptionSwitchWideEvent.onPlayBillingSwitchSuccess()
+                        checkPurchase(it.packageName, it.purchaseToken)
+                    }
                     is PurchaseState.Canceled -> {
+                        subscriptionPurchaseWideEvent.onPurchaseCancelledByUser()
+                        subscriptionSwitchWideEvent.onUserCancelled()
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
                         if (removeExpiredSubscriptionOnCancelledPurchase) {
                             if (subscriptionStatus().isExpired()) {
@@ -335,6 +402,12 @@ class RealSubscriptionsManager @Inject constructor(
                             }
                             removeExpiredSubscriptionOnCancelledPurchase = false
                         }
+                    }
+
+                    is PurchaseState.Failure -> {
+                        subscriptionPurchaseWideEvent.onBillingFlowPurchaseFailure(it.errorType)
+                        subscriptionSwitchWideEvent.onSwitchFailed(it.errorType)
+                        _currentPurchaseState.emit(CurrentPurchase.Failure(it.errorType))
                     }
 
                     else -> {
@@ -357,6 +430,175 @@ class RealSubscriptionsManager @Inject constructor(
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
+    }
+
+    override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        val subscription = authRepository.getSubscription()
+        val hasActiveSubscription = subscription?.isActive() ?: false
+        val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
+        val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+
+        return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
+    }
+
+    override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        return@withContext privacyProFeature.get().blackFridayOffer2025().isEnabled()
+    }
+
+    override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
+        return@withContext try {
+            val currentSubscription = getSubscription() ?: return@withContext null
+            val basePlans = getSubscriptionOffer().filter { it.offerId == null }
+
+            // Determine current and target plan IDs based on region
+            val isUS = currentSubscription.productId in listOf(MONTHLY_PLAN_US, YEARLY_PLAN_US)
+            val (currentPlanId, targetPlanId) = if (isUpgrade) {
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                monthly to yearly
+            } else {
+                val yearly = if (isUS) YEARLY_PLAN_US else YEARLY_PLAN_ROW
+                val monthly = if (isUS) MONTHLY_PLAN_US else MONTHLY_PLAN_ROW
+                yearly to monthly
+            }
+
+            // Get prices from offers
+            val currentPrice = basePlans.find { it.planId == currentPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+
+            val targetPrice = basePlans.find { it.planId == targetPlanId }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.formattedPrice ?: return@withContext null
+
+            // Get monthly and yearly price amounts for savings calculation
+            val monthlyPriceAmount = basePlans
+                .find { it.planId in listOf(MONTHLY_PLAN_US, MONTHLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.priceAmount ?: return@withContext null
+
+            val yearlyPriceAmount = basePlans
+                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.priceAmount ?: return@withContext null
+
+            val yearlyPriceCurrency = basePlans
+                .find { it.planId in listOf(YEARLY_PLAN_US, YEARLY_PLAN_ROW) }
+                ?.pricingPhases
+                ?.firstOrNull()
+                ?.priceCurrency ?: return@withContext null
+
+            // Calculate monthly equivalent for yearly plan
+            val yearlyMonthlyEquivalent = NumberFormat.getCurrencyInstance()
+                .apply { currency = yearlyPriceCurrency }
+                .format(yearlyPriceAmount / 12.toBigDecimal())
+
+            // Calculate savings percentage: ((monthly * 12 - yearly) / (monthly * 12)) * 100
+            // This represents the percentage saved by choosing yearly over 12 monthly payments
+            val totalMonthlyAnnual = monthlyPriceAmount * 12.toBigDecimal()
+            val savingsAmount = totalMonthlyAnnual - yearlyPriceAmount
+            val savingsPercentage = ((savingsAmount / totalMonthlyAnnual) * 100.toBigDecimal())
+                .setScale(0, RoundingMode.DOWN)
+                .toInt()
+
+            SwitchPlanPricingInfo(
+                currentPrice = currentPrice,
+                targetPrice = targetPrice,
+                yearlyMonthlyEquivalent = yearlyMonthlyEquivalent,
+                savingsPercentage = savingsPercentage,
+            )
+        } catch (e: Exception) {
+            logcat { "Subs: Failed to get switch plan pricing: ${e.message}" }
+            null
+        }
+    }
+
+    override suspend fun switchSubscriptionPlan(
+        activity: Activity,
+        planId: String,
+        offerId: String?,
+        replacementMode: SubscriptionReplacementMode,
+        origin: String?,
+    ) = withContext(dispatcherProvider.io()) {
+        try {
+            val currentSubscription = authRepository.getSubscription()
+            if (currentSubscription == null || !currentSubscription.isActive()) {
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No active subscription found for switch"))
+                return@withContext
+            }
+
+            // Start wide event tracking
+            subscriptionSwitchWideEvent.onSwitchFlowStarted(
+                context = origin,
+                fromPlan = currentSubscription.productId,
+                toPlan = planId,
+            )
+
+            if (!isSignedIn()) {
+                val errorMessage = "User not signed in for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onValidationFailure(errorMessage)
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                return@withContext
+            }
+
+            subscriptionSwitchWideEvent.onCurrentSubscriptionValidated()
+
+            val currentPurchaseToken = playBillingManager.getLatestPurchaseToken()
+
+            if (currentPurchaseToken == null) {
+                val errorMessage = "No current purchase token found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No current purchase token found for switch"))
+                return@withContext
+            }
+
+            // Get account details for external ID
+            val account = authRepository.getAccount()
+            if (account == null) {
+                val errorMessage = "No account found for switch"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure("No account found for switch"))
+                return@withContext
+            }
+
+            // Validate the new plan exists
+            val availableOffers = getSubscriptionOffer()
+            val targetOffer = availableOffers.find { it.planId == planId && it.offerId == offerId }
+            if (targetOffer == null) {
+                val errorMessage = "Target plan not found: $planId"
+                logcat { "Subs: Cannot switch plan - $errorMessage" }
+                subscriptionSwitchWideEvent.onTargetPlanRetrievalFailure()
+                _currentPurchaseState.emit(CurrentPurchase.Failure(errorMessage))
+                return@withContext
+            }
+
+            subscriptionSwitchWideEvent.onTargetPlanRetrieved()
+
+            // Launch Google Play billing flow for subscription update
+            logcat { "Subs: Launching subscription update flow for plan: $planId" }
+
+            // Launch the subscription update flow using PlayBillingManager
+            withContext(dispatcherProvider.main()) {
+                playBillingManager.launchSubscriptionUpdate(
+                    activity = activity,
+                    newPlanId = planId,
+                    externalId = account.externalId,
+                    newOfferId = offerId,
+                    oldPurchaseToken = currentPurchaseToken,
+                    replacementMode = replacementMode,
+                )
+            }
+        } catch (e: Exception) {
+            val error = extractError(e)
+            logcat(ERROR) { "Subs: Failed to switch subscription plan: $error" }
+            _currentPurchaseState.emit(CurrentPurchase.Failure("Failed to switch subscription plan: $error"))
+            subscriptionSwitchWideEvent.onSwitchFailed(javaClass.simpleName)
+        }
     }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
@@ -413,6 +655,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.setAccount(null)
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
+        authRepository.removeLocalPurchasedAt()
         _isSignedIn.emit(false)
         _subscriptionStatus.emit(UNKNOWN)
         _entitlements.emit(emptyList())
@@ -466,6 +709,21 @@ class RealSubscriptionsManager @Inject constructor(
                 ),
             )
 
+            val pendingPlans = try {
+                confirmationResponse.subscription.pendingPlans.map {
+                    PendingPlan(
+                        productId = it.productId,
+                        billingPeriod = it.billingPeriod,
+                        effectiveAt = it.effectiveAt,
+                        status = it.status,
+                        tier = SubscriptionTier.fromTierString(it.tier),
+                    )
+                }
+            } catch (e: Exception) {
+                logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+                emptyList()
+            }
+
             val subscription = Subscription(
                 productId = confirmationResponse.subscription.productId,
                 billingPeriod = confirmationResponse.subscription.billingPeriod,
@@ -474,6 +732,7 @@ class RealSubscriptionsManager @Inject constructor(
                 status = confirmationResponse.subscription.status.toStatus(),
                 platform = confirmationResponse.subscription.platform,
                 activeOffers = confirmationResponse.subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             )
 
             authRepository.setSubscription(subscription)
@@ -495,6 +754,16 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
+                authRepository.registerLocalPurchasedAt()
+
+                subscriptionSwitchWideEvent.onSwitchConfirmationSuccess()
+                subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
+                if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
+                    freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
+                    if (privacyProFeature.get().vpnReminderNotification().isEnabled()) {
+                        vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
+                    }
+                }
             } else {
                 handlePurchaseFailed()
             }
@@ -526,7 +795,7 @@ class RealSubscriptionsManager @Inject constructor(
         val subscription = authRepository.getSubscription()
 
         return if (subscription != null) {
-            getFeaturesInternal(subscription.productId)
+            getEntitlementsForPlan(subscription.productId).map { it.product }.toSet()
         } else {
             emptySet()
         }
@@ -587,58 +856,112 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun refreshAccessToken() {
-        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        try {
+            tokenRefreshWideEvent.onStart(subscriptionStatus())
+            val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+            tokenRefreshWideEvent.onTokenRead()
 
-        /*
-            Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
-            a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
-        */
-        val jwks = authClient.getJwks()
+            /*
+                Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
+                a new token has been fetched (potentially invalidating the old one), but we can't validate and store it.
+             */
+            val jwks = authClient.getJwks()
+            tokenRefreshWideEvent.onJwksFetched()
 
-        val newTokens = try {
-            val tokens = authClient.getTokens(refreshToken.jwt)
-            validateTokens(tokens, jwks)
-        } catch (e: HttpException) {
-            if (e.code() == 400) {
-                if (parseError(e)?.error == "unknown_account") {
-                    /*
+            val newTokens = try {
+                val tokens = authClient.getTokens(refreshToken.jwt)
+                tokenRefreshWideEvent.onTokensFetched()
+                validateTokens(tokens, jwks)
+                    .also { tokenRefreshWideEvent.onTokensValidated() }
+            } catch (e: HttpException) {
+                val backendErrorResponse = parseError(e)?.error
+                    ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it) }
+
+                if (e.code() == 400) {
+                    if (backendErrorResponse == "unknown_account") {
+                        /*
                         Refresh token appears to be valid, but the related account doesn't exist in BE.
                         After the subscription expires, BE eventually deletes the account, so this is expected.
-                     */
-                    signOut()
-                    throw e
-                }
-
-                // refresh token is invalid / expired -> try to get a new pair of tokens using store login
-                pixelSender.reportAuthV2InvalidRefreshTokenDetected()
-                val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
-
-                when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
-                        storeLoginResult.tokens
-                    }
-                    StoreLoginResult.Failure.AccountExternalIdMismatch,
-                    StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
-                    StoreLoginResult.Failure.AuthenticationError,
-                    -> {
-                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                         */
+                        tokenRefreshWideEvent.onUnknownAccountError()
                         signOut()
                         throw e
                     }
 
-                    StoreLoginResult.Failure.Other -> throw e
-                }
-            } else {
-                throw e
-            }
-        }
+                    // refresh token is invalid / expired -> try to get a new pair of tokens using store login
+                    pixelSender.reportAuthV2InvalidRefreshTokenDetected()
+                    val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
-        saveTokens(newTokens)
+                    when (val storeLoginResult = storeLogin(account.externalId)) {
+                        is StoreLoginResult.Success -> {
+                            tokenRefreshWideEvent.onPlayLoginSuccess()
+                            pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                            storeLoginResult.tokens
+                        }
+
+                        StoreLoginResult.Failure.AccountExternalIdMismatch,
+                        StoreLoginResult.Failure.PurchaseHistoryNotAvailable,
+                        StoreLoginResult.Failure.AuthenticationError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = true,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                            signOut()
+                            throw e
+                        }
+
+                        StoreLoginResult.Failure.TokenValidationFailed,
+                        StoreLoginResult.Failure.UnknownError,
+                        -> {
+                            tokenRefreshWideEvent.onPlayLoginFailure(
+                                signedOut = false,
+                                refreshException = e,
+                                loginError = storeLoginResult.javaClass.simpleName,
+                            )
+                            throw e
+                        }
+                    }
+                } else {
+                    throw e
+                }
+            }
+
+            saveTokens(newTokens)
+            tokenRefreshWideEvent.onSuccess()
+        } catch (e: Exception) {
+            tokenRefreshWideEvent.onFailure(e)
+            throw e
+        }
     }
 
     override suspend fun refreshSubscriptionData() {
         val subscription = subscriptionsService.subscription()
+
+        val oldSubscription =
+            try {
+                authRepository.getSubscription()
+            } catch (_: Exception) {
+                null
+            }
+
+        // Convert full pendingPlans array to domain models
+        val pendingPlans = try {
+            subscription.pendingPlans.map {
+                PendingPlan(
+                    productId = it.productId,
+                    billingPeriod = it.billingPeriod,
+                    effectiveAt = it.effectiveAt,
+                    status = it.status,
+                    tier = SubscriptionTier.fromTierString(it.tier),
+                )
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "Failed to parse pending plans: ${e.asLog()}" }
+            emptyList()
+        }
 
         authRepository.setSubscription(
             Subscription(
@@ -649,10 +972,24 @@ class RealSubscriptionsManager @Inject constructor(
                 status = subscription.status.toStatus(),
                 platform = subscription.platform,
                 activeOffers = subscription.activeOffers.map { it.type.toActiveOfferType() },
+                pendingPlans = pendingPlans,
             ),
         )
 
-        _subscriptionStatus.emit(subscription.status.toStatus())
+        val newStatus = subscription.status.toStatus()
+        val isSubscriptionActive = newStatus.isActive()
+        val wasFreeTrial = oldSubscription?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+        val isFreeTrial = subscription.activeOffers.any { it.type.toActiveOfferType() == ActiveOfferType.TRIAL }
+
+        subscriptionPurchaseWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
+        subscriptionSwitchWideEvent.onSubscriptionUpdated(oldStatus = oldSubscription?.status, newStatus = newStatus)
+        freeTrialConversionWideEvent.onSubscriptionRefreshed(
+            wasFreeTrial = wasFreeTrial,
+            isFreeTrial = isFreeTrial,
+            isSubscriptionActive = isSubscriptionActive,
+        )
+
+        _subscriptionStatus.emit(newStatus)
     }
 
     private fun validateTokens(tokens: TokenPair, jwks: String): ValidatedTokenPair {
@@ -701,7 +1038,11 @@ class RealSubscriptionsManager @Inject constructor(
             val sessionId = authClient.authorize(codeChallenge)
             val authorizationCode = authClient.storeLogin(sessionId, purchase.signature, purchase.originalJson)
             val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
-            val validatedTokens = validateTokens(tokens, jwks)
+            val validatedTokens = try {
+                validateTokens(tokens, jwks)
+            } catch (_: Exception) {
+                return StoreLoginResult.Failure.TokenValidationFailed
+            }
 
             if (accountExternalId != null && accountExternalId != validatedTokens.accessTokenClaims.accountExternalId) {
                 return StoreLoginResult.Failure.AccountExternalIdMismatch
@@ -712,7 +1053,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (e is HttpException && e.code() == 400) {
                 StoreLoginResult.Failure.AuthenticationError
             } else {
-                StoreLoginResult.Failure.Other
+                StoreLoginResult.Failure.UnknownError
             }
         }
     }
@@ -734,7 +1075,7 @@ class RealSubscriptionsManager @Inject constructor(
                     }
 
                     is StoreLoginResult.Failure -> {
-                        RecoverSubscriptionResult.Failure("")
+                        RecoverSubscriptionResult.Failure(message = "Store login error: ${storeLoginResult.javaClass.simpleName}")
                     }
                 }
             } else {
@@ -774,43 +1115,104 @@ class RealSubscriptionsManager @Inject constructor(
         data class Failure(val message: String) : RecoverSubscriptionResult()
     }
 
+    private suspend fun recoverSubscriptionFromStoreOnPurchaseAttempt() {
+        subscriptionRestoreWideEvent.onGooglePlayRestoreFlowStartedOnPurchaseAttempt()
+        when (val result = recoverSubscriptionFromStore()) {
+            is RecoverSubscriptionResult.Success -> {
+                logcat {
+                    "Recovering: Recovered subscription from store on purchase attempt: ${result.subscription}"
+                }
+                subscriptionRestoreWideEvent.onGooglePlayRestoreSuccess()
+            }
+            is RecoverSubscriptionResult.Failure -> {
+                logcat {
+                    "Recovering: Failed to recover subscription from store on purchase attempt: ${result.message}"
+                }
+                subscriptionRestoreWideEvent.onGooglePlayRestoreFailure(error = result.message)
+            }
+        }
+    }
+
     private suspend fun activePlanIds(): List<String> =
-        if (isLaunchedRow()) {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US, YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW)
-        } else {
-            listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US)
+        buildList {
+            addAll(listOf(YEARLY_PLAN_US, MONTHLY_PLAN_US))
+            if (isLaunchedRow()) {
+                addAll(listOf(YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
+            }
+            if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                addAll(LIST_OF_PRO_PLANS)
+            }
         }
 
     override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
-            .find { it.productId == BASIC_SUBSCRIPTION }
-            ?.subscriptionOfferDetails
-            .orEmpty()
-            .filter { activePlanIds().contains(it.basePlanId) }
+            .filter {
+                if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                    it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
+                } else {
+                    it.productId == BASIC_SUBSCRIPTION
+                }
+            }
+            .flatMap {
+                logcat {
+                    "Subs: Found product ${it.productId} with ${it.subscriptionOfferDetails?.map { Pair(it.basePlanId, it.offerId) }} offers"
+                }
+                it.subscriptionOfferDetails.orEmpty()
+            }
+            .filter {
+                activePlanIds().contains(it.basePlanId)
+            }
             .let { availablePlans ->
                 availablePlans.map { offer ->
                     val pricingPhases = offer.pricingPhases.pricingPhaseList.map { phase ->
                         PricingPhase(
+                            priceAmount = BigDecimal.valueOf(phase.priceAmountMicros, 6),
+                            priceCurrency = Currency.getInstance(phase.priceCurrencyCode),
                             formattedPrice = phase.formattedPrice,
                             billingPeriod = phase.billingPeriod,
-
                         )
                     }
 
-                    val features = getFeaturesInternal(offer.basePlanId)
+                    val entitlements = getEntitlementsForPlan(offer.basePlanId)
 
-                    if (features.isEmpty()) return@let emptyList()
+                    if (entitlements.isEmpty()) return@let emptyList()
 
                     SubscriptionOffer(
                         planId = offer.basePlanId,
+                        tier = SubscriptionTier.fromPlanId(offer.basePlanId).value,
                         pricingPhases = pricingPhases,
                         offerId = offer.offerId,
-                        features = features,
+                        entitlements = entitlements,
                     )
+                }.also {
+                    logcat {
+                        "Subs: Subscription offers after mapping: $it"
+                    }
                 }
             }
 
-    private suspend fun getFeaturesInternal(planId: String): Set<String> {
+    /**
+     * Returns entitlements for a plan, working seamlessly regardless of flag state.
+     * When tierMessagingEnabled is ON: Uses actual entitlements from V2 API, with fallback to legacy.
+     * When tierMessagingEnabled is OFF: Converts legacy features to entitlements with default tier "plus".
+     */
+    private suspend fun getEntitlementsForPlan(planId: String): Set<Entitlement> {
+        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+            val v2Entitlements = authRepository.getFeaturesV2(planId)
+            if (v2Entitlements.isNotEmpty()) {
+                return v2Entitlements
+            }
+            // Fallback to legacy features for smooth runtime flag transitions
+        }
+        logcat {
+            "Subs: getEntitlementsForPlan fallback to legacy features for planId: $planId"
+        }
+        return getLegacyFeatures(planId).map { feature ->
+            Entitlement(name = "plus", product = feature) // Temporary name placeholder until we have support multiple tiers
+        }.toSet()
+    }
+
+    private suspend fun getLegacyFeatures(planId: String): Set<String> {
         return if (privacyProFeature.get().featuresApi().isEnabled()) {
             authRepository.getFeatures(planId)
         } else {
@@ -828,9 +1230,16 @@ class RealSubscriptionsManager @Inject constructor(
         offerId: String?,
         experimentName: String?,
         experimentCohort: String?,
+        origin: String?,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
+
+            subscriptionPurchaseWideEvent.onPurchaseFlowStarted(
+                subscriptionIdentifier = offerId ?: planId,
+                freeTrialEligible = isFreeTrialEligible(),
+                origin = origin,
+            )
 
             // refresh any existing account / subscription data
             when {
@@ -840,21 +1249,29 @@ class RealSubscriptionsManager @Inject constructor(
                     when (e.code()) {
                         400, 404 -> {} // expected if this is a first ever purchase using this account - ignore
                         401 -> signOut() // access token was rejected even though it's not expired - can happen if the account was removed from BE
-                        else -> throw e
+                        else -> {
+                            subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
+                            throw e
+                        }
                     }
+                } catch (e: Exception) {
+                    subscriptionPurchaseWideEvent.onSubscriptionRefreshFailure(e)
+                    throw e
                 }
 
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 
+            subscriptionPurchaseWideEvent.onSubscriptionRefreshSuccess()
+
             if (!isSignedIn()) {
-                recoverSubscriptionFromStore()
+                recoverSubscriptionFromStoreOnPurchaseAttempt()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
-                        recoverSubscriptionFromStore()
+                        recoverSubscriptionFromStoreOnPurchaseAttempt()
                         removeExpiredSubscriptionOnCancelledPurchase =
                             accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
@@ -864,9 +1281,13 @@ class RealSubscriptionsManager @Inject constructor(
             val subscription = authRepository.getSubscription()
 
             if (subscription?.isActive() == true) {
+                logcat {
+                    "Recovering: User already has an active subscription: $subscription"
+                }
                 pixelSender.reportSubscriptionActivated()
                 pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                 _currentPurchaseState.emit(CurrentPurchase.Recovered)
+                subscriptionPurchaseWideEvent.onExistingSubscriptionRestored()
                 return
             }
 
@@ -896,6 +1317,7 @@ class RealSubscriptionsManager @Inject constructor(
             logcat(ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name, error)
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
+            subscriptionPurchaseWideEvent.onPurchaseFailed(error)
         }
     }
 
@@ -1016,6 +1438,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun createAccount() {
         try {
             if (shouldUseAuthV2()) {
+                subscriptionPurchaseWideEvent.onAccountCreationStarted()
                 val codeVerifier = pkceGenerator.generateCodeVerifier()
                 val codeChallenge = pkceGenerator.generateCodeChallenge(codeVerifier)
                 val jwks = authClient.getJwks()
@@ -1023,6 +1446,7 @@ class RealSubscriptionsManager @Inject constructor(
                 val authorizationCode = authClient.createAccount(sessionId)
                 val tokens = authClient.getTokens(sessionId, authorizationCode, codeVerifier)
                 saveTokens(validateTokens(tokens, jwks))
+                subscriptionPurchaseWideEvent.onAccountCreationSuccess()
             } else {
                 val account = authService.createAccount("Bearer ${emailManager.getToken()}")
                 if (account.authToken.isEmpty()) {
@@ -1033,6 +1457,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
         } catch (e: Exception) {
+            subscriptionPurchaseWideEvent.onAccountCreationFailure(e)
             when (e) {
                 is JsonDataException, is JsonEncodingException, is HttpException -> {
                     pixelSender.reportPurchaseFailureAccountCreation()
@@ -1061,7 +1486,8 @@ class RealSubscriptionsManager @Inject constructor(
             data object PurchaseHistoryNotAvailable : Failure()
             data object AccountExternalIdMismatch : Failure()
             data object AuthenticationError : Failure()
-            data object Other : Failure()
+            data object TokenValidationFailed : Failure()
+            data object UnknownError : Failure()
         }
     }
 
@@ -1116,14 +1542,22 @@ sealed class CurrentPurchase {
 data class SubscriptionOffer(
     val planId: String,
     val offerId: String?,
+    val tier: String,
     val pricingPhases: List<PricingPhase>,
-    val features: Set<String>,
-)
+    val entitlements: Set<Entitlement>,
+) {
+    /**
+     * Returns the set of feature/product names from entitlements.
+     * Provided for backward compatibility with code that used the legacy features set.
+     */
+    val features: Set<String> get() = entitlements.map { it.product }.toSet()
+}
 
 data class PricingPhase(
+    val priceAmount: BigDecimal,
+    val priceCurrency: Currency,
     val formattedPrice: String,
     val billingPeriod: String,
-
 ) {
     internal fun getBillingPeriodInDays(): Int? {
         return try {
@@ -1135,6 +1569,13 @@ data class PricingPhase(
         }
     }
 }
+
+data class SwitchPlanPricingInfo(
+    val currentPrice: String,
+    val targetPrice: String,
+    val yearlyMonthlyEquivalent: String,
+    val savingsPercentage: Int,
+)
 
 data class ValidatedTokenPair(
     val accessToken: String,

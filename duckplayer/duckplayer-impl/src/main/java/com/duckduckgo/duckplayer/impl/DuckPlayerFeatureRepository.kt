@@ -26,10 +26,6 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.io.IOException
-import java.io.InputStream
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +35,10 @@ import logcat.logcat
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
+import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Named
 
 interface DuckPlayerFeatureRepository {
     fun getDuckPlayerRemoteConfigJson(): String

@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Jelszavak importálása a Google-ból</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Elrejtés</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importálás a DuckDuckGóba</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Chrome-ból importálva</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Könyvjelzők importálása a Google-ből</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importálás a Google-ból</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Válaszd ki a könyvjelzőfájlt…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Könyvjelzők importálása</string>
+    <string name="importBookmarksProgressTitle">Importálás a Google-ből…</string>
+    <string name="importBookmarksProgressSubtitle">Ne zárd be ezt a képernyőt, és várj türelemmel – nem fog tovább tartani egy-két percnél.</string>
+    <string name="importBookmarksProgressInfoMessage1">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
+    <string name="importBookmarksProgressInfoMessage2">Előfordulhat, hogy a Google küld neked egy e-mailt, amelyben megerősíti, hogy a könyvjelzőid exportálásra kerülnek.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Megszakítod az importálást?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Ha most megszakítod, nem lesznek importálva a könyvjelzőid.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Importálás megszakítása</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Folytatás</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">%1$d könyvjelző</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Bezárás</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Hiba történt</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Kérlek, győződj meg róla, hogy csatlakozol az internethez, és próbáld újra.</string>
+
 </resources>

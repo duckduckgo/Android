@@ -27,6 +27,7 @@ interface PrivacyProUnifiedFeedback {
         SUBSCRIPTION_SETTINGS,
         VPN_MANAGEMENT,
         VPN_EXCLUDED_APPS,
+        PIR_DASHBOARD,
         UNKNOWN,
     }
 }

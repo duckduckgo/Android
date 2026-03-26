@@ -28,7 +28,6 @@ import com.duckduckgo.privacy.config.impl.features.trackingparameters.TrackingPa
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.Before
@@ -38,6 +37,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class TrackingParameterReferenceTest(private val testCase: TestCase) {

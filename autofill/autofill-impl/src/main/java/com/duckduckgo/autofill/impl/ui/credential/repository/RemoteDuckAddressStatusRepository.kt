@@ -24,8 +24,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.net.HttpURLConnection
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -33,6 +31,8 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
+import java.net.HttpURLConnection
+import javax.inject.Inject
 
 /**
  * Repository for Duck Address activation status

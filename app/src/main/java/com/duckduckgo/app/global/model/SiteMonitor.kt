@@ -22,6 +22,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -38,11 +39,11 @@ import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     url: String,
@@ -56,6 +57,7 @@ class SiteMonitor(
     dispatcherProvider: DispatcherProvider,
     brokenSiteContext: BrokenSiteContext,
     private val duckPlayer: DuckPlayer,
+    private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
 ) : Site {
 
     override var url: String = url
@@ -168,9 +170,19 @@ class SiteMonitor(
 
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
+
         if (maliciousSiteStatus != null) return MALICIOUS
         if (duckPlayer.isDuckPlayerUri(url)) return UNKNOWN
-        if (userAllowList || !isHttps) return UNPROTECTED
+
+        if (standardizedLeadingIconToggle.self().isEnabled()) {
+            // When feature is enabled, only show UNPROTECTED for user-initiated allowlist,
+            // not remote config exceptions
+            val isUserAllowListed = domain?.let { userAllowListRepository.isDomainInUserAllowList(it) } ?: false
+            if (isUserAllowListed || !isHttps) return UNPROTECTED
+        } else {
+            // Legacy behavior: show UNPROTECTED for both user allowlist and remote config exceptions
+            if (userAllowList || !isHttps) return UNPROTECTED
+        }
 
         if (!fullSiteDetailsAvailable) {
             logcat(INFO) { "Shield: not fullSiteDetailsAvailable for $domain" }
@@ -210,6 +222,10 @@ class SiteMonitor(
     override var consentSelfTestFailed: Boolean = false
 
     override var consentCosmeticHide: Boolean? = false
+
+    override var consentRule: String? = null
+
+    override var consentReloadLoop: Boolean = false
 
     override var isDesktopMode: Boolean = false
 

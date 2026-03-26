@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
@@ -34,12 +35,13 @@ import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesBinding(ActivityScope::class)
 @Named("ContentScopeScripts")
@@ -49,7 +51,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<ContentScopeJsMessageHandlersPlugin>,
 ) : JsMessaging {
-
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     private lateinit var webView: WebView
@@ -61,15 +62,24 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val allowedDomains: List<String> = emptyList()
 
     @JavascriptInterface
-    override fun process(message: String, secret: String) {
+    override fun process(
+        message: String,
+        secret: String,
+    ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain = runBlocking(dispatcherProvider.main()) {
-                webView.url?.toUri()?.host
-            }
+            val domain =
+                runBlocking(dispatcherProvider.main()) {
+                    webView.url?.toUri()?.host
+                }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, domain)) {
+                    if (jsMessage.featureName == "webEvents" && jsMessage.method == "webEvent") {
+                        val nativeData = JSONObject()
+                        nativeData.put("webViewId", System.identityHashCode(webView).toString())
+                        jsMessage.params.put("nativeData", nativeData)
+                    }
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
                         jsMessageCallback.process(
@@ -79,10 +89,13 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                             data = jsMessage.params,
                         )
                     }
-                    handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
-                            (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
-                    }?.process(jsMessage, this, jsMessageCallback)
+                    handlers
+                        .getPlugins()
+                        .map { it.getJsMessageHandler() }
+                        .firstOrNull {
+                            it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
+                                isUrlAllowed(it.allowedDomains, domain)
+                        }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -90,7 +103,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         }
     }
 
-    override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+    override fun register(
+        webView: WebView,
+        jsMessageCallback: JsMessageCallback?,
+    ) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
@@ -98,25 +114,37 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
-        val subscriptionEvent = SubscriptionEvent(
-            context,
-            subscriptionEventData.featureName,
-            subscriptionEventData.subscriptionName,
-            subscriptionEventData.params,
-        )
+        val subscriptionEvent =
+            SubscriptionEvent(
+                context,
+                subscriptionEventData.featureName,
+                subscriptionEventData.subscriptionName,
+                subscriptionEventData.params,
+            )
         if (::webView.isInitialized) {
             jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
         }
     }
 
     override fun onResponse(response: JsCallbackData) {
-        val jsResponse = JsRequestResponse.Success(
-            context = context,
-            featureName = response.featureName,
-            method = response.method,
-            id = response.id,
-            result = response.params,
-        )
+        val jsResponse =
+            JsRequestResponse.Success(
+                context = context,
+                featureName = response.featureName,
+                method = response.method,
+                id = response.id,
+                result = response.params,
+            )
         jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
+    }
+
+    private fun isUrlAllowed(
+        allowedDomains: List<String>,
+        url: String?,
+    ): Boolean {
+        if (allowedDomains.isEmpty()) return true
+        val host = url ?: return false
+        val eTld = host.toTldPlusOne()
+        return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
     }
 }

@@ -16,13 +16,19 @@
 
 package com.duckduckgo.site.permissions.impl
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
+import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -36,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SitePermissionsManagerTest {
 
@@ -45,20 +52,32 @@ class SitePermissionsManagerTest {
     private val mockSitePermissionsRepository: SitePermissionsRepository = mock()
     private val mockPackageManager = mock<PackageManager>()
     private val mockLocationManager = mock<LocationManager>()
-
-    private val testee = SitePermissionsManagerImpl(
-        mockPackageManager,
-        mockLocationManager,
-        mockSitePermissionsRepository,
-        coroutineRule.testDispatcherProvider,
+    private val mockContext = mock<Context>()
+    private val mockDuckAiHostProvider = mock<DuckAiHostProvider>()
+    private val fakeMicrophoneSitePermissionsDomainRecoveryFeature = FakeFeatureToggleFactory.create(
+        MicrophoneSitePermissionsDomainRecoveryFeature::class.java,
     )
+
+    private val testee by lazy {
+        SitePermissionsManagerImpl(
+            mockPackageManager,
+            mockLocationManager,
+            mockSitePermissionsRepository,
+            coroutineRule.testDispatcherProvider,
+            mockContext,
+            fakeMicrophoneSitePermissionsDomainRecoveryFeature,
+            mockDuckAiHostProvider,
+        )
+    }
 
     private val url = "https://domain.com/whatever"
     private val tabId = "tabId"
 
     @Before
     fun before() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         whenever(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(false))
     }
 
     @Test
@@ -211,5 +230,24 @@ class SitePermissionsManagerTest {
     @Test
     fun whenAndroidPermissionNotSupportedThenGetPermissionsQueryResponseReturnsDenied() = runTest {
         assertEquals(SitePermissionQueryResponse.Denied, testee.getPermissionsQueryResponse(url, tabId, "unsupported"))
+    }
+
+    @Test
+    fun whenRecoveryEnabledAndDuckAiAudioGrantedAndAndroidPermissionDeniedThenAudioNotAutoAccepted() = runTest {
+        val duckAiUrl = "https://duck.ai/chat"
+        fakeMicrophoneSitePermissionsDomainRecoveryFeature.self().setRawStoredState(Toggle.State(true))
+        val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(duckAiUrl, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(duckAiUrl, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockContext.checkPermission(any(), any(), any())).thenReturn(PackageManager.PERMISSION_DENIED)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(duckAiUrl.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(1, permissions.userHandled.size)
+        assertEquals(PermissionRequest.RESOURCE_AUDIO_CAPTURE, permissions.userHandled.first())
+        assertEquals(0, permissions.autoAccept.size)
     }
 }

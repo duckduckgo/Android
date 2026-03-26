@@ -33,9 +33,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)

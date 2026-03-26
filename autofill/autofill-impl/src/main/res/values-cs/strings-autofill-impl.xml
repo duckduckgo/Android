@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Import hesel z Googlu</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skrýt</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Import do DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importováno z Chromu</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importovat záložky z Googlu</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import z Googlu</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber soubor záložek…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importovat záložky</string>
+    <string name="importBookmarksProgressTitle">Import z Googlu…</string>
+    <string name="importBookmarksProgressSubtitle">Nech obrazovku otevřenou a chvilku počkej. Nemělo by to trvat déle než pár minut.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google ti může poslat e-mail s potvrzením, že se tvoje záložky exportují.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Zrušit import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Pokud akci teď zrušíš, k importu záložek nedojde.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Zrušit import</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Pokračovat</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Záložky: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Zavřít</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Něco se pokazilo</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Zkontroluj svoje připojení k internetu a zkus to znovu.</string>
+
 </resources>

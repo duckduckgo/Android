@@ -137,9 +137,114 @@
                     android:visibility="gone" />
 
                 <include
-                    android:id="@+id/address_bar_position"
-                    layout="@layout/pre_onboarding_address_bar_position"
+                    android:id="@+id/comparison_chart_with_duck_ai"
+                    layout="@layout/pre_onboarding_comparison_chart_with_duck_ai"
                     android:visibility="gone" />
+
+                <include
+                    android:id="@+id/address_bar_position"
+                    layout="@layout/pre_onboarding_address_bar_position_horizontal"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/duckAiInputScreenToggleContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/duckAiInputScreenWithoutAiContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:paddingTop="@dimen/keyline_6"
+                        android:paddingBottom="@dimen/keyline_2"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:foreground="@drawable/selectable_large_rounded_ripple"
+                            android:src="@drawable/searchbox_withoutai_active" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiCaption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center_horizontal"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithoutAiCheck"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:src="@drawable/ic_check_accent_24" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/duckAiInputScreenWithAiContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+                        android:paddingTop="@dimen/keyline_6"
+                        android:paddingBottom="@dimen/keyline_2"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithAiImage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:foreground="@drawable/selectable_large_rounded_ripple"
+                            android:src="@drawable/searchbox_withai_inactive" />
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:id="@+id/duckAiInputScreenToggleWithAiCaption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center_horizontal"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                        <ImageView
+                            android:id="@+id/duckAiInputScreenToggleWithAiCheck"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:src="@drawable/ic_shape_circle_24" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/duckAiInputScreenToggleDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_6"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:gravity="start"
+                    android:visibility="gone"
+                    app:textType="secondary"
+                    app:typography="caption" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"

@@ -20,6 +20,7 @@
     <string name="cancel">Tühista</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo tellimus</string>
     <string name="manageEmail">Halda e-posti</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Tellimust ei leitud</string>
     <string name="subscriptionNotFoundDescription">Selle Google Play kontoga seotud tellimus ei ole enam aktiivne.</string>
     <string name="purchaseRestored">Sinu ostud on taastatud.</string>
-    <string name="restoreSubscriptionTitle">Lisa sellele seadmele oma Privacy Pro tellimus</string>
+    <string name="restoreSubscriptionTitle">Lisa oma tellimus sellele seadmele</string>
     <string name="restoreSubscriptionGooglePlayTitle">Lisa Google Play konto kaudu</string>
     <string name="restoreSubscriptionGooglePlayDescription">Taastage oma tellimus Android-seadmetes, kasutades oma Google Play kontot.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Taasta ost</string>
     <string name="restoreSubscriptionEmailTitle">Lisa e-posti kaudu</string>
-    <string name="restoreSubscriptionEmailDescription">Lisage e-posti aadress oma tellimusele, et lisada Privacy Pro sellele seadmele.</string>
+    <string name="restoreSubscriptionEmailDescription">Seo e-posti aadress oma tellimusega, et lisada see sellesse seadmesse.</string>
     <string name="restoreSubscriptionEmailGetStarted">Alustage</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Eemalda tellimus</string>
     <string name="subscriptionRemoved">Sinu tellimus on sellest seadmest eemaldatud</string>
     <string name="removeFromDevice">Kas soovid sellest seadmest eemaldada?</string>
-    <string name="removeFromDeviceDescription">Sa ei pääse enam oma Privacy Pro tellimusele selles seadmes ligi. See ei tühista su tellimust ja see jääb teistel seadmetel aktiivseks.</string>
+    <string name="removeFromDeviceDescription">Sa ei pääse enam selles seadmes oma tellimusele ligi. See ei tühista su tellimust ja see jääb teistel seadmetel aktiivseks.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Sinu igakuine tellimus %1$s kuupäeval %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Sinu aastane tellimus %1$s kuupäeval %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Sinu tellimus aegus kuupäeval %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Aastane tellimus</string>
     <string name="renews">uueneb</string>
     <string name="expires">aegub</string>
-    <string name="activateOnOtherDevices">Lisa Privacy Pro teistele seadmetele</string>
+    <string name="activateOnOtherDevices">Lisage oma tellimus teistele seadmetele</string>
     <string name="addToDevicePrimaryText">Lisa seadmele</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Lisage Privacy Pro oma teistesse seadmetesse Google Play kaudu või e-posti aadressi linkimise teel.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Kasutage ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Avage jaotis Seaded &gt; Privacy Pro &gt; Mul on tellimus.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisa oma tellimus oma teistesse seadmetesse Google Play kaudu või e-posti aadressi sidumisega.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Kasutage ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Mine jaotisse Seaded &gt; Tellimisseaded &gt; Mul on tellimus.</string>
     <string name="editEmailPrimaryText">Muuda e-posti</string>
     <string name="learnMore">Loe edasi</string>
-    <string name="privacyProFaq">Kas vajad abi Privacy Pro\'ga?</string>
-    <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
+    <string name="privacyProFaq">Kas vajad abi oma tellimusega?</string>
+    <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust tellimuse toega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
     <string name="subscriptionStatusSubscribed">Tellitud</string>
     <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
     <string name="subscriptionStatusFreeTrial">Tasuta prooviperiood aktiveeritud</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tellimuse seaded</string>
-    <string name="subscriptionSettingSubscribe">Kaitse oma ühendust ja identiteeti rakendusega Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Kaitse oma ühendust ja identiteeti ühe tellimusega.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Tellijad saavad meie VPN-i ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Tellijad saavad meie VPN-i ja teenuse Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Proovi Privacy Pro\'d tasuta</string>
+    <string name="subscriptionSettingGet">Telli DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Proovi tasuta</string>
     <string name="subscriptionSettingRestore">Mul on tellimus</string>
-    <string name="subscriptionSettingExpired">Sinu Privacy Pro tellimus on aegunud</string>
+    <string name="subscriptionSettingExpired">Sinu DuckDuckGo tellimus aegus</string>
     <string name="subscriptionSettingExpiredViewPlans">Kuva plaane</string>
     <string name="subscriptionSettingSectionSubscription">Püsitellimus</string>
     <string name="subscriptionSettingRemoveFromDevice">Eemalda sellest seadmest</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Abi ja tugi</string>
     <string name="subscriptionSettingSendFeedback">Saada tagasisidet</string>
     <string name="subscriptionSettingActivating">Aktiveerimine</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Säästa aastase plaaniga %1$s%%</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Parim hind</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaheta plaani</string>
+    <string name="subscriptionSettingManagePlan">Makse haldamine</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kõik on valmis.</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Teie tellimus osteti Apple\'i App Store\'i kaudu. Paketi või arvelduse seadistuste muutmiseks avage jaotis Seaded &gt; Apple\'i konto &gt; Tellimused seadmel, mis on sisse logitud sama Apple\'i kontoga, millelt ostsite oma tellimuse.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveerige töölaual Privacy Pro</string>
-    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisesse <b>Seaded &gt; Privacy Pro</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
+    <string name="pirTitle">Personal Information Removal\'i seadistamiseks aktiveeri arvutis DuckDuckGo tellimus</string>
+    <string name="pirDescription">Mine töölaua DuckDuckGo brauseris jaotisse <b>Seaded &gt; DuckDuckGo tellimus</b> ja klõpsa alustamiseks <b>Mul on tellimus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Nõustajale helistamine ei aita</string>
     <string name="feedbackSubCategoryItrOther">Muu</string>
 
-    <string name="feedbackSubCategorySubsOtp">Ühekordne parool</string>
-    <string name="feedbackSubCategorySubsOther">Muu</string>
+    <string name="feedbackSubCategorySubsOtp">Probleem ühekordse parooliga</string>
+    <string name="feedbackSubCategorySubsOther">Midagi muud</string>
 
     <string name="feedbackSubmitVpnHeader">Kas leidsid probleemi, mida meie <annotation type="faqs_link">abikeskuses</annotation> ei käsitleta? Me tahame sellest kindlasti teada saada.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Ütle meile, mis toimub...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Lisaks eespool sisestatud andmetele saadame koos sinu tagasisidega ka mõned anonüümsed andmed:\n\n• Kas mõned brauseri funktsioonid on aktiivsed\n• Rakenduse koonddiagnostika (nt veakoodid)\n\nVajutades nuppu Saada, nõustud, et DuckDuckGo võib kasutada esitatud teavet rakenduse täiustamiseks."</string>
     <string name="feedbackSubmitVpnSubmit">Esita</string>
     <string name="feedbackSubmitCompletedMessage">Aitäh! Tagasiside on esitatud.</string>
-    <string name="feedbackSubmitFailedMessage">Midagi läks valesti</string>
-
-    <string name="feedbackSubmitEmailByLine">Anna oma e-posti aadress, kui soovid, et võtaksime sinuga selle probleemi osas ühendust (me ei pruugi kõigile probleemidele vastata):</string>
-    <string name="feedbackSubmitEmailHint">E-post (valikuline)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Palun anna meile tagasisidet...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Millist funktsiooni soovid näha?</string>
+    <string name="feedbackSubmitContactSupport">Kas vajad abi? <annotation type="support_link">Võta ühendust tugiteenusega</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tellimused</string>
     <string name="activitySubscriptionSettings">Tellimuse seaded</string>
     <string name="activityActivateSubscription">Mul on tellimus</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo tellimus</string>
-    <string name="subscriptionSettingExpiredRebranding">Sinu DuckDuckGo tellimus aegus</string>
-    <string name="privacyProFaqRebranding">Kas vajad abi oma tellimusega?</string>
-    <string name="privacyProFaqSecondaryRebranding">Saa vastused korduma kippuvatele küsimustele või võta ühendust tellimuse toega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
-    <string name="restoreSubscriptionTitleRebranding">Lisa oma tellimus sellele seadmele</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Seo e-posti aadress oma tellimusega, et lisada see sellesse seadmesse.</string>
-    <string name="activateOnOtherDevicesRebranding">Lisage oma tellimus teistele seadmetele</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisa oma tellimus oma teistesse seadmetesse Google Play kaudu või e-posti aadressi sidumisega.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Kasuta ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Mine jaotisse Seaded &gt; Tellimisseaded &gt; Mul on tellimus.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kannab nüüd lihtsalt nime DuckDuckGo tellimus</string>
-    <string name="subscriptionSettingSubscribeRebranding">Kaitse oma ühendust ja identiteeti ühe tellimusega.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Sa ei pääse enam selles seadmes oma tellimusele ligi. See ei tühista sinu tellimust ja see jääb teistel seadmetel aktiivseks.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenuse Identity Theft Restoration.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ei pääse Duck.ai-le teistes brauserites oma tellimusega ligi</string>
     <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai tagasiside</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo tellimus</string>
     <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
 
-    <string name="subscriptionSettingGetRebranding">Telli DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Proovi tasuta</string>
     <string name="feedbackGeneralSubscription">Püsitellimus</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Säästa aastase plaaniga %1$s%%!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Aastaplaan on vaid %1$s/kuu, võrreldes sinu praeguse %2$s kuuplaaniga.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Mine üle aastasele plaanile (%1$s/aasta)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Jätka igakuise plaaniga</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Sa säästad aastase plaaniga %1$s%%!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Üleminek suurendab sinu igakuist hinda hinnalt %1$s/kuus hinnale %2$s/kuus.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Jätka aastaplaaniga</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Mine üle igakuisele plaanile (%1$s/kuu)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Ei saa Plus või Pro taseme funktsioonidele ligi pääseda</string>
+    <string name="subscriptionsProUpgradeTitle">Mine üle Pro-le</string>
+    <string name="subscriptionsProUpgradeMessage">Vabasta võimsam tehisintellekt</string>
+    <string name="subscriptionSettingSectionManageSubscription">Tellimuse haldamine</string>
+    <string name="subscriptionSettingViewAllPlans">Vaata kõiki plaane</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Makse haldamine või tühistamine</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sinu plaan uuendatakse plaanile %1$s kuupäeval %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sinu pakett alandatakse plaanile %1$s kuupäeval %2$s.</string>
+    <string name="planNamePlusMonthly">Plus Monthly</string>
+    <string name="planNamePlusYearly">Plus Yearly</string>
+    <string name="planNameProMonthly">Pro Monthly</string>
+    <string name="planNameProYearly">Pro Yearly</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

@@ -32,13 +32,15 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PproUpsellDisabledMessagePlugin.Companion.PRIORITY_PPRO_DISABLED
 import com.duckduckgo.subscriptions.api.Subscriptions
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_DISABLED,
+    featureName = "pluginPproUpsellDisabledMessagePlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PproUpsellDisabledMessagePlugin @Inject constructor(
     private val subscriptions: Subscriptions,

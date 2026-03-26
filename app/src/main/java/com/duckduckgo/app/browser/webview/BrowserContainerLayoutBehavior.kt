@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -24,8 +25,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.isGone
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.google.android.material.appbar.AppBarLayout
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.google.android.material.appbar.AppBarLayout.ScrollingViewBehavior
 import kotlin.math.roundToInt
 
@@ -38,36 +39,62 @@ import kotlin.math.roundToInt
  *
  * This prevents the omnibar and the navigation bar from overlapping with, for example, content found in the web view.
  *
- * Note: If bottom [OmnibarLayout] is used ([OmnibarPosition.BOTTOM]), [BottomOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
+ * Note: If bottom [OmnibarLayout] is used ([OmnibarType.SINGLE_BOTTOM]), [BottomOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
  */
 class TopOmnibarBrowserContainerLayoutBehavior(
     context: Context,
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
+    private val marginOffsetPx = (MARGIN_OFFSET_DP * context.resources.displayMetrics.density).toInt()
+
+    override fun onRequestChildRectangleOnScreen(
+        parent: CoordinatorLayout,
+        child: View,
+        rectangle: Rect,
+        immediate: Boolean,
+    ): Boolean = false
 
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: View,
         dependency: View,
-    ): Boolean {
-        return dependency.isBrowserNavigationBar() || super.layoutDependsOn(parent, child, dependency)
-    }
+    ): Boolean = dependency.isBrowserNavigationBar() || super.layoutDependsOn(parent, child, dependency)
 
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
         child: View,
         dependency: View,
-    ): Boolean {
-        return if (dependency.isBrowserNavigationBar()) {
+    ): Boolean =
+        if (dependency.isBrowserNavigationBar()) {
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
-            super.onDependentViewChanged(parent, child, dependency)
+            val result = super.onDependentViewChanged(parent, child, dependency)
+            correctBottomMargin(child, dependency)
+            result
+        }
+
+    /**
+     * Sets `bottomMargin` based on the visible height of the AppBarLayout ([dependency]).
+     *
+     * [ScrollingViewBehavior] positions [child] below the AppBarLayout, but [child]'s `match_parent` height
+     * causes it to overflow past the parent. The correct margin equals the AppBarLayout's visible portion
+     * minus a small offset ([MARGIN_OFFSET_DP]) to reduce visual flicker during scroll.
+     */
+    internal fun correctBottomMargin(child: View, dependency: View) {
+        if (child.isGone) return
+        val lp = child.layoutParams as? CoordinatorLayout.LayoutParams ?: return
+        val visibleHeight = dependency.height + dependency.top
+        // Only apply the offset during scroll (partially collapsed) to reduce visual stutter.
+        // When fully expanded, use the exact visible height to avoid cutting off content.
+        val newMargin = if (dependency.top < 0) maxOf(0, visibleHeight - marginOffsetPx) else visibleHeight
+        if (lp.bottomMargin != newMargin) {
+            lp.bottomMargin = newMargin
         }
     }
 }
 
 /**
- * A behavior that observes the position of the bottom [OmnibarLayout] ([OmnibarPosition.BOTTOM]), if present,
+ * A behavior that observes the position of the bottom [OmnibarLayout] ([OmnibarType.SINGLE_BOTTOM]), if present,
  * and applies bottom padding to the target view equal to the visible height of the omnibar.
  *
  * This prevents the omnibar from overlapping with, for example, content found in the web view.
@@ -77,42 +104,39 @@ class TopOmnibarBrowserContainerLayoutBehavior(
  *
  * We don't need to additionally observe the position of the [BrowserNavigationBarView] when bottom [OmnibarLayout] is used because it comes pre-embedded with the navigation bar.
  *
- * Note: If top [OmnibarLayout] is used ([OmnibarPosition.TOP]), [TopOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
+ * Note: If top [OmnibarLayout] is used ([OmnibarType.SINGLE_TOP] or [OmnibarType.SPLIT]), [TopOmnibarBrowserContainerLayoutBehavior] should be set to the target child.
  */
 class BottomOmnibarBrowserContainerLayoutBehavior : Behavior<View>() {
-
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: View,
         dependency: View,
-    ): Boolean {
-        return dependency.isBottomOmnibar() || super.layoutDependsOn(parent, child, dependency)
-    }
+    ): Boolean = dependency.isBottomOmnibar() || super.layoutDependsOn(parent, child, dependency)
 
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
         child: View,
         dependency: View,
-    ): Boolean {
-        return if (dependency.isBottomOmnibar()) {
+    ): Boolean =
+        if (dependency.isBottomOmnibar()) {
             offsetByBottomElementVisibleHeight(child = child, dependency = dependency)
         } else {
             super.onDependentViewChanged(parent, child, dependency)
         }
-    }
 }
 
 private fun offsetByBottomElementVisibleHeight(
     child: View,
     dependency: View,
 ): Boolean {
-    val newBottomPadding = if (dependency.isGone) {
-        0
-    } else {
-        // Clamp negative translation (e.g., IME pushing the bar up) to avoid inflating padding
-        val clampedTranslationY = if (dependency.translationY > 0f) dependency.translationY.roundToInt() else 0
-        (dependency.measuredHeight - clampedTranslationY).coerceAtLeast(0)
-    }
+    val newBottomPadding =
+        if (dependency.isGone) {
+            0
+        } else {
+            // Clamp negative translation (e.g., IME pushing the bar up) to avoid inflating padding
+            val clampedTranslationY = if (dependency.translationY > 0f) dependency.translationY.roundToInt() else 0
+            (dependency.measuredHeight - clampedTranslationY).coerceAtLeast(0)
+        }
     return if (child.paddingBottom != newBottomPadding) {
         child.setPadding(
             0,
@@ -125,6 +149,8 @@ private fun offsetByBottomElementVisibleHeight(
         false
     }
 }
+private const val MARGIN_OFFSET_DP = 7
 
 private fun View.isBrowserNavigationBar(): Boolean = this is BrowserNavigationBarView
-private fun View.isBottomOmnibar(): Boolean = this is OmnibarLayout && this.omnibarPosition == OmnibarPosition.BOTTOM
+
+private fun View.isBottomOmnibar(): Boolean = this is OmnibarView && this.omnibarType == OmnibarType.SINGLE_BOTTOM

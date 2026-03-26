@@ -39,10 +39,10 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.notification.NetPDisabledNotificationBuilder
 import com.duckduckgo.networkprotection.impl.notification.NetPDisabledNotificationScheduler
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.8.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.8.2">
 
     <issue
         id="SimpleDateFormat"
@@ -58,12 +58,23 @@
 
     <issue
         id="QueryPermissionsNeeded"
+        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
+        errorLine1="        this.getInstalledApplications(PackageManager.GET_META_DATA)"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/common/utils/extensions/PackageManagerExtension.kt"
+            line="34"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
         message="Consider adding a `&lt;queries>` declaration to your manifest when calling this method; see https://g.co/dev/packagevisibility for details"
         errorLine1="        return playStoreIntent().resolveActivity(context.packageManager) != null"
         errorLine2="                                 ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/common/utils/playstore/PlayStoreUtils.kt"
-            line="78"
+            line="82"
             column="34"/>
     </issue>
 

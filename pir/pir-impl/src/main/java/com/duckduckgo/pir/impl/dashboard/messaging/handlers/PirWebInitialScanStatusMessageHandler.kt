@@ -29,13 +29,15 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 /**
  * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
@@ -49,9 +51,11 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val stateProvider: PirDashboardInitialScanStateProvider,
     private val pirRepository: PirRepository,
+    private val pirPixelSender: PirPixelSender,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
+    private val checkedForResumeScan: AtomicBoolean = AtomicBoolean(false)
 
     override fun process(
         jsMessage: JsMessage,
@@ -69,6 +73,11 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 return@launch
             }
 
+            // Check once per PirDashboardWebViewActivity launch if we need to resume a scan that was interrupted (e.g., by app kill)
+            if (!checkedForResumeScan.getAndSet(true)) {
+                checkForIncompleteInitialScan()
+            }
+
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.InitialScanResponse(
@@ -84,12 +93,28 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     }
 
     private suspend fun canRunScan(): Boolean {
-        return pirRepository.getUserProfileQueries().isNotEmpty()
+        return pirRepository.getValidUserProfileQueries().isNotEmpty()
+    }
+
+    /**
+     * Checks if the initial foreground scan should be resumed (was interrupted with remaining brokers).
+     * Currently emits a pixel to measure how often this scenario occurs.
+     */
+    private suspend fun checkForIncompleteInitialScan() {
+        if (!stateProvider.shouldRestartInitialScan()) {
+            logcat { "PIR-WEB: No need to resume scan, it's either not started or already completed" }
+            return
+        }
+
+        // Emit pixel to measure how often interrupted scans could be resumed
+        logcat { "PIR-WEB: Detected opportunity to resume interrupted scan, emitting pixel" }
+        pirPixelSender.reportInitialScanIncomplete()
     }
 
     private suspend fun getResultsFound(): List<ScanResult> {
         return stateProvider.getScanResults().map {
             ScanResult(
+                id = it.extractedProfile.dbId,
                 dataBroker = DataBroker(
                     name = it.broker.name,
                     url = it.broker.url,

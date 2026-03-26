@@ -50,11 +50,11 @@ import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProAppF
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.facebook.shimmer.ShimmerFrameLayout
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetPAppExclusionListNoParams::class)
@@ -122,7 +122,8 @@ class NetpAppExclusionListActivity :
             }
 
             R.id.netp_exclusion_menu_report -> {
-                viewModel.launchFeedback(); true
+                viewModel.launchFeedback()
+                true
             }
 
             else -> super.onOptionsItemSelected(item)
@@ -240,7 +241,8 @@ class NetpAppExclusionListActivity :
             is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
 
             is Command.ShowAutoExcludePrompt -> showAutoExcludePrompt(command.apps)
-            else -> { /* noop */
+            else -> {
+                /* noop */
             }
         }
     }

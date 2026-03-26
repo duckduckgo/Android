@@ -20,10 +20,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
-import java.time.LocalDateTime
-import java.time.Month.JANUARY
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,6 +38,8 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.time.Month.JANUARY
 
 @RunWith(AndroidJUnit4::class)
 class HistoryTest {
@@ -63,14 +69,15 @@ class HistoryTest {
         }
     }
 
+    @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true), eq("tabId"))
         }
     }
 
@@ -79,9 +86,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false), eq("tabId"))
         }
     }
 
@@ -99,9 +106,9 @@ class HistoryTest {
         whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any(), any())
         }
     }
 
@@ -110,9 +117,9 @@ class HistoryTest {
         runTest {
             whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
 
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("url", "title", "tabId")
 
-            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any(), any())
         }
     }
 
@@ -132,5 +139,102 @@ class HistoryTest {
         testee.removeHistoryEntryByQuery(query)
 
         verify(mockHistoryRepository).removeHistoryEntryByQuery(eq(query))
+    }
+
+    @Test
+    fun whenRemoveHistoryForTabThenRemoveHistoryForTabCalled() = runTest {
+        val tabId = "tab1"
+
+        testee.removeHistoryForTab(tabId)
+
+        verify(mockHistoryRepository).removeHistoryForTab(eq(tabId))
+    }
+
+    @Test
+    fun whenSaveToHistoryWithTabIdThenTabIdIsPassedToRepository() {
+        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title", "tab1")
+
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false), eq("tab1"))
+        }
+    }
+
+    @Test
+    fun whenGetHistoryAndFeatureAndUserEnabledThenReturnRepositoryHistory() = runTest {
+        whenever(mockHistoryRepository.getHistory()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.getHistory()
+
+        verify(mockHistoryRepository).getHistory()
+        assertEquals(emptyList<HistoryEntry>(), result.firstOrNull())
+    }
+
+    @Test
+    fun whenGetHistoryAndFeatureDisabledThenReturnEmptyFlow() = runTest {
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
+
+        val result = testee.getHistory().firstOrNull()
+
+        assertEquals(emptyList<HistoryEntry>(), result)
+        verify(mockHistoryRepository, never()).getHistory()
+    }
+
+    @Test
+    fun whenGetHistoryAndUserDisabledThenReturnEmptyFlow() = runTest {
+        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
+
+        val result = testee.getHistory().firstOrNull()
+
+        assertEquals(emptyList<HistoryEntry>(), result)
+        verify(mockHistoryRepository, never()).getHistory()
+    }
+
+    @Test
+    fun whenClearHistoryThenRepositoryClearHistoryCalled() = runTest {
+        testee.clearHistory()
+
+        verify(mockHistoryRepository).clearHistory()
+    }
+
+    @Test
+    fun whenIsHistoryUserEnabledThenRepositoryCalledWithFeatureFlagDefault() = runTest {
+        testee.isHistoryUserEnabled()
+
+        verify(mockHistoryRepository).isHistoryUserEnabled(eq(true))
+    }
+
+    @Test
+    fun whenSetHistoryUserEnabledThenRepositoryCalled() = runTest {
+        testee.setHistoryUserEnabled(false)
+
+        verify(mockHistoryRepository).setHistoryUserEnabled(eq(false))
+    }
+
+    @Test
+    fun whenIsHistoryFeatureAvailableAndFeatureEnabledThenReturnTrue() {
+        assertTrue(testee.isHistoryFeatureAvailable())
+    }
+
+    @Test
+    fun whenIsHistoryFeatureAvailableAndFeatureDisabledThenReturnFalse() {
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
+
+        assertFalse(testee.isHistoryFeatureAvailable())
+    }
+
+    @Test
+    fun whenHasHistoryThenReturnRepositoryResult() = runTest {
+        whenever(mockHistoryRepository.hasHistory()).thenReturn(true)
+
+        assertTrue(testee.hasHistory())
+    }
+
+    @Test
+    fun whenHasNoHistoryThenReturnFalse() = runTest {
+        whenever(mockHistoryRepository.hasHistory()).thenReturn(false)
+
+        assertFalse(testee.hasHistory())
     }
 }

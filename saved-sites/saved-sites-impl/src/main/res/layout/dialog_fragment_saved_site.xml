@@ -14,93 +14,105 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/savedSiteAppBar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.common.ui.view.text.DaxTextInput
-        android:id="@+id/titleInput"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        android:hint="@string/savedSiteDialogTitleHint"
-        android:inputType="text|textCapWords"
-        app:layout_constraintTop_toBottomOf="@id/savedSiteAppBar" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextInput
-        android:id="@+id/urlInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        android:hint="@string/savedSiteDialogUrlHint"
-        android:inputType="textUri"
-        app:layout_constraintTop_toBottomOf="@id/titleInput" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/savedSiteLocationLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:text="@string/locationLabel"
-        app:layout_constraintTop_toBottomOf="@id/urlInput"
-        app:textType="secondary"
-        app:typography="caption" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/savedSiteLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_4"
-        android:paddingBottom="@dimen/keyline_2"
-        android:text="@string/bookmarksSectionTitle"
-        app:layout_constraintTop_toBottomOf="@id/savedSiteLocationLabel"
-        app:typography="body1" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/savedSiteLocationContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="savedSiteLocationLabel,savedSiteLocation" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/addToFavoritesBottomDivider"
-        app:layout_constraintTop_toBottomOf="@id/savedSiteLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <FrameLayout
-        android:id="@+id/addToFavoritesItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/addToFavoritesBottomDivider"
-        android:visibility="gone">
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/addToFavoritesPrimaryItem"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/addToFavorites"
-            app:leadingIconBackground="circular"/>
+            android:layout_height="wrap_content">
 
-        <com.duckduckgo.common.ui.view.DaxSwitch
-            android:id="@+id/addToFavoritesSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="16dp"/>
-    </FrameLayout>
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/titleInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4"
+                android:hint="@string/savedSiteDialogTitleHint"
+                android:inputType="text|textCapWords"
+                app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/urlInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/keyline_4"
+                android:hint="@string/savedSiteDialogUrlHint"
+                android:inputType="textUri"
+                app:layout_constraintTop_toBottomOf="@id/titleInput" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/savedSiteLocationLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/locationLabel"
+                app:layout_constraintTop_toBottomOf="@id/urlInput"
+                app:textType="secondary"
+                app:typography="caption" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/savedSiteLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"
+                android:text="@string/bookmarksSectionTitle"
+                app:layout_constraintTop_toBottomOf="@id/savedSiteLocationLabel"
+                app:typography="body1" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/savedSiteLocationContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="savedSiteLocationLabel,savedSiteLocation" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/addToFavoritesBottomDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/savedSiteLocation" />
+
+            <FrameLayout
+                android:id="@+id/addToFavoritesItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/addToFavoritesBottomDivider">
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/addToFavoritesPrimaryItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIconBackground="circular"
+                    app:primaryText="@string/addToFavorites" />
+
+                <com.duckduckgo.common.ui.view.DaxSwitch
+                    android:id="@+id/addToFavoritesSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="16dp" />
+            </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</LinearLayout>

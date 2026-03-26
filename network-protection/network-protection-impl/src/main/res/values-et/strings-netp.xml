@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Ühenda kohe uuesti</string>
     <string name="netpNotificationSnoozeTitle">VPN on uinutatud</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN loob uuesti ühenduse %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN-ühendus katkestati aegunud tellimuse tõttu. DuckDuckGo VPN-i taasühendamiseks telli Privacy Pro.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN-ühendus katkestati aegunud tellimuse tõttu. DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-i asukoht</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN-ühendus katkestati aegunud tellimuse tõttu</string>
-    <string name="netpDialogVpnAccessRevokedBody">DuckDuckGo VPN-i taasühendamiseks telli Privacy Pro.</string>
+    <string name="netpDialogVpnAccessRevokedBody">DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Telli</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Loobu</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Ei ühildu VPN-idega</string>
     <string name="netpExclusionListAutoExcludeDescription">Mõned rakendused, nagu pangandus- või voogedastusrakendused, ei tööta VPN-idega hästi. Kui see seade on lubatud, välistame need rakendused automaatselt.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN-ühendus katkestati aegunud tellimuse tõttu. DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
 </resources>

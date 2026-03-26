@@ -10,10 +10,9 @@ import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
 import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
-import com.duckduckgo.app.trackerdetection.blocklist.get2XRefresh
-import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -21,16 +20,17 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.squareup.moshi.Moshi
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.kotlin.never
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
@@ -49,6 +49,7 @@ class RefreshPixelSenderTest {
     private val configAdapter = moshi.adapter(Config::class.java)
 
     private val mockPixel: Pixel = mock()
+    private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var blockListPixelsPlugin: BlockListPixelsPlugin
@@ -73,6 +74,8 @@ class RefreshPixelSenderTest {
             ),
             coroutineTestRule.testDispatcherProvider,
         )
+
+        fakeMetricsPixelExtension.register()
 
         blockListPixelsPlugin = BlockListPixelsPlugin(inventory)
 
@@ -118,40 +121,33 @@ class RefreshPixelSenderTest {
     }
 
     @Test
-    fun whenRefreshedTwiceAndThriceAndAssignedToExperimentThen2XAnd3XRefreshPixelsFired() = runTest {
+    fun whenRefreshedTwiceAndThriceAndAssignedToExperimentThen2XAnd3XRefreshPixelsSent() = runTest {
         assignToExperiment()
         val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS, RefreshPattern.THRICE_IN_20_SECONDS)
         testee.onRefreshPatternDetected(refreshPatterns)
 
-        blockListPixelsPlugin.get2XRefresh()!!.getPixelDefinitions().forEach {
-            verify(mockPixel).fire(it.pixelName, it.params)
-        }
-        blockListPixelsPlugin.get3XRefresh()!!.getPixelDefinitions().forEach {
-            verify(mockPixel).fire(it.pixelName, it.params)
-        }
+        assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "2xRefresh" })
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.any { it.metric == "3xRefresh" })
         verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
         verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
     }
 
     @Test
-    fun whenRefreshedTwiceAndNotAssignedToExperimentThenExperiment2XRefreshPixelsNotFired() = runTest {
+    fun whenRefreshedTwiceAndNotAssignedToExperimentThenExperiment2XRefreshPixelsNotSent() = runTest {
         val refreshPatterns = setOf(RefreshPattern.TWICE_IN_12_SECONDS)
         testee.onRefreshPatternDetected(refreshPatterns)
 
-        blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel, never()).fire(it.pixelName, it.params)
-        }
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
         verify(mockPixel).fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
     }
 
     @Test
-    fun whenRefreshedThriceAndNotAssignedToExperimentThenExperiment3XRefreshPixelsNotFired() = runTest {
+    fun whenRefreshedThriceAndNotAssignedToExperimentThenExperiment3XRefreshPixelsNotSent() = runTest {
         val refreshPatterns = setOf(RefreshPattern.THRICE_IN_20_SECONDS)
         testee.onRefreshPatternDetected(refreshPatterns)
 
-        blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-            verify(mockPixel, never()).fire(it.pixelName, it.params)
-        }
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
         verify(mockPixel).fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
     }
 

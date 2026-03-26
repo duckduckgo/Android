@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':attributed-metrics-api')
 
     implementation AndroidX.core.ktx
 
@@ -97,6 +98,7 @@ dependencies {
     testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

@@ -1,0 +1,24 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+tags:
+  - securityTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - doubleTapOn:
+          id: "omnibarTextInput"
+      - inputText: "http://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-emptyaddress.html"
+      - pressKey: Enter
+
+      - tapOn: "run"
+
+      - copyTextFrom:
+          id: "omnibarTextInput"
+
+      - assertTrue: ${maestro.copiedText == "about:blank" }

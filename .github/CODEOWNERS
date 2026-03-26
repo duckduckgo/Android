@@ -1,5 +1,6 @@
 # This is the module where the Android Design System resides
 # Any changes to the source files of this module require approval from @malmstein or @nalcalag.
-/common/common-ui/ @malmstein @nalcalag
+/android-design-system/design-system/ @malmstein @mikescamell
+/android-design-system/design-system-internal/ @malmstein @mikescamell
 /saved-sites/ @malmstein
 /example-feature/ @cdrussell

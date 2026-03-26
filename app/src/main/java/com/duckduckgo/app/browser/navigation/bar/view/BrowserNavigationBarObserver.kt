@@ -36,18 +36,6 @@ interface BrowserNavigationBarObserver {
     }
 
     @EmptySuper
-    fun onBackButtonClicked() {
-    }
-
-    @EmptySuper
-    fun onBackButtonLongClicked() {
-    }
-
-    @EmptySuper
-    fun onForwardButtonClicked() {
-    }
-
-    @EmptySuper
     fun onNewTabButtonClicked() {
     }
 

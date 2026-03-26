@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Search Bookmarks</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
     <string name="addToFavorites">Add to Favorites</string>
     <string name="editBookmark">Edit Bookmark</string>
     <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
@@ -110,4 +109,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
+    <string name="bookmarksImportDialogClose">Close</string>
 </resources>

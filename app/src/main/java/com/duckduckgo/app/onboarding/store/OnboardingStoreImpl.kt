@@ -65,7 +65,7 @@ class OnboardingStoreImpl @Inject constructor(
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
-                link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
+                link = "!image ${context.getString(R.string.onboardingSearchQueryOption4)}",
             ),
         )
     }
@@ -85,7 +85,7 @@ class OnboardingStoreImpl @Inject constructor(
 
             "GB" -> {
                 site1 = "skysports.com "
-                site2 = "bbc.co.uk"
+                site2 = "uk.yahoo.com"
                 site3 = "ebay.com"
                 site4Query = "britannica.com/animal/duck"
             }
@@ -127,7 +127,7 @@ class OnboardingStoreImpl @Inject constructor(
 
             "IE" -> {
                 site1 = "skysports.com"
-                site2 = "bbc.co.uk "
+                site2 = "uk.yahoo.com"
                 site3 = "ebay.com"
                 site4Query = "britannica.com/animal/duck"
             }
@@ -163,8 +163,30 @@ class OnboardingStoreImpl @Inject constructor(
         )
     }
 
+    override fun storeInputScreenSelection(selected: Boolean) {
+        preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION, selected) }
+    }
+
+    override fun getInputScreenSelection(): Boolean? {
+        return if (preferences.contains(KEY_INPUT_SCREEN_SELECTION)) {
+            preferences.getBoolean(KEY_INPUT_SCREEN_SELECTION, false)
+        } else {
+            null
+        }
+    }
+
+    override fun isInputScreenSelectionOverriddenByUser(): Boolean {
+        return preferences.getBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, false)
+    }
+
+    override fun setInputScreenSelectionOverriddenByUser() {
+        preferences.edit { putBoolean(KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER, true) }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
+        private const val KEY_INPUT_SCREEN_SELECTION = "inputScreenSelection"
+        private const val KEY_INPUT_SCREEN_SELECTION_OVERRIDDEN_BY_USER = "inputScreenSelectionOverriddenByUser"
     }
 }

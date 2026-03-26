@@ -33,7 +33,7 @@ abstract class SecureStorageDatabase : RoomDatabase() {
     abstract fun neverSavedSitesDao(): NeverSavedSitesDao
 }
 
-val ALL_MIGRATIONS = arrayOf(
+val ALL_MIGRATIONS = listOf(
     object : Migration(1, 2) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notes` TEXT")

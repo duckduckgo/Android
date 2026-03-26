@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<com.duckduckgo.app.bookmarks.dialog.TouchObservingLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/actionBottomSheetVerticalPadding">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/bookmarksBottomSheetDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/bottomSheetTitleVerticalPadding"
+        android:paddingBottom="@dimen/bottomSheetTitleVerticalPadding"
+        app:textType="secondary"
+        app:typography="body1"
+        tools:text="Actions" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/setAsFavorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIconBackground="circular"
+            app:primaryText="@string/addBookmarkDialogAddToFavorites"
+            app:leadingIcon="@drawable/ic_favorite_24" />
+
+        <com.duckduckgo.common.ui.view.DaxSwitch
+            android:id="@+id/setAsFavoriteSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp" />
+    </FrameLayout>
+
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/editBookmark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_edit_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/addBookmarkDialogEditBookmark" />
+
+    <LinearLayout
+        android:id="@+id/promotionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:background="?attr/daxColorBackground"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4" />
+
+</com.duckduckgo.app.bookmarks.dialog.TouchObservingLinearLayout>

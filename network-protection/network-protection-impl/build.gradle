@@ -29,7 +29,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-api')

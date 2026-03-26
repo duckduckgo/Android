@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangeDuckAiUrl
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ChangePrivacyConfigUrl
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
@@ -49,11 +50,12 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.internal.DuckAiUrlSettingsActivity
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class DevSettingsActivity : DuckDuckGoActivity() {
@@ -102,6 +104,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.overrideDuckAiUrl.setOnClickListener { viewModel.onDuckAiUrlClicked() }
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
@@ -131,6 +134,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is SendTdsIntent -> sendTdsIntent()
             is OpenUASelector -> showUASelector()
             is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is ChangeDuckAiUrl -> showChangeDuckAiUrl()
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
             Tabs -> showTabs()
@@ -164,6 +168,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showChangePrivacyUrl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showChangeDuckAiUrl() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(DuckAiUrlSettingsActivity.intent(this), options)
     }
 
     private fun showCustomTabs() {

@@ -22,9 +22,9 @@ import android.view.View
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface ViewNodeClassifier {
     fun classify(viewNode: ViewNode): AutofillFieldType
@@ -63,10 +63,14 @@ class AutofillServiceViewNodeClassifier @Inject constructor() : ViewNodeClassifi
             if (autofillType == AutofillFieldType.UNKNOWN) {
                 val isUsername: Boolean = viewNode.htmlInfo?.attributes?.find { it.first == "type" }?.second?.containsAny(userNameKeywords) == true ||
                     viewNode.htmlInfo?.attributes
-                    ?.firstOrNull { it.first?.containsAny(listOf("autofill")) == true && it.second?.containsAny(userNameKeywords) == true } != null
+                        ?.firstOrNull {
+                            it.first?.containsAny(listOf("autofill")) == true && it.second?.containsAny(userNameKeywords) == true
+                        } != null
                 val isPassword = viewNode.htmlInfo?.attributes?.find { it.first == "type" }?.second?.containsAny(passwordKeywords) == true ||
                     viewNode.htmlInfo?.attributes
-                    ?.firstOrNull { it.first?.containsAny(listOf("autofill")) == true && it.second?.containsAny(passwordKeywords) == true } != null
+                        ?.firstOrNull {
+                            it.first?.containsAny(listOf("autofill")) == true && it.second?.containsAny(passwordKeywords) == true
+                        } != null
 
                 if (isUsername) {
                     autofillType = AutofillFieldType.USERNAME

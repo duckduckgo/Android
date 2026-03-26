@@ -49,7 +49,6 @@ import java.time.format.DateTimeFormatter
         VpnFeatureRemoverState::class,
     ],
 )
-
 @TypeConverters(VpnTypeConverters::class)
 abstract class VpnDatabase : RoomDatabase() {
 

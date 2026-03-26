@@ -41,31 +41,36 @@ import com.duckduckgo.sync.impl.SyncAuthCode.Connect
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
+import com.duckduckgo.sync.impl.metrics.ConnectedDevicesObserver
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
-import java.util.UUID
-import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.util.UUID
+import javax.inject.*
 
 interface SyncAccountRepository {
 
     fun parseSyncAuthCode(stringCode: String): SyncAuthCode
     fun isSyncSupported(): Boolean
+
+    @WorkerThread
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(code: SyncAuthCode): Result<Boolean>
+    fun processCode(code: SyncAuthCode, existingDeviceId: String? = null): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
@@ -98,6 +103,7 @@ interface SyncAccountRepository {
 @SingleInstanceIn(AppScope::class)
 @WorkerThread
 class AppSyncAccountRepository @Inject constructor(
+    private val connectedDevicesObserver: ConnectedDevicesObserver,
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
@@ -109,6 +115,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
     private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : SyncAccountRepository {
 
     /**
@@ -138,11 +145,11 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(code: SyncAuthCode): Result<Boolean> {
+    override fun processCode(code: SyncAuthCode, existingDeviceId: String?): Result<Boolean> {
         when (code) {
             is Recovery -> {
                 logcat { "Sync: code is a recovery code" }
-                return login(code.b64Code)
+                return login(code.b64Code, existingDeviceId)
             }
 
             is Connect -> {
@@ -285,7 +292,7 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    private fun login(recoveryCode: RecoveryCode): Result<Boolean> {
+    private fun login(recoveryCode: RecoveryCode, existingDeviceId: String? = null): Result<Boolean> {
         var wasUserLogout = false
         if (isSignedIn()) {
             val allowSwitchAccount = syncFeature.seamlessAccountSwitching().isEnabled()
@@ -304,7 +311,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         val primaryKey = recoveryCode.primaryKey
         val userId = recoveryCode.userId
-        val deviceId = syncDeviceIds.deviceId()
+        val deviceId = existingDeviceId ?: syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
 
         return performLogin(userId, deviceId, deviceName, primaryKey).onFailure {
@@ -491,9 +498,9 @@ class AppSyncAccountRepository @Inject constructor(
 
                 logcat(VERBOSE) {
                     """
-                    Sync-exchange: We have received the other device's details. 
-                    name:${response.deviceName}, 
-                    keyId:${response.keyId}, 
+                    Sync-exchange: We have received the other device's details.
+                    name:${response.deviceName},
+                    keyId:${response.keyId},
                     public key: ${response.publicKey}
                     """.trimIndent()
                 }
@@ -632,11 +639,12 @@ class AppSyncAccountRepository @Inject constructor(
                         }
                     }.sortedWith { a, b ->
                         if (a.thisDevice) -1 else 1
-                    }.also {
+                    }.also { devices ->
                         connectedDevicesCached.apply {
                             clear()
-                            addAll(it)
+                            addAll(devices)
                         }
+                        connectedDevicesObserver.onDevicesUpdated(devices)
                     },
                 )
             }
@@ -726,14 +734,19 @@ class AppSyncAccountRepository @Inject constructor(
             return throwable.asErrorResult()
         }
 
-        val result = syncApi.createAccount(
-            account.userId,
-            account.passwordHash,
-            account.protectedSecretKey,
-            deviceId,
-            encryptedDeviceName,
-            encryptedDeviceType,
-        )
+        val result = try {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
+            syncApi.createAccount(
+                account.userId,
+                account.passwordHash,
+                account.protectedSecretKey,
+                deviceId,
+                encryptedDeviceName,
+                encryptedDeviceType,
+            )
+        } finally {
+            runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
+        }
 
         return when (result) {
             is Error -> {
@@ -742,7 +755,12 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                syncEngine.triggerSync(ACCOUNT_CREATION)
+                try {
+                    runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
+                    syncEngine.triggerSync(ACCOUNT_CREATION)
+                } finally {
+                    runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
+                }
                 logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)
             }

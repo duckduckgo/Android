@@ -17,11 +17,30 @@ jobs:
   build_debug_apk:
     name: Build debug apk
     runs-on: ubuntu-latest
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Create folder
+        run: mkdir apk
+
+      - name: Decode debug keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.DEBUG_PROPERTIES }}
+          fileName: ddg_android_debug_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode debug key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.DEBUG_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
@@ -35,7 +54,9 @@ jobs:
           go-version: '1.18.3'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Assemble the project
         env:
@@ -44,7 +65,7 @@ jobs:
 
       - name: Obtain debug apk
         if: always()
-        run: cp $(find . -regex '.*outputs/apk/.*internal-debug.apk') pr-ddg-debug.apk
+        run: cp "$(find . -regex '.*outputs/apk/.*internal-debug.apk')" pr-ddg-debug.apk
 
       - name: Upload debug apk
         if: always()
@@ -52,3 +73,7 @@ jobs:
         with:
           name: pr-ddg-debug
           path: pr-ddg-debug.apk
+
+      - name: Cleanup secrets
+        if: always()
+        run: rm -rf "$HOME/jenkins_static/com.duckduckgo.mobile.android/"*.properties "$HOME/jenkins_static/com.duckduckgo.mobile.android/android"

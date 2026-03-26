@@ -27,9 +27,9 @@ import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.*
-import javax.inject.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)

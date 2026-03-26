@@ -2,7 +2,6 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -20,10 +19,11 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class RestoreSubscriptionViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val authClient: AuthClient = mock()
-    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
+    private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent = mock()
     private lateinit var viewModel: RestoreSubscriptionViewModel
 
     @Before
@@ -52,14 +52,14 @@ class RestoreSubscriptionViewModelTest {
             subscriptionsChecker = subscriptionsChecker,
             authClient = authClient,
             appCoroutineScope = coroutineTestRule.testScope,
-            subscriptionRebrandingFeatureToggle = mockSubscriptionRebrandingFeatureToggle,
+            subscriptionRestoreWideEvent = subscriptionRestoreWideEvent,
         )
     }
 
     @Test
     fun whenRestoreFromEmailThenSendCommand() = runTest {
         viewModel.commands().test {
-            viewModel.restoreFromEmail()
+            viewModel.restoreFromEmail(isOriginWeb = false)
             assertTrue(awaitItem() is RestoreFromEmail)
         }
     }
@@ -73,7 +73,7 @@ class RestoreSubscriptionViewModelTest {
         viewModel.init()
 
         viewModel.commands().test {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb = false)
             val result = awaitItem()
             assertTrue(result is Error)
         }
@@ -90,7 +90,7 @@ class RestoreSubscriptionViewModelTest {
         viewModel.init()
 
         viewModel.commands().test {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb = false)
             val result = awaitItem()
             assertTrue(result is SubscriptionNotFound)
         }
@@ -103,7 +103,7 @@ class RestoreSubscriptionViewModelTest {
         )
 
         viewModel.commands().test {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb = false)
             val result = awaitItem()
             assertTrue(result is Success)
         }
@@ -111,13 +111,13 @@ class RestoreSubscriptionViewModelTest {
 
     @Test
     fun whenRestoreFromStoreClickThenPixelIsSent() = runTest {
-        viewModel.restoreFromStore()
+        viewModel.restoreFromStore(isOriginWeb = false)
         verify(pixelSender).reportActivateSubscriptionRestorePurchaseClick()
     }
 
     @Test
     fun whenRestoreFromEmailClickThenPixelIsSent() = runTest {
-        viewModel.restoreFromEmail()
+        viewModel.restoreFromEmail(isOriginWeb = false)
         verify(pixelSender).reportActivateSubscriptionEnterEmailClick()
     }
 
@@ -127,7 +127,7 @@ class RestoreSubscriptionViewModelTest {
             RecoverSubscriptionResult.Success(subscriptionActive()),
         )
 
-        viewModel.restoreFromStore()
+        viewModel.restoreFromStore(isOriginWeb = false)
         verify(pixelSender).reportRestoreUsingStoreSuccess()
     }
 
@@ -139,7 +139,7 @@ class RestoreSubscriptionViewModelTest {
         givenSubscriptionStatus(UNKNOWN)
         viewModel.init()
 
-        viewModel.restoreFromStore()
+        viewModel.restoreFromStore(isOriginWeb = false)
         verify(pixelSender).reportRestoreUsingStoreFailureSubscriptionNotFound()
     }
 
@@ -151,7 +151,7 @@ class RestoreSubscriptionViewModelTest {
         givenSubscriptionStatus(UNKNOWN)
         viewModel.init()
 
-        viewModel.restoreFromStore()
+        viewModel.restoreFromStore(isOriginWeb = false)
         verify(pixelSender).reportRestoreUsingStoreFailureOther()
     }
 
@@ -190,7 +190,7 @@ class RestoreSubscriptionViewModelTest {
         viewModel.init()
 
         viewModel.commands().test {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb = false)
             val result = awaitItem()
             assertTrue(result is SubscriptionNotFound)
             verify(subscriptionsManager).signOut()
@@ -199,7 +199,7 @@ class RestoreSubscriptionViewModelTest {
 
     @Test
     fun whenRestoreFromEmailThenJwksCacheIsWarmedUp() = runTest {
-        viewModel.restoreFromEmail()
+        viewModel.restoreFromEmail(isOriginWeb = false)
         verify(authClient).getJwks()
     }
 
@@ -207,7 +207,7 @@ class RestoreSubscriptionViewModelTest {
     fun whenWarmUpJwksFailsThenNoCrashOccurs() = runTest {
         whenever(authClient.getJwks()).thenThrow(RuntimeException("Network error"))
 
-        viewModel.restoreFromEmail()
+        viewModel.restoreFromEmail(isOriginWeb = false)
 
         viewModel.commands().test {
             assertTrue(awaitItem() is RestoreFromEmail)

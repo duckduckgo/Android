@@ -34,7 +34,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':remote-messaging-store')
     implementation project(path: ':browser-api')
@@ -45,6 +45,7 @@ dependencies {
     implementation project(path: ':app-tracking-api')
     implementation project(path: ':data-store-api')
     implementation project(path: ':survey-api')
+    implementation project(path: ':modal-coordinator-api')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
@@ -63,10 +64,17 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
+    implementation AndroidX.recyclerView
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+    api AndroidX.dataStore.preferences
 
     // ViewModel
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
+
+    implementation "com.github.bumptech.glide:glide:_"
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')

@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "DuckPlayer: Ask > SERP > Carousel > YouTube"
-tags:
-  - duckplayer
+#tags:
+#  - duckplayer
 ---
 - retry:
     maxRetries: 3

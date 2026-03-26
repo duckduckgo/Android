@@ -32,11 +32,14 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -52,6 +55,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
 import org.mockito.Mockito.verify
@@ -70,7 +74,7 @@ class SystemSearchViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockUserStageStore: UserStageStore = mock()
-    private val mockDeviceAppLookup: DeviceAppLookup = mock()
+    private val mockAutoCompleteFactory: AutoCompleteFactory = mock()
     private val mockAutoComplete: AutoComplete = mock()
     private val mocksavedSitesRepository: SavedSitesRepository = mock()
     private val mockPixel: Pixel = mock()
@@ -87,11 +91,10 @@ class SystemSearchViewModelTest {
     private lateinit var testee: SystemSearchViewModel
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         whenever(mockAutoComplete.autoComplete(QUERY)).thenReturn(flowOf(autocompleteQueryResult))
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(flowOf(autocompleteBlankResult))
-        whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
-        whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
+        whenever(mockAutoCompleteFactory.create(any())).thenReturn(mockAutoComplete)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList())) // Ensure initial favorites is empty for most tests
         doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
@@ -102,8 +105,7 @@ class SystemSearchViewModelTest {
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
-            mockAutoComplete,
-            mockDeviceAppLookup,
+            mockAutoCompleteFactory,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -186,7 +188,6 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
             val newViewState = expectMostRecentItem()
             assertNotNull(newViewState)
-            assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
     }
@@ -202,7 +203,6 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
             val newViewState = awaitItem()
             assertNotNull(newViewState)
-            assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
     }
@@ -215,7 +215,6 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
             val newViewState = expectMostRecentItem()
             assertNotNull(newViewState)
-            assertEquals(appQueryResult, newViewState.appResults)
             assertEquals(autocompleteQueryResult, newViewState.autocompleteResults)
         }
     }
@@ -306,10 +305,13 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsAppResultThenAppLaunchedAndPixelSent() {
-        testee.userSelectedApp(deviceApp)
+    fun whenUserSubmitsDeviceAppSuggestionThenAppLaunchedAndPixelSent() = runTest {
+        val deviceAppSuggestion = AutoCompleteDeviceAppSuggestion("Test App", "Test App", "com.test.app", Intent())
+
+        testee.userSubmittedAutocompleteResult(deviceAppSuggestion)
+
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchDeviceApplication(deviceApp), commandCaptor.lastValue)
+        assertEquals(Command.LaunchDeviceApplication(deviceAppSuggestion), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_DEVICE_APP)
     }
 
@@ -328,16 +330,11 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenAppsRefreshed() = runTest {
-        verify(mockDeviceAppLookup).refreshAppList()
-    }
-
-    @Test
-    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = runTest {
-        testee.appNotFound(deviceApp)
-        verify(mockDeviceAppLookup, times(2)).refreshAppList()
+    fun whenUserSelectsAppThatCannotBeFoundThenUserMessageShown() = runTest {
+        val deviceAppSuggestion = AutoCompleteDeviceAppSuggestion("Test App", "Test App", "com.test.app", Intent())
+        testee.appNotFound(deviceAppSuggestion)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
+        assertEquals(Command.ShowAppNotFoundMessage(deviceAppSuggestion.shortName), commandCaptor.lastValue)
     }
 
     @Test
@@ -346,6 +343,14 @@ class SystemSearchViewModelTest {
         testee.onUserSelectedToEditQuery(query)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.EditQuery(query), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun `when voice search result then launch browser`() {
+        val query = "test"
+        testee.onVoiceSearchResult(capturedText = query)
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowser(query), commandCaptor.lastValue)
     }
 
     @Test
@@ -416,8 +421,7 @@ class SystemSearchViewModelTest {
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
-            mockAutoComplete,
-            mockDeviceAppLookup,
+            mockAutoCompleteFactory,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -450,8 +454,7 @@ class SystemSearchViewModelTest {
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
-            mockAutoComplete,
-            mockDeviceAppLookup,
+            mockAutoCompleteFactory,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -518,8 +521,7 @@ class SystemSearchViewModelTest {
             mockVoiceSearchAvailability,
             mockDuckChat,
             mockUserStageStore,
-            mockAutoComplete,
-            mockDeviceAppLookup,
+            mockAutoCompleteFactory,
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
@@ -686,6 +688,145 @@ class SystemSearchViewModelTest {
         }
     }
 
+    @Test
+    fun `when launched from search only widget and duck ai enabled then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when not launched from search only widget and duck ai enabled then duck ai button visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(false)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertTrue(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertTrue(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when launched from search only widget and duck ai disabled then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = false
+        testee.queryFlow.value = "query"
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertTrue(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when launched from search only widget and query empty then duck ai button not visible`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+        testee.queryFlow.value = ""
+
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible)
+            assertFalse(viewState.isClearButtonVisible)
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when reset view state then search only widget state preserved`() = runTest {
+        whenever(mockVoiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+        (mockDuckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus as MutableStateFlow).value = true
+
+        // Set search-only widget state
+        testee.setLaunchedFromSearchOnlyWidget(true)
+        testee.queryFlow.value = "query"
+
+        // Reset view state
+        testee.resetViewState()
+
+        testee.omnibarViewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVoiceSearchButtonVisible)
+            assertFalse(viewState.isDuckAiButtonVisible) // Should still be false due to search-only widget
+            assertFalse(viewState.isClearButtonVisible) // Should be false due to reset
+            assertFalse(viewState.isButtonDividerVisible)
+        }
+    }
+
+    @Test
+    fun `when search only widget enabled then DuckAI prompts filtered from autocomplete`() = runTest {
+        val duckAiPrompt = AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("Ask DuckAI about weather")
+        val searchSuggestion = AutoCompleteSearchSuggestion("weather forecast", isUrl = false, isAllowedInTopHits = false)
+        val autocompleteResultWithDuckAI = AutoCompleteResult(
+            "weather",
+            listOf(searchSuggestion, duckAiPrompt),
+        )
+
+        whenever(mockAutoComplete.autoComplete("weather")).thenReturn(flowOf(autocompleteResultWithDuckAI))
+
+        // Enable search-only mode
+        testee.setLaunchedFromSearchOnlyWidget(true)
+
+        testee.suggestionsViewState.test {
+            testee.userUpdatedQuery("weather")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val viewState = expectMostRecentItem()
+
+            // DuckAI prompt should be filtered out
+            assertFalse(viewState.autocompleteResults.suggestions.contains(duckAiPrompt))
+            assertTrue(viewState.autocompleteResults.suggestions.contains(searchSuggestion))
+        }
+    }
+
+    @Test
+    fun `when search only widget disabled then DuckAI prompts not filtered from autocomplete`() = runTest {
+        val duckAiPrompt = AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("Ask DuckAI about weather")
+        val searchSuggestion = AutoCompleteSearchSuggestion("weather forecast", isUrl = false, isAllowedInTopHits = false)
+        val autocompleteResultWithDuckAI = AutoCompleteResult(
+            "weather",
+            listOf(searchSuggestion, duckAiPrompt),
+        )
+
+        whenever(mockAutoComplete.autoComplete("weather")).thenReturn(flowOf(autocompleteResultWithDuckAI))
+
+        // Disable search-only mode
+        testee.setLaunchedFromSearchOnlyWidget(false)
+
+        testee.suggestionsViewState.test {
+            testee.userUpdatedQuery("weather")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            val viewState = expectMostRecentItem()
+
+            // DuckAI prompt should not be filtered out
+            assertTrue(viewState.autocompleteResults.suggestions.contains(duckAiPrompt))
+            assertTrue(viewState.autocompleteResults.suggestions.contains(searchSuggestion))
+        }
+    }
+
     private suspend fun whenOnboardingShowing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
@@ -715,13 +856,10 @@ class SystemSearchViewModelTest {
         const val QUERY = "abc"
         const val BLANK_QUERY = ""
         const val AUTOCOMPLETE_RESULT = "autocomplete result"
-        val deviceApp = DeviceApp("", "", Intent())
         val autocompleteQueryResult = AutoCompleteResult(
             QUERY,
             listOf(AutoCompleteSearchSuggestion(QUERY, isUrl = false, isAllowedInTopHits = false)),
         )
         val autocompleteBlankResult = AutoCompleteResult(BLANK_QUERY, emptyList())
-        val appQueryResult = listOf(deviceApp)
-        val appBlankResult = emptyList<DeviceApp>()
     }
 }

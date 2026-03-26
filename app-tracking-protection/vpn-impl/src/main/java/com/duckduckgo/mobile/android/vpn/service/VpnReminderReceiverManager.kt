@@ -30,8 +30,8 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentP
 import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnReminderNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface VpnReminderReceiverManager {
     fun showReminderNotificationIfVpnDisabled(context: Context)

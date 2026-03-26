@@ -21,21 +21,23 @@ import android.content.Intent
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * Handler to control PIR work execution and cancellation.
@@ -51,7 +53,7 @@ interface PirWorkHandler {
     /**
      * Cancels any ongoing PIR work, including foreground services and scheduled scans.
      */
-    fun cancelWork()
+    suspend fun cancelWork()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -65,6 +67,8 @@ class RealPirWorkHandler @Inject constructor(
     private val subscriptions: Subscriptions,
     private val context: Context,
     private val pirScanScheduler: PirScanScheduler,
+    private val pirRepository: PirRepository,
+    private val pirNotificationManager: PirNotificationManager,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<Boolean> {
@@ -81,7 +85,7 @@ class RealPirWorkHandler @Inject constructor(
                         }
                         .distinctUntilChanged(),
                 ) { subscriptionStatus, hasValidEntitlement ->
-                    isPirEnabled(hasValidEntitlement, subscriptionStatus)
+                    isPirEnabled(hasValidEntitlement, subscriptionStatus) && pirRepository.isRepositoryAvailable()
                 }
             } else {
                 flowOf(false)
@@ -89,12 +93,13 @@ class RealPirWorkHandler @Inject constructor(
         }
     }
 
-    override fun cancelWork() {
+    override suspend fun cancelWork() {
         // Stop any running foreground services
         context.stopService(Intent(context, PirForegroundScanService::class.java))
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
         // Cancel any running or scheduled workers
         pirScanScheduler.cancelScheduledScans(context)
+        pirNotificationManager.cancelNotifications()
     }
 
     private fun isPirEnabled(

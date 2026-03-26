@@ -2,28 +2,6 @@
     "readme": "https://github.com/duckduckgo/privacy-configuration",
     "version": 1652275711516,
     "features": {
-        "onboardingDesignExperiment": {
-            "state": "enabled",
-            "features": {
-                "onboardingDesignExperimentAug25": {
-                    "state": "enabled",
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "bb",
-                            "weight": 0
-                        },
-                        {
-                            "name": "buck",
-                            "weight": 0
-                        }
-                    ]
-                }
-            }
-        },
         "ampLinks": {
             "exceptions": [
                 {

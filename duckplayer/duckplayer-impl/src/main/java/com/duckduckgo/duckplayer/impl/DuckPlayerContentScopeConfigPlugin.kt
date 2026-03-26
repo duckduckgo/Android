@@ -24,9 +24,9 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.duckplayer.api.DuckPlayerFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class DuckPlayerContentScopeConfigPlugin @Inject constructor(

@@ -24,6 +24,7 @@ import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -33,16 +34,17 @@ import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
+private const val PIR_PROCESS_NAME = "pir"
 
 open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
 
@@ -57,6 +59,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     @Inject
     lateinit var vpnLifecycleObserverPluginPoint: PluginPoint<VpnProcessLifecycleObserver>
+
+    @Inject
+    lateinit var pirLifecycleObserverPluginPoint: PluginPoint<PirProcessLifecycleObserver>
 
     @Inject
     lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.browser.api.ActivityLifecycleCallbacks>
@@ -112,6 +117,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     ProcessLifecycleOwner.get().lifecycle.apply {
                         vpnLifecycleObserverPluginPoint.getPlugins().forEach {
                             it.onVpnProcessCreated()
+                        }
+                    }
+                }
+
+                if (shortProcessName == PIR_PROCESS_NAME) {
+                    // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
+                    // is good enough.
+                    // See https://developer.android.com/reference/android/arch/lifecycle/ProcessLifecycleOwner#get
+                    ProcessLifecycleOwner.get().lifecycle.apply {
+                        logcat { "PIR-LIFECYCLE: New PIR process created with pid=${android.os.Process.myPid()}" }
+                        pirLifecycleObserverPluginPoint.getPlugins().forEach {
+                            it.onPirProcessCreated()
                         }
                     }
                 }

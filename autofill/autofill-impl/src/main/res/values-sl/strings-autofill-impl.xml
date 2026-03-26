@@ -301,4 +301,27 @@
     <string name="passwords_import_promo_in_settings_title">Uvozi gesla iz Googla</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Skrij se</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Uvoz v DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Uvoženo iz Chroma</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Uvozi zaznamke iz Googla</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvozi iz Googla</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izberite datoteko z zaznamki …</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Uvoz zaznamkov</string>
+    <string name="importBookmarksProgressTitle">Uvažanje iz Googla …</string>
+    <string name="importBookmarksProgressSubtitle">Pustite ta zaslon odprt in počakajte – ne bi smelo trajati več kot minuto ali dve.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google vam bo morda poslal e-poštno sporočilo s potrditvijo izvoza vaših zaznamkov.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Želite preklicati uvoz?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Če prekličete zdaj, vaši zaznamki ne bodo uvoženi.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Prekliči uvoz</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Nadaljuj</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Zaznamki: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Zapri</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Nekaj je šlo narobe</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Prepričajte se, da je vzpostavljena povezava z internetom, in poskusite znova.</string>
+
 </resources>

@@ -1,0 +1,217 @@
+{
+  "name": "Neighbor Report",
+  "url": "neighbor.report",
+  "version": "0.10.0",
+  "addedDatetime": 1703570400000,
+  "optOutUrl": "https://neighbor.report/remove",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "6e589101-df53-4af7-bf6a-41376927f6ec",
+          "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#logo"
+            }
+          ],
+          "id": "aaaab20b-aaaa-45b6-8c53-9ee1354e918b"
+        },
+        {
+          "actionType": "extract",
+          "id": "1ec79c67-40b0-4f91-baf8-996073109092",
+          "selector": ".lstd",
+          "noResultsSelector": "//h1[contains(text(), 'Error 404')]",
+          "profile": {
+            "name": {
+              "selector": "(.//a[@class='persons'])[1]"
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".i_room"
+            },
+            "addressCityState": {
+              "selector": ".i_home"
+            },
+            "phone": {
+              "selector": ".i_phone"
+            },
+            "relativesList": {
+              "selector": ".i_people",
+              "afterText": "Associated persons:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": "(.//a[@class='persons'])[1]",
+              "identifierType": "path",
+              "identifier": "https://neighbor.report/person/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}",
+          "id": "38c57507-9fd2-429d-bfb4-f19405678028"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#logo"
+            }
+          ],
+          "id": "aaaab20b-bbbb-45b6-8c53-9ee1354e918b"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "(.//a[@class='persons'])[1]",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".lstd",
+                  "profile": {
+                    "name": {
+                      "selector": "(.//a[@class='persons'])[1]"
+                    },
+                    "age": {
+                      "selector": ".age"
+                    },
+                    "addressFull": {
+                      "selector": ".i_room"
+                    },
+                    "addressCityState": {
+                      "selector": ".i_home"
+                    },
+                    "phone": {
+                      "selector": ".i_phone"
+                    },
+                    "relativesList": {
+                      "selector": ".i_people",
+                      "afterText": "Associated persons:",
+                      "separator": ","
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "7e44ae7a-19c6-40f2-aa8c-3240692a7106"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//ul[contains(@class, 'footer-nav')]//a[contains(text(), 'Do Not Sell')]"
+            }
+          ],
+          "id": "60121e4c-9232-4407-bfb4-a77a747a4862"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "7fbaf65f-c130-494b-8f61-a77cebb422f4",
+          "selector": ".form-horizontal",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='inputEmail']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "23d6eb3e-2cfd-45f8-a0ca-b2168605173e",
+          "selector": ".recaptcha-div"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "f0ea9801-8b8d-4e27-bd3f-bba0cdb4bf4a",
+          "selector": ".recaptcha-div"
+        },
+        {
+          "actionType": "click",
+          "id": "2aa19f1d-1dbf-4465-8e40-857311bf7f37",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".submit-comment"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "form.deletor"
+            }
+          ],
+          "id": "db06ebe9-97a3-45d0-ab71-469410bf4ab9"
+        },
+        {
+          "actionType": "click",
+          "id": "1f411b2e-9f93-4519-ae35-7c0411b535e1",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-danger",
+              "multiple": true
+            },
+            {
+              "type": "button",
+              "selector": ".btn-success"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "h1 .glyphicon-ok"
+            }
+          ],
+          "id": "2f6fa54b-9091-4d40-7d16-877b98af1cac"
+        },
+        {
+          "actionType": "expectation",
+          "id": "2bf0a2dd-7d16-4d40-9091-61c96a1e6949",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "we've removed your data from the Neighbor Report website"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -20,15 +20,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import app.cash.turbine.test
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
-import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -42,14 +40,16 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import junit.framework.TestCase
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -57,7 +57,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -73,10 +72,6 @@ class BrowserViewModelTest {
 
     @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock private lateinit var mockCommandObserver: Observer<Command>
-
-    private val commandCaptor = argumentCaptor<Command>()
-
     @Mock private lateinit var mockTabRepository: TabRepository
 
     @Mock private lateinit var mockOmnibarEntryConverter: OmnibarEntryConverter
@@ -91,15 +86,12 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
 
-    @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
-
     private val additionalDefaultBrowserPromptsCommandsFlow = Channel<AdditionalDefaultBrowserPrompts.Command>(capacity = Channel.CONFLATED)
 
     @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
 
-    @Mock private lateinit var mockDuckChat: DuckChat
-
-    private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
+    @Mock private lateinit var mockDuckAIFeatureState: DuckAiFeatureState
+    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     private lateinit var testee: BrowserViewModel
 
@@ -123,18 +115,10 @@ class BrowserViewModelTest {
 
         initTestee()
 
-        testee.command.observeForever(mockCommandObserver)
-
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
-        }
-    }
-
-    @After
-    fun after() {
-        if (this::testee.isInitialized) {
-            testee.command.removeObserver(mockCommandObserver)
+            whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         }
     }
 
@@ -179,26 +163,39 @@ class BrowserViewModelTest {
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
         testee.onTabsUpdated(listOf(TabEntity("123")))
-        verify(mockCommandObserver, never()).onChanged(any())
+        verify(mockTabRepository, never()).addDefaultTab()
     }
 
     @Test
-    fun whenUserSelectedToRateAppThenPlayStoreCommandTriggered() {
+    fun whenUserSelectedToRateAppThenPlayStoreCommandTriggered() = runTest {
         testee.onUserSelectedToRateApp(PromptCount.first())
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchPlayStore, commandCaptor.lastValue)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchPlayStore)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun whenUserSelectedToGiveFeedbackThenFeedbackCommandTriggered() {
+    fun whenUserSelectedToGiveFeedbackThenFeedbackCommandTriggered() = runTest {
         testee.onUserSelectedToGiveFeedback(PromptCount.first())
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchFeedbackView, commandCaptor.lastValue)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.LaunchFeedbackView)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
-        assertTrue(testee.viewState.value!!.hideWebContent)
+    fun whenViewStateCreatedThenWebViewContentShouldBeHidden() = runTest {
+        initSuspendTestee()
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.hideWebContent)
+        }
     }
 
     @Test
@@ -279,8 +276,16 @@ class BrowserViewModelTest {
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.SwitchToTab(tab.tabId), commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.SwitchToTab)
+            command as Command.SwitchToTab
+            TestCase.assertEquals(
+                tab.tabId,
+                command.tabId,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -294,8 +299,16 @@ class BrowserViewModelTest {
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.OpenSavedSite)
+            command as Command.OpenSavedSite
+            TestCase.assertEquals(
+                bookmarkUrl,
+                command.url,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -322,29 +335,14 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenHandleShowOnAppLaunchCalledThenNoTabIsAddedByDefault() = runTest {
-        testee.handleShowOnAppLaunchOption()
-
-        verify(mockTabRepository, never()).add()
-        verify(mockTabRepository, never()).addFromSourceTab(url = any(), skipHome = any(), sourceTabId = any())
-        verify(mockTabRepository, never()).addDefaultTab()
-    }
-
-    @Test
-    fun whenShowOnAppLaunchFeatureToggleIsOnThenShowOnAppLaunchHandled() = runTest {
-        fakeShowOnAppLaunchFeatureToggle.self().setRawStoredState(State(enable = true))
-
-        testee.handleShowOnAppLaunchOption()
-
-        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
-    }
-
-    @Test
     fun `when default browser prompts OpenMessageDialog command, then propagate it to consumers`() = runTest {
         additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog)
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowSetAsDefaultBrowserDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -353,8 +351,16 @@ class BrowserViewModelTest {
         val trigger: SetAsDefaultActionTrigger = mock()
         additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowSystemDefaultBrowserDialog(intent), commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowSystemDefaultBrowserDialog)
+            command as Command.ShowSystemDefaultBrowserDialog
+            TestCase.assertEquals(
+                intent,
+                command.intent,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -363,8 +369,16 @@ class BrowserViewModelTest {
         val trigger: SetAsDefaultActionTrigger = mock()
         additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity(intent, trigger))
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowSystemDefaultAppsActivity(intent), commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowSystemDefaultAppsActivity)
+            command as Command.ShowSystemDefaultAppsActivity
+            TestCase.assertEquals(
+                intent,
+                command.intent,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -382,21 +396,29 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information and dismiss dialog`() {
+    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information and dismiss dialog`() = runTest {
         testee.onSetDefaultBrowserConfirmationButtonClicked()
 
         verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogConfirmationButtonClicked()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.DismissSetAsDefaultBrowserDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `when onSetDefaultBrowserDoNotAskAgainButtonClicked called, then pass that information and dismiss dialog`() {
+    fun `when onSetDefaultBrowserDoNotAskAgainButtonClicked called, then pass that information and dismiss dialog`() = runTest {
         testee.onSetDefaultBrowserDoNotAskAgainButtonClicked()
 
         verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogDoNotAskAgainButtonClicked()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.DoNotAskAgainSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.DoNotAskAgainSetAsDefaultBrowserDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -440,73 +462,111 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOnTabsDeletedInTabSwitcherCalledThenUndoSnackbarCommandTriggered() {
+    fun whenOnTabsDeletedInTabSwitcherCalledThenUndoSnackbarCommandTriggered() = runTest {
         val tabIds = listOf("tab1", "tab2")
         testee.onTabsDeletedInTabSwitcher(tabIds)
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.ShowUndoDeleteTabsMessage(tabIds), commandCaptor.lastValue)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.ShowUndoDeleteTabsMessage)
+            command as Command.ShowUndoDeleteTabsMessage
+            TestCase.assertEquals(
+                tabIds,
+                command.tabIds,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun whenOmnibarIsInEditModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+    fun whenOmnibarIsInEditModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
 
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
         val isInEditMode = true
         testee.onOmnibarEditModeChanged(isInEditMode)
-        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
-    fun whenOmnibarIsInNotEditModeTabSwipingIsEnabled() {
+    fun whenOmnibarIsInNotEditModeTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isInEditMode = false
-        testee.onOmnibarEditModeChanged(isInEditMode)
-        assertEquals(!isInEditMode, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenBrowserIsNotInFullscreenModeTabSwipingIsEnabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = false
-        testee.onFullScreenModeChanged(isFullScreen)
-        assertEquals(true, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenBrowserIsInFullscreenModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = true
-        testee.onFullScreenModeChanged(isFullScreen)
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
-    }
-
-    @Test
-    fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() {
-        swipingTabsFeature.self().setRawStoredState(State(enable = true))
-
-        val isFullScreen = true
-        testee.onFullScreenModeChanged(isFullScreen)
-
         val isInEditMode = false
         testee.onOmnibarEditModeChanged(isInEditMode)
 
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
-    fun whenOmnibarIsInEditModeAndBrowserIsNotInFullscreenModeTabSwipingIsDisabled() {
+    fun whenBrowserIsNotInFullscreenModeTabSwipingIsEnabled() = runTest {
+        initSuspendTestee()
+
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
 
         val isFullScreen = false
         testee.onFullScreenModeChanged(isFullScreen)
 
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenBrowserIsInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenOmnibarIsNotInEditModeAndBrowserIsInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = true
+        testee.onFullScreenModeChanged(isFullScreen)
+
+        val isInEditMode = false
+        testee.onOmnibarEditModeChanged(isInEditMode)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
+    }
+
+    @Test
+    fun whenOmnibarIsInEditModeAndBrowserIsNotInFullscreenModeTabSwipingIsDisabled() = runTest {
+        initSuspendTestee()
+
+        swipingTabsFeature.self().setRawStoredState(State(enable = true))
+        val isFullScreen = false
+        testee.onFullScreenModeChanged(isFullScreen)
+
         val isInEditMode = true
         testee.onOmnibarEditModeChanged(isInEditMode)
 
-        assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isTabSwipingEnabled)
+        }
     }
 
     @Test
@@ -516,8 +576,49 @@ class BrowserViewModelTest {
 
         testee.onBookmarksActivityResult(bookmarkUrl)
 
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.OpenSavedSite)
+            command as Command.OpenSavedSite
+            TestCase.assertEquals(
+                bookmarkUrl,
+                command.url,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when openDuckChat called and tabs are null then command is sent with 0 tabs`() = runTest {
+        doReturn(MutableLiveData(null)).whenever(mockTabRepository).liveTabs
+        initTestee()
+
+        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.OpenDuckChat)
+            command as Command.OpenDuckChat
+            assertEquals(0, command.tabs)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when openDuckChat called then command is sent with correct tab count`() = runTest {
+        val tabs = listOf(TabEntity("1", "", "", position = 0))
+        doReturn(MutableLiveData(tabs)).whenever(mockTabRepository).liveTabs
+        initTestee()
+
+        testee.openDuckChat(duckChatUrl = "duck://chat", duckChatSessionActive = false, withTransition = false)
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is Command.OpenDuckChat)
+            command as Command.OpenDuckChat
+            assertEquals(tabs.size, command.tabs)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun initTestee() {
@@ -531,16 +632,43 @@ class BrowserViewModelTest {
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel,
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
-            showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
-            showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            duckChat = mockDuckChat,
+            duckAiFeatureState = mockDuckAIFeatureState,
+        )
+    }
+
+    private suspend fun initSuspendTestee() {
+        whenever(mockTabRepository.add()).thenReturn(TAB_ID)
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
+        whenever(mockDuckAIFeatureState.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
+
+        testee = BrowserViewModel(
+            tabRepository = mockTabRepository,
+            queryUrlConverter = mockOmnibarEntryConverter,
+            dataClearer = mockAutomaticDataClearer,
+            appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            pixel = mockPixel,
+            skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
+            additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
+            swipingTabsFeature = swipingTabsFeatureProvider,
+            duckAiFeatureState = mockDuckAIFeatureState,
         )
     }
 
     private fun configureSkipUrlConversionInNewTabState(enabled: Boolean) {
         skipUrlConversionOnNewTabFeature.self().setRawStoredState(State(enable = enabled))
+    }
+
+    @Test
+    fun whenSendPixelEventForLandscapeOrientationThenPixelsAreFired() = runTest {
+        testee.sendPixelEventForLandscapeOrientation()
+
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED)
+        verify(mockPixel).fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_LANDSCAPE_ORIENTATION_USED_DAILY, type = Daily())
     }
 
     companion object {

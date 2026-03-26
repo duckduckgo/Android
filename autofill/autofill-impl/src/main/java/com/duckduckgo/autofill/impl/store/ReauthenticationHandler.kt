@@ -19,10 +19,10 @@ package com.duckduckgo.autofill.impl.store
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
 interface ReauthenticationHandler {
     fun storeForReauthentication(url: String, password: String? = null)

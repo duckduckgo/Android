@@ -33,8 +33,6 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
@@ -45,6 +43,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncPersisterAlgorithmTest {
@@ -245,12 +245,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     class FakeCrypto : SyncCrypto {
-        override fun encrypt(text: String): String {
-            return text
-        }
+        override fun encrypt(text: String) = text
 
-        override fun decrypt(data: String): String {
-            return data
-        }
+        override fun decrypt(data: String) = data
+
+        override fun encrypt(data: ByteArray): ByteArray = data
+
+        override fun decrypt(data: ByteArray): ByteArray = data
     }
 }

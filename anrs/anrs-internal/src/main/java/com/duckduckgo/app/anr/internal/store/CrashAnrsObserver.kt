@@ -22,13 +22,13 @@ import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import logcat.logcat
 import okio.ByteString.Companion.encode
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -45,6 +46,10 @@ import okio.ByteString.Companion.encode
     scope = AppScope::class,
     boundType = VpnProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PirProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class CrashAnrsObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -52,7 +57,7 @@ class CrashAnrsObserver @Inject constructor(
     private val repository: CrashANRsRepository,
     private val anrDatabase: AnrsDatabase,
     private val uncaughtExceptionDao: UncaughtExceptionDao,
-) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, PirProcessLifecycleObserver {
 
     private var anrObserverJob: ConflatedJob = ConflatedJob()
     private var crashObserverJob: ConflatedJob = ConflatedJob()
@@ -63,6 +68,11 @@ class CrashAnrsObserver @Inject constructor(
     }
 
     override fun onVpnProcessCreated() {
+        anrObserverJob += observeAnrDatabase()
+        crashObserverJob += observeCrashDatabase()
+    }
+
+    override fun onPirProcessCreated() {
         anrObserverJob += observeAnrDatabase()
         crashObserverJob += observeCrashDatabase()
     }

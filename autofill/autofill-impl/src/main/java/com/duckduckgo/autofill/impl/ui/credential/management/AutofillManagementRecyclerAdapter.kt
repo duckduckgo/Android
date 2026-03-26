@@ -314,8 +314,8 @@ class AutofillManagementRecyclerAdapter(
     ) {
         logcat(VERBOSE) {
             """
-                Updating logins, 
-                credentialsLoadedState=$credentialsLoadedState, 
+                Updating logins,
+                credentialsLoadedState=$credentialsLoadedState,
                 promo view: ${promotionView?.javaClass?.simpleName}
             """.trimIndent()
         }

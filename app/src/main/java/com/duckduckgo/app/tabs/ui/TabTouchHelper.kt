@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.ViewState.Mode
 import kotlin.math.abs
 
 class TabTouchHelper(
@@ -40,8 +40,10 @@ class TabTouchHelper(
     private val onTabDraggingStarted: () -> Unit,
     private val onTabDraggingFinished: () -> Unit,
 ) : ItemTouchHelper.SimpleCallback(
-    /* dragDirs = */ ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-    /* swipeDirs = */ ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+    /* dragDirs = */
+    ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+    /* swipeDirs = */
+    ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
 ) {
     var mode: Mode = Mode.Normal
 

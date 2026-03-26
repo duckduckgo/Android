@@ -29,10 +29,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.saved.sites.impl.databinding.*
 import dagger.android.support.*
-import javax.inject.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(ViewScope::class)
 class FaviconFetchingSyncSetting @JvmOverloads constructor(

@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -33,7 +34,6 @@ import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DASHBOARD
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DESKTOP
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -57,6 +58,7 @@ class PirSettingViewModel @Inject constructor(
     sealed class Command {
         data object OpenPirDesktop : Command()
         data object OpenPirDashboard : Command()
+        data object ShowPirUnavailableDialog : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -83,11 +85,19 @@ class PirSettingViewModel @Inject constructor(
     fun onPir(type: Type) {
         pixelSender.reportAppSettingsPirClick()
 
-        val command = when (type) {
-            DESKTOP -> OpenPirDesktop
-            DASHBOARD -> Command.OpenPirDashboard
+        viewModelScope.launch {
+            val command = when (type) {
+                DESKTOP -> OpenPirDesktop
+                DASHBOARD -> {
+                    when (pirFeature.getPirFeatureState()) {
+                        PirFeatureState.ENABLED -> Command.OpenPirDashboard
+                        PirFeatureState.DISABLED -> OpenPirDesktop
+                        PirFeatureState.NOT_AVAILABLE -> Command.ShowPirUnavailableDialog
+                    }
+                }
+            }
+            sendCommand(command)
         }
-        sendCommand(command)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -128,10 +138,12 @@ class PirSettingViewModel @Inject constructor(
             SubscriptionStatus.GRACE_PERIOD,
             -> {
                 if (hasValidEntitlement) {
-                    val type = if (pirFeature.isPirBetaEnabled()) {
-                        DASHBOARD
-                    } else {
-                        DESKTOP
+                    val type = when (pirFeature.getPirFeatureState()) {
+                        PirFeatureState.ENABLED,
+                        PirFeatureState.NOT_AVAILABLE,
+                        -> DASHBOARD
+
+                        PirFeatureState.DISABLED -> DESKTOP
                     }
                     PirState.Enabled(type)
                 } else {

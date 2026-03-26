@@ -28,9 +28,9 @@ import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.Relation
 import dagger.Lazy
-import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(

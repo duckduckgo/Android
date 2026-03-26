@@ -4,6 +4,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarksScreen
+import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsScreen
+import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SetupSyncBookmarkAddedPromoRules
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -21,6 +25,7 @@ class SyncPromotionsImplTest {
 
     private val syncPromotionFeature = FakeFeatureToggleFactory.create(SyncPromotionFeature::class.java)
 
+    private val bookmarkAddedPromoRules: SetupSyncBookmarkAddedPromoRules = mock()
     private val dataStore: SyncPromotionDataStore = mock()
     private val syncState: DeviceSyncState = mock()
 
@@ -29,6 +34,7 @@ class SyncPromotionsImplTest {
         syncPromotionFeature = syncPromotionFeature,
         syncState = syncState,
         dataStore = dataStore,
+        bookmarkAddedPromoRules = bookmarkAddedPromoRules,
     )
 
     @Before
@@ -108,15 +114,27 @@ class SyncPromotionsImplTest {
     }
 
     @Test
-    fun whenPasswordPromoDismissedThenEventRecordedInDataStore() = runTest {
-        testee.recordPasswordsPromotionDismissed()
-        verify(dataStore).recordPasswordsPromoDismissed()
+    fun whenCouldShowBookmarksAddedDialogThenUsePromoRulesToDecide() = runTest {
+        testee.canShowBookmarkAddedDialogPromotion()
+        verify(bookmarkAddedPromoRules).canShowPromo()
     }
 
     @Test
-    fun whenBookmarkPromoDismissedThenEventRecordedInDataStore() = runTest {
+    fun whenPasswordPromoDismissedThenEventRecordedInDataStore() = runTest {
+        testee.recordPasswordsPromotionDismissed()
+        verify(dataStore).recordPromoDismissed(PasswordsScreen)
+    }
+
+    @Test
+    fun whenBookmarkScreenPromoDismissedThenEventRecordedInDataStore() = runTest {
         testee.recordBookmarksPromotionDismissed()
-        verify(dataStore).recordBookmarksPromoDismissed()
+        verify(dataStore).recordPromoDismissed(BookmarksScreen)
+    }
+
+    @Test
+    fun whenBookmarkAddedDialogPromoDismissedThenEventRecordedInDataStore() = runTest {
+        testee.recordBookmarkAddedDialogPromotionDismissed()
+        verify(dataStore).recordPromoDismissed(BookmarkAddedDialog)
     }
 
     private fun configureUserHasEnabledSync(enabled: Boolean) {
@@ -128,11 +146,11 @@ class SyncPromotionsImplTest {
     }
 
     private suspend fun configureBookmarksPromoPreviouslyDismissed(previouslyDismissed: Boolean) {
-        whenever(dataStore.hasBookmarksPromoBeenDismissed()).thenReturn(previouslyDismissed)
+        whenever(dataStore.hasPromoBeenDismissed(BookmarksScreen)).thenReturn(previouslyDismissed)
     }
 
     private suspend fun configurePasswordsPromoPreviouslyDismissed(previouslyDismissed: Boolean) {
-        whenever(dataStore.hasPasswordsPromoBeenDismissed()).thenReturn(previouslyDismissed)
+        whenever(dataStore.hasPromoBeenDismissed(PasswordsScreen)).thenReturn(previouslyDismissed)
     }
 
     private fun configureAllTogglesEnabled() {

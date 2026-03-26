@@ -16,13 +16,14 @@
 
 package com.duckduckgo.sync.settings.impl
 
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.squareup.anvil.annotations.*
 import dagger.*
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.shortcut
 
 import android.app.TaskStackBuilder
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -29,10 +30,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -43,7 +41,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -51,6 +48,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)
@@ -101,8 +99,6 @@ class AppShortcutCreator @Inject constructor(
 
             if (duckAiFeatureState.showPopupMenuShortcut.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
-            } else if (appBuildConfig.isInternalBuild()) {
-                shortcutList.add(buildAndroidDesignSystemShortcut(context))
             }
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
@@ -110,10 +106,24 @@ class AppShortcutCreator @Inject constructor(
         }
     }
 
+    fun refreshPinnedShortcuts(activeLauncherComponent: String) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+            kotlin.runCatching {
+                val updatedShortcuts = shortcutManager.pinnedShortcuts.map {
+                    ShortcutInfo.Builder(context, it.id)
+                        .setActivity(ComponentName(context, activeLauncherComponent))
+                        .build()
+                }
+                shortcutManager.updateShortcuts(updatedShortcuts)
+            }
+        }
+    }
+
     private fun buildNewTabShortcut(context: Context): ShortcutInfo {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_NEW_TAB)
             .setShortLabel(context.getString(R.string.newTabMenuItem))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab_adaptive))
             .setIntent(
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
@@ -126,7 +136,7 @@ class AppShortcutCreator @Inject constructor(
     private fun buildClearDataShortcut(context: Context): ShortcutInfo {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire_adaptive))
             .setIntent(
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
@@ -149,24 +159,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(com.duckduckgo.saved.sites.impl.R.string.bookmarksActivityTitle))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
-            .setIntents(stackBuilder.intents)
-            .build().toShortcutInfo()
-    }
-
-    private fun buildAndroidDesignSystemShortcut(context: Context): ShortcutInfo {
-        val browserActivity = BrowserActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val settingsActivity = SettingsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-        val adsActivity = AppComponentsActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
-
-        val stackBuilder = TaskStackBuilder.create(context)
-            .addNextIntent(browserActivity)
-            .addNextIntent(settingsActivity)
-            .addNextIntent(adsActivity)
-
-        return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DESIGN_SYSTEM_DEMO)
-            .setShortLabel(context.getString(com.duckduckgo.mobile.android.R.string.ads_demo_activity_title))
-            .setIcon(IconCompat.createWithResource(context, com.duckduckgo.mobile.android.R.drawable.ic_dax_icon))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks_adaptive))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }
@@ -178,7 +171,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai_adaptive))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

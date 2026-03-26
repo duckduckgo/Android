@@ -29,6 +29,11 @@ interface DeviceSyncState {
     fun isUserSignedInOnDevice(): Boolean
 
     /**
+     * Checks if chat sync feature is enabled
+     */
+    fun isDuckChatSyncFeatureEnabled(): Boolean
+
+    /**
      * Returns the sync account state
      */
     fun getAccountState(): SyncAccountState
@@ -39,7 +44,10 @@ interface DeviceSyncState {
      */
     sealed interface SyncAccountState {
         data object SignedOut : SyncAccountState
-        data class SignedIn(val devices: List<ConnectedDevice>) : SyncAccountState
+        data class SignedIn(
+            val userId: String,
+            val devices: List<ConnectedDevice>,
+        ) : SyncAccountState
     }
 
     /**
@@ -59,6 +67,5 @@ interface DeviceSyncState {
         MOBILE,
         UNKNOWN,
         DESKTOP,
-        ;
     }
 }

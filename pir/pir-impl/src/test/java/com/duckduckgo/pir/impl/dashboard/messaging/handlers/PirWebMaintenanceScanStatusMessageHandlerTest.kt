@@ -33,7 +33,6 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -45,6 +44,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class PirWebMaintenanceScanStatusMessageHandlerTest {
@@ -254,6 +254,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         // Verify in-progress opt-out
         assertEquals(1, parsedResponse!!.inProgressOptOuts.size)
         val inProgressResult = parsedResponse.inProgressOptOuts[0]
+        assertEquals(1L, inProgressResult.id)
         assertEquals("John Doe", inProgressResult.name)
         assertEquals(listOf("Johnny", "J. Doe"), inProgressResult.alternativeNames)
         assertEquals(listOf("Jane Doe"), inProgressResult.relatives)
@@ -271,6 +272,7 @@ class PirWebMaintenanceScanStatusMessageHandlerTest {
         // Verify completed opt-out
         assertEquals(1, parsedResponse.completedOptOuts.size)
         val completedResult = parsedResponse.completedOptOuts[0]
+        assertEquals(1L, completedResult.id)
         assertEquals("John Doe", completedResult.name)
         assertEquals(TimeUnit.MILLISECONDS.toSeconds(1643673600000L), completedResult.removedDate)
         assertEquals(5, completedResult.matches)

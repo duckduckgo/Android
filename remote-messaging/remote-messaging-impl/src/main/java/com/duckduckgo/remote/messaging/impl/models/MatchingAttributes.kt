@@ -17,9 +17,9 @@
 package com.duckduckgo.remote.messaging.impl.models
 
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import java.util.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.util.*
 
 data class Locale(
     override val value: List<String> = emptyList(),

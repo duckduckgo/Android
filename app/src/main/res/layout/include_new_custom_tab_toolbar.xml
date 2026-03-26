@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/customTabToolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <ImageView
+        android:id="@+id/customTabCloseIcon"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:layout_marginEnd="6dp"
+        android:layout_marginVertical="@dimen/keyline_2"
+        android:background="@drawable/selectable_item_rounded_corner_background"
+        android:importantForAccessibility="no"
+        android:padding="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_24" />
+
+    <View
+        android:id="@+id/animatedIconBackgroundView"
+        android:layout_width="@dimen/omnibarCookieAnimationBannerHeight"
+        android:layout_height="?attr/cookiesAnimationHeight"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:alpha="0"
+        android:background="@drawable/animated_icon_dummy_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/customTabSceneRoot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/trackersAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/keyline_2"
+        android:importantForAccessibility="no"
+        android:saveEnabled="false"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/customTabShieldIcon"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="matrix"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/addressBarTrackersBlockedAnimationShieldIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:saveEnabled="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/address_bar_trackers_animation_shield" />
+
+    <ImageView
+        android:id="@+id/customTabDuckPlayerIcon"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:padding="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_0"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_video_player_color_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/daxIcon"
+        android:layout_width="@dimen/toolbarIcon"
+        android:layout_height="@dimen/toolbarIcon"
+        android:padding="@dimen/keyline_2"
+        android:importantForAccessibility="no"
+        android:layout_marginEnd="@dimen/keyline_1"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_dax_icon"
+        tools:visibility="visible" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/customTabDomain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_2"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/daxIcon"
+        app:layout_constraintStart_toEndOf="@id/animatedIconBackgroundView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:typography="body2"
+        tools:text="www.example.com"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

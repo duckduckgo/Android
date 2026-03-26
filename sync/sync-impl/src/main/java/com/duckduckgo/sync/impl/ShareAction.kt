@@ -24,10 +24,10 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import java.io.File
-import javax.inject.*
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import java.io.File
+import javax.inject.*
 
 class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig) {
 

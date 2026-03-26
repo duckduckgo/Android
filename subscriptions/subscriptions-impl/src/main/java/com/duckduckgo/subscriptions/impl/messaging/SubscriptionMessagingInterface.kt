@@ -23,6 +23,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -41,13 +42,13 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Named
 
 @ContributesBinding(ActivityScope::class)
 @Named("Subscriptions")
@@ -58,7 +59,8 @@ class SubscriptionMessagingInterface @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     pixelSender: SubscriptionPixelSender,
     subscriptionsChecker: SubscriptionsChecker,
-    private val privacyProFeature: PrivacyProFeature,
+    duckAiHostProvider: DuckAiHostProvider,
+    privacyProFeature: PrivacyProFeature,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -129,12 +131,13 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val context: String = "subscriptionPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf("duckduckgo.com")
+    override val allowedDomains: List<String> = listOf("duckduckgo.com", duckAiHostProvider.getHost())
 
     private fun isUrlAllowed(url: String?): Boolean {
         if (allowedDomains.isEmpty()) return true
-        val eTld = url?.toTldPlusOne() ?: return false
-        return (allowedDomains.contains(eTld))
+        val host = url ?: return false
+        val eTld = host.toTldPlusOne()
+        return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
     }
 
     inner class SubscriptionsHandler : JsMessageHandler {
@@ -146,7 +149,9 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf(
             "subscriptionSelected",
+            "subscriptionChangeSelected",
             "getSubscriptionOptions",
+            "getSubscriptionTierOptions",
             "backToSettings",
             "activateSubscription",
             "featureSelected",
@@ -408,10 +413,12 @@ class SubscriptionMessagingInterface @Inject constructor(
             val authV2Enabled = privacyProFeature.enableSubscriptionFlowsV2().isEnabled()
             val duckAiSubscriberModelsEnabled = privacyProFeature.duckAiPlus().isEnabled()
             val supportsAlternateStripePaymentFlow = privacyProFeature.supportsAlternateStripePaymentFlow().isEnabled()
+            val useGetSubscriptionTierOptions = privacyProFeature.tierMessagingEnabled().isEnabled()
             val resultJson = JSONObject().apply {
                 put("useSubscriptionsAuthV2", authV2Enabled)
                 put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
                 put("useAlternateStripePaymentFlow", supportsAlternateStripePaymentFlow)
+                put("useGetSubscriptionTierOptions", useGetSubscriptionTierOptions)
             }
 
             val response = JsRequestResponse.Success(

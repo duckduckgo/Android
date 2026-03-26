@@ -20,8 +20,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.testing.TestLifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import java.net.URI
-import java.net.URISyntaxException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -29,6 +27,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.net.URI
+import java.net.URISyntaxException
 
 class RedditBlockWorkaroundTest {
     @get:Rule var coroutineRule = CoroutineTestRule()

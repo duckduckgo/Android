@@ -18,11 +18,11 @@ package com.duckduckgo.sync.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class SyncUnavailableSharedPrefsStoreTest {

@@ -40,10 +40,10 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSe
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewState
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) {
@@ -93,7 +93,12 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         when (viewState.viewMode) {
             is CreateAccountIntro -> {
                 binding.contentTitle.text = getString(R.string.sync_intro_enable_title)
-                binding.contentBody.text = getString(R.string.sync_intro_enable_content)
+                val contentRes = if (viewState.aiChatSyncEnabled) {
+                    R.string.sync_intro_enable_content_with_ai_chat
+                } else {
+                    R.string.sync_intro_enable_content
+                }
+                binding.contentBody.text = getString(contentRes)
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_server_128)
                 binding.syncIntroCta.text = getString(R.string.sync_intro_enable_cta)
                 binding.syncIntroFooter.text = getString(R.string.sync_intro_enable_footer)

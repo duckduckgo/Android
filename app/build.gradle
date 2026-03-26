@@ -1,3 +1,8 @@
+import com.duckduckgo.gradle.ModuleCreator
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
+
 plugins {
     id 'com.android.application'
 
@@ -5,6 +10,7 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.devtools.ksp'
     id 'com.squareup.anvil'
+    id 'androidx.room'
 }
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
@@ -26,13 +32,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
         sourceSets {
-            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+            androidTest.assets.srcDirs += files("$projectDir/schemas")
             main {
                 java {
                     resources {
@@ -98,6 +99,17 @@ android {
                     keyAlias = properties['customDebugCertAlias']?.toString()
                     keyPassword properties['customDebugCertKeyPassword']?.toString()
                 }
+            } else {
+                def propertiesPath = "${CI_HOME_DIR}/ddg_android_debug_build.properties"
+                def propertiesFile = new File(propertiesPath)
+                if (propertiesFile.exists()) {
+                    def props = new Properties()
+                    propertiesFile.withInputStream { props.load(it) }
+                    storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
+                    storePassword = props['key.store.password']
+                    keyAlias = props['key.alias']
+                    keyPassword = props['key.alias.password']
+                }
             }
         }
         release {
@@ -105,7 +117,7 @@ android {
             def propertiesFile = new File(propertiesPath)
             if (propertiesFile.exists()) {
                 def props = new Properties()
-                props.load(new FileInputStream(propertiesFile))
+                propertiesFile.withInputStream { props.load(it) }
                 storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
                 storePassword = props['key.store.password']
                 keyAlias = props['key.alias']
@@ -117,7 +129,7 @@ android {
             def propertiesFile = new File(propertiesPath)
             if (propertiesFile.exists()) {
                 def props = new Properties()
-                props.load(new FileInputStream(propertiesFile))
+                propertiesFile.withInputStream { props.load(it) }
                 storeFile = file("${CI_HOME_DIR}/${props['key.store']}")
                 storePassword = props['key.store.password']
                 keyAlias = props['key.alias']
@@ -184,6 +196,17 @@ android {
             jvmArgs '-XX:+TieredCompilation', '-XX:TieredStopAtLevel=1'
         }
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "_"
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 static def isValidSigningConfig(signingConfig) {
@@ -198,24 +221,30 @@ fulladleModuleConfig {
     variant.set("playDebug")
 }
 
+def privacyTestDefaults = { config ->
+    config.async.set(false)
+    config.useOrchestrator.set(true)
+    config.environmentVariables.set(["clearPackageData": "true"])
+    config.devices.set([["model": "MediumPhone.arm", "version": "34"]])
+    config.localResultsDir.set("fladleResults")
+    config.flakyTestAttempts.set(2)
+    config.testShards.set(1)
+}
+
 fladle {
     configs {
         privacyTests {
-            async.set(false)
+            privacyTestDefaults(it)
             flankVersion.set("21.+")
-            useOrchestrator.set(true)
-            environmentVariables.set([
-                    "clearPackageData": "true"
-            ])
-            testTargets.set([
-                    "annotation com.duckduckgo.espresso.PrivacyTest"
-            ])
-            devices.set([
-                    ["model": "MediumPhone.arm", "version": "34"],
-            ])
-            localResultsDir.set("fladleResults")
-            flakyTestAttempts.set(2)
-            testShards.set(1)
+            testTargets.set(["annotation com.duckduckgo.espresso.PrivacyTest"])
+        }
+        internalPrivacyTests {
+            privacyTestDefaults(it)
+            flankVersion.set("21.+")
+            testTargets.set(["annotation com.duckduckgo.espresso.InternalPrivacyTest"])
+            debugApk.set(project.layout.buildDirectory.file("outputs/apk/internal/debug/duckduckgo-${buildVersionName()}-internal-debug.apk").map { it.asFile.absolutePath })
+            instrumentationApk.set(project.layout.buildDirectory.file("outputs/apk/androidTest/internal/debug/duckduckgo-${buildVersionName()}-internal-debug-androidTest.apk").map { it.asFile.absolutePath })
+            additionalTestApks.set([])
         }
     }
 }
@@ -223,6 +252,7 @@ fladle {
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
@@ -239,6 +269,9 @@ dependencies {
 
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
+
+	implementation project(":modal-coordinator-impl")
+	implementation project(":modal-coordinator-api")
 
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
@@ -258,14 +291,15 @@ dependencies {
 
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':browser-ui')
     implementation project(":statistics-api")
     implementation project(':statistics-impl')
     implementation project(':experiments-api')
     implementation project(':experiments-impl')
     implementation project(':common-utils')
     implementation project(':app-store')
-    implementation project(':common-ui')
-    internalImplementation project(':common-ui-internal')
+    internalImplementation project(':design-system-internal')
+    implementation project(':design-system')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
@@ -281,6 +315,11 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
+    implementation project(':tracker-detection-api')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
@@ -296,9 +335,6 @@ dependencies {
 
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-dashboard-impl')
-
-    implementation project(":privacy-protections-popup-api")
-    implementation project(":privacy-protections-popup-impl")
 
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
@@ -356,6 +392,12 @@ dependencies {
     implementation project(':sync-settings-api')
     implementation project(':sync-settings-impl')
 
+    // temporary inclusion to ensure blockstore integration
+    implementation project(':persistent-storage-api')
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -365,6 +407,7 @@ dependencies {
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
+    internalImplementation project(':saved-sites-internal')
 
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
@@ -376,11 +419,19 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':event-hub-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
     playImplementation project(':subscriptions-impl')
     fdroidImplementation project(':subscriptions-dummy-impl')
+
+    implementation project(':persistent-storage-api')
+
+    internalImplementation project(':persistent-storage-impl')
+    playImplementation project(':persistent-storage-impl')
+    fdroidImplementation project(':persistent-storage-dummy-impl')
 
     internalImplementation project(':subscriptions-internal')
 
@@ -401,13 +452,24 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(':attributed-metrics-api')
+    implementation project(':attributed-metrics-impl')
+    internalImplementation project(':attributed-metrics-internal')
+
     implementation project(':breakage-reporting-impl')
+
+    implementation project(':web-interference-detection-impl')
+
+    implementation project(':web-detection-impl')
 
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
     implementation project(':serp-logos-api')
     implementation project(':serp-logos-impl')
+
+    // Widgets
+    implementation "androidx.core:core-remoteviews:1.1.0"
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -424,6 +486,7 @@ dependencies {
     }
 
     implementation AndroidX.appCompat
+    implementation AndroidX.activity.compose
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
@@ -451,6 +514,8 @@ dependencies {
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
+
+    implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
 
     // Android KTX
     implementation AndroidX.core.ktx
@@ -506,10 +571,6 @@ dependencies {
     // Browser
     implementation "androidx.browser:browser:_"
 
-    // Flipper
-    internalImplementation "com.facebook.flipper:flipper:_"
-    internalImplementation "com.facebook.soloader:soloader:_"
-
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
@@ -527,6 +588,7 @@ dependencies {
 
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
@@ -547,6 +609,17 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+}
+
+// Export Android connected test results to Develocity
+afterEvaluate {
+    tasks.withType(DeviceProviderInstrumentTestTask).names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_CONNECTED
+        )
+    }
 }
 
 tasks.register('fastlaneVersionCode') {
@@ -579,6 +652,10 @@ tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }
 
+tasks.register('internalAndroidTestsBuild') {
+    dependsOn 'assembleInternalDebug', 'assembleInternalDebugAndroidTest'
+}
+
 tasks.register('releaseTestLocal', Exec) {
     commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
     dependsOn 'installPlayReleaseDefaultVariant'
@@ -597,6 +674,8 @@ tasks.register('assemblePlayReleaseDefaultVariant', Exec) {
     commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
 }
 
-task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
-    feature = project.hasProperty('feature') ? project.getProperty('feature') : null
+tasks.register('newModule', ModuleCreator) {
+    feature.set(providers.gradleProperty('feature'))
+    repoRootDirectory.set(rootProject.layout.projectDirectory)
+    appBuildGradleFile.set(layout.projectDirectory.file('build.gradle'))
 }

@@ -37,23 +37,28 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Vietnes var izmantot skaņas ierakstītāju tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai ir papildu līdzeklis, kas ļauj anonīmi tērzēt ar populāriem trešo pušu Ml tērzēšanas modeļiem. Tavas tērzēšanas sarunas netiek izmantotas AMI apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Iespējot Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Mākslīgā intelekta funkcijas</string>
+    <string name="duck_chat_settings_activity_description">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Privāti tērzē ar populāriem trešo personu mākslīgā intelekta modeļiem</string>
     <string name="duck_chat_visibility_setting">Pārlūka izvēlne</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
-    <string name="duck_chat_assist_settings_title">Assist iestatījumi</string>
+    <string name="duck_chat_assist_settings_title">Meklēšanas Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
     <string name="duck_ai_shortcut_settings_title">Duck.ai īsceļi</string>
     <string name="duck_ai_shortcut_settings_description">Izvēlies, kurus Duck.ai īsceļus parādīt</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Balss meklēšana</string>
+
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Meklēt</string>
     <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Pajautāt privāti</string>
     <string name="input_screen_user_pref_without_ai">Meklēt tikai</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_description">Izmēģini mūsu jauno iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
+    <string name="input_screen_user_pref_description">Izmēģini jauno iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -62,25 +67,38 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Mākslīgā intelekta funkcijas</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privāti tērzē ar populāriem trešo personu mākslīgā intelekta modeļiem</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Lietojumprogrammu nevarēja atrast</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vēlies vieglāk piekļūt privātai MI tērzēšanai?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Pārslēgties starp meklēšanu un MI tērzēšanu</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">MI funkcijas vienmēr var izvēlēties nelietot.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Apstiprināt</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne tagad</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Pielāgo iestatījumos &gt; MI funkcijas.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Meklēt tikai</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Meklēšana &amp; Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Adreses joslas opcija</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Mākslīgā intelekta funkcijas</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Meklēt</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Paslēpt MI ģenerētus attēlus</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtrē MI radītus attēlus no attēlu meklēšanas rezultātiem</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Ieslēgt MI funkciju iestatījumos</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Pārvaldīt MI funkciju iestatījumos</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurē Duck.ai MI funkciju iestatījumos.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Apkopot šo lapu</string>
+    <string name="duckAIContextualAutomaticContextTitle">Automātiski nosūtīt lapas saturu</string>
+    <string name="duckAIContextualAutomaticContextMessage">Automātiski nosūtīt lapas saturu uz Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Pievienot lapas saturu</string>
 </resources>

@@ -22,11 +22,11 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceRef
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 interface AppInstallationReferrerParser {
 

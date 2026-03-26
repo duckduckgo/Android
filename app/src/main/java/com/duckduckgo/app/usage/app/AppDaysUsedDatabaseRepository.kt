@@ -19,11 +19,11 @@ package com.duckduckgo.app.usage.app
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.withContext
 
 private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 

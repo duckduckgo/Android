@@ -21,9 +21,10 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import java.util.UUID
+import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.util.UUID
 
 interface SavedSitesParser {
     fun generateHtml(
@@ -34,6 +35,7 @@ interface SavedSitesParser {
     suspend fun parseHtml(
         document: Document,
         savedSitesRepository: SavedSitesRepository,
+        destination: ImportFolder,
     ): List<Any>
 }
 
@@ -125,6 +127,7 @@ class RealSavedSitesParser : SavedSitesParser {
     override suspend fun parseHtml(
         document: Document,
         savedSitesRepository: SavedSitesRepository,
+        destination: ImportFolder,
     ): List<Any> {
         val body = document.select("body").first() ?: return emptyList()
         val children = body.childNodes()
@@ -136,7 +139,30 @@ class RealSavedSitesParser : SavedSitesParser {
         if (children.size > 1) {
             rootElement = Element("DL").appendChildren(children)
         }
-        return parseElement(rootElement, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, mutableListOf(), false)
+
+        val destinationFolderId = when (destination) {
+            is ImportFolder.Root -> SavedSitesNames.BOOKMARKS_ROOT
+            is ImportFolder.Folder -> {
+                // Check if folder with this name already exists, otherwise create it
+                val existingFolder = savedSitesRepository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT)
+                    .find { it.url == null && it.name == destination.folderName && it.parentId == SavedSitesNames.BOOKMARKS_ROOT }
+
+                existingFolder?.id ?: run {
+                    // Create new folder if it doesn't exist
+                    val newFolder = savedSitesRepository.insert(
+                        BookmarkFolder(
+                            id = UUID.randomUUID().toString(),
+                            name = destination.folderName,
+                            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+                            lastModified = DatabaseDateFormatter.iso8601(),
+                        ),
+                    )
+                    newFolder.id
+                }
+            }
+        }
+
+        return parseElement(rootElement, destinationFolderId, savedSitesRepository, mutableListOf(), false)
     }
 
     private fun parseElement(

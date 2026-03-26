@@ -33,11 +33,11 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,

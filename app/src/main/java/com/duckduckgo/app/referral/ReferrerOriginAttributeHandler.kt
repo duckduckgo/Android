@@ -19,10 +19,10 @@ package com.duckduckgo.app.referral
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface ReferrerOriginAttributeHandler {
     fun process(referrerParts: List<String>)

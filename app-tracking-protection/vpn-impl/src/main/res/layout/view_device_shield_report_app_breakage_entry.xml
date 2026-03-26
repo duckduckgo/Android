@@ -25,6 +25,7 @@
         android:paddingBottom="@dimen/keyline_2"
         android:gravity="center"
         android:background="?selectableItemBackground"
+        tools:ignore="Overdraw"
 >
     <RadioButton
         android:id="@+id/deviceShieldInstalledAppSelector"

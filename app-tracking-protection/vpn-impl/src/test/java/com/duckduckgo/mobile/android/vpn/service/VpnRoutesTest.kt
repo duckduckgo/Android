@@ -18,9 +18,9 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import java.net.InetAddress
 import org.junit.Assert.*
 import org.junit.Test
+import java.net.InetAddress
 
 class VpnRoutesTest {
 

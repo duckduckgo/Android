@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import android.content.Intent
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,10 +28,14 @@ import com.duckduckgo.app.onboarding.store.AppStage.NEW
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.systemsearch.DeviceApp
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
@@ -49,8 +54,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import java.time.LocalDateTime
-import java.util.UUID
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -65,8 +68,11 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class AutoCompleteApiTest {
@@ -104,6 +110,9 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockDeviceAppLookup: DeviceAppLookup
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -120,25 +129,12 @@ class AutoCompleteApiTest {
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(NEW)
+            whenever(mockDeviceAppLookup.query(any())).thenReturn(emptyList())
         }
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        testee = AutoCompleteApi(
-            mockAutoCompleteService,
-            mockSavedSitesRepository,
-            mockNavigationHistory,
-            RealAutoCompleteScorer(),
-            mockAutoCompleteRepository,
-            mockTabRepository,
-            mockUserStageStore,
-            mockAutocompleteTabsFeature,
-            mockDuckChat,
-            mockHistory,
-            DefaultDispatcherProvider(),
-            mockPixel,
-
-        )
+        testee = createTestee()
     }
 
     @Test
@@ -1885,6 +1881,332 @@ class AutoCompleteApiTest {
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
     }
 
+    @Test
+    fun whenShowInstalledAppsDisabledThenNoDeviceAppResultsReturned() = runTest {
+        val testee = createTestee(AutoComplete.Config(showInstalledApps = false))
+        val mockIntent = Intent()
+        val deviceApps = listOf(
+            DeviceApp(shortName = "First App", packageName = "com.example.first", launchIntent = mockIntent),
+            DeviceApp(shortName = "Second App", packageName = "com.example.second", launchIntent = mockIntent),
+        )
+
+        whenever(mockDeviceAppLookup.query("app")).thenReturn(deviceApps)
+        whenever(mockAutoCompleteService.autoComplete("test")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("test")
+        val value = result.first()
+
+        verify(mockDeviceAppLookup, never()).query(any())
+        assertTrue(value.suggestions.none { it is AutoCompleteDeviceAppSuggestion })
+    }
+
+    @Test
+    fun whenShowInstalledAppsEnabledAndQueryBlankThenNoDeviceAppResultsReturned() = runTest {
+        val testeeWithInstalledApps = createTestee(AutoComplete.Config(showInstalledApps = true))
+        val mockIntent = Intent()
+        val deviceApps = listOf(
+            DeviceApp(shortName = "First App", packageName = "com.example.first", launchIntent = mockIntent),
+            DeviceApp(shortName = "Second App", packageName = "com.example.second", launchIntent = mockIntent),
+        )
+
+        whenever(mockDeviceAppLookup.query("app")).thenReturn(deviceApps)
+
+        val result = testeeWithInstalledApps.autoComplete("")
+        val value = result.first()
+
+        verify(mockDeviceAppLookup, never()).query(any())
+        assertTrue(value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenShowInstalledAppsEnabledAndQueryNotBlankThenDeviceAppResultsReturned() = runTest {
+        val testeeWithInstalledApps = createTestee(AutoComplete.Config(showInstalledApps = true))
+        val mockIntent = Intent()
+        val deviceApps = listOf(
+            DeviceApp(shortName = "First App", packageName = "com.example.first", launchIntent = mockIntent),
+            DeviceApp(shortName = "Second App", packageName = "com.example.second", launchIntent = mockIntent),
+        )
+
+        whenever(mockDeviceAppLookup.query("app")).thenReturn(deviceApps)
+        whenever(mockAutoCompleteService.autoComplete("app")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testeeWithInstalledApps.autoComplete("app")
+        val value = result.first()
+
+        verify(mockDeviceAppLookup).query("app")
+        val deviceAppSuggestions = value.suggestions.filterIsInstance<AutoCompleteDeviceAppSuggestion>()
+        assertEquals(2, deviceAppSuggestions.size)
+        assertEquals("First App", deviceAppSuggestions[0].shortName)
+        assertEquals("com.example.first", deviceAppSuggestions[0].packageName)
+        assertEquals("Second App", deviceAppSuggestions[1].shortName)
+        assertEquals("com.example.second", deviceAppSuggestions[1].packageName)
+    }
+
+    @Test
+    fun whenDeviceAppsAndSearchResultsBothPresentThenEachGroupLimitedTo4() = runTest {
+        val testeeWithInstalledApps = createTestee(AutoComplete.Config(showInstalledApps = true))
+        val mockIntent = Intent()
+        val deviceApps = (1..6).map {
+            DeviceApp(shortName = "App$it", packageName = "com.app$it", launchIntent = mockIntent)
+        }
+
+        whenever(mockDeviceAppLookup.query("app")).thenReturn(deviceApps)
+        whenever(mockAutoCompleteService.autoComplete("app")).thenReturn(
+            (1..6).map { AutoCompleteServiceRawResult("app suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testeeWithInstalledApps.autoComplete("app")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filter { it is AutoCompleteSearchSuggestion || it is AutoCompleteDefaultSuggestion }
+        val deviceAppSuggestions = value.suggestions.filterIsInstance<AutoCompleteDeviceAppSuggestion>()
+
+        assertEquals(4, searchSuggestions.size)
+        assertEquals(4, deviceAppSuggestions.size)
+    }
+
+    @Test
+    fun whenOnlyDeviceAppsAvailableThenAllDeviceAppsReturned() = runTest {
+        val testeeWithInstalledApps = createTestee(AutoComplete.Config(showInstalledApps = true))
+        val mockIntent = Intent()
+        val deviceApps = (1..6).map {
+            DeviceApp(shortName = "App$it", packageName = "com.app$it", launchIntent = mockIntent)
+        }
+
+        whenever(mockDeviceAppLookup.query("app")).thenReturn(deviceApps)
+        whenever(mockAutoCompleteService.autoComplete("app")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testeeWithInstalledApps.autoComplete("app")
+        val value = result.first()
+
+        val deviceAppSuggestions = value.suggestions.filterIsInstance<AutoCompleteDeviceAppSuggestion>()
+        assertEquals(6, deviceAppSuggestions.size)
+    }
+
+    @Test
+    fun whenOnlySearchSuggestionsAvailableThenAllSearchSuggestionsReturned() = runTest {
+        val testeeWithInstalledApps = createTestee(AutoComplete.Config(showInstalledApps = true))
+
+        whenever(mockDeviceAppLookup.query("test")).thenReturn(emptyList())
+        whenever(mockAutoCompleteService.autoComplete("test")).thenReturn(
+            (1..6).map { AutoCompleteServiceRawResult("test suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testeeWithInstalledApps.autoComplete("test")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filter { it !is AutoCompleteDeviceAppSuggestion }
+        val deviceAppSuggestions = value.suggestions.filterIsInstance<AutoCompleteDeviceAppSuggestion>()
+
+        assertEquals(5, searchSuggestions.size)
+        assertEquals(0, deviceAppSuggestions.size)
+    }
+
+    @Test
+    fun whenDeviceAppSuggestionSubmittedThenAutoCompleteInstalledAppSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+        whenever(mockHistory.hasHistory()).thenReturn(false)
+        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
+
+        val suggestion = AutoCompleteDeviceAppSuggestion(
+            phrase = "test",
+            shortName = "Test App",
+            packageName = "com.test.app",
+            launchIntent = Intent(),
+        )
+        val suggestions = listOf(suggestion)
+
+        testee.fireAutocompletePixel(suggestions, suggestion)
+
+        verify(mockPixel).fire(AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION)
+    }
+
+    @Test
+    fun whenSearchSuggestionsReturnsMoreThanFiveNonUrlSuggestionsThenOnlyFiveAreEmitted() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(
+            (1..10).map { AutoCompleteServiceRawResult("suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("query")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isUrl }
+        assertEquals(5, searchSuggestions.size)
+        assertEquals("suggestion 1", searchSuggestions[0].phrase)
+        assertEquals("suggestion 5", searchSuggestions[4].phrase)
+    }
+
+    @Test
+    fun whenSearchSuggestionsReturnsExactlyFiveNonUrlSuggestionsThenAllFiveAreIncluded() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(
+            (1..5).map { AutoCompleteServiceRawResult("suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("query")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isUrl }
+        assertEquals(5, searchSuggestions.size)
+        assertEquals("suggestion 1", searchSuggestions[0].phrase)
+        assertEquals("suggestion 5", searchSuggestions[4].phrase)
+    }
+
+    @Test
+    fun whenSearchSuggestionsReturnsFewerThanFiveNonUrlSuggestionsThenAllAreIncluded() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(
+            (1..3).map { AutoCompleteServiceRawResult("suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("query")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isUrl }
+        assertEquals(3, searchSuggestions.size)
+        assertEquals("suggestion 1", searchSuggestions[0].phrase)
+        assertEquals("suggestion 3", searchSuggestions[2].phrase)
+    }
+
+    @Test
+    fun whenSearchSuggestionsReturnsEmptyListThenEmptyListIsEmitted() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(emptyList())
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("query")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>()
+        assertEquals(0, searchSuggestions.size)
+    }
+
+    @Test
+    fun whenCombinedAutocompleteWithTenSuggestionsNonUrlSuggestionsAndBookmarksAndHistoryThenMaxFiveSuggestionsShown() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("test")).thenReturn(
+            (1..10).map { AutoCompleteServiceRawResult("suggestion $it", isNav = false) },
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(
+            flowOf(
+                listOf(
+                    bookmark(title = "test bookmark", url = "https://test-bookmark.com"),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockNavigationHistory.getHistory()).thenReturn(
+            flowOf(
+                listOf(
+                    VisitedPage(
+                        title = "test history",
+                        url = "https://test-history.com".toUri(),
+                        visits = listOf(LocalDateTime.now()),
+                    ),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("test")
+        val value = result.first()
+
+        val searchSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isUrl }
+        val bookmarkSuggestions = value.suggestions.filterIsInstance<AutoCompleteBookmarkSuggestion>()
+
+        // Verify max 5 non-URL suggestions even though 10 were returned
+        assertEquals(5, searchSuggestions.size)
+        assertEquals("suggestion 1", searchSuggestions[0].phrase)
+        assertEquals("suggestion 5", searchSuggestions[4].phrase)
+
+        // Verify other suggestion types are still present
+        assertTrue(bookmarkSuggestions.isNotEmpty())
+    }
+
+    @Test
+    fun whenSearchSuggestionsReturnsMixedUrlAndNonUrlSuggestionsThenOnlyOnlySuggestionsOutsideHitsAreLimited() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("https://url1.com", isNav = true),
+                AutoCompleteServiceRawResult("https://url2.com", isNav = true),
+                AutoCompleteServiceRawResult("https://url3.com", isNav = true),
+                AutoCompleteServiceRawResult("suggestion 1", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 2", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 3", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 4", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 5", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 6", isNav = false),
+                AutoCompleteServiceRawResult("suggestion 7", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete("query")
+        val value = result.first()
+
+        val hitSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { it.isAllowedInTopHits }
+        val middleSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isAllowedInTopHits }
+
+        assertEquals(2, hitSuggestions.size)
+        assertEquals(5, middleSuggestions.size)
+    }
+
+    @Test
+    fun whenSearchSuggestionsIncludeUrlAlreadyInTopHitsThenUrlIsNotDuplicatedInMiddleSection() = runTest {
+        whenever(mockAutoCompleteService.autoComplete("example")).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("https://example.com", isNav = true),
+                AutoCompleteServiceRawResult("example suggestion 1", isNav = false),
+                AutoCompleteServiceRawResult("example suggestion 2", isNav = false),
+                AutoCompleteServiceRawResult("example suggestion 3", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(
+            flowOf(
+                listOf(favorite(url = "https://example.com", title = "Example Site")),
+            ),
+        )
+
+        val result = testee.autoComplete("example")
+        val value = result.first()
+
+        // Verify example.com appears only once as a top hit (favorite)
+        val topHits = value.suggestions.filter {
+            it is AutoCompleteBookmarkSuggestion && it.isFavorite ||
+                (it is AutoCompleteSearchSuggestion && it.isAllowedInTopHits)
+        }
+        val middleSuggestions = value.suggestions.filterIsInstance<AutoCompleteSearchSuggestion>().filter { !it.isAllowedInTopHits }
+
+        // Should have 2 top hit (the URL as favorite and the URL as a suggestion)
+        assertEquals(2, topHits.size)
+        assertTrue(topHits[0] is AutoCompleteBookmarkSuggestion)
+        assertTrue(topHits[1] is AutoCompleteSearchSuggestion)
+        assertEquals("example.com", topHits[0].phrase)
+        assertEquals("example.com", topHits[1].phrase)
+
+        // Verify no duplicate of example.com in middle section
+        val exampleUrlInMiddle = middleSuggestions.any { it.phrase.contains("example.com") }
+        assertFalse(exampleUrlInMiddle)
+
+        // Should have 3 non-URL suggestions in middle section
+        assertEquals(3, middleSuggestions.size)
+    }
+
     private fun favorite(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
@@ -1908,4 +2230,24 @@ class AutoCompleteApiTest {
             DatabaseDateFormatter.iso8601(),
         ),
     )
+
+    private fun createTestee(config: AutoComplete.Config = AutoComplete.Config()): AutoCompleteApi {
+        return AutoCompleteApi(
+            mockAutoCompleteService,
+            mockSavedSitesRepository,
+            mockNavigationHistory,
+            RealAutoCompleteScorer(),
+            mockAutoCompleteRepository,
+            mockTabRepository,
+            mockUserStageStore,
+            mockAutocompleteTabsFeature,
+            mockDuckChat,
+            mockHistory,
+            DefaultDispatcherProvider(),
+            mockPixel,
+            mockDeviceAppLookup,
+            coroutineTestRule.testScope,
+            config,
+        )
+    }
 }

@@ -47,10 +47,10 @@ import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsPromotionViewMo
 import com.duckduckgo.sync.impl.ui.SyncActivityWithSourceParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_SYNC_PROMO)

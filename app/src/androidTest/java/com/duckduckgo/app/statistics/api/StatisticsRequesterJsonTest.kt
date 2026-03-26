@@ -30,10 +30,6 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.Moshi
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.TestScope
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -49,6 +45,10 @@ import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.util.concurrent.TimeUnit
 
 class StatisticsRequesterJsonTest {
 
@@ -109,6 +109,14 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
+        assertEquals("v99-1", statisticsStore.atb?.version)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshDuckAiRetentionCallWithUpdateVersionResponseUpdatesAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_UPDATE_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
         assertEquals("v99-1", statisticsStore.atb?.version)
     }
 
@@ -236,6 +244,16 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
+    fun whenAlreadyInitializedRefreshDuckAiCallGoesToCorrectEndpoint() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
+        val refreshRequest = takeRequestImmediately()
+        assertEquals("/atb.js", refreshRequest?.encodedPath())
+        assertEquals("duckai", refreshRequest?.extractQueryParam("at"))
+    }
+
+    @Test
     fun whenAlreadyInitializedRefreshSearchCallUpdatesSearchRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
@@ -249,6 +267,14 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         assertEquals("v107-7", statisticsStore.appRetentionAtb)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshDuckAiCallUpdatesAppRetentionAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
+        assertEquals("v107-7", statisticsStore.duckaiRetentionAtb)
     }
 
     @Test
@@ -266,6 +292,16 @@ class StatisticsRequesterJsonTest {
         statisticsStore.saveAtb(Atb("100-1"))
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
+        val refreshRequest = takeRequestImmediately()
+        val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
+        assertTestParameterSent(testParam)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshDuckAiCallSendsTestParameter() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
         val refreshRequest = takeRequestImmediately()
         val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
@@ -292,6 +328,16 @@ class StatisticsRequesterJsonTest {
     }
 
     @Test
+    fun whenAlreadyInitializedRefreshDuckAiCallSendsCorrectAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
+        val refreshRequest = takeRequestImmediately()
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.ATB)
+        assertEquals("100-1ma", atbParam)
+    }
+
+    @Test
     fun whenAlreadyInitializedRefreshSearchCallSendsCorrectRetentionAtb() {
         statisticsStore.saveAtb(Atb("100-1"))
         statisticsStore.searchRetentionAtb = "101-3"
@@ -308,6 +354,17 @@ class StatisticsRequesterJsonTest {
         statisticsStore.appRetentionAtb = "101-3"
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
+        val refreshRequest = takeRequestImmediately()
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
+        assertEquals("101-3", atbParam)
+    }
+
+    @Test
+    fun whenAlreadyInitializedRefreshDuckAiCallSendsCorrectRetentionAtb() {
+        statisticsStore.saveAtb(Atb("100-1"))
+        statisticsStore.duckaiRetentionAtb = "101-3"
+        queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
+        testee.refreshDuckAiRetentionAtb()
         val refreshRequest = takeRequestImmediately()
         val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)

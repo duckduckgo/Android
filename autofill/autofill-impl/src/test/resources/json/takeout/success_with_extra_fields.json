@@ -1,0 +1,1 @@
+{"name":"actionCompleted","data":{"result":{"success":{"actionID":"test-action","actionType":"click","extraField":"ignored","anotherField":123}},"extraData":"ignored"}}

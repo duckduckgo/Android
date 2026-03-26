@@ -20,32 +20,40 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DuckAiShortcutSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
+    duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel() {
 
     data class ViewState(
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
+        val showInVoiceSearch: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
+        val shouldShowVoiceSearchToggle: Boolean = false,
     )
 
     val viewState = combine(
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
-    ) { showInBrowserMenu, showInAddressBar ->
+        duckChat.observeShowInVoiceSearchUserSetting(),
+        duckAiFeatureState.showVoiceSearchToggle,
+    ) { showInBrowserMenu, showInAddressBar, showInVoiceSearch, showVoiceSearchToggle ->
         ViewState(
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
+            showInVoiceSearch = showInVoiceSearch,
             shouldShowAddressBarToggle = duckChat.isAddressBarEntryPointEnabled(),
+            shouldShowVoiceSearchToggle = duckChat.isVoiceSearchEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -58,6 +66,12 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
     fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setShowInAddressBarUserSetting(checked)
+        }
+    }
+
+    fun onShowDuckChatInVoiceSearchToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setShowInVoiceSearchUserSetting(checked)
         }
     }
 }

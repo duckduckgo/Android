@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -44,4 +45,10 @@ interface ScanLogDao {
 
     @Query("DELETE from pir_broker_scan_log")
     fun deleteAllBrokerScanEvents()
+
+    @Transaction
+    fun deleteAll() {
+        deleteAllEventLogs()
+        deleteAllBrokerScanEvents()
+    }
 }

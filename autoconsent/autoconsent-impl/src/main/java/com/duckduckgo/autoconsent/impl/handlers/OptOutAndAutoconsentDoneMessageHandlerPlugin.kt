@@ -20,22 +20,28 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -44,7 +50,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
             when (messageType) {
-                OPT_OUT -> processOptOutResult(jsonString, autoconsentCallback)
+                OPT_OUT -> processOptOutResult(jsonString, webView, autoconsentCallback)
                 RESULT_MESSAGE -> processAutoconsentDone(jsonString, webView, autoconsentCallback)
                 else -> return
             }
@@ -53,12 +59,22 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
 
     override val supportedTypes: List<String> = listOf(OPT_OUT, RESULT_MESSAGE)
 
-    private fun processOptOutResult(jsonString: String, autoconsentCallback: AutoconsentCallback) {
+    private fun processOptOutResult(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             val message: OptOutResultMessage = parseOptOutMessage(jsonString) ?: return
 
             if (!message.result) {
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
+                autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_ERROR_OPTOUT_DAILY)
+                autoconsentCallback.onResultReceived(
+                    AutoconsentResult(
+                        consentManaged = true,
+                        optOutFailed = true,
+                        selfTestFailed = false,
+                        isCosmetic = null,
+                        consentRule = message.cmp,
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    ),
+                )
             } else if (message.scheduleSelfTest) {
                 selfTest = true
             }
@@ -70,10 +86,28 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
+
+            when {
+                message.cmp == HEURISTIC_CMP -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_HEURISTIC_DAILY)
+                message.isCosmetic -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_COSMETIC_DAILY)
+                else -> autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+            }
+
             message.url.toUri().host ?: return
 
+            reloadLoopDetector.rememberLastHandledCMP(webView, message.cmp, message.isCosmetic)
+
             autoconsentCallback.onPopUpHandled(message.isCosmetic)
-            autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = message.isCosmetic)
+            autoconsentCallback.onResultReceived(
+                AutoconsentResult(
+                    consentManaged = true,
+                    optOutFailed = false,
+                    selfTestFailed = false,
+                    isCosmetic = message.isCosmetic,
+                    consentRule = message.cmp,
+                    consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                ),
+            )
 
             if (selfTest) {
                 appCoroutineScope.launch(dispatcherProvider.main()) {
@@ -103,5 +137,6 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     companion object {
         const val OPT_OUT = "optOutResult"
         const val RESULT_MESSAGE = "autoconsentDone"
+        private const val HEURISTIC_CMP = "HEURISTIC"
     }
 }

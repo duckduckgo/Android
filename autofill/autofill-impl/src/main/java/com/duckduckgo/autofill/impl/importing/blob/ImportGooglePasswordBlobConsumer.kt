@@ -27,11 +27,11 @@ import com.duckduckgo.autofill.impl.importing.blob.GooglePasswordBlobConsumer.Ca
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.encode
+import javax.inject.Inject
 
 interface GooglePasswordBlobConsumer {
     suspend fun configureWebViewForBlobDownload(
@@ -39,10 +39,14 @@ interface GooglePasswordBlobConsumer {
         callback: Callback,
     )
 
-    suspend fun postMessageToConvertBlobToDataUri(url: String)
+    suspend fun postMessageToConvertBlobToDataUri(
+        webView: WebView,
+        url: String,
+    )
 
     interface Callback {
         suspend fun onCsvAvailable(csv: String)
+
         suspend fun onCsvError()
     }
 }
@@ -53,7 +57,6 @@ class ImportGooglePasswordBlobConsumer @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : GooglePasswordBlobConsumer {
-
     // access to the flow which uses this be guarded against where these features aren't available
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     override suspend fun configureWebViewForBlobDownload(
@@ -84,16 +87,25 @@ class ImportGooglePasswordBlobConsumer @Inject constructor(
         callback: Callback,
     ) {
         if (data.startsWith("data:")) {
-            kotlin.runCatching {
-                callback.onCsvAvailable(data)
-            }.onFailure { callback.onCsvError() }
+            kotlin
+                .runCatching {
+                    callback.onCsvAvailable(data)
+                }.onFailure { callback.onCsvError() }
         } else if (message.data?.startsWith("Ping:") == true) {
-            val locationRef = message.data.toString().encode().md5().toString()
+            val locationRef =
+                message.data
+                    .toString()
+                    .encode()
+                    .md5()
+                    .toString()
             webViewBlobDownloader.storeReplyProxy(sourceOrigin.toString(), replyProxy, locationRef)
         }
     }
 
-    override suspend fun postMessageToConvertBlobToDataUri(url: String) {
-        webViewBlobDownloader.convertBlobToDataUri(url)
+    override suspend fun postMessageToConvertBlobToDataUri(
+        webView: WebView,
+        url: String,
+    ) {
+        webViewBlobDownloader.convertBlobToDataUri(webView, url)
     }
 }

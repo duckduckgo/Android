@@ -16,20 +16,26 @@
 
 package com.duckduckgo.site.permissions.impl
 
+import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.webkit.PermissionRequest
+import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.impl.feature.MicrophoneSitePermissionsDomainRecoveryFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 // Cannot be a Singleton
 @ContributesBinding(AppScope::class)
@@ -38,6 +44,9 @@ class SitePermissionsManagerImpl @Inject constructor(
     private val locationManager: LocationManager,
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val context: Context,
+    private val microphoneSitePermissionsDomainRecoveryFeature: MicrophoneSitePermissionsDomainRecoveryFeature,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : SitePermissionsManager {
 
     private suspend fun getSitePermissionsGranted(
@@ -63,7 +72,19 @@ class SitePermissionsManagerImpl @Inject constructor(
 
         logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
-        val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+        val sitePermissionsGranted = if (microphoneSitePermissionsDomainRecoveryFeature.self().isEnabled()) {
+            getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk).filter { permission ->
+                if (permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE && audioCapturePermissionDomains.contains(url.extractDomain())) {
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
+            }.toTypedArray()
+        } else {
+            getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+        }
+
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
                 logcat { "Permissions: site permission granted" }
@@ -148,4 +169,6 @@ class SitePermissionsManagerImpl @Inject constructor(
             else -> null
         }
     }
+
+    private val audioCapturePermissionDomains: List<String> = listOf(duckAiHostProvider.getHost(), "duckduckgo.com")
 }

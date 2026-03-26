@@ -52,6 +52,7 @@ private fun AnrEntity.asAnr(): Anr {
         timestamp = timestamp,
         webView = webView,
         customTab = customTab,
+        appVersion = appVersion,
     )
 }
 

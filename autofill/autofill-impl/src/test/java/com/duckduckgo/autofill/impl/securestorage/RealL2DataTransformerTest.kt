@@ -20,7 +20,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.impl.securestorage.RealL2DataTransformer
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageKeyProvider
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.security.Key
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,6 +31,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import java.security.Key
 
 @RunWith(AndroidJUnit4::class)
 class RealL2DataTransformerTest {

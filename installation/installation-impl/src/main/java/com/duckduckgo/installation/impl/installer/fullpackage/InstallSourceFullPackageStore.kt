@@ -27,10 +27,10 @@ import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullP
 import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSourceFullPackageListJsonParser
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface InstallSourceFullPackageStore {
     suspend fun updateInstallSourceFullPackages(json: String)

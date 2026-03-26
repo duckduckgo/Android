@@ -23,14 +23,20 @@ import android.os.Message
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.net.toUri
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface PirDetachedWebViewProvider {
     /**
@@ -64,7 +70,11 @@ interface PirDetachedWebViewProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealPirDetachedWebViewProvider @Inject constructor() :
+class RealPirDetachedWebViewProvider @Inject constructor(
+    private val userAgentProvider: UserAgentProvider,
+    private val pirRequestInterceptor: PirRequestInterceptor,
+    private val dispatcherProvider: DispatcherProvider,
+) :
     PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun createInstance(
@@ -76,6 +86,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
         return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
@@ -100,6 +111,16 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 private var requestedUrl: String? = null
                 private var receivedError: Boolean = false
 
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                ): WebResourceResponse? {
+                    request ?: return null
+                    return pirRequestInterceptor.shouldInterceptRequest(request) {
+                        runBlocking { withContext(dispatcherProvider.main()) { view?.url } }?.toUri()
+                    }
+                }
+
                 @SuppressLint("RequiresFeature")
                 override fun shouldOverrideUrlLoading(
                     view: WebView?,
@@ -118,6 +139,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     logcat { "PIR-SCAN: webview onPageStarted $url" }
                     requestedUrl = url
                     receivedError = false
+                    view?.evaluateJavascript("javascript:$scriptToLoad", null)
                 }
 
                 override fun onPageFinished(
@@ -126,7 +148,6 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 ) {
                     if (!receivedError) {
                         logcat { "PIR-SCAN: webview onPageFinished receivedError $receivedError requestedUrl $requestedUrl for url $url" }
-                        view?.evaluateJavascript("javascript:$scriptToLoad", null)
                         onPageLoaded(url)
                     }
                     super.onPageFinished(view, url)
@@ -143,7 +164,7 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                     ) {
                         logcat {
                             """
-                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} 
+                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url}
                             mainframe ${request.isForMainFrame}
                             """.trimIndent()
                         }
@@ -154,23 +175,14 @@ class RealPirDetachedWebViewProvider @Inject constructor() :
                 }
             }
             settings.apply {
-                userAgentString = CUSTOM_UA
+                userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                setSupportMultipleWindows(false)
-                databaseEnabled = false
-                setSupportZoom(true)
+                cacheMode = WebSettings.LOAD_NO_CACHE
             }
         }
-    }
-
-    companion object {
-        private const val CUSTOM_UA =
-            "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
 }

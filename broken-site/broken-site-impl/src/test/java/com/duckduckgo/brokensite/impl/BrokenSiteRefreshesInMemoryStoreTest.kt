@@ -18,7 +18,6 @@ package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
 import com.duckduckgo.brokensite.api.RefreshPattern
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -31,6 +30,7 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 @RunWith(JUnit4::class)
 class BrokenSiteRefreshesInMemoryStoreTest {

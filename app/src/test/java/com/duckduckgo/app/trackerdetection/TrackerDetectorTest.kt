@@ -24,7 +24,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientName
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYLIST
 import com.duckduckgo.app.trackerdetection.Client.ClientName.EASYPRIVACY
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -47,7 +46,6 @@ class TrackerDetectorTest {
     private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
-    private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
     private val mockAdClickManager: AdClickManager = mock()
 
     private val trackerDetector = TrackerDetectorImpl(
@@ -55,7 +53,6 @@ class TrackerDetectorTest {
         mockUserAllowListDao,
         mockContentBlocking,
         mockTrackerAllowlist,
-        mockWebTrackersBlockedDao,
         mockAdClickManager,
     )
 

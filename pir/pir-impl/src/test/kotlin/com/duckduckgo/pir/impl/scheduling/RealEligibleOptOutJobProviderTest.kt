@@ -22,9 +22,6 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.DAYS
-import java.util.concurrent.TimeUnit.HOURS
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,6 +31,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.DAYS
+import java.util.concurrent.TimeUnit.HOURS
 
 class RealEligibleOptOutJobProviderTest {
 
@@ -306,10 +306,10 @@ class RealEligibleOptOutJobProviderTest {
     }
 
     @Test
-    fun whenGetAllEligibleOptOutJobsWithInvalidStatusThenReturnEmpty() = runTest {
-        val invalidOptOutRecord = optOutJobRecordNotExecuted.copy(status = OptOutJobStatus.INVALID)
+    fun whenGetAllEligibleOptOutJobsWithDeprecatedStatusThenReturnEmpty() = runTest {
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
-        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(invalidOptOutRecord))
+        // deprecated records get filtered out at the repository level
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         val result = testee.getAllEligibleOptOutJobs(currentTimeMillis)
 

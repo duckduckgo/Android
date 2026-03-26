@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command
@@ -39,21 +38,21 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.modalcoordinator.api.ModalEvaluator
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -73,6 +72,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 /**
  * Introduced by [this Asana task](https://app.asana.com/0/1208671518894266/1207295380941379/f).
@@ -81,7 +81,7 @@ import logcat.logcat
  */
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    boundType = ModalEvaluator::class,
 )
 @ContributesMultibinding(
     AppScope::class,
@@ -104,9 +104,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val userBrowserProperties: UserBrowserProperties,
+    private val daxPrompts: DaxPrompts,
     private val pixel: Pixel,
     moshi: Moshi,
-) : AdditionalDefaultBrowserPrompts, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
+
+    override val priority: Int = 2
+    override val evaluatorId: String = "additional_default_browser_prompts"
 
     private val evaluationMutex = Mutex()
 
@@ -179,25 +183,9 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
      */
     private var browserSelectionWindowFallbackDeferred: Deferred<Unit>? = null
 
-    init {
-        appCoroutineScope.launch {
-            userStageStore.userAppStageFlow().collect {
-                evaluate()
-            }
-        }
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        appCoroutineScope.launch {
-            evaluate()
-        }
-    }
-
     override fun onPrivacyConfigDownloaded() {
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             featureSettings = defaultBrowserPromptsFeatureToggles.parseFeatureSettings()
-            evaluate()
         }
     }
 
@@ -210,24 +198,29 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
     }
 
-    private suspend fun evaluate() = evaluationMutex.withLock {
+    override suspend fun evaluate(): ModalEvaluator.EvaluationResult = evaluationMutex.withLock {
+        if (daxPrompts.evaluate() != DaxPrompts.ActionType.NONE) {
+            logcat { "evaluate: DaxPrompts will show a prompt or has recently shown a prompt, skipping evaluation this time" }
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
+        }
+
         val isEnabled =
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
         logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
         if (!isEnabled) {
-            return
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
         val isStopped = defaultBrowserPromptsDataStore.stage.firstOrNull() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
-            return
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
         val userType = getUserType()
         if (userType == DefaultBrowserPromptsDataStore.UserType.UNKNOWN) {
             logcat { "evaluate: user stage is unknown, skipping evaluation" }
-            return
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
         defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
@@ -251,7 +244,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
             val appActiveDaysUsedSinceStart = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
-                return
+                return@withLock ModalEvaluator.EvaluationResult.Skipped
             }
 
             logcat { "evaluate: active days used since flow started = $appActiveDaysUsedSinceStart" }
@@ -263,7 +256,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 parsedSettings
             } ?: run {
                 logcat(ERROR) { "Failed to obtain feature settings." }
-                return
+                return@withLock ModalEvaluator.EvaluationResult.Skipped
             }
 
             when (userType) {
@@ -277,7 +270,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 }
                 else -> {
                     logcat { "evaluate: user type is not known, skipping evaluation" }
-                    return
+                    return@withLock ModalEvaluator.EvaluationResult.Skipped
                 }
             }
         }
@@ -294,7 +287,14 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(action.showSetAsDefaultPopupMenuItem)
             defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(action.highlightPopupMenu)
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(action.showMessage)
+
+            return@withLock if (action.showMessageDialog) {
+                ModalEvaluator.EvaluationResult.ModalShown
+            } else {
+                ModalEvaluator.EvaluationResult.Skipped
+            }
         }
+        return@withLock ModalEvaluator.EvaluationResult.Skipped
     }
 
     override fun onPopupMenuLaunched() {

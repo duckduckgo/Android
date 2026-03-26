@@ -24,8 +24,6 @@ import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -38,6 +36,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class RealAdClickPixelsTest {

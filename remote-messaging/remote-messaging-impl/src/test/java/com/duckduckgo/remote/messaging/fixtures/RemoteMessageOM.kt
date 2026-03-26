@@ -17,11 +17,16 @@
 package com.duckduckgo.remote.messaging.fixtures
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.IMAGE_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.RADAR
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface
 
 @Suppress("MemberVisibilityCanBePrivate")
 object RemoteMessageOM {
@@ -41,10 +46,12 @@ object RemoteMessageOM {
         titleText: String = "title",
         descriptionText: String = "description",
         placeholder: Placeholder = ANNOUNCE,
+        imageUrl: String? = null,
     ) = Content.Medium(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
+        imageUrl = imageUrl,
     )
 
     fun bigSingleActionContent(
@@ -53,12 +60,14 @@ object RemoteMessageOM {
         placeholder: Placeholder = ANNOUNCE,
         primaryActionText: String = "Action1",
         primaryAction: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.BigSingleAction(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
+        imageUrl = imageUrl,
     )
 
     fun bigTwoActionsContent(
@@ -69,6 +78,7 @@ object RemoteMessageOM {
         primaryAction: Action = urlAction(),
         secondaryActionText: String = "Action2",
         secondaryAction: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.BigTwoActions(
         titleText = titleText,
         descriptionText = descriptionText,
@@ -77,6 +87,7 @@ object RemoteMessageOM {
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
         secondaryAction = secondaryAction,
+        imageUrl = imageUrl,
     )
 
     fun promoSingleActionContent(
@@ -85,12 +96,32 @@ object RemoteMessageOM {
         placeholder: Placeholder = MAC_AND_WINDOWS,
         actionText: String = "Action",
         action: Action = urlAction(),
+        imageUrl: String? = null,
     ) = Content.PromoSingleAction(
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
         actionText = actionText,
         action = action,
+        imageUrl = imageUrl,
+    )
+
+    fun cardsListContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: Placeholder = ANNOUNCE,
+        primaryActionText: String = "Action",
+        primaryAction: Action = urlAction(),
+        listItems: List<CardItem> = translatedListItems(),
+        imageUrl: String? = null,
+    ) = Content.CardsList(
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        primaryActionText = primaryActionText,
+        primaryAction = primaryAction,
+        listItems = listItems,
+        imageUrl = imageUrl,
     )
 
     fun aSmallMessage(
@@ -98,12 +129,14 @@ object RemoteMessageOM {
         content: Content = smallContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -112,12 +145,14 @@ object RemoteMessageOM {
         content: Content = mediumContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -126,12 +161,14 @@ object RemoteMessageOM {
         content: Content = bigSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -140,12 +177,14 @@ object RemoteMessageOM {
         content: Content = bigTwoActionsContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
 
@@ -154,12 +193,62 @@ object RemoteMessageOM {
         content: Content = promoSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules,
+            surfaces = surfaces,
         )
     }
+
+    fun aCardsListMessage(
+        id: String = "id",
+        content: Content = cardsListContent(),
+        exclusionRules: List<Int> = emptyList(),
+        matchingRules: List<Int> = emptyList(),
+        surfaces: List<Surface> = emptyList(),
+    ): RemoteMessage {
+        return RemoteMessage(
+            id = id,
+            content = content,
+            exclusionRules = exclusionRules,
+            matchingRules = matchingRules,
+            surfaces = surfaces,
+        )
+    }
+
+    fun translatedListItems(
+        item1TitleText: String = "Item Title 1",
+        item1DescriptionText: String = "Item Description 1",
+        item1PrimaryActionText: String = "Item Action 1",
+        item2TitleText: String = "Item Title 2",
+        item2DescriptionText: String = "Item Description 2",
+        item2PrimaryActionText: String = "Item Action 2",
+    ) = listOf(
+        CardItem.ListItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = item1TitleText,
+            descriptionText = item1DescriptionText,
+            placeholder = IMAGE_AI,
+            primaryAction = urlAction(),
+            primaryActionText = item1PrimaryActionText,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+        CardItem.ListItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            titleText = item2TitleText,
+            descriptionText = item2DescriptionText,
+            placeholder = RADAR,
+            primaryAction = urlAction(),
+            primaryActionText = item2PrimaryActionText,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        ),
+    )
 }

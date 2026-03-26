@@ -25,17 +25,16 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.duckduckgo.common.utils.baseHost
-import com.duckduckgo.mobile.android.R as CommonR
-import java.io.File
-import java.util.*
-import kotlin.math.absoluteValue
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encodeUtf8
+import java.io.File
+import java.util.*
+import kotlin.math.absoluteValue
+import com.duckduckgo.mobile.android.R as CommonR
 
 fun ImageView.loadFavicon(
     file: File,
@@ -47,8 +46,6 @@ fun ImageView.loadFavicon(
         Glide.with(context).clear(this@loadFavicon)
         Glide.with(context)
             .load(file)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)
@@ -68,8 +65,6 @@ fun ImageView.loadFavicon(
         Glide.with(context).clear(this)
         Glide.with(context)
             .load(bitmap)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
             .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)

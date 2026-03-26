@@ -1,0 +1,105 @@
+// Wide event pixel for page load performance monitoring
+// Tracks page load lifecycle to measure SLO compliance and identify performance issues
+{
+    "wide_page-load": {
+        "description": "Monitors page load performance across lifecycle phases to track stuck-at-progress issues and overall load times",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelAppVersion",
+            "widePixelAppName",
+            "widePixelFormFactor",
+            "widePixelDevMode",
+            {
+                "key": "feature.name",
+                "description": "Feature identifier for this wide event",
+                "enum": ["page-load"]
+            },
+            {
+                "key": "feature.data.ext.elapsed_time_to_finish_ms_bucketed",
+                "description": "Total duration from page_start to page_finish, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.elapsed_time_to_visible_ms_bucketed",
+                "description": "Duration from page_start to page_visible, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.elapsed_time_to_escaped_fixed_progress_ms_bucketed",
+                "description": "Duration from page_start to page_escaped_fixed_progress, bucketed. Uses lower end of the bucket.",
+                "enum": ["0", "1000", "5000", "10000", "30000", "60000", "300000", "600000"]
+            },
+            {
+                "key": "feature.data.ext.webview_version",
+                "description": "WebView major version",
+                "type": "string"
+            },
+            {
+                "key": "feature.data.ext.cpm_enabled",
+                "description": "Whether Cookie Pop-up Management (autoconsent) is enabled",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.tracker_optimization_enabled_v2",
+                "description": "Whether tracker evaluation optimization is enabled",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.is_tab_in_foreground_on_finish",
+                "description": "Whether the tab was in foreground when page finished loading",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.active_requests_on_load_start",
+                "description": "Number of active network requests when page load started",
+                "type": "number"
+            },
+            {
+                "key": "feature.data.ext.concurrent_requests_on_finish",
+                "description": "Number of concurrent network requests when page finished loading",
+                "type": "number"
+            },
+            {
+                "key": "feature.data.ext.step.page_start",
+                "description": "Parameter present when page load begins",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_visible",
+                "description": "Parameter present when page becomes visible",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_visible.progress",
+                "description": "True if page became visible at or after fixed progress threshold (50%), false if before",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_escaped_fixed_progress",
+                "description": "Parameter present when progress escapes the fixed progress zone (typically 50%)",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_finish",
+                "description": "Parameter present when page load completes or fails",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.page_finish.outcome",
+                "description": "Final outcome of the page load",
+                "enum": ["success", "error"]
+            },
+            {
+                "key": "feature.data.ext.step.page_finish.error_code",
+                "description": "WebViewClient error constant name (e.g., ERROR_HOST_LOOKUP, ERROR_CONNECT). Only present on error outcomes.",
+                "type": "string"
+            }
+        ]
+    }
+}

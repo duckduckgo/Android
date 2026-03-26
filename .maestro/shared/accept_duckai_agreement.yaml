@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android
+---
+# Handle the duck.ai agreement/terms prompt that appears on first use.
+# This dialog is rendered in the duck.ai WebView frontend.
+#
+- extendedWaitUntil:
+    visible:
+      text: ".*Agree and Continue.*"
+    timeout: 10000
+    optional: true
+
+- tapOn:
+    text: ".*Agree and Continue.*"
+    optional: true

@@ -20,15 +20,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
-        android:id="@+id/singleOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:elevation="1dp"
-        android:outlineProvider="none"
-        app:omnibarPosition="top" />
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
@@ -104,16 +95,6 @@
                 android:visibility="gone" />
 
             <include
-                android:id="@+id/includeOnboardingInContextBuckDialog"
-                layout="@layout/include_onboarding_in_context_buck_dialog"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/includeOnboardingInContextBBDialog"
-                layout="@layout/include_onboarding_in_context_bb_dialog"
-                android:visibility="gone" />
-
-            <include
                 android:id="@+id/includeBrokenSitePromptDialog"
                 layout="@layout/prompt_broken_site"
                 android:visibility="gone" />
@@ -161,12 +142,20 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
-        android:id="@+id/singleOmnibarBottom"
+    <FrameLayout
+        android:id="@+id/duckAiContextualFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="12dp"
+        app:behavior_hideable="true"
+        app:behavior_skipCollapsed="true"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:visibility="gone" />
+
+    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
+        android:id="@+id/navigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:outlineProvider="none"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
+        android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

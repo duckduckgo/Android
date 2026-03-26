@@ -27,9 +27,9 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
+import javax.inject.Inject
 
 class DeviceShieldNotificationFactory @Inject constructor(
     private val resources: Resources,

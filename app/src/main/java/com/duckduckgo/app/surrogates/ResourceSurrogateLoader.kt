@@ -25,14 +25,14 @@ import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.io.ByteArrayInputStream
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.io.ByteArrayInputStream
+import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(

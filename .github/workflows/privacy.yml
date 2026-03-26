@@ -8,26 +8,50 @@ on:
       - reopened
     paths:
       - 'node_modules/@duckduckgo/content-scope-scripts/**'
-
-  schedule:
-    - cron: '0 3 * * *' # run at 3 AM UTC
-
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   privacy_tests:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'pull_request' }}
-    name: Privacy Tests
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'workflow_call' || github.event_name == 'pull_request' }}
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Privacy Tests
+            build-task: androidTestsBuild
+            flank-task: runFlankPrivacyTests
+            artifact-name: android-tests-report-privacy
+            asana-task-name: GH Workflow Failure - Privacy tests
+          - name: Internal Privacy Tests
+            build-task: internalAndroidTestsBuild
+            flank-task: runFlankInternalPrivacyTests
+            artifact-name: android-tests-report-privacy-internal
+            asana-task-name: GH Workflow Failure - Internal privacy tests
+    env:
+      DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Setup jq
@@ -52,17 +76,19 @@ jobs:
         run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Build
-        run: ./gradlew androidTestsBuild
+        run: ./gradlew ${{ matrix.build-task }}
 
       - name: Run Android Tests
-        run: ./gradlew runFlankPrivacyTests --no-configuration-cache
+        run: ./gradlew ${{ matrix.flank-task }} --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: always()
-        run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+        run: find . -type d -name 'fladleResults' | zip -@ -r ${{ matrix.artifact-name }}.zip
 
       - name: Generate json file with failures
         if: ${{ failure() }}
@@ -77,16 +103,27 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-tests-report
-          path: android-tests-report.zip
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-name }}.zip
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() && github.event_name != 'workflow_dispatch' }}
-        uses: honeycombio/gha-create-asana-task@main
+        id: create-failure-task
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-secret: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Privacy tests
-          asana-task-description: The privacy workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: ${{ matrix.asana-task-name }}
+          asana-task-description: The ${{ matrix.name }} workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
+
+      - name: Adding as a release blocker
+        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
+          action: 'add-task-asana-project'

@@ -36,13 +36,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -128,15 +128,24 @@ class RxPixelSender @Inject constructor(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
-    ): Completable {
-        return Completable.fromCallable {
-            val pixelEntity = PixelEntity(
-                pixelName = pixelName,
-                atb = getAtbInfo(),
-                additionalQueryParams = addDeviceParametersTo(parameters),
-                encodedQueryParams = encodedParameters,
-            )
-            pendingPixelDao.insert(pixelEntity)
+        type: Pixel.PixelType,
+    ): Single<PixelSender.EnqueuePixelResult> {
+        return Single.fromCallable {
+            runBlocking {
+                if (shouldFirePixel(pixelName, type)) {
+                    val pixelEntity = PixelEntity(
+                        pixelName = pixelName,
+                        atb = getAtbInfo(),
+                        additionalQueryParams = addDeviceParametersTo(parameters),
+                        encodedQueryParams = encodedParameters,
+                    )
+                    pendingPixelDao.insert(pixelEntity)
+                    storePixelFired(pixelName, type)
+                    PixelSender.EnqueuePixelResult.PIXEL_ENQUEUED
+                } else {
+                    PixelSender.EnqueuePixelResult.PIXEL_IGNORED
+                }
+            }
         }
     }
 

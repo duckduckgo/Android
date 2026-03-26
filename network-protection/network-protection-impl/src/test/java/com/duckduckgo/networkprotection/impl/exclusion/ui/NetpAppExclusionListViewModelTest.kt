@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.exclusion.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import app.cash.turbine.test
@@ -89,6 +90,9 @@ class NetpAppExclusionListViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    @Mock
+    private lateinit var context: Context
+
     private val autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
     private val localConfig = FakeNetPSettingsLocalConfigFactory.create()
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
@@ -117,6 +121,7 @@ class NetpAppExclusionListViewModelTest {
             localConfig,
             autoExcludeAppsRepository,
             autoExcludePrompt,
+            context,
         )
 
         testee.initialize()

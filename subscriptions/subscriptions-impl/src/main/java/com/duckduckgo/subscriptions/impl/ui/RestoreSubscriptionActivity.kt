@@ -42,10 +42,9 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(RestoreSubscriptionScreenWithParams::class)
@@ -80,23 +79,8 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        viewModel.viewState
-            .onEach { renderView(it) }
-            .launchIn(lifecycleScope)
-    }
-
-    private fun renderView(viewState: ViewState) {
-        val title: Int
-        val secondaryText: Int
-        if (viewState.rebrandingEnabled) {
-            title = string.restoreSubscriptionTitleRebranding
-            secondaryText = string.restoreSubscriptionEmailDescriptionRebranding
-        } else {
-            title = string.restoreSubscriptionTitle
-            secondaryText = string.restoreSubscriptionEmailDescription
-        }
-        binding.title.setText(title)
-        binding.restoreSubscriptionEmailTitle.setSecondaryText(getString(secondaryText))
+        binding.title.setText(string.restoreSubscriptionTitle)
+        binding.restoreSubscriptionEmailTitle.setSecondaryText(getString(string.restoreSubscriptionEmailDescription))
 
         // removing the click listeners from the LineListItems
         // so that they don't trigger the selectable background animation when interacted with
@@ -104,10 +88,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         binding.restoreSubscriptionGooglePlayTitle.setOnClickListener(null)
 
         binding.restoreSubscriptionEmailLayout.setOnClickListener {
-            viewModel.restoreFromEmail()
+            viewModel.restoreFromEmail(isOriginWeb)
         }
         binding.restoreSubscriptionGooglePlayLayout.setOnClickListener {
-            viewModel.restoreFromStore()
+            viewModel.restoreFromStore(isOriginWeb)
         }
     }
 
@@ -118,13 +102,13 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToRestore() {
-        val intent = globalActivityStarter.startIntent(
+        globalActivityStarter.startForResult(
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = subscriptionsUrlProvider.activateUrl,
             ),
+            startForResultRestore,
         )
-        startForResultRestore.launch(intent)
     }
 
     private fun onPurchaseRestored() {

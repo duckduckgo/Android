@@ -19,17 +19,19 @@ tags:
       - assertVisible:
             text: "Search engine"
       - tapOn:
-            text: "https://www.search-company.site/"
+            id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
             text: "Privacy Test Pages"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
             text: "add bookmark"
       - tapOn:
             text: "add bookmark"
-      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - tapOn:
+          id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
       - assertVisible:
             text: "bookmarks"
       - tapOn:

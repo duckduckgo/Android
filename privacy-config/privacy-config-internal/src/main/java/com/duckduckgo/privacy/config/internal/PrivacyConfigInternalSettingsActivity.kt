@@ -41,9 +41,9 @@ import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Com
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.Loading
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.ViewState
 import com.duckduckgo.privacy.config.internal.databinding.ActivityPrivacyConfigInternalSettingsBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class PrivacyConfigInternalSettingsActivity : DuckDuckGoActivity() {

@@ -20,7 +20,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.DrawableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
@@ -31,50 +35,35 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBackButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyForwardButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyMenuButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.OmnibarView
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+import kotlin.math.abs
 
 @InjectWith(ViewScope::class)
 class BrowserNavigationBarView @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle) {
-
-    @Inject
-    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    private var showShadows: Boolean = false
-
-    init {
-        context.theme.obtainStyledAttributes(attrs, R.styleable.BrowserNavigationBarView, defStyle, 0)
-            .apply {
-                showShadows = getBoolean(R.styleable.BrowserNavigationBarView_showShadows, true)
-                recycle()
-            }
-    }
+) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
 
     override fun setVisibility(visibility: Int) {
         val isVisibilityUpdated = this.visibility != visibility
@@ -112,18 +101,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner, onboardingDesignExperimentManager)
+        PulseAnimation(lifecycleOwner)
     }
 
     val popupMenuAnchor: View = binding.menuButton
 
     var browserNavigationBarObserver: BrowserNavigationBarObserver? = null
-
-    fun setCustomTab(isCustomTab: Boolean) {
-        doOnAttach {
-            viewModel.setCustomTab(isCustomTab)
-        }
-    }
 
     fun setViewMode(viewMode: ViewMode) {
         doOnAttach {
@@ -135,6 +118,23 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         doOnAttach {
             viewModel.setFireButtonHighlight(highlighted)
         }
+    }
+
+    fun setBrowserMenuIcon(@DrawableRes icon: Int) {
+        doOnAttach {
+            ContextCompat.getDrawable(this.context, icon)?.let {
+                binding.browserMenuImageView.setImageDrawable(it)
+            }
+        }
+    }
+
+    fun disableViewStateSaving() {
+        binding.browserMenuImageView.isSaveEnabled = false
+        binding.tabsButton.isSaveEnabled = false
+        binding.fireIconImageView.isSaveEnabled = false
+        binding.bookmarksImageView.isSaveEnabled = false
+        binding.autofillButtonImageView.isSaveEnabled = false
+        binding.newTabButtonImageView.isSaveEnabled = false
     }
 
     override fun onAttachedToWindow() {
@@ -190,8 +190,11 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         conflatedStateJob.cancel()
     }
 
+    override fun getBehavior(): Behavior<*> {
+        return BottomViewBehavior(context, attrs)
+    }
+
     private fun renderView(viewState: ViewState) {
-        binding.shadowView.isVisible = showShadows
         binding.root.isVisible = viewState.isVisible
 
         binding.newTabButton.isVisible = viewState.newTabButtonVisible
@@ -201,6 +204,8 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
         binding.tabsButton.count = viewState.tabsCount
         binding.tabsButton.hasUnread = viewState.hasUnreadTabs
+        binding.browserMenuHighlight.isVisible = viewState.showBrowserMenuHighlight
+        binding.shadowView.isVisible = viewState.showShadow
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
@@ -211,9 +216,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyTabsButtonClicked -> browserNavigationBarObserver?.onTabsButtonClicked()
             NotifyTabsButtonLongClicked -> browserNavigationBarObserver?.onTabsButtonLongClicked()
             NotifyMenuButtonClicked -> browserNavigationBarObserver?.onMenuButtonClicked()
-            NotifyBackButtonClicked -> browserNavigationBarObserver?.onBackButtonClicked()
-            NotifyBackButtonLongClicked -> browserNavigationBarObserver?.onBackButtonLongClicked()
-            NotifyForwardButtonClicked -> browserNavigationBarObserver?.onForwardButtonClicked()
             NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
             NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
             NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
@@ -233,7 +235,41 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     enum class ViewMode {
+        CustomTab,
         NewTab,
         Browser,
+        TabManager,
+    }
+
+    /**
+     * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
+     */
+    inner class BottomViewBehavior(
+        context: Context,
+        attrs: AttributeSet?,
+    ) : Behavior<View>(context, attrs) {
+        override fun layoutDependsOn(
+            parent: CoordinatorLayout,
+            child: View,
+            dependency: View,
+        ): Boolean {
+            return dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT
+        }
+
+        override fun onDependentViewChanged(
+            parent: CoordinatorLayout,
+            child: View,
+            dependency: View,
+        ): Boolean {
+            if (dependency is OmnibarView && dependency.omnibarType == OmnibarType.SPLIT) {
+                val dependencyOffset = abs(dependency.top)
+                val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
+                val childHeight = child.measuredHeight
+                val childOffset = childHeight * offsetPercentage
+                child.translationY = childOffset
+                return true
+            }
+            return false
+        }
     }
 }

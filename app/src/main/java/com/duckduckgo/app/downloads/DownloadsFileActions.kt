@@ -28,10 +28,10 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.squareup.anvil.annotations.ContributesBinding
-import java.io.File
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) : DownloadsFileActions {

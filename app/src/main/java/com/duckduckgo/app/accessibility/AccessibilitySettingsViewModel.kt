@@ -27,13 +27,13 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_OFF
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(

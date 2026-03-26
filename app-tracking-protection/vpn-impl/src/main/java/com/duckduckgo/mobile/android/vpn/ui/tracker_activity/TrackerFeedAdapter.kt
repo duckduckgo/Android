@@ -42,8 +42,8 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedIt
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.facebook.shimmer.ShimmerFrameLayout
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class TrackerFeedAdapter @Inject constructor(
     private val dispatchers: DispatcherProvider,

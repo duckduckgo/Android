@@ -26,11 +26,11 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.*
+import logcat.logcat
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
-import kotlinx.coroutines.*
-import logcat.logcat
 
 interface AppTrackerRecorder {
     fun insertTracker(vpnTracker: VpnTracker)

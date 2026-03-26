@@ -37,23 +37,28 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">I siti possono utilizzare il registratore audio solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai è una funzionalità opzionale che consente di chattare in forma anonima con i più diffusi modelli di chat AI di terze parti. Le chat non vengono usate per addestrare l\'IA.\n<annotation type="learn_more_link">Scopri di più</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Abilita Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Funzionalità IA</string>
+    <string name="duck_chat_settings_activity_description">Le funzionalità AI di DuckDuckGo sono private e opzionali.I tuoi dati non vengono usati per addestrare l\'IA.\n<annotation type="learn_more_link">Scopri di più</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Chatta privatamente con i più diffusi modelli di AI di terze parti</string>
     <string name="duck_chat_visibility_setting">Menu del browser</string>
     <string name="duck_chat_address_bar_visibility_setting">Barra degli indirizzi</string>
-    <string name="duck_chat_assist_settings_title">Impostazioni di Assist</string>
+    <string name="duck_chat_assist_settings_title">Impostazioni di Search Assist</string>
     <string name="duck_chat_assist_settings_description">Scegli la frequenza con cui vuoi che le risposte assistite dall\'intelligenza artificiale appaiano nelle tue ricerche</string>
     <string name="duck_ai_shortcut_settings_title">Scorciatoie Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Scegli quali scorciatoie di Duck.ai visualizzare</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Ricerca vocale</string>
+
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Ricerca</string>
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>
-    <string name="input_screen_user_pref_description">Prova la nostra nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
+    <string name="input_screen_user_pref_description">Prova la nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -62,25 +67,38 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Apri Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Ulteriori informazioni</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Funzionalità IA</string>
-    <string name="duck_chat_settings_activity_description_rebranding">Le funzionalità AI di DuckDuckGo sono private e opzionali.I tuoi dati non vengono usati per addestrare l\'IA.\n<annotation type="learn_more_link">Scopri di più</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatta privatamente con i più diffusi modelli di AI di terze parti</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Impostazioni di Search Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Scegli la frequenza con cui vuoi che le risposte assistite dall\'intelligenza artificiale appaiano nelle tue ricerche</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Chiedi a Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Impossibile trovare l\'applicazione</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Vuoi un accesso più semplice\nall\'AI chat privata?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Cerca o digita l\'indirizzo</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Passa dalla ricerca alla chat AI e viceversa</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Le funzionalità AI sono sempre facoltative.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Conferma</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Non adesso</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Regola in Impostazioni &gt; Funzionalità AI.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Solo ricerca</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Ricerca e Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Opzione Barra degli indirizzi</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Funzionalità IA</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Ricerca</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Nascondi le immagini generate dall\'IA</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Filtra le immagini generate dall\'intelligenza artificiale dai risultati di ricerca delle immagini</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Abilita nelle impostazioni delle funzionalità AI</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Gestisci nelle impostazioni delle funzionalità AI</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Configura Duck.ai nelle impostazioni delle funzionalità AI.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Riassumi questa pagina</string>
+    <string name="duckAIContextualAutomaticContextTitle">Invia automaticamente il contenuto della pagina</string>
+    <string name="duckAIContextualAutomaticContextMessage">Invia automaticamente il contenuto della pagina a Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Allega il contenuto della pagina</string>
 </resources>

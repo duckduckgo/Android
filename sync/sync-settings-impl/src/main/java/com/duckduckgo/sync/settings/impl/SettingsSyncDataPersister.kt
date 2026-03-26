@@ -18,6 +18,7 @@ package com.duckduckgo.sync.settings.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.*
@@ -30,11 +31,11 @@ import com.duckduckgo.sync.settings.impl.SettingsSyncDataPersister.Adapters.Comp
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SettingsSyncDataPersister @Inject constructor(

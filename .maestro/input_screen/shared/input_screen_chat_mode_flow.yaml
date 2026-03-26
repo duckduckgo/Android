@@ -1,0 +1,44 @@
+appId: com.duckduckgo.mobile.android
+---
+- tapOn:
+    id: "omnibarTextInput"
+    optional: true
+- assertVisible:
+    id: "inputModeWidget"
+- tapOn:
+    text: "Duck.ai"
+
+# verify that typed text is visible
+- assertVisible:
+    text: "Ask privately"
+- inputText: "hey"
+- assertVisible:
+    text: "hey"
+    childOf:
+      id: "inputField"
+
+# verify clear text button works
+- tapOn:
+    id: "inputFieldClearText"
+- assertNotVisible:
+    text: "hey"
+    childOf:
+      id: "inputField"
+
+# verify new line button works
+- inputText: "ducks"
+- tapOn:
+    id: "actionNewLine"
+- inputText: "go"
+- assertVisible:
+    text: 'ducks\Rgo'
+    childOf:
+      id: "inputField"
+
+# verify that Duck.ai web view is opened when submitting a query in chat mode
+- tapOn:
+    id: "actionSend"
+- assertVisible:
+    text: "Duck.ai"
+    childOf:
+      id: "toolbar"

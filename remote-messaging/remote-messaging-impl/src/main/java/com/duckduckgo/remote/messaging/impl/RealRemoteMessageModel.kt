@@ -23,10 +23,11 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealRemoteMessageModel @Inject constructor(
@@ -77,6 +78,14 @@ class RealRemoteMessageModel @Inject constructor(
             }
         }
         return action
+    }
+
+    override suspend fun getRemoteMessageImageFile(surface: Surface): String? {
+        return remoteMessagingRepository.getRemoteMessageImageFile(surface)
+    }
+
+    override suspend fun clearMessageImage(surface: Surface) {
+        remoteMessagingRepository.clearMessageImage(surface)
     }
 
     private fun Content.getPrimaryAction(): Action? {

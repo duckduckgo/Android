@@ -17,6 +17,11 @@
 package com.duckduckgo.app.autocomplete.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelName {
 
@@ -32,4 +37,14 @@ enum class AutoCompletePixelNames(override val pixelName: String) : Pixel.PixelN
 
     AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION("m_autocomplete_click_duckai_experimental"),
     AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION("m_autocomplete_click_duckai_legacy"),
+    AUTOCOMPLETE_INSTALLED_APP_SELECTION("m_autocomplete_click_installed-app"),
+}
+
+@ContributesMultibinding(AppScope::class)
+class AutocompleteParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            AutoCompletePixelNames.AUTOCOMPLETE_INSTALLED_APP_SELECTION.pixelName to PixelParameter.removeAtb(),
+        )
+    }
 }

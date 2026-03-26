@@ -17,11 +17,11 @@
 package com.duckduckgo.browser.api.webviewcompat
 
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
 
 interface WebViewCompatWrapper {
-
     suspend fun addDocumentStartJavaScript(
         webView: WebView,
         script: String,
@@ -38,5 +38,11 @@ interface WebViewCompatWrapper {
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
+    )
+
+    suspend fun postMessage(
+        webView: WebView,
+        replyProxy: JavaScriptReplyProxy?,
+        subscriptionEvent: String,
     )
 }

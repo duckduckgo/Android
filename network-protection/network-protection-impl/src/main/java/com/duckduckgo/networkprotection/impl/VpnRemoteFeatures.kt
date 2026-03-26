@@ -33,9 +33,9 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -55,6 +55,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun localVpnControllerDns(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendVpnEnableWideEvent(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

@@ -25,6 +25,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class DefaultWebViewVersionProvider @Inject constructor(
     private val webViewVersionSource: WebViewVersionSource,
+    private val webViewPackageSource: WebViewPackageSource,
 ) : WebViewVersionProvider {
     companion object {
         const val WEBVIEW_VERSION_DELIMITER = "."
@@ -34,6 +35,8 @@ class DefaultWebViewVersionProvider @Inject constructor(
 
     override fun getMajorVersion(): String =
         webViewVersionSource.get().captureMajorVersion().mapNonIntegerToUnknown()
+
+    override fun getPackageName(): String = webViewPackageSource.get().mapEmptyToUnknown()
 
     private fun String.captureMajorVersion() = this.split(WEBVIEW_VERSION_DELIMITER)[0]
 

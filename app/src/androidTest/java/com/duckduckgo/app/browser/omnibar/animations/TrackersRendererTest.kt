@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.omnibar.animations
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.omnibar.animations.addressbar.TrackersRenderer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

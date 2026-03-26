@@ -25,12 +25,12 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
+import javax.inject.Inject
 
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,

@@ -33,13 +33,13 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.wireguard.crypto.KeyPair
 import dagger.Module
 import dagger.Provides
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Qualifier
-import logcat.LogPriority.ERROR
-import logcat.asLog
-import logcat.logcat
 
 interface NetPRekeyer {
     suspend fun doRekey()

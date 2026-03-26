@@ -22,19 +22,21 @@ import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ContributesBinding(AppScope::class)
 class WebViewCookieManager @Inject constructor(
     private val cookieManager: CookieManagerProvider,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider,
+    duckAiHostProvider: DuckAiHostProvider,
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
@@ -79,7 +81,7 @@ class WebViewCookieManager @Inject constructor(
 
     private fun getDuckDuckGoCookies(): Map<String, List<String>> {
         val map = mutableMapOf<String, List<String>>()
-        DDG_COOKIE_DOMAINS.forEach { host ->
+        ddgCookieDomains.forEach { host ->
             map[host] = cookieManager.get()?.getCookie(host)?.split(";").orEmpty()
         }
         return map
@@ -89,7 +91,5 @@ class WebViewCookieManager @Inject constructor(
         cookieManager.get()?.flush()
     }
 
-    companion object {
-        val DDG_COOKIE_DOMAINS = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES)
-    }
+    private val ddgCookieDomains: List<String> = listOf(AppUrl.Url.COOKIES, AppUrl.Url.SURVEY_COOKIES, "https://${duckAiHostProvider.getHost()}")
 }

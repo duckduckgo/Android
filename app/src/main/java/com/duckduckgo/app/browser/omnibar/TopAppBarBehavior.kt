@@ -40,6 +40,7 @@ class TopAppBarBehavior(
         private val viewsExemptedFromOffset = setOf(
             R.id.browserLayout,
             R.id.webViewFullScreenContainer,
+            R.id.navigationBar,
         )
     }
 
@@ -58,6 +59,18 @@ class TopAppBarBehavior(
         }
 
         return super.layoutDependsOn(parent, child, dependency)
+    }
+
+    override fun onStartNestedScroll(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        directTargetChild: View,
+        target: View,
+        nestedScrollAxes: Int,
+        type: Int,
+    ): Boolean {
+        if (!omnibar.isOmnibarScrollingEnabled()) return false
+        return super.onStartNestedScroll(parent, child, directTargetChild, target, nestedScrollAxes, type)
     }
 
     override fun onNestedPreScroll(

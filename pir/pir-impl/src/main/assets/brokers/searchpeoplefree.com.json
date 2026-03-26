@@ -1,0 +1,87 @@
+{
+  "name": "Search People FREE",
+  "url": "searchpeoplefree.com",
+  "version": "0.7.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1703052000000,
+  "optOutUrl": "https://www.searchpeoplefree.com/opt-out",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "a85625a6-4607-4fea-9fa4-38294a7de727",
+          "url": "https://searchpeoplefree.com/find/${firstName}-${lastName}/${state}/${city}"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "div.body"
+            }
+          ],
+          "id": "7334a63e-1d47-45e9-a1f3-c1780b29cd1f"
+        },
+        {
+          "actionType": "extract",
+          "id": "f41ee88d-149e-48ac-9371-efbaa151c773",
+          "selector": "//li[@class='toc l-i mb-5']",
+          "noResultsSelector": "//h2[contains(text(), 'Not Found')]",
+          "profile": {
+            "name": {
+              "selector": ".h2",
+              "beforeText": " in "
+            },
+            "alternativeNamesList": {
+              "selector": ".//h2[contains(@class, 'h2')]/span[contains(@class, 'd-block')]",
+              "afterText": "also"
+            },
+            "age": {
+              "selector": ".//h3[contains(@class, 'mb-3')]/span",
+              "beforeText": "("
+            },
+            "addressFullList": {
+              "selector": ".//i[contains(text(), 'address')]/following-sibling::ul[1]//li[contains(@class, 'col-lg-6')]",
+              "findElements": true,
+              "beforeText": "-Current"
+            },
+            "addressCityState": {
+              "selector": ".h2",
+              "afterText": "in",
+              "beforeText": "also"
+            },
+            "phoneList": {
+              "selector": ".//i[contains(text(), 'phone')]/following-sibling::ul[1]//li[contains(@class, 'col-md-6')]",
+              "findElements": true,
+              "beforeText": "-Current"
+            },
+            "relativesList": {
+              "selector": ".//i[contains(text(), 'Spouse')]/following-sibling::ul[1]//li[contains(@class, 'col-md-6')]",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[contains(@class, 'btn-continue')]",
+              "identifierType": "path",
+              "identifier": "https://www.searchpeoplefree.com/find/${firstName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

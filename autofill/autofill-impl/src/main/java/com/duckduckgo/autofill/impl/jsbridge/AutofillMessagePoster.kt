@@ -25,10 +25,10 @@ import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import javax.inject.Inject
 
 interface AutofillMessagePoster {
     suspend fun postMessage(

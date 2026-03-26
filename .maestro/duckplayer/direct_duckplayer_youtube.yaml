@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
 name: "DuckPlayer: Direct > Duck Player > YouTube"
 tags:
   - duckplayer
@@ -18,8 +19,13 @@ tags:
 
       - runFlow: common/assert_duckplayer_visible.yaml
 
-      - tapOn:
-          id: app
+      - runFlow:
+          when:
+            visible: 
+              id: "global-loader"
+          commands:
+          - tapOn:
+              id: app
 
       - tapOn:
           text: "Watch on YouTube"

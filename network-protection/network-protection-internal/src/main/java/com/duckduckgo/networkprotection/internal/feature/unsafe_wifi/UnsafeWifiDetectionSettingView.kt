@@ -46,7 +46,6 @@ import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiD
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionViewModel.Factory
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -56,6 +55,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
@@ -118,7 +118,8 @@ class UnsafeWifiDetectionSettingView @JvmOverloads constructor(
         when (state) {
             Disable -> binding.unsafeWifiDetection.quietlySetIsChecked(false, toggleListener)
             Enable -> binding.unsafeWifiDetection.quietlySetIsChecked(true, toggleListener)
-            Idle -> { /* no-op */
+            Idle -> {
+                /* no-op */
             }
         }
     }

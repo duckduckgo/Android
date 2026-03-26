@@ -1,0 +1,8 @@
+appId: com.duckduckgo.mobile.android
+---
+# enable the Split omnibar
+- runFlow: ../../shared/open_appearance_settings_screen.yaml
+- tapOn:
+    id: "splitOmnibarToggleImage"
+- action: back
+- action: back

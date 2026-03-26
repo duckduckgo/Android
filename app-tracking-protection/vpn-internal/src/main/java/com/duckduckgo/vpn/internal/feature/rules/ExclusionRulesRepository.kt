@@ -19,8 +19,8 @@ package com.duckduckgo.vpn.internal.feature.rules
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class ExclusionRulesRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,

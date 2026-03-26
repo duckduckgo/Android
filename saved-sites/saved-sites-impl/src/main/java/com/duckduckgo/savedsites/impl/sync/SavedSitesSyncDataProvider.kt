@@ -30,8 +30,8 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SavedSitesSyncDataProvider @Inject constructor(

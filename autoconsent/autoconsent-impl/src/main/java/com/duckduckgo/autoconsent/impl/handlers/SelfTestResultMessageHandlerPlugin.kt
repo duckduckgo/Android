@@ -18,17 +18,24 @@ package com.duckduckgo.autoconsent.impl.handlers
 
 import android.webkit.WebView
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
+import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
+import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerPlugin {
+class SelfTestResultMessageHandlerPlugin @Inject constructor(
+    private val autoconsentPixelManager: AutoconsentPixelManager,
+    private val reloadLoopDetector: AutoconsentReloadLoopDetector,
+) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -36,7 +43,23 @@ class SelfTestResultMessageHandlerPlugin @Inject constructor() : MessageHandlerP
         if (supportedTypes.contains(messageType)) {
             try {
                 val message: SelfTestResultMessage = parseMessage(jsonString) ?: return
-                autoconsentCallback.onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = message.result, isCosmetic = null)
+
+                if (message.result) {
+                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_OK_DAILY)
+                } else {
+                    autoconsentPixelManager.fireDailyPixel(AutoConsentPixel.AUTOCONSENT_SELF_TEST_FAIL_DAILY)
+                }
+
+                autoconsentCallback.onResultReceived(
+                    AutoconsentResult(
+                        consentManaged = true,
+                        optOutFailed = false,
+                        selfTestFailed = message.result,
+                        isCosmetic = null,
+                        consentRule = message.cmp,
+                        consentReloadLoop = reloadLoopDetector.isReloadLoopDetected(webView),
+                    ),
+                )
             } catch (e: Exception) {
                 logcat { e.localizedMessage }
             }

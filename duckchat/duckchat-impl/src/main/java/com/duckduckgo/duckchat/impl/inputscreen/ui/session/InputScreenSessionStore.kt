@@ -24,8 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.RealInputScreenSessionStore.Keys.HAS_USED_CHAT_MODE_KEY
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.RealInputScreenSessionStore.Keys.HAS_USED_SEARCH_MODE_KEY
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Inject
 
 interface InputScreenSessionStore {
     suspend fun hasUsedSearchMode(): Boolean

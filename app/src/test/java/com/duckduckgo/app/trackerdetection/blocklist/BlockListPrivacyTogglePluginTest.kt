@@ -1,9 +1,9 @@
 package com.duckduckgo.app.trackerdetection.blocklist
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -13,15 +13,14 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.DASHBOARD
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.MENU
 import com.squareup.moshi.Moshi
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.verify
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoInteractions
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @SuppressLint("DenyListedApi")
 class BlockListPrivacyTogglePluginTest {
@@ -38,7 +37,7 @@ class BlockListPrivacyTogglePluginTest {
     )
     private val configAdapter = moshi.adapter(Config::class.java)
 
-    private val pixel: Pixel = mock()
+    private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
     private lateinit var blockListPixelsPlugin: BlockListPixelsPlugin
@@ -63,19 +62,20 @@ class BlockListPrivacyTogglePluginTest {
             coroutineRule.testDispatcherProvider,
         )
 
+        fakeMetricsPixelExtension.register()
+
         blockListPixelsPlugin = BlockListPixelsPlugin(inventory)
-        blockListPrivacyTogglePlugin = BlockListPrivacyTogglePlugin(blockListPixelsPlugin, pixel)
+        blockListPrivacyTogglePlugin = BlockListPrivacyTogglePlugin(blockListPixelsPlugin)
     }
 
     @Test
-    fun `when toggle is off and assigned to experiment and origin dashboard then send pixels`() = runTest {
+    fun `when toggle is off and assigned to experiment and origin dashboard then send pixel`() = runTest {
         assignToExperiment()
 
         blockListPrivacyTogglePlugin.onToggleOff(DASHBOARD)
 
-        blockListPixelsPlugin.getPrivacyToggleUsed()!!.getPixelDefinitions().forEach {
-            verify(pixel).fire(it.pixelName, it.params)
-        }
+        assertEquals(1, fakeMetricsPixelExtension.sentMetrics.size)
+        assertEquals("privacyToggleUsed", fakeMetricsPixelExtension.sentMetrics.first().metric)
     }
 
     @Test
@@ -83,10 +83,10 @@ class BlockListPrivacyTogglePluginTest {
         assignToExperiment()
 
         blockListPrivacyTogglePlugin.onToggleOff(MENU)
-        verifyNoInteractions(pixel)
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
 
         blockListPrivacyTogglePlugin.onToggleOff(BREAKAGE_FORM)
-        verifyNoInteractions(pixel)
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
     }
 
     private fun assignToExperiment() {

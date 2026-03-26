@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -36,9 +37,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
-import java.io.File
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -50,12 +48,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -140,6 +142,19 @@ class DownloadsViewModel @Inject constructor(
     fun onQueryTextChange(newText: String) {
         viewModelScope.launch {
             filterText.emit(newText)
+        }
+    }
+
+    fun syncDownloads() {
+        viewModelScope.launch(dispatcher.io()) {
+            val downloads = downloadsRepository.getDownloads()
+            val staleDownloadIds = downloads
+                .filter { it.downloadStatus == DownloadStatus.FINISHED && !File(it.filePath).exists() }
+                .map { it.downloadId }
+            if (staleDownloadIds.isNotEmpty()) {
+                downloadsRepository.delete(staleDownloadIds)
+            }
+            downloadMenuStateProvider.onDownloadsScreenViewed()
         }
     }
 

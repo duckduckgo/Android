@@ -20,13 +20,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
-import java.time.LocalDateTime
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 
 interface HistoryRepository {
     fun getHistory(): Flow<List<HistoryEntry>>
@@ -36,7 +34,10 @@ interface HistoryRepository {
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     )
+
+    suspend fun removeHistoryForTab(tabId: String)
 
     suspend fun clearHistory()
 
@@ -56,23 +57,20 @@ interface HistoryRepository {
 class RealHistoryRepository(
     private val historyDao: HistoryDao,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
     private val historyDataStore: HistoryDataStore,
 ) : HistoryRepository {
 
-    private var cachedHistoryEntries: List<HistoryEntry>? = null
-
-    override fun getHistory(): Flow<List<HistoryEntry>> = runCatching {
-        flow {
-            emit(cachedHistoryEntries ?: fetchAndCacheHistoryEntries())
-        }.flowOn(dispatcherProvider.io())
-    }.getOrElse { flowOf(emptyList()) }
+    override fun getHistory(): Flow<List<HistoryEntry>> =
+        historyDao.getHistoryEntriesWithVisitsFlow()
+            .map { entries -> entries.mapNotNull { it.toHistoryEntry() } }
+            .distinctUntilChanged()
 
     override suspend fun saveToHistory(
         url: String,
         title: String?,
         query: String?,
         isSerp: Boolean,
+        tabId: String,
     ) {
         withContext(dispatcherProvider.io()) {
             historyDao.updateOrInsertVisit(
@@ -81,32 +79,32 @@ class RealHistoryRepository(
                 query,
                 isSerp,
                 LocalDateTime.now(),
+                tabId,
             )
-            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun removeHistoryForTab(tabId: String) {
+        withContext(dispatcherProvider.io()) {
+            historyDao.deleteHistoryForTab(tabId)
         }
     }
 
     override suspend fun clearHistory() {
         withContext(dispatcherProvider.io()) {
-            cachedHistoryEntries = null
             historyDao.deleteAll()
-            fetchAndCacheHistoryEntries()
         }
     }
 
     override suspend fun removeHistoryEntryByUrl(url: String) {
         withContext(dispatcherProvider.io()) {
-            cachedHistoryEntries = null
             historyDao.deleteEntriesByUrl(url)
-            fetchAndCacheHistoryEntries()
         }
     }
 
     override suspend fun removeHistoryEntryByQuery(query: String) {
         withContext(dispatcherProvider.io()) {
-            cachedHistoryEntries = null
             historyDao.deleteEntriesByQuery(query)
-            fetchAndCacheHistoryEntries()
         }
     }
 
@@ -122,24 +120,16 @@ class RealHistoryRepository(
         }
     }
 
-    private suspend fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {
-        return historyDao
-            .getHistoryEntriesWithVisits()
-            .mapNotNull { it.toHistoryEntry() }
-            .also { cachedHistoryEntries = it }
-    }
-
     override suspend fun clearEntriesOlderThan(dateTime: LocalDateTime) {
-        cachedHistoryEntries = null
-        historyDao.deleteEntriesOlderThan(dateTime)
-        fetchAndCacheHistoryEntries()
+        withContext(dispatcherProvider.io()) {
+            historyDao.deleteEntriesOlderThan(dateTime)
+        }
     }
 
     override suspend fun hasHistory(): Boolean {
         return withContext(dispatcherProvider.io()) {
-            (cachedHistoryEntries ?: fetchAndCacheHistoryEntries()).let {
-                it.isNotEmpty()
-            }
+            historyDao.getHistoryEntriesWithVisits()
+                .any { it.toHistoryEntry() != null }
         }
     }
 }

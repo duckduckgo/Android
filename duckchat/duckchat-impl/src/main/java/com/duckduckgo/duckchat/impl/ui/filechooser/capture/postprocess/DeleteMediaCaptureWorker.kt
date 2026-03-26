@@ -22,10 +22,10 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 /**
  * Media captured from camera / sound recorder to be uploaded through the WebView shouldn't be kept forever.

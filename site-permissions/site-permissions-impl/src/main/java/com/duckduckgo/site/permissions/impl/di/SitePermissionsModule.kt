@@ -17,7 +17,8 @@
 package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
@@ -36,11 +37,12 @@ object SitePermissionsModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
-        return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun providesSitePermissionsDatabase(databaseProvider: DatabaseProvider): SitePermissionsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            SitePermissionsDatabase::class.java,
+            "site_permissions.db",
+            config = RoomDatabaseConfig(fallbackToDestructiveMigration = true, migrations = ALL_MIGRATIONS),
+        )
     }
 
     @Provides

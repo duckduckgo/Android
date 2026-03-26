@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Търсене или въвеждане на URL адрес</string>
     <string name="clearButtonContentDescription">Изчистване на въведеното търсене</string>
     <string name="no_compatible_third_party_app_installed">Няма инсталирано съвместимо приложение</string>
-    <string name="addBookmarkMenuTitle">Добави отметка</string>
-    <string name="editBookmarkMenuTitle">Редактиране на отметка</string>
+
     <string name="addFavoriteMenuTitle">Добавяне в любими</string>
     <string name="removeFavoriteMenuTitle">Премахване от любими</string>
     <string name="favoriteAddedMessage">Добавено в любими</string>
     <string name="bookmarkAddedMessage">Добавена е отметка</string>
-    <string name="requestDesktopSiteMenuTitle">Сайт на работния плот</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Премахване на огнеустойчивост</string>
-    <string name="requestMobileSiteMenuTitle">Мобилна версия на сайта</string>
     <string name="downloadsMenuTitle">Изтеглени файлове</string>
-    <string name="printMenuTitle">Отпечатване на страницата</string>
     <string name="favoriteDeleteConfirmationMessage">Премахнато от любими</string>
     <string name="fireproofDeleteConfirmationMessage">Премахната огнеустойчивост</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Защитата на поверителността е активирана за %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Опции</string>
     <string name="shareLink">Споделяне на връзка</string>
-    <string name="shareMenuTitle">Споделяне</string>
     <string name="copyUrl">Копиране на адреса на връзката</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Намери в страницата</string>
     <string name="nextSearchTermDescription">Намери следващ</string>
     <string name="previousSearchTermDescription">Намери предишен</string>
     <string name="closeFindInPageButtonDescription">Затваряне на изгледа за търсене в страницата</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Изчистване на данни</string>
-    <string name="fireClearAll">Изчистване на всички раздели и данни</string>
-    <string name="fireClearAllPlusDuckChats">Изчистване на всички раздели, данни и чатове с Duck.ai</string>
+    <string name="fireClearAll">Изтриване на раздели и данни</string>
+    <string name="fireClearAllPlusDuckChats">Изтриване на раздели, данни и чатове с Duck.ai</string>
     <string name="fireCancel">Отмени</string>
     <string name="fireDataCleared">Данните са изчистени</string>
 
@@ -135,6 +128,7 @@
     <string name="settingsMenuItemTitle">Настройки</string>
     <string name="settingsHeadingProtections">Защити</string>
     <string name="settingsHeadingAppearance">Външен вид</string>
+    <string name="settingsWhatsNew">Новости</string>
     <string name="settingsHeadingAbout">За нас</string>
     <string name="settingsAboutDuckduckgo">За DuckDuckGo</string>
     <string name="settingsVersion">Версия</string>
@@ -167,6 +161,7 @@
     <string name="settingsAddressBarPosition">Задайте позицията на адресната лента</string>
     <string name="settingsEnableVoiceSearch">Активиране на поверително гласово търсене</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo на други платформи</string>
+    <string name="settingsDuckAi">Функции с изкуствен интелект</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">поверително търсене</string>
@@ -181,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
     <string name="openAutoCompleteSettings">Отвори Настройки</string>
+    <string name="privateSearchChatSuggestionsToggle">Предложения за чат</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Показване на предложения от историята, отметките и (по избор) историята на чата с Duck.ai, когато въвеждате в лентата за търсене. Всички търсения са поверителни.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Обща информация</string>
@@ -189,7 +186,6 @@
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
     <string name="webTrackingProtectionTitle">Защита от проследяване в мрежата</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматично блокира скритите тракери, докато сърфирате в мрежата.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Браузърът DuckDuckGo предоставя защити от проследяване, които винаги са активни.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Как защитаваме теб</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Блокира тракерите на трети страни</string>
@@ -213,12 +209,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Глобален контрол на поверителността</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Упражнява правото Ви на отказ от Ваше име, като казва на сайтовете да не продават или споделят личната Ви информация.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
+    <string name="getDesktopBrowserTitle">Защитете личната си информация и на Mac, и на Windows!</string>
+    <string name="getDesktopBrowserBody">За да изтеглите DuckDuckGo за Mac или Windows, посетете:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Споделяне на връзка за изтегляне</string>
+    <string name="getDesktopBrowserNoThanks">Не, благодаря</string>
+    <string name="getDesktopBrowserHideItem">Скрий</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Връзката е копирана</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Изчистване на данни</string>
+    <string name="dataClearingDescription">Изтриването на данните може да помогне за защитата на поверителността Ви онлайн. Използвайте Fire Button, за да изтриете данните ръчно или задайте автоматично изтриване.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d сайт е изключен от изчистване</item>
+        <item quantity="other">%1$d сайта са изключени от изчистване</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Включен</string>
+    <string name="dataClearingAutomaticClearingOff">Изключено</string>
+    <string name="dataClearingClearBrowsingData">Изчистване на данните за сърфиране</string>
+    <string name="dataClearingAutomaticDataClearing">Автоматично изтриване на данни</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Автоматично изтриване на данни</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Затваряне на всички отворени раздели</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Изтрива всички данни от сайта, включително посетени сайтове. Може да Ви отпише от акаунтите.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Изтриване на всички чатове, включително закачените чатове</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Избери какво да изтриеш</string>
+    <string name="dataClearingOptionTabs">Раздели</string>
+    <string name="dataClearingOptionData">Бисквитки и данни за сайта</string>
+    <string name="dataClearingDuckAiChats">Чатове с Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Изтриване на всички чатове</string>
+    <string name="fireDialogDeleteButton">Изтрий</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Затваряне на раздела</item>
+        <item quantity="other">Затваряне на всички %1$d раздела</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Може да Ви отпише от акаунтите.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Няма</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Изтрий от 1 сайт. Може да те отпише от акаунтите.</item>
+        <item quantity="other">Изтрий от %1$d сайта. Може да те отпише от акаунтите.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Да изтрием ли разделите и данните от сайта?</string>
+    <string name="singleTabFireDialogTitleWithChats">Да изтрием ли раздели, данни от сайтове и чатове?</string>
+    <string name="singleTabFireDialogDeleteAll">Изтриване на всички</string>
+    <string name="singleTabFireDialogDeleteThisTab">Изтриване на този раздел</string>
+    <string name="singleTabFireDialogDeleteChat">Изтриване на чата</string>
+    <string name="singleTabFireDialogTitleDuckAi">Да бъде ли изтрит този чат?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Изтриването на данни от сайта може да те отпише от акаунтите.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Това ще отмени текущите изтегляния.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d раздел и данните му са изтрити</item>
+        <item quantity="other">%1$d раздела и данните им са изтрити</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Данните от сайтовете не могат да бъдат изтрити. Актуализирайте WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Данните от сайтовете не могат да бъдат изтрити поради възникнала грешка.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Разрешения</string>
@@ -237,26 +291,28 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Раздели и данни</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Раздели, данни и чатове с Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Изчистване на…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Изчистване на…</string>
+    <string name="settingsAutomaticallyClearWhen">Изтриване на…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Изтриване на…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Само при изход от приложението</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Изход от приложението, неактивен за 5 секунди</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Изход от приложението, неактивен за 5 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Изход от приложението, неактивен за 15 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Изход от приложението, неактивен за 30 минути</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Изход от приложението, 1 час без активност</string>
-    <string name="settingsClearAiDataTitle">Изчистване на чатовете с Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Fire Button ще изтрие също и историята на Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Изтриване на чатове с Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Fire Button ще изтрие също и историята на Duck.ai, включително закачените чатове.</string>
+    <string name="settingsClearDataActionSecondaryText">Изчиства всички раздели и данни за всички сайтове, които не защитиш с Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Изчиства всички раздели, Duck.ai чатове и данни за всички сайтове, които не защитиш с Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Относно DuckDuckGo</string>
     <string name="aboutActivityTitleNew">За нас</string>
     <string name="aboutHeaderNewTagLine">Защита. Поверителност. Спокойствие.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo е независима компания за онлайн защита за всеки, който иска да си върне контрола върху личната информация.\n\nНие вярваме, че най-добрият начин за защита на личната информация от хакери, измамници и компании, които не зачитат поверителността, е тя изобщо да не бъде събирана. Ето защо милиони хора <annotation type="chart_comparison">избират DuckDuckGo пред Chrome и други браузъри</annotation> за търсене и сърфиране онлайн. Нашата вградена търсачка е като Google, но никога не следи какво търсите. А нашите защити при сърфиране, като блокиране на рекламни тракери и блокиране на бисквитки, помагат да спрем събирането на Вашите данни от други компании. Освен това нашият браузър е безплатен — ние печелим от <annotation type="privacy_respecting_ads">зачитащи поверителността реклами при търсене</annotation>, а не като използваме Вашите данни.\n\nВ допълнение към това предлагаме и <annotation type="ppro_help_page">Privacy Pro</annotation>, абонаментна услуга „три в едно“, интегрирана в нашия браузър. Абонатите на Privacy Pro получават още по-добра защита на личните данни с бърза и лесна <annotation type="vpn_help_page">VPN</annotation> услуга, която помага да защитите дейността си онлайн; услуга, която намира и премахва личната Ви информация от сайтове за търсене на хора; и услуга, която възстановява самоличността Ви, ако бъде открадната.\n\nВърнете си контрола върху личната информация с браузъра, предназначен за защита на данните, а не за събиране на данните.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nDuckDuckGo е независима компания за онлайн защита за всеки, който иска да си върне контрола върху личната информация.\n\nНие вярваме, че най-добрият начин за защита на личната информация от хакери, измамници и компании, които не зачитат поверителността, е тя изобщо да не бъде събирана. Ето защо милиони хора <annotation type="chart_comparison">избират DuckDuckGo пред Chrome и други браузъри</annotation> за търсене и сърфиране онлайн. Нашата вградена търсачка е като Google, но никога не следи какво търсите. А нашите защити при сърфиране, като блокиране на рекламни тракери и блокиране на бисквитки, помагат да спрем събирането на Вашите данни от други компании. Освен това нашият браузър е безплатен — ние печелим от <annotation type="privacy_respecting_ads">зачитащи поверителността реклами при търсене</annotation>, а не като използваме Вашите данни.\n\nВ допълнение към това предлагаме и <annotation type="ppro_help_page">абонамент за DuckDuckGo</annotation>, интегриран в нашия браузър. Абонатите получават още по-добра защита на личните данни с бърза и лесна <annotation type="vpn_help_page">VPN</annotation> услуга, която помага да защитите дейността си онлайн; достъп до усъвършенствани AI модели в нашата услуга за поверителен AI чат Duck.ai; услуга, която намира и премахва личната Ви информация от сайтове за търсене на хора; и услуга, която възстановява самоличността Ви, ако бъде открадната.\n\nВърнете си контрола върху личната информация с браузъра, предназначен за защита на данните, а не за събиране на данните.</string>
     <string name="no_suggestions">Няма предложения</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
+
 
     <string name="brokenSiteProtectionsOn">Защитите за този сайт са <b>ВКЛЮЧЕНИ</b></string>
     <string name="brokenSiteProtectionsOff">Защитите за този сайт са <b>ИЗКЛЮЧЕНИ</b></string>
@@ -279,7 +335,7 @@
     <string name="searchWidgetLabel">Търсене и Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Добавете към Начална Страница</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Готово! %1$s е добавен към началния екран.</string>
 
     <!-- User Survey -->
@@ -485,8 +541,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащитени сайтове</string>
-    <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
-    <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Още опции за незащитен сайт %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Сигурни ли сте, че искате да премахнете &lt;b&gt;%1$s&lt;/b&gt; от незащитените сайтове?</string>
     <string name="allowlistExplanation">Към тези сайтове няма да бъде приложена защита на поверителността.</string>
@@ -585,11 +639,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Можете да отворите тази връзка в %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Можете да отворите тази връзка в други приложения.</string>
     <string name="appLinkIntentChooserTitle">Отваряне с</string>
-    <string name="appLinkMenuItemTitle">Отваряне в приложението</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Новият адрес е копиран в клипборда</string>
-    <string name="newEmailAliasMenuTitle">Генериране на Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Преглед</string>
@@ -600,7 +652,7 @@
     <string name="waitlistNotificationDialogNotifyMe">УВЕДОМЕТЕ МЕ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Защита на имейл (Бета версия)</string>
+    <string name="emailProtectionActivityTitle">Защита на имейл</string>
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
 
@@ -760,10 +812,6 @@
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
 
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Отваряне в DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Работи в DuckDuckGo</string>
-
     <!-- SSL Error -->
     <string name="sslErrorTitle">Предупреждение: Този сайт може да не е сигурен</string>
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Сертификатът за този сайт е невалиден. Възможно е да се свързвате със сървър, който се представя за &lt;b&gt;%1$s&lt;/b&gt;, което може да изложи поверителната Ви информация на риск.</string>
@@ -776,36 +824,47 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционната система на Вашето устройство не се доверява на сертификата за сигурност за %1$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-добро и по-поверително изживяване в интернет?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
-    <string name="preOnboardingDaxDialog2Title">Защитата на поверителността е активирана!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
+    <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
     <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
-    <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
+    <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
+    <string name="preOnboardingAddressBarOkButton">Следващ</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
-    <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е анонимно.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"как се нарича патицата на английски"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"как се казва „патица“ на испански"</string>
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
     <string name="onboardingSearchDaxDialogOption2US">прогнозата на мощните патици</string>
     <string name="onboardingSearchDaxDialogOption3">местното време</string>
     <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
-    <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
-    <string name="onboardingSearchQueryOption4US">рецепти за бисквити с парченца шоколад</string>
+    <string name="onboardingSearchQueryOption4">патенца</string>
     <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Изненадайте ме!</string>
-    <string name="onboardingSerpDaxDialogDescription">Това е DuckDuckGo Search. Поверителен. Бърз. По-малко реклами.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
     <string name="onboardingSerpDaxDialogButton">Разбрах!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Сега опитайте да посетите някой сайт!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,47 +877,31 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Разбрах!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <b>Fire Button</b>.<br/><br/>Опитайте!️ 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
     <string name="onboardingEndDaxDialogTitle">"Справихте се!"</string>
-    <string name="onboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Готово!</string>
+    <string name="onboardingEndDaxDialogDescription">Запомнете: Всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Дай пет!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">О, преди да забравя…</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo има и защитена <b>VPN услуга + още 2 премиум защити</b>, достъпни с <b>допълнителен платен абонамент</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo също предлага <b>опция за платен абонамент</b> със защитена <b>VPN</b> услуга и <b>поверителен чат с усъвършенстван AI</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Научете повече</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Пробвайте безплатно!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропускане</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Знаете ли, че?</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който осигурява защита?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Защитите са активирани!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Блокиране на заявки и изскачащи прозорци за бисквитки</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Бързо изтриване на данни за сърфиране</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Кой цвят изглежда най-добре на този фон?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Изберете икона за приложенията:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Следващ</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Горе (по подразбиране)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">По-добре се вижда</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Следващ</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Отдолу</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">По-лесен достъп</string>
-    <string name="highlightsOnboardingSearchQueryOption4">патенца</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е поверително.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Това е <b>DuckDuckGo Search</b>! Поверителен. Бърз. По-малко реклами.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Запомнете: Всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Дай пет!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Изпробвайте го</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Пропускане</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Разбрах! Ще пропусна другите съвети.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Не забравяйте: можете да изтриете всички раздели, историята и данните от сърфирането с две докосвания на <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Показване на указанията</string>
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenButton">Следващ</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Адресна лента</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Позиция на адресната лента</string>
     <string name="settingsAddressBarPositionTop">Най-горе</string>
     <string name="settingsAddressBarPositionBottom">Отдолу</string>
+    <string name="settingsAddressBarPositionSplit">Раздели</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показване при стартиране на приложението</string>
@@ -915,40 +958,17 @@
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Завършете настройките</string>
 
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Здравейте.</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Готови ли сте за по-бърз браузър, който осигурява защита?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Защитите са</b> <i>активирани!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Здравейте!<br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <font color=\"#F05C2B\">Fire Button</font>]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Изпробвайте го!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ и %1$d други се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
-        <item quantity="other"><![CDATA[ и %1$d други се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
-        <item quantity="other"><![CDATA[ Опитваха се да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Докоснете щита за повече информация.️</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo е независима компания за онлайн защита за всеки, който иска да си върне контрола върху личната информация.\n\nНие вярваме, че най-добрият начин за защита на личната информация от хакери, измамници и компании, които не зачитат поверителността, е тя изобщо да не бъде събирана. Ето защо милиони хора <annotation type="chart_comparison">избират DuckDuckGo пред Chrome и други браузъри</annotation> за търсене и сърфиране онлайн. Нашата вградена търсачка е като Google, но никога не следи какво търсите. А нашите защити при сърфиране, като блокиране на рекламни тракери и блокиране на бисквитки, помагат да спрем събирането на Вашите данни от други компании. Освен това нашият браузър е безплатен — ние печелим от <annotation type="privacy_respecting_ads">зачитащи поверителността реклами при търсене</annotation>, а не като използваме Вашите данни.\n\nВ допълнение към това предлагаме и <annotation type="ppro_help_page">абонамент за DuckDuckGo</annotation>, интегриран в нашия браузър. Абонатите получават още по-добра защита на личните данни с бърза и лесна <annotation type="vpn_help_page">VPN</annotation> услуга, която помага да защитите дейността си онлайн; достъп до усъвършенствани AI модели в нашата услуга за поверителен AI чат Duck.ai; услуга, която намира и премахва личната Ви информация от сайтове за търсене на хора; и услуга, която възстановява самоличността Ви, ако бъде открадната.\n\nВърнете си контрола върху личната информация с браузъра, предназначен за защита на данните, а не за събиране на данните.</string>
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo също предлага <b>опция за платен абонамент</b> със защитена <b>VPN</b> услуга и <b>поверителен чат с усъвършенстван AI</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Функции с изкуствен интелект</string>
-    <string name="settingsDuckAi">Duck.ai</string>
-
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Показване на броя на тракерите в превключвателя на раздели</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s блокиран тракер &lt;/b&gt; през последните 7 дни</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Искате ли да скриете брояча на тракери?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Можете да го включите отново в Настройки &gt; Външен вид.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Анимация за блокирани тракери</string>
+    <string name="showTrackerCountInAddressBar">Показване в адресната лента</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Показване в мениджъра на разделите</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Само търсене</string>

@@ -26,15 +26,15 @@ import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.api.DeviceSyncState.Type.DESKTOP
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.DurationUnit.HOURS
 import kotlin.time.DurationUnit.MILLISECONDS
 import kotlin.time.toDuration
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,

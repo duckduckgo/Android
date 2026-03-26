@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.fixtures
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
+import com.duckduckgo.remote.messaging.impl.models.JsonListItem
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
@@ -47,11 +48,13 @@ object JsonRemoteMessageOM {
         titleText: String = "title",
         descriptionText: String = "description",
         placeholder: String = "Announce",
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "medium",
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
+        imageUrl = imageUrl,
     )
 
     fun bigSingleActionJsonContent(
@@ -60,6 +63,7 @@ object JsonRemoteMessageOM {
         placeholder: String = "Announce",
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "big_single_action",
         titleText = titleText,
@@ -67,6 +71,7 @@ object JsonRemoteMessageOM {
         placeholder = placeholder,
         primaryActionText = primaryActionText,
         primaryAction = primaryAction,
+        imageUrl = imageUrl,
     )
 
     fun bigTwoActionJsonContent(
@@ -77,6 +82,7 @@ object JsonRemoteMessageOM {
         primaryAction: JsonMessageAction = jsonMessageAction(),
         secondaryActionText: String = "Action2",
         secondaryAction: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "big_two_action",
         titleText = titleText,
@@ -86,14 +92,16 @@ object JsonRemoteMessageOM {
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
         secondaryAction = secondaryAction,
+        imageUrl = imageUrl,
     )
 
     fun promoSingleActionJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "NewForMacAndWindows",
+        placeholder: String = "MacAndWindows",
         actionText: String = "Action",
         action: JsonMessageAction = jsonMessageAction(),
+        imageUrl: String? = null,
     ) = JsonContent(
         messageType = "promo_single_action",
         titleText = titleText,
@@ -101,6 +109,45 @@ object JsonRemoteMessageOM {
         placeholder = placeholder,
         actionText = actionText,
         action = action,
+        imageUrl = imageUrl,
+    )
+
+    fun cardsListJsonContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: String = "Announce",
+        primaryActionText: String = "Action",
+        primaryAction: JsonMessageAction = jsonMessageAction(),
+        listItems: List<JsonListItem> = listOf(
+            JsonListItem(
+                id = "item1",
+                type = "two_line_list_item",
+                titleText = "Item Title 1",
+                descriptionText = "Item Description 1",
+                placeholder = "ImageAI",
+                primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 1",
+            ),
+            JsonListItem(
+                id = "item2",
+                type = "two_line_list_item",
+                titleText = "Item Title 2",
+                descriptionText = "Item Description 2",
+                placeholder = "Radar",
+                primaryAction = jsonMessageAction(),
+                primaryActionText = "Item Action 2",
+            ),
+        ),
+        imageUrl: String? = null,
+    ) = JsonContent(
+        messageType = "cards_list",
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        primaryActionText = primaryActionText,
+        primaryAction = primaryAction,
+        listItems = listItems,
+        imageUrl = imageUrl,
     )
 
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
@@ -111,12 +158,14 @@ object JsonRemoteMessageOM {
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList(),
         translations: Map<String, JsonContentTranslations> = emptyMap(),
+        surfaces: List<String>? = null,
     ) = JsonRemoteMessage(
         id = id,
         content = content,
         exclusionRules = exclusionRules,
         matchingRules = matchingRules,
         translations = translations,
+        surfaces = surfaces,
     )
 
     fun aJsonRemoteMessagingConfig(

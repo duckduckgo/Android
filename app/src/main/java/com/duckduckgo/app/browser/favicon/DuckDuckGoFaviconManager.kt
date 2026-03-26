@@ -38,10 +38,10 @@ import com.duckduckgo.common.utils.touchFaviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
-import java.io.File
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 private const val FAVICON_LOAD_RETRY_DELAY = 2000L
 private const val FAVICON_LOAD_RETRIES = 3

@@ -1,0 +1,31 @@
+// Below is the most basic pixel definition
+// For more examples of what is possible with the schema, see
+// https://github.com/duckduckgo/pixel-schema/blob/main/tests/test_data/valid/pixels/pixel_guide.json5
+// General overview of the pixel regitry: https://github.com/duckduckgo/pixel-schema/blob/main/README.md
+{
+    "pixel_name": {
+        "description": "Describe when the pixel fires and its purpose",
+        // Github usernames of the people responsible for the pixel (https://github.com/duckduckgo/internal-github-asana-utils/blob/main/user_map.yml)
+        "owners": ["nshuba"],
+        "triggers": ["other"],
+        "suffixes": [
+            // A suffix is a dynamic part of the pixel name, e.g. "some.pixel.[count|daily]"
+            "first_daily_count", // shortcut to a commonly used suffix, defined in common_suffixes.json.
+            {
+                // Custom suffix.
+                "description": "Describe the custom suffix and its purpose",
+                "enum": ["suffix1", "suffix2"]
+            }
+        ],
+        "parameters": [
+            // Commonly used param, defined in params_dictionary.json.
+            "appVersion",
+            {
+                "key": "paramKey",
+                "description": "Describe the parameter and its purpose"
+            }
+        ],
+        // If pixel is temporary, remove if pixel is permanent.
+        "expires": "2025-01-30"
+    }
+}

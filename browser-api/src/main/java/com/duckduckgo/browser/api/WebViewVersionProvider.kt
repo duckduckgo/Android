@@ -32,4 +32,10 @@ interface WebViewVersionProvider {
      * @returns a string [String] with the major version of WebView
      */
     fun getMajorVersion(): String
+
+    /**
+     * Returns the package name of the WebView provider or unknown if unable to get it
+     * @returns a string [String] with the package name of the WebView provider
+     */
+    fun getPackageName(): String
 }

@@ -31,9 +31,9 @@ import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.*
 import com.squareup.anvil.annotations.*
-import javax.inject.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(

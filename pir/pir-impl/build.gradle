@@ -19,6 +19,7 @@ plugins {
     id 'kotlin-android'
     id 'com.squareup.anvil'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -29,14 +30,18 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':browser-api')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':di')
     implementation project(':data-store-api')
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
+    implementation project(':network-protection-api')
+    implementation project(':remote-messaging-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
+    implementation project(':tracker-detection-api')
+    implementation project(':user-agent-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"
@@ -45,6 +50,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation Google.dagger
+    implementation Google.android.material
     implementation KotlinX.coroutines.android
 
     // Room
@@ -58,6 +64,11 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
 
+    // Encryption
+    implementation "net.zetetic:sqlcipher-android:_"
+    implementation project(':sqlcipher-loader-api')
+    implementation AndroidX.security.crypto
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
@@ -65,9 +76,20 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation AndroidX.work.testing
     testImplementation(KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    // AndroidTest dependencies (no mockito - use real implementations or manual fakes for Android instrumentation tests)
+    androidTestImplementation Testing.junit4
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation project(path: ':feature-toggles-test')
+    androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
@@ -83,8 +105,8 @@ android {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
     testOptions {
         unitTests {
@@ -96,3 +118,6 @@ android {
     }
 }
 
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}

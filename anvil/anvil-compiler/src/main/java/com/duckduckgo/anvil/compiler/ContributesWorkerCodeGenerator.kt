@@ -22,7 +22,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.compiler.api.AnvilContext
 import com.squareup.anvil.compiler.api.CodeGenerator
-import com.squareup.anvil.compiler.api.GeneratedFile
+import com.squareup.anvil.compiler.api.GeneratedFileWithSources
 import com.squareup.anvil.compiler.api.createGeneratedFile
 import com.squareup.anvil.compiler.internal.asClassName
 import com.squareup.anvil.compiler.internal.buildFile
@@ -40,12 +40,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import java.io.File
-import java.lang.StringBuilder
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
+import java.lang.StringBuilder
+import javax.inject.Inject
 
 /**
  * This Anvil code generator allows injection dependencies into the Workers (WorkerInjectorPlugin) without manually creating a WorkerInjectorPlugin
@@ -59,7 +59,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         projectFiles: Collection<KtFile>,
-    ): Collection<GeneratedFile> = projectFiles.classAndInnerClassReferences(module)
+    ): Collection<GeneratedFileWithSources> = projectFiles.classAndInnerClassReferences(module)
         .toList()
         .filter { it.isAnnotatedWith(ContributesWorker::class.fqName) }
         .flatMap {
@@ -71,7 +71,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
         vmClass: ClassReference.Psi,
         codeGenDir: File,
         module: ModuleDescriptor,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val workerPluginName = "${vmClass.shortName}_WorkerInjectorPlugin"
         val scope = vmClass.annotations.first { it.fqName == ContributesWorker::class.fqName }.scopeOrNull(0)
@@ -125,7 +125,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, workerPluginName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, workerPluginName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     private fun generateCode(

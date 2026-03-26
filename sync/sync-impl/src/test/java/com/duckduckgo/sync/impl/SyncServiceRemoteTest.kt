@@ -34,6 +34,10 @@ import com.duckduckgo.sync.TestSyncFixtures.deleteAccountError
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountInvalid
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountResponse
 import com.duckduckgo.sync.TestSyncFixtures.deleteAccountSuccess
+import com.duckduckgo.sync.TestSyncFixtures.deleteAiChatsError
+import com.duckduckgo.sync.TestSyncFixtures.deleteAiChatsErrorResponse
+import com.duckduckgo.sync.TestSyncFixtures.deleteAiChatsSuccess
+import com.duckduckgo.sync.TestSyncFixtures.deleteAiChatsSuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.deviceFactor
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.deviceLogoutBody
@@ -54,11 +58,18 @@ import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.logoutError
 import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenEmptyError
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenEmptyErrorResponse
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenError
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenErrorResponse
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenSuccess
+import com.duckduckgo.sync.TestSyncFixtures.rescopeTokenSuccessResponse
 import com.duckduckgo.sync.TestSyncFixtures.signUpRequest
 import com.duckduckgo.sync.TestSyncFixtures.signupFailDuplicatedUser
 import com.duckduckgo.sync.TestSyncFixtures.signupFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.signupSuccess
 import com.duckduckgo.sync.TestSyncFixtures.token
+import com.duckduckgo.sync.TestSyncFixtures.untilTimestamp
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.store.*
 import org.junit.Assert.assertEquals
@@ -67,16 +78,17 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 import retrofit2.Call
+import retrofit2.HttpException
 
 @RunWith(AndroidJUnit4::class)
 class SyncServiceRemoteTest {
 
     private val syncService: SyncService = mock()
     private val syncStore: SyncStore = mock()
+    private val syncRemote = SyncServiceRemote(syncService, syncStore)
 
     @Test
     fun whenCreateAccountSucceedsThenReturnAccountCreatedSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<AccountCreatedResponse> = mock()
         whenever(syncService.signup(signUpRequest)).thenReturn(call)
         whenever(call.execute()).thenReturn(signupSuccess)
@@ -90,7 +102,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenCreateAccountIsInvalidThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<AccountCreatedResponse> = mock()
         whenever(syncService.signup(signUpRequest)).thenReturn(call)
         whenever(call.execute()).thenReturn(signupFailInvalid)
@@ -104,7 +115,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenCreateAccountDuplicateUserThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<AccountCreatedResponse> = mock()
         whenever(syncService.signup(signUpRequest)).thenReturn(call)
         whenever(call.execute()).thenReturn(signupFailDuplicatedUser)
@@ -118,7 +128,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenLogoutSucceedsThenReturnLogoutSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Logout> = mock()
         whenever(syncService.logout(anyString(), eq(deviceLogoutBody))).thenReturn(call)
         whenever(call.execute()).thenReturn(deviceLogoutResponse)
@@ -130,7 +139,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenLogoutIsInvalidThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Logout> = mock()
         whenever(syncService.logout(anyString(), eq(deviceLogoutBody))).thenReturn(call)
         whenever(call.execute()).thenReturn(logoutError)
@@ -143,7 +151,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenDeleteAccountSucceedsThenReturnDeleteAccountSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Void> = mock()
         whenever(syncService.deleteAccount(anyString())).thenReturn(call)
         whenever(call.execute()).thenReturn(deleteAccountResponse)
@@ -155,7 +162,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenDeleteAccountIsInvalidThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Void> = mock()
         whenever(syncService.deleteAccount(anyString())).thenReturn(call)
         whenever(call.execute()).thenReturn(deleteAccountError)
@@ -168,7 +174,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenLoginSucceedsThenReturnLoginSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<LoginResponse> = mock()
         whenever(syncService.login(loginRequestBody)).thenReturn(call)
         whenever(call.execute()).thenReturn(loginSuccessResponse)
@@ -180,7 +185,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenLoginIsInvalidThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<LoginResponse> = mock()
         whenever(syncService.login(loginRequestBody)).thenReturn(call)
         whenever(call.execute()).thenReturn(loginFailedInvalidResponse)
@@ -192,7 +196,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenGetDevicesSuccessThenResultSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<DeviceResponse> = mock()
         whenever(syncService.getDevices(anyString())).thenReturn(call)
         whenever(call.execute()).thenReturn(getDevicesBodySuccessResponse)
@@ -204,7 +207,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenGetDevicesSuccessFailsThenResultError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<DeviceResponse> = mock()
         whenever(syncService.getDevices(anyString())).thenReturn(call)
         whenever(call.execute()).thenReturn(getDevicesBodyErrorResponse)
@@ -216,7 +218,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenGetDevicesIsInvalidCodeThenResultError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<DeviceResponse> = mock()
         whenever(syncService.getDevices(anyString())).thenReturn(call)
         whenever(call.execute()).thenReturn(getDevicesBodyInvalidCodeResponse)
@@ -229,7 +230,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenConnectSuccedsThenReturnSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Void> = mock()
         whenever(syncService.connect(anyString(), eq(connectBody))).thenReturn(call)
         whenever(call.execute()).thenReturn(connectResponse)
@@ -241,7 +241,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenConnectFailsThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<Void> = mock()
         whenever(syncService.connect(anyString(), eq(connectBody))).thenReturn(call)
         whenever(call.execute()).thenReturn(connectInvalid)
@@ -253,7 +252,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenConnectDeviceSuccedsThenReturnSuccess() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<ConnectKey> = mock()
         whenever(syncService.connectDevice(deviceId)).thenReturn(call)
         whenever(call.execute()).thenReturn(connectDeviceResponse)
@@ -265,7 +263,6 @@ class SyncServiceRemoteTest {
 
     @Test
     fun whenConnectDeviceFailsThenReturnError() {
-        val syncRemote = SyncServiceRemote(syncService, syncStore)
         val call: Call<ConnectKey> = mock()
         whenever(syncService.connectDevice(deviceId)).thenReturn(call)
         whenever(call.execute()).thenReturn(connectDeviceErrorResponse)
@@ -273,5 +270,118 @@ class SyncServiceRemoteTest {
         val result = syncRemote.connectDevice(deviceId)
 
         assertEquals(connectDeviceKeysNotFoundError, result)
+    }
+
+    @Test
+    fun whenDeleteAiChatsSucceedsThenReturnSuccess() {
+        val call: Call<org.json.JSONObject> = mock()
+        whenever(syncService.deleteAiChats(anyString(), eq(untilTimestamp))).thenReturn(call)
+        whenever(call.execute()).thenReturn(deleteAiChatsSuccessResponse)
+
+        val result = syncRemote.deleteAiChats(token, untilTimestamp)
+
+        assertEquals(deleteAiChatsSuccess, result)
+    }
+
+    @Test
+    fun whenDeleteAiChatsFailsThenReturnError() {
+        val call: Call<org.json.JSONObject> = mock()
+        whenever(syncService.deleteAiChats(anyString(), eq(untilTimestamp))).thenReturn(call)
+        whenever(call.execute()).thenReturn(deleteAiChatsErrorResponse)
+
+        val result = syncRemote.deleteAiChats(token, untilTimestamp)
+
+        assertEquals(deleteAiChatsError, result)
+    }
+
+    @Test
+    fun whenDeleteAiChatsThrowsExceptionThenReturnError() {
+        val call: Call<org.json.JSONObject> = mock()
+        val exception = RuntimeException("Network error")
+        whenever(syncService.deleteAiChats(anyString(), eq(untilTimestamp))).thenReturn(call)
+        whenever(call.execute()).thenThrow(exception)
+
+        val result = syncRemote.deleteAiChats(token, untilTimestamp)
+
+        assertEquals(Result.Error(reason = "Network error"), result)
+    }
+
+    @Test
+    fun whenRescopeTokenSucceedsThenReturnSuccess() {
+        val call: Call<TokenRescopeResponse> = mock()
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(rescopeTokenSuccessResponse)
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(rescopeTokenSuccess, result)
+    }
+
+    @Test
+    fun whenRescopeTokenFailsWithErrorBodyThenReturnUnexpectedStatusCode() {
+        val call: Call<TokenRescopeResponse> = mock()
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(rescopeTokenErrorResponse)
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(rescopeTokenError, result)
+    }
+
+    @Test
+    fun whenRescopeTokenFailsWithEmptyErrorBodyThenReturnEmptyResponse() {
+        val call: Call<TokenRescopeResponse> = mock()
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(rescopeTokenEmptyErrorResponse)
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(rescopeTokenEmptyError, result)
+    }
+
+    @Test
+    fun whenRescopeTokenReturnsEmptyTokenThenReturnEmptyResponse() {
+        val call: Call<TokenRescopeResponse> = mock()
+        val emptyTokenResponse = retrofit2.Response.success(TokenRescopeResponse(token = ""))
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(emptyTokenResponse)
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(Result.Error(reason = "empty response"), result)
+    }
+
+    @Test
+    fun whenRescopeTokenReturnsNullBodyThenReturnEmptyResponse() {
+        val call: Call<TokenRescopeResponse> = mock()
+        val nullBodyResponse = retrofit2.Response.success<TokenRescopeResponse>(null)
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(nullBodyResponse)
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(Result.Error(reason = "empty response"), result)
+    }
+
+    @Test
+    fun whenRescopeTokenThrowsHttpExceptionThenReturnUnexpectedStatusCode() {
+        val call: Call<TokenRescopeResponse> = mock()
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenThrow(HttpException(rescopeTokenErrorResponse))
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(rescopeTokenError, result)
+    }
+
+    @Test
+    fun whenRescopeTokenThrowsNonHttpExceptionThenReturnInternalError() {
+        val call: Call<TokenRescopeResponse> = mock()
+        whenever(syncService.rescopeToken(anyString(), any())).thenReturn(call)
+        whenever(call.execute()).thenThrow(RuntimeException("Network error"))
+
+        val result = syncRemote.rescopeToken(token, "aiChat")
+
+        assertEquals(Result.Error(reason = "internal error"), result)
     }
 }

@@ -45,10 +45,13 @@ class FakeSubscriptionsDataStore(
     override var platform: String? = null
     override var billingPeriod: String? = null
     override var startedAt: Long? = 0L
+    override var localPurchasedAt: Long? = 0L
     override var status: String? = null
     override var entitlements: String? = null
     override var productId: String? = null
     override var freeTrialActive: Boolean = false
     override fun canUseEncryption(): Boolean = supportEncryption
     override var subscriptionFeatures: String? = null
+    override var subscriptionEntitlements: String? = null
+    override var pendingPlans: String? = null
 }

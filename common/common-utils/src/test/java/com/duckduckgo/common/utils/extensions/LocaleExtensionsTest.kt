@@ -1,8 +1,8 @@
 package com.duckduckgo.common.utils.extensions
 
-import java.util.Locale
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import java.util.Locale
 
 class LocaleExtensionsTest {
 

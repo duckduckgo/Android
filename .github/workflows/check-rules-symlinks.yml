@@ -1,0 +1,66 @@
+name: Check Rules Symlinks
+
+on:
+  pull_request:
+    paths:
+      - '.cursor/rules/**'
+      - '.claude/rules/**'
+
+permissions:
+  contents: read
+
+jobs:
+  check-symlinks:
+    name: Verify .cursor/rules ↔ .claude/rules parity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check symlink parity
+        run: |
+          failed=0
+          errors=""
+
+          # 1. Every .cursor/rules/*.mdc must have a valid symlink in .claude/rules/
+          for mdc_file in .cursor/rules/*.mdc; do
+            [ -f "$mdc_file" ] || continue
+
+            name="$(basename "$mdc_file" .mdc)"
+            symlink=".claude/rules/${name}.md"
+
+            if [ ! -L "$symlink" ]; then
+              errors="${errors}\n  - ${symlink} (symlink missing for ${mdc_file})"
+              failed=1
+              continue
+            fi
+
+            target="$(readlink "$symlink")"
+            expected="../../${mdc_file}"
+
+            if [ "$target" != "$expected" ]; then
+              errors="${errors}\n  - ${symlink} → ${target} (expected ${expected})"
+              failed=1
+            fi
+          done
+
+          # 2. Every file in .claude/rules/ must be a symlink (no regular files allowed)
+          for claude_file in .claude/rules/*; do
+            [ -e "$claude_file" ] || continue
+            if [ ! -L "$claude_file" ]; then
+              errors="${errors}\n  - ${claude_file} is a regular file, not a symlink (rules must live in .cursor/rules/)"
+              failed=1
+            fi
+          done
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::Rules symlink parity check failed"
+            printf "Errors found:\n%b\n" "$errors"
+            printf "\nRules must be created in .cursor/rules/ and symlinked into .claude/rules/.\n"
+            printf "To fix, run from the repo root:\n"
+            printf "  cd .claude/rules && ln -s ../../.cursor/rules/<name>.mdc <name>.md\n"
+            exit 1
+          fi
+
+          echo "All .cursor/rules files have valid .claude/rules symlinks."

@@ -25,10 +25,10 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.time.LocalDateTime
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.time.LocalDateTime
+import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 class VpnLastTrackersBlockedCollector @Inject constructor(

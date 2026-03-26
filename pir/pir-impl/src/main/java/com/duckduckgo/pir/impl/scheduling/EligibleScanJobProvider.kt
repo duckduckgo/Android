@@ -26,8 +26,8 @@ import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJob
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface EligibleScanJobProvider {
     suspend fun getAllEligibleScanJobs(timeInMillis: Long): List<ScanJobRecord>
@@ -71,7 +71,24 @@ class RealEligibleScanJobProvider @Inject constructor(
         }.sortedBy {
             it.attemptCount
         }.mapNotNull {
-            pirSchedulingRepository.getValidScanJobRecord(it.brokerName, it.userProfileId)
+            val schedulingConfig =
+                schedulingConfigs.find { config -> config.brokerName == it.brokerName }!!
+
+            val expectedScanDate = when (it.status) {
+                OptOutJobStatus.REQUESTED -> it.getRequestConfirmationScanDate(schedulingConfig)
+                OptOutJobStatus.REMOVED -> it.getRemovedMaintenanceScanDate(schedulingConfig)
+                else -> return@mapNotNull null
+            }
+            val scanJobRecord = pirSchedulingRepository.getValidScanJobRecord(it.brokerName, it.userProfileId)
+
+            // If the last scan happened more recently that the expected scan date from opt outs, it means we have already performed the
+            // maintenance scan / confirmation scan needed for this opt-out.
+            // More info on https://app.asana.com/1/137249556945/project/488551667048375/task/1211207086563708?focus=true
+            return@mapNotNull if (scanJobRecord != null && scanJobRecord.lastScanDateInMillis <= expectedScanDate) {
+                scanJobRecord
+            } else {
+                null
+            }
         }
     }
 
@@ -79,8 +96,13 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == OptOutJobStatus.REQUESTED &&
-            (this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
+        return this.status == OptOutJobStatus.REQUESTED && this.getRequestConfirmationScanDate(schedulingConfig) <= timeInMillis
+    }
+
+    private fun OptOutJobRecord.getRequestConfirmationScanDate(
+        schedulingConfig: BrokerSchedulingConfig,
+    ): Long {
+        return this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis
     }
 
     private fun OptOutJobRecord.isRemovedAndShouldBeMaintainedNow(
@@ -88,7 +110,15 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == OptOutJobStatus.REMOVED &&
-            (this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
+            // do not pick-up deprecated opt-out jobs for maintenance scans as they belong to invalid/removed profiles
+            !this.deprecated &&
+            this.getRemovedMaintenanceScanDate(schedulingConfig) <= timeInMillis
+    }
+
+    private fun OptOutJobRecord.getRemovedMaintenanceScanDate(
+        schedulingConfig: BrokerSchedulingConfig,
+    ): Long {
+        return this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis
     }
 
     private suspend fun getValidScanJobsFromScanJobRecords(
@@ -99,12 +129,14 @@ class RealEligibleScanJobProvider @Inject constructor(
             val schedulingConfig =
                 schedulingConfigs.find { config -> config.brokerName == record.brokerName }
 
-            schedulingConfig != null && (
-                record.isNotYetExecuted() ||
-                    record.isNoMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
-                    record.hasMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
-                    record.isErrorAndShouldBeRetried(schedulingConfig, timeInMillis)
-                )
+            schedulingConfig != null &&
+                // do not pick-up deprecated jobs as they belong to invalid/removed profiles
+                !record.deprecated && (
+                    record.isNotYetExecuted() ||
+                        record.isNoMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
+                        record.hasMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
+                        record.isErrorAndShouldBeRetried(schedulingConfig, timeInMillis)
+                    )
         }.sortedBy {
             it.lastScanDateInMillis
         }

@@ -40,9 +40,9 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkViewModel.ViewState
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SyncSetupDeepLinkFragment : DuckDuckGoFragment() {

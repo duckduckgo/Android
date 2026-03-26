@@ -23,9 +23,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -38,32 +41,58 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
+import com.duckduckgo.duckchat.impl.store.getDefaultTogglePositionForIndex
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.DuckChatSettingsViewModelFactory
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
+import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.settings.api.SettingsPageFeature
+import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
+@ContributeToActivityStarter(DuckChatNativeSettingsNoParams::class, screenName = "duckai.settings")
 class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: DuckChatSettingsViewModel by bindViewModel()
+    @Inject
+    lateinit var duckChatSettingsViewModelFactory: DuckChatSettingsViewModelFactory
+
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
+
+    private val viewModel by lazy {
+        val activityParams = intent.getActivityParams(GlobalActivityStarter.ActivityParams::class.java)!!
+        duckChatSettingsViewModel(activityParams)
+    }
 
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onDuckChatUserEnabledToggled(isChecked)
+            updateWidgets()
+        }
+
+    private val userEnabledAutomaticPageContextToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onAutomaticContextAttachmentToggled(isChecked)
+            updateWidgets()
+        }
+
+    private val userEnabledNativeInputFieldToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onNativeInputFieldToggled(isChecked)
             updateWidgets()
         }
 
@@ -78,6 +107,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var settingsPageFeature: SettingsPageFeature
 
     @Inject
     lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
@@ -108,57 +140,42 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.isRebrandingAiFeaturesEnabled) {
-            binding.includeToolbar.toolbar.title = getString(R.string.duck_chat_title_rebranding)
-            binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_ai_128))
-            binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
-            binding.userEnabledDuckChatToggle.gone()
-            binding.userEnabledDuckChatToggleRebranding.show()
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
+        binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
-            // align content with the main Duck.ai toggle's text
-            val offset = resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
+        binding.duckAIAutomaticContext.isVisible = viewState.isAutomaticContextVisible
+        binding.duckAIAutomaticContext.quietlySetIsChecked(viewState.isAutomaticContextEnabled, userEnabledAutomaticPageContextToggleListener)
+
+        binding.duckAiNativeInputField.isVisible = viewState.isNativeInputFieldVisible
+        binding.duckAiNativeInputField.quietlySetIsChecked(viewState.isNativeInputFieldEnabled, userEnabledNativeInputFieldToggleListener)
+
+        // align content with the main Duck.ai toggle's text
+        val offset =
+            resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
                 resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
-            val orientation = resources.configuration.orientation
-            binding.duckAiInputScreenToggleContainer.updatePadding(
-                left = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    0
-                } else {
-                    offset
-                },
-            )
-            binding.duckAiInputScreenDescription.updatePadding(left = offset)
-            binding.duckAiShortcuts.updatePadding(left = offset)
-        } else {
-            binding.includeToolbar.toolbar.title = getString(R.string.duck_ai_paid_settings_title)
-            binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.chat_private_128))
-            binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
-            binding.userEnabledDuckChatToggle.show()
-            binding.userEnabledDuckChatToggleRebranding.gone()
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
-
-            val offset = 0
-            binding.duckAiInputScreenToggleContainer.updatePadding(left = offset)
-            binding.duckAiInputScreenDescription.updatePadding(left = offset)
-            binding.duckAiShortcuts.updatePadding(left = offset)
-        }
+        val orientation = resources.configuration.orientation
+        binding.duckAiInputScreenToggleContainer.updatePadding(
+            left =
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                0
+            } else {
+                offset
+            },
+        )
+        binding.duckAiInputScreenDescription.updatePadding(left = offset)
+        binding.duckAiShortcuts.updatePadding(left = offset)
+        binding.duckAIAutomaticContext.updatePadding(left = offset)
+        binding.duckAiNativeInputField.updatePadding(left = offset)
 
         binding.duckChatSettingsText.addClickableSpan(
-            textSequence = if (viewState.isRebrandingAiFeaturesEnabled) {
-                getText(R.string.duck_chat_settings_activity_description_rebranding)
-            } else {
-                getText(R.string.duck_chat_settings_activity_description)
-            },
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.duckChatLearnMoreClicked()
-                    }
-                },
+            textSequence = getText(R.string.duck_chat_settings_activity_description),
+            spans =
+            listOf(
+                "learn_more_link" to
+                    object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.duckChatLearnMoreClicked()
+                        }
+                    },
             ),
         )
 
@@ -168,15 +185,30 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
         )
 
+        binding.duckAiDefaultTogglePosition.isVisible = viewState.isDefaultTogglePositionVisible
+        binding.duckAiDefaultTogglePosition.setSecondaryText(
+            when (viewState.defaultTogglePosition) {
+                DefaultTogglePosition.SEARCH -> getString(R.string.duckAiDefaultTogglePositionSearch)
+                DefaultTogglePosition.DUCK_AI -> getString(R.string.duckAiDefaultTogglePositionDuckAi)
+                DefaultTogglePosition.LAST_USED -> getString(R.string.duckAiDefaultTogglePositionLastUsed)
+            },
+        )
+        binding.duckAiDefaultTogglePosition.setOnClickListener {
+            viewModel.onDefaultTogglePositionClicked()
+        }
+        binding.duckAiDefaultTogglePosition.updatePadding(left = offset)
+
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
-            spans = listOf(
-                "share_feedback" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.duckAiInputScreenShareFeedbackClicked()
-                    }
-                },
+            spans =
+            listOf(
+                "share_feedback" to
+                    object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.duckAiInputScreenShareFeedbackClicked()
+                        }
+                    },
             ),
         )
 
@@ -185,9 +217,8 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onDuckAiShortcutsClicked()
         }
 
-        binding.showDuckChatSearchSettingsLink.setOnClickListener {
-            viewModel.duckChatSearchAISettingsClicked()
-        }
+        renderSearchSettingsSection(viewState)
+
         binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
             viewModel.onDuckAiInputScreenWithoutAiSelected()
         }
@@ -196,16 +227,58 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun renderSearchSettingsSection(viewState: ViewState) {
+        with(binding) {
+            if (viewState.isSearchSectionVisible) {
+                with(showDuckChatSearchSettingsLink) {
+                    isVisible = true
+                    setOnClickListener {
+                        viewModel.duckChatSearchAISettingsClicked()
+                    }
+                }
+
+                if (viewState.isHideGeneratedImagesOptionVisible) {
+                    searchSettingsSectionHeader.isVisible = true
+
+                    with(duckAiHideAiGeneratedImagesLink) {
+                        isVisible = true
+                        setOnClickListener {
+                            viewModel.onDuckAiHideAiGeneratedImagesClicked()
+                        }
+                    }
+                } else {
+                    searchSettingsSectionHeader.isGone = true
+                    duckAiHideAiGeneratedImagesLink.isGone = true
+                }
+            } else {
+                divider2.isGone = true
+                searchSettingsSectionHeader.isGone = true
+                showDuckChatSearchSettingsLink.isGone = true
+                duckAiHideAiGeneratedImagesLink.isGone = true
+            }
+        }
+    }
+
     private fun processCommand(command: DuckChatSettingsViewModel.Command) {
         when (command) {
             is DuckChatSettingsViewModel.Command.OpenLink -> {
-                globalActivityStarter.start(
-                    this,
-                    WebViewActivityWithParams(
-                        url = command.link,
-                        screenTitle = getString(R.string.duck_chat_title),
-                    ),
-                )
+                if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
+                    globalActivityStarter.start(
+                        this,
+                        SettingsWebViewScreenWithParams(
+                            url = command.link,
+                            screenTitle = getString(command.titleRes),
+                        ),
+                    )
+                } else {
+                    globalActivityStarter.start(
+                        this,
+                        WebViewActivityWithParams(
+                            url = command.link,
+                            screenTitle = getString(R.string.duck_chat_title),
+                        ),
+                    )
+                }
             }
             is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
                 startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
@@ -219,7 +292,33 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.LaunchFeedback -> {
                 globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
             }
+
+            is DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog -> {
+                showDefaultTogglePositionDialog(command.currentPosition)
+            }
         }
+    }
+
+    private fun showDefaultTogglePositionDialog(currentPosition: DefaultTogglePosition) {
+        RadioListAlertDialogBuilder(this)
+            .setTitle(R.string.duckAiDefaultTogglePositionTitle)
+            .setOptions(
+                listOf(
+                    R.string.duckAiDefaultTogglePositionSearch,
+                    R.string.duckAiDefaultTogglePositionDuckAi,
+                    R.string.duckAiDefaultTogglePositionLastUsed,
+                ),
+                currentPosition.getOptionIndex(),
+            )
+            .setPositiveButton(CommonR.string.dialogSave)
+            .setNegativeButton(CommonR.string.cancel)
+            .addEventListener(
+                object : RadioListAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked(selectedItem: Int) {
+                        viewModel.onDefaultTogglePositionSelected(selectedItem.getDefaultTogglePositionForIndex())
+                    }
+                },
+            ).show()
     }
 
     private fun configureInputScreenToggle(
@@ -234,31 +333,42 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         duckAiInputScreenToggleWithAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withAi.checkRes))
     }
 
-    private sealed class InputScreenToggleButton(isActive: Boolean) {
+    private sealed class InputScreenToggleButton(
+        isActive: Boolean,
+    ) {
         abstract val imageRes: Int
 
-        val checkRes: Int = if (isActive) {
-            CommonR.drawable.ic_check_accent_24
-        } else {
-            CommonR.drawable.ic_shape_circle_disabled_24
+        val checkRes: Int =
+            if (isActive) {
+                CommonR.drawable.ic_check_accent_24
+            } else {
+                CommonR.drawable.ic_shape_circle_disabled_24
+            }
+
+        class WithoutAi(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.searchbox_withoutai_active
+                    isActive && !isLightMode -> R.drawable.searchbox_withoutai_active_dark
+                    !isActive && isLightMode -> R.drawable.searchbox_withoutai_inactive
+                    else -> R.drawable.searchbox_withoutai_inactive_dark
+                }
         }
 
-        class WithoutAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = when {
-                isActive && isLightMode -> R.drawable.searchbox_withoutai_active
-                isActive && !isLightMode -> R.drawable.searchbox_withoutai_active_dark
-                !isActive && isLightMode -> R.drawable.searchbox_withoutai_inactive
-                else -> R.drawable.searchbox_withoutai_inactive_dark
-            }
-        }
-
-        class WithAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = when {
-                isActive && isLightMode -> R.drawable.searchbox_withai_active
-                isActive && !isLightMode -> R.drawable.searchbox_withai_active_dark
-                !isActive && isLightMode -> R.drawable.searchbox_withai_inactive
-                else -> R.drawable.searchbox_withai_inactive_dark
-            }
+        class WithAi(
+            isActive: Boolean,
+            isLightMode: Boolean,
+        ) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int =
+                when {
+                    isActive && isLightMode -> R.drawable.searchbox_withai_active
+                    isActive && !isLightMode -> R.drawable.searchbox_withai_active_dark
+                    !isActive && isLightMode -> R.drawable.searchbox_withai_inactive
+                    else -> R.drawable.searchbox_withai_inactive_dark
+                }
         }
     }
 
@@ -266,4 +376,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
         sendBroadcast(intent)
     }
+
+    private fun duckChatSettingsViewModel(activityParams: GlobalActivityStarter.ActivityParams): DuckChatSettingsViewModel = ViewModelProvider.create(
+        store = viewModelStore,
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>) = duckChatSettingsViewModelFactory.create(activityParams) as T
+        },
+        extras = this.defaultViewModelCreationExtras,
+    )[DuckChatSettingsViewModel::class.java]
 }

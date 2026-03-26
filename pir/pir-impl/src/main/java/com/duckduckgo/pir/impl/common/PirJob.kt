@@ -20,7 +20,9 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import logcat.logcat
 
-abstract class PirJob(private val callbacks: PluginPoint<PirCallbacks>) {
+abstract class PirJob(
+    private val callbacks: PluginPoint<PirCallbacks>,
+) {
     fun onJobStarted() {
         callbacks.getPlugins().forEach {
             logcat { "PIR-CALLBACKS: Starting $it" }
@@ -46,5 +48,6 @@ abstract class PirJob(private val callbacks: PluginPoint<PirCallbacks>) {
         MANUAL,
         SCHEDULED,
         OPTOUT,
+        EMAIL_CONFIRMATION,
     }
 }

@@ -303,6 +303,7 @@ interface NetworkProtectionPixels {
     fun reportAutoExcludePromptEnable()
     fun reportAutoExcludeEnableViaExclusionList()
     fun reportAutoExcludeDisableViaExclusionList()
+    fun reportNotificationLaunched(pixelName: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -673,6 +674,10 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportAutoExcludeDisableViaExclusionList() {
         firePixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST)
         tryToFireDailyPixel(NETP_AUTO_EXCLUDE_DISABLED_VIA_EXCLUSION_LIST_DAILY)
+    }
+
+    override fun reportNotificationLaunched(pixelName: String) {
+        firePixel(pixelName)
     }
 
     private fun firePixel(

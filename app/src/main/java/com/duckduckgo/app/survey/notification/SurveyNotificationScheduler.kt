@@ -30,10 +30,10 @@ import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @WorkerThread
 interface SurveyNotificationScheduler {

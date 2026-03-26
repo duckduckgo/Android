@@ -37,12 +37,12 @@ import com.duckduckgo.windows.impl.databinding.ActivityWindowsBinding
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WindowsScreenWithEmptyParams::class)

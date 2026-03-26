@@ -22,15 +22,17 @@ import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.reflect.KClass
-import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -59,10 +61,12 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
         return when (actualEvent.url) {
             DBP_INITIAL_URL -> {
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         currentBrokerStepIndex = 0,
                         currentActionIndex = 0,
                         pendingUrl = null,
+                        preseeding = false,
                     ),
                     nextEvent = ExecuteNextBrokerStep,
                 )
@@ -72,24 +76,42 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 logcat { "PIR-RUNNER ($this): Completing broker due to recovery" }
                 // nextCommand(BrokerCompleted(commandsFlow.value.state, isSuccess = false))
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         pendingUrl = null,
+                        preseeding = false,
                     ),
-                    nextEvent = BrokerStepCompleted(false),
+                    nextEvent = BrokerStepCompleted(
+                        needsEmailConfirmation = false,
+                        stepStatus = StepStatus.Failure(
+                            error = PirError.UnableToLoadBrokerUrl,
+                        ),
+                    ),
                 )
             }
 
             else -> {
+                if (state.preseeding) {
+                    return Next(
+                        nextState = state.copy(
+                            pendingUrl = null,
+                        ),
+                        nextEvent = ExecuteNextBrokerStep,
+                    )
+                }
+
                 // If the current action is still navigate, it means we just finished loading and we can proceed to next action.
                 // Sometimes the loaded url gets redirected to another url (could be different domain too) so we can't really check here.
                 logcat { "PIR-RUNNER ($this): Completed loading for ${event.url}" }
                 Next(
-                    nextState = state.copy(
+                    nextState =
+                    state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
                         actionRetryCount = 0,
                         pendingUrl = null,
                     ),
-                    nextEvent = ExecuteBrokerStepAction(
+                    nextEvent =
+                    ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),

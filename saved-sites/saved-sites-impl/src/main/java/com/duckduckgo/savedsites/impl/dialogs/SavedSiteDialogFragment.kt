@@ -34,7 +34,6 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.utils.text.TextChangedWatcher
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -42,6 +41,7 @@ import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
+import com.duckduckgo.mobile.android.R as CommonR
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 

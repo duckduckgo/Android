@@ -55,7 +55,6 @@ import com.duckduckgo.privacy.config.store.toFeatureException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import org.json.JSONObject
@@ -68,6 +67,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 
 // FIXME reference tests forced to have visibility in things we should not have visibility like httpsupgrade-impl and impl classes :shrug:
 @RunWith(Parameterized::class)

@@ -18,20 +18,26 @@ package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
+import com.duckduckgo.autoconsent.impl.cache.AutoconsentSettingsCache
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesBinding(
@@ -49,9 +55,19 @@ class RealAutoconsent @Inject constructor(
     private val autoconsent: AutoconsentFeature,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
+    private val settingsCache: AutoconsentSettingsCache,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : Autoconsent, PrivacyConfigCallbackPlugin {
 
     private lateinit var autoconsentJs: String
+
+    init {
+        if (isMainProcess) {
+            cacheSettingsFromConfig()
+        }
+    }
 
     override fun injectAutoconsent(webView: WebView, url: String) {
         if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
@@ -120,5 +136,17 @@ class RealAutoconsent @Inject constructor(
 
     override fun onPrivacyConfigDownloaded() {
         settingsRepository.invalidateCache()
+        cacheSettingsFromConfig()
+    }
+
+    private fun cacheSettingsFromConfig() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val settingsJson = autoconsent.self().getSettings()
+            if (settingsCache.getHash() != settingsJson.hashCode()) {
+                settingsJson?.let {
+                    settingsCache.updateSettings(it)
+                }
+            }
+        }
     }
 }

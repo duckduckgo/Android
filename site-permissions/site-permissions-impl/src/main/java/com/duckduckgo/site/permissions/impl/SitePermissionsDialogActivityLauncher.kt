@@ -48,12 +48,12 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
-import java.lang.IllegalStateException
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.lang.IllegalStateException
+import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
@@ -241,7 +241,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         activity: Activity,
         url: String,
     ) {
-        sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
         val domain = url.extractDomain() ?: url
 
         // Check if user allowed or denied per session
@@ -284,6 +283,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 object : TextAlertDialogBuilder.EventListener() {
 
                     var rememberChoice = false
+
+                    override fun onDialogShown() {
+                        sendDialogImpressionPixel(SitePermissionsPixelValues.DRM)
+                    }
 
                     override fun onPositiveButtonClicked() {
                         if (rememberChoice) {

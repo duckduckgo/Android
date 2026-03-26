@@ -36,9 +36,6 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
-import java.io.BufferedReader
-import java.io.StringReader
-import java.net.InetAddress
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -46,6 +43,9 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
+import java.io.BufferedReader
+import java.io.StringReader
+import java.net.InetAddress
 
 class WgVpnNetworkStackTest {
 
@@ -92,7 +92,7 @@ class WgVpnNetworkStackTest {
         DNS = 1.2.3.4
         MTU = 1280
         PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443

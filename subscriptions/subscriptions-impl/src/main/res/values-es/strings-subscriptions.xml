@@ -20,6 +20,7 @@
     <string name="cancel">Cancelar</string>
     <string name="ok">De acuerdo</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">Suscripción a DuckDuckGo</string>
     <string name="manageEmail">Gestionar el correo electrónico</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Suscripción no encontrada</string>
     <string name="subscriptionNotFoundDescription">La suscripción asociada a esta cuenta de Google Play ya no está activa.</string>
     <string name="purchaseRestored">Se han restablecido tus compras.</string>
-    <string name="restoreSubscriptionTitle">Añadir suscripción a Privacy Pro a este dispositivo</string>
+    <string name="restoreSubscriptionTitle">Añade tu suscripción a este dispositivo</string>
     <string name="restoreSubscriptionGooglePlayTitle">Añadir a través de cuenta de Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Restaurar suscripción en dispositivos Android usando tu cuenta de Google Play.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Restaurar compra</string>
     <string name="restoreSubscriptionEmailTitle">Añade a través de correo electrónico</string>
-    <string name="restoreSubscriptionEmailDescription">Vincular una dirección de correo electrónico a tu suscripción para añadir Privacy Pro a este dispositivo.</string>
+    <string name="restoreSubscriptionEmailDescription">Vincula una dirección de correo electrónico a tu suscripción para añadirla a este dispositivo.</string>
     <string name="restoreSubscriptionEmailGetStarted">Empezar</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Eliminar suscripción</string>
     <string name="subscriptionRemoved">Tu suscripción se ha eliminado de este dispositivo</string>
     <string name="removeFromDevice">¿Eliminar de este dispositivo?</string>
-    <string name="removeFromDeviceDescription">Ya no podrás acceder a tu suscripción a Privacy Pro en este dispositivo. Esto no cancelará tu suscripción, que seguirá activa en tus otros dispositivos.</string>
+    <string name="removeFromDeviceDescription">Ya no podrás acceder a tu suscripción en este dispositivo. Esto no cancelará tu suscripción, que seguirá activa en tus otros dispositivos.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tu suscripción mensual %1$s el %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Tu suscripción anual %1$s el %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tu suscripción caducó el %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Suscripción anual</string>
     <string name="renews">se renueva</string>
     <string name="expires">caduca</string>
-    <string name="activateOnOtherDevices">Añadir Privacy Pro a otros dispositivos</string>
+    <string name="activateOnOtherDevices">Añade tu suscripción a otros dispositivos</string>
     <string name="addToDevicePrimaryText">Añadir al dispositivo</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Añadir Privacy Pro a tus otros dispositivos mediante Google Play o vinculando una dirección de correo electrónico.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Usa el correo electrónico de arriba para añadir tu suscripción a tus otros dispositivos en la aplicación DuckDuckGo. Ve a Ajustes &gt; Privacy Pro &gt; Tengo una suscripción.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Añade tu suscripción a tus otros dispositivos a través de Google Play o vinculando una dirección de correo electrónico.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Usa el correo electrónico de arriba para añadir tu suscripción a tus otros dispositivos en la aplicación DuckDuckGo. Ve a Ajustes &gt; Configuración de suscripción &gt; Tengo una suscripción.</string>
     <string name="editEmailPrimaryText">Editar correo electrónico</string>
     <string name="learnMore">Más información</string>
-    <string name="privacyProFaq">¿Necesitas ayuda con Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Obtén respuestas a las preguntas más frecuentes o ponte en contacto con el servicio de asistencia de Privacy Pro en nuestras páginas de ayuda. La disponibilidad de las funciones varía según el país.</string>
+    <string name="privacyProFaq">¿Necesitas ayuda con tu suscripción?</string>
+    <string name="privacyProFaqSecondary">Obtén respuestas a las preguntas más frecuentes o ponte en contacto con el servicio de asistencia para suscripciones en nuestras páginas de ayuda. La disponibilidad de las funciones varía según el país.</string>
     <string name="subscriptionStatusSubscribed">Suscrito</string>
     <string name="privacyPolicyAndTermsOfService">Política de privacidad y condiciones del servicio</string>
     <string name="subscriptionStatusFreeTrial">Prueba gratuita activa</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ajustes de suscripción</string>
-    <string name="subscriptionSettingSubscribe">Protege tu conexión e identidad con Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Protege tu conexión e identidad con una suscripción.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Los suscriptores obtienen nuestra VPN, Personal Information Removal y Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Los suscriptores obtienen nuestra VPN y Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Conseguir Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Prueba Privacy Pro gratis</string>
+    <string name="subscriptionSettingGet">Suscríbete a DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Prueba gratis</string>
     <string name="subscriptionSettingRestore">Tengo una suscripción</string>
-    <string name="subscriptionSettingExpired">Tu suscripción a Privacy Pro ha caducado</string>
+    <string name="subscriptionSettingExpired">Tu suscripción a DuckDuckGo ha caducado</string>
     <string name="subscriptionSettingExpiredViewPlans">Ver planes</string>
     <string name="subscriptionSettingSectionSubscription">Suscripción</string>
     <string name="subscriptionSettingRemoveFromDevice">Eliminar de este dispositivo</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Ayuda y asistencia</string>
     <string name="subscriptionSettingSendFeedback">Enviar comentarios</string>
     <string name="subscriptionSettingActivating">Activando</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Ahorra un %1$s %% con un plan anual</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Mejor oferta</string>
+    <string name="subscriptionSettingSwitchDowngrade">Cambiar de plan</string>
+    <string name="subscriptionSettingManagePlan">Gestionar pago</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">¡Todo listo!</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Has adquirido tu suscripción a través de la App Store de Apple. Para cambiar tu plan o la configuración de facturación, ve a Ajustes &gt; Cuenta de Apple &gt; Suscripciones en un dispositivo con la misma Cuenta de Apple que usaste para comprar tu suscripción.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Activa Privacy Pro en el escritorio para configurar Personal Information Removal</string>
-    <string name="pirDescription">En el navegador DuckDuckGo para escritorio, ve a <b>Configuración &gt; Privacy Pro</b> y haz clic en <b>Tengo una suscripción</b> para empezar.</string>
+    <string name="pirTitle">Activa la suscripción a DuckDuckGo en el escritorio para configurar Personal Information Removal</string>
+    <string name="pirDescription">En el navegador DuckDuckGo para escritorio, ve a <b>Configuración &gt; Suscribirse a DuckDuckGo</b> y haz clic en <b>Tengo una suscripción</b> para empezar.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Llamar al asesor no ayuda</string>
     <string name="feedbackSubCategoryItrOther">Otros</string>
 
-    <string name="feedbackSubCategorySubsOtp">Contraseña de un solo uso</string>
-    <string name="feedbackSubCategorySubsOther">Otros</string>
+    <string name="feedbackSubCategorySubsOtp">Problema con la contraseña de un solo uso</string>
+    <string name="feedbackSubCategorySubsOther">Otro problema</string>
 
     <string name="feedbackSubmitVpnHeader">¿Has encontrado una incidencia que no aparece en nuestro <annotation type="faqs_link">centro de ayuda</annotation> ? Nos interesa mucho saberlo.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Cuéntanos qué está pasando…</string>
     <string name="feedbackSubmitVpnDisclaimer">"Además de los detalles introducidos anteriormente, enviamos información anónima con tus comentarios:\n\n• Si algunas funciones del navegador están activas\n• Diagnósticos agregados de la aplicación (por ejemplo, códigos de error)\n\nAl hacer clic en Enviar, aceptas que DuckDuckGo puede utilizar la información enviada para mejorar la aplicación."</string>
     <string name="feedbackSubmitVpnSubmit">Enviar</string>
     <string name="feedbackSubmitCompletedMessage">Gracias, se han enviado tus opiniones.</string>
-    <string name="feedbackSubmitFailedMessage">Se ha producido un error</string>
-
-    <string name="feedbackSubmitEmailByLine">Indica una dirección de correo electrónico si quieres que nos pongamos en contacto contigo en relación con esta incidencia (es posible que no podamos responder a todas las incidencias):</string>
-    <string name="feedbackSubmitEmailHint">Correo electrónico (opcional)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Danos tu opinión…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">¿Qué función te gustaría ver?</string>
+    <string name="feedbackSubmitContactSupport">¿Necesitas ayuda? <annotation type="support_link">Ponte en contacto con el servicio de asistencia</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Suscripciones</string>
     <string name="activitySubscriptionSettings">Ajustes de suscripción</string>
     <string name="activityActivateSubscription">Tengo una suscripción</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Enviar comentarios</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">Suscripción a DuckDuckGo</string>
-    <string name="subscriptionSettingExpiredRebranding">Tu suscripción a DuckDuckGo ha caducado</string>
-    <string name="privacyProFaqRebranding">¿Necesitas ayuda con tu suscripción?</string>
-    <string name="privacyProFaqSecondaryRebranding">Obtén respuestas a las preguntas más frecuentes o ponte en contacto con el servicio de asistencia para suscripciones en nuestras páginas de ayuda. La disponibilidad de las funciones varía según el país.</string>
-    <string name="restoreSubscriptionTitleRebranding">Añade tu suscripción a este dispositivo</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Vincula una dirección de correo electrónico a tu suscripción para añadirla a este dispositivo.</string>
-    <string name="activateOnOtherDevicesRebranding">Añade tu suscripción a otros dispositivos</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Añade tu suscripción a tus otros dispositivos a través de Google Play o vinculando una dirección de correo electrónico.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Usa el correo electrónico de arriba para añadir tu suscripción a tus otros dispositivos en la aplicación DuckDuckGo. Ve a Ajustes &gt; Configuración de suscripción &gt; Tengo una suscripción.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro ahora se llama simplemente suscripción a DuckDuckGo</string>
-    <string name="subscriptionSettingSubscribeRebranding">Protege tu conexión e identidad con una suscripción.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Ya no podrás acceder a tu suscripción en este dispositivo. Esto no cancelará tu suscripción, que seguirá activa en tus otros dispositivos.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Duck.ai, Personal Information Removal y Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Los suscriptores obtienen nuestra VPN, modelos avanzados de IA en Duck.ai y Identity Theft Restoration.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">No puedo acceder a Duck.ai con mi suscripción en otros navegadores.</string>
     <string name="feedbackSubCategoryDuckAiOther">Otros comentarios de Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">Suscripción a DuckDuckGo</string>
     <string name="subscriptionSettingSubscribeSecure">Protege tu Wi-Fi y chatea de forma privada con modelos avanzados de IA</string>
 
-    <string name="subscriptionSettingGetRebranding">Suscríbete a DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Prueba gratis</string>
     <string name="feedbackGeneralSubscription">Suscripción</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">¡Ahorra un %1$s %% con un plan anual!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">El plan anual solo cuesta %1$s/mes, en comparación con tu plan actual de %2$s/mes.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Cambiar a anual (%1$s/año)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Mantener el plan mensual</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">¡Te ahorras un %1$s %%\ncon un plan anual!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Si te cambias, el precio al mes pasará de ser de %1$s/mes a %2$s/mes.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Mantener el plan anual</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Cambiar a plan mensual (%1$s/mes)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">No puedes acceder a las funciones de los niveles Plus o Pro</string>
+    <string name="subscriptionsProUpgradeTitle">Actualiza a Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Desbloquea una IA más potente</string>
+    <string name="subscriptionSettingSectionManageSubscription">Gestionar suscripción</string>
+    <string name="subscriptionSettingViewAllPlans">Ver todos los planes</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Gestionar el pago o cancelar</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tu plan se actualizará a %1$s el %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Tu plan se revertirá a %1$s el %2$s.</string>
+    <string name="planNamePlusMonthly">Plus mensual</string>
+    <string name="planNamePlusYearly">Plus anual</string>
+    <string name="planNameProMonthly">Pro mensual</string>
+    <string name="planNameProYearly">Pro anual</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

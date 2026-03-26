@@ -16,11 +16,11 @@
 
 package com.duckduckgo.app.global.install
 
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 class AppInstallStoreTest {
 

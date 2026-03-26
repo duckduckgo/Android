@@ -1,0 +1,19 @@
+appId: com.duckduckgo.mobile.android
+name: "Navigation Test: Navigate to SERP with duck scheme query"
+tags:
+  - navigationTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - openLink:
+          link: duck://https://duckduckgo.com?q=why%20use%20duckduckgo
+
+      - copyTextFrom:
+          id: "omnibarTextInput"
+
+      - assertTrue: ${maestro.copiedText == "why use duckduckgo" }

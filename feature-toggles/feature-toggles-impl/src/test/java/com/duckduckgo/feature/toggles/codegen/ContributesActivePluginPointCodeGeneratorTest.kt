@@ -29,8 +29,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.moshi.Moshi
-import kotlin.reflect.KClass
-import kotlin.reflect.full.functions
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -38,6 +36,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import kotlin.reflect.KClass
+import kotlin.reflect.full.functions
 
 class ContributesActivePluginPointCodeGeneratorTest {
 
@@ -383,6 +383,55 @@ class ContributesActivePluginPointCodeGeneratorTest {
         instance.set("foo", Toggle.State(enable = false))
         assertEquals(Toggle.State(enable = false), instance.get("foo"))
     }
+
+    // region explicit featureName / parentFeatureName
+
+    @Test
+    fun `explicit featureName on plugin point generates sentinel class`() {
+        // The sentinel is used by sibling-module plugins to validate parentFeatureName at :app
+        // compile time. Its mere existence (loadable class) proves the codegen emitted it.
+        Class.forName("com.duckduckgo.anvil.generated.ActivePluginPointRegistry_pluginPointExplicit")
+    }
+
+    @Test
+    fun `explicit featureName on plugin point is used in generated remote feature`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNamePlugin_ActivePluginPoint_RemoteFeature")
+
+        val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
+        assertEquals("pluginPointExplicit", featureAnnotation.featureName)
+    }
+
+    @Test
+    fun `explicit featureName on plugin is used as toggle function name in generated remote feature`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNameActivePlugin_ActivePlugin_RemoteFeature")
+
+        assertNotNull(
+            clazz.methods.find { it.name == "pluginExplicit" && it.returnType.kotlin == Toggle::class },
+        )
+    }
+
+    @Test
+    fun `explicit parentFeatureName on plugin is used as parent feature in generated remote feature`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.ExplicitNameActivePlugin_ActivePlugin_RemoteFeature")
+
+        val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
+        assertEquals("pluginPointExplicit", featureAnnotation.featureName)
+    }
+
+    @Test
+    fun `explicit featureName and parentFeatureName are used in generated remote feature`() {
+        val clazz = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.BarActivePlugin_ActivePlugin_RemoteFeature")
+
+        val featureAnnotation = clazz.kotlin.java.getAnnotation(ContributesRemoteFeature::class.java)!!
+        assertEquals("pluginPointMyPlugin", featureAnnotation.featureName)
+        assertNotNull(clazz.methods.find { it.name == "pluginBarActivePlugin" })
+    }
+
+    // endregion
 
     private infix fun KClass<*>.extends(other: KClass<*>): Boolean =
         other.java.isAssignableFrom(this.java)

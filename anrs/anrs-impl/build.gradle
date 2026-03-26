@@ -48,6 +48,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     implementation AndroidX.room.rxJava2
+    implementation AndroidX.webkit
 
     testImplementation project(':common-test')
     implementation project(':data-store-test')

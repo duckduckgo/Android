@@ -18,7 +18,6 @@ package com.duckduckgo.vpn.internal.feature
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
@@ -35,6 +34,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.isDdgApp
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
@@ -48,11 +48,11 @@ import com.duckduckgo.vpn.internal.feature.logs.LoggingExtensions
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(
     scope = ActivityScope::class,
@@ -164,7 +164,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun refreshInstalledApps() {
-        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        installedApps = packageManager.safeGetInstalledApplications(this.applicationContext)
             .asSequence()
             .filterNot { shouldNotBeShown(it) }
     }

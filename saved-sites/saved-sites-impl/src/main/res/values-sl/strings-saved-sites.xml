@@ -85,7 +85,6 @@
     <string name="searchBookmarks">Iskanje zaznamkov</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Želite izbrisati mapo %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Želite izbrisati zaznamek %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Zaznamek je dodan v mapo %1$s</string>
     <string name="addToFavorites">Dodaj med priljubljene</string>
     <string name="editBookmark">Uredi zaznamek</string>
     <string name="importBookmarksDescription">Če so zaznamki shranjeni v drugem brskalniku, jih lahko\nuvozite v DuckDuckGo.</string>
@@ -118,4 +117,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">S tem boste izbrisali svojo mapo z zaznamki &lt;b&gt;%1$s&lt;/b&gt; .</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Prekliči</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Uvozi zaznamke iz Googla</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google vas bo morda prosil, da se prijavite ali vnesete geslo za potrditev.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvozi iz Googla</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izberite datoteko z zaznamki …</string>
+    <string name="bookmarksImportDialogClose">Zapri</string>
 </resources>

@@ -21,7 +21,7 @@ package com.duckduckgo.app.browser.tabpreview
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.io.File
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -32,6 +32,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import java.io.File
 
 class FileBasedWebViewPreviewPersisterTest {
 
@@ -44,7 +46,8 @@ class FileBasedWebViewPreviewPersisterTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
+        whenever(mockFileDeleter.deleteContents(any(), any())).thenReturn(Result.success(Unit))
         testee = FileBasedWebViewPreviewPersister(context, mockFileDeleter, coroutineTestRule.testDispatcherProvider)
     }
 

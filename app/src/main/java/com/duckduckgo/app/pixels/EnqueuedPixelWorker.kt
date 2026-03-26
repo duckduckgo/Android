@@ -32,20 +32,21 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Provider
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -60,9 +61,9 @@ class EnqueuedPixelWorker @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val customTabDetector: CustomTabDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
     private val appBuildConfig: AppBuildConfig,
+    private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
@@ -82,9 +83,17 @@ class EnqueuedPixelWorker @Inject constructor(
             launchedByFireAction = false
             return
         }
+
+        appCoroutineScope.launch(dispatchers.io()) {
+            sendAppLaunchPixel()
+        }
+    }
+
+    private suspend fun sendAppLaunchPixel() {
         logcat(INFO) { "Sending app launch pixel" }
         val collectWebViewFullVersion =
             androidBrowserConfigFeature.self().isEnabled() && androidBrowserConfigFeature.collectFullWebViewVersion().isEnabled()
+
         val paramsMap = mutableMapOf<String, String>().apply {
             put(WEBVIEW_VERSION, webViewVersionProvider.getMajorVersion())
             put(DEFAULT_BROWSER, defaultBrowserDetector.isDefaultBrowser().toString())
@@ -93,20 +102,26 @@ class EnqueuedPixelWorker @Inject constructor(
                 put(WEBVIEW_FULL_VERSION, webViewVersionProvider.getFullVersion())
             }
         }.toMap()
-        appCoroutineScope.launch {
-            val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-            val parameters = paramsMap + popupExperimentParams
-            pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
-                parameters = parameters,
-            )
 
-            if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
-                pixel.get().fire(
-                    pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
-                    parameters = parameters,
-                )
-            }
+        // app launch pixel
+        pixel.get().fire(
+            pixel = AppPixelName.APP_LAUNCH,
+            parameters = paramsMap,
+        )
+        pixel.get().fire(
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU,
+        )
+        pixel.get().fire(
+            pixel = AppPixelName.PRODUCT_TELEMETRY_SURFACE_DAU_DAILY,
+            type = Pixel.PixelType.Daily(),
+        )
+
+        // verified app launch pixel
+        if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
+            pixel.get().fire(
+                pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
+                parameters = paramsMap,
+            )
         }
     }
 
@@ -123,14 +138,16 @@ class EnqueuedPixelWorker @Inject constructor(
         return false
     }
 
-    fun submitUnsentFirePixels() {
-        val count = unsentForgetAllPixelStore.pendingPixelCountClearData
-        logcat(INFO) { "Found $count unsent clear data pixels" }
-        if (count > 0) {
-            for (i in 1..count) {
-                pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
+    suspend fun submitUnsentFirePixels() {
+        withContext(dispatchers.io()) {
+            val count = unsentForgetAllPixelStore.pendingPixelCountClearData
+            logcat(INFO) { "Found $count unsent clear data pixels" }
+            if (count > 0) {
+                for (i in 1..count) {
+                    pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
+                }
+                unsentForgetAllPixelStore.resetCount()
             }
-            unsentForgetAllPixelStore.resetCount()
         }
     }
 

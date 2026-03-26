@@ -24,8 +24,7 @@ import android.webkit.WebView
  * Useful for privacy protections and that need to run as early as possible and/or on iframes.
  */
 interface AddDocumentStartJavaScriptPlugin {
+    suspend fun addDocumentStartJavaScript(webView: WebView)
 
-    fun addDocumentStartJavaScript(
-        webView: WebView,
-    )
+    val context: String
 }

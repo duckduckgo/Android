@@ -32,13 +32,14 @@ import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import java.util.UUID
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import java.util.UUID
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
@@ -53,7 +54,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         val url = intent.intentText
-        val toolbarColor = intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)
+        val toolbarColor =
+            intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, getColorFromAttr(com.duckduckgo.mobile.android.R.attr.preferredStatusBarColor))
 
         logcat { "onCreate called with url=$url and toolbar color=$toolbarColor" }
 
@@ -108,12 +110,20 @@ class CustomTabActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context, flags: Int, text: String?, toolbarColor: Int, isExternal: Boolean): Intent {
+        fun intent(
+            context: Context,
+            flags: Int,
+            text: String?,
+            toolbarColor: Int?,
+            isExternal: Boolean,
+        ): Intent {
             return Intent(context, CustomTabActivity::class.java).apply {
                 addFlags(flags)
-                putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
                 putExtra(Intent.EXTRA_TEXT, text)
                 putExtra(LAUNCH_FROM_EXTERNAL_EXTRA, isExternal)
+                if (toolbarColor != null) {
+                    putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
+                }
             }
         }
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"

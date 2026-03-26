@@ -20,11 +20,12 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.pixels.SyncPixels
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
@@ -41,11 +42,15 @@ class SyncCreateAccountViewModelTest {
 
     private val syncRepostitory: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncFeatureToggle: SyncFeatureToggle = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
     private val testee = SyncCreateAccountViewModel(
         syncRepostitory,
         syncPixels,
         coroutineTestRule.testDispatcherProvider,
+        syncFeatureToggle,
+        syncSetupWideEvent,
     )
 
     @Test
@@ -79,6 +84,38 @@ class SyncCreateAccountViewModelTest {
         testee.commands().test {
             awaitItem()
             verify(syncPixels).fireSignupDirectPixel(source = "foo")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAccountCreatedSuccessfullyThenOnAccountCreatedCalled() = runTest {
+        whenever(syncRepostitory.createAccount()).thenReturn(Result.Success(true))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            verify(syncSetupWideEvent).onAccountCreated()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAccountCreationFailsThenOnAccountCreationFailedCalled() = runTest {
+        whenever(syncRepostitory.createAccount()).thenReturn(Result.Error(1, ""))
+
+        testee.viewState(source = null).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            awaitItem()
+            verify(syncSetupWideEvent).onAccountCreationFailed()
             cancelAndIgnoreRemainingEvents()
         }
     }

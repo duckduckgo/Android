@@ -25,13 +25,13 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.time.Duration
-import java.time.Instant
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
 import retrofit2.Response
+import java.time.Duration
+import java.time.Instant
+import javax.inject.Inject
 
 interface AuthClient {
     /**

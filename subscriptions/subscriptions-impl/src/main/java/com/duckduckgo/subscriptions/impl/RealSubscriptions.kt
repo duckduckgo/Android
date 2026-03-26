@@ -52,13 +52,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
@@ -95,6 +95,11 @@ class RealSubscriptions @Inject constructor(
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
+
+        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+            return isActive
+        }
+
         return isActive || (isEligible && supportsEncryption)
     }
 
@@ -185,14 +190,10 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useUnifiedFeedback(): Toggle
 
-    // Kill switch
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun allowEmailFeedback(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
@@ -227,7 +228,7 @@ interface PrivacyProFeature {
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun enableSubscriptionFlowsV2(): Toggle
 
     /**
@@ -244,20 +245,65 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAISubscriptionMessaging(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun subscriptionRebranding(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshSubscriptionPlanFeatures(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun subscriptionAIFeaturesRebranding(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useClientWithCacheForFeatures(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun supportsAlternateStripePaymentFlow(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionPurchaseWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendAuthTokenRefreshWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionSwitchWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionRestoreWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun supportsSwitchSubscription(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun blackFridayOffer2025(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleSubscriptionsWebViewRenderProcessCrash(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendFreeTrialConversionWideEvent(): Toggle
+
+    /**
+     * When enabled, the native app will respond to the getSubscriptionTierOptions message
+     * with the new tier-based payload structure supporting Plus/Pro tiers.
+     * The flag is exposed to FE via getFeatureConfig.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun tierMessagingEnabled(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun allowProTierPurchase(): Toggle
+
+    /**
+     * When enabled, pending plan hint is displayed to users.
+     * When disabled, pending plans hint is not shown (kill switch for pending plans UI).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showPendingPlanHint(): Toggle
+
+    /**
+     * When enabled, a VPN reminder notification will be scheduled for day 2 of the free trial.
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun vpnReminderNotification(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun handleExpiredStateWhenSubscriptionChangeSelected(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun fetchProTierEntitlements(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

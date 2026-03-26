@@ -22,8 +22,8 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import java.lang.Error
 import logcat.logcat
+import java.lang.Error
 
 class SyncFaviconsFetchingPrompt(
     private val faviconsFetchingStore: FaviconsFetchingStore,

@@ -54,8 +54,8 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Qualifier
 
 @Module
 @ContributesTo(AppScope::class)
@@ -168,7 +168,21 @@ object SyncStoreModule {
     fun provideSyncPromotionsDataStore(context: Context): DataStore<Preferences> {
         return context.dataStore
     }
+
+    private val Context.autoRestoreDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "com.duckduckgo.sync.auto_restore",
+    )
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @SyncAutoRestoreStore
+    fun provideSyncAutoRestoreDataStore(context: Context): DataStore<Preferences> {
+        return context.autoRestoreDataStore
+    }
 }
 
 @Qualifier
 annotation class SyncPromotion
+
+@Qualifier
+annotation class SyncAutoRestoreStore

@@ -23,10 +23,10 @@ import androidx.datastore.preferences.core.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 interface AutofillServiceStore {
     suspend fun isDefaultAutofillProvider(): Boolean

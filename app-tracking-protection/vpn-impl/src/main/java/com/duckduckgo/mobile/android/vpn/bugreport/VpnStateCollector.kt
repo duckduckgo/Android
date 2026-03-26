@@ -24,10 +24,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)

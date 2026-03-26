@@ -37,10 +37,10 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {
@@ -92,9 +92,23 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         setButtonsBehaviour()
     }
 
+    @Suppress("DEPRECATION")
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        super.setUserVisibleHint(isVisibleToUser)
+        maybeReportPageShown()
+    }
+
     override fun onResume() {
         super.onResume()
+        maybeReportPageShown()
         viewModel.loadUI()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun maybeReportPageShown() {
+        if (userVisibleHint && isResumed && view != null) {
+            viewModel.onPageShown()
+        }
     }
 
     override fun onStop() {

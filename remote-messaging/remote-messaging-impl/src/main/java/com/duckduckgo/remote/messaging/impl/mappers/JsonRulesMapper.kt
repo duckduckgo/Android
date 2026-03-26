@@ -23,9 +23,9 @@ import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.toIntOrDefault
 import com.duckduckgo.remote.messaging.impl.models.toStringList
 import com.duckduckgo.remote.messaging.impl.models.toStringOrDefault
-import java.text.SimpleDateFormat
 import logcat.LogPriority.INFO
 import logcat.logcat
+import java.text.SimpleDateFormat
 
 private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 

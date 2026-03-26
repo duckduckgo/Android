@@ -21,16 +21,11 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackGeneralBinding
-import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SubscriptionFeedbackGeneralFragment : SubscriptionFeedbackFragment(R.layout.content_feedback_general) {
-
-    @Inject
-    lateinit var subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle
 
     private val binding: ContentFeedbackGeneralBinding by viewBinding()
 
@@ -44,12 +39,7 @@ class SubscriptionFeedbackGeneralFragment : SubscriptionFeedbackFragment(R.layou
         binding.browserFeedback.setOnClickListener {
             listener.onBrowserFeedbackClicked()
         }
-
-        if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
-            binding.pproFeedback.setPrimaryText(getString(R.string.feedbackGeneralSubscription))
-        } else {
-            binding.pproFeedback.setPrimaryText(getString(R.string.feedbackGeneralPpro))
-        }
+        binding.pproFeedback.setPrimaryText(getString(R.string.feedbackGeneralSubscription))
         binding.pproFeedback.setOnClickListener {
             listener.onPproFeedbackClicked()
         }

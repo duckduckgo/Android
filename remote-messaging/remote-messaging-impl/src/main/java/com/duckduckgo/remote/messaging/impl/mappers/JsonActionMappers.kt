@@ -21,7 +21,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.JsonActionType
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
+import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_CREDENTIAL_PROVIDER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
@@ -39,6 +41,19 @@ class UrlActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == URL.jsonValue) {
             Action.Url(jsonMessageAction.value)
+        } else {
+            null
+        }
+    }
+}
+
+@ContributesMultibinding(
+    AppScope::class,
+)
+class UrlInContextActionMapper @Inject constructor() : MessageActionMapperPlugin {
+    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
+        return if (jsonMessageAction.type == JsonActionType.URL_IN_CONTEXT.jsonValue) {
+            Action.UrlInContext(jsonMessageAction.value)
         } else {
             null
         }
@@ -112,5 +127,18 @@ class NavigationActionMapper @Inject constructor(
             }
         }
         return null
+    }
+}
+
+@ContributesMultibinding(
+    AppScope::class,
+)
+class DefaultCredentialProviderActionMapper @Inject constructor() : MessageActionMapperPlugin {
+    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
+        return if (jsonMessageAction.type == DEFAULT_CREDENTIAL_PROVIDER.jsonValue) {
+            Action.DefaultCredentialProvider
+        } else {
+            null
+        }
     }
 }

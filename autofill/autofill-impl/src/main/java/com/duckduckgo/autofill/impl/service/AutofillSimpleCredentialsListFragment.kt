@@ -54,11 +54,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragment_autofill_provider_list) {
@@ -231,7 +231,12 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
             logcat(INFO) { "DDGAutofillService showSuggestionsFor: $showSuggestionsFor" }
             val directSuggestions = suggestionMatcher.getDirectSuggestions(showSuggestionsFor, credentials)
             val shareableCredentials = suggestionMatcher.getShareableSuggestions(showSuggestionsFor)
-            val directSuggestionsListItems = suggestionListBuilder.build(directSuggestions, shareableCredentials, allowBreakageReporting = false)
+            val directSuggestionsListItems = suggestionListBuilder.build(
+                unsortedQuerySuggestions = listOf(),
+                unsortedDirectSuggestions = directSuggestions,
+                unsortedSharableSuggestions = shareableCredentials,
+                allowBreakageReporting = false,
+            )
             val groupedCredentials = credentialGrouper.group(credentials)
 
             withContext(dispatchers.main()) {

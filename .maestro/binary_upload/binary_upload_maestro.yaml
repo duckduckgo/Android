@@ -1,0 +1,11 @@
+appId: com.duckduckgo.mobile.android
+tags:
+  - binaryUpload
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+          permissions: { all: unset }

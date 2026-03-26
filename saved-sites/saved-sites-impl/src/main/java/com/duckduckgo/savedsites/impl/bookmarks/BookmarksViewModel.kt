@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
@@ -47,7 +48,7 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.Expor
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ImportedSavedSites
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchAddFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkExport
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.LaunchBookmarkImportFile
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenBookmarkFolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.OpenSavedSite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksViewModel.Command.ShowBrowserMenu
@@ -65,7 +66,6 @@ import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,6 +73,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
@@ -84,6 +85,7 @@ class BookmarksViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val bookmarksDataStore: BookmarksDataStore,
     private val dispatcherProvider: DispatcherProvider,
+    private val importFromGoogle: ImportFromGoogle,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
@@ -106,11 +108,11 @@ class BookmarksViewModel @Inject constructor(
         class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
-        data object LaunchBookmarkImport : Command()
+        data object ShowBookmarkImportDialog : Command()
+        data object LaunchBookmarkImportFile : Command()
         data object LaunchBookmarkExport : Command()
         data object LaunchAddFolder : Command()
         data object ShowFaviconsPrompt : Command()
-        data object LaunchSyncSettings : Command()
         data object ReevalutePromotions : Command()
         data class ShowBrowserMenu(
             val buttonsDisabled: Boolean,
@@ -136,9 +138,15 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
+        pixel.fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
         pixel.fire(
             SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
             parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
+            type = Daily(),
+        )
+        pixel.fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName)
+        pixel.fire(
+            SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName,
             type = Daily(),
         )
     }
@@ -346,7 +354,7 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items + bookmarkFolder.id))
         }
-        command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
+        command.value = ConfirmDeleteBookmarkFolder(bookmarkFolder)
     }
 
     private suspend fun onSavedSitesItemsChanged(
@@ -478,12 +486,6 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    fun userReturnedFromSyncSettings() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            showSyncPromotionIfEligible()
-        }
-    }
-
     fun onPromotionDismissed() {
         viewModelScope.launch(dispatcherProvider.io()) {
             showSyncPromotionIfEligible()
@@ -516,7 +518,18 @@ class BookmarksViewModel @Inject constructor(
 
     fun onImportBookmarksClicked() {
         pixel.fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
-        command.value = LaunchBookmarkImport
+
+        viewModelScope.launch {
+            val googleImportLaunchIntent = withContext(dispatcherProvider.io()) {
+                importFromGoogle.getBookmarksImportLaunchIntent()
+            }
+
+            command.value = if (googleImportLaunchIntent != null) {
+                Command.ShowBookmarkImportDialog
+            } else {
+                LaunchBookmarkImportFile
+            }
+        }
     }
 
     fun onExportBookmarksClicked() {

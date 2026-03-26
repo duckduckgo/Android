@@ -85,7 +85,6 @@
     <string name="searchBookmarks">Wyszukaj zakładki</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Usunąć %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Usunąć zakładkę %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Dodano zakładkę w %1$s</string>
     <string name="addToFavorites">Dodaj do ulubionych</string>
     <string name="editBookmark">Edytuj zakładkę</string>
     <string name="importBookmarksDescription">Jeśli zakładki są zapisane w innej przeglądarce, możesz\nzaimportować je do DuckDuckGo.</string>
@@ -118,4 +117,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Spowoduje to usunięcie folderu zakładek &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Anuluj</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Usuń</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importuj zakładki z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
+    <string name="bookmarksImportDialogClose">Zamknij</string>
 </resources>

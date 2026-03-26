@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Lesezeichen durchsuchen</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s löschen?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Lesezeichen %1$s löschen?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Lesezeichen zu %1$s hinzugefügt</string>
     <string name="addToFavorites">Zu Favoriten hinzufügen</string>
     <string name="editBookmark">Lesezeichen bearbeiten</string>
     <string name="importBookmarksDescription">Wenn deine Lesezeichen in einem anderen Browser gespeichert sind,\nkannst du sie in DuckDuckGo importieren.</string>
@@ -110,4 +109,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Lesezeichen von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Lesezeichendatei auswählen …</string>
+    <string name="bookmarksImportDialogClose">Schließen</string>
 </resources>

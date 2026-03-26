@@ -20,6 +20,7 @@
     <string name="cancel">Avbryt</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo-abonnement</string>
     <string name="manageEmail">Administrer e-postadresse</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Abonnementet ble ikke funnet</string>
     <string name="subscriptionNotFoundDescription">Abonnementet tilknyttet denne Google Play-kontoen er ikke lenger aktiv.</string>
     <string name="purchaseRestored">Kjøpene dine er gjenopprettet.</string>
-    <string name="restoreSubscriptionTitle">Legg til Privacy Pro-abonnementet ditt på denne enheten</string>
+    <string name="restoreSubscriptionTitle">Legg til abonnementet på denne enheten</string>
     <string name="restoreSubscriptionGooglePlayTitle">Legg til via Google Play-konto</string>
     <string name="restoreSubscriptionGooglePlayDescription">Gjenopprett abonnementet ditt på Android-enheter ved å bruke Google Play-kontoen din.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Gjenopprett kjøp</string>
     <string name="restoreSubscriptionEmailTitle">Legg til via e-postadresse</string>
-    <string name="restoreSubscriptionEmailDescription">Koble en e-postadresse til abonnementet ditt for å legge til Privacy Pro på denne enheten.</string>
+    <string name="restoreSubscriptionEmailDescription">Koble en e-postadresse til abonnementet ditt for å legge det til på denne enheten.</string>
     <string name="restoreSubscriptionEmailGetStarted">Kom i gang</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Fjern abonnement</string>
     <string name="subscriptionRemoved">Abonnementet ditt er fjernet fra denne enheten</string>
     <string name="removeFromDevice">Vil du fjerne det fra denne enheten?</string>
-    <string name="removeFromDeviceDescription">Du får ikke lenger tilgang til Privacy Pro-abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet, det er fortsatt aktivt på de andre enhetene.</string>
+    <string name="removeFromDeviceDescription">Du får ikke lenger tilgang til abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet, det er fortsatt aktivt på de andre enhetene.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Månedsabonnementet ditt %1$s %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Årsabonnementet ditt %1$s %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Abonnementet ditt utløp %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Årsabonnement</string>
     <string name="renews">fornyes</string>
     <string name="expires">utløper</string>
-    <string name="activateOnOtherDevices">Legg til Privacy Pro på andre enheter</string>
+    <string name="activateOnOtherDevices">Legg til abonnementet ditt på andre enheter</string>
     <string name="addToDevicePrimaryText">Legg til på enheten</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Legg til Privacy Pro på dine andre enheter via Google Play eller ved å koble til en e-postadresse.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Privacy Pro &gt; Jeg har et abonnement.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Legg til abonnementet på de andre enhetene dine via Google Play eller ved å koble til en e-postadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Abonnementsinnstillinger &gt; Jeg har et abonnement.</string>
     <string name="editEmailPrimaryText">Rediger e-postadresse</string>
     <string name="learnMore">Finn ut mer</string>
-    <string name="privacyProFaq">Trenger du hjelp med Privacy Pro?</string>
-    <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt Privacy Pro-støtte fra hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
+    <string name="privacyProFaq">Trenger du hjelp med abonnementet ditt?</string>
+    <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt abonnementsstøtte via hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
     <string name="subscriptionStatusSubscribed">Abonnerer</string>
     <string name="privacyPolicyAndTermsOfService">Personvernerklæring og vilkår for bruk</string>
     <string name="subscriptionStatusFreeTrial">Gratis prøveperiode er aktiv</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnementsinnstillinger</string>
-    <string name="subscriptionSettingSubscribe">Beskytt tilkoblingen og identiteten din med Privacy Pro</string>
+    <string name="subscriptionSettingSubscribe">Beskytt tilkoblingen og identiteten din med ett abonnement.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Abonnenter får vår VPN, Personal Information Removal og Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Abonnenter får vår VPN og Identity Theft Restoration.</string>
 
-    <string name="subscriptionSettingGet">Skaff deg Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Prøv Privacy Pro gratis</string>
+    <string name="subscriptionSettingGet">Abonner på DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Prøv gratis</string>
     <string name="subscriptionSettingRestore">Jeg har et abonnement</string>
-    <string name="subscriptionSettingExpired">Abonnementet ditt på Privacy Pro har utløpt</string>
+    <string name="subscriptionSettingExpired">DuckDuckGo-abonnementet er utløpt</string>
     <string name="subscriptionSettingExpiredViewPlans">Se abonnementer</string>
     <string name="subscriptionSettingSectionSubscription">Abonnement</string>
     <string name="subscriptionSettingRemoveFromDevice">Fjern fra denne enheten</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Hjelp og kundestøtte</string>
     <string name="subscriptionSettingSendFeedback">Send tilbakemelding</string>
     <string name="subscriptionSettingActivating">Aktiverer</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Spar %1$s %% med et årsabonnement</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Tilbud</string>
+    <string name="subscriptionSettingSwitchDowngrade">Bytt abonnement</string>
+    <string name="subscriptionSettingManagePlan">Administrer betaling</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Alt klart.</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Abonnementet ditt ble kjøpt gjennom Apple App Store. Hvis du vil endre abonnementet eller faktureringsinnstillingene, må du gå til Innstillinger &gt; Apple-konto &gt; Abonnementer på en enhet som er logget på samme Apple-konto som ble brukt til å kjøpe abonnementet.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktiver Privacy Pro på en datamaskin for å konfigurere Personal Information Removal</string>
-    <string name="pirDescription">I skrivebordsversjonen av DuckDuckGo-nettleseren går du til <b>Innstillinger &gt; Privacy Pro</b> og klikker på <b>Jeg har et abonnement</b> for å komme i gang.</string>
+    <string name="pirTitle">Aktiver DuckDuckGo-abonnementet på datamaskin for å konfigurere Personal Information Removal</string>
+    <string name="pirDescription">I skrivebordsversjonen av DuckDuckGo-nettleseren går du til <b>Innstillinger &gt; Abonner på DuckDuckGo</b> og klikker på <b>Jeg har et abonnement</b> for å komme i gang.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Det hjalp ikke å ringe til rådgiver</string>
     <string name="feedbackSubCategoryItrOther">Annet</string>
 
-    <string name="feedbackSubCategorySubsOtp">Engangspassord</string>
-    <string name="feedbackSubCategorySubsOther">Annet</string>
+    <string name="feedbackSubCategorySubsOtp">Problem med engangspassord</string>
+    <string name="feedbackSubCategorySubsOther">Noe annet</string>
 
     <string name="feedbackSubmitVpnHeader">Har du funnet et problem som ikke er dekket i <annotation type="faqs_link">hjelpesenteret</annotation>? Da vil vi svært gjerne høre om det.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Fortell oss hva som skjer …</string>
     <string name="feedbackSubmitVpnDisclaimer">"I tillegg til detaljene som oppgis ovenfor, sender vi noe anonymisert informasjon sammen med tilbakemeldingen:\n\n• Hvorvidt enkelte nettleserfunksjoner er aktive\n• Samlet appdiagnose (f.eks. feilkoder)\n\nVed å klikke på Send inn godtar du at DuckDuckGo kan bruke innsendt informasjon til å forbedre appen."</string>
     <string name="feedbackSubmitVpnSubmit">Send</string>
     <string name="feedbackSubmitCompletedMessage">Takk! Tilbakemeldingen er sendt.</string>
-    <string name="feedbackSubmitFailedMessage">Noe gikk galt</string>
-
-    <string name="feedbackSubmitEmailByLine">Oppgi en e-postadresse hvis du vil at vi skal kontakte deg om dette problemet (det er ikke sikkert vi kan svare på alle henvendelser):</string>
-    <string name="feedbackSubmitEmailHint">E-postadresse (valgfritt)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Gi oss gjerne en tilbakemelding …</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hvilken funksjon hadde du ønsket deg?</string>
+    <string name="feedbackSubmitContactSupport">Trenger du hjelp? <annotation type="support_link">Kontakt kundestøtte</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonnementer</string>
     <string name="activitySubscriptionSettings">Abonnementsinnstillinger</string>
     <string name="activityActivateSubscription">Jeg har et abonnement</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbakemelding</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo-abonnement</string>
-    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-abonnementet er utløpt</string>
-    <string name="privacyProFaqRebranding">Trenger du hjelp med abonnementet ditt?</string>
-    <string name="privacyProFaqSecondaryRebranding">Få svar på ofte stilte spørsmål eller kontakt abonnementsstøtte via hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
-    <string name="restoreSubscriptionTitleRebranding">Legg til abonnementet på denne enheten</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Koble en e-postadresse til abonnementet ditt for å legge det til på denne enheten.</string>
-    <string name="activateOnOtherDevicesRebranding">Legg til abonnementet ditt på andre enheter</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Legg til abonnementet på de andre enhetene dine via Google Play eller ved å koble til en e-postadresse.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Abonnementsinnstillinger &gt; Jeg har et abonnement.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kalles nå bare DuckDuckGo-abonnementet</string>
-    <string name="subscriptionSettingSubscribeRebranding">Beskytt tilkoblingen og identiteten din med ett abonnement.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Du får ikke lenger tilgang til abonnementet ditt på denne enheten. Dette avslutter ikke abonnementet; det er fortsatt aktivt på de andre enhetene.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vår VPN, avanserte AI-modeller i Duck.ai, Personal Information Removal og Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vår VPN, avanserte AI-modeller i Duck.ai og Identity Theft Restoration.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Får ikke tilgang til Duck.ai med abonnementet mitt i andre nettlesere</string>
     <string name="feedbackSubCategoryDuckAiOther">Andre tilbakemeldinger om Duck.ai</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo-abonnement</string>
     <string name="subscriptionSettingSubscribeSecure">Sikre wifien din og chat privat med avanserte AI-modeller</string>
 
-    <string name="subscriptionSettingGetRebranding">Abonner på DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Prøv gratis</string>
     <string name="feedbackGeneralSubscription">Abonnement</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Spar %1$s %% med\net årsabonnement!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Et årsabonnement koster bare %1$s per måned, sammenlignet med det nåværende månedsabonnementet ditt til %2$s per måned.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Bytt til årlig (%1$s per år)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Behold månedsabonnementet</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Du sparer %1$s %% med\net årsabonnement!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Hvis du bytter, øker månedsprisen fra %1$s per måned til %2$s per måned.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Behold årsabonnementet</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Bytt til månedlig (%1$s per måned)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Får ikke tilgang til Plus- eller Pro-nivåfunksjoner</string>
+    <string name="subscriptionsProUpgradeTitle">Oppgrader til Pro</string>
+    <string name="subscriptionsProUpgradeMessage">Få tilgang til kraftigere AI</string>
+    <string name="subscriptionSettingSectionManageSubscription">Administrer abonnement</string>
+    <string name="subscriptionSettingViewAllPlans">Vis alle abonnementer</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Administrer betaling eller si opp</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Abonnementet ditt blir oppgradert til %1$s den %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Abonnementet ditt blir nedgradert til %1$s den %2$s.</string>
+    <string name="planNamePlusMonthly">Plus månedlig</string>
+    <string name="planNamePlusYearly">Plus årlig</string>
+    <string name="planNameProMonthly">Pro månedlig</string>
+    <string name="planNameProYearly">Pro årlig</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

@@ -25,13 +25,13 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
 import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore.DataVolume
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @ContributesMultibinding(VpnScope::class)
 class NetpDataVolumeMonitor @Inject constructor(

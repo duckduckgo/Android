@@ -28,6 +28,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
@@ -42,10 +43,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.util.Locale
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,6 +56,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
@@ -164,6 +165,51 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(TriggerTestScope::class, annotation.scope)
         assertEquals(PrivacyFeaturePlugin::class, annotation.boundType)
         assertTrue(annotation.ignoreQualifier)
+    }
+
+    @Test
+    fun `inventory getAll returns exactly all toggle methods declared in the feature interface`() = runTest {
+        val proxyModule = Class.forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_ProxyModule")
+        val instance = proxyModule.getField("INSTANCE").get(null)
+        val method = proxyModule.getMethod("providesTestTriggerFeatureInventory", TestTriggerFeature::class.java)
+        val inventory = method.invoke(instance, testFeature) as FeatureTogglesInventory
+
+        val toggles = inventory.getAll()
+
+        // self() is the root toggle: featureName().name == the feature name, parentName == null
+        // sub-toggles: featureName().name == method name, featureName().parentName == feature name
+        assertEquals(10, toggles.size)
+        val rootToggle = toggles.single { it.featureName().parentName == null }
+        assertEquals("testFeature", rootToggle.featureName().name)
+        val subToggleNames = toggles.filter { it.featureName().parentName != null }.map { it.featureName().name }.toSet()
+        assertEquals(
+            setOf(
+                "fooFeature",
+                "experimentFooFeature",
+                "internalDefaultTrue",
+                "internalDefaultFalse",
+                "defaultValueInternal",
+                "defaultTrue",
+                "defaultFalse",
+                "variantFeature",
+                "experimentDisabledByDefault",
+            ),
+            subToggleNames,
+        )
+    }
+
+    @Test
+    fun `inventory getAll does not include Object methods`() = runTest {
+        val proxyModule = Class.forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_ProxyModule")
+        val instance = proxyModule.getField("INSTANCE").get(null)
+        val method = proxyModule.getMethod("providesTestTriggerFeatureInventory", TestTriggerFeature::class.java)
+        val inventory = method.invoke(instance, testFeature) as FeatureTogglesInventory
+
+        val toggleNames = inventory.getAll().map { it.featureName().name }
+
+        assertFalse(toggleNames.contains("equals"))
+        assertFalse(toggleNames.contains("hashCode"))
+        assertFalse(toggleNames.contains("toString"))
     }
 
     @Test
@@ -529,16 +575,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "enabled"
                         },
                         "internalDefaultFalse": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "enabled"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "enabled"
                         }
@@ -568,16 +614,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "disabled"
                         },
                         "internalDefaultFalse": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "disabled"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "disabled"
                         }
@@ -606,16 +652,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "features": {
                         "internalDefaultTrue": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultTrue": {
                             "state": "internal"
                         },
                         "internalDefaultFalse": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultFalse": {
                             "state": "internal"
-                        }, 
+                        },
                         "defaultValueInternal": {
                             "state": "internal"
                         }
@@ -714,7 +760,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0.1
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -746,7 +792,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -771,7 +817,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -796,7 +842,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -824,7 +870,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 100
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -854,7 +900,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0
-                            }                    
+                            }
                         ]
                     }
                 }
@@ -883,10 +929,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 1
-                            },                    
+                            },
                             {
                                 "percent": 2
-                            },                    
+                            },
                             {
                                 "percent": 100
                             }
@@ -918,13 +964,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "steps": [
                             {
                                 "percent": 0.5
-                            },                    
+                            },
                             {
                                 "percent": 1.5
-                            },                    
+                            },
                             {
                                 "percent": 2
-                            },                    
+                            },
                             {
                                 "percent": 100
                             }
@@ -1158,8 +1204,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(rolloutThreshold < 50.0, testFeature.fooFeature().isEnabled())
     }
 
-    @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
+    @Test
     fun `backwards compatibility test - feature was disabled set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
@@ -1203,8 +1249,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(step >= threshold!!, testFeature.fooFeature().isEnabled())
     }
 
-    @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
+    @Test
     fun `backwards compatibility test - feature was null set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
@@ -1389,7 +1435,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": ${rolloutThreshold - 1.0}
+                                            "percent": ${(rolloutThreshold - 1.0).coerceAtLeast(0.0)}
                                         }
                                     ]
                                 }
@@ -1629,7 +1675,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null)),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null, null)),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1672,8 +1718,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1683,8 +1729,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1694,8 +1740,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target(null, "US", "en", null, null, null),
-                Toggle.State.Target(null, "FR", "fr", null, null, null),
+                Toggle.State.Target(null, "US", "en", null, null, null, null),
+                Toggle.State.Target(null, "FR", "fr", null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1735,7 +1781,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         // foo feature is not an experiment and the target has a variantKey. As this is a mistake, that target is invalidated, hence assertTrue
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
-            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null)),
+            listOf(Toggle.State.Target("mc", "US", "fr", null, null, null, null)),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
     }
@@ -1779,9 +1825,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, "fr", null, null, null),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, "fr", null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1826,9 +1872,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, "zh", null, null, null),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, "zh", null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1873,9 +1919,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, null, null, null, 30),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, null, 30),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1920,9 +1966,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, null, null, null, 28),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, null, 28),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -1967,9 +2013,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, null, null, null, 28),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, null, 28),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -2014,9 +2060,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", null, null, null, null, null),
-                Toggle.State.Target(null, "US", null, null, null, null),
-                Toggle.State.Target(null, null, null, null, null, 28),
+                Toggle.State.Target("mc", null, null, null, null, null, null),
+                Toggle.State.Target(null, "US", null, null, null, null, null),
+                Toggle.State.Target(null, null, null, null, null, null, 28),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -2106,8 +2152,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
@@ -2115,8 +2161,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -2124,7 +2170,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.variantFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -2182,8 +2228,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentFooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -2192,7 +2238,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -2247,8 +2293,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
-                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
+                Toggle.State.Target("mb", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
@@ -2257,7 +2303,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
         )
@@ -2298,7 +2344,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2339,7 +2385,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2380,7 +2426,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals("mc", variantManager.getVariantKey())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2421,7 +2467,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2452,7 +2498,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US", null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = "US", null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2482,7 +2528,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2512,7 +2558,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.experimentDisabledByDefault().isEnabled()) // true because experiments only check variantKey
         assertEquals(
             listOf(
-                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null),
+                Toggle.State.Target("ma", localeCountry = null, localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2554,7 +2600,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null),
+                Toggle.State.Target("mc", localeCountry = "US", localeLanguage = null, null, null, null, null),
             ),
             testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
@@ -2580,7 +2626,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2612,7 +2658,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2639,7 +2685,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2666,7 +2712,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2693,7 +2739,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2720,7 +2766,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2747,7 +2793,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": $justDisabledRollout
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2774,7 +2820,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": $justEnableRollout
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -2812,7 +2858,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -2865,7 +2911,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3264,7 +3310,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3302,7 +3348,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold + 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3378,7 +3424,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3416,7 +3462,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": ${rolloutThreshold + 1}
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3483,8 +3529,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3537,7 +3583,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3573,8 +3619,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3657,7 +3703,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3738,7 +3784,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3792,7 +3838,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -3849,7 +3895,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3891,7 +3937,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -3926,7 +3972,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             }
                         }
@@ -3971,7 +4017,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4010,7 +4056,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4046,7 +4092,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4083,7 +4129,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4132,7 +4178,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4192,7 +4238,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4236,7 +4282,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4279,7 +4325,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4345,7 +4391,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4390,7 +4436,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4435,7 +4481,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4479,7 +4525,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "targets": [
@@ -4533,7 +4579,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4586,7 +4632,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4635,7 +4681,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4674,8 +4720,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "rollout": {
                                 "steps": [
                                     {
-                                        "percent": ${rolloutThreshold - 1}
-                                    }                    
+                                        "percent": ${(rolloutThreshold - 1).coerceAtLeast(0.0)}
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4723,7 +4769,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4768,7 +4814,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4814,7 +4860,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4855,7 +4901,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -4950,7 +4996,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5010,13 +5056,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "fooFeature": {
                             "state": "enabled",
                             "settings": {
-                                "foo": "foo/value"                                
+                                "foo": "foo/value"
                             },
                             "rollout": {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5057,12 +5103,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "state": "disabled",
                     "features": {
                         "fooFeature": {
-                            "state": "enabled",                           
+                            "state": "enabled",
                             "rollout": {
                                 "steps": [
                                     {
                                         "percent": 100
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [
@@ -5114,7 +5160,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "steps": [
                                     {
                                         "percent": 0
-                                    }                    
+                                    }
                                 ]
                             },
                             "cohorts": [

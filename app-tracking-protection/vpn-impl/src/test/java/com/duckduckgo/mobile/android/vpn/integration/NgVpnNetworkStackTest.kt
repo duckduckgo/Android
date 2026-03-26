@@ -28,7 +28,6 @@ import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
 import com.duckduckgo.vpn.network.api.VpnNetwork
-import java.net.InetAddress
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.*
@@ -37,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import java.net.InetAddress
 
 private const val TRACKER_HOSTNAME = "api2.branch.com"
 

@@ -72,6 +72,7 @@ class StatisticsRequesterTest {
         whenever(mockVariantManager.defaultVariantKey()).thenReturn("")
         whenever(mockService.atb(any(), any())).thenReturn(Observable.just(ATB))
         whenever(mockService.updateSearchAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
+        whenever(mockService.updateDuckAiAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
     }
 
@@ -166,6 +167,14 @@ class StatisticsRequesterTest {
         testee.refreshSearchRetentionAtb()
         verify(mockService).updateSearchAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
         verify(mockStatisticsStore).searchRetentionAtb = NEW_ATB
+    }
+
+    @Test
+    fun whenStatisticsStoredThenRefreshDuckAiUpdatesAtb() {
+        configureStoredStatistics()
+        testee.refreshDuckAiRetentionAtb()
+        verify(mockService).updateDuckAiAtb(eq(ATB_WITH_VARIANT), eq(ATB.version), any(), any())
+        verify(mockStatisticsStore).duckaiRetentionAtb = NEW_ATB
     }
 
     @Test

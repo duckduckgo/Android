@@ -50,9 +50,9 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCre
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListener, SyncSetupFlowFinishedListener {
@@ -142,10 +142,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
                 }
             }
 
-            AskSaveRecoveryCode -> {
+            is AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
+                val fragment = if (viewState.viewMode.useNewScreen) {
+                    RecoverDataFragment.instance()
+                } else {
+                    SaveRecoveryCodeFragment.instance()
+                }
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, fragment, TAG_RECOVER_ACCOUNT)
                 }
             }
 

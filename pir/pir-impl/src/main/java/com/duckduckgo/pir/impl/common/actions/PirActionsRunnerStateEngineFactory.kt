@@ -22,8 +22,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.models.ProfileQuery
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
 interface PirActionsRunnerStateEngineFactory {
     fun create(

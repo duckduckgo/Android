@@ -16,35 +16,49 @@
 
 package com.duckduckgo.duckchat.impl.ui.settings
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
+import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
-import javax.inject.Inject
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.settings.api.SettingsPageFeature
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@ContributesViewModel(ActivityScope::class)
-class DuckChatSettingsViewModel @Inject constructor(
+class DuckChatSettingsViewModel @AssistedInject constructor(
+    @Assisted duckChatActivityParams: GlobalActivityStarter.ActivityParams,
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
-    private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel,
+    private val settingsPageFeature: SettingsPageFeature,
+    private val duckChatPixels: DuckChatPixels,
+    private val dispatcherProvider: DispatcherProvider,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
-
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
@@ -53,27 +67,100 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
-        val isRebrandingAiFeaturesEnabled: Boolean = false,
+        val isSearchSectionVisible: Boolean = true,
+        val isHideGeneratedImagesOptionVisible: Boolean = false,
+        val isAutomaticContextVisible: Boolean = false,
+        val isAutomaticContextEnabled: Boolean = false,
+        val isNativeInputFieldVisible: Boolean = false,
+        val isNativeInputFieldEnabled: Boolean = false,
+        val isDefaultTogglePositionVisible: Boolean = false,
+        val defaultTogglePosition: DefaultTogglePosition = DefaultTogglePosition.SEARCH,
     )
 
-    val viewState = combine(
-        duckChat.observeEnableDuckChatUserSetting(),
-        duckChat.observeInputScreenUserSettingEnabled(),
-    ) { isDuckChatUserEnabled, isInputScreenEnabled ->
-        ViewState(
-            isDuckChatUserEnabled = isDuckChatUserEnabled,
-            isInputScreenEnabled = isInputScreenEnabled,
-            shouldShowShortcuts = isDuckChatUserEnabled,
-            shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-            isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    private data class FeatureState(
+        val isDuckChatUserEnabled: Boolean,
+        val isCosmeticInputScreenEnabled: Boolean?,
+        val isInputScreenEnabled: Boolean,
+        val isAutomaticContextEnabled: Boolean,
+        val isNativeInputFieldEnabled: Boolean,
+    )
+
+    private data class FeatureVisibility(
+        val isHideGeneratedImagesOptionVisible: Boolean,
+        val isNativeInputFieldSettingVisible: Boolean,
+        val isRememberTogglePositionVisible: Boolean,
+    )
+
+    private val featureState =
+        combine(
+            duckChat.observeEnableDuckChatUserSetting(),
+            duckChat.observeCosmeticInputScreenUserSettingEnabled(),
+            duckChat.observeInputScreenUserSettingEnabled(),
+            duckChat.observeAutomaticContextAttachmentUserSettingEnabled(),
+            duckChat.observeNativeInputFieldUserSettingEnabled(),
+        ) { isDuckChatUserEnabled, cosmeticInputScreenEnabled, isInputScreenEnabled, isAutomaticPageContextEnabled, isNativeInputFieldEnabled ->
+            FeatureState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isCosmeticInputScreenEnabled = cosmeticInputScreenEnabled,
+                isInputScreenEnabled = isInputScreenEnabled,
+                isAutomaticContextEnabled = isAutomaticPageContextEnabled,
+                isNativeInputFieldEnabled = isNativeInputFieldEnabled,
+            )
+        }
+
+    private val featureVisibility =
+        flow {
+            emit(
+                FeatureVisibility(
+                    isHideGeneratedImagesOptionVisible = duckChatFeature.showHideAiGeneratedImages().isEnabled(),
+                    isNativeInputFieldSettingVisible = duckChatFeature.nativeInputField().isEnabled(),
+                    isRememberTogglePositionVisible = duckChatFeature.rememberTogglePosition().isEnabled(),
+                ),
+            )
+        }.flowOn(dispatcherProvider.io())
+
+    val viewState =
+        combine(
+            featureState,
+            featureVisibility,
+            duckChat.observeDefaultTogglePosition(),
+        ) { featureState, featureVisibility, defaultTogglePosition ->
+            val isDuckChatUserEnabled = featureState.isDuckChatUserEnabled
+            val isInputScreenEnabled = featureState.isCosmeticInputScreenEnabled ?: featureState.isInputScreenEnabled
+            ViewState(
+                isDuckChatUserEnabled = isDuckChatUserEnabled,
+                isInputScreenEnabled = isInputScreenEnabled,
+                shouldShowShortcuts = isDuckChatUserEnabled,
+                shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
+                isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams),
+                isHideGeneratedImagesOptionVisible = featureVisibility.isHideGeneratedImagesOptionVisible,
+                isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
+                isAutomaticContextVisible = isDuckChatUserEnabled && duckChatFeature.automaticContextAttachment().isEnabled(),
+                isNativeInputFieldEnabled = featureState.isNativeInputFieldEnabled,
+                isNativeInputFieldVisible = isDuckChatUserEnabled && featureVisibility.isNativeInputFieldSettingVisible,
+                isDefaultTogglePositionVisible = isDuckChatUserEnabled && isInputScreenEnabled &&
+                    duckChat.isInputScreenFeatureAvailable() && featureVisibility.isRememberTogglePositionVisible,
+                defaultTogglePosition = defaultTogglePosition,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLink(val link: String) : Command()
-        data class OpenLinkInNewTab(val link: String) : Command()
+        data class OpenLink(
+            val link: String,
+            @StringRes val titleRes: Int,
+        ) : Command()
+
+        data class OpenLinkInNewTab(
+            val link: String,
+        ) : Command()
+
         data object OpenShortcutSettings : Command()
+
         data object LaunchFeedback : Command()
+
+        data class ShowDefaultTogglePositionDialog(
+            val currentPosition: DefaultTogglePosition,
+        ) : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -84,6 +171,19 @@ class DuckChatSettingsViewModel @Inject constructor(
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
             }
             duckChat.setEnableDuckChatUserSetting(checked)
+        }
+    }
+
+    fun onAutomaticContextAttachmentToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setAutomaticPageContextUserSetting(checked)
+        }
+        duckChatPixels.reportContextualSettingAutomaticPageContentToggled(checked)
+    }
+
+    fun onNativeInputFieldToggled(checked: Boolean) {
+        viewModelScope.launch {
+            duckChat.setNativeInputFieldUserSetting(checked)
         }
     }
 
@@ -98,27 +198,49 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
-        viewModelScope.launch {
-            if (checked) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
-            }
-            duckChat.setShowInAddressBarUserSetting(checked)
-        }
-    }
-
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK))
+            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK, R.string.duck_chat_title))
         }
     }
 
     fun duckChatSearchAISettingsClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+            val showHideAiGeneratedImages = withContext(dispatcherProvider.io()) {
+                duckChatFeature.showHideAiGeneratedImages().isEnabled()
+            }
+
+            if (settingsPageFeature.embeddedSettingsWebView().isEnabled()) {
+                commandChannel.send(
+                    OpenLink(
+                        link = if (showHideAiGeneratedImages) {
+                            DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        } else {
+                            LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED
+                        },
+                        titleRes = if (showHideAiGeneratedImages) {
+                            R.string.duckAiSerpSettingsTitle
+                        } else {
+                            R.string.duck_chat_assist_settings_title
+                        },
+                    ),
+                )
+            } else {
+                commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+            }
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+    }
+
+    fun onDuckAiHideAiGeneratedImagesClicked() {
+        viewModelScope.launch {
+            commandChannel.send(
+                OpenLink(
+                    link = DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED,
+                    titleRes = R.string.duckAiSerpSettingsTitle,
+                ),
+            )
+            pixel.fire(DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES)
         }
     }
 
@@ -144,14 +266,46 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onDefaultTogglePositionClicked() {
+        viewModelScope.launch {
+            commandChannel.send(
+                Command.ShowDefaultTogglePositionDialog(
+                    currentPosition = viewState.value.defaultTogglePosition,
+                ),
+            )
+        }
+    }
+
+    fun onDefaultTogglePositionSelected(position: DefaultTogglePosition) {
+        viewModelScope.launch {
+            duckChat.setDefaultTogglePosition(position)
+        }
+    }
+
     fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
         }
     }
 
+    private fun isSearchSectionVisible(duckChatActivityParams: GlobalActivityStarter.ActivityParams): Boolean = when (duckChatActivityParams) {
+        is DuckChatSettingsNoParams -> true
+        is DuckChatNativeSettingsNoParams -> false
+        else -> throw IllegalArgumentException("Unknown params type: $duckChatActivityParams")
+    }
+
+    @AssistedFactory
+    interface DuckChatSettingsViewModelFactory {
+        fun create(duckChatActivityParams: GlobalActivityStarter.ActivityParams): DuckChatSettingsViewModel
+    }
+
     companion object {
         const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
         const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
+        const val LEGACY_DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED = "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe#aifeatures"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK_EMBEDDED =
+            "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbe&hideduckai=1#aifeatures"
+        const val DUCK_CHAT_HIDE_GENERATED_IMAGES_LINK_EMBEDDED =
+            "https://duckduckgo.com/settings?ko=-1&embedded=1&highlight=kbj&hideduckai=1#aifeatures"
     }
 }

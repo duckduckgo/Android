@@ -21,21 +21,20 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.daxprompts.api.DaxPrompts
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.NONE
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_CONTROL
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
-import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAYER
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_BROWSER_COMPARISON_PROMPT
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.TOO_SOON_TO_SHOW_OTHER_PROMPTS
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class LaunchViewModel @Inject constructor(
@@ -43,49 +42,29 @@ class LaunchViewModel @Inject constructor(
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val daxPrompts: DaxPrompts,
     private val appInstallStore: AppInstallStore,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
-) :
-    ViewModel() {
+    private val pixel: Pixel,
+) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
         data object Onboarding : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
-        data object DaxPromptDuckPlayer : Command()
-        data class PlayVideoInDuckPlayer(val url: String) : Command()
         data object DaxPromptBrowserComparison : Command()
         data object CloseDaxPrompt : Command()
     }
 
     suspend fun determineViewToShow() {
-        if (onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()) {
-            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-                val referrerJob = async {
-                    waitForReferrerData()
-                }
-                val configJob = async {
-                    onboardingDesignExperimentManager.waitForPrivacyConfig()
-                }
-                awaitAll(referrerJob, configJob)
-            }
-        } else {
-            waitForReferrerData()
-        }
+        waitForReferrerData()
 
         when (daxPrompts.evaluate()) {
-            SHOW_CONTROL, NONE -> {
-                logcat { "Control / None action" }
+            NONE, TOO_SOON_TO_SHOW_OTHER_PROMPTS -> {
+                logcat { "daxPrompts evaluate: None action" }
                 showOnboardingOrHome()
             }
 
-            SHOW_VARIANT_DUCKPLAYER -> {
-                logcat { "Variant Duck Player action" }
-                command.value = Command.DaxPromptDuckPlayer
-            }
-
-            SHOW_VARIANT_BROWSER_COMPARISON -> {
-                logcat { "Variant Browser Comparison action" }
+            SHOW_BROWSER_COMPARISON_PROMPT -> {
+                logcat { "daxPrompts evaluate: Browser Comparison Prompt action" }
                 command.value = Command.DaxPromptBrowserComparison
             }
         }
@@ -96,14 +75,6 @@ class LaunchViewModel @Inject constructor(
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()
-        }
-    }
-
-    fun onDaxPromptDuckPlayerActivityResult(url: String? = null) {
-        if (url != null) {
-            command.value = Command.PlayVideoInDuckPlayer(url)
-        } else {
-            command.value = Command.CloseDaxPrompt
         }
     }
 
@@ -120,8 +91,13 @@ class LaunchViewModel @Inject constructor(
         withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
             logcat { "Waiting for referrer" }
             return@withTimeoutOrNull appReferrerStateListener.waitForReferrerCode()
-        }
+        } ?: onReferrerTimeout()
 
         logcat { "Waited ${System.currentTimeMillis() - startTime}ms for referrer" }
+    }
+
+    private fun onReferrerTimeout() {
+        logcat(LogPriority.ERROR) { "LaunchViewModel timed out waiting for referrer" }
+        pixel.fire(AppPixelName.TIMEOUT_WAITING_FOR_APP_REFERRER)
     }
 }

@@ -35,10 +35,10 @@ import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companio
 import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
-import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import kotlin.math.absoluteValue
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,

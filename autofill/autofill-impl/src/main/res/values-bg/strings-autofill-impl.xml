@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Импортиране на пароли от Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Скрий</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Импортиране в DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Импортирано от Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Импортирай отметки от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортиране от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки...</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Импортиране на отметки</string>
+    <string name="importBookmarksProgressTitle">Импортиране от Google…</string>
+    <string name="importBookmarksProgressSubtitle">Дръж този екран отворен и изчакай – не би трябвало да отнеме повече от минута-две.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="importBookmarksProgressInfoMessage2">Възможно е Google да ти изпрати имейл с потвърждение, че отметките ти се експортират.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Искаш да отмениш импортирането ли?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Отметките ти няма да бъдат импортирани, ако отмениш сега.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Отмени импортирането</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Продължи</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Отметки: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Затваряне</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Възникна някаква грешка</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Моля, увери се, че имаш връзка с интернет и опитай отново.</string>
+
 </resources>

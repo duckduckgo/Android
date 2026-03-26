@@ -28,12 +28,12 @@ import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.error.SyncUnavailableRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
 @ContributesViewModel(ViewScope::class)

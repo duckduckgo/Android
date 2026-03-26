@@ -20,13 +20,25 @@ import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore
+import com.duckduckgo.feature.toggles.api.internal.CachedToggleStore.Listener
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
+import org.jetbrains.annotations.VisibleForTesting
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
-import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 class FeatureToggles private constructor(
     private val store: Toggle.Store,
@@ -36,9 +48,10 @@ class FeatureToggles private constructor(
     private val appVariantProvider: () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
 
-    private val featureToggleCache = mutableMapOf<Method, Toggle>()
+    private val featureToggleCache = ConcurrentHashMap<Method, Toggle>()
 
     data class Builder(
         private var store: Toggle.Store? = null,
@@ -48,6 +61,7 @@ class FeatureToggles private constructor(
         private var appVariantProvider: () -> String? = { "" },
         private var forceDefaultVariant: () -> Unit = { /** noop **/ },
         private var callback: FeatureTogglesCallback? = null,
+        private var ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
@@ -57,6 +71,9 @@ class FeatureToggles private constructor(
         fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
         fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun callback(callback: FeatureTogglesCallback) = apply { this.callback = callback }
+
+        @VisibleForTesting
+        fun ioDispatcher(ioDispatcher: CoroutineDispatcher) = apply { this.ioDispatcher = ioDispatcher }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -76,6 +93,7 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = this.callback,
+                ioDispatcher = this.ioDispatcher,
             )
         }
     }
@@ -97,9 +115,7 @@ class FeatureToggles private constructor(
     }
 
     private fun loadToggleMethod(method: Method): Toggle {
-        synchronized(featureToggleCache) {
-            featureToggleCache[method]?.let { return it }
-
+        return featureToggleCache.computeIfAbsent(method) {
             val defaultValue = try {
                 method.getAnnotation(Toggle.DefaultValue::class.java).defaultValue
             } catch (t: Throwable) {
@@ -118,8 +134,8 @@ class FeatureToggles private constructor(
                 method.getAnnotation(Toggle.Experiment::class.java)
             }.getOrNull() != null
 
-            return ToggleImpl(
-                store = store,
+            ToggleImpl(
+                store = if (store is CachedToggleStore) store else CachedToggleStore(store),
                 key = getToggleNameForMethod(method),
                 defaultValue = resolvedDefaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
@@ -129,7 +145,8 @@ class FeatureToggles private constructor(
                 appVariantProvider = appVariantProvider,
                 forceDefaultVariant = forceDefaultVariant,
                 callback = callback,
-            ).also { featureToggleCache[method] = it }
+                ioDispatcher = ioDispatcher,
+            )
         }
     }
 
@@ -171,6 +188,41 @@ interface Toggle {
      * @return `true` when the first enrolment is done, `false` in any other subsequent call
      */
     suspend fun enroll(): Boolean
+
+    /**
+     * Returns a cold [Flow] of [Boolean] values representing whether this toggle is enabled.
+     *
+     * ### Behavior
+     * - When a collector starts, the current toggle value is emitted immediately.
+     * - Subsequent emissions occur whenever the underlying [store] writes a new [State].
+     * - The flow is cold: a listener is only registered while it is being collected.
+     * - When collection is cancelled or completed, the registered listener is automatically unregistered.
+     *
+     * ### Thread-safety
+     * Emissions are delivered on the coroutine context where the flow is collected.
+     * Multiple collectors will each register their own listener instance.
+     *
+     * ### Example
+     * ```
+     * viewModelScope.launch {
+     *     toggle.enabled()
+     *         .distinctUntilChanged()
+     *         .collect { enabled ->
+     *             if (enabled) {
+     *                 showOnboarding()
+     *             } else {
+     *                 showLoading()
+     *             }
+     *         }
+     * }
+     * ```
+     *
+     * Note: When not context is specified, [Dispatchers.IO] will be used
+     *
+     * @return a cold [Flow] that emits the current enabled state and any subsequent changes
+     *         until the collector is cancelled.
+     */
+    fun enabled(): Flow<Boolean>
 
     /**
      * This method
@@ -254,12 +306,35 @@ interface Toggle {
         val settings: String? = null,
         val exceptions: List<FeatureException> = emptyList(),
     ) {
+        /**
+         * The targeting properties that can be used to specify the target audience for a feature flag.
+         *
+         * Each property acts as a filter criterion. When a property is `null`, it is ignored during
+         * matching (i.e., any value matches). When multiple properties are specified, all must match
+         * for the target to be considered a match (AND logic).
+         *
+         * @param variantKey The experiment variant key to target (e.g., "mc"). When specified, only users
+         *   assigned to this variant will match. Used for A/B testing and experiment targeting.
+         * @param localeCountry The ISO 3166-1 alpha-2 country code to target (e.g., "US", "FR"). Matching
+         *   is case-insensitive.
+         * @param localeLanguage The ISO 639-1 language code to target (e.g., "en", "fr"). Matching is
+         *   case-insensitive.
+         * @param isReturningUser When `true`, targets users who have reinstalled the app. When `false`,
+         *   targets new users only.
+         * @param isPrivacyProEligible When `true`, targets users eligible for Privacy Pro subscription.
+         *   When `false`, targets users not eligible for Privacy Pro.
+         * @param entitlement The subscription Product entitlement string. When specified, only users with
+         *   this active entitlement will match. Matching is case-insensitive.
+         * @param minSdkVersion The minimum Android SDK version required. Devices running an SDK version
+         *   greater than or equal to this value will match.
+         */
         data class Target(
             val variantKey: String?,
             val localeCountry: String?,
             val localeLanguage: String?,
             val isReturningUser: Boolean?,
             val isPrivacyProEligible: Boolean?,
+            val entitlement: String?,
             val minSdkVersion: Int?,
         )
         data class Cohort(
@@ -360,6 +435,7 @@ internal class ToggleImpl constructor(
     private val appVariantProvider: () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : Toggle {
 
     override fun equals(other: Any?): Boolean {
@@ -385,6 +461,29 @@ internal class ToggleImpl constructor(
     override suspend fun enroll(): Boolean {
         return enrollInternal()
     }
+
+    override fun enabled(): Flow<Boolean> = callbackFlow {
+        // emit current value when someone starts collecting
+        trySend(isEnabled())
+
+        val unsubscribe = when (val s = store) {
+            is CachedToggleStore -> {
+                s.setListener(
+                    object : Listener {
+                        override fun onToggleStored(k: String, newValue: State) {
+                            if (k == key) {
+                                launch { trySend(isEnabled()) }
+                            }
+                        }
+                    },
+                )
+            }
+            else -> { -> Unit }
+        }
+
+        // when flow collection is cancelled/closed, run the unsubscribe to avoid leaking the listener
+        awaitClose { unsubscribe() }
+    }.conflate().flowOn(ioDispatcher)
 
     private fun enrollInternal(force: Boolean = false): Boolean {
         // if the Toggle is not enabled, then we don't enroll

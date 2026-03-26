@@ -16,15 +16,16 @@
 
 package com.duckduckgo.networkprotection.impl.autoexclude
 
+import android.content.Context
 import android.content.pm.PackageManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface AutoExcludeAppsRepository {
     /**
@@ -93,6 +95,7 @@ class RealAutoExcludeAppsRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val autoExcludeDao: AutoExcludeDao,
     private val packageManager: PackageManager,
+    private val context: Context,
 ) : AutoExcludeAppsRepository {
 
     private val autoExcludeList: Deferred<List<VpnIncompatibleApp>> = appCoroutineScope.async(start = CoroutineStart.LAZY) {
@@ -133,7 +136,7 @@ class RealAutoExcludeAppsRepository @Inject constructor(
 
     override suspend fun getInstalledIncompatibleApps(): List<VpnIncompatibleApp> {
         return withContext(dispatcherProvider.io()) {
-            val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }
+            val installedApps = packageManager.safeGetInstalledApplications(context).map { it.packageName }
 
             autoExcludeList.await().filter {
                 installedApps.contains(it.packageName)

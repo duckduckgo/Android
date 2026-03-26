@@ -21,9 +21,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.DEFAULT_VARIANT
 import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 interface ExperimentVariantRepository {
     fun getUserVariant(): String?

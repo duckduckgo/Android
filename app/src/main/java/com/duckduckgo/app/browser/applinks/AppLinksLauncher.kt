@@ -27,10 +27,10 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 interface AppLinksLauncher {
     fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel)

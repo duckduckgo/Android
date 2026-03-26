@@ -26,12 +26,12 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 interface UriLoadedManager {
-    fun sendUriLoadedPixel()
+    fun sendUriLoadedPixels(isDuckDuckGoUrl: Boolean)
 }
 
 @ContributesBinding(
@@ -61,9 +61,17 @@ class DuckDuckGoUriLoadedManager @Inject constructor(
         }
     }
 
-    override fun sendUriLoadedPixel() {
+    override fun sendUriLoadedPixels(isDuckDuckGoUrl: Boolean) {
         if (shouldSendUriLoadedPixel) {
             pixel.fire(AppPixelName.URI_LOADED)
+        }
+
+        if (isDuckDuckGoUrl) {
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_SERP_LOADED_DAILY, type = Pixel.PixelType.Daily())
+        } else {
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED)
+            pixel.fire(AppPixelName.PRODUCT_TELEMETRY_SURFACE_WEBSITE_LOADED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 

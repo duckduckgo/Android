@@ -25,8 +25,6 @@ import com.duckduckgo.sync.impl.SyncService
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.io.IOException
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.MediaType
@@ -36,6 +34,8 @@ import okio.Buffer
 import okio.BufferedSink
 import okio.GzipSink
 import okio.buffer
+import java.io.IOException
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,

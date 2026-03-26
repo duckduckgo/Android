@@ -26,6 +26,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -42,11 +44,12 @@ import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class PirSettingView @JvmOverloads constructor(
@@ -104,6 +107,7 @@ class PirSettingView @JvmOverloads constructor(
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
                     isClickable = true
                     binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }
+                    binding.pirSettings.showPillIcon(viewState.pirState.type == Type.DASHBOARD)
                 }
 
                 is Disabled -> {
@@ -112,6 +116,7 @@ class PirSettingView @JvmOverloads constructor(
                     setStatus(isOn = false)
                     binding.pirSettings.setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
+                    binding.pirSettings.showPillIcon(false)
                 }
 
                 Hidden -> isGone = true
@@ -127,6 +132,14 @@ class PirSettingView @JvmOverloads constructor(
 
             OpenPirDashboard -> {
                 globalActivityStarter.start(context, PirDashboardWebViewScreen)
+            }
+
+            Command.ShowPirUnavailableDialog -> {
+                TextAlertDialogBuilder(context)
+                    .setTitle(R.string.pirStorageUnavailableDialogTitle)
+                    .setMessage(R.string.pirStorageUnavailableDialogMessage)
+                    .setPositiveButton(R.string.pirStorageUnavailableDialogButton, GHOST)
+                    .show()
             }
         }
     }

@@ -17,8 +17,10 @@
 package com.duckduckgo.pir.impl.scripts.models
 
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Condition
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
+import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation.ExpectationSelector
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Extract
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.FillForm
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.GetCaptchaInfo
@@ -61,11 +63,13 @@ sealed class BrokerAction(
     data class GetCaptchaInfo(
         override val id: String,
         val selector: String,
+        val captchaType: String? = null,
     ) : BrokerAction(id)
 
     data class SolveCaptcha(
         override val id: String,
         val selector: String,
+        val captchaType: String? = null,
     ) : BrokerAction(id)
 
     data class Click(
@@ -102,6 +106,14 @@ sealed class BrokerAction(
     data class EmailConfirmation(
         override val id: String,
         val pollingTime: String,
+    ) : BrokerAction(id)
+
+    data class Condition(
+        override val id: String,
+        @Json(name = "_comment")
+        val comment: String,
+        val expectations: List<ExpectationSelector>,
+        val actions: List<BrokerAction>,
     ) : BrokerAction(id)
 }
 
@@ -169,5 +181,6 @@ fun BrokerAction.asActionType(): String {
         is GetCaptchaInfo -> "getCaptchaInfo"
         is SolveCaptcha -> "solveCaptcha"
         is EmailConfirmation -> "emailConfirmation"
+        is Condition -> "condition"
     }
 }

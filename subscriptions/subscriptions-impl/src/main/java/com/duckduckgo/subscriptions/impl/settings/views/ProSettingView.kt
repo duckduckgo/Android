@@ -32,7 +32,6 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
@@ -54,9 +53,10 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.View
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.US
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ViewScope::class)
 class ProSettingView @JvmOverloads constructor(
@@ -164,12 +164,7 @@ class ProSettingView @JvmOverloads constructor(
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.isVisible = true
-                    val subscriptionExpiredRes = if (viewState.rebrandingEnabled) {
-                        R.string.subscriptionSettingExpiredRebranding
-                    } else {
-                        R.string.subscriptionSettingExpired
-                    }
-                    subscriptionSetting.setSecondaryText(context.getString(subscriptionExpiredRes))
+                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
                     subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_recolorable_16)
                 }
             }
@@ -178,7 +173,7 @@ class ProSettingView @JvmOverloads constructor(
                     if (viewState.duckAiPlusAvailable) {
                         subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeSecure))
                     } else {
-                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeRebranding))
+                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
                     }
                     subscriptionBuy.setSecondaryText(getSubscriptionSecondaryText(viewState))
                     subscriptionGet.setText(getActionButtonText(viewState))
@@ -192,22 +187,10 @@ class ProSettingView @JvmOverloads constructor(
         }
     }
 
-    private fun getActionButtonText(viewState: ViewState) = when (viewState.freeTrialEligible) {
-        true -> {
-            if (viewState.rebrandingEnabled) {
-                R.string.subscriptionSettingTryFreeTrialRebranding
-            } else {
-                R.string.subscriptionSettingTryFreeTrial
-            }
-        }
-
-        false -> {
-            if (viewState.rebrandingEnabled) {
-                R.string.subscriptionSettingGetRebranding
-            } else {
-                R.string.subscriptionSettingGet
-            }
-        }
+    private fun getActionButtonText(viewState: ViewState) = when {
+        viewState.blackFridayOfferAvailable -> R.string.subscriptionSettingBlackFridayOffer
+        viewState.freeTrialEligible -> R.string.subscriptionSettingTryFreeTrial
+        else -> R.string.subscriptionSettingGet
     }
 
     private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {

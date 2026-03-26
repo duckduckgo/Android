@@ -25,9 +25,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 interface AppReferrerDataStore {
     var referrerCheckedPreviously: Boolean
@@ -56,6 +56,8 @@ class AppReferenceSharePreferences @Inject constructor(
             utmOriginAttributeCampaign = origin
         }
     }
+
+    override fun getOriginAttributeCampaign(): String? = utmOriginAttributeCampaign
 
     override var campaignSuffix: String?
         get() = preferences.getString(KEY_CAMPAIGN_SUFFIX, null)

@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "DuckPlayer: Always > SERP > Carousel > Duck Player"
-tags:
-  - duckplayer
+#tags:
+#  - duckplayer
 ---
 - retry:
     maxRetries: 3

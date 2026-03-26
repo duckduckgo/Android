@@ -23,13 +23,14 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':navigation-api')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':common-utils')
     implementation project(':feature-toggles-api')
     implementation AndroidX.core.ktx
     implementation AndroidX.webkit
     implementation KotlinX.coroutines.core
 
+    api "com.duckduckgo.urlpredictor:url-predictor-android:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.okHttp3.okHttp
     // Room

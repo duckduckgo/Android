@@ -24,13 +24,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
-import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
-import javax.inject.*
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -38,12 +38,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncCreateAccountViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
+    private val syncFeatureToggle: SyncFeatureToggle,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -61,6 +64,7 @@ class SyncCreateAccountViewModel @Inject constructor(
 
     data class ViewState(
         val viewMode: ViewMode = CreatingAccount,
+        val aiChatSyncEnabled: Boolean = false,
     )
 
     sealed class ViewMode {
@@ -69,14 +73,17 @@ class SyncCreateAccountViewModel @Inject constructor(
     }
 
     private fun createAccount(source: String?) = viewModelScope.launch(dispatchers.io()) {
-        viewState.emit(ViewState(CreatingAccount))
+        val aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync()
+        viewState.emit(ViewState(CreatingAccount, aiChatSyncEnabled))
         if (syncAccountRepository.isSignedIn()) {
             command.send(FinishSetupFlow)
         } else {
             syncAccountRepository.createAccount().onSuccess {
+                syncSetupWideEvent.onAccountCreated()
                 syncPixels.fireSignupDirectPixel(source)
                 command.send(FinishSetupFlow)
             }.onFailure {
+                syncSetupWideEvent.onAccountCreationFailed()
                 command.send(Command.ShowError(R.string.sync_create_account_generic_error, it.reason))
             }
         }

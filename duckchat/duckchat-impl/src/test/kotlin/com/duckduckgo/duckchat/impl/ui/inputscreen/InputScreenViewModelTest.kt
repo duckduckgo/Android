@@ -1,20 +1,37 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AnimateLogoToProgress
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetInputModeWidgetScrollPosition
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SetLogoProgress
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -24,14 +41,18 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreen
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
+import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabattachments.TabAttachmentItem
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
@@ -46,20 +67,27 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.IOException
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class InputScreenViewModelTest {
-
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
     private val autoComplete: AutoComplete = mock()
+    private val autoCompleteFactory: AutoCompleteFactory = mock()
     private val history: NavigationHistory = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
@@ -68,20 +96,44 @@ class InputScreenViewModelTest {
     private val duckChat: DuckChat = mock()
     private val inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel = mock()
     private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
+    private val inputScreenConfigResolver: InputScreenConfigResolver = mock()
+    private val omnibarRepository: OmnibarRepository = mock()
+    private val queryUrlPredictor: QueryUrlPredictor = mock()
+    private val tabRepository: TabRepository = mock()
+    private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
+    private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
+
+    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val fullScreenModeDisabledFlow = MutableStateFlow(false)
+    private val fullScreenModeEnabledFlow = MutableStateFlow(true)
+    private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
     @Before
-    fun setup() = runTest {
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
-        whenever(autoComplete.autoComplete(any())).thenReturn(
-            flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
-        )
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-    }
+    fun setup() =
+        runTest {
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+            whenever(autoCompleteFactory.create(any())).thenReturn(autoComplete)
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(AutoCompleteResult("", listOf(AutoCompleteDefaultSuggestion("suggestion")))),
+            )
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            whenever(duckChat.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isReady()).thenReturn(true)
+        }
 
-    private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel {
-        return InputScreenViewModel(
+    private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
+        InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
-            autoComplete = autoComplete,
+            autoCompleteFactory = autoCompleteFactory,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
             appCoroutineScope = coroutineRule.testScope,
@@ -92,354 +144,403 @@ class InputScreenViewModelTest {
             duckChat = duckChat,
             inputScreenDiscoveryFunnel = inputScreenDiscoveryFunnel,
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
+            inputScreenConfigResolver = inputScreenConfigResolver,
+            omnibarRepository = omnibarRepository,
+            duckAiFeatureState = duckAiFeatureState,
+            duckChatFeature = duckChatFeature,
+            chatSuggestionsReader = chatSuggestionsReader,
+            queryUrlPredictor = queryUrlPredictor,
+            tabRepository = tabRepository,
+            tabPageContextRepository = tabPageContextRepository,
+            duckChatJSHelper = duckChatJSHelper,
         )
-    }
 
     @Test
-    fun `when initialized with web URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("https://example.com")
+    fun `when initialized with web URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when initialized with search query and autocomplete enabled then autocomplete suggestions should be visible`() = runTest {
-        val viewModel = createViewModel("search query")
-
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when initialized with empty text and autocomplete enabled then autocomplete suggestions should be hidden`() = runTest {
-        val viewModel = createViewModel("")
+    fun `when initialized with search query and autocomplete enabled then autocomplete suggestions should be visible`() =
+        runTest {
+            val viewModel = createViewModel("search query")
 
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when initialized with duck URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("duck://results?q=test")
-
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when initialized with http URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("http://example.com")
+    fun `when initialized with search query and autocomplete enabled then send autocomplete pixels`() =
+        runTest {
+            createViewModel("search query")
 
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when user modifies initial web URL text then autocomplete suggestions should become visible`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-        viewModel.onSearchInputTextChanged("https://example.com/modified")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_AUTOCOMPLETE_DISPLAYED_DAILY, type = Daily())
+        }
 
     @Test
-    fun `when user modifies initial search query then autocomplete suggestions should remain visible`() = runTest {
-        val viewModel = createViewModel("search query")
+    fun `when initialized with empty text and autocomplete enabled then autocomplete suggestions should be hidden`() =
+        runTest {
+            val viewModel = createViewModel("")
 
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-        viewModel.onSearchInputTextChanged("modified search")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when user clears text after modifying initial URL then autocomplete suggestions should be hidden`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        viewModel.onSearchInputTextChanged("modified")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-        viewModel.onSearchInputTextChanged("")
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when autocomplete settings disabled then autocomplete suggestions should always be hidden`() = runTest {
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        val viewModel = createViewModel("search query")
+    fun `when initialized with duck URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
+        runTest {
+            val viewModel = createViewModel("duck://results?q=test")
 
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when autocomplete settings disabled and user modifies text then autocomplete suggestions should remain hidden`() = runTest {
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        val viewModel = createViewModel("https://example.com")
-
-        viewModel.onSearchInputTextChanged("modified")
-
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when initialized with URL containing whitespace then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("  https://example.com  ")
+    fun `when initialized with http URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() =
+        runTest {
+            val viewModel = createViewModel("http://example.com")
 
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when user restores original URL after modification then autocomplete suggestions should remain visible`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        // User modifies text
-        viewModel.onSearchInputTextChanged("modified")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-
-        // User restores original URL
-        viewModel.onSearchInputTextChanged("https://example.com")
-
-        // Should still show autocomplete because user has moved beyond initial state
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when onActivityResume called then autocomplete settings are refreshed`() = runTest {
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        val viewModel = createViewModel("search query")
+    fun `when user modifies initial web URL text then autocomplete suggestions should become visible`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        // Initially disabled
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-
-        // Settings change to enabled
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
-        viewModel.onActivityResume()
-
-        // Should now show autocomplete for search query
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onSearchInputTextChanged("https://example.com/modified")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when initialized with partial URL then autocomplete suggestions should be visible`() = runTest {
-        val viewModel = createViewModel("example")
+    fun `when user modifies initial search query then autocomplete suggestions should remain visible`() =
+        runTest {
+            val viewModel = createViewModel("search query")
 
-        // Partial URLs that don't match web URL pattern should show autocomplete
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when initialized with complete domain then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("example.com")
-
-        // Complete domain names are treated as web URLs and suppress autocomplete initially
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onSearchInputTextChanged("modified search")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when text input contains special characters then autocomplete visibility follows URL pattern`() = runTest {
-        // Test with URL-like string with special characters
-        var viewModel = createViewModel("https://example.com?query=test&param=value")
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+    fun `when user clears text after modifying initial URL then autocomplete suggestions should be hidden`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        // Test with non-URL string with special characters
-        viewModel = createViewModel("search with @special #characters")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
-    fun `when user types new text character by character then autocomplete behavior is consistent`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        // Initially hidden
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-
-        // Type additional characters
-        viewModel.onSearchInputTextChanged("https://example.com/")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-
-        viewModel.onSearchInputTextChanged("https://example.com/p")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-
-        viewModel.onSearchInputTextChanged("https://example.com/page")
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
+            viewModel.onSearchInputTextChanged("modified")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onSearchInputTextChanged("")
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when search query provided and autocomplete enabled then autoCompleteSuggestionResults emits autocomplete results`() = runTest {
-        val expectedSuggestions = listOf(
-            AutoCompleteDefaultSuggestion("suggestion 1"),
-            AutoCompleteSearchSuggestion("suggestion 2", isUrl = false, isAllowedInTopHits = true),
-        )
-        val expectedResult = AutoCompleteResult("test query", expectedSuggestions)
+    fun `when autocomplete settings disabled then autocomplete suggestions should always be hidden`() =
+        runTest {
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+            val viewModel = createViewModel("search query")
 
-        whenever(autoComplete.autoComplete("test query")).thenReturn(flowOf(expectedResult))
-
-        val viewModel = createViewModel("test query")
-
-        assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when web URL provided initially then autoCompleteSuggestionResults remains empty until user modifies input`() = runTest {
-        val expectedResult = AutoCompleteResult("modified", listOf(AutoCompleteDefaultSuggestion("suggestion")))
-        whenever(autoComplete.autoComplete("modified")).thenReturn(flowOf(expectedResult))
+    fun `when autocomplete settings disabled and user modifies text then autocomplete suggestions should remain hidden`() =
+        runTest {
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+            val viewModel = createViewModel("https://example.com")
 
-        val viewModel = createViewModel("https://example.com")
+            viewModel.onSearchInputTextChanged("modified")
 
-        assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-
-        viewModel.onSearchInputTextChanged("modified")
-        advanceTimeBy(301) // Wait for debounce
-
-        assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when autocomplete service throws exception then autoCompleteSuggestionResults remains at initial state`() = runTest {
-        whenever(autoComplete.autoComplete(any())).thenReturn(flow { throw IOException("Network error") })
+    fun `when initialized with URL containing whitespace then autocomplete suggestions should be hidden initially`() =
+        runTest {
+            val viewModel = createViewModel("  https://example.com  ")
 
-        val viewModel = createViewModel("test query")
-
-        assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-    }
-
-    @Test
-    fun `when search input text changes rapidly then autoComplete is debounced`() = runTest {
-        val result1 = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
-        val result2 = AutoCompleteResult("testing", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
-
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(result1))
-        whenever(autoComplete.autoComplete("testing")).thenReturn(flowOf(result2))
-
-        val viewModel = createViewModel("test")
-
-        // First emission should be immediate
-        assertEquals(result1, viewModel.autoCompleteSuggestionResults.value)
-
-        // Change text rapidly
-        viewModel.onSearchInputTextChanged("testing")
-
-        // Should not trigger autocomplete immediately due to debounce
-        verify(autoComplete, never()).autoComplete("testing")
-
-        // Wait for debounce period
-        advanceTimeBy(301)
-
-        // Now should get the second result
-        assertEquals(result2, viewModel.autoCompleteSuggestionResults.value)
-    }
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when autocomplete settings disabled then autoCompleteSuggestionResults remains empty`() = runTest {
-        whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
-        val expectedResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+    fun `when user restores original URL after modification then autocomplete suggestions should remain visible`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        val viewModel = createViewModel("test")
+            // User modifies text
+            viewModel.onSearchInputTextChanged("modified")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
-        // Should remain empty even with search query when autocomplete disabled
-        assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+            // User restores original URL
+            viewModel.onSearchInputTextChanged("https://example.com")
 
-        // Autocomplete service should not be called
-        verify(autoComplete, never()).autoComplete(any())
-    }
-
-    @Test
-    fun `when empty text provided then autoCompleteSuggestionResults remains empty`() = runTest {
-        val viewModel = createViewModel("")
-
-        assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-
-        verify(autoComplete, never()).autoComplete(any())
-    }
+            // Should still show autocomplete because user has moved beyond initial state
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when autocomplete result contains IAM suggestion then hasUserSeenHistoryIAM is tracked`() = runTest {
-        val resultWithIAM = AutoCompleteResult(
-            "test",
-            listOf(
-                AutoCompleteDefaultSuggestion("suggestion"),
-                AutoCompleteInAppMessageSuggestion,
-            ),
-        )
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithIAM))
+    fun `when onActivityResume called then autocomplete settings are refreshed`() =
+        runTest {
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+            val viewModel = createViewModel("search query")
 
-        val viewModel = createViewModel("test")
+            // Initially disabled
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
-        // Should emit the result with IAM
-        assertEquals(resultWithIAM, viewModel.autoCompleteSuggestionResults.value)
+            // Settings change to enabled
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(true)
+            viewModel.onActivityResume()
 
-        // When autocomplete suggestions are gone, should submit that user saw IAM
-        viewModel.autoCompleteSuggestionsGone()
-
-        verify(autoComplete).submitUserSeenHistoryIAM()
-    }
+            // Should now show autocomplete for search query
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when autocomplete result does not contain IAM suggestion then submitUserSeenHistoryIAM is not called`() = runTest {
-        val resultWithoutIAM = AutoCompleteResult(
-            "test",
-            listOf(AutoCompleteDefaultSuggestion("suggestion")),
-        )
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithoutIAM))
+    fun `when initialized with partial URL then autocomplete suggestions should be visible`() =
+        runTest {
+            val viewModel = createViewModel("example")
 
-        val viewModel = createViewModel("test")
-
-        // Should emit the result without IAM
-        assertEquals(resultWithoutIAM, viewModel.autoCompleteSuggestionResults.value)
-
-        // When autocomplete suggestions are gone, should not submit IAM tracking
-        viewModel.autoCompleteSuggestionsGone()
-
-        verify(autoComplete, never()).submitUserSeenHistoryIAM()
-    }
+            // Partial URLs that don't match web URL pattern should show autocomplete
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when text input changes from empty to non-empty then autoCompleteSuggestionResults updates`() = runTest {
-        val expectedResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+    fun `when initialized with complete domain then autocomplete suggestions should be hidden initially`() =
+        runTest {
+            val viewModel = createViewModel("example.com")
 
-        val viewModel = createViewModel("")
-
-        // Initially empty
-        assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
-
-        // Change to non-empty text
-        viewModel.onSearchInputTextChanged("test")
-        advanceTimeBy(301) // Wait for debounce
-
-        // Should get autocomplete results
-        assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
-    }
+            // Complete domain names are treated as web URLs and suppress autocomplete initially
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when text input changes from non-empty to empty then autoCompleteSuggestionResults changes to empty value`() = runTest {
-        val initialResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
-        val clearedResult = AutoCompleteResult("", emptyList())
-        whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(initialResult))
+    fun `when text input contains special characters then autocomplete visibility follows URL pattern`() =
+        runTest {
+            // Test with URL-like string with special characters
+            var viewModel = createViewModel("https://example.com?query=test&param=value")
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
-        val viewModel = createViewModel("test")
-
-        // Initially has results
-        assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
-
-        // Change to empty text
-        viewModel.onSearchInputTextChanged("")
-
-        // Should retain last value since the flow stops emitting when shouldShowAutoComplete becomes false
-        assertEquals(clearedResult, viewModel.autoCompleteSuggestionResults.value)
-    }
+            // Test with non-URL string with special characters
+            viewModel = createViewModel("search with @special #characters")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when chat text is web url then submitButtonIcon is SEND`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        viewModel.onChatInputTextChanged("https://example.com")
-        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
-    }
+    fun `when user types new text character by character then autocomplete behavior is consistent`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
+
+            // Initially hidden
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+
+            // Type additional characters
+            viewModel.onSearchInputTextChanged("https://example.com/")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+
+            viewModel.onSearchInputTextChanged("https://example.com/p")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+
+            viewModel.onSearchInputTextChanged("https://example.com/page")
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+        }
 
     @Test
-    fun `when chat text is not web url then submitButtonIcon is SEND`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        viewModel.onChatInputTextChanged("example")
-        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
-    }
+    fun `when search query provided and autocomplete enabled then autoCompleteSuggestionResults emits autocomplete results`() =
+        runTest {
+            val expectedSuggestions =
+                listOf(
+                    AutoCompleteDefaultSuggestion("suggestion 1"),
+                    AutoCompleteSearchSuggestion("suggestion 2", isUrl = false, isAllowedInTopHits = true),
+                )
+            val expectedResult = AutoCompleteResult("test query", expectedSuggestions)
+
+            whenever(autoComplete.autoComplete("test query")).thenReturn(flowOf(expectedResult))
+
+            val viewModel = createViewModel("test query")
+
+            assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when web URL provided initially then autoCompleteSuggestionResults remains empty until user modifies input`() =
+        runTest {
+            val expectedResult = AutoCompleteResult("modified", listOf(AutoCompleteDefaultSuggestion("suggestion")))
+            whenever(autoComplete.autoComplete("modified")).thenReturn(flowOf(expectedResult))
+
+            val viewModel = createViewModel("https://example.com")
+
+            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+
+            viewModel.onSearchInputTextChanged("modified")
+            advanceTimeBy(301) // Wait for debounce
+
+            assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when autocomplete service throws exception then autoCompleteSuggestionResults remains at initial state`() =
+        runTest {
+            whenever(autoComplete.autoComplete(any())).thenReturn(flow { throw IOException("Network error") })
+
+            val viewModel = createViewModel("test query")
+
+            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when search input text changes rapidly then autoComplete is debounced`() =
+        runTest {
+            val result1 = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
+            val result2 = AutoCompleteResult("testing", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
+
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(result1))
+            whenever(autoComplete.autoComplete("testing")).thenReturn(flowOf(result2))
+
+            val viewModel = createViewModel("test")
+
+            // First emission should be immediate
+            assertEquals(result1, viewModel.autoCompleteSuggestionResults.value)
+
+            // Change text rapidly
+            viewModel.onSearchInputTextChanged("testing")
+
+            // Should not trigger autocomplete immediately due to debounce
+            verify(autoComplete, never()).autoComplete("testing")
+
+            // Wait for debounce period
+            advanceTimeBy(301)
+
+            // Now should get the second result
+            assertEquals(result2, viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when autocomplete settings disabled then autoCompleteSuggestionResults remains empty`() =
+        runTest {
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+            val expectedResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+
+            val viewModel = createViewModel("test")
+
+            // Should remain empty even with search query when autocomplete disabled
+            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+
+            // Autocomplete service should not be called
+            verify(autoComplete, never()).autoComplete(any())
+        }
+
+    @Test
+    fun `when empty text provided then autoCompleteSuggestionResults remains empty`() =
+        runTest {
+            val viewModel = createViewModel("")
+
+            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+
+            verify(autoComplete, never()).autoComplete(any())
+        }
+
+    @Test
+    fun `when autocomplete result contains IAM suggestion then hasUserSeenHistoryIAM is tracked`() =
+        runTest {
+            val resultWithIAM =
+                AutoCompleteResult(
+                    "test",
+                    listOf(
+                        AutoCompleteDefaultSuggestion("suggestion"),
+                        AutoCompleteInAppMessageSuggestion,
+                    ),
+                )
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithIAM))
+
+            val viewModel = createViewModel("test")
+
+            // Should emit the result with IAM
+            assertEquals(resultWithIAM, viewModel.autoCompleteSuggestionResults.value)
+
+            // When autocomplete suggestions are gone, should submit that user saw IAM
+            viewModel.autoCompleteSuggestionsGone()
+
+            verify(autoComplete).submitUserSeenHistoryIAM()
+        }
+
+    @Test
+    fun `when autocomplete result does not contain IAM suggestion then submitUserSeenHistoryIAM is not called`() =
+        runTest {
+            val resultWithoutIAM =
+                AutoCompleteResult(
+                    "test",
+                    listOf(AutoCompleteDefaultSuggestion("suggestion")),
+                )
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(resultWithoutIAM))
+
+            val viewModel = createViewModel("test")
+
+            // Should emit the result without IAM
+            assertEquals(resultWithoutIAM, viewModel.autoCompleteSuggestionResults.value)
+
+            // When autocomplete suggestions are gone, should not submit IAM tracking
+            viewModel.autoCompleteSuggestionsGone()
+
+            verify(autoComplete, never()).submitUserSeenHistoryIAM()
+        }
+
+    @Test
+    fun `when text input changes from empty to non-empty then autoCompleteSuggestionResults updates`() =
+        runTest {
+            val expectedResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+
+            val viewModel = createViewModel("")
+
+            // Initially empty
+            assertEquals(AutoCompleteResult("", emptyList()), viewModel.autoCompleteSuggestionResults.value)
+
+            // Change to non-empty text
+            viewModel.onSearchInputTextChanged("test")
+            advanceTimeBy(301) // Wait for debounce
+
+            // Should get autocomplete results
+            assertEquals(expectedResult, viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when text input changes from non-empty to empty then autoCompleteSuggestionResults changes to empty value`() =
+        runTest {
+            val initialResult = AutoCompleteResult("test", listOf(AutoCompleteDefaultSuggestion("suggestion")))
+            val clearedResult = AutoCompleteResult("", emptyList())
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(initialResult))
+
+            val viewModel = createViewModel("test")
+
+            // Initially has results
+            assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
+
+            // Change to empty text
+            viewModel.onSearchInputTextChanged("")
+
+            // Should retain last value since the flow stops emitting when shouldShowAutoComplete becomes false
+            assertEquals(clearedResult, viewModel.autoCompleteSuggestionResults.value)
+        }
+
+    @Test
+    fun `when chat text is web url then submitButtonIcon is SEND`() =
+        runTest {
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("https://example.com")
+            assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
+        }
+
+    @Test
+    fun `when chat text is not web url then submitButtonIcon is SEND`() =
+        runTest {
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
+        }
 
     @Test
     fun `when search text is web url then submitButtonIcon is SEND`() {
@@ -456,43 +557,47 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onSearchSubmitted then emit SubmitSearch Command`() = runTest {
-        val viewModel = createViewModel()
-        val query = "example"
+    fun `when onSearchSubmitted then emit SubmitSearch Command`() =
+        runTest {
+            val viewModel = createViewModel()
+            val query = "example"
 
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
-        viewModel.onSearchSubmitted(query)
+            viewModel.onSearchSubmitted(query)
 
-        assertEquals(SubmitSearch(query), viewModel.command.value)
-    }
-
-    @Test
-    fun `when onChatSubmitted with web url then emit SubmitSearch Command`() = runTest {
-        val viewModel = createViewModel()
-        val url = "https://example.com"
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onChatSubmitted(url)
-
-        assertEquals(SubmitSearch(url), viewModel.command.value)
-    }
+            assertEquals(SubmitSearch(query), viewModel.command.value)
+        }
 
     @Test
-    fun `when onChatSubmitted with query then emit SubmitChat Command`() = runTest {
-        val viewModel = createViewModel()
-        val query = "example"
+    fun `when onChatSubmitted with web url then emit SubmitSearch Command`() =
+        runTest {
+            val viewModel = createViewModel()
+            val url = "https://example.com"
 
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isUrl(url)).thenReturn(true)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
-        viewModel.onChatSubmitted(query)
+            viewModel.onChatSubmitted(url)
 
-        assertEquals(SubmitChat(query), viewModel.command.value)
-    }
+            assertEquals(SubmitSearch(url), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onChatSubmitted with query then emit SubmitChat Command`() =
+        runTest {
+            val viewModel = createViewModel()
+            val query = "example"
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted(query)
+
+            assertEquals(SubmitChat(query), viewModel.command.value)
+        }
 
     @Test
     fun `when onChatInputTextChanged with empty query then showChatLogo should be true`() {
@@ -504,37 +609,38 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be false`() {
+    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be true`() {
         val viewModel = createViewModel("initial text")
 
         viewModel.onChatInputTextChanged("different text")
 
-        assertFalse(viewModel.visibilityState.value.showChatLogo)
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
     }
 
     @Test
-    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be false`() = runTest {
-        val initialText = "test query"
-        val viewModel = createViewModel(initialText)
+    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be true`() =
+        runTest {
+            val initialText = "test query"
+            val viewModel = createViewModel(initialText)
 
-        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
 
-        viewModel.onChatInputTextChanged(initialText)
+            viewModel.onChatInputTextChanged(initialText)
 
-        assertFalse(viewModel.visibilityState.value.showChatLogo)
-    }
+            assertTrue(viewModel.visibilityState.value.showChatLogo)
+        }
 
     @Test
-    fun `when onChatInputTextChanged with web URL then showChatLogo logic still applies`() {
+    fun `when onChatInputTextChanged with web URL then showChatLogo is always true`() {
         val viewModel = createViewModel("https://example.com")
 
         // Initially true (same as initial text, no autocomplete suggestions for URL)
         viewModel.onChatInputTextChanged("https://example.com")
         assertTrue(viewModel.visibilityState.value.showChatLogo)
 
-        // Change to different URL - should be false
+        // Change to different URL - should still be true
         viewModel.onChatInputTextChanged("https://different.com")
-        assertFalse(viewModel.visibilityState.value.showChatLogo)
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
 
         // Change to empty - should be true
         viewModel.onChatInputTextChanged("")
@@ -542,32 +648,33 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onRemoveSearchSuggestionConfirmed then refreshSuggestions triggered and autoComplete results updated`() = runTest {
-        val initialResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
-        val refreshedResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
+    fun `when onRemoveSearchSuggestionConfirmed then refreshSuggestions triggered and autoComplete results updated`() =
+        runTest {
+            val initialResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
+            val refreshedResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
 
-        val flow1 = MutableSharedFlow<AutoCompleteResult>()
-        val flow2 = MutableSharedFlow<AutoCompleteResult>()
-        whenever(autoComplete.autoComplete("query"))
-            .thenReturn(flow1)
-            .thenReturn(flow2)
+            val flow1 = MutableSharedFlow<AutoCompleteResult>()
+            val flow2 = MutableSharedFlow<AutoCompleteResult>()
+            whenever(autoComplete.autoComplete("query"))
+                .thenReturn(flow1)
+                .thenReturn(flow2)
 
-        val viewModel = createViewModel("query")
+            val viewModel = createViewModel("query")
 
-        flow1.emit(initialResult)
-        advanceUntilIdle()
-        assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
+            flow1.emit(initialResult)
+            advanceUntilIdle()
+            assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
 
-        viewModel.onRemoveSearchSuggestionConfirmed(
-            AutoCompleteHistorySuggestion(phrase = "query", url = "example.com", title = "title", isAllowedInTopHits = true),
-        )
+            viewModel.onRemoveSearchSuggestionConfirmed(
+                AutoCompleteHistorySuggestion(phrase = "query", url = "example.com", title = "title", isAllowedInTopHits = true),
+            )
 
-        flow2.emit(refreshedResult)
-        advanceUntilIdle()
-        assertEquals(refreshedResult, viewModel.autoCompleteSuggestionResults.value)
+            flow2.emit(refreshedResult)
+            advanceUntilIdle()
+            assertEquals(refreshedResult, viewModel.autoCompleteSuggestionResults.value)
 
-        verify(autoComplete, times(2)).autoComplete("query")
-    }
+            verify(autoComplete, times(2)).autoComplete("query")
+        }
 
     @Test
     fun `when initialized with web URL then inputFieldState canExpand should be false initially`() {
@@ -584,37 +691,40 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when user modifies initial web URL text then inputFieldState canExpand should become true`() = runTest {
-        val viewModel = createViewModel("https://example.com")
+    fun `when user modifies initial web URL text then inputFieldState canExpand should become true`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        assertFalse(viewModel.inputFieldState.value.canExpand)
-        viewModel.onSearchInputTextChanged("https://example.com/modified")
-        assertTrue(viewModel.inputFieldState.value.canExpand)
-    }
-
-    @Test
-    fun `when user modifies initial search query then inputFieldState canExpand should remain true`() = runTest {
-        val viewModel = createViewModel("search query")
-
-        assertTrue(viewModel.inputFieldState.value.canExpand)
-        viewModel.onSearchInputTextChanged("modified search")
-        assertTrue(viewModel.inputFieldState.value.canExpand)
-    }
+            assertFalse(viewModel.inputFieldState.value.canExpand)
+            viewModel.onSearchInputTextChanged("https://example.com/modified")
+            assertTrue(viewModel.inputFieldState.value.canExpand)
+        }
 
     @Test
-    fun `when user restores original URL after modification then inputFieldState canExpand should remain true`() = runTest {
-        val viewModel = createViewModel("https://example.com")
+    fun `when user modifies initial search query then inputFieldState canExpand should remain true`() =
+        runTest {
+            val viewModel = createViewModel("search query")
 
-        // User modifies text
-        viewModel.onSearchInputTextChanged("modified")
-        assertTrue(viewModel.inputFieldState.value.canExpand)
+            assertTrue(viewModel.inputFieldState.value.canExpand)
+            viewModel.onSearchInputTextChanged("modified search")
+            assertTrue(viewModel.inputFieldState.value.canExpand)
+        }
 
-        // User restores original URL
-        viewModel.onSearchInputTextChanged("https://example.com")
+    @Test
+    fun `when user restores original URL after modification then inputFieldState canExpand should remain true`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        // Should still allow expansion because user has moved beyond initial state
-        assertTrue(viewModel.inputFieldState.value.canExpand)
-    }
+            // User modifies text
+            viewModel.onSearchInputTextChanged("modified")
+            assertTrue(viewModel.inputFieldState.value.canExpand)
+
+            // User restores original URL
+            viewModel.onSearchInputTextChanged("https://example.com")
+
+            // Should still allow expansion because user has moved beyond initial state
+            assertTrue(viewModel.inputFieldState.value.canExpand)
+        }
 
     @Test
     fun `when onInputFieldTouched called then inputFieldState canExpand should become true`() {
@@ -626,80 +736,86 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onInputFieldTouched called then canExpand remains true even after text changes`() = runTest {
-        val viewModel = createViewModel("https://example.com")
+    fun `when onInputFieldTouched called then canExpand remains true even after text changes`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        // Touch input field to enable expansion
-        viewModel.onInputFieldTouched()
-        assertTrue(viewModel.inputFieldState.value.canExpand)
+            // Touch input field to enable expansion
+            viewModel.onInputFieldTouched()
+            assertTrue(viewModel.inputFieldState.value.canExpand)
 
-        // Change text - should still allow expansion
-        viewModel.onSearchInputTextChanged("new text")
-        assertTrue(viewModel.inputFieldState.value.canExpand)
+            // Change text - should still allow expansion
+            viewModel.onSearchInputTextChanged("new text")
+            assertTrue(viewModel.inputFieldState.value.canExpand)
 
-        // Back to URL - should still allow expansion
-        viewModel.onSearchInputTextChanged("https://example.com")
-        assertTrue(viewModel.inputFieldState.value.canExpand)
-    }
-
-    @Test
-    fun `when initialized with web URL then SelectAll command should be sent`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        viewModel.inputFieldCommand.test {
-            val receivedCommand = awaitItem()
-            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
-            cancelAndIgnoreRemainingEvents()
+            // Back to URL - should still allow expansion
+            viewModel.onSearchInputTextChanged("https://example.com")
+            assertTrue(viewModel.inputFieldState.value.canExpand)
         }
-    }
 
     @Test
-    fun `when initialized with duck URL then SelectAll command should be sent`() = runTest {
-        val viewModel = createViewModel("duck://results?q=test")
+    fun `when initialized with web URL then SelectAll command should be sent`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        viewModel.inputFieldCommand.test {
-            val receivedCommand = awaitItem()
-            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
-            cancelAndIgnoreRemainingEvents()
+            viewModel.inputFieldCommand.test {
+                val receivedCommand = awaitItem()
+                assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when initialized with search query then SelectAll command should NOT be sent`() = runTest {
-        val viewModel = createViewModel("search query")
+    fun `when initialized with duck URL then SelectAll command should be sent`() =
+        runTest {
+            val viewModel = createViewModel("duck://results?q=test")
 
-        viewModel.inputFieldCommand.test {
-            expectNoEvents()
+            viewModel.inputFieldCommand.test {
+                val receivedCommand = awaitItem()
+                assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `when user modifies URL text after initialization then no additional SelectAll commands are sent`() = runTest {
-        val viewModel = createViewModel("https://example.com")
+    fun `when initialized with search query then SelectAll command should NOT be sent`() =
+        runTest {
+            val viewModel = createViewModel("search query")
 
-        viewModel.inputFieldCommand.test {
-            // Should receive initial SelectAll
-            val initialCommand = awaitItem()
-            assertEquals(InputFieldCommand.SelectAll, initialCommand)
-
-            // Modify text
-            viewModel.onSearchInputTextChanged("https://example.com/page")
-
-            // Should not receive any additional commands
-            expectNoEvents()
+            viewModel.inputFieldCommand.test {
+                expectNoEvents()
+            }
         }
-    }
 
     @Test
-    fun `when restoreAutoCompleteScrollPosition called then RestoreAutoCompleteScrollPosition command sent and keyboard shown`() = runTest {
-        val viewModel = createViewModel()
+    fun `when user modifies URL text after initialization then no additional SelectAll commands are sent`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
 
-        viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition = 123, itemOffsetTop = 456)
-        viewModel.restoreAutoCompleteScrollPosition()
+            viewModel.inputFieldCommand.test {
+                // Should receive initial SelectAll
+                val initialCommand = awaitItem()
+                assertEquals(InputFieldCommand.SelectAll, initialCommand)
 
-        assertEquals(SearchCommand.RestoreAutoCompleteScrollPosition(123, 456), viewModel.searchTabCommand.value)
-        assertEquals(ShowKeyboard, viewModel.command.value)
-    }
+                // Modify text
+                viewModel.onSearchInputTextChanged("https://example.com/page")
+
+                // Should not receive any additional commands
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `when restoreAutoCompleteScrollPosition called then RestoreAutoCompleteScrollPosition command sent and keyboard shown`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition = 123, itemOffsetTop = 456)
+            viewModel.restoreAutoCompleteScrollPosition()
+
+            assertEquals(SearchCommand.RestoreAutoCompleteScrollPosition(123, 456), viewModel.searchTabCommand.value)
+            assertEquals(ShowKeyboard, viewModel.command.value)
+        }
 
     @Test
     fun `when initialized with web URL then showSearchLogo should be true initially`() {
@@ -709,542 +825,2006 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when initialized with search query then showSearchLogo should be false due to autocomplete suggestions`() = runTest {
-        val viewModel = createViewModel("search query")
-
-        // Should be false because autocomplete suggestions are visible for search queries
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when onNewTabPageContentChanged with true then showSearchLogo should be false`() = runTest {
-        val viewModel = createViewModel()
-
-        // Initially true
-        assertTrue(viewModel.visibilityState.value.showSearchLogo)
-
-        viewModel.onNewTabPageContentChanged(hasContent = true)
-
-        // Should become false when new tab page has content
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when onNewTabPageContentChanged with false then showSearchLogo should be true if autocomplete not visible`() = runTest {
-        val viewModel = createViewModel()
-
-        // Set new tab page to have content first
-        viewModel.onNewTabPageContentChanged(hasContent = true)
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-
-        // Remove content from new tab page
-        viewModel.onNewTabPageContentChanged(hasContent = false)
-
-        // Should become true again when no content and no autocomplete suggestions
-        assertTrue(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when new tab page has content and autocomplete becomes visible then showSearchLogo should remain false`() = runTest {
-        val viewModel = createViewModel()
-
-        // Set new tab page to have content
-        viewModel.onNewTabPageContentChanged(hasContent = true)
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-
-        // Trigger autocomplete (this would normally make showSearchLogo false anyway)
-        viewModel.onSearchInputTextChanged("test query")
-
-        // Should remain false
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when new tab page has no content but autocomplete is visible then showSearchLogo should be false`() = runTest {
-        val viewModel = createViewModel()
-
-        // Ensure new tab page has no content
-        viewModel.onNewTabPageContentChanged(hasContent = false)
-
-        // Trigger autocomplete suggestions
-        viewModel.onSearchInputTextChanged("test query")
-
-        // Should be false because autocomplete suggestions are visible
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when new tab page has no content and autocomplete is not visible then showSearchLogo should be true`() = runTest {
-        val viewModel = createViewModel("https://example.com")
-
-        // Ensure new tab page has no content
-        viewModel.onNewTabPageContentChanged(hasContent = false)
-
-        // Should be true because no content and no autocomplete suggestions (URL doesn't trigger autocomplete initially)
-        assertTrue(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when user transitions from autocomplete visible to hidden then showSearchLogo should be true if new tab page has no content`() = runTest {
-        val viewModel = createViewModel("search query")
-
-        // Initially false due to autocomplete
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-
-        // Ensure new tab page has no content
-        viewModel.onNewTabPageContentChanged(hasContent = false)
-
-        // Clear text to hide autocomplete
-        viewModel.onSearchInputTextChanged("")
-
-        // Should become true when autocomplete hidden and no new tab content
-        assertTrue(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when user transitions from autocomplete visible to hidden but new tab page has content then showSearchLogo should remain false`() = runTest {
-        val viewModel = createViewModel("search query")
-
-        // Initially false due to autocomplete
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-
-        // Set new tab page to have content
-        viewModel.onNewTabPageContentChanged(hasContent = true)
-
-        // Clear text to hide autocomplete
-        viewModel.onSearchInputTextChanged("")
-
-        // Should remain false because new tab page has content
-        assertFalse(viewModel.visibilityState.value.showSearchLogo)
-    }
-
-    @Test
-    fun `when fireShownPixel then DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN pixels is fired`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.fireShownPixel()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Daily())
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, type = Count)
-    }
-
-    @Test
-    fun `when onSearchSubmitted then query submitted pixels are fired`() = runTest {
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.setHasUsedSearchMode(any())).thenReturn(Unit)
-
-        viewModel.onSearchSubmitted("query")
-
-        val expectedParams = mapOf("text_length_bucket" to "short")
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = expectedParams)
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when onSearchSubmitted then inputScreenSessionUsage onSearchSubmitted is called`() = runTest {
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onSearchSubmitted("query")
-
-        verify(inputScreenSessionUsageMetric).onSearchSubmitted()
-    }
-
-    @Test
-    fun `when onChatSubmitted then prompt submitted pixels are fired`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onChatSubmitted("prompt")
-
-        verify(pixel).fire(
-            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-            parameters = mapOf(
-                DuckChatPixelParameters.WAS_USED_BEFORE to "0",
-                "text_length_bucket" to "short",
-            ),
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when onChatSubmitted and DuckChat was used before then prompt submitted pixel includes was_used_before parameter as 1`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onChatSubmitted("prompt")
-
-        val expectedParams = mapOf(
-            DuckChatPixelParameters.WAS_USED_BEFORE to "1",
-            DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
-        )
-        verify(pixel).fire(
-            pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
-            parameters = expectedParams,
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when onChatSubmitted then inputScreenSessionUsage onPromptSubmitted is called`() = runTest {
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onChatSubmitted("prompt")
-
-        verify(inputScreenSessionUsageMetric).onPromptSubmitted()
-    }
-
-    @Test
-    fun `when onSearchSelected and user was in chat mode with text then mode switched pixel is fired with correct parameters`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onChatSelected()
-        viewModel.onChatInputTextChanged("some chat text")
-        viewModel.onSearchSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_search",
-            "had_text" to "true",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onSearchSelected and user was in chat mode without text then mode switched pixel is fired with correct parameters`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onChatSelected()
-        viewModel.onSearchSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_search",
-            "had_text" to "false",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onSearchSelected and user was not in chat mode then mode switched pixel is not fired`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onSearchSelected()
-
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
-    }
-
-    @Test
-    fun `when onChatSelected and user was in search mode with text then mode switched pixel is fired with correct parameters`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onSearchSelected()
-        viewModel.onSearchInputTextChanged("some search text")
-        viewModel.onChatSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_duckai",
-            "had_text" to "true",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onChatSelected and user was in search mode without text then mode switched pixel is fired with correct parameters`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onSearchSelected()
-        viewModel.onChatSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_duckai",
-            "had_text" to "false",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onChatSelected and user was not in search mode then mode switched pixel is not fired`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onChatSelected()
-
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
-    }
-
-    @Test
-    fun `when both search and chat modes used in same session then both modes pixel is fired`() = runTest {
-        val viewModel = createViewModel()
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
-
-        viewModel.onSearchSubmitted("query")
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when only search mode used then both modes pixel is not fired`() = runTest {
-        val viewModel = createViewModel()
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onSearchSubmitted("query")
-
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when only chat mode used then both modes pixel is not fired`() = runTest {
-        val viewModel = createViewModel()
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
-
-        viewModel.onChatSubmitted("prompt")
-
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
-        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `when onChatSelected then new line button is visible`() {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onSearchSelected then new line button is not visible`() {
-        val viewModel = createViewModel()
-        viewModel.onSearchSelected()
-        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
-    }
-
-    @Test
-    fun `when onSearchSubmitted with newlines then they are replaced with spaces`() = runTest {
-        val viewModel = createViewModel()
-        val queryWithNewlines = "first line\nsecond line\nthird line"
-        val expected = "first line second line third line"
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onSearchSubmitted(queryWithNewlines)
-
-        assertEquals(SubmitSearch(expected), viewModel.command.value)
-    }
-
-    @Test
-    fun `when userSelectedAutocomplete with chat then command and pixel sent`() = runTest {
-        val viewModel = createViewModel()
-        val query = "example"
-
-        val duckAIPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString())
-
-        viewModel.userSelectedAutocomplete(duckAIPrompt)
-
-        assertEquals(SubmitChat(query), viewModel.command.value)
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
-        verify(autoComplete).fireAutocompletePixel(any(), any(), any())
-    }
-
-    @Test
-    fun `when onSearchSubmitted then discovery funnel onSearchSubmitted is called`() = runTest {
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onSearchSubmitted("query")
-
-        verify(inputScreenDiscoveryFunnel).onSearchSubmitted()
-    }
-
-    @Test
-    fun `when onChatSubmitted with prompt then discovery funnel onPromptSubmitted is called`() = runTest {
-        val viewModel = createViewModel()
-
-        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-        viewModel.onChatSubmitted("prompt")
-
-        verify(inputScreenDiscoveryFunnel).onPromptSubmitted()
-    }
-
-    @Test
-    fun `when onChatInputTextChanged then chatInputTextState is updated`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("  test chat input  ")
-
-        // The chatInputTextState is trimmed and stored internally
-        // We can verify this indirectly by testing the mode switch pixel behavior
-        viewModel.onChatSelected()
-        viewModel.onSearchSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_search",
-            "had_text" to "true", // Should be true because we have trimmed text
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onChatInputTextChanged with empty text then chatInputTextState reflects empty state`() = runTest {
-        val viewModel = createViewModel()
-
-        viewModel.onChatInputTextChanged("some text")
-        viewModel.onChatInputTextChanged("   ") // Only whitespace, should be trimmed to empty
-
-        // Verify through mode switch behavior
-        viewModel.onChatSelected()
-        viewModel.onSearchSelected()
-
-        val expectedParams = mapOf(
-            "direction" to "to_search",
-            "had_text" to "false", // Should be false because trimmed text is empty
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
-    }
-
-    @Test
-    fun `when onSendButtonClicked in search mode then pixel is fired with search mode parameter`() = runTest {
-        val viewModel = createViewModel()
-
-        // Set to search mode
-        viewModel.onSearchSelected()
-
-        viewModel.onSendButtonClicked()
-
-        val expectedParams = mapOf(
-            DuckChatPixelParameters.INPUT_SCREEN_MODE to "search",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
-    }
-
-    @Test
-    fun `when onSendButtonClicked in chat mode then pixel is fired with aiChat mode parameter`() = runTest {
-        val viewModel = createViewModel()
-
-        // Set to chat mode
-        viewModel.onChatSelected()
-
-        viewModel.onSendButtonClicked()
-
-        val expectedParams = mapOf(
-            DuckChatPixelParameters.INPUT_SCREEN_MODE to "aiChat",
-        )
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
-    }
-
-    @Test
-    fun `when onSearchSubmitted then correct text_length_bucket parameters are sent`() = runTest {
-        data class TestCase(
-            val query: String,
-            val expectedBucket: String,
-        )
-
-        val testCases = listOf(
-            // 5 characters
-            TestCase("short", "short"),
-            // 33 characters
-            TestCase("this is a medium length query text", "medium"),
-            // 85 characters
-            TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
-            // 15 characters - boundary
-            TestCase("exactly15chars!", "short"),
-            // 16 characters - boundary
-            TestCase("exactly16chars!!", "medium"),
-            // 40 characters - boundary
-            TestCase("this text has exactly forty characters!", "medium"),
-            // 41 characters - boundary
-            TestCase("this text has exactly forty-one characters", "long"),
-            // 100 characters - boundary
-            TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
-            // 101 characters - boundary
-            TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
-        )
-
-        testCases.forEach { testCase ->
-            val viewModel = createViewModel()
-            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-            viewModel.onSearchSubmitted(testCase.query)
-
-            verify(pixel).fire(
-                DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
-                parameters = mapOf("text_length_bucket" to testCase.expectedBucket),
-            )
-            clearInvocations(pixel) // Reset mock for next iteration
+    fun `when initialized with search query then showSearchLogo should be false due to autocomplete suggestions`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+
+            // Should be false because autocomplete suggestions are visible for search queries
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
         }
-    }
 
     @Test
-    fun `when onChatSubmitted then correct text_length_bucket parameters are sent`() = runTest {
-        data class TestCase(
-            val prompt: String,
-            val expectedBucket: String,
-        )
-
-        val testCases = listOf(
-            // 5 characters
-            TestCase("short", "short"),
-            // 33 characters
-            TestCase("this is a medium length query text", "medium"),
-            // 85 characters
-            TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
-            // 15 characters - boundary
-            TestCase("exactly15chars!", "short"),
-            // 16 characters - boundary
-            TestCase("exactly16chars!!", "medium"),
-            // 40 characters - boundary
-            TestCase("this text has exactly forty characters!", "medium"),
-            // 41 characters - boundary
-            TestCase("this text has exactly forty-one characters", "long"),
-            // 100 characters - boundary
-            TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
-            // 101 characters - boundary
-            TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
-        )
-
-        testCases.forEach { testCase ->
+    fun `when onNewTabPageContentChanged with true then showSearchLogo should be false`() =
+        runTest {
             val viewModel = createViewModel()
+
+            // Initially true
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+
+            // Should become false when new tab page has content
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when onNewTabPageContentChanged with false then showSearchLogo should be true if autocomplete not visible`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Set new tab page to have content first
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+            // Remove content from new tab page
+            viewModel.onNewTabPageContentChanged(hasContent = false)
+
+            // Should become true again when no content and no autocomplete suggestions
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when new tab page has content and autocomplete becomes visible then showSearchLogo should remain false`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Set new tab page to have content
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+            // Trigger autocomplete (this would normally make showSearchLogo false anyway)
+            viewModel.onSearchInputTextChanged("test query")
+
+            // Should remain false
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when new tab page has no content but autocomplete is visible then showSearchLogo should be false`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Ensure new tab page has no content
+            viewModel.onNewTabPageContentChanged(hasContent = false)
+
+            // Trigger autocomplete suggestions
+            viewModel.onSearchInputTextChanged("test query")
+
+            // Should be false because autocomplete suggestions are visible
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when new tab page has no content and autocomplete is not visible then showSearchLogo should be true`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
+
+            // Ensure new tab page has no content
+            viewModel.onNewTabPageContentChanged(hasContent = false)
+
+            // Should be true because no content and no autocomplete suggestions (URL doesn't trigger autocomplete initially)
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when user transitions from autocomplete visible to hidden then showSearchLogo should be true if new tab page has no content`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+
+            // Initially false due to autocomplete
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+            // Ensure new tab page has no content
+            viewModel.onNewTabPageContentChanged(hasContent = false)
+
+            // Clear text to hide autocomplete
+            viewModel.onSearchInputTextChanged("")
+
+            // Should become true when autocomplete hidden and no new tab content
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when user transitions from autocomplete visible to hidden but new tab page has content then showSearchLogo should remain false`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+
+            // Initially false due to autocomplete
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+            // Set new tab page to have content
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+
+            // Clear text to hide autocomplete
+            viewModel.onSearchInputTextChanged("")
+
+            // Should remain false because new tab page has content
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+        }
+
+    @Test
+    fun `when fireShownPixel then DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN pixels is fired`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.fireShownPixel()
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_DAILY, type = Daily())
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN_COUNT, type = Count)
+        }
+
+    @Test
+    fun `when onSearchSubmitted then query submitted pixels are fired`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.setHasUsedSearchMode(any())).thenReturn(Unit)
+
+            viewModel.onSearchSubmitted("query")
+
+            val expectedParams = mapOf("text_length_bucket" to "short")
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = expectedParams)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onSearchSubmitted then inputScreenSessionUsage onSearchSubmitted is called`() =
+        runTest {
+            val viewModel = createViewModel()
+
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
-            viewModel.onChatSubmitted(testCase.prompt)
+            viewModel.onSearchSubmitted("query")
 
-            val expectedParams = mapOf(
-                DuckChatPixelParameters.WAS_USED_BEFORE to "0",
-                DuckChatPixelParameters.TEXT_LENGTH_BUCKET to testCase.expectedBucket,
-            )
+            verify(inputScreenSessionUsageMetric).onSearchSubmitted()
+        }
+
+    @Test
+    fun `when onChatSubmitted then prompt submitted pixels are fired`() =
+        runTest {
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted("prompt")
+
             verify(pixel).fire(
-                DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+                parameters = mapOf(
+                    DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                    "text_length_bucket" to "short",
+                ),
+            )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onChatSubmitted and DuckChat was used before then prompt submitted pixel includes was_used_before parameter as 1`() =
+        runTest {
+            whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted("prompt")
+
+            val expectedParams =
+                mapOf(
+                    DuckChatPixelParameters.WAS_USED_BEFORE to "1",
+                    DuckChatPixelParameters.TEXT_LENGTH_BUCKET to "short",
+                )
+            verify(pixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
                 parameters = expectedParams,
             )
-            clearInvocations(pixel) // Reset mock for next iteration
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
         }
-    }
+
+    @Test
+    fun `when onChatSubmitted then inputScreenSessionUsage onPromptSubmitted is called`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted("prompt")
+
+            verify(inputScreenSessionUsageMetric).onPromptSubmitted()
+        }
+
+    @Test
+    fun `when onSearchSelected and user was in chat mode with text then mode switched pixel is fired with correct parameters`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("some chat text")
+            viewModel.onSearchSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_search",
+                    "had_text" to "true",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onSearchSelected and user was in chat mode without text then mode switched pixel is fired with correct parameters`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSelected()
+            viewModel.onSearchSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_search",
+                    "had_text" to "false",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onSearchSelected and user was not in chat mode then mode switched pixel is not fired`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onSearchSelected()
+
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+        }
+
+    @Test
+    fun `when onChatSelected and user was in search mode with text then mode switched pixel is fired with correct parameters`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("some search text")
+            viewModel.onChatSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "true",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onChatSelected and user was in search mode without text then mode switched pixel is fired with correct parameters`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onSearchSelected()
+            viewModel.onChatSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "false",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onChatSelected and user was not in search mode then mode switched pixel is not fired`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSelected()
+
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+        }
+
+    @Test
+    fun `when both search and chat modes used in same session then both modes pixel is fired`() =
+        runTest {
+            val viewModel = createViewModel()
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
+
+            viewModel.onSearchSubmitted("query")
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when only search mode used then both modes pixel is not fired`() =
+        runTest {
+            val viewModel = createViewModel()
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onSearchSubmitted("query")
+
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when only chat mode used then both modes pixel is not fired`() =
+        runTest {
+            val viewModel = createViewModel()
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
+
+            viewModel.onChatSubmitted("prompt")
+
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onSearchSubmitted with newlines then they are replaced with spaces`() =
+        runTest {
+            val viewModel = createViewModel()
+            val queryWithNewlines = "first line\nsecond line\nthird line"
+            val expected = "first line second line third line"
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onSearchSubmitted(queryWithNewlines)
+
+            assertEquals(SubmitSearch(expected), viewModel.command.value)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with chat then command and pixel sent`() =
+        runTest {
+            val viewModel = createViewModel()
+            val query = "example"
+
+            val duckAIPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString())
+
+            viewModel.userSelectedAutocomplete(duckAIPrompt)
+
+            assertEquals(SubmitChat(query), viewModel.command.value)
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
+            verify(autoComplete).fireAutocompletePixel(any(), any(), any())
+        }
+
+    @Test
+    fun `when onSearchSubmitted then discovery funnel onSearchSubmitted is called`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onSearchSubmitted("query")
+
+            verify(inputScreenDiscoveryFunnel).onSearchSubmitted()
+        }
+
+    @Test
+    fun `when onChatSubmitted with prompt then discovery funnel onPromptSubmitted is called`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted("prompt")
+
+            verify(inputScreenDiscoveryFunnel).onPromptSubmitted()
+        }
+
+    @Test
+    fun `when onChatInputTextChanged then chatInputTextState is updated`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatInputTextChanged("  test chat input  ")
+
+            // The chatInputTextState is trimmed and stored internally
+            // We can verify this indirectly by testing the mode switch pixel behavior
+            viewModel.onChatSelected()
+            viewModel.onSearchSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_search",
+                    "had_text" to "true", // Should be true because we have trimmed text
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onChatInputTextChanged with empty text then chatInputTextState reflects empty state`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatInputTextChanged("some text")
+            viewModel.onChatInputTextChanged("   ") // Only whitespace, should be trimmed to empty
+
+            // Verify through mode switch behavior
+            viewModel.onChatSelected()
+            viewModel.onSearchSelected()
+
+            val expectedParams =
+                mapOf(
+                    "direction" to "to_search",
+                    "had_text" to "false", // Should be false because trimmed text is empty
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, expectedParams)
+        }
+
+    @Test
+    fun `when onSendButtonClicked in search mode then pixel is fired with search mode parameter`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Set to search mode
+            viewModel.onSearchSelected()
+
+            viewModel.onSendButtonClicked()
+
+            val expectedParams =
+                mapOf(
+                    DuckChatPixelParameters.INPUT_SCREEN_MODE to "search",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
+        }
+
+    @Test
+    fun `when onSendButtonClicked in chat mode then pixel is fired with aiChat mode parameter`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Set to chat mode
+            viewModel.onChatSelected()
+
+            viewModel.onSendButtonClicked()
+
+            val expectedParams =
+                mapOf(
+                    DuckChatPixelParameters.INPUT_SCREEN_MODE to "aiChat",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, expectedParams)
+        }
+
+    @Test
+    fun `when onSearchSubmitted then correct text_length_bucket parameters are sent`() =
+        runTest {
+            data class TestCase(
+                val query: String,
+                val expectedBucket: String,
+            )
+
+            val testCases =
+                listOf(
+                    // 5 characters
+                    TestCase("short", "short"),
+                    // 33 characters
+                    TestCase("this is a medium length query text", "medium"),
+                    // 85 characters
+                    TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
+                    // 15 characters - boundary
+                    TestCase("exactly15chars!", "short"),
+                    // 16 characters - boundary
+                    TestCase("exactly16chars!!", "medium"),
+                    // 40 characters - boundary
+                    TestCase("this text has exactly forty characters!", "medium"),
+                    // 41 characters - boundary
+                    TestCase("this text has exactly forty-one characters", "long"),
+                    // 100 characters - boundary
+                    TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
+                    // 101 characters - boundary
+                    TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
+                )
+
+            testCases.forEach { testCase ->
+                val viewModel = createViewModel()
+                whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+                whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+                viewModel.onSearchSubmitted(testCase.query)
+
+                verify(pixel).fire(
+                    DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+                    parameters = mapOf("text_length_bucket" to testCase.expectedBucket),
+                )
+                clearInvocations(pixel) // Reset mock for next iteration
+            }
+        }
+
+    @Test
+    fun `when onChatSubmitted then correct text_length_bucket parameters are sent`() =
+        runTest {
+            data class TestCase(
+                val prompt: String,
+                val expectedBucket: String,
+            )
+
+            val testCases =
+                listOf(
+                    // 5 characters
+                    TestCase("short", "short"),
+                    // 33 characters
+                    TestCase("this is a medium length query text", "medium"),
+                    // 85 characters
+                    TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
+                    // 15 characters - boundary
+                    TestCase("exactly15chars!", "short"),
+                    // 16 characters - boundary
+                    TestCase("exactly16chars!!", "medium"),
+                    // 40 characters - boundary
+                    TestCase("this text has exactly forty characters!", "medium"),
+                    // 41 characters - boundary
+                    TestCase("this text has exactly forty-one characters", "long"),
+                    // 100 characters - boundary
+                    TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
+                    // 101 characters - boundary
+                    TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
+                )
+
+            testCases.forEach { testCase ->
+                val viewModel = createViewModel()
+                whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+                whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+                viewModel.onChatSubmitted(testCase.prompt)
+
+                val expectedParams =
+                    mapOf(
+                        DuckChatPixelParameters.WAS_USED_BEFORE to "0",
+                        DuckChatPixelParameters.TEXT_LENGTH_BUCKET to testCase.expectedBucket,
+                    )
+                verify(pixel).fire(
+                    DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+                    parameters = expectedParams,
+                )
+                clearInvocations(pixel) // Reset mock for next iteration
+            }
+        }
+
+    @Test
+    fun `when onTabTapped to position 1 and has no content then animate logo to position 1`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onTabTapped(index = 1)
+
+            assertEquals(AnimateLogoToProgress(1f), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onTabTapped to position 0 and has no content then animate logo to position 0`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onPageSelected(position = 1)
+            viewModel.onTabTapped(index = 0)
+
+            assertEquals(AnimateLogoToProgress(0f), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onTabTapped at current position then AnimateLogoToProgress is not emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onTabTapped(index = 0)
+
+            assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onTabTapped and has content then no command is emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+            viewModel.onTabTapped(index = 1)
+
+            assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onTabTapped and search logo hidden by autocomplete then no command is emitted`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onTabTapped(index = 1)
+
+            assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onTabTapped and both logos visible then AnimateLogoToProgress is emitted`() =
+        runTest {
+            val viewModel = createViewModel("https://example.com")
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+            viewModel.onTabTapped(index = 1)
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(AnimateLogoToProgress(1f), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onTabTapped to search tab with content then no command is emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+            viewModel.onPageSelected(position = 1)
+            capturedCommands.clear()
+
+            viewModel.onTabTapped(index = 0)
+
+            assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onPageScrolled at position 0 and not tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(2, capturedCommands.size)
+            assertEquals(SetLogoProgress(positionOffset), capturedCommands[0])
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+        }
+
+    @Test
+    fun `when onPageScrolled at position 1 and not tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            val position = 1
+            val positionOffset = 0.7f
+            val logoProgress = 1f - positionOffset
+            val easedOffset = 1f - (1f - positionOffset) * (1f - positionOffset) * 2f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(2, capturedCommands.size)
+            assertEquals(SetLogoProgress(logoProgress), capturedCommands[0])
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+        }
+
+    @Test
+    fun `when onPageScrolled and has content then SetLogoProgress is not emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onNewTabPageContentChanged(hasContent = true)
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onPageScrolled during tap transition then SetLogoProgress and SetInputModeWidgetScrollPosition are not emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            viewModel.onTabTapped(index = 1)
+            capturedCommands.clear()
+
+            val position = 0
+            val positionOffset = 0.3f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(0, capturedCommands.size)
+        }
+
+    @Test
+    fun `when onPageScrolled and search logo hidden then SetLogoProgress is not emitted`() =
+        runTest {
+            val viewModel = createViewModel("search query")
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(1, capturedCommands.size)
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[0])
+        }
+
+    @Test
+    fun `when onPageScrolled with both logos visible then SetLogoProgress is emitted`() =
+        runTest {
+            val viewModel = createViewModel()
+            val capturedCommands = mutableListOf<Command>()
+
+            viewModel.command.observeForever { command ->
+                if (command != null) {
+                    capturedCommands.add(command)
+                }
+            }
+
+            assertTrue(viewModel.visibilityState.value.showSearchLogo)
+            assertTrue(viewModel.visibilityState.value.showChatLogo)
+
+            val position = 0
+            val positionOffset = 0.3f
+            val easedOffset = positionOffset * positionOffset * 2f
+
+            viewModel.onPageScrolled(position, positionOffset)
+
+            assertEquals(2, capturedCommands.size)
+            assertEquals(SetLogoProgress(positionOffset), capturedCommands[0])
+            assertEquals(SetInputModeWidgetScrollPosition(position = position, offset = easedOffset), capturedCommands[1])
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are visible then bottomFadeVisible should be true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("search query")
+
+            assertTrue(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using bottom bar and autocomplete suggestions are visible then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(false)
+            val viewModel = createViewModel("search query")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when using top bar and autocomplete suggestions are hidden then bottomFadeVisible should be false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
+            val viewModel = createViewModel("https://example.com")
+
+            assertFalse(viewModel.visibilityState.value.bottomFadeVisible)
+        }
+
+    @Test
+    fun `when onSubmitMessageAvailableChange called then submitButtonVisible is updated correctly`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            // Initially false
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to true
+            viewModel.onSubmitMessageAvailableChange(true)
+            assertTrue(viewModel.visibilityState.value.submitButtonVisible)
+
+            // Set to false
+            viewModel.onSubmitMessageAvailableChange(false)
+            assertFalse(viewModel.visibilityState.value.submitButtonVisible)
+        }
+
+    @Test
+    fun `when onTabSwitcherTapped then emit TabSwitcherRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onTabSwitcherTapped()
+
+            assertEquals(Command.TabSwitcherRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onFireButtonTapped then emit FireButtonRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onFireButtonTapped()
+
+            assertEquals(Command.FireButtonRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when onBrowserMenuTapped then emit MenuRequested Command`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onBrowserMenuTapped()
+
+            assertEquals(Command.MenuRequested, viewModel.command.value)
+        }
+
+    @Test
+    fun `when any button is visible then actionButtonsContainerVisible should be true`() =
+        runTest {
+            data class TestCase(
+                val name: String,
+                val setup: (InputScreenViewModel) -> Unit,
+                val expectedVisible: Boolean,
+            )
+
+            val testCases =
+                listOf(
+                    TestCase(
+                        name = "submit button visible",
+                        setup = { it.onSubmitMessageAvailableChange(true) },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "voice input button visible (default)",
+                        setup = { /* voice input is visible by default in the test setup */ },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "new line button visible",
+                        setup = { it.onChatInputTextChanged("test") },
+                        expectedVisible = true,
+                    ),
+                    TestCase(
+                        name = "no buttons visible",
+                        setup = {
+                            // Disable voice input
+                            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+                            it.onActivityResume()
+                            it.onSubmitMessageAvailableChange(false)
+                            // newLineButtonVisible is false by default
+                        },
+                        expectedVisible = false,
+                    ),
+                )
+
+            testCases.forEach { testCase ->
+                val viewModel = createViewModel()
+                testCase.setup(viewModel)
+                assertEquals(
+                    "Failed for test case: ${testCase.name}",
+                    testCase.expectedVisible,
+                    viewModel.visibilityState.value.actionButtonsContainerVisible,
+                )
+            }
+        }
+
+    @Test
+    fun `when onClearTextTapped and search mode enabled then pixel sent and state updated`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            viewModel.onClearTextTapped()
+            // UI clears the text which triggers visibility update
+            viewModel.onSearchInputTextChanged("")
+
+            val expectedParams =
+                mapOf(
+                    "mode" to "search",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, expectedParams)
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when onClearTextTapped and chat mode enabled then pixel sent and state updated`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onClearTextTapped()
+
+            val expectedParams =
+                mapOf(
+                    "mode" to "aiChat",
+                )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_CLEAR_BUTTON_PRESSED, expectedParams)
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user types some text in search mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertTrue(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user types some text in duck ai mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onChatInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertFalse(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user deletes all text in search mode then buttons are visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+            assertTrue(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when user deletes all text in chat mode then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            viewModel.onChatInputTextChanged("")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+            assertFalse(viewModel.visibilityState.value.searchMode)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is true then mainButtonsVisible is true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when search mode selected with empty text and mainButtonsEnabled is false then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(false)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user types in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user clears text in search mode and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from search to chat mode with empty text then mainButtonsVisible becomes false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with empty text and mainButtonsEnabled is true then mainButtonsVisible becomes true`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user switches from chat to search mode with non-empty text then mainButtonsVisible is true because search text is empty`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("query")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when initialized with non-empty text and user selects search mode then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("initial query")
+
+            viewModel.onSearchSelected()
+
+            // mainButtonsVisible should be false because searchInputTextState is not empty
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when onSearchInputTextChanged called then mainButtonsVisible is updated based on canShowMainButtons`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged("")
+
+            // Initially empty in search mode
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Type some text
+            viewModel.onSearchInputTextChanged("q")
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+
+            // Clear text
+            viewModel.onSearchInputTextChanged("")
+            assertTrue(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is true then factory creates autoComplete with showInstalledApps config enabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = true)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when shouldShowInstalledApps is false then factory creates autoComplete with showInstalledApps config disabled`() =
+        runTest {
+            val expectedConfig = AutoComplete.Config(showInstalledApps = false)
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(false)
+            val viewModel = createViewModel("test query")
+
+            verify(autoCompleteFactory).create(expectedConfig)
+
+            advanceTimeBy(301)
+            verify(autoComplete).autoComplete("test query")
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app suggestion then LaunchDeviceApplication command is sent`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            assertEquals(Command.LaunchDeviceApplication(deviceAppSuggestion), viewModel.command.value)
+        }
+
+    @Test
+    fun `when appNotFound is called then ShowAppNotFoundMessage command is sent and refreshAppList is called`() =
+        runTest {
+            val viewModel = createViewModel()
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+
+            viewModel.appNotFound(deviceAppSuggestion)
+
+            assertEquals(Command.ShowAppNotFoundMessage("First App"), viewModel.command.value)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with device app then fireAutocompletePixel is called with experimentalInputScreen true`() =
+        runTest {
+            val deviceAppSuggestion = AutoCompleteSuggestion.AutoCompleteDeviceAppSuggestion(
+                phrase = "app",
+                shortName = "First App",
+                packageName = "com.example.first",
+                launchIntent = Intent(),
+            )
+            val suggestions = listOf(AutoCompleteDefaultSuggestion("suggestion")) + deviceAppSuggestion
+            val expectedResult = AutoCompleteResult("test", suggestions)
+            whenever(autoComplete.autoComplete("test")).thenReturn(flowOf(expectedResult))
+            whenever(inputScreenConfigResolver.shouldShowInstalledApps()).thenReturn(true)
+
+            val viewModel = createViewModel("test")
+
+            viewModel.userSelectedAutocomplete(deviceAppSuggestion)
+
+            advanceUntilIdle()
+
+            verify(autoComplete).fireAutocompletePixel(suggestions, deviceAppSuggestion, experimentalInputScreen = true)
+        }
+
+    @Test
+    fun `when using split omnibar and search mode selected with empty text then mainButtonsVisible is false`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
+            val viewModel = createViewModel("")
+
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when user deletes all text in search mode and omnibar is SPLIT then buttons are not visible`() =
+        runTest {
+            whenever(inputScreenConfigResolver.mainButtonsEnabled()).thenReturn(true)
+            whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SPLIT)
+            val viewModel = createViewModel("")
+            viewModel.onSearchSelected()
+
+            viewModel.onSearchInputTextChanged("")
+
+            assertFalse(viewModel.visibilityState.value.mainButtonsVisible)
+        }
+
+    @Test
+    fun `when fullscreen mode enabled submitting chat sends a query to the main fragment`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            val viewModel = createViewModel()
+            val query = "example"
+
+            viewModel.onChatSubmitted(query)
+
+            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+        }
+
+    @Test
+    fun `when fullscreen mode enabled submitting a URL navigates directly instead of opening DuckChat`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+
+            val viewModel = createViewModel()
+            val url = "bbc.com"
+
+            viewModel.onChatSubmitted(url)
+
+            assertEquals(SubmitSearch(url), viewModel.command.value)
+            verify(duckChat, never()).getDuckChatUrl(url, true)
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL in non-fullscreen mode then SubmitSearch command is emitted`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            assertEquals(SubmitSearch("bbc.com"), viewModel.command.value)
+            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL then chat pixels are not fired`() =
+        runTest {
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            verify(pixel, never()).fire(eq(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED), any(), any(), any())
+            verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onChatSubmitted with URL then setHasUsedChatMode is not called`() =
+        runTest {
+            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("bbc.com")
+
+            verify(inputScreenSessionStore, never()).setHasUsedChatMode(true)
+        }
+
+    @Test
+    fun `when predictor not ready and input is web url then onChatSubmitted emits SubmitSearch`() =
+        runTest {
+            whenever(queryUrlPredictor.isReady()).thenReturn(false)
+            whenever(queryUrlPredictor.isUrl("https://example.com")).thenReturn(true)
+            val viewModel = createViewModel()
+
+            viewModel.onChatSubmitted("https://example.com")
+
+            assertEquals(SubmitSearch("https://example.com"), viewModel.command.value)
+        }
+
+    @Test
+    fun `when sendKeyboardFocusedPixel then fire both keyboard usage pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.sendKeyboardFocusedPixel()
+
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE)
+            verify(pixel).fire(DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen disabled then SubmitChat command sent and openDuckChatWithAutoPrompt`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            val prompt = "prompt"
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(prompt))
+
+            assertEquals(SubmitChat(prompt), viewModel.command.value)
+            verify(duckChat).openDuckChatWithAutoPrompt(prompt)
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen enabled then onChatSubmitted`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
+
+            val viewModel = createViewModel()
+
+            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
+            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was used before then pixel fired with was_used_before true`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to true.toBinaryString()),
+            )
+        }
+
+    @Test
+    fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was not used before then pixel fired with was_used_before false`() =
+        runTest {
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+
+            createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL,
+                parameters = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString()),
+            )
+        }
+
+    // region Chat Suggestions
+
+    @Test
+    fun `when onChatSuggestionSelected then emit SubmitSearch Command with chatID parameter`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = false)
+
+            val expectedUrl = "$duckChatURL&chatID=test-chat-id"
+            assertEquals(SubmitSearch(expectedUrl), viewModel.command.value)
+        }
+
+    @Test
+    fun `when onChatSuggestionSelected with pinned true then fire pinned pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = true)
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_PINNED_DAILY, type = Daily())
+        }
+
+    @Test
+    fun `when onChatSuggestionSelected with pinned false then fire non-pinned pixels`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.onChatSuggestionSelected("test-chat-id", pinned = false)
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_RECENT_CHAT_SELECTED_DAILY, type = Daily())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when onChatSelected and feature flag enabled and suggestions empty then suggestions are fetched`() =
+        runTest {
+            val suggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader).fetchSuggestions(eq(""))
+            assertEquals(suggestions, viewModel.chatSuggestions.value)
+        }
+
+    @Test
+    fun `when onChatSelected and feature flag disabled then suggestions are not fetched`() =
+        runTest {
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when onChatSelected and suggestions already loaded then suggestions are refreshed`() =
+        runTest {
+            val suggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+            verify(chatSuggestionsReader).fetchSuggestions(any())
+
+            // Switch away and back — should re-fetch in case chats changed in storage
+            viewModel.onSearchSelected()
+            clearInvocations(chatSuggestionsReader)
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat suggestions loaded then showChatLogo is false and chatSuggestionsVisible is true`() =
+        runTest {
+            val suggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            assertFalse(viewModel.visibilityState.value.showChatLogo)
+            assertTrue(viewModel.visibilityState.value.chatSuggestionsVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat suggestions are empty then showChatLogo is true and chatSuggestionsVisible is false`() =
+        runTest {
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.visibilityState.value.showChatLogo)
+            assertFalse(viewModel.visibilityState.value.chatSuggestionsVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat input text changes then suggestions are re-fetched after debounce`() =
+        runTest {
+            val initialSuggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            val filteredSuggestions = listOf(
+                ChatSuggestion(chatId = "2", title = "Filtered", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(eq(""))).thenReturn(initialSuggestions)
+            whenever(chatSuggestionsReader.fetchSuggestions(eq("hello"))).thenReturn(filteredSuggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            viewModel.onChatInputTextChanged("hello")
+            advanceTimeBy(200) // Debounce is 150ms
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader).fetchSuggestions(eq("hello"))
+            assertEquals(filteredSuggestions, viewModel.chatSuggestions.value)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat input text changes and in search mode then suggestions are not re-fetched`() =
+        runTest {
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+
+            // Stay in search mode (default)
+            viewModel.onChatInputTextChanged("hello")
+            advanceTimeBy(200)
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when onChatSelected and user setting disabled then suggestions are not fetched`() =
+        runTest {
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat input text changes and user setting disabled then suggestions are not fetched`() =
+        runTest {
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(flowOf(false))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("hello")
+            advanceTimeBy(200)
+            advanceUntilIdle()
+
+            verify(chatSuggestionsReader, never()).fetchSuggestions(any())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when user setting toggled off then existing suggestions are cleared`() =
+        runTest {
+            val suggestionsFlow = MutableStateFlow(true)
+            whenever(duckChat.observeChatSuggestionsUserSettingEnabled()).thenReturn(suggestionsFlow)
+            val suggestions = listOf(
+                ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false),
+            )
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(suggestions)
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+            assertEquals(suggestions, viewModel.chatSuggestions.value)
+
+            suggestionsFlow.value = false
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatSuggestions.value.isEmpty())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when fetchSuggestions throws exception then chatSuggestions remains empty`() =
+        runTest {
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenThrow(RuntimeException("error"))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatSuggestions.value.isEmpty())
+        }
+
+    // endregion
+
+    // region chat tab attachments
+
+    @Test
+    fun `when feature flag disabled then onChatTagTextChanged does not show popup`() =
+        runTest {
+            whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "1", title = "Duck", url = "https://duck.com")))
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when feature flag enabled and @ typed then popup shows matching tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com"),
+                    TabEntity(tabId = "2", title = "Example", url = "https://example.com"),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            val state = viewModel.tabAttachmentState.value
+            assertTrue(state.popupVisible)
+            assertEquals(2, state.filteredTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when @ typed with query then filters tabs by title`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com"),
+                    TabEntity(tabId = "2", title = "Example", url = "https://example.com"),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@duck", 5)
+            advanceUntilIdle()
+
+            val state = viewModel.tabAttachmentState.value
+            assertTrue(state.popupVisible)
+            assertEquals(1, state.filteredTabs.size)
+            assertEquals("DuckDuckGo", state.filteredTabs[0].title)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when no tabs match query then popup is hidden`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "DuckDuckGo", url = "https://duckduckgo.com")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@xyz", 4)
+            advanceUntilIdle()
+
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab selected then token is returned with @ prefix`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            val token = viewModel.onTabAttachmentSelected(item)
+
+            assertEquals("@Example ", token)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab with long title selected then token is ellipsized`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "A Very Long Tab Title That Exceeds Limit", url = "https://example.com")
+            val token = viewModel.onTabAttachmentSelected(item)
+
+            assertEquals("@A Very Long Tab Titl\u2026 ", token)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab selected then it is added to attached tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            viewModel.onTabAttachmentSelected(item)
+
+            val attachedTabs = viewModel.tabAttachmentState.value.attachedTabs
+            assertEquals(1, attachedTabs.size)
+            assertEquals("1", attachedTabs[0].tabId)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when same tab selected twice then it is not duplicated in the state`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            val item = TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com")
+            viewModel.onTabAttachmentSelected(item)
+            viewModel.onTabAttachmentSelected(item)
+
+            assertEquals(1, viewModel.tabAttachmentState.value.attachedTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab attachment removed then it is removed from attached tabs`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+
+            val viewModel = createViewModel()
+            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
+            viewModel.onTabAttachmentRemoved("1")
+
+            assertTrue(viewModel.tabAttachmentState.value.attachedTabs.isEmpty())
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat submitted with attached tabs but no page contexts then falls back to normal submission`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+            whenever(tabPageContextRepository.getPageContexts(any())).thenReturn(emptyMap())
+
+            val viewModel = createViewModel()
+            viewModel.onTabAttachmentSelected(TabAttachmentItem(tabId = "1", title = "Example", url = "https://example.com"))
+
+            viewModel.onChatSubmitted("hello @Example")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello @Example")
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when chat submitted without attached tabs then query is not enriched`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSubmitted("hello")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello")
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tabs have blank url then they are filtered out`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(
+                    TabEntity(tabId = "1", title = "Good Tab", url = "https://example.com"),
+                    TabEntity(tabId = "2", title = "Blank URL", url = ""),
+                    TabEntity(tabId = "3", title = "Null URL", url = null),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertEquals(1, viewModel.tabAttachmentState.value.filteredTabs.size)
+            assertEquals("Good Tab", viewModel.tabAttachmentState.value.filteredTabs[0].title)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when popup limited to max tabs then only 5 shown`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            val tabs = (1..10).map { TabEntity(tabId = "$it", title = "Tab $it", url = "https://tab$it.com") }
+            whenever(tabRepository.getTabs()).thenReturn(tabs)
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@Tab", 4)
+            advanceUntilIdle()
+
+            assertEquals(5, viewModel.tabAttachmentState.value.filteredTabs.size)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tag query removed then popup is hidden`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "Example", url = "https://example.com")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@ex", 3)
+            advanceUntilIdle()
+            assertTrue(viewModel.tabAttachmentState.value.popupVisible)
+
+            viewModel.onChatTagTextChanged("hello", 5)
+            advanceUntilIdle()
+            assertFalse(viewModel.tabAttachmentState.value.popupVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when tab has blank title then host is used as title`() =
+        runTest {
+            duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
+            whenever(tabRepository.getTabs()).thenReturn(
+                listOf(TabEntity(tabId = "1", title = "", url = "https://example.com/page")),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatTagTextChanged("@", 1)
+            advanceUntilIdle()
+
+            assertEquals("example.com", viewModel.tabAttachmentState.value.filteredTabs[0].title)
+        }
+
+    @Test
+    fun `when chat submitted with flag disabled then query is not enriched`() =
+        runTest {
+            // Flag is disabled by default
+            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSubmitted("hello")
+
+            verify(duckChat).openDuckChatWithAutoPrompt("hello")
+        }
+
+    // endregion
+
+    // region voice entry point
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when search mode and voice available and flag on then voice button visible`() =
+        runTest {
+            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+
+            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when search mode and voice unavailable and flag on then voice button hidden`() =
+        runTest {
+            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+            val viewModel = createViewModel()
+            viewModel.onActivityResume()
+            viewModel.onSearchSelected()
+
+            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when duck ai mode and flag on and no text entered then voice button visible regardless of voice service`() =
+        runTest {
+            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+            val viewModel = createViewModel()
+            viewModel.onActivityResume()
+            viewModel.onChatSelected()
+
+            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when duck ai mode and flag on and text entered then voice button hidden`() =
+        runTest {
+            duckChatFeature.duckAiVoiceEntryPoint().setRawStoredState(State(enable = true))
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+            val viewModel = createViewModel()
+            viewModel.onActivityResume()
+            viewModel.onChatSelected()
+            viewModel.onVoiceInputAllowedChange(false)
+
+            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @Test
+    fun `when duck ai mode and flag off and voice available then voice button visible`() =
+        runTest {
+            // flag is off by default in FakeFeatureToggleFactory (DefaultValue.INTERNAL = disabled in tests)
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+
+            assertTrue(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @Test
+    fun `when duck ai mode and flag off and voice unavailable then voice button hidden`() =
+        runTest {
+            // flag is off by default
+            whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(false)
+            val viewModel = createViewModel()
+            viewModel.onActivityResume()
+            viewModel.onChatSelected()
+
+            assertFalse(viewModel.visibilityState.value.voiceInputButtonVisible)
+        }
+
+    @Test
+    fun `when onVoiceEntryTapped then pixels fired and openVoiceDuckChat called`() =
+        runTest {
+            val viewModel = createViewModel()
+            viewModel.onVoiceEntryTapped()
+
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_COUNT)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_VOICE_ENTRY_TAPPED_DAILY, type = Daily())
+            verify(duckChat).openVoiceDuckChat()
+        }
+
+    // endregion
 }

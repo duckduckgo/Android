@@ -22,12 +22,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.*
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import org.json.JSONObject
+import retrofit2.HttpException
 import retrofit2.Response
+import javax.inject.*
 
 interface SyncApi {
     fun createAccount(
@@ -73,11 +74,6 @@ interface SyncApi {
 
     fun getDevices(token: String): Result<List<Device>>
 
-    fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject?>
-
     fun getBookmarks(
         token: String,
         since: String,
@@ -92,6 +88,31 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit>
+
+    fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject>
+
+    fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String? = null,
+    ): Result<JSONObject>
+
+    /**
+     * Obtain a new "scoped token" for the sync service
+     * A scoped token has a reduced range of capabilities, restricted to only the given scope
+     */
+    fun rescopeToken(
+        token: String,
+        scope: String,
+    ): Result<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -287,27 +308,6 @@ class SyncServiceRemote @Inject constructor(
         }
     }
 
-    override fun patch(
-        token: String,
-        updates: JSONObject,
-    ): Result<JSONObject> {
-        logcat(INFO) { "Sync-service: patch request $updates" }
-
-        val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", updates)
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            logcat(INFO) { "Sync-service: patch response: $it" }
-            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
-            Result.Success(data)
-        }
-    }
-
     override fun getBookmarks(
         token: String,
         since: String,
@@ -376,6 +376,107 @@ class SyncServiceRemote @Inject constructor(
             val data = response.body() ?: return@onSuccess Result.Error(reason = "GetSettings: empty body")
             Result.Success(data)
         }
+    }
+
+    override fun deleteAiChats(
+        token: String,
+        until: String,
+    ): Result<Unit> {
+        val response = runCatching {
+            val deleteCall = syncService.deleteAiChats("Bearer $token", until)
+            deleteCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Result.Success(Unit)
+        }
+    }
+
+    override fun patchData(
+        token: String,
+        updates: JSONObject,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchData request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchData("Bearer $token", updates)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchData error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchData response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchData: empty Body")
+            Result.Success(data)
+        }
+    }
+
+    override fun patchChats(
+        token: String,
+        body: okhttp3.RequestBody,
+        since: String?,
+    ): Result<JSONObject> {
+        logcat(INFO) { "Sync-service: patchChats request" }
+
+        val response = runCatching {
+            val patchCall = syncService.patchChats("Bearer $token", body, since)
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: patchChats error ${throwable.localizedMessage}" }
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            logcat(INFO) { "Sync-service: patchChats response: $it" }
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "PatchChats: empty Body")
+            Result.Success(data)
+        }
+    }
+
+    override fun rescopeToken(
+        token: String,
+        scope: String,
+    ): Result<String> {
+        return runCatching {
+            val rescopeCall = syncService.rescopeToken("Bearer $token", TokenRescopeRequest(scope))
+            val response = rescopeCall.execute()
+
+            if (response.isSuccessful) {
+                val newToken = response.body()?.token.takeUnless { it.isNullOrEmpty() }
+                    ?: return Result.Error(reason = "empty response")
+                Result.Success(newToken)
+            } else {
+                mapRescopeTokenError(response)
+            }
+        }.getOrElse { throwable ->
+            logcat(INFO) { "Sync-service: rescope token error ${throwable.localizedMessage}" }
+            val error = if (throwable is HttpException) {
+                Result.Error(code = throwable.code(), reason = "unexpected status code")
+            } else {
+                Result.Error(reason = "internal error")
+            }
+            error.removeKeysIfInvalid()
+            error
+        }
+    }
+
+    private fun mapRescopeTokenError(response: Response<TokenRescopeResponse?>): Result<String> {
+        val errorBody = response.errorBody()
+        val hasErrorBody = runCatching {
+            errorBody != null && errorBody.string().isNotEmpty()
+        }.getOrDefault(false)
+        val error = if (hasErrorBody) {
+            Result.Error(code = response.code(), reason = "unexpected status code")
+        } else {
+            Result.Error(code = response.code(), reason = "empty response")
+        }
+        error.removeKeysIfInvalid()
+        return error
     }
 
     private fun <T, R> onSuccess(

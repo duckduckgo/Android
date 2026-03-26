@@ -19,8 +19,8 @@ package com.duckduckgo.downloads.api
 import android.content.Context
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import java.io.File
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 /** Interface containing download callbacks. */
 interface DownloadStateListener {

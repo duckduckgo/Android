@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,11 +42,11 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
-import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
+import javax.inject.Inject
+import javax.inject.Named
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirDashboardWebViewScreen::class)
@@ -73,6 +74,7 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         observeCommands()
 
         pirNotificationManager.createNotificationChannel()
+        lifecycle.addObserver(viewModel)
     }
 
     override fun onDestroy() {
@@ -152,6 +154,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         when (command) {
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
+            is Command.ShowManualConfigWarning -> {
+                binding.manualConfigWarning.isVisible = command.show
+            }
         }
     }
 

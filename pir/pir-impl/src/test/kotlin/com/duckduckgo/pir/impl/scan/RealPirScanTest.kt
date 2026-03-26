@@ -24,8 +24,11 @@ import com.duckduckgo.pir.impl.PirConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.PirJob.RunType
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
@@ -59,6 +62,7 @@ class RealPirScanTest {
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
     private val mockContext: Context = mock()
     private val mockPirActionsRunner: RealPirActionsRunner = mock()
+    private val mockWebViewDataCleaner: PirWebViewDataCleaner = mock()
 
     @Before
     fun setUp() {
@@ -73,6 +77,7 @@ class RealPirScanTest {
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
+            webViewDataCleaner = mockWebViewDataCleaner,
         )
     }
 
@@ -83,6 +88,19 @@ class RealPirScanTest {
     private val testScript = "test-script-content"
     private val testStepsJson = """{"stepType":"scan","actions":[]}"""
 
+    private val testBroker1 = Broker(
+        name = testBrokerName,
+        fileName = "test-broker-1.json",
+        url = "https://test-broker-1.com",
+        version = "1.0",
+        parent = null,
+        addedDatetime = testCurrentTime,
+        removedAt = 0L,
+    )
+
+    private val testBroker2 = testBroker1.copy(
+        name = testBrokerName2,
+    )
     private val testProfileQuery = ProfileQuery(
         id = 123L,
         firstName = "John",
@@ -126,22 +144,27 @@ class RealPirScanTest {
     )
 
     private val testScanStep = ScanStep(
-        brokerName = testBrokerName,
-        stepType = "scan",
-        actions = emptyList(),
-        scanType = "data",
+        broker = testBroker1,
+        step = ScanStepActions(
+            stepType = "scan",
+            actions = emptyList(),
+            scanType = "data",
+        ),
     )
 
     private val testScanStep2 = ScanStep(
-        brokerName = testBrokerName2,
-        stepType = "scan",
-        actions = emptyList(),
-        scanType = "data",
+        broker = testBroker2,
+        step = ScanStepActions(
+            stepType = "scan",
+            actions = emptyList(),
+            scanType = "data",
+        ),
     )
 
     @Test
     fun whenEmptyJobRecordsThenDontCreateRunners() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
         whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
@@ -154,11 +177,13 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenNoBrokerScanStepsThenDontCreateRunners() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(null)
 
@@ -172,14 +197,16 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenBrokerStepsParsingReturnsEmptyThenDontCreateRunners() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(emptyList())
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(emptyList())
 
         whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
         whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
@@ -191,15 +218,17 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenNoRelevantProfilesThenDontCreateRunners() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
 
         whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
         whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
@@ -211,15 +240,17 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenNoRelevantProfilesUsesDefaultProfileQueries() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(emptyList())
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
@@ -235,16 +266,18 @@ class RealPirScanTest {
         // Then
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenJobRecordHasNoMatchingProfileThenSkipsRecord() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         val unknownProfileJobRecord = testScanJobRecord.copy(userProfileId = 999L)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
 
         whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
         whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
@@ -256,11 +289,13 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenJobRecordHasNoMatchingBrokerStepThenSkipsRecord() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         val unknownBrokerJobRecord = testScanJobRecord.copy(brokerName = "unknown-broker")
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps("unknown-broker")).thenReturn(null)
@@ -274,15 +309,17 @@ class RealPirScanTest {
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenValidJobRecordThenExecutesScan() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(testProfileQuery, listOf(testScanStep))).thenReturn(Result.success(Unit))
@@ -298,17 +335,19 @@ class RealPirScanTest {
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testScanStep))
         verify(mockPirActionsRunner).stop()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenMultipleValidJobRecordsThenExecutesAllScans() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1, testBroker2))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName2)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName2, testStepsJson)).thenReturn(listOf(testScanStep2))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockBrokerStepsParser.parseStep(testBroker2, testStepsJson)).thenReturn(listOf(testScanStep2))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
             .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
@@ -323,19 +362,21 @@ class RealPirScanTest {
         // Then
         verify(mockRepository).getBrokerScanSteps(testBrokerName)
         verify(mockRepository).getBrokerScanSteps(testBrokerName2)
-        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson)
-        verify(mockBrokerStepsParser).parseStep(testBrokerName2, testStepsJson)
+        verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson)
+        verify(mockBrokerStepsParser).parseStep(testBroker2, testStepsJson)
         verify(mockPirCssScriptLoader).getScript()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenDuplicateBrokerNamesThenParsesBrokerStepsOnlyOnce() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         val duplicateJobRecord = testScanJobRecord.copy(userProfileId = testProfileQuery2.id)
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL))
             .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
@@ -350,16 +391,18 @@ class RealPirScanTest {
         // Then
         // Verify broker steps parsed only once for the same broker name
         verify(mockRepository).getBrokerScanSteps(testBrokerName)
-        verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson)
+        verify(mockBrokerStepsParser).parseStep(testBroker1, testStepsJson)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenExecuteScanForJobsWithScheduledRunTypeThenUsesScheduledPixels() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.SCHEDULED)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
@@ -372,15 +415,17 @@ class RealPirScanTest {
 
         // Then
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.SCHEDULED)
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenExecuteScanForJobsThenCleansUpPreviousRun() = runTest {
         // Given
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
@@ -393,14 +438,16 @@ class RealPirScanTest {
 
         // Then
         verify(mockEventsRepository).deleteAllScanResults()
+        verify(mockWebViewDataCleaner).cleanWebViewData()
     }
 
     @Test
     fun whenStopThenCallsStopOnAllRunners() = runTest {
+        whenever(mockRepository.getAllActiveBrokerObjects()).thenReturn(listOf(testBroker1))
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
-        whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(mockBrokerStepsParser.parseStep(testBroker1, testStepsJson)).thenReturn(listOf(testScanStep))
+        whenever(mockRepository.getAllUserProfileQueries()).thenReturn(testUserProfileQueries)
         whenever(mockPirCssScriptLoader.getScript()).thenReturn(testScript)
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
@@ -413,5 +460,6 @@ class RealPirScanTest {
         testee.stop()
 
         verify(mockPirActionsRunner, times(2)).stop()
+        verify(mockWebViewDataCleaner, times(2)).cleanWebViewData()
     }
 }

@@ -36,9 +36,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -63,6 +63,7 @@ class NotificationRegistrar @Inject constructor(
         const val AppFeature = 104
         const val SurveyAvailable = 109 // 105 to 108 were already used previously
         // 110 was already used previously
+        // 111 is being used in VpnReminderNotification
     }
 
     object ChannelType {

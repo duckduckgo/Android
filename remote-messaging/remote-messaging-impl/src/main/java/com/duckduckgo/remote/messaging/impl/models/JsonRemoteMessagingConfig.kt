@@ -28,15 +28,17 @@ data class JsonRemoteMessagingConfig(
 data class JsonRemoteMessage(
     val id: String,
     val content: JsonContent?,
-    val exclusionRules: List<Int>,
-    val matchingRules: List<Int>,
+    val exclusionRules: List<Int>?,
+    val matchingRules: List<Int>?,
     val translations: Map<String, JsonContentTranslations>,
+    val surfaces: List<String>?,
 )
 
 data class JsonContent(
     val messageType: String = "",
     val titleText: String = "",
     val descriptionText: String = "",
+    val imageUrl: String? = null,
     val placeholder: String = "",
     val primaryActionText: String = "",
     val primaryAction: JsonMessageAction? = null,
@@ -44,6 +46,7 @@ data class JsonContent(
     val secondaryAction: JsonMessageAction? = null,
     val actionText: String = "",
     val action: JsonMessageAction? = null,
+    val listItems: List<JsonListItem>? = null,
 )
 
 data class JsonContentTranslations(
@@ -53,6 +56,13 @@ data class JsonContentTranslations(
     val primaryActionText: String = "",
     val secondaryActionText: String = "",
     val actionText: String = "",
+    val listItems: Map<String, JsonListItemTranslation>? = null,
+)
+
+data class JsonListItemTranslation(
+    val titleText: String = "",
+    val descriptionText: String? = "",
+    val primaryActionText: String? = "",
 )
 
 data class JsonMatchingRule(
@@ -65,10 +75,26 @@ data class JsonTargetPercentile(
     val before: Float?,
 )
 
+data class JsonListItem(
+    val id: String,
+    val type: String,
+    val titleText: String,
+    val descriptionText: String?,
+    val placeholder: String? = "",
+    val primaryAction: JsonMessageAction?,
+    val primaryActionText: String? = "",
+    val matchingRules: List<Int>? = emptyList(),
+    val exclusionRules: List<Int>? = emptyList(),
+    val itemIDs: List<String>? = emptyList(),
+    val imageUrl: String? = null,
+)
+
+@Suppress("ktlint:standard:class-naming")
 sealed class JsonMessageType(val jsonValue: String) {
     data object SMALL : JsonMessageType("small")
     data object MEDIUM : JsonMessageType("medium")
     data object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
     data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
     data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
+    data object CARDS_LIST : JsonMessageType("cards_list")
 }

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.app.firebutton.AutomaticDataClearingSettingsActivity">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/keyline_4"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <!-- Master Toggle -->
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/automaticClearingToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/dataClearingAutomaticallyClearDataToggle"
+                app:showSwitch="true" />
+
+            <!-- Options Container (shown/hidden based on master toggle) -->
+            <LinearLayout
+                android:id="@+id/optionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Tabs Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearTabsSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingOptionTabs"
+                    app:secondaryText="@string/dataClearingAutomaticTabsOptionDescription"
+                    app:showSwitch="true" />
+
+                <!-- Cookies and Site Data Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearDataSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingOptionData"
+                    app:secondaryText="@string/dataClearingAutomaticDataOptionDescription"
+                    app:showSwitch="true" />
+
+                <!-- Duck.ai Chats Toggle -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearDuckAiChatsSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/dataClearingDuckAiChats"
+                    app:secondaryText="@string/dataClearingAutomaticChatsOptionDescription"
+                    app:showSwitch="true" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Clear On... Setting -->
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/clearWhenSetting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/settingsAutomaticallyClearWhen"
+                    tools:secondaryText="App exit only" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

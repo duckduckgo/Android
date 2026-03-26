@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "aiChatImageUpload",
 )
-
 interface AIChatImageUploadFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

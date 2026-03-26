@@ -22,7 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -37,14 +37,14 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebAddAddressToCurrentUserProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebAddAddressToCurrentUserProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -60,13 +60,13 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"city": "New York", "state": "NY"}""",
             method = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addAddress("New York", "NY")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.addAddress("New York", "NY")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addAddress("New York", "NY")
+        verify(mockPirWebProfileStateHolder).addAddress("New York", "NY")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -77,13 +77,13 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"city": "  Los Angeles  ", "state": "  CA  "}""",
             method = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addAddress("Los Angeles", "CA")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.addAddress("Los Angeles", "CA")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addAddress("Los Angeles", "CA")
+        verify(mockPirWebProfileStateHolder).addAddress("Los Angeles", "CA")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -99,7 +99,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -115,7 +115,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -131,7 +131,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -147,7 +147,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -163,7 +163,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -179,7 +179,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -195,7 +195,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -206,13 +206,13 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"city": "New York", "state": "NY"}""",
             method = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.addAddress("New York", "NY")).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.addAddress("New York", "NY")).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).addAddress("New York", "NY")
+        verify(mockPirWebProfileStateHolder).addAddress("New York", "NY")
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -228,7 +228,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -244,7 +244,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -260,7 +260,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).addAddress(any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 }

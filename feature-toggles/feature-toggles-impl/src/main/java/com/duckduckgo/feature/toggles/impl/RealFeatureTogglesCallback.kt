@@ -27,11 +27,11 @@ import com.duckduckgo.feature.toggles.impl.FeatureTogglesPixelName.EXPERIMENT_EN
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import okio.ByteString.Companion.encode
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import okio.ByteString.Companion.encode
 
 @ContributesBinding(AppScope::class)
 class RealFeatureTogglesCallback @Inject constructor(

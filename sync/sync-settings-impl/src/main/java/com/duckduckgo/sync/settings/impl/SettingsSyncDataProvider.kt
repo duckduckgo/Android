@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.settings.impl
 
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
@@ -29,9 +30,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.*
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SettingsSyncDataProvider @Inject constructor(

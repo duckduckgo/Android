@@ -20,6 +20,7 @@ plugins {
     id 'com.squareup.anvil'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -34,7 +35,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics-api')
@@ -46,7 +47,9 @@ dependencies {
     implementation project(':data-store-api')
     testImplementation project(':feature-toggles-test')
     implementation project(path: ':settings-api') // temporary until we release new settings
-    implementation project(':library-loader-api')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':saved-sites-api')
+    implementation project(':cookies-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -134,12 +137,11 @@ android {
         }
     }
     sourceSets {
-        test.assets.srcDirs += files("$projectDir/schemas".toString())
+        test.assets.srcDirs += files("$projectDir/schemas")
     }
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 tasks.register('installForAutofillTesting', Exec) {

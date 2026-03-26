@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +9,8 @@
     android:paddingTop="5dp"
     android:paddingRight="10dp"
     android:paddingBottom="5dp"
-    android:background="@color/gray0">
+    android:background="@color/gray0"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/ddgIcon"

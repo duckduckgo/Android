@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Koble til nå</string>
     <string name="netpNotificationSnoozeTitle">VPN slumrer</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN kobler til igjen %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN ble frakoblet på grunn av et utløpt abonnement. Abonner på Privacy Pro for å koble til DuckDuckGo-VPN igjen.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN ble frakoblet på grunn av et utløpt abonnement. Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-lokasjon</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN ble frakoblet på grunn av et utløpt abonnement</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonner på Privacy Pro for å koble til DuckDuckGo-VPN igjen.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Abonner</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Avvis</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Inkompatible med VPN-er</string>
     <string name="netpExclusionListAutoExcludeDescription">Noen apper, som bank- eller strømmeapper, fungerer ikke så godt med VPN. Når denne innstillingen er aktivert, ekskluderer vi disse appene automatisk.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN ble frakoblet på grunn av et utløpt abonnement. Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
 </resources>

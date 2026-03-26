@@ -194,7 +194,7 @@
     <string name="netpNotificationCTAReconnectNow">Połącz się ponownie</string>
     <string name="netpNotificationSnoozeTitle">Wstrzymano VPN</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN połączy się ponownie o %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">Sieć VPN została rozłączona z powodu wygasłej subskrypcji. Subskrybuj Privacy Pro, aby ponownie połączyć się z siecią DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">Sieć VPN została rozłączona z powodu wygasłej subskrypcji. Subskrybuj DuckDuckGo, aby ponownie połączyć się z siecią VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Lokalizacja VPN</string>
@@ -206,7 +206,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">Sieć VPN została rozłączona z powodu wygasłej subskrypcji</string>
-    <string name="netpDialogVpnAccessRevokedBody">Subskrybuj Privacy Pro, aby ponownie połączyć się z siecią VPN DuckDuckGo.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Subskrybuj DuckDuckGo, aby ponownie połączyć się z siecią VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Subskrybuj</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Odrzuć</string>
 
@@ -264,7 +264,4 @@
     <string name="netpExclusionListLabelAutoExclude">Niezgodne z VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Niektóre aplikacje, na przykład bankowe czy streamingowe, nie współpracują dobrze z sieciami VPN. Po włączeniu tego ustawienia aplikacje będą automatycznie wykluczane.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">Sieć VPN została rozłączona z powodu wygasłej subskrypcji. Subskrybuj DuckDuckGo, aby ponownie połączyć się z siecią VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Subskrybuj DuckDuckGo, aby ponownie połączyć się z siecią VPN.</string>
 </resources>

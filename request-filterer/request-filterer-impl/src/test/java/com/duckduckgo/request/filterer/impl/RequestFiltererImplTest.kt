@@ -27,7 +27,6 @@ import com.duckduckgo.request.filterer.impl.RequestFiltererImpl.Companion.ORIGIN
 import com.duckduckgo.request.filterer.impl.RequestFiltererImpl.Companion.REFERER
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
 import com.duckduckgo.request.filterer.store.SettingsEntity
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -40,6 +39,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RequestFiltererImplTest {

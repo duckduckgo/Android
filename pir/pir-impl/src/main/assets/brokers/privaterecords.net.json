@@ -1,0 +1,212 @@
+{
+  "name": "PrivateRecords",
+  "url": "privaterecords.net",
+  "version": "0.2.0",
+  "parent": "privatereports.com",
+  "optOutUrl": "https://www.privaterecords.net/optOut/name/landing",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.privaterecords.net/name/search-result",
+          "id": "4ccf82e4-9cce-439a-8f37-7371cf762c2a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#bottomModifySearch"
+            }
+          ],
+          "id": "a29d23be-7b9a-4bcd-b2a8-a9d8845ba8f1"
+        },
+        {
+          "actionType": "fillForm",
+          "dataSource": "userProfile",
+          "selector": "#bottomModifySearch",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName-bottom"
+            },
+            {
+              "type": "middleName",
+              "selector": "#middleName-bottom"
+            },
+            {
+              "type": "lastName",
+              "selector": "#lastName-bottom"
+            },
+            {
+              "type": "city",
+              "selector": "#city-bottom"
+            },
+            {
+              "type": "state",
+              "selector": "#state-bottom"
+            }
+          ],
+          "id": "95e0ff96-f62e-48d9-9582-6f47beadfa4f"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#ux-2"
+            }
+          ],
+          "id": "cdba1374-4bdd-41c3-b1fb-a135c6accd37"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "4bbef0f6-c9d8-43cc-ae7c-4fe05b4f7f63"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.cityState']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": "button[class~='btn-primary']"
+                }
+              ],
+              "id": "b2b68035-3aae-44a4-9192-439dac6a055d"
+            }
+          ],
+          "id": "71a3bfd1-46a5-4e7d-b921-6af65f7bb9cb"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "12a1ecdf-1ac5-481b-bad8-ae6bdd5307c7"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//div[@data-key='comp.name-search.rule.question.reSearch.moreThanAge']",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "click",
+              "choices": [
+                {
+                  "condition": {
+                    "left": "${age}",
+                    "operation": ">=",
+                    "right": "45"
+                  },
+                  "elements": [
+                    {
+                      "type": "button",
+                      "selector": "//button[contains(text(), 'Yes')]"
+                    }
+                  ]
+                }
+              ],
+              "default": {
+                "elements": [
+                  {
+                    "type": "button",
+                    "selector": "//button[contains(text(), 'No')]"
+                  }
+                ]
+              },
+              "id": "0ef8122f-6f95-4a08-a6e5-38a7a3ec4b7e"
+            }
+          ],
+          "id": "98837eb7-ddb2-4f6b-868c-a1c1d33da9f1"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "d15713e6-afb2-4992-b301-4f93df869696"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".result .more",
+              "multiple": true,
+              "failSilently": true
+            }
+          ],
+          "id": "4e6bc82a-28c3-4203-81c1-75b1327893fc"
+        },
+        {
+          "actionType": "extract",
+          "selector": "//li[contains(@class, 'searchedPerson')]",
+          "noResultsSelector": "//div[contains(text(), 'unable to find')]|//h2[contains(text(), 'too many results')]",
+          "profile": {
+            "name": {
+              "selector": ".//a/div[1]//h3"
+            },
+            "age": {
+              "selector": ".//a/div[1]//h4",
+              "afterText": "Age:"
+            },
+            "relativesList": {
+              "selector": ".//strong[contains(text(), 'relative')]/following-sibling::text()",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".//strong[contains(text(), 'Locations:')]/following-sibling::text()",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "d94dd8dd-5723-4fe3-9c55-6529892bc07c"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "addedDatetime": 1738234793898,
+  "removedAt": null
+}

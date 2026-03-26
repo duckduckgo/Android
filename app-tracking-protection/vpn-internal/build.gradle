@@ -43,7 +43,7 @@ dependencies {
     implementation project(':app-tracking-api')
     implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':internal-features-api')
@@ -77,7 +77,6 @@ dependencies {
     implementation AndroidX.room.ktx
 
     implementation "com.frybits.harmony:harmony:_"
-    implementation "com.facebook.flipper:flipper:_"
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

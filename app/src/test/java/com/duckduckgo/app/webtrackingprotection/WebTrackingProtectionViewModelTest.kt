@@ -23,7 +23,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.test.runTest
@@ -57,12 +56,6 @@ internal class WebTrackingProtectionViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var mockWebTrackingProtectionsGridFeature: WebTrackingProtectionsGridFeature
-
-    @Mock
-    private lateinit var mockWebTrackingProtectionsGridFeatureToggle: Toggle
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -70,19 +63,15 @@ internal class WebTrackingProtectionViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockWebTrackingProtectionsGridFeature.self()).thenReturn(mockWebTrackingProtectionsGridFeatureToggle)
-
         testee = WebTrackingProtectionViewModel(
             mockGpc,
             mockFeatureToggle,
             mockPixel,
-            mockWebTrackingProtectionsGridFeature,
         )
     }
 
     @Test
     fun whenInitialisedThenGpgDisabled() = runTest {
-        whenever(mockWebTrackingProtectionsGridFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
         testee.viewState().test {
@@ -94,7 +83,6 @@ internal class WebTrackingProtectionViewModelTest {
 
     @Test
     fun whenGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
-        whenever(mockWebTrackingProtectionsGridFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(false)
 
@@ -107,7 +95,6 @@ internal class WebTrackingProtectionViewModelTest {
 
     @Test
     fun whenGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
-        whenever(mockWebTrackingProtectionsGridFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
@@ -143,8 +130,7 @@ internal class WebTrackingProtectionViewModelTest {
     }
 
     @Test
-    fun whenInitialisedAndGridEnabledThenProtectionsListPresent() = runTest {
-        whenever(mockWebTrackingProtectionsGridFeatureToggle.isEnabled()).thenReturn(true)
+    fun whenInitialisedThenProtectionsListPresent() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
@@ -152,20 +138,6 @@ internal class WebTrackingProtectionViewModelTest {
             val item = awaitItem()
             assertFalse(item.globalPrivacyControlEnabled)
             assertEquals(9, item.protectionItems.size)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInitialisedAndGridDisabledThenProtectionsListEmpty() = runTest {
-        whenever(mockWebTrackingProtectionsGridFeatureToggle.isEnabled()).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(false)
-        whenever(mockGpc.isEnabled()).thenReturn(true)
-
-        testee.viewState().test {
-            val item = awaitItem()
-            assertFalse(item.globalPrivacyControlEnabled)
-            assertEquals(0, item.protectionItems.size)
             cancelAndConsumeRemainingEvents()
         }
     }

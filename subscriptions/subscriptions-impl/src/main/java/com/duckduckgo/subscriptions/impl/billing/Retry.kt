@@ -16,8 +16,8 @@
 
 package com.duckduckgo.subscriptions.impl.billing
 
-import kotlin.time.Duration
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
 
 /**
  * Retries a given block of code according to the retry policy defined in [retryPolicy].

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -30,14 +31,12 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessag
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.R as CommonR
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -46,9 +45,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import com.duckduckgo.common.utils.R as CommonR
 
 @RunWith(AndroidJUnit4::class)
 @Config(manifest = Config.NONE)
@@ -59,6 +63,8 @@ class DownloadsViewModelTest {
 
     private val mockDownloadsRepository: DownloadsRepository = mock()
 
+    private val mockDownloadMenuStateProvider: DownloadMenuStateProvider = mock()
+
     private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
@@ -67,6 +73,7 @@ class DownloadsViewModelTest {
                 FakeTimeDiffFormatter(TODAY, RealTimeDiffFormatter(context)),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
+                mockDownloadMenuStateProvider,
             )
         model
     }
@@ -341,6 +348,41 @@ class DownloadsViewModelTest {
         testee.removeFromDownloadManager(downloadId)
 
         verify(mockDownloadsRepository).delete(downloadId)
+    }
+
+    @Test
+    fun whenSyncDownloadsThenStaleFinishedDownloadsAreRemoved() = runTest {
+        val existingFile = File.createTempFile("existing", ".jpg")
+        existingFile.deleteOnExit()
+        val staleItem = oneItem().copy(downloadId = 1L, filePath = "/non/existent/path/file.jpg")
+        val existingItem = oneItem().copy(downloadId = 2L, filePath = existingFile.absolutePath)
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(listOf(staleItem, existingItem))
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(listOf(existingItem)))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadsRepository).delete(listOf(1L))
+    }
+
+    @Test
+    fun whenSyncDownloadsThenInProgressDownloadsAreNotRemoved() = runTest {
+        val inProgressItem = oneItem().copy(downloadId = 1L, downloadStatus = STARTED, filePath = "/non/existent/path/file.jpg")
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(listOf(inProgressItem))
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(listOf(inProgressItem)))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadsRepository, never()).delete(listOf(1L))
+    }
+
+    @Test
+    fun whenSyncDownloadsThenDownloadsScreenViewedIsCalled() = runTest {
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(emptyList()))
+
+        testee.syncDownloads()
+
+        verify(mockDownloadMenuStateProvider).onDownloadsScreenViewed()
     }
 
     private fun oneItem() =

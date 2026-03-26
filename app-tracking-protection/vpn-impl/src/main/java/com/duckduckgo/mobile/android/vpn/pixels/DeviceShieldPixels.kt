@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.send
 import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
 import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
 import com.duckduckgo.mobile.android.vpn.feature.getDisabledProtectionForApp
@@ -33,6 +34,8 @@ import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableProtection
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedRemoveAppTP
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -41,8 +44,6 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.absoluteValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -673,18 +674,14 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didChooseToDisableTrackingProtectionFromDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.getSelectedDisableProtection()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.getSelectedDisableProtection()?.send()
         }
     }
 
     override fun didChooseToDisableOneAppFromDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.getSelectedDisableAppProtection()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.getSelectedDisableAppProtection()?.send()
         }
     }
 
@@ -769,12 +766,8 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didDisableAppProtectionFromDetail() {
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
-            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail()?.send()
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.send()
         }
     }
 
@@ -785,12 +778,8 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didDisableAppProtectionFromApps() {
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.getProtectionDisabledAppFromAll()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
-            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.getProtectionDisabledAppFromAll()?.send()
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.send()
         }
     }
 
@@ -804,9 +793,7 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.getSelectedRemoveAppTP()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.getSelectedRemoveAppTP()?.send()
         }
     }
 
@@ -968,9 +955,7 @@ class RealDeviceShieldPixels @Inject constructor(
             ),
         )
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.getPixelDefinitions()?.forEach {
-                firePixel(it.pixelName, it.params)
-            }
+            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.send()
         }
     }
 

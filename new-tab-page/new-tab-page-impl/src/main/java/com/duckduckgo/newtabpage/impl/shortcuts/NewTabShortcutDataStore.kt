@@ -25,11 +25,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.impl.shortcuts.RealNewTabShortcutData.Keys.SECTION_IS_ENABLED
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface NewTabShortcutDataStore {
     val isEnabled: Flow<Boolean>

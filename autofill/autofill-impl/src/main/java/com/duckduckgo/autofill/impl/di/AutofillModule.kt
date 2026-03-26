@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
@@ -26,7 +25,6 @@ import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
@@ -41,12 +39,15 @@ import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 
 @Module
 @ContributesTo(AppScope::class)
@@ -84,13 +85,17 @@ class AutofillModule {
     @Provides
     fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAutofillDatabase(context: Context): AutofillDatabase {
-        return Room.databaseBuilder(context, AutofillDatabase::class.java, "autofill.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*AutofillMigrations)
-            .build()
+    @SingleInstanceIn(AppScope::class)
+    fun provideAutofillDatabase(databaseProvider: DatabaseProvider): AutofillDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AutofillDatabase::class.java,
+            "autofill.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = AutofillMigrations,
+            ),
+        )
     }
 
     @Provides
@@ -103,22 +108,26 @@ class AutofillModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesAutofillEngagementDb(
-        context: Context,
-    ): AutofillEngagementDatabase {
-        return Room.databaseBuilder(context, AutofillEngagementDatabase::class.java, "autofill_engagement.db")
-            .addMigrations(*AutofillEngagementDatabase.ALL_MIGRATIONS)
-            .build()
+    fun providesAutofillEngagementDb(databaseProvider: DatabaseProvider): AutofillEngagementDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AutofillEngagementDatabase::class.java,
+            "autofill_engagement.db",
+            config = RoomDatabaseConfig(
+                migrations = AutofillEngagementDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesDomainTargetAppsDatabase(
-        context: Context,
-    ): DomainTargetAppsDatabase {
-        return Room.databaseBuilder(context, DomainTargetAppsDatabase::class.java, "autofill_domain_target_apps.db")
-            .addMigrations(*DomainTargetAppsDatabase.ALL_MIGRATIONS)
-            .build()
+    fun provideDomainTargetAppsDatabase(databaseProvider: DatabaseProvider): DomainTargetAppsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            DomainTargetAppsDatabase::class.java,
+            "autofill_domain_target_apps.db",
+            config = RoomDatabaseConfig(
+                migrations = DomainTargetAppsDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides

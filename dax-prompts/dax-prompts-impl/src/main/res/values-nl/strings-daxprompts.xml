@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="dax_prompt_browser_comparison_title" instruction="Title for the Browser Comparison section">Browservergelijking</string>
+    <string name="dax_prompt_browser_comparison_close" instruction="Content description for the X button">Sluiten</string>
+    <string name="dax_prompt_browser_comparison_message_title" instruction="Title for Dax message">DuckDuckGo heeft beveiligingen die andere browsers niet hebben.</string>
+    <string name="dax_prompt_browser_comparison_message_primary_button" instruction="This text is placed on a large button">Links openen met DuckDuckGo</string>
+    <string name="dax_prompt_browser_comparison_message_ghost_button" instruction="This text is placed on a large button">Later misschien</string>
+
+    <string name="dax_prompt_browser_comparison_item1" instruction="This text is placed in a table">Standaard privé zoeken</string>
+    <string name="dax_prompt_browser_comparison_item2" instruction="This text is placed in a table">Blokkeer trackers van derden</string>
+    <string name="dax_prompt_browser_comparison_item3" instruction="This text is placed in a table">Blokkeer cookiepop-ups</string>
+    <string name="dax_prompt_browser_comparison_item4" instruction="This text is placed in a table">Blokkeer gerichte advertenties</string>
+</resources>

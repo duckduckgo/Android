@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -39,6 +40,9 @@ interface JobSchedulingDao {
     @Query("SELECT * FROM pir_optout_job_record ORDER BY attemptCount")
     fun getAllOptOutJobRecords(): List<OptOutJobRecordEntity>
 
+    @Query("SELECT * FROM pir_optout_job_record WHERE brokerName = :brokerName ORDER BY attemptCount")
+    fun getAllOptOutJobRecordsForBroker(brokerName: String): List<OptOutJobRecordEntity>
+
     @Query("SELECT * FROM pir_optout_job_record ORDER BY attemptCount")
     fun getAllOptOutJobRecordsFlow(): Flow<List<OptOutJobRecordEntity>>
 
@@ -47,8 +51,8 @@ interface JobSchedulingDao {
 
     @Query(
         """
-        UPDATE pir_scan_job_record 
-        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis 
+        UPDATE pir_scan_job_record
+        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis, deprecated = :deprecated
         WHERE brokerName = :brokerName AND userProfileId = :profileQueryId
     """,
     )
@@ -57,7 +61,20 @@ interface JobSchedulingDao {
         profileQueryId: Long,
         newStatus: String,
         newLastScanDateMillis: Long,
+        deprecated: Boolean,
     )
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE emailConfirmationLink = '' AND deprecated == 0 ORDER BY linkFetchAttemptCount")
+    fun getAllActiveEmailConfirmationJobRecordsWithNoLink(): List<EmailConfirmationJobRecordEntity>
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE emailConfirmationLink != '' AND deprecated == 0 order BY jobAttemptCount")
+    fun getAllActiveEmailConfirmationJobRecordsWithLink(): List<EmailConfirmationJobRecordEntity>
+
+    @Query("SELECT * FROM pir_email_confirmation_job_record WHERE extractedProfileId = :extractedProfileId")
+    fun getEmailConfirmationJobRecord(extractedProfileId: Long): EmailConfirmationJobRecordEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveEmailConfirmationJobRecord(emailConfirmationJobRecordEntity: EmailConfirmationJobRecordEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecordEntity)
@@ -71,9 +88,89 @@ interface JobSchedulingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveScanJobRecords(scanJobRecords: List<ScanJobRecordEntity>)
 
+    @Query("DELETE FROM pir_email_confirmation_job_record WHERE extractedProfileId = :extractedProfileId")
+    fun deleteEmailConfirmationJobRecord(extractedProfileId: Long)
+
     @Query("DELETE from pir_scan_job_record")
     fun deleteAllScanJobRecords()
 
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteScanJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Query("DELETE from pir_scan_job_record WHERE userProfileId IN (:profileQueryIds) AND status != 'MATCHES_FOUND'")
+    fun deleteScanJobRecordsWithoutMatchesForProfiles(profileQueryIds: List<Long>)
+
     @Query("DELETE from pir_optout_job_record")
     fun deleteAllOptOutJobRecords()
+
+    @Query("DELETE from pir_optout_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteOptOutJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Query("DELETE from pir_email_confirmation_job_record")
+    fun deleteAllEmailConfirmationJobRecords()
+
+    @Query("DELETE from pir_email_confirmation_job_record WHERE userProfileId IN (:profileQueryIds)")
+    fun deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds: List<Long>)
+
+    @Transaction
+    fun deleteJobRecordsForProfiles(profileQueryIds: List<Long>) {
+        deleteScanJobRecordsForProfiles(profileQueryIds)
+        deleteOptOutJobRecordsForProfiles(profileQueryIds)
+        deleteEmailConfirmationJobRecordsForProfiles(profileQueryIds)
+    }
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_sevenDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun updateSevenDayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_fourteenDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun update14DayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_twentyOneDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun update21DayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
+
+    @Query(
+        """
+    UPDATE pir_optout_job_record
+    SET reporting_fortyTwoDayConfirmationReportSentDateMs = :newDate
+    WHERE extractedProfileId = :extractedProfileId
+    """,
+    )
+    fun update42DayConfirmationReportSentDate(
+        extractedProfileId: Long,
+        newDate: Long,
+    )
+
+    @Transaction
+    fun deleteAll() {
+        deleteAllScanJobRecords()
+        deleteAllOptOutJobRecords()
+        deleteAllEmailConfirmationJobRecords()
+    }
 }

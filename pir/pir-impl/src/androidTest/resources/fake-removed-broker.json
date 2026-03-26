@@ -1,0 +1,110 @@
+{
+  "name": "FakeRemovedBroker",
+  "url": "fake-removed-broker.com",
+  "version": "0.7.0",
+  "addedDatetime": 1692572400000,
+  "optOutUrl": "https://fake-removed-broker.com/optout",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "removed-nav-scan-1",
+          "url": "https://www.fake-removed-broker.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "removed-extract-1",
+          "selector": "div[role='listitem']",
+          "noResultsSelector": ".no_results_container",
+          "profile": {
+            "name": {
+              "selector": "h3",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": "h3",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//div[contains(text(), 'Reside')]",
+              "afterText": "Resides in"
+            },
+            "profileUrl": {
+              "selector": "a",
+              "identifierType": "path",
+              "identifier": "https://www.fake-removed-broker.com/${firstName}-${lastName}/${state|stateFull}/${city|hyphenated}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "removed-nav-optout-1",
+          "url": "https://www.fake-removed-broker.com/optout"
+        },
+        {
+          "actionType": "expectation",
+          "id": "removed-expect-1",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#optout-form",
+              "parent": ".optout_container"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "removed-fill-1",
+          "selector": ".optout_container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='email']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='url']"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "removed-click-1",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".submit-button"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "removed-expect-2",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Request submitted"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": 1700000000000
+}

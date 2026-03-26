@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "aiChatQueryDetectionFeature",
 )
-
 interface AIChatQueryDetectionFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

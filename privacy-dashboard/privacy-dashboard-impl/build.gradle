@@ -35,13 +35,12 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':statistics-api')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':browser-api')
     implementation project(':autoconsent-api')
     implementation project(':app-build-config-api')
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
-    implementation project(':privacy-protections-popup-api')
     implementation project(':broken-site-api')
     api AndroidX.dataStore.preferences
 

@@ -37,10 +37,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,

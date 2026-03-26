@@ -6,11 +6,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import java.net.InetAddress
 import junit.framework.TestCase.assertEquals
 import okhttp3.Dns
 import org.junit.Assert
 import org.junit.Test
+import java.net.InetAddress
 
 @SuppressLint("DenyListedApi") // setRawStoredState
 class VpnLocalDnsImplTest {
@@ -43,7 +43,8 @@ class VpnLocalDnsImplTest {
     private val vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java).apply {
         localVpnControllerDns().setRawStoredState(defaultState)
     }
-    private val vpnLocalDns = VpnLocalDnsModule.provideVpnLocalDns(vpnRemoteFeatures, moshi, defaultDns)
+    private val vpnExcludedDomainsFallback = RealVPNExcludedDomainsFallback()
+    private val vpnLocalDns = VpnLocalDnsImpl(vpnRemoteFeatures, moshi, defaultDns, vpnExcludedDomainsFallback)
 
     @Test(expected = NotImplementedError::class)
     fun `lookup uses default DNS when feature is disabled and looking up domains other than VPN controller`() {

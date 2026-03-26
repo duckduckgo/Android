@@ -24,10 +24,10 @@ import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 interface InternalNavigationHistory : NavigationHistory {
     suspend fun clearOldEntries()
@@ -45,6 +45,7 @@ class RealNavigationHistory @Inject constructor(
     override suspend fun saveToHistory(
         url: String,
         title: String?,
+        tabId: String,
     ) {
         if (!historyFeature.shouldStoreHistory || !isHistoryUserEnabled()) {
             return
@@ -52,7 +53,7 @@ class RealNavigationHistory @Inject constructor(
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         val query = if (ddgUrl) duckDuckGoUrlDetector.extractQuery(url) else null
 
-        historyRepository.saveToHistory(url, title, query, query != null)
+        historyRepository.saveToHistory(url, title, query, query != null, tabId)
     }
 
     override fun getHistory(): Flow<List<HistoryEntry>> {
@@ -90,5 +91,9 @@ class RealNavigationHistory @Inject constructor(
 
     override suspend fun hasHistory(): Boolean {
         return historyRepository.hasHistory()
+    }
+
+    override suspend fun removeHistoryForTab(tabId: String) {
+        historyRepository.removeHistoryForTab(tabId)
     }
 }

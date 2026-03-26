@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.newaddressbaroption.RealNewAddressBarOptionManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,6 +33,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
@@ -51,8 +52,6 @@ class OnboardingViewModelTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
-
     private val newAddressBarOptionManager: RealNewAddressBarOptionManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
@@ -62,7 +61,6 @@ class OnboardingViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
-            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
             newAddressBarOptionManager = newAddressBarOptionManager,
         )
     }
@@ -95,44 +93,17 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenInitializePagesCalledAndBbExperimentEnabledThenBuildBbPageBlueprints() = runTest {
-        whenever(onboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
-        whenever(onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
-        testee.initializePages()
-
-        verify(onboardingDesignExperimentManager).enroll()
-        verify(pageLayout).buildPageBlueprintsBb()
-    }
-
-    @Test
-    fun whenInitializePagesCalledAndBuckExperimentEnabledThenBuildBuckPageBlueprints() = runTest {
-        whenever(onboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
-        whenever(onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-
-        testee.initializePages()
-
-        verify(onboardingDesignExperimentManager).enroll()
-        verify(pageLayout).buildPageBlueprintsBuck()
-    }
-
-    @Test
-    fun whenInitializePagesCalledAndNoExperimentEnabledThenBuildDefaultPageBlueprints() = runTest {
-        whenever(onboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
-        whenever(onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-
-        testee.initializePages()
-
-        verify(onboardingDesignExperimentManager).enroll()
-        verify(pageLayout).buildPageBlueprints()
-    }
-
-    @Test
     fun whenDevOnlyFullyCompleteAllOnboardingCalledThenMarkOnboardingAsCompletedAndSetAsShown() = runTest {
         testee.devOnlyFullyCompleteAllOnboarding()
 
         verify(onboardingSkipper).markOnboardingAsCompleted()
         verify(newAddressBarOptionManager).setAsShown()
+    }
+
+    @Test
+    fun whenInitializePagesCalledThenBuildPageBlueprints() {
+        testee.initializePages()
+        verify(pageLayout).buildPageBlueprints()
     }
 
     private fun configureSkipperFlow() = runTest {

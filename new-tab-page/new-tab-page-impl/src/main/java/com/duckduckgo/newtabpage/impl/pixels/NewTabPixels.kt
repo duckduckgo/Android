@@ -26,9 +26,9 @@ import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 interface NewTabPixels {
     // Engagement pixels https://app.asana.com/0/72649045549333/1207667088727866/f
@@ -92,6 +92,8 @@ class RealNewTabPixels @Inject constructor(
             }
             pixel.fire(NewTabPixelNames.NEW_TAB_DISPLAYED)
             pixel.fire(pixel = NewTabPixelNames.NEW_TAB_DISPLAYED_UNIQUE, type = Daily(), parameters = paramsMap)
+            pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED)
+            pixel.fire(pixel = NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY, type = Daily())
         }
     }
 

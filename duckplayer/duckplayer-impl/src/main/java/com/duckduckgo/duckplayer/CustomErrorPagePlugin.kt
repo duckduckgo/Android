@@ -20,8 +20,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayerPageSettingsPlugin
 import com.duckduckgo.duckplayer.impl.DuckPlayerFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class CustomErrorPagePlugin @Inject constructor(

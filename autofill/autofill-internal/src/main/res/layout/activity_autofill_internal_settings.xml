@@ -99,6 +99,10 @@
             app:primaryText="@string/autofillDevSettingsClearLogins"
             tools:secondaryText="@string/autofillDevSettingsClearLoginsSubtitle" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/importPasswordsSectionTitle"
             android:layout_width="match_parent"
@@ -144,7 +148,6 @@
             android:layout_height="wrap_content"
             app:primaryText="@string/autofillDevSettingsSimulatePasswordsImportedTitle"
             app:secondaryText="@string/autofillDevSettingsSimulatePasswordsImportedInstruction" />
-
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"

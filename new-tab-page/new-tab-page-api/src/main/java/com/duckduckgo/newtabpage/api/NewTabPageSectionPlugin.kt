@@ -22,7 +22,7 @@ import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
  * This class is used to provide each of the Sections that build the New Tab Page
- * Implementation of https://app.asana.com/0/1174433894299346/12070643725750
+ * Implementation of https://app.asana.com/1/137249556945/project/72649045549333/task/1207111396655548?focus=true
  */
 interface NewTabPageSectionPlugin : ActivePlugin {
 

@@ -32,11 +32,11 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.S
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataProvider.DashboardBrokerMatch
 import com.squareup.anvil.annotations.ContributesMultibinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = ActivityScope::class,
@@ -103,6 +103,7 @@ class PirWebMaintenanceScanStatusMessageHandler @Inject constructor(
     private suspend fun getCompletedOptOuts(): List<PirWebMessageResponse.ScanResult> {
         return statusProvider.getRemovedOptOuts().map {
             PirWebMessageResponse.ScanResult(
+                id = it.result.extractedProfile.dbId,
                 dataBroker = DataBroker(
                     name = it.result.broker.name,
                     url = it.result.broker.url,
@@ -131,6 +132,7 @@ class PirWebMaintenanceScanStatusMessageHandler @Inject constructor(
     private suspend fun getInProgressOptOuts(): List<PirWebMessageResponse.ScanResult> {
         return statusProvider.getInProgressOptOuts().map {
             PirWebMessageResponse.ScanResult(
+                id = it.extractedProfile.dbId,
                 dataBroker = DataBroker(
                     name = it.broker.name,
                     url = it.broker.url,

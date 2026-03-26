@@ -30,23 +30,29 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.impl.store.PirEventsRepository
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalResultsBinding
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEmailResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
+import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirExtractedProfilesResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirResultsScreenParams::class)
 class PirResultsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var eventsRepository: PirEventsRepository
+
+    @Inject
+    lateinit var pirRepository: PirRepository
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -86,8 +92,59 @@ class PirResultsActivity : DuckDuckGoActivity() {
                 showOptOutResults()
             }
 
+            is PirEmailResultsScreen -> {
+                setTitle(R.string.pirDevViewEmailResults)
+                showEmailResults()
+            }
+
+            is PirExtractedProfilesResultsScreen -> {
+                setTitle(R.string.pirDevViewExtractedProfiles)
+                showExtractedProfiles()
+            }
+
             null -> {}
         }
+    }
+
+    private fun showEmailResults() {
+        eventsRepository.getAllEmailConfirmationLogFlow().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { emailEvents ->
+                emailEvents.map { result ->
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.append("Time: ${formatter.format(Date(result.eventTimeInMillis))}\n")
+                    stringBuilder.append("EVENT: ${result.eventType}\n")
+                    stringBuilder.append("RESULT: ${result.value}\n")
+                    stringBuilder.toString()
+                }.also {
+                    render(it)
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun showExtractedProfiles() {
+        pirRepository.getAllExtractedProfilesFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { extractedProfiles ->
+                extractedProfiles.map { profile ->
+                    val stringBuilder = StringBuilder()
+                    stringBuilder.append("ID: ${profile.dbId}\n")
+                    stringBuilder.append("PROFILE QUERY ID: ${profile.profileQueryId}\n")
+                    stringBuilder.append("BROKER: ${profile.brokerName}\n")
+                    stringBuilder.append("NAME: ${profile.name}\n")
+                    stringBuilder.append("FULL NAME: ${profile.fullName}\n")
+                    stringBuilder.append("AGE: ${profile.age}\n")
+                    stringBuilder.append("ADDRESSES: ${profile.addresses.joinToString { "${it.city}, ${it.state}" }}\n")
+                    stringBuilder.append("RELATIVES: ${profile.relatives.joinToString()}\n")
+                    stringBuilder.append("PROFILE URL: ${profile.profileUrl}\n")
+                    stringBuilder.append("IDENTIFIER: ${profile.identifier}\n")
+                    stringBuilder.append("DEPRECATED: ${profile.deprecated}\n")
+                    stringBuilder.toString()
+                }.also {
+                    render(it)
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun showOptOutResults() {
@@ -151,4 +208,6 @@ sealed class PirResultsScreenParams : ActivityParams {
     data object PirEventsResultsScreen : PirResultsScreenParams()
     data object PirScanResultsScreen : PirResultsScreenParams()
     data object PirOptOutResultsScreen : PirResultsScreenParams()
+    data object PirEmailResultsScreen : PirResultsScreenParams()
+    data object PirExtractedProfilesResultsScreen : PirResultsScreenParams()
 }

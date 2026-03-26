@@ -35,11 +35,10 @@ import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.RemoveCookies
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -50,6 +49,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @RunWith(Parameterized::class)
 @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -62,6 +63,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock())
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private lateinit var testee: WebViewCookieManager
 
     companion object {
@@ -94,7 +96,7 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
 
         val removeCookiesStrategy = RemoveCookies(CookieManagerRemover(cookieManagerProvider), sqlCookieRemover)
 
-        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
+        testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider(), mockDuckAiHostProvider)
 
         fireproofedSites.map { url ->
             val domain = url.toUri().domain() ?: url

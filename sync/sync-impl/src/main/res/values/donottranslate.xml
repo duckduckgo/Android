@@ -20,7 +20,7 @@
     <string name="sync_internal_environment_header">Environment Settings</string>
     <string name="sync_internal_environment_title">Use Dev Environment?</string>
     <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>
-    <string name="sync_internal_environment_subtitle_dev">https://dev-sync-use.duckduckgo.com</string>
+    <string name="sync_internal_environment_subtitle_dev">https://sync-staging.duckduckgo.com</string>
     <string name="sync_internal_account_header">Account Settings</string>
     <string name="sync_internal_device_header">Device Settings</string>
     <string name="sync_internal_recovery_code">Recovery code</string>
@@ -29,5 +29,28 @@
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
+    <string name="sync_internal_promotions_header">Sync Promotions</string>
+    <string name="sync_internal_promotions_clear_history_bookmark_added_promo">Clear history (bookmark added dialog)</string>
+    <string name="sync_internal_promotions_clear_history_bookmark_screen_promo">Clear history (bookmark screen)</string>
+    <string name="sync_internal_promotions_clear_history_password_screen_promo">Clear history (password screen)</string>
+
+    <!-- Recover Data Screen -->
+    <string name="sync_recover_data_title">Recover Your Data Easily</string>
+    <string name="sync_recover_data_content">Use this code to restore your data if you lose access to this device. Sync &amp; Backup data can\'t be recovered after 18 months of inactivity.</string>
+    <string name="sync_recover_data_recovery_code_label">Recovery Code</string>
+    <string name="sync_recover_data_download_pdf">Download as PDF</string>
+    <string name="sync_restore_on_reinstall_title">Restore on App Reinstall</string>
+    <string name="sync_restore_on_reinstall_description">If you reinstall the DuckDuckGo app, we\'ll ask if you want to restore your data on this device.</string>
+
+    <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
+    <string name="sync_internal_block_store_write_recovery_code">Save Recovery Code to Persistent Storage</string>
+
+    <!-- Block Store -->
+    <string name="sync_internal_block_store_header">Persistent Storage / Block Store</string>
+    <string name="sync_internal_block_store_current_value_label">Current stored value (SyncRecovery key)</string>
+    <string name="sync_internal_block_store_recovery_code_hint">Recovery code</string>
+    <string name="sync_internal_block_store_device_id_hint">Device ID (optional, 8–64 chars)</string>
+    <string name="sync_internal_block_store_write">Write</string>
+    <string name="sync_internal_block_store_clear">Clear</string>
 
 </resources>

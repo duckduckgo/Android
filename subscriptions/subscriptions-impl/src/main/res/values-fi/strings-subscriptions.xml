@@ -20,6 +20,7 @@
     <string name="cancel">Peruuta</string>
     <string name="ok">OK</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo-tilaus</string>
     <string name="manageEmail">Hallinnoi sähköpostia</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Tilausta ei löytynyt</string>
     <string name="subscriptionNotFoundDescription">Tähän Google Play -tiliin liitetty tilaus ei ole enää voimassa.</string>
     <string name="purchaseRestored">Ostosi on palautettu.</string>
-    <string name="restoreSubscriptionTitle">Lisää Privacy Pro -tilauksesi tähän laitteeseen</string>
+    <string name="restoreSubscriptionTitle">Lisää tilauksesi tähän laitteeseen</string>
     <string name="restoreSubscriptionGooglePlayTitle">Lisää Google Play -tilin kautta</string>
     <string name="restoreSubscriptionGooglePlayDescription">Palauta tilauksesi Android-laitteissa käyttämällä Google Play -tiliäsi.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Palauta osto</string>
     <string name="restoreSubscriptionEmailTitle">Lisää sähköpostin kautta</string>
-    <string name="restoreSubscriptionEmailDescription">Lisää Privacy Pro tähän laitteeseen linkittämällä sähköpostiosoite tilaukseesi.</string>
+    <string name="restoreSubscriptionEmailDescription">Liitä sähköpostiosoite tilaukseesi lisätäksesi sen tähän laitteeseen.</string>
     <string name="restoreSubscriptionEmailGetStarted">Aloita</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Poista tilaus</string>
     <string name="subscriptionRemoved">Tilauksesi on poistettu tältä laitteelta</string>
     <string name="removeFromDevice">Poistetaanko tältä laitteelta?</string>
-    <string name="removeFromDeviceDescription">Et voi enää käyttää Privacy Pro -tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muilla laitteillasi.</string>
+    <string name="removeFromDeviceDescription">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muilla laitteillasi.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Kuukausitilauksesi %1$s %2$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Vuositilauksesi %1$s %2$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Tilauksesi päättyi %1$s.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Vuositilaus</string>
     <string name="renews">uusiutuu</string>
     <string name="expires">päättyy</string>
-    <string name="activateOnOtherDevices">Lisää Privacy Pro muihin laitteisiin</string>
+    <string name="activateOnOtherDevices">Lisää tilauksesi muihin laitteisiin</string>
     <string name="addToDevicePrimaryText">Lisää laitteeseen</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Lisää Privacy Pro muihin laitteisiisi Google Playn kautta tai linkittämällä sähköpostiosoite.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Privacy Pro &gt; Minulla on tilaus.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
     <string name="editEmailPrimaryText">Muokkaa sähköpostiosoitetta</string>
     <string name="learnMore">Lue lisää</string>
-    <string name="privacyProFaq">Tarvitsetko apua Privacy Pron kanssa?</string>
-    <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä Privacy Pron tukeen ohjesivuiltamme. Ominaisuuden saatavuus vaihtelee maittain.</string>
+    <string name="privacyProFaq">Tarvitsetko apua tilauksesi kanssa?</string>
+    <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä tilaustukeen ohjesivujemme kautta. Ominaisuuden saatavuus vaihtelee maittain.</string>
     <string name="subscriptionStatusSubscribed">Tilattu</string>
     <string name="privacyPolicyAndTermsOfService">Tietosuojakäytäntö ja palveluehdot</string>
     <string name="subscriptionStatusFreeTrial">Ilmainen kokeilujakso on aktiivinen</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tilauksen asetukset</string>
-    <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja identiteettisi Privacy Prolla</string>
+    <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Tilaajat saavat VPN:n, Personal Information Removalin ja Identity Theft Restorationin.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Tilaajat saavat VPN:n ja Identity Theft Restorationin.</string>
 
-    <string name="subscriptionSettingGet">Hanki Privacy Pro</string>
-    <string name="subscriptionSettingTryFreeTrial">Kokeile Privacy Pro -tilausta ilmaiseksi</string>
+    <string name="subscriptionSettingGet">Tilaa DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrial">Kokeile maksutta</string>
     <string name="subscriptionSettingRestore">Minulla on tilaus</string>
-    <string name="subscriptionSettingExpired">Privacy Pro -tilauksesi on päättynyt</string>
+    <string name="subscriptionSettingExpired">DuckDuckGo-tilauksesi on päättynyt</string>
     <string name="subscriptionSettingExpiredViewPlans">Näytä tilaukset</string>
     <string name="subscriptionSettingSectionSubscription">Tilaus</string>
     <string name="subscriptionSettingRemoveFromDevice">Poista tältä laitteelta</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Apu ja tuki</string>
     <string name="subscriptionSettingSendFeedback">Lähetä palautetta</string>
     <string name="subscriptionSettingActivating">Aktivoidaan</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Säästä %1$s%% vuositilauksella</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">Paras ale</string>
+    <string name="subscriptionSettingSwitchDowngrade">Vaihda sopimusta</string>
+    <string name="subscriptionSettingManagePlan">Hallinnoi maksua</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Kaikki on valmista.</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Tilauksesi on ostettu Applen App Storesta. Jos haluat muuttaa tilaustasi tai laskutusasetuksiasi, siirry kohtaan Asetukset &gt; Apple-tili &gt; Tilaukset sillä laitteella, jolla on kirjauduttu samalle Apple-tilille, jota käytit tilauksesi ostamiseen.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Aktivoi Privacy Pro tietokoneella Personal Information Removalin asentamiseksi</string>
-    <string name="pirDescription">Avaa ensin tietokoneen DuckDuckGo-selain, siirry kohtaan <b>Asetukset &gt; Privacy Pro</b> ja klikkaa <b>Minulla on tilaus</b>.</string>
+    <string name="pirTitle">Aktivoi DuckDuckGo-tilaus tietokoneella Personal Information Removalin asettamiseksi.</string>
+    <string name="pirDescription">Avaa tietokoneen DuckDuckGo-selaimessa <b>Asetukset &gt; DuckDuckGo-tilaus</b> ja aloita napsauttamalla <b>Minulla on tilaus</b>.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Soitto neuvonantajalle ei auttanut</string>
     <string name="feedbackSubCategoryItrOther">Muu</string>
 
-    <string name="feedbackSubCategorySubsOtp">Kertakäyttöinen salasana</string>
-    <string name="feedbackSubCategorySubsOther">Muu</string>
+    <string name="feedbackSubCategorySubsOtp">Ongelma kertakäyttöisen salasanan kanssa</string>
+    <string name="feedbackSubCategorySubsOther">Jotain muuta</string>
 
     <string name="feedbackSubmitVpnHeader">Kohtasitko ongelman, jota ei löydy <annotation type="faqs_link">ohjekeskuksestamme</annotation>? Me haluamme ehdottomasti tietää siitä.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Kerro meille, mitä tapahtuu...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Edellä annettujen tietojen lisäksi lähetämme palautteesi mukana joitakin anonymisoituja tietoja:\n\n• tieto siitä, ovatko jotkin selaimen ominaisuudet aktiivisia\n• yhdistetty sovellusdiagnostiikka (esim. virhekoodit).\n\nKlikkaamalla Lähetä hyväksyt, että DuckDuckGo voi käyttää lähetettyjä tietoja sovelluksen parantamiseen."</string>
     <string name="feedbackSubmitVpnSubmit">Lähetä</string>
     <string name="feedbackSubmitCompletedMessage">Kiitos! Palaute lähetetty.</string>
-    <string name="feedbackSubmitFailedMessage">Jokin meni pieleen</string>
-
-    <string name="feedbackSubmitEmailByLine">Anna sähköpostiosoite, jos haluat meidän ottavan sinuun yhteyttä tästä ongelmasta (emme ehkä pysty vastaamaan kaikkiin ongelmiin):</string>
-    <string name="feedbackSubmitEmailHint">Sähköpostiosoite (valinnainen)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Anna meille palautetta...</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Minkä ominaisuuden haluaisit nähdä?</string>
+    <string name="feedbackSubmitContactSupport">Tarvitsetko apua? <annotation type="support_link">Ota yhteyttä tukeen</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Tilaukset</string>
     <string name="activitySubscriptionSettings">Tilauksen asetukset</string>
     <string name="activityActivateSubscription">Minulla on tilaus</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo-tilaus</string>
-    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-tilauksesi on päättynyt</string>
-    <string name="privacyProFaqRebranding">Tarvitsetko apua tilauksesi kanssa?</string>
-    <string name="privacyProFaqSecondaryRebranding">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä tilaustukeen ohjesivujemme kautta. Ominaisuuden saatavuus vaihtelee maittain.</string>
-    <string name="restoreSubscriptionTitleRebranding">Lisää tilauksesi tähän laitteeseen</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Liitä sähköpostiosoite tilaukseesi lisätäksesi sen tähän laitteeseen.</string>
-    <string name="activateOnOtherDevicesRebranding">Lisää tilauksesi muihin laitteisiin</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro on nyt nimeltään DuckDuckGo-tilaus</string>
-    <string name="subscriptionSettingSubscribeRebranding">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muissa laitteissasi.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">En voi käyttää Duck.ai:ta muissa selaimissa tilauksellani.</string>
     <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai -palaute</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo-tilaus</string>
     <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
 
-    <string name="subscriptionSettingGetRebranding">Tilaa DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Kokeile maksutta</string>
     <string name="feedbackGeneralSubscription">Tilaus</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Säästä %1$s %%\nvuositilauksella!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Vuositilaus maksaa vain %1$s/kk verrattuna nykyiseen %2$s kuukausitilaukseesi.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Vaihda vuositilaukseen (%1$s/ vuosi)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Pidä kuukausisopimus</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Säästät %1$s %%\nvuositilauksella!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Vaihtaminen nostaa kuukausihintasi %1$s/kk:sta %2$s/kk:een.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Säilytä vuosisuunnitelma</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Vaihda kuukausitilaukseen (%1$s/kk)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus- tai Pro-tason ominaisuuksia ei voi käyttää</string>
+    <string name="subscriptionsProUpgradeTitle">Päivitä Pro-versioon</string>
+    <string name="subscriptionsProUpgradeMessage">Ota käyttöön tehokkaampi tekoäly</string>
+    <string name="subscriptionSettingSectionManageSubscription">Hallitse tilausta</string>
+    <string name="subscriptionSettingViewAllPlans">Näytä kaikki tilaukset</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Hallitse maksua tai peruuta</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi päivittyy sopimukseen %1$s %2$s.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Sopimuksesi alenee tasolle %1$s alkaen %2$s.</string>
+    <string name="planNamePlusMonthly">Plus kuukausittain</string>
+    <string name="planNamePlusYearly">Plus vuosittain</string>
+    <string name="planNameProMonthly">Pro kuukausittain</string>
+    <string name="planNameProYearly">Pro vuosittain</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

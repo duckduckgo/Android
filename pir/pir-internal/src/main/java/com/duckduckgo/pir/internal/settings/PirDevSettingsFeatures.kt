@@ -17,17 +17,25 @@
 package com.duckduckgo.pir.internal.settings
 
 import android.content.Context
+import android.widget.Toast
 import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.internal.R
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @PriorityKey(InternalFeaturePlugin.PIR_SETTINGS_PRIO_KEY)
 class PirDevSettingsFeatures @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
+    private val pirRepository: PirRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
         return "PIR dev settings"
@@ -38,6 +46,17 @@ class PirDevSettingsFeatures @Inject constructor(
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        globalActivityStarter.start(activityContext, PirSettingsScreenNoParams)
+        // Check if PIR database is available before launching settings
+        CoroutineScope(dispatcherProvider.main()).launch {
+            if (pirRepository.isRepositoryAvailable()) {
+                globalActivityStarter.start(activityContext, PirSettingsScreenNoParams)
+            } else {
+                Toast.makeText(
+                    activityContext,
+                    R.string.pirDevSettingNotAvailableMessage,
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
+        }
     }
 }

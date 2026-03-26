@@ -24,12 +24,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 interface AppToDomainMapper {
     /**

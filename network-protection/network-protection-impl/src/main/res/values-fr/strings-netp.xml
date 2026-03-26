@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Reconnectez-vous maintenant</string>
     <string name="netpNotificationSnoozeTitle">Le VPN est en veille</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">Le VPN se reconnectera à %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN déconnecté en raison de l\'expiration de l\'abonnement. Abonnez-vous à Privacy Pro pour reconnecter le VPN DuckDuckGo.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN déconnecté en raison de l\'expiration de l\'abonnement. Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Localisation VPN</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN déconnecté en raison de l\'expiration de l\'abonnement</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonnez-vous à Privacy Pro pour reconnecter le VPN DuckDuckGo.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">S\'abonner</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Ignorer</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatible avec les VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Certaines applications, comme les applications bancaires ou de streaming, ne fonctionnent pas bien avec les VPN. Quand ce paramètre sera activé, nous exclurons automatiquement ces applications.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN déconnecté en raison de l\'expiration de l\'abonnement. Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
 </resources>

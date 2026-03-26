@@ -19,11 +19,11 @@ package com.duckduckgo.downloads.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 import logcat.logcat
 import okhttp3.ResponseBody
 import retrofit2.Call
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
 interface UrlFileDownloadCallManager {
     fun add(downloadId: Long, call: Call<ResponseBody>)

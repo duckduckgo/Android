@@ -37,19 +37,13 @@ import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
 import com.duckduckgo.cookies.store.toFeatureException
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
-import java.util.Locale
-import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -61,6 +55,13 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
+import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @RunWith(Parameterized::class)
 @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -74,6 +75,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
     private val userAllowListRepository = mock<UserAllowListRepository>()
     private val fireproofRepository = mock<FireproofRepository>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
     private lateinit var cookieModifier: FirstPartyCookiesModifier
 
     companion object {
@@ -106,6 +108,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             mock(),
             fireproofRepository,
             DefaultDispatcherProvider(),
+            mockDuckAiHostProvider,
         )
         val host = testCase.siteURL.toUri().host
 

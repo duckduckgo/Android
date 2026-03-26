@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 /**
@@ -116,6 +117,19 @@ interface AutofillFeature {
     fun canImportFromGooglePasswordManager(): Toggle
 
     /**
+     * Remote Flag that enables the ability to import bookmarks directly from Google Takeout
+     * @return `true` when the remote config has "canImportBookmarksFromGoogleTakeout" autofill sub-feature flag enabled
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun canImportBookmarksFromGoogleTakeout(): Toggle
+
+    /**
+     * Remote Flag that enables the ability to use web message listener during bookmark import flow from Google Takeout
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun canUseWebMessageListenerDuringBookmarkImport(): Toggle
+
+    /**
      * Remote flag that enables the ability to support partial form saves. A partial form save is common with scenarios like:
      *  - a multi-step login form where username and password are entered on separate pages
      *  - password reset flow
@@ -144,9 +158,6 @@ interface AutofillFeature {
     fun settingsScreen(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
-    fun createAsyncPreferences(): Toggle
-
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canPromoteImportPasswordsInPasswordManagement(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -163,4 +174,16 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canDetectSystemAutofillEngagement(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun prioritizeDomainMatchesOnSearch(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun useHarmony(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    fun sendSanitizedStackTraces(): Toggle
+
+    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
+    fun readFromHarmony(): Toggle
 }

@@ -34,6 +34,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -66,7 +67,7 @@ class SyncLoginViewModelTest {
     @Test
     fun whenProcessRecoveryCodeThenPerformLoginAndEmitResult() = runTest {
         whenever(syncRepostitory.parseSyncAuthCode(jsonRecoveryKeyEncoded)).thenReturn(Recovery(RecoveryCode(jsonRecoveryKey, primaryKey)))
-        whenever(syncRepostitory.processCode(any())).thenReturn(Success(true))
+        whenever(syncRepostitory.processCode(any(), anyOrNull())).thenReturn(Success(true))
 
         testee.commands().test {
             testee.onQRCodeScanned(jsonRecoveryKeyEncoded)

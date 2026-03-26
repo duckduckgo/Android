@@ -20,7 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
+import com.duckduckgo.app.browser.api.OmnibarRepository
+import com.duckduckgo.app.browser.menu.BrowserMenuDisplayRepository
+import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_DARK
@@ -28,82 +32,104 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
-import kotlin.to
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.to
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
+    private val urlDisplayRepository: UrlDisplayRepository,
+    private val browserMenuDisplayRepository: BrowserMenuDisplayRepository,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
+    private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
+    omnibarRepository: OmnibarRepository,
 ) : ViewModel() {
-
     data class ViewState(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val forceDarkModeEnabled: Boolean = false,
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
-        val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
+        val omnibarType: OmnibarType = OmnibarType.SINGLE_TOP,
         val isFullUrlEnabled: Boolean = true,
         val isTrackersCountInTabSwitcherEnabled: Boolean = true,
+        val isAddressBarTrackersAnimationEnabled: Boolean = true,
+        val shouldShowAddressBarTrackersAnimationItem: Boolean = false,
+        val hasExperimentalBrowserMenuOption: Boolean = false,
+        val useBottomSheetMenuEnabled: Boolean = false,
+        val shouldShowSplitOmnibarSettings: Boolean = false,
     )
 
     sealed class Command {
-        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
+        data class LaunchThemeSettings(
+            val theme: DuckDuckGoTheme,
+        ) : Command()
+
         data object LaunchAppIcon : Command()
+
         data object UpdateTheme : Command()
-        data class LaunchOmnibarPositionSettings(val position: OmnibarPosition) : Command()
+
+        data class LaunchOmnibarTypeSettings(
+            val omnibarType: OmnibarType,
+        ) : Command()
     }
 
-    private val viewState = MutableStateFlow(ViewState())
+    private val viewState = MutableStateFlow(
+        ViewState(
+            theme = themingDataStore.theme,
+            appIcon = settingsDataStore.appIcon,
+            forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
+            canForceDarkMode = canForceDarkMode(),
+            supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
+            omnibarType = settingsDataStore.omnibarType,
+            shouldShowSplitOmnibarSettings = omnibarRepository.isSplitOmnibarAvailable,
+            isAddressBarTrackersAnimationEnabled = settingsDataStore.showTrackersCountInAddressBar,
+        ),
+    )
+
+    fun viewState() = combine(
+        viewState,
+        urlDisplayRepository.isFullUrlEnabled,
+        browserMenuDisplayRepository.browserMenuState,
+        tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
+    ) { currentViewState, isFullUrlEnabled, browserMenuState, isTrackersAnimationTileHidden ->
+        val isAddressBarTrackersAnimationFeatureEnabled = addressBarTrackersAnimationManager.isFeatureEnabled()
+        currentViewState.copy(
+            isTrackersCountInTabSwitcherEnabled = !isTrackersAnimationTileHidden,
+            isFullUrlEnabled = isFullUrlEnabled,
+            hasExperimentalBrowserMenuOption = browserMenuState.hasOption,
+            useBottomSheetMenuEnabled = browserMenuState.isEnabled,
+            shouldShowAddressBarTrackersAnimationItem = isAddressBarTrackersAnimationFeatureEnabled,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, viewState.value)
+
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch {
-            viewState.update {
-                currentViewState().copy(
-                    theme = themingDataStore.theme,
-                    appIcon = settingsDataStore.appIcon,
-                    forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
-                    canForceDarkMode = canForceDarkMode(),
-                    supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
-                    omnibarPosition = settingsDataStore.omnibarPosition,
-                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
-                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
-                )
-            }
-        }
-    }
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
-    }
-
-    private fun canForceDarkMode(): Boolean {
-        return themingDataStore.theme != DuckDuckGoTheme.LIGHT
-    }
+    private fun canForceDarkMode(): Boolean = themingDataStore.theme != DuckDuckGoTheme.LIGHT
 
     fun userRequestedToChangeTheme() {
         viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
@@ -116,7 +142,7 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeAddressBarPosition() {
-        viewModelScope.launch { command.send(Command.LaunchOmnibarPositionSettings(viewState.value.omnibarPosition)) }
+        viewModelScope.launch { command.send(Command.LaunchOmnibarTypeSettings(viewState.value.omnibarType)) }
         pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_PRESSED)
     }
 
@@ -129,34 +155,31 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             themingDataStore.theme = selectedTheme
             withContext(dispatcherProvider.main()) {
-                viewState.update { currentViewState().copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
+                viewState.update { it.copy(theme = selectedTheme, forceDarkModeEnabled = canForceDarkMode()) }
                 command.send(Command.UpdateTheme)
             }
         }
 
         val pixelName =
             when (selectedTheme) {
-                LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
-                DARK -> SETTINGS_THEME_TOGGLED_DARK
-                SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
+                DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
+                DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
+                DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
     }
 
-    fun onOmnibarPositionUpdated(position: OmnibarPosition) {
+    fun onOmnibarTypeSelected(type: OmnibarType) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.omnibarPosition = position
-            viewState.update { currentViewState().copy(omnibarPosition = position) }
+            settingsDataStore.omnibarType = type
+            viewState.update { it.copy(omnibarType = type) }
 
-            when (position) {
-                OmnibarPosition.TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
-                OmnibarPosition.BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+            when (type) {
+                OmnibarType.SINGLE_TOP -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+                OmnibarType.SINGLE_BOTTOM -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_BOTTOM)
+                OmnibarType.SPLIT -> pixel.fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_SPLIT_TOP)
             }
         }
-    }
-
-    private fun currentViewState(): ViewState {
-        return viewState.value
     }
 
     fun onForceDarkModeSettingChanged(checked: Boolean) {
@@ -172,8 +195,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun onFullUrlSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.isFullUrlEnabled = checked
-            viewState.update { it.copy(isFullUrlEnabled = checked) }
+            urlDisplayRepository.setFullUrlEnabled(checked)
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
@@ -187,6 +209,31 @@ class AppearanceViewModel @Inject constructor(
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED, params)
+        }
+    }
+
+    fun onShowTrackersCountInAddressBarChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.showTrackersCountInAddressBar = checked
+            viewState.update { it.copy(isAddressBarTrackersAnimationEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_ADDRESS_BAR_TOGGLED, params)
+        }
+    }
+
+    fun onUseBottomSheetMenuChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            browserMenuDisplayRepository.setExperimentalMenuEnabled(checked)
+            if (checked) {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_ENABLED, type = Count)
+            } else {
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_DAILY, type = Daily())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED_UNIQUE, type = Unique())
+                pixel.fire(AppPixelName.EXPERIMENTAL_MENU_DISABLED, type = Count)
+            }
         }
     }
 }

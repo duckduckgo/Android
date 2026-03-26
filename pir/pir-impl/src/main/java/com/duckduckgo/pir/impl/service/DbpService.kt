@@ -49,13 +49,6 @@ interface DbpService {
     ): PirGetEmailResponse
 
     @PirAuthRequired
-    @GET("$BASE_URL/em/v0/links")
-    suspend fun getEmailStatus(
-        @Query("e") emailAddress: String,
-        @Query("attemptId") attemptId: String? = null,
-    ): PirGetEmailStatusResponse
-
-    @PirAuthRequired
     @POST("$BASE_URL/captcha/v0/submit")
     suspend fun submitCaptchaInformation(
         @Body body: PirStartCaptchaSolutionBody,
@@ -68,6 +61,18 @@ interface DbpService {
         @Query("transactionId") transactionId: String,
         @Query("attemptId") attemptId: String? = null,
     ): PirGetCaptchaSolutionResponse
+
+    @PirAuthRequired
+    @POST("$BASE_URL/em/v1/email-data")
+    suspend fun getEmailConfirmationLinkStatus(
+        @Body request: PirEmailConfirmationDataRequest,
+    ): PirGetEmailConfirmationLinkResponse
+
+    @PirAuthRequired
+    @POST("$BASE_URL/em/v1/email-data/delete")
+    suspend fun deleteEmailData(
+        @Body request: PirEmailConfirmationDataRequest,
+    )
 
     companion object {
         private const val BASE_URL = "https://dbp.duckduckgo.com/dbp"
@@ -121,11 +126,6 @@ interface DbpService {
         val pattern: String,
     )
 
-    data class PirGetEmailStatusResponse(
-        val link: String?,
-        val status: String,
-    )
-
     data class PirStartCaptchaSolutionBody(
         val siteKey: String,
         val url: String,
@@ -157,4 +157,36 @@ interface DbpService {
         val pollAttempts: Int,
         val error: Int,
     )
+
+    data class PirEmailConfirmationDataRequest(
+        val items: List<RequestEmailData>,
+    ) {
+        data class RequestEmailData(
+            val email: String,
+            val attemptId: String,
+        )
+    }
+
+    data class PirGetEmailConfirmationLinkResponse(
+        val items: List<ResponseItem>,
+    ) {
+        data class ResponseItem(
+            val email: String,
+            val attemptId: String,
+            val status: String,
+            @field:Json(name = "email_address_created_at")
+            val emailAddressCreatedAt: Long,
+            @field:Json(name = "email_received_at")
+            val emailReceivedAt: Long = 0L,
+            val data: List<ResponseItemData> = emptyList(),
+            @field:Json(name = "error_code")
+            val errorCode: String? = null,
+            val error: String? = null,
+        )
+
+        data class ResponseItemData(
+            val name: String,
+            val value: String,
+        )
+    }
 }

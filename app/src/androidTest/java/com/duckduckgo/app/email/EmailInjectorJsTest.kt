@@ -31,10 +31,10 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
-import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
+import java.io.BufferedReader
 
 class EmailInjectorJsTest {
 

@@ -20,9 +20,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface WebViewCompatContentScopeJSReader {
     suspend fun getContentScopeJS(): String

@@ -35,10 +35,10 @@ import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.CHROME
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.DDG
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.WEBVIEW
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealClientBrandHintProvider @Inject constructor(

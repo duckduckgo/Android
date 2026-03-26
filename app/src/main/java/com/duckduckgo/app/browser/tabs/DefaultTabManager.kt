@@ -25,19 +25,19 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
+import javax.inject.Inject
 
 interface TabManager {
     companion object {
-        const val MAX_ACTIVE_TABS = 20
+        const val MAX_ACTIVE_TABS = 15
     }
 
     fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)
     fun getSelectedTabId(): String?
-    fun onSelectedTabChanged(tabId: String)
+    suspend fun onSelectedTabChanged(tabId: String)
 
     suspend fun onTabsChanged(updatedTabIds: List<TabModel>)
     suspend fun switchToTab(tabId: String)
@@ -48,6 +48,7 @@ interface TabManager {
         val tabId: String,
         val url: String?,
         val skipHome: Boolean,
+        val sourceTabId: String?,
     )
 }
 
@@ -68,8 +69,11 @@ class DefaultTabManager @Inject constructor(
 
     override fun getSelectedTabId(): String? = selectedTabId
 
-    override fun onSelectedTabChanged(tabId: String) {
+    override suspend fun onSelectedTabChanged(tabId: String) {
         selectedTabId = tabId
+        withContext(dispatchers.io()) {
+            tabRepository.updateTabLastAccess(tabId)
+        }
     }
 
     override suspend fun onTabsChanged(updatedTabIds: List<TabModel>) {

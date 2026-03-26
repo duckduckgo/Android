@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.UNKNOWN
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
@@ -73,6 +74,7 @@ enum class SubscriptionFeedbackVpnSubCategory : SubscriptionFeedbackSubCategory 
 
 enum class SubscriptionFeedbackSubsSubCategory : SubscriptionFeedbackSubCategory {
     ONE_TIME_PASSWORD,
+    UNABLE_TO_ACCESS_FEATURES,
     OTHER,
 }
 
@@ -103,6 +105,7 @@ internal fun PrivacyProFeedbackSource.asParams(): String {
         SUBSCRIPTION_SETTINGS -> "ppro"
         VPN_MANAGEMENT -> "vpn"
         VPN_EXCLUDED_APPS -> "vpnExcludedApps"
+        PIR_DASHBOARD -> "pir"
         UNKNOWN -> "unknown"
     }
 }
@@ -150,6 +153,7 @@ internal fun SubscriptionFeedbackVpnSubCategory.asParams(): String {
 internal fun SubscriptionFeedbackSubsSubCategory.asParams(): String {
     return when (this) {
         ONE_TIME_PASSWORD -> "otp"
+        SubscriptionFeedbackSubsSubCategory.UNABLE_TO_ACCESS_FEATURES -> "unableToAccessFeatures"
         SubscriptionFeedbackSubsSubCategory.OTHER -> "somethingElse"
     }
 }

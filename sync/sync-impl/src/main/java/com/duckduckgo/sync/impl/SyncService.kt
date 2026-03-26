@@ -19,9 +19,11 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
+import okhttp3.RequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -79,12 +81,6 @@ interface SyncService {
         @Body request: EncryptedMessage,
     ): Call<Void>
 
-    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
-    fun patch(
-        @Header("Authorization") token: String,
-        @Body request: JSONObject,
-    ): Call<JSONObject>
-
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
@@ -109,9 +105,34 @@ interface SyncService {
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/settings")
     fun settingsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 
+    @DELETE("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun deleteAiChats(
+        @Header("Authorization") token: String,
+        @Query("until") until: String,
+    ): Call<JSONObject>
+
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
+    fun patchData(
+        @Header("Authorization") token: String,
+        @Body body: JSONObject,
+    ): Call<JSONObject>
+
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/ai_chats")
+    fun patchChats(
+        @Header("Authorization") token: String,
+        @Body body: RequestBody,
+        @Query("since") since: String? = null,
+    ): Call<JSONObject>
+
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/token/rescope")
+    fun rescopeToken(
+        @Header("Authorization") token: String,
+        @Body request: TokenRescopeRequest,
+    ): Call<TokenRescopeResponse>
+
     companion object {
         const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
-        const val SYNC_DEV_ENVIRONMENT_URL = "https://dev-sync-use.duckduckgo.com"
+        const val SYNC_DEV_ENVIRONMENT_URL = "https://sync-staging.duckduckgo.com"
     }
 }
 
@@ -181,6 +202,15 @@ data class ErrorResponse(
     val error: String,
 )
 
+data class TokenRescopeRequest(
+    val scope: String,
+)
+
+data class TokenRescopeResponse(
+    val token: String,
+)
+
+@Suppress("ktlint:standard:class-naming")
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
     NOT_MODIFIED(304),

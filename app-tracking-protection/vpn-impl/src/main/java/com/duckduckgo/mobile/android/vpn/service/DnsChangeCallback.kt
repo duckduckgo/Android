@@ -26,13 +26,13 @@ import android.net.NetworkRequest
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
-import java.net.InetAddress
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.net.InetAddress
+import javax.inject.Inject
 
 class DnsChangeCallback @Inject constructor(
     private val context: Context,

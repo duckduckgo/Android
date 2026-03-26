@@ -44,10 +44,10 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {

@@ -32,10 +32,10 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Provider
-import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
+import javax.inject.Provider
+import javax.inject.Qualifier
 
 @Module
 @ContributesTo(AppScope::class)

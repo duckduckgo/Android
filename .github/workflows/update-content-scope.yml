@@ -1,12 +1,21 @@
 name: Update Content Scope Scripts
 
 on:
-  schedule:
-    - cron: '30 1 * * *' # run at 1 AM UTC
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Specific commit SHA to checkout (optional, defaults to latest)'
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -18,6 +27,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.commit || github.sha }}
           submodules: recursive
 
       - name: Install npm-check-updates
@@ -130,6 +140,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
+        id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -138,3 +149,13 @@ jobs:
           asana-task-name: GH Workflow Failure - Update content scope scripts
           asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+      - name: Adding as a release blocker
+        if: ${{ failure() && steps.create-failure-task.outputs.taskId != '' }}
+        uses: duckduckgo/native-github-asana-sync@v2.0
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_BLOCKER_SECTION_ID }}
+          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
+          action: 'add-task-asana-project'

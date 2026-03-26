@@ -20,6 +20,7 @@
     <string name="cancel">Vazgeç</string>
     <string name="ok">Tamam</string>
     <string name="privacyPro" translatable="false">Privacy Pro</string>
+    <string name="ddg_subscription">DuckDuckGo Aboneliği</string>
     <string name="manageEmail">E-postayı Yönet</string>
 
     <!--Restore Subscriptions Activity-->
@@ -31,19 +32,19 @@
     <string name="subscriptionNotFound">Abonelik Bulunamadı</string>
     <string name="subscriptionNotFoundDescription">Bu Google Play hesabıyla ilişkili abonelik artık aktif değil.</string>
     <string name="purchaseRestored">Satın aldıklarınız geri yüklendi.</string>
-    <string name="restoreSubscriptionTitle">Privacy Pro aboneliğinizi bu cihaza ekleyin</string>
+    <string name="restoreSubscriptionTitle">Aboneliğinizi bu cihaza ekleyin</string>
     <string name="restoreSubscriptionGooglePlayTitle">Google Play Hesabı üzerinden ekleyin</string>
     <string name="restoreSubscriptionGooglePlayDescription">Google Play hesabınızı kullanarak Android cihazlarda aboneliğinizi geri yükleyin.</string>
     <string name="restoreSubscriptionGooglePlayGetStarted">Satın Almayı Geri Yükle</string>
     <string name="restoreSubscriptionEmailTitle">E-posta ile ekleyin</string>
-    <string name="restoreSubscriptionEmailDescription">Privacy Pro\'yu bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
+    <string name="restoreSubscriptionEmailDescription">Bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
     <string name="restoreSubscriptionEmailGetStarted">Başlayın</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Aboneliği Kaldır</string>
     <string name="subscriptionRemoved">Aboneliğiniz bu cihazdan kaldırıldı</string>
     <string name="removeFromDevice">Bu cihazdan kaldırılsın mı?</string>
-    <string name="removeFromDeviceDescription">Privacy Pro aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu, aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
+    <string name="removeFromDeviceDescription">Aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu, aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
     <string name="subscriptionsDataMonthly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Aylık aboneliğiniz %2$s tarihinde %1$s.</string>
     <string name="subscriptionsDataYearly" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Yıllık aboneliğiniz %2$s tarihinde %1$s.</string>
     <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Aboneliğiniz %1$s tarihinde sona erdi.</string>
@@ -51,14 +52,14 @@
     <string name="yearlySubscription">Yıllık Abonelik</string>
     <string name="renews">yenilenecek</string>
     <string name="expires">sona erecek</string>
-    <string name="activateOnOtherDevices">Privacy Pro\'yu Diğer Cihazlara Ekleyin</string>
+    <string name="activateOnOtherDevices">Aboneliğinizi diğer cihazlara ekleyin</string>
     <string name="addToDevicePrimaryText">Cihaza Ekle</string>
-    <string name="addToDeviceSecondaryTextWithoutEmail">Privacy Pro\'yu diğer cihazlarınıza Google Play üzerinden veya bir e-posta adresi bağlayarak ekleyin.</string>
-    <string name="addToDeviceSecondaryTextWithEmail">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Privacy Pro &gt; Aboneliğim Var\'a gidin.</string>
+    <string name="addToDeviceSecondaryTextWithoutEmail">Aboneliğinizi Google Play üzerinden veya bir e-posta adresi bağlayarak diğer cihazlarınıza ekleyebilirsiniz.</string>
+    <string name="addToDeviceSecondaryTextWithEmail">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Abonelik Ayarları &gt; Aboneliğim Var\'a gidin.</string>
     <string name="editEmailPrimaryText">E-postayı Düzenle</string>
     <string name="learnMore">Daha Fazla Bilgi</string>
-    <string name="privacyProFaq">Privacy Pro ile ilgili yardıma mı ihtiyacınız var?</string>
-    <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
+    <string name="privacyProFaq">Aboneliğinizle ilgili yardıma mı ihtiyacınız var?</string>
+    <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya abonelik destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
     <string name="subscriptionStatusSubscribed">Abone olundu</string>
     <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
     <string name="subscriptionStatusFreeTrial">Ücretsiz Deneme Süresi Aktif</string>
@@ -68,21 +69,26 @@
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonelik Ayarları</string>
-    <string name="subscriptionSettingSubscribe">Privacy Pro ile bağlantınızı ve kimliğinizi koruyun</string>
+    <string name="subscriptionSettingSubscribe">Tek bir abonelikle bağlantınızı ve kimliğinizi koruyun.</string>
 
     <string name="subscriptionSettingSubscribeSubtitle">Aboneler VPN, Personal Information Removal ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Aboneler VPN ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
 
-    <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
-    <string name="subscriptionSettingTryFreeTrial">Privacy Pro\'yu Ücretsiz Deneyin</string>
+    <string name="subscriptionSettingGet">DuckDuckGo\'ya abone olun</string>
+    <string name="subscriptionSettingTryFreeTrial">Ücretsiz Deneyin</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>
-    <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
+    <string name="subscriptionSettingExpired">DuckDuckGo aboneliğinizin süresi doldu</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>
     <string name="subscriptionSettingSectionSubscription">Abonelik</string>
     <string name="subscriptionSettingRemoveFromDevice">Bu Cihazdan Kaldır</string>
     <string name="subscriptionSettingSectionHelpAndSupport">Yardım ve Destek</string>
     <string name="subscriptionSettingSendFeedback">Geri Bildirim gönder</string>
     <string name="subscriptionSettingActivating">Etkinleştiriliyor</string>
+    <string name="subscriptionSettingSwitchUpgradeDynamic" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık planla %%%1$s tasarruf edin</string>
+    <!-- smartling.character_limit = 10 -->
+    <string name="subscriptionSettingSwitchUpgradePill">En iyi</string>
+    <string name="subscriptionSettingSwitchDowngrade">Planı Değiştir</string>
+    <string name="subscriptionSettingManagePlan">Ödemeyi Yönet</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">Her şey hazır.</string>
@@ -102,8 +108,8 @@
     <string name="changePlanDescription">Aboneliğiniz Apple App Store üzerinden satın alınmış. Planınızı veya faturalandırma ayarlarınızı değiştirmek için lütfen aboneliğinizi satın alırken kullandığınız Apple Hesabı ile giriş yapmış bir cihazdan Ayarlar &gt; Apple Hesabı &gt; Abonelikler bölümüne gidin.</string>
 
     <!-- PIR Activity-->
-    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde Privacy Pro\'yu etkinleştirin</string>
-    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; Privacy Pro</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
+    <string name="pirTitle">Personal Information Removal kurulumu için masaüstünde DuckDuckGo aboneliğini etkinleştirin</string>
+    <string name="pirDescription">Masaüstü için DuckDuckGo tarayıcısında <b>Ayarlar &gt; DuckDuckGo\'ya Abone Ol</b> bölümüne gidin ve başlamak için <b>Aboneliğim Var</b>\'a tıklayın.</string>
     <string name="pirWindowsButton" translatable="false">Windows</string>
     <string name="pirMacOsButton" translatable="false">Mac</string>
 
@@ -146,42 +152,24 @@
     <string name="feedbackSubCategoryItrAdvisorUnhelpful">Danışmanı aramak yardımcı olmuyor</string>
     <string name="feedbackSubCategoryItrOther">Diğer</string>
 
-    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre</string>
-    <string name="feedbackSubCategorySubsOther">Diğer</string>
+    <string name="feedbackSubCategorySubsOtp">Tek kullanımlık şifre ile ilgili sorun</string>
+    <string name="feedbackSubCategorySubsOther">Başka bir şey</string>
 
     <string name="feedbackSubmitVpnHeader"><annotation type="faqs_link">Yardım merkezimizde</annotation> ele alınmayan bir sorun mu buldunuz? Bunu mutlaka öğrenmek istiyoruz.</string>
     <string name="feedbackSubmitVpnDescriptionHint">Bize neler olduğunu anlatın...</string>
     <string name="feedbackSubmitVpnDisclaimer">"Yukarıda girilen ayrıntılara ek olarak, geri bildiriminizle birlikte bazı anonimleştirilmiş bilgiler gönderiyoruz:\n\n• Bazı tarayıcı özelliklerinin etkin olup olmadığı\n• Toplu uygulama tanılama (ör. hata kodları)\n\nGönder'e tıklayarak, DuckDuckGo'nun uygulamayı geliştirmek için gönderilen bilgileri kullanabileceğini kabul ediyorsunuz."</string>
     <string name="feedbackSubmitVpnSubmit">Gönder</string>
     <string name="feedbackSubmitCompletedMessage">Teşekkür Ederiz! Geri bildirim gönderildi.</string>
-    <string name="feedbackSubmitFailedMessage">Bir hata oluştu</string>
-
-    <string name="feedbackSubmitEmailByLine">Bu sorunla ilgili olarak sizinle iletişime geçmemizi istiyorsanız bir e-posta adresi sağlayın (tüm sorunlara yanıt veremeyebiliriz):</string>
-    <string name="feedbackSubmitEmailHint">E-posta (isteğe bağlı)</string>
 
     <string name="feedbackSubmitGeneralDescriptionHint">Lütfen bize geri bildirimlerinizi iletin…</string>
     <string name="feedbackSubmitFeatureRequestDescriptionHint">Hangi özelliği görmek istersiniz?</string>
+    <string name="feedbackSubmitContactSupport">Yardıma mı ihtiyacınız var? <annotation type="support_link">Destek ekibiyle iletişime geçin</annotation>.</string>
 
     <!-- Activity titles -->
     <string name="activitySubscriptions">Abonelikler</string>
     <string name="activitySubscriptionSettings">Abonelik Ayarları</string>
     <string name="activityActivateSubscription">Aboneliğim Var</string>
-    <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo Aboneliği</string>
-    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo aboneliğinizin süresi doldu</string>
-    <string name="privacyProFaqRebranding">Aboneliğinizle ilgili yardıma mı ihtiyacınız var?</string>
-    <string name="privacyProFaqSecondaryRebranding">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya abonelik destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
-    <string name="restoreSubscriptionTitleRebranding">Aboneliğinizi bu cihaza ekleyin</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
-    <string name="activateOnOtherDevicesRebranding">Aboneliğinizi diğer cihazlara ekleyin</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Aboneliğinizi Google Play üzerinden veya bir e-posta adresi bağlayarak diğer cihazlarınıza ekleyebilirsiniz.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Abonelik Ayarları &gt; Aboneliğim Var\'a gidin.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro artık sadece DuckDuckGo aboneliği olarak adlandırılıyor</string>
-    <string name="subscriptionSettingSubscribeRebranding">Tek bir abonelikle bağlantınızı ve kimliğinizi koruyun.</string>
-    <string name="removeFromDeviceDescriptionRebranding">Aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu işlem aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
 
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Aboneler VPN, Duck.ai\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
@@ -191,11 +179,37 @@
     <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Duck.ai\'a erişemiyorum.</string>
     <string name="feedbackSubCategoryDuckAiOther">Diğer Duck.ai geri bildirimleri</string>
 
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSectionTitle">DuckDuckGo Aboneliği</string>
     <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
 
-    <string name="subscriptionSettingGetRebranding">DuckDuckGo\'ya abone olun</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Ücretsiz Deneyin</string>
     <string name="feedbackGeneralSubscription">Abonelik</string>
+
+    <!-- Switch plan-->
+    <string name="switchBottomSheetDynamicTitleUpgrade" instruction="%1$s is the savings percentage when switching from monthly to yearly (e.g. 16)">Yıllık planla %%%1$s tasarruf edin!</string>
+    <string name="switchBottomSheetDescriptionUpgrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the current monthly plan price (e.g. $9.99)">Yıllık bir plan, mevcut %2$s aylık planınıza kıyasla ayda sadece %1$s tutarındadır.</string>
+    <string name="switchBottomSheetPrimaryButtonUpgrade" instruction="%1$s is the yearly plan price (e.g. $99.99)">Yıllık Plana Geç (%1$s/yıl)</string>
+    <string name="switchBottomSheetSecondaryButtonUpgrade">Aylık Planı Sürdür</string>
+    <string name="switchBottomSheetDynamicTitleDowngrade" instruction="%1$s is the savings percentage when using a yearly plan instead of monthly (e.g. 16)">Yıllık planla %%%1$s tasarruf ediyorsunuz!</string>
+    <string name="switchBottomSheetDescriptionDowngrade" instruction="%1$s is the yearly plan monthly equivalent price (e.g. $8.33), %2$s is the monthly plan price (e.g. $9.99)">Geçiş yapmak, aylık fiyatı %1$s/ay\'dan %2$s/ay\'a çıkaracaktır.</string>
+    <string name="switchBottomSheetPrimaryButtonDowngrade">Yıllık Planı Sürdür</string>
+    <string name="switchBottomSheetSecondaryButtonDowngrade" instruction="%1$s is the monthly plan price (e.g. $9.99)">Aylık Plana Geç (%1$s/ay)</string>
+
+    <!-- Pro tier changes -->
+    <string name="feedbackSubCategorySubsUnableToAccessProFeatures">Plus veya Pro seviye özelliklere erişilemiyor</string>
+    <string name="subscriptionsProUpgradeTitle">Pro\'ya Yükseltin</string>
+    <string name="subscriptionsProUpgradeMessage">Daha güçlü yapay zekanın kilidini açın</string>
+    <string name="subscriptionSettingSectionManageSubscription">Aboneliği Yönet</string>
+    <string name="subscriptionSettingViewAllPlans">Bütün Planları Görüntüle</string>
+    <string name="subscriptionSettingManagePaymentOrCancel">Ödemeyi Yönetin veya İptal Edin</string>
+
+    <!-- Pending plan changes -->
+    <string name="subscriptionPendingPlanChangeUpgrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planın %2$s tarihinde %1$s planına yükseltilecek.</string>
+    <string name="subscriptionPendingPlanChangeDowngrade" instruction="First placeholder is the plan name (e.g. Plus Yearly), third is a date">Planınız %2$s tarihinde %1$s planına düşürülecek.</string>
+    <string name="planNamePlusMonthly">Plus Aylık</string>
+    <string name="planNamePlusYearly">Plus Yıllık</string>
+    <string name="planNameProMonthly">Pro Aylık</string>
+    <string name="planNameProYearly">Pro Yıllık</string>
+    <string name="tierPlusName" translatable="false">PLUS</string>
+    <string name="tierProName" translatable="false">PRO</string>
 
 </resources>

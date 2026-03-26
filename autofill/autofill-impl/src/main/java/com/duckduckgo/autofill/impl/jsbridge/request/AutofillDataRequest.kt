@@ -90,6 +90,4 @@ enum class FormSubmissionTriggerType {
     PARTIAL_SAVE,
 
     UNKNOWN,
-
-    ;
 }

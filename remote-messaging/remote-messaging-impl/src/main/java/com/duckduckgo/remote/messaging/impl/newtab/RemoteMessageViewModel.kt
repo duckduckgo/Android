@@ -22,22 +22,26 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
 import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
+import com.duckduckgo.remote.messaging.api.Action.DefaultCredentialProvider
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
 import com.duckduckgo.remote.messaging.api.Action.Navigation
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Action.Survey
 import com.duckduckgo.remote.messaging.api.Action.Url
+import com.duckduckgo.remote.messaging.api.Action.UrlInContext
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
+import com.duckduckgo.remote.messaging.api.Surface
+import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.survey.api.SurveyParameterManager
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,10 +49,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -57,10 +63,12 @@ class RemoteMessageViewModel @Inject constructor(
     private val remoteMessagingModel: RemoteMessageModel,
     private val playStoreUtils: PlayStoreUtils,
     private val surveyParameterManager: SurveyParameterManager,
+    private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val message: RemoteMessage? = null,
+        val messageImageFilePath: String? = null,
         val newMessage: Boolean = false,
     )
 
@@ -79,6 +87,8 @@ class RemoteMessageViewModel @Inject constructor(
             val screen: String,
             val payload: String,
         ) : Command()
+
+        data object LaunchDefaultCredentialProvider : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
@@ -94,8 +104,16 @@ class RemoteMessageViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             remoteMessagingModel.getActiveMessages()
+                .map { message ->
+                    if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) {
+                        val imageFile = remoteMessagingModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)
+                        message to imageFile
+                    } else {
+                        null to null
+                    }
+                }
                 .flowOn(dispatchers.io())
-                .onEach { message ->
+                .onEach { (message, imageFile) ->
                     withContext(dispatchers.main()) {
                         val newMessage = message?.id != lastRemoteMessageSeen?.id
                         if (newMessage) {
@@ -105,6 +123,7 @@ class RemoteMessageViewModel @Inject constructor(
                         _viewState.emit(
                             viewState.value.copy(
                                 message = message,
+                                messageImageFilePath = imageFile,
                                 newMessage = newMessage,
                             ),
                         )
@@ -126,6 +145,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
         }
     }
 
@@ -133,6 +153,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             command.send(action.asNewTabCommand())
         }
     }
@@ -141,6 +162,7 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
             command.send(action.asNewTabCommand())
         }
     }
@@ -149,6 +171,9 @@ class RemoteMessageViewModel @Inject constructor(
         val message = lastRemoteMessageSeen ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            if (action !is Share) {
+                remoteMessagingModel.clearMessageImage(Surface.NEW_TAB_PAGE)
+            }
             command.send(action.asNewTabCommand())
         }
     }
@@ -157,17 +182,33 @@ class RemoteMessageViewModel @Inject constructor(
         playStoreUtils.launchPlayStore(appPackage)
     }
 
+    fun onRemoteImageLoadFailed() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
+    }
+
+    fun onRemoteImageLoadSuccess() {
+        pixel.fire(
+            RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS,
+            mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to lastRemoteMessageSeen?.id.orEmpty()),
+        )
+    }
+
     private suspend fun Action.asNewTabCommand(): Command {
         return when (this) {
             is Dismiss -> Command.DismissMessage
             is PlayStore -> Command.LaunchPlayStore(this.value)
             is Url -> Command.SubmitUrl(this.value)
+            is UrlInContext -> Command.SubmitUrl(this.value)
             is DefaultBrowser -> Command.LaunchDefaultBrowser
             is AppTpOnboarding -> Command.LaunchAppTPOnboarding
             is Share -> Command.SharePromoLinkRMF(this.value, this.title)
             is Navigation -> {
                 Command.LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty())
             }
+            is DefaultCredentialProvider -> Command.LaunchDefaultCredentialProvider
 
             is Survey -> {
                 val queryParams = additionalParameters?.get("queryParams")?.split(";") ?: emptyList()

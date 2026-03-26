@@ -38,9 +38,9 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.Bookma
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptySearchHint
-import java.util.Collections
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Collections
 
 class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,

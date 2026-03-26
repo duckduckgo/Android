@@ -22,15 +22,15 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getString
-import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
 import com.duckduckgo.common.utils.extensions.preventWidows
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.duckduckgo.app.browser.R as BrowserR
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomSheetDialog(context) {

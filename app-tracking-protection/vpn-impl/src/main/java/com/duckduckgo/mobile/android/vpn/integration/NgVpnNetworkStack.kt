@@ -36,15 +36,15 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.lang.IllegalStateException
-import java.net.InetAddress
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.lang.IllegalStateException
+import java.net.InetAddress
+import javax.inject.Inject
 
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24

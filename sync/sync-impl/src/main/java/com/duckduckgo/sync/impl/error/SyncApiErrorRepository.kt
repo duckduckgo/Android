@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.error
 
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.store.dao.SyncApiErrorDao
 import com.duckduckgo.sync.store.model.SyncApiError
@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 interface SyncApiErrorRepository {
     fun addError(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: SyncApiErrorType,
     )
 
@@ -41,7 +41,7 @@ data class SyncApiErrorPixelData(
 
 class RealSyncApiErrorRepository @Inject constructor(private val apiErrorDao: SyncApiErrorDao) : SyncApiErrorRepository {
     override fun addError(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: SyncApiErrorType,
     ) {
         val today = DatabaseDateFormatter.getUtcIsoLocalDate()

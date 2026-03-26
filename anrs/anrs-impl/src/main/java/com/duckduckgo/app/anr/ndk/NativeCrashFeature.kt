@@ -32,9 +32,9 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -51,6 +51,9 @@ interface NativeCrashFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun nativeCrashHandlingSecondaryProcess(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun nativeCrashReportsFullWebViewVersion(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

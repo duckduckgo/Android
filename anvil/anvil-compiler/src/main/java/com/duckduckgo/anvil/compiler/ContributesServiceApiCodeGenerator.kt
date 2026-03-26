@@ -28,11 +28,11 @@ import com.squareup.anvil.compiler.internal.fqName
 import com.squareup.anvil.compiler.internal.reference.*
 import com.squareup.kotlinpoet.*
 import dagger.Provides
-import java.io.File
-import javax.inject.Named
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
+import javax.inject.Named
 
 /** This Anvil code generator allows generates a backend service API and its dagger bindings. */
 @OptIn(ExperimentalAnvilApi::class)
@@ -46,7 +46,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { reference -> reference.isAnnotatedWith(serviceApiAnnotations.map { it.fqName }) }
@@ -58,7 +58,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateServiceApiModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateServiceApiModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.shortName}_Module"
 
@@ -125,7 +125,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     private fun ClassReference.Psi.serviceApiClassName(

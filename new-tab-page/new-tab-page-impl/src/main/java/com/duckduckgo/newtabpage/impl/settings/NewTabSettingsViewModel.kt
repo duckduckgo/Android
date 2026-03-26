@@ -28,7 +28,6 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutDataStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabShortcutsProvider
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -40,6 +39,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)

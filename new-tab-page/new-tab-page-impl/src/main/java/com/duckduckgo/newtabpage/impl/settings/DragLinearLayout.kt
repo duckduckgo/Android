@@ -32,10 +32,10 @@ import android.view.ViewConfiguration
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
 import androidx.core.view.MotionEventCompat
-import kotlin.math.abs
-import kotlin.math.roundToInt
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class DragLinearLayout @JvmOverloads constructor(
     context: Context?,

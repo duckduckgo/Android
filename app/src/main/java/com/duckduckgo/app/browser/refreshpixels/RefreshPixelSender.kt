@@ -27,13 +27,14 @@ import com.duckduckgo.app.trackerdetection.blocklist.get3XRefresh
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.send
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 interface RefreshPixelSender {
     fun sendMenuRefreshPixels()
@@ -70,17 +71,13 @@ class DuckDuckGoRefreshPixelSender @Inject constructor(
             patternsDetected.forEach { detectedPattern ->
                 when (detectedPattern) {
                     RefreshPattern.TWICE_IN_12_SECONDS -> {
-                        blockListPixelsPlugin.get2XRefresh()?.getPixelDefinitions()?.forEach {
-                            pixel.fire(it.pixelName, it.params)
-                        }
+                        blockListPixelsPlugin.get2XRefresh()?.send()
                         pixel.fire(AppPixelName.RELOAD_TWICE_WITHIN_12_SECONDS)
                     }
 
                     RefreshPattern.THRICE_IN_20_SECONDS -> {
                         pixel.fire(AppPixelName.RELOAD_THREE_TIMES_WITHIN_20_SECONDS)
-                        blockListPixelsPlugin.get3XRefresh()?.getPixelDefinitions()?.forEach {
-                            pixel.fire(it.pixelName, it.params)
-                        }
+                        blockListPixelsPlugin.get3XRefresh()?.send()
                     }
                     else -> logcat(WARN) { "Unknown refresh pattern: $detectedPattern, no pixels fired" }
                 }

@@ -20,7 +20,6 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 class ReportBreakageCategorySingleChoiceViewModelTest {

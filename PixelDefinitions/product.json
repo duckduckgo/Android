@@ -1,0 +1,8 @@
+{
+    "agents": ["ddg_android"],
+    "target": {
+        "key": "appVersion",
+        "version": "5.264.1"
+    },
+    "forceLowerCase": false
+}

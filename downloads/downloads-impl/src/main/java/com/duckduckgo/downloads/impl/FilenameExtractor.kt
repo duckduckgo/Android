@@ -21,9 +21,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.TriedAllOptions
+import logcat.logcat
 import java.io.File
 import javax.inject.Inject
-import logcat.logcat
 
 class FilenameExtractor @Inject constructor(
     private val pixel: Pixel,

@@ -25,9 +25,9 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.S
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface FeedbackCustomMetadataProvider {
     suspend fun getCustomMetadata(

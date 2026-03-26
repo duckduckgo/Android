@@ -1,6 +1,6 @@
 # New Tab Page Name
 
-This module contains all the logic and UI elements for the new New Tab Page.
+This module contains all the logic and UI elements for the Configurable New Tab Page.
 
 ## Who can help you better understand this feature?
 - David Gonzalez

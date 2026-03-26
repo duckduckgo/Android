@@ -23,12 +23,12 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.LogPriority.WARN
+import logcat.logcat
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
 import kotlin.math.roundToInt
-import logcat.LogPriority.WARN
-import logcat.logcat
 
 /**
  * Measures latency to provided IP and returns it in milliseconds (ms)

@@ -102,10 +102,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.UUID
-import javax.inject.Inject
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,6 +113,10 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.util.UUID
+import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillPasswordsManagementViewModel @Inject constructor(
@@ -428,7 +428,10 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
+            _viewState.value = _viewState.value.copy(
+                autofillEnabled = autofillStore.autofillEnabled,
+                prioritizeDomainMatchesOnSearch = autofillFeature.prioritizeDomainMatchesOnSearch().isEnabled(),
+            )
 
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
@@ -680,6 +683,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val source = launchSource.asString()
             val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
             pixel.fire(AUTOFILL_MANAGEMENT_SCREEN_OPENED, mapOf("source" to source, "has_credentials_saved" to hasCredentialsSaved.toBinaryString()))
+            pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED)
+            pixel.fire(AutofillPixelNames.PRODUCT_TELEMETRY_SURFACE_PASSWORDS_OPENED_DAILY, type = Pixel.PixelType.Daily())
         }
     }
 
@@ -820,6 +825,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val reportBreakageState: ReportBreakageState = ReportBreakageState(),
         val canShowPromo: Boolean = false,
         val canImportFromGooglePasswords: Boolean = false,
+        val prioritizeDomainMatchesOnSearch: Boolean = false,
     )
 
     data class ReportBreakageState(

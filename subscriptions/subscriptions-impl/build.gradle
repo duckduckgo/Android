@@ -39,7 +39,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':cookies-api')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':browser-api')
@@ -62,6 +62,7 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
     implementation project(':pir-api')
+    implementation project(':attributed-metrics-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

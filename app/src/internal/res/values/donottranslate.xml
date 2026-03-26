@@ -31,6 +31,10 @@
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>
 
+    <string name="devSettingsDuckAiSection">Duck.ai</string>
+    <string name="devSettingsDuckAiUrlOverrideTitle">Custom Duck.ai URL</string>
+    <string name="devSettingsDuckAiUrlOverrideSubtitle">Click here to customize the Duck.ai URL</string>
+
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
@@ -98,8 +102,12 @@
     <string name="customTabsTitle">Custom Tabs</string>
     <string name="customTabsLoad">Load Custom Tab</string>
     <string name="customTabsUrlHint">Add your URL here</string>
+    <string name="customTabsToolbarColorHint">Toolbar color (e.g., #FF5733 or leave empty for default)</string>
     <string name="customTabsInvalidUrl">Invalid URL</string>
     <string name="customTabsEmptyUrl">Enter a URL</string>
+    <string name="customTabsInvalidColor">Invalid color format. Use hex format like #FF5733</string>
+    <string name="customTabsClearColor">Clear Custom Color</string>
+    <string name="customTabsColorPicker">Pick a Color</string>
     <string name="customTabsDefaultBrowserTitle">Default Browser</string>
 
     <!-- Notifications -->
@@ -119,4 +127,11 @@
     <string name="webview_internal_feature_subtitle">WebView dev settings and tools</string>
     <string name="webview_dev_ui_not_available">WebView Developer UI is not available.</string>
     <string name="webview_play_store_unavailable">Play Store unavailable on this device</string>
+
+    <!-- Onboarding Dev Settings -->
+    <string name="onboardingDevSettingsTitle">Onboarding Dev Settings</string>
+    <string name="onboardingDevSettingsStateSection">Onboarding state</string>
+    <string name="onboardingDevSettingsCompletedTitle">Onboarding completed</string>
+    <string name="onboardingDevSettingsSkippedTitle">Onboarding skipped</string>
+    <string name="onboardingDevSettingsDialogsSection">Dialogs shown</string>
 </resources>

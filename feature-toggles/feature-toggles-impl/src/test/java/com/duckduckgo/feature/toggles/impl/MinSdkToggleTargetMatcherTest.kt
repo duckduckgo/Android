@@ -69,6 +69,6 @@ class MinSdkToggleTargetMatcherTest {
     }
 
     companion object {
-        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null)
+        private val NULL_TARGET = Toggle.State.Target(null, null, null, null, null, null, null)
     }
 }

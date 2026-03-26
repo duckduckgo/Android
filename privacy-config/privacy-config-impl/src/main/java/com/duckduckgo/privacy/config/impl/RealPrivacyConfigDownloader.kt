@@ -29,10 +29,10 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadError.STORE_ERROR
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.WARN
 import logcat.logcat
 import retrofit2.HttpException
+import javax.inject.Inject
 
 /** Public interface for download remote privacy config */
 interface PrivacyConfigDownloader {

@@ -20,8 +20,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class ConnectionQualityStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,

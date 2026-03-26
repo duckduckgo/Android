@@ -23,8 +23,8 @@ import android.content.Intent.ACTION_LOCALE_CHANGED
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
-import javax.inject.Inject
 import org.jetbrains.annotations.VisibleForTesting
+import javax.inject.Inject
 
 @InjectWith(ReceiverScope::class)
 class VoiceSearchWidgetUpdaterReceiver : BroadcastReceiver() {

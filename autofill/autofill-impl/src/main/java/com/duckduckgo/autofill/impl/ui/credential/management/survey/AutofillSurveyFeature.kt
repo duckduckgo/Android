@@ -26,19 +26,19 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+/**
+ * This is the class that represents the feature flag for showing autofill user-surveys.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     boundType = AutofillSurveysFeature::class,
     featureName = "autofillSurveys",
     settingsStore = AutofillSurveyFeatureSettingsStore::class,
 )
-/**
- * This is the class that represents the feature flag for showing autofill user-surveys.
- */
 interface AutofillSurveysFeature {
     /**
      * @return `true` when the remote config has the global "autofillSurveys" feature flag enabled

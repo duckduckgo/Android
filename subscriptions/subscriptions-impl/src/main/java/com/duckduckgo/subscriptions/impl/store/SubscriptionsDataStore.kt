@@ -38,6 +38,9 @@ interface SubscriptionsDataStore {
     var expiresOrRenewsAt: Long?
     var billingPeriod: String?
     var startedAt: Long?
+
+    // Local purchased at time, not from server or other devices
+    var localPurchasedAt: Long?
     var platform: String?
     var status: String?
     var entitlements: String?
@@ -45,6 +48,10 @@ interface SubscriptionsDataStore {
     var freeTrialActive: Boolean
 
     var subscriptionFeatures: String?
+    var subscriptionEntitlements: String?
+
+    // Pending Plans (stored as JSON array string)
+    var pendingPlans: String?
 
     fun canUseEncryption(): Boolean
 }
@@ -197,6 +204,18 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var localPurchasedAt: Long?
+        get() = encryptedPreferences?.getLong(KEY_LOCAL_PURCHASED_AT, 0L).takeIf { it != 0L }
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_LOCAL_PURCHASED_AT)
+                } else {
+                    putLong(KEY_LOCAL_PURCHASED_AT, value)
+                }
+            }
+        }
+
     override var billingPeriod: String?
         get() = encryptedPreferences?.getString(KEY_BILLING_PERIOD, null)
         set(value) {
@@ -210,6 +229,22 @@ internal class SubscriptionsEncryptedDataStore(
         set(value) {
             encryptedPreferences?.edit(commit = true) {
                 putString(KEY_SUBSCRIPTION_FEATURES, value)
+            }
+        }
+
+    override var subscriptionEntitlements: String?
+        get() = encryptedPreferences?.getString(KEY_SUBSCRIPTION_ENTITLEMENTS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_SUBSCRIPTION_ENTITLEMENTS, value)
+            }
+        }
+
+    override var pendingPlans: String?
+        get() = encryptedPreferences?.getString(KEY_PENDING_PLANS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_PENDING_PLANS, value)
             }
         }
 
@@ -231,11 +266,14 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
         const val KEY_STARTED_AT = "KEY_STARTED_AT"
+        const val KEY_LOCAL_PURCHASED_AT = "KEY_LOCAL_PURCHASED_AT"
         const val KEY_BILLING_PERIOD = "KEY_BILLING_PERIOD"
         const val KEY_ENTITLEMENTS = "KEY_ENTITLEMENTS"
         const val KEY_STATUS = "KEY_STATUS"
         const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
         const val KEY_SUBSCRIPTION_FEATURES = "KEY_SUBSCRIPTION_FEATURES"
+        const val KEY_SUBSCRIPTION_ENTITLEMENTS = "KEY_SUBSCRIPTION_ENTITLEMENTS"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
+        const val KEY_PENDING_PLANS = "KEY_PENDING_PLANS"
     }
 }

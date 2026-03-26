@@ -21,14 +21,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
+/**
+ * This is the class that represents the adClickAttribution feature flags.
+ */
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "adClickAttribution",
     settingsStore = AdClickAttributionFeatureSettingsStore::class,
 )
-/**
- * This is the class that represents the adClickAttribution feature flags.
- */
 interface AdClickAttributionFeature {
     /**
      * @return `true` when the remote config has the global "adClickAttribution" feature flag enabled

@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</string>
     <string name="clearButtonContentDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="no_compatible_third_party_app_installed">Δεν υπάρχει εγκατεστημένη συμβατή εφαρμογή</string>
-    <string name="addBookmarkMenuTitle">Προσθήκη σελιδοδείκτη</string>
-    <string name="editBookmarkMenuTitle">Επεξεργασία σελιδοδείκτη</string>
+
     <string name="addFavoriteMenuTitle">Προσθήκη Αγαπημένου</string>
     <string name="removeFavoriteMenuTitle">Αφαίρεση αγαπημένου</string>
     <string name="favoriteAddedMessage">Προστέθηκε αγαπημένο</string>
     <string name="bookmarkAddedMessage">Προστέθηκε σελιδοδείκτης</string>
-    <string name="requestDesktopSiteMenuTitle">Ιστότοπος επιφάνειας εργασίας</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Αφαίρεση διαγραφής δραστηριότητας</string>
-    <string name="requestMobileSiteMenuTitle">Ιστότοπος για κινητά</string>
     <string name="downloadsMenuTitle">Λήψεις</string>
-    <string name="printMenuTitle">Εκτύπωση σελίδας</string>
     <string name="favoriteDeleteConfirmationMessage">Το Αγαπημένο αφαιρέθηκε</string>
     <string name="fireproofDeleteConfirmationMessage">Η διαγραφή δραστηριότητας αφαιρέθηκε</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Επιλογές</string>
     <string name="shareLink">Κοινή χρήση συνδέσμου</string>
-    <string name="shareMenuTitle">Κοινή χρήση</string>
     <string name="copyUrl">Αντιγραφή διεύθυνσης συνδέσμου</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Εύρεση στη σελίδα</string>
     <string name="nextSearchTermDescription">Εύρεση επόμενου</string>
     <string name="previousSearchTermDescription">Εύρεση προηγούμενου</string>
     <string name="closeFindInPageButtonDescription">Κλείσιμο εύρεσης στην προβολή σελίδας</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Εκκαθάριση δεδομένων</string>
-    <string name="fireClearAll">Εκκαθάριση όλων των καρτελών και δεδομένων</string>
-    <string name="fireClearAllPlusDuckChats">Εκκαθάριση όλων των καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
+    <string name="fireClearAll">Διαγραφή καρτελών και δεδομένων</string>
+    <string name="fireClearAllPlusDuckChats">Διαγραφή καρτελών, δεδομένων και συνομιλιών Duck.ai</string>
     <string name="fireCancel">Ακύρωση</string>
     <string name="fireDataCleared">Εκκαθάριση δεδομένων</string>
 
@@ -135,6 +128,7 @@
     <string name="settingsMenuItemTitle">Ρυθμίσεις</string>
     <string name="settingsHeadingProtections">Προστασίες</string>
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
+    <string name="settingsWhatsNew">Τι νέο υπάρχει</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
@@ -167,6 +161,7 @@
     <string name="settingsAddressBarPosition">Ορίστε τη θέση της γραμμής διευθύνσεών σας</string>
     <string name="settingsEnableVoiceSearch">Ενεργοποίηση της Ιδιωτικής φωνητικής αναζήτησης</string>
     <string name="settingsDDGOnOtherPlatforms">Το DuckDuckGo σε άλλες πλατφόρμες</string>
+    <string name="settingsDuckAi">Λειτουργίες τεχνητής νοημοσύνης</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
@@ -181,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Οι προτάσεις αυτόματης συμπλήρωσης περιλαμβάνουν πλέον τους ιστότοπους που επισκεφθήκατε πρόσφατα. Απενεργοποιήστε τη λειτουργία από τις Ρυθμίσεις ή καταργήστε την οποιαδήποτε στιγμή με το κουμπί 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">Ίδιο απόρρητο.\nΚαλύτερες προτάσεις αναζήτησης!</string>
     <string name="openAutoCompleteSettings">Άνοιγμα ρυθμίσεων</string>
+    <string name="privateSearchChatSuggestionsToggle">Προτάσεις συνομιλίας</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Εμφάνιση προτάσεων από το ιστορικό σας, τους σελιδοδείκτες σας και (προαιρετικά) το ιστορικό συνομιλιών του Duck.ai καθώς πληκτρολογείτε στη γραμμή αναζήτησης. Όλες οι αναζητήσεις είναι ιδιωτικές.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Γενικά</string>
@@ -189,7 +186,6 @@
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Το πρόγραμμα περιήγησης DuckDuckGo παρέχει προστασίες παρακολούθησης, οι οποίες είναι πάντα ενεργές.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Πώς σας προστατεύουμε</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Αποκλείει τις εφαρμογές παρακολούθησης τρίτων</string>
@@ -213,12 +209,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Παγκόσμιος έλεγχος απορρήτου</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Εκφράζει τα δικαιώματα εξαίρεσης εκ μέρους σας, ζητώντας από τους ιστότοπους να μην πωλούν ή κοινοποιούν τις προσωπικές πληροφορίες σας.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
+    <string name="getDesktopBrowserTitle">Προστατέψτε τα προσωπικά στοιχεία σας τόσο σε Mac όσο και σε Windows!</string>
+    <string name="getDesktopBrowserBody">Για να κάνετ ελήψη του DuckDuckGo σε Mac ή Windows, επισκεφθείτε τη διεύθυνση:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Κοινή χρήση συνδέσμου λήψης</string>
+    <string name="getDesktopBrowserNoThanks">Όχι, ευχαριστώ</string>
+    <string name="getDesktopBrowserHideItem">Αποκρυψη</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Ο σύνδεσμος αντιγράφηκε</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Κουμπί Φωτιά</string>
     <string name="dataClearingActivityTitle">Διαγραφή δεδομένων</string>
+    <string name="dataClearingDescription">Η διαγραφή των δεδομένων σας μπορεί να βοηθήσει στην προστασία του απορρήτου σας στο διαδίκτυο. Χρησιμοποιήστε το Fire Button για να διαγράψετε δεδομένα μη αυτόματα ή για να ρυθμίσετε την αυτόματη διαγραφή.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d ιστότοπος εξαιρέθηκε από την εκκαθάριση</item>
+        <item quantity="other">%1$d ιστότοποι εξαιρέθηκαν από την εκκαθάριση</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ενεργό</string>
+    <string name="dataClearingAutomaticClearingOff">Κλειστό</string>
+    <string name="dataClearingClearBrowsingData">Εκκαθάριση δεδομένων περιήγησης</string>
+    <string name="dataClearingAutomaticDataClearing">Αυτόματη διαγραφή δεδομένων</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Αυτόματη διαγραφή δεδομένων</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Κλείσιμο όλων των ανοιχτών καρτελών</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Διαγράψτε όλα τα δεδομένα των ιστοτόπων, συμπεριλαμβανομένων των ιστοτόπων που επισκεφτήκατε. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Διαγραφή όλων των συνομιλιών, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Επιλέξτε τι να διαγράψετε</string>
+    <string name="dataClearingOptionTabs">Καρτέλες</string>
+    <string name="dataClearingOptionData">Cookie και δεδομένα ιστότοπου</string>
+    <string name="dataClearingDuckAiChats">Συνομιλίες Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Διαγραφή όλων των συνομιλιών</string>
+    <string name="fireDialogDeleteButton">Διαγραφή</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Κλείσιμο καρτέλας</item>
+        <item quantity="other">Κλείσιμο και των %1$d καρτελών</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Κανένα</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Διαγραφή από 1 ιστότοπο. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</item>
+        <item quantity="other">Διαγραφή από %1$d ιστότοπους. Μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Διαγραφή καρτελών και δεδομένων ιστότοπου;</string>
+    <string name="singleTabFireDialogTitleWithChats">Διαγραφή καρτελών, δεδομένων ιστότοπου και συνομιλιών;</string>
+    <string name="singleTabFireDialogDeleteAll">Διαγραφή όλων</string>
+    <string name="singleTabFireDialogDeleteThisTab">Διαγραφή αυτής της καρτέλας</string>
+    <string name="singleTabFireDialogDeleteChat">Διαγραφή συνομιλίας</string>
+    <string name="singleTabFireDialogTitleDuckAi">Διαγραφή αυτής της συνομιλίας;</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Η διαγραφή δεδομένων ιστότοπου μπορεί να σας αποσυνδέσει από τους λογαριασμούς.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Αυτό θα ακυρώσει λήψεις που βρίσκονται σε εξέλιξη.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d καρτέλα και τα δεδομένα τους διαγράφηκαν</item>
+        <item quantity="other">%1$d καρτέλες και τα δεδομένα τους διαγράφηκαν</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου. Ενημερώστε το WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Δεν ήταν δυνατή η διαγραφή των δεδομένων του ιστότοπου λόγω σφάλματος.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Δικαιώματα</string>
@@ -237,26 +291,28 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Καρτέλες, δεδομένα και συνομιλίες Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Εκκαθάριση στις…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Εκκαθάριση στις…</string>
+    <string name="settingsAutomaticallyClearWhen">Διαγραφή στις...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Διαγραφή στις...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Μόνο έξοδος εφαρμογής</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Έξοδος εφαρμογής, ανενεργή για 5 δευτερόλεπτα</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Έξοδος εφαρμογής, ανενεργή για 5 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Έξοδος εφαρμογής, ανενεργή για 15 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Έξοδος εφαρμογής, ανενεργή για 30 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
-    <string name="settingsClearAiDataTitle">Εκκαθάριση συνομιλιών Duck.ai</string>
-    <string name="settingsClearAiDataMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai.</string>
+    <string name="settingsClearAiDataTitle">Διαγραφή συνομιλιών Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">Το Fire Button θα διαγράψει επίσης το ιστορικό του Duck.ai, συμπεριλαμβανομένων των καρφιτσωμένων συνομιλιών.</string>
+    <string name="settingsClearDataActionSecondaryText">Εκκαθαρίζει όλες τις καρτέλες και τα δεδομένα για ιστότοπους που δεν έχετε προστατεύσει με Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Εκκαθαρίζει όλες τις καρτέλες, τις συνομιλίες Duck.ai και τα δεδομένα για οποιονδήποτε ιστότοπο δεν έχετε προστατεύσει με Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Σχετικά</string>
     <string name="aboutHeaderNewTagLine">Προστασία. Ιδιωτικότητα. Ηρεμία.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nΗ DuckDuckGo αποτελεί ανεξάρτητη εταιρεία διαδικτυακής προστασίας για οποιονδήποτε επιθυμεί να ανακτήσει τον έλεγχο των προσωπικών πληροφοριών του.\n\nΠιστεύουμε ότι ο καλύτερος τρόπος για να προστατέψετε τις προσωπικές πληροφορίες σας από χάκερ, απατεώνες και εταιρείες που παραβιάζουν την ιδιωτικότητα είναι να μη συλλέγονται καθόλου. Αυτός είναι ο λόγος για τον οποίον εκατομμύρια άνθρωποι <annotation type="chart_comparison">επιλέγουν το DuckDuckGo έναντι του Chrome και άλλων προγραμμάτων περιήγησης</annotation> για να πραγματοποιήσουν αναζητήσεις και να περιηγηθούν στο διαδίκτυο. Η ενσωματωμένη μηχανή αναζήτησής μας είναι σαν της Google, ωστόσο δεν παρακολουθεί ποτέ τις αναζητήσεις σας. Και οι προστασίες περιήγησής μας, όπως ο αποκλεισμός παρακολούθησης διαφημίσεων και ο αποκλεισμός cookie, βοηθούν ώστε να σταματήσουν άλλες εταιρείες να συλλέγουν τα δεδομένα σας. Και, φυσικά, το πρόγραμμα περιήγησής μας είναι δωρεάν. Κερδίζουμε χρήματα από <annotation type="privacy_respecting_ads">διαφημίσεις αναζήτησης που σέβονται την ιδιωτικότητα</annotation>, όχι από την εκμετάλλευση των δεδομένων σας.Επιπλέον, προσφέρουμε επίσης το <annotation type="ppro_help_page">Privacy Pro</annotation>, μια συνδρομητική υπηρεσία τρία σε ένα, ενσωματωμένη στο πρόγραμμα περιήγησής μας. Οι συνδρομητές του Privacy Pro απολαμβάνουν ακόμα μεγαλύτερη προστασία απορρήτου με ένα γρήγορο και απλό <annotation type="vpn_help_page">VPN</annotation>, που βοηθά στην ασφάλεια της διαδικτυακής δραστηριότητάς σας, μια υπηρεσία που εντοπίζει και αφαιρεί τα προσωπικά στοιχεία σας από ιστότοπους εύρεσης ατόμων και μια υπηρεσία που αποκαθιστά την ταυτότητά σας σε περίπτωση κλοπής.\n\nΑνακτήστε τον έλεγχο των προσωπικών πληροφοριών σας με το πρόγραμμα περιήγησης που έχει σχεδιαστεί για προστασία δεδομένων και όχι για συλλογή δεδομένων.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nΗ DuckDuckGo αποτελεί ανεξάρτητη εταιρεία διαδικτυακής προστασίας για οποιονδήποτε επιθυμεί να ανακτήσει τον έλεγχο των προσωπικών πληροφοριών του.\n\nΠιστεύουμε ότι ο καλύτερος τρόπος για να προστατέψετε τις προσωπικές πληροφορίες σας από χάκερ, απατεώνες και εταιρείες που παραβιάζουν την ιδιωτικότητα είναι να μη συλλέγονται καθόλου. Αυτός είναι ο λόγος για τον οποίον εκατομμύρια άνθρωποι <annotation type="chart_comparison">επιλέγουν το DuckDuckGo έναντι του Chrome και άλλων προγραμμάτων περιήγησης</annotation> για να πραγματοποιήσουν αναζητήσεις και να περιηγηθούν στο διαδίκτυο. Η ενσωματωμένη μηχανή αναζήτησής μας είναι σαν της Google, ωστόσο δεν παρακολουθεί ποτέ τις αναζητήσεις σας. Και οι προστασίες περιήγησής μας, όπως ο αποκλεισμός παρακολούθησης διαφημίσεων και ο αποκλεισμός cookie, βοηθούν ώστε να σταματήσουν άλλες εταιρείες να συλλέγουν τα δεδομένα σας. Και, φυσικά, το πρόγραμμα περιήγησής μας είναι δωρεάν. Κερδίζουμε χρήματα από <annotation type="privacy_respecting_ads">διαφημίσεις αναζήτησης που σέβονται την ιδιωτικότητα</annotation>, όχι από την εκμετάλλευση των δεδομένων σας.Επιπλέον, προσφέρουμε επίσης τη <annotation type="ppro_help_page">συνδρομή DuckDuckGo</annotation> ενοποιημένη στο πρόγραμμα περιήγησής μας. Οι συνδρομητές απολαμβάνουν ακόμα μεγαλύτερη προστασία απορρήτου με ένα γρήγορο και απλό <annotation type="vpn_help_page">VPN</annotation>, που βοηθά στην ασφάλεια της διαδικτυακής δραστηριότητάς σας, πρόσβαση σε προηγμένα μοντέλα τεχνητής νοημοσύνης στην ιδιωτική υπηρεσία συνομιλίας AI Duck.ai, μια υπηρεσία που εντοπίζει και αφαιρεί τα προσωπικά στοιχεία σας από ιστότοπους εύρεσης ατόμων και μια υπηρεσία που αποκαθιστά την ταυτότητά σας σε περίπτωση κλοπής.\n\nΑνακτήστε τον έλεγχο των προσωπικών πληροφοριών σας με το πρόγραμμα περιήγησης που έχει σχεδιαστεί για προστασία δεδομένων και όχι για συλλογή δεδομένων.</string>
     <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
+
 
     <string name="brokenSiteProtectionsOn">Οι επιλογές προστασίας είναι <b>ΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
     <string name="brokenSiteProtectionsOff">Οι επιλογές προστασίας είναι <b>ΑΝΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
@@ -279,7 +335,7 @@
     <string name="searchWidgetLabel">Αναζήτηση και Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Επιτυχία! Το %1$s έχει προστεθεί στην αρχική οθόνη σας.</string>
 
     <!-- User Survey -->
@@ -485,8 +541,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
-    <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
-    <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="allowlistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
@@ -585,11 +639,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Μπορείτε να ανοίξετε τον σύνδεσμο αυτό σε άλλες εφαρμογές.</string>
     <string name="appLinkIntentChooserTitle">Ανοίξτε με</string>
-    <string name="appLinkMenuItemTitle">Ανοίξτε στην εφαρμογή</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
-    <string name="newEmailAliasMenuTitle">Δημιουργήστε Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
@@ -600,7 +652,7 @@
     <string name="waitlistNotificationDialogNotifyMe">ΝΑ ΕΙΔΟΠΟΙΗΘΩ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Προστασία Email (Beta)</string>
+    <string name="emailProtectionActivityTitle">Προστασία email</string>
     <string name="emailNotSupported">Η συσκευή δεν υποστηρίζεται</string>
     <string name="emailNotSupportedExplanation">Η Προστασία email σάς επιτρέπει να δημιουργείτε ιδιωτικές διευθύνσεις email οι οποίες καταργούν εφαρμογές παρακολούθησης email. Πρέπει να κρυπτογραφούμε και να αποθηκεύουμε αυτές τις διευθύνσεις που δημιουργείτε τοπικά στη συσκευή σας. Καθώς η συσκευή σας δεν υποστηρίζει κρυπτογραφημένο χώρο αποθήκευσης, η Προστασία email δεν είναι διαθέσιμη.</string>
 
@@ -760,10 +812,6 @@
     <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
 
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Άνοιγμα στο DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Εκτέλεση στο DuckDuckGo</string>
-
     <!-- SSL Error -->
     <string name="sslErrorTitle">Προειδοποίηση: Αυτός ο ιστότοπος ενδέχεται να μην είναι ασφαλής</string>
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό για τον ιστότοπο αυτόν δεν είναι έγκυρο. Ίσως συνδέεστε σε διακομιστή που προσποιείται ότι είναι ο τομέας %1$s, γεγονός που θα μπορούσε να θέσει σε κίνδυνο τις εμπιστευτικές πληροφορίες σας.</string>
@@ -776,36 +824,47 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Έτοιμοι για ένα καλύτερο και πιο ιδιωτικό διαδίκτυο;]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Ας το κάνουμε!</string>
-    <string name="preOnboardingDaxDialog2Title">H προστασία προσωπικών δεδομένων energopoi;huhke!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
+    <string name="preOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
     <string name="preOnboardingDaxDialog2Button">Επιλέξτε το πρόγραμμα περιήγησής σας</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
     <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
     <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
     <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
-    <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
+    <string name="preOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
+    <string name="preOnboardingAddressBarOkButton">Επόμενο</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Κορυφή (Προεπιλογή)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Ευδιάκριτο</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Κάτω μέρος</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Εύκολη πρόσβαση</string>
     <string name="onboardingSearchDaxDialogTitle">Δοκίμασε μια αναζήτηση!</string>
-    <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς μπορείτε να πείτε «duck» στα ισπανικά</string>
+    <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"πώς να πείτε πάπια στα αγγλικά"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"πώς μπορείτε να πείτε πάπια στα ισπανικά"</string>
     <string name="onboardingSearchQueryOption1">πώς να πείτε πάπια στα αγγλικά</string>
     <string name="onboardingSearchQueryOption1English">πώς μπορείτε να πείτε πάπια στα ισπανικά</string>
     <string name="onboardingSearchDaxDialogOption2">οι ηθοποιοί του avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks Cast</string>
     <string name="onboardingSearchDaxDialogOption3">τοπικός καιρός</string>
     <string name="onboardingSearchDaxDialogOption4">Κάνε μου έκπληξη!</string>
-    <string name="onboardingSearchQueryOption4">συνταγές για δείπνο</string>
-    <string name="onboardingSearchQueryOption4US">συνταγές για μπισκότα με κομματάκια σοκολάτας</string>
+    <string name="onboardingSearchQueryOption4">παπάκια</string>
     <string name="onboardingSitesDaxDialogTitle">Δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <string name="onboardingSitesDaxDialogDescription">Θα εμποδίσω τις εφαρμογές παρακολούθησης ώστε να μην μπορούν να σας κατασκοπεύουν.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Κάνε μου έκπληξη!</string>
-    <string name="onboardingSerpDaxDialogDescription">Αυτό είναι το DuckDuckGo Search. Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
     <string name="onboardingSerpDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,47 +877,31 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Το κατάλαβα!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
     <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
-    <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
-    <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
+    <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Κόλλα πέντε!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Πριν το ξεχάσω...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης ένα ασφαλές <b>VPN + 2 ακόμη premium προστασίες</b>, διαθέσιμες με <b>προαιρετική συνδρομή επί πληρωμή</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης μια <b>προαιρετική επί πληρωμή συνδρομή</b>, με ασφαλές <b>VPN</b> και <b>προηγμένη, ιδιωτική τεχνητή νοημοσύνη</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Το γνωρίζατε;</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Γεια σας.<br/><br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Η προστασία ενεργοποιήθηκε!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Αποκλεισμός αιτημάτων και αναδυόμενων παραθύρων για cookie</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Γρήγορη διαγραφή δεδομένων περιήγησης</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Ποιο χρώμα μου ταιριάζει καλύτερα;</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Επιλέξτε το εικονίδιο της εφαρμογής σας:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Επόμενο</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Πού πρέπει να τοποθετήσω τη γραμμή διευθύνσεών σας;</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Κορυφή (Προεπιλογή)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Ευδιάκριτο</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Επόμενο</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Κάτω μέρος</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Εύκολη πρόσβαση</string>
-    <string name="highlightsOnboardingSearchQueryOption4">παπάκια</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ιδιωτικές.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[Αυτό είναι το <b>DuckDuckGo Search</b>! Ιδιωτικά. Γρήγορα. Λιγότερες διαφημίσεις.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της!</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Κόλλα πέντε!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Δοκιμάστε το</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Παράλειψη</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Έχω ξαναβρεθεί εδώ</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Το κατάλαβα! Θα παραλείψω τις άλλες συμβουλές.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Θυμηθείτε: μπορείτε να διαγράψετε όλες τις καρτέλες, το ιστορικό και τα δεδομένα περιήγησης με δύο πατήματα με το <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Εμφάνιση προγράμματος εκμάθησης</string>
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Θέλετε εύκολη πρόσβαση στο ιδιωτικό AI chat;</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenButton">Επόμενο</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[Οι λειτουργίες τεχνητής νοημοσύνης είναι ιδιωτικές και προαιρετικές. Μπορείτε να κάνετε αλλαγές στις <b>Ρυθμίσεις > Λειτουργίες τεχνητής νοημοσύνης</b>.]]></string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Γραμμή διευθύνσεων</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Θέση γραμμής διευθύνσεων</string>
     <string name="settingsAddressBarPositionTop">Κορυφή</string>
     <string name="settingsAddressBarPositionBottom">Κάτω μέρος</string>
+    <string name="settingsAddressBarPositionSplit">Διαχωρισμός</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Εμφάνιση στην Εκκίνηση εφαρμογής</string>
@@ -915,40 +958,17 @@
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Ολοκληρώστε την εγκατάστασή σας</string>
 
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Γεια σας.</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ενεργοποιήθηκαν</b> οι <i>προστασίες!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Γεια σας.<br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <font color=\"#F05C2B\">Fire Button</font>]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Δοκιμάστε το!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ και %1$d ακόμα προσπαθούσαν να σας παρακολουθήσουν εδώ. <font color=\"#F05C2B\">Τους μπλόκαρα!</font>]]></item>
-        <item quantity="other"><![CDATA[ και %1$d ακόμα προσπαθούσαν να σας παρακολουθήσουν εδώ. <font color=\"#F05C2B\">Τους μπλόκαρα!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. <font color=\"#F05C2B\">Τους μπλόκαρα!</font>]]></item>
-        <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. <font color=\"#F05C2B\">Τους μπλόκαρα!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nΗ DuckDuckGo αποτελεί ανεξάρτητη εταιρεία διαδικτυακής προστασίας για οποιονδήποτε επιθυμεί να ανακτήσει τον έλεγχο των προσωπικών πληροφοριών του.\n\nΠιστεύουμε ότι ο καλύτερος τρόπος για να προστατέψετε τις προσωπικές πληροφορίες σας από χάκερ, απατεώνες και εταιρείες που παραβιάζουν την ιδιωτικότητα είναι να μη συλλέγονται καθόλου. Αυτός είναι ο λόγος για τον οποίον εκατομμύρια άνθρωποι <annotation type="chart_comparison">επιλέγουν το DuckDuckGo έναντι του Chrome και άλλων προγραμμάτων περιήγησης</annotation> για να πραγματοποιήσουν αναζητήσεις και να περιηγηθούν στο διαδίκτυο. Η ενσωματωμένη μηχανή αναζήτησής μας είναι σαν της Google, ωστόσο δεν παρακολουθεί ποτέ τις αναζητήσεις σας. Και οι προστασίες περιήγησής μας, όπως ο αποκλεισμός παρακολούθησης διαφημίσεων και ο αποκλεισμός cookie, βοηθούν ώστε να σταματήσουν άλλες εταιρείες να συλλέγουν τα δεδομένα σας. Και, φυσικά, το πρόγραμμα περιήγησής μας είναι δωρεάν. Κερδίζουμε χρήματα από <annotation type="privacy_respecting_ads">διαφημίσεις αναζήτησης που σέβονται την ιδιωτικότητα</annotation>, όχι από την εκμετάλλευση των δεδομένων σας.Επιπλέον, προσφέρουμε επίσης τη <annotation type="ppro_help_page">συνδρομή DuckDuckGo</annotation> ενοποιημένη στο πρόγραμμα περιήγησής μας. Οι συνδρομητές απολαμβάνουν ακόμα μεγαλύτερη προστασία απορρήτου με ένα γρήγορο και απλό <annotation type="vpn_help_page">VPN</annotation>, που βοηθά στην ασφάλεια της διαδικτυακής δραστηριότητάς σας, πρόσβαση σε προηγμένα μοντέλα τεχνητής νοημοσύνης στην ιδιωτική υπηρεσία συνομιλίας AI Duck.ai, μια υπηρεσία που εντοπίζει και αφαιρεί τα προσωπικά στοιχεία σας από ιστότοπους εύρεσης ατόμων και μια υπηρεσία που αποκαθιστά την ταυτότητά σας σε περίπτωση κλοπής.\n\nΑνακτήστε τον έλεγχο των προσωπικών πληροφοριών σας με το πρόγραμμα περιήγησης που έχει σχεδιαστεί για προστασία δεδομένων και όχι για συλλογή δεδομένων.</string>
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[Το DuckDuckGo διαθέτει επίσης μια <b>προαιρετική επί πληρωμή συνδρομή</b>, με ασφαλές <b>VPN</b> και <b>προηγμένη, ιδιωτική τεχνητή νοημοσύνη</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Λειτουργίες τεχνητής νοημοσύνης</string>
-    <string name="settingsDuckAi">Duck.ai</string>
-
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Εμφάνιση πλήθους εφαρμογών παρακολούθησης στην Εναλλαγή καρτελών</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s εφαρμογή παρακολούθησης αποκλείστηκε &lt;/b&gt; τις τελευταίες 7 ημέρες</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Απόκρυψη πλήθους εφαρμογών παρακολούθησης;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Μπορείτε να ενεργοποιήσετε ξανά αυτήν την επιλογή στις Ρυθμίσεις &gt; Εμφάνιση.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Αποκρυψη</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Διατήρηση</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Κίνηση αποκλεισμένων εφαρμογών παρακολούθησης</string>
+    <string name="showTrackerCountInAddressBar">Εμφάνιση στη Γραμμή διευθύνσεων</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Εμφάνιση στη Διαχείριση καρτελών</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Αναζήτηση μόνο</string>

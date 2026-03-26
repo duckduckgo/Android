@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface DisplayablePreferredLocationProvider {
     suspend fun getDisplayablePreferredLocation(): String?

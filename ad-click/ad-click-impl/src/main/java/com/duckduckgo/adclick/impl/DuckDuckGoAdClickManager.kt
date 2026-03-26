@@ -17,15 +17,16 @@
 package com.duckduckgo.adclick.impl
 
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.adclick.impl.metrics.AdClickCollector
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.adclick.impl.pixels.AdClickPixels
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.logcat
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -33,9 +34,8 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private val adClickData: AdClickData,
     private val adClickAttribution: AdClickAttribution,
     private val adClickPixels: AdClickPixels,
+    private val adClickCollector: AdClickCollector,
 ) : AdClickManager {
-
-    private val publicSuffixDatabase = PublicSuffixDatabase()
 
     override fun detectAdClick(url: String?, isMainFrame: Boolean) {
         if (url == null) return
@@ -130,7 +130,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
     private fun toTldPlusOne(url: String): String? {
         val urlAdDomain = UriString.host(url)
         if (urlAdDomain.isNullOrEmpty()) return urlAdDomain
-        return kotlin.runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
+        return kotlin.runCatching { PublicSuffixDatabase.get().getEffectiveTldPlusOne(urlAdDomain) }.getOrNull()
     }
 
     private fun adClicked(detectedAdDomain: String?) {
@@ -223,6 +223,7 @@ class DuckDuckGoAdClickManager @Inject constructor(
                     exemptionDeadline = System.currentTimeMillis() + adClickAttribution.getTotalExpirationMillis(),
                 ),
             )
+            adClickCollector.onAdClick()
             adClickPixels.fireAdClickDetectedPixel(
                 savedAdDomain = savedAdDomain,
                 urlAdDomain = urlAdDomain,

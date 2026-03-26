@@ -21,6 +21,8 @@ import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.StatisticsPixelName.ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -28,12 +30,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import logcat.LogPriority
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -50,6 +53,7 @@ class AtbInitializer @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: PluginPoint<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -65,14 +69,31 @@ class AtbInitializer @Inject constructor(
     override fun onPrivacyConfigDownloaded() {
         if (!statisticsDataStore.hasInstallationStatistics) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
-                logcat(VERBOSE) { "Initialize ATB" }
-                listeners.getPlugins().forEach {
-                    withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
+                val preAtbInitPlugins = listeners.getPlugins()
+                logcat(VERBOSE) { "AtbInitializer: About to initialize ATB; running ${preAtbInitPlugins.size} pre ATB initialization plugins" }
+
+                preAtbInitPlugins.forEach { plugin ->
+                    val pluginName = plugin.javaClass.simpleName
+                    logcat(VERBOSE) { "AtbInitializer: Running pre-ATB init plugin [$pluginName]" }
+
+                    withTimeoutOrNull(plugin.beforeAtbInitTimeoutMillis()) {
+                        plugin.beforeAtbInit()
+                    } ?: onPluginTimeout(pluginName)
                 }
+
                 // First time we initializeAtb
                 statisticsUpdater.initializeAtb()
             }
         }
+    }
+
+    private fun onPluginTimeout(pluginName: String) {
+        logcat(LogPriority.ERROR) { "AtbInitializer: pre-init plugin timed out [$pluginName]" }
+
+        val params = mapOf(
+            "plugin" to pluginName,
+        )
+        pixel.fire(ATB_PRE_INITIALIZER_PLUGIN_TIMEOUT, parameters = params, emptyMap())
     }
 }
 

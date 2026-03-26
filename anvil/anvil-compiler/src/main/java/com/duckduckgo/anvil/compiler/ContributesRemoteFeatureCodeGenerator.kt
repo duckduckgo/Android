@@ -34,12 +34,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.BindsOptionalOf
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import java.io.File
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
+import java.io.File
+import javax.inject.Inject
 
 @OptIn(ExperimentalAnvilApi::class)
 @AutoService(CodeGenerator::class)
@@ -51,7 +51,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         projectFiles: Collection<KtFile>,
-    ): Collection<GeneratedFile> {
+    ): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesRemoteFeature::class.fqName) }
@@ -72,7 +72,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         customStorePresence: CustomStorePresence,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_ProxyModule"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -165,18 +165,19 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .addCode(
                                     CodeBlock.of(
                                         """
-                                            return object : FeatureTogglesInventory {
-                                                override suspend fun getAll(): List<Toggle> {
-                                                    return feature.javaClass.declaredMethods.mapNotNull { method ->
-                                                        if (method.genericReturnType.toString().contains(Toggle::class.java.canonicalName!!)) {
-                                                            method.invoke(feature) as Toggle
-                                                        } else {
-                                                            null
-                                                        }
-                                                    }
+                                            return object : %T {
+                                                override suspend fun getAll(): %T<%T> {
+                                                    return listOf(
+                                                        ${boundType.declaredFunctions().joinToString(
+                                            separator = ",\n                                                        ",
+                                        ) { "feature.${it.name}()" }}
+                                                    )
                                                 }
                                             }
                                         """.trimIndent(),
+                                        FeatureTogglesInventory::class.asClassName(),
+                                        List::class.asClassName(),
+                                        Toggle::class.asClassName(),
                                     ),
                                 )
                                 .returns(FeatureTogglesInventory::class.asClassName())
@@ -187,7 +188,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     private fun generateRemoteFeature(
@@ -195,7 +196,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         customStorePresence: CustomStorePresence,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_RemoteFeature"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -204,6 +205,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         val scope = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }.scopeOrNull()!!
 
         val content = FileSpec.buildFile(generatedPackage, generatedClassName) {
+            addImport("com.duckduckgo.feature.toggles.internal.api", "REMOTE_FEATURE_MOSHI")
             addType(
                 TypeSpec.classBuilder(generatedClassName)
                     .addAnnotations(
@@ -295,7 +297,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     )
                     .addProperty(
                         PropertySpec.builder("moshi", moshi.asClassName(module), KModifier.PRIVATE)
-                            .initializer("Moshi.Builder().add(%T()).build()", jsonObjectAdapter.asClassName(module))
+                            .initializer("REMOTE_FEATURE_MOSHI")
                             .build(),
                     )
                     .addProperty(createSharedPreferencesProperty(generatedPackage, featureName, module))
@@ -307,26 +309,18 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addFunction(createParseJsonFun(module))
                     .addFunction(createParseExceptions(module))
                     .addFunction(createInvokeMethod(boundType))
-                    .addType(createJsonRolloutDataClass(generatedPackage, module))
-                    .addType(createJsonRolloutStepDataClass(generatedPackage, module))
-                    .addType(createJsonToggleTargetDataClass(generatedPackage, module))
-                    .addType(createJsonToggleCohortDataClass(generatedPackage, module))
-                    .addType(createJsonToggleDataClass(generatedPackage, module))
-                    .addType(createJsonFeatureDataClass(generatedPackage, module))
-                    .addType(createJsonExceptionDataClass(generatedPackage, module))
-                    .addType(createJsonObjectAdapterClass(generatedPackage, module))
                     .build(),
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     private fun generateOptionalBindings(
         vmClass: ClassReference.Psi,
         codeGenDir: File,
         module: ModuleDescriptor,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_OptionalBindings_Module"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -359,7 +353,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     private fun createFeatureNameProperty(featureName: String): PropertySpec {
@@ -401,7 +395,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             val hash = %T().writeUtf8(concatMethodNames).md5().hex()
                             return hash
                         } catch(e: Throwable) {
-                            // fallback to just featureName 
+                            // fallback to just featureName
                             return this.featureName
                         }
                     """.trimIndent(),
@@ -420,7 +414,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 """
                 if (featureName == this.featureName) {
                     val feature = parseJson(jsonString) ?: return false
-                    
+
                     // feature hash is the hash of the feature + hash coming from remote config
                     // this way we evaluate either when remote config has changes OR when feature changes
                     // when the feature.hash (remote config) is null we always re-evaluate
@@ -428,9 +422,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         val _hash = hash() + feature.hash
                         if (compareAndSetHash(_hash)) return true
                     }
-        
+
                     val exceptions = parseExceptions(feature.exceptions)
-        
+
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
                     this.feature.get().invokeMethod("self").setRawStoredState(
                         Toggle.State(
@@ -443,7 +437,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             exceptions = exceptions,
                         )
                     )
-        
+
                     // Handle sub-features
                     feature.features?.forEach { subfeature ->
                         subfeature.value.let { jsonToggle ->
@@ -454,9 +448,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 // we try to honour the previous state
                                 // else we resort to compute it using isEnabled()
                                 val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
-                                
-                                val previousRolloutThreshold = previousState?.rolloutThreshold 
-                                val previousAssignedCohort = previousState?.assignedCohort 
+
+                                val previousRolloutThreshold = previousState?.rolloutThreshold
+                                val previousAssignedCohort = previousState?.assignedCohort
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
@@ -465,6 +459,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         localeLanguage = target.localeLanguage,
                                         isReturningUser = target.isReturningUser,
                                         isPrivacyProEligible = target.isPrivacyProEligible,
+                                        entitlement = target.entitlement,
                                         minSdkVersion = target.minSdkVersion,
                                     )
                                 } ?: emptyList()
@@ -486,8 +481,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         assignedCohort = previousAssignedCohort,
                                         targets = targets,
                                         cohorts = cohorts,
-                                        settings = settings,                                        
-                                        exceptions = subFeatureExceptions,                                        
+                                        settings = settings,
+                                        exceptions = subFeatureExceptions,
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -495,12 +490,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             }
                         }
                     }
-        
+
                     // handle settings
                     feature.settings?.let {
                         settingsStore.store(it.toString())
                     }
-        
+
                     return true
                 }
                 return false
@@ -553,7 +548,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 CodeBlock.builder()
                     .add(
                         """
-                            if (hash == null) return false 
+                            if (hash == null) return false
                             val currentHash = preferences.getString("hash", null)
                             if (hash == currentHash) return true
                             preferences.edit().putString("hash", hash).apply()
@@ -579,14 +574,14 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         """.trimIndent(),
                     ).build(),
             )
-            .returns(FqName("JsonFeature").asClassName(module).copy(nullable = true))
+            .returns(jsonFeature.asClassName(module).copy(nullable = true))
             .build()
     }
 
     private fun createParseExceptions(module: ModuleDescriptor): FunSpec {
         return FunSpec.builder("parseExceptions")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter("exceptions", List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)))
+            .addParameter("exceptions", List::class.asClassName().parameterizedBy(jsonException.asClassName(module)))
             .addCode(
                 CodeBlock.builder()
                     .add(
@@ -618,322 +613,6 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 """.trimIndent(),
             )
             .returns(Toggle::class)
-            .build()
-    }
-
-    private fun createJsonRolloutDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleRollout").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter(
-                        "steps",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleRolloutStep").asClassName(module)),
-                    )
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec.builder(
-                    "steps",
-                    List::class.asClassName().parameterizedBy(FqName("JsonToggleRolloutStep").asClassName(module)),
-                ).initializer("steps")
-                    .build(),
-            )
-            .build()
-    }
-
-    private fun createJsonRolloutStepDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleRolloutStep").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("percent", Double::class.asClassName())
-                    .build(),
-            )
-            .addProperty(PropertySpec.builder("percent", Double::class.asClassName()).initializer("percent").build())
-            .build()
-    }
-
-    private fun createJsonToggleTargetDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleTarget").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("variantKey", String::class.asClassName())
-                    .addParameter("localeCountry", String::class.asClassName())
-                    .addParameter("localeLanguage", String::class.asClassName())
-                    .addParameter("isReturningUser", Boolean::class.asClassName().copy(nullable = true))
-                    .addParameter("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
-                    .addParameter("minSdkVersion", Int::class.asClassName().copy(nullable = true))
-                    .build(),
-            )
-            .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
-            .addProperty(PropertySpec.builder("localeCountry", String::class.asClassName()).initializer("localeCountry").build())
-            .addProperty(PropertySpec.builder("localeLanguage", String::class.asClassName()).initializer("localeLanguage").build())
-            .addProperty(
-                PropertySpec.builder("isReturningUser", Boolean::class.asClassName().copy(nullable = true)).initializer("isReturningUser").build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("isPrivacyProEligible", Boolean::class.asClassName().copy(nullable = true))
-                    .initializer("isPrivacyProEligible")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("minSdkVersion", Int::class.asClassName().copy(nullable = true))
-                    .initializer("minSdkVersion")
-                    .build(),
-            )
-            .build()
-    }
-
-    private fun createJsonToggleCohortDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleCohort").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("name", String::class.asClassName())
-                    .addParameter("weight", Int::class.asClassName())
-                    .build(),
-            )
-            .addProperty(PropertySpec.builder("name", String::class.asClassName()).initializer("name").build())
-            .addProperty(PropertySpec.builder("weight", Int::class.asClassName()).initializer("weight").build())
-            .build()
-    }
-
-    private fun createJsonToggleDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggle").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter(
-                        "state",
-                        String::class.asClassName().copy(nullable = true),
-                    )
-                    .addParameter(
-                        "minSupportedVersion",
-                        Double::class.asClassName().copy(nullable = true),
-                    )
-                    .addParameter(
-                        "rollout",
-                        FqName("JsonToggleRollout").asClassName(module).copy(nullable = true),
-                    )
-                    .addParameter(
-                        "targets",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
-                    )
-                    .addParameter(
-                        "cohorts",
-                        List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)),
-                    )
-                    .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
-                    .addParameter(
-                        ParameterSpec
-                            .builder(
-                                "exceptions",
-                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
-                            )
-                            .build(),
-                    )
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("state", String::class.asClassName().copy(nullable = true))
-                    .initializer("state")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("minSupportedVersion", Double::class.asClassName().copy(nullable = true))
-                    .initializer("minSupportedVersion")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("rollout", FqName("JsonToggleRollout").asClassName(module).copy(nullable = true))
-                    .initializer("rollout")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
-                    .initializer("targets")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("cohorts", List::class.asClassName().parameterizedBy(FqName("JsonToggleCohort").asClassName(module)))
-                    .initializer("cohorts")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
-                    .initializer("settings")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec.builder(
-                    "exceptions",
-                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
-                ).initializer("exceptions")
-                    .build(),
-            )
-            .build()
-    }
-
-    private fun createJsonFeatureDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonFeature").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("state", String::class.asClassName().copy(nullable = true))
-                    .addParameter("hash", String::class.asClassName().copy(nullable = true))
-                    .addParameter("minSupportedVersion", Int::class.asClassName().copy(nullable = true))
-                    .addParameter("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
-                    .addParameter(
-                        ParameterSpec
-                            .builder(
-                                "exceptions",
-                                List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
-                            )
-                            .build(),
-                    )
-                    .addParameter(
-                        ParameterSpec
-                            .builder(
-                                "features",
-                                Map::class.asClassName().parameterizedBy(
-                                    String::class.asClassName(),
-                                    FqName("JsonToggle").asClassName(module),
-                                ).copy(nullable = true),
-                            )
-                            .build(),
-                    )
-                    .build(),
-            )
-            // properties that match params to generate data class
-            .addProperty(PropertySpec.builder("state", String::class.asClassName().copy(nullable = true)).initializer("state").build())
-            .addProperty(PropertySpec.builder("hash", String::class.asClassName().copy(nullable = true)).initializer("hash").build())
-            .addProperty(
-                PropertySpec.builder("minSupportedVersion", Int::class.asClassName().copy(nullable = true))
-                    .initializer("minSupportedVersion")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec.builder("settings", FqName("org.json.JSONObject").asClassName(module).copy(nullable = true))
-                    .initializer("settings")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec.builder(
-                    "exceptions",
-                    List::class.asClassName().parameterizedBy(FqName("JsonException").asClassName(module)),
-                ).initializer("exceptions")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder(
-                        "features",
-                        Map::class.asClassName().parameterizedBy(
-                            String::class.asClassName(),
-                            FqName("JsonToggle").asClassName(module),
-                        ).copy(nullable = true),
-                    )
-                    .initializer("features")
-                    .build(),
-            )
-            .build()
-    }
-
-    private fun createJsonExceptionDataClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonException").asClassName(module))
-            .addModifiers(KModifier.PRIVATE)
-            .addModifiers(KModifier.DATA)
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("domain", String::class.asClassName())
-                    .addParameter("reason", String::class.asClassName().copy(nullable = true))
-                    .build(),
-            )
-            .addProperty(PropertySpec.builder("domain", String::class.asClassName()).initializer("domain").build())
-            .addProperty(PropertySpec.builder("reason", String::class.asClassName().copy(nullable = true)).initializer("reason").build())
-            .build()
-    }
-
-    private fun createJsonObjectAdapterClass(
-        generatedPackage: String,
-        module: ModuleDescriptor,
-    ): TypeSpec {
-        return TypeSpec.classBuilder("JSONObjectAdapter")
-            .addModifiers(KModifier.PRIVATE)
-            .addFunction(
-                FunSpec.builder("fromJson")
-                    .addAnnotation(fromJsonAnnotation.asClassName(module))
-                    .addParameter("reader", JsonReader.asClassName(module))
-                    .addCode(
-                        CodeBlock.of(
-                            """
-                                return (reader.readJsonValue() as? Map<*, *>)?.let { data ->
-                                    try {
-                                        %T(data)
-                                    } catch (e: %T) {
-                                        return null
-                                    }
-                                }
-                            """.trimIndent(),
-                            JSONObject.asClassName(module),
-                            JSONException.asClassName(module),
-                        ),
-                    )
-                    .returns(JSONObject.asClassName(module).copy(nullable = true))
-                    .build(),
-            )
-            .addFunction(
-                FunSpec.builder("toJson")
-                    .addAnnotation(toJsonAnnotation.asClassName(module))
-                    .addParameter("writer", JsonWriter.asClassName(module))
-                    .addParameter("value", JSONObject.asClassName(module).copy(nullable = true))
-                    .addCode(
-                        CodeBlock.of(
-                            """
-                                value?.let { writer.run { value(%T().writeUtf8(value.toString())) } }
-                            """.trimIndent(),
-                            okioBuffer.asClassName(module),
-                        ),
-                    )
-                    .build(),
-            )
             .build()
     }
 
@@ -1009,7 +688,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             if (this != null) {
                 // check that the Store is actually a [FeatureSettings.Store]
                 if (this.directSuperTypeReferences()
-                    .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
+                        .none { it.asClassReferenceOrNull()?.fqName == FeatureSettings.Store::class.fqName }
                 ) {
                     throw AnvilCompilationException(
                         "${vmClass.fqName} [settingsStore] must extend [FeatureSettings.Store]",
@@ -1123,15 +802,14 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val variantManager = FqName("com.duckduckgo.experiments.api.VariantManager")
         private val buildFlavorInternal = FqName("com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL")
         private val moshi = FqName("com.squareup.moshi.Moshi")
-        private val jsonObjectAdapter = FqName("JSONObjectAdapter")
         private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
-        private val fromJsonAnnotation = FqName("com.squareup.moshi.FromJson")
-        private val toJsonAnnotation = FqName("com.squareup.moshi.ToJson")
-        private val JSONObject = FqName("org.json.JSONObject")
-        private val JSONException = FqName("org.json.JSONException")
-        private val JsonWriter = FqName("com.squareup.moshi.JsonWriter")
-        private val JsonReader = FqName("com.squareup.moshi.JsonReader")
         private val okioBuffer = FqName("okio.Buffer")
+
+        // Shared JSON model types from feature-toggles-internal-api — visible to all feature
+        // modules via the transitive `api project(":feature-toggles-internal-api")` dep in
+        // feature-toggles-api. Each one avoids re-generating the same private data class per feature.
+        private val jsonFeature = FqName("com.duckduckgo.feature.toggles.internal.api.JsonFeature")
+        private val jsonException = FqName("com.duckduckgo.feature.toggles.internal.api.JsonException")
     }
 }
 

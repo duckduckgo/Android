@@ -40,5 +40,3 @@ tags:
             - copyTextFrom:
                 id: "omnibarTextInput"
             - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
-            - tapOn:
-                id: "omnibarTextInput"

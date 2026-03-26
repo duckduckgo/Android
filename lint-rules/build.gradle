@@ -18,11 +18,11 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 dependencies {
-    compileOnly Kotlin.stdlib.jdk7
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
     compileOnly "com.android.tools.lint:lint-checks:$lint_version"
 
     testImplementation Testing.junit4
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testImplementation "com.android.tools.lint:lint-api:$lint_version"
     testImplementation "com.android.tools.lint:lint-tests:$lint_version"
 }
@@ -34,6 +34,16 @@ java {
 
 kotlin {
     jvmToolchain(17)
+}
+
+// Force Kotlin 1.9.0 compatibility for lint-rules module
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    compilerOptions {
+        freeCompilerArgs.addAll([
+            "-Xskip-metadata-version-check",
+            "-Xsuppress-version-warnings"
+        ])
+    }
 }
 
 tasks.register('jvm_checks') {

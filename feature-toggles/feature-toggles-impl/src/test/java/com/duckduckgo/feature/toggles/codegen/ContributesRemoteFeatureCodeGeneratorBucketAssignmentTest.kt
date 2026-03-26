@@ -26,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import dagger.Lazy
-import kotlin.math.abs
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -34,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import kotlin.math.abs
 
 private var enables = 0
 private var disables = 0
@@ -64,7 +64,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
     fun `test probability`() {
         fun assertWithinRange() {
             if (testCase.run < 9000) return // small sample sizes will have high variance
-            val allowableDeviation = (enables + disables) / 2 * 6.0f / 100 // allowable deviation of 6%
+            val allowableDeviation = (enables + disables) * 6.0f / 100 // allowable deviation of 6%
 
             // Check if the absolute difference between the two numbers is within the allowable deviation
             val difference = abs(enables - disables)
@@ -94,7 +94,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
                                 "steps": [
                                     {
                                         "percent": ${testCase.rollout}
-                                    }                    
+                                    }
                                 ]
                             }
                         }

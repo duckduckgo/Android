@@ -22,7 +22,6 @@ import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -36,6 +35,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class DefaultAutofillEngagementRepositoryTest {
@@ -251,6 +251,7 @@ class DefaultAutofillEngagementRepositoryTest {
             pixel: PixelName,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels[pixel.pixelName] = parameters
         }
@@ -259,6 +260,7 @@ class DefaultAutofillEngagementRepositoryTest {
             pixelName: String,
             parameters: Map<String, String>,
             encodedParameters: Map<String, String>,
+            type: PixelType,
         ) {
             firedPixels[pixelName] = parameters
         }

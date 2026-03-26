@@ -39,5 +39,6 @@
 
     <!-- New Tab -->
     <string name="vpn_NewTabSectionSettingsTitle">App Tracking Protection Status</string>
+    <string name="vpnMenuTitle">VPN</string>
 
 </resources>

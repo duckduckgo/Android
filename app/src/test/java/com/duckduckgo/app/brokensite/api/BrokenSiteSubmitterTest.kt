@@ -43,11 +43,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.Moshi
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -63,6 +59,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @SuppressLint("DenyListedApi")
@@ -104,10 +103,6 @@ class BrokenSiteSubmitterTest {
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
     private val networkProtectionState: NetworkProtectionState = mock()
-
-    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
-        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
-    }
 
     private val webViewVersionProvider: WebViewVersionProvider = mock()
 
@@ -164,7 +159,6 @@ class BrokenSiteSubmitterTest {
             mockUnprotectedTemporary,
             mockContentBlocking,
             mockBrokenSiteLastSentReport,
-            privacyProtectionsPopupExperimentExternalPixels,
             networkProtectionState,
             webViewVersionProvider,
             ampLinks,
@@ -382,19 +376,6 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.firstValue
 
         assertFalse("reportFlow" in params)
-    }
-
-    @Test
-    fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
-        val params = mapOf("test_key" to "test_value")
-        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
-
-        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
-
-        val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(Count))
-
-        assertEquals("test_value", paramsCaptor.firstValue["test_key"])
     }
 
     @Test
@@ -658,6 +639,34 @@ class BrokenSiteSubmitterTest {
         assertEquals("flag1,flag2", params["debugFlags"])
     }
 
+    @Test
+    fun whenBreakageDataIsNullThenEncodedParamsDoNotContainIt() = runTest {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertFalse(encodedParams.containsKey("breakageData"))
+    }
+
+    @Test
+    fun whenBreakageDataExistsThenItIsIncludedInEncodedParams() = runTest {
+        // Pre-encoded breakage data from content-scope-scripts
+        val preEncodedBreakageData = "%7B%22test%22%3A%22value%22%7D"
+        val brokenSite = getBrokenSite().copy(breakageData = preEncodedBreakageData)
+
+        testee.submitBrokenSiteFeedback(brokenSite, toggle = false)
+
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), any(), encodedParamsCaptor.capture(), eq(Count))
+        val encodedParams = encodedParamsCaptor.firstValue
+
+        assertEquals(preEncodedBreakageData, encodedParams["breakageData"])
+    }
+
     private fun assignToExperiment() {
         val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
@@ -684,6 +693,8 @@ class BrokenSiteSubmitterTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            consentRule = null,
+            consentReloadLoop = false,
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
@@ -693,6 +704,7 @@ class BrokenSiteSubmitterTest {
             jsPerformance = null,
             contentScopeExperiments = null,
             debugFlags = null,
+            breakageData = null,
         )
     }
 

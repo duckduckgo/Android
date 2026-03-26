@@ -1,6 +1,7 @@
 package com.duckduckgo.networkprotection.impl.exclusion
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -30,11 +31,15 @@ class RealNetPExclusionListRepositoryTest {
     @Mock
     private lateinit var packageManager: PackageManager
 
+    @Mock
+    private lateinit var context: Context
+
     private lateinit var repository: RealNetPExclusionListRepository
     private val autoExcludeAppsRepository = FakeAutoExcludeAppsRepository()
     private val localConfig = FakeNetPSettingsLocalConfigFactory.create()
 
     @Before
+    @SuppressLint("DenyListedApi")
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         repository = RealNetPExclusionListRepository(
@@ -43,6 +48,7 @@ class RealNetPExclusionListRepositoryTest {
             localConfig,
             coroutineTestRule.testDispatcherProvider,
             packageManager,
+            context,
         )
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(
             listOf(

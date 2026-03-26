@@ -21,8 +21,7 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
 
         webViewCompatApiUsages
-            .firstOrNull { it.methodName == method.name }
-            ?.takeIf { context.evaluator.isMemberInClass(method, it.containingClass) }
+            .firstOrNull { it.methodName == method.name && context.evaluator.isMemberInClass(method, it.containingClass) }
             ?.let { context.report(
                 it.issue,
                 node,
@@ -71,7 +70,7 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
         val ISSUE_POST_MESSAGE_USAGE: Issue = Issue.create(
             id = "PostMessageUsage",
             briefDescription = "Use PostMessageWrapperPlugin to post messages",
-            explanation = "Use `PluginPoint<PostMessageWrapperPlugin>` instead for backwards compatibility",
+            explanation = "Use `PluginPoint<PostMessageWrapperPlugin>` instead for backwards compatibility. If already within a `WebMessagingPlugin`, use `WebViewCompatWrapper#postMessage` instead",
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
@@ -114,6 +113,11 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
             WebViewCompatApiUsage(
                 methodName = "postMessage",
                 containingClass = "com.duckduckgo.js.messaging.api.WebMessagingPlugin",
+                issue = ISSUE_POST_MESSAGE_USAGE
+            ),
+            WebViewCompatApiUsage(
+                methodName = "postMessage",
+                containingClass = "androidx.webkit.JavaScriptReplyProxy",
                 issue = ISSUE_POST_MESSAGE_USAGE
             )
         )

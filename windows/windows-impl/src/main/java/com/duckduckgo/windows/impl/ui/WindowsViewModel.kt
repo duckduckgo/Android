@@ -24,11 +24,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.windows.impl.WindowsDownloadLinkOrigin
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class WindowsViewModel @Inject constructor(

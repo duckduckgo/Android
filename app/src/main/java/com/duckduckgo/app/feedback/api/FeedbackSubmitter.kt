@@ -25,7 +25,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.OTHER
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.SEARCH_NOT_GOOD_ENOUGH
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.WEBSITES_NOT_LOADING
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -33,12 +32,12 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.experiments.api.VariantManager
-import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.Locale
 
 interface FeedbackSubmitter {
 
@@ -66,7 +65,6 @@ class FireAndForgetFeedbackSubmitter(
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
-    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(
         mainReason: MainReason,
@@ -150,13 +148,6 @@ class FireAndForgetFeedbackSubmitter(
         url: String? = null,
         reason: String = FeedbackService.REASON_GENERAL,
     ) {
-        // Delete after the experiment has finished and go back to always return atbWithVariant()
-        val atb = if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
-            atbWithVariant() + "_${onboardingDesignExperimentManager.getCohort()}"
-        } else {
-            atbWithVariant()
-        }
-
         feedbackService.submitFeedback(
             reason = reason,
             category = category,
@@ -168,7 +159,7 @@ class FireAndForgetFeedbackSubmitter(
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
             api = appBuildConfig.sdkInt,
-            atb = atb,
+            atb = atbWithVariant(),
         )
     }
 

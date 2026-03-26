@@ -37,23 +37,28 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Spletna mesta lahko uporabljajo snemalnik zvoka le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
 
     <!-- Settings -->
-    <string name="duck_chat_settings_activity_description">Duck.ai je izbirna funkcija, ki vam omogoča anonimen klepet s priljubljenimi modeli za klepet z umetno inteligenco drugih ponudnikov. Vaši klepeti se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting">Omogoči Duck.ai</string>
+    <string name="duck_chat_ai_features_title">Lastnosti UI</string>
+    <string name="duck_chat_settings_activity_description">Funkcije umetne inteligence DuckDuckGo so zasebne in izbirne.\nVaši podatki se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description">Klepetajte zasebno s priljubljenimi modeli umetne inteligence tretjih oseb</string>
     <string name="duck_chat_visibility_setting">Meni brskalnika</string>
     <string name="duck_chat_address_bar_visibility_setting">Naslovna vrstica</string>
-    <string name="duck_chat_assist_settings_title">Nastavitve modula Assist</string>
+    <string name="duck_chat_assist_settings_title">Nastavitve modula Search Assist</string>
     <string name="duck_chat_assist_settings_description">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
     <string name="duck_ai_shortcut_settings_title">Bližnjice do Duck.ai</string>
     <string name="duck_ai_shortcut_settings_description">Izberite, katere bližnjice do Duck.ai naj bodo prikazane</string>
 
+    <!-- Duck AI Voice Search Shortcut Setting -->
+    <string name="duckAiVoiceSearchVisibilitySetting">Glasovno iskanje</string>
+
     <!-- Input Screen  -->
-    <string name="input_screen_search_tab">Iskanje</string>
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
+    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
-    <string name="input_screen_user_pref_description">Preizkusite našo novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
+    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
+    <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -62,25 +67,38 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Odprite Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Več</string>
 
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">Lastnosti UI</string>
-    <string name="duck_chat_settings_activity_description_rebranding">Funkcije umetne inteligence DuckDuckGo so zasebne in izbirne.\nVaši podatki se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Klepetajte zasebno s priljubljenimi modeli umetne inteligence tretjih oseb</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Nastavitve modula Search Assist</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
-
     <!-- AutoComplete -->
     <string name="autocompleteDuckAiPrompt">Vprašajte Duck.ai</string>
+    <string name="autocompleteDeviceAppNotFound">Prošnje ni bilo mogoče najti</string>
 
     <!-- New Address Bar Option Bottom Sheet Dialog -->
+    <string name="newAddressBarOptionBottomSheetDialogTitle">Želite lažji dostop do zasebnega klepeta z umetno inteligenco?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Poišči ali vnesi naslov</string>
-    <string name="newAddressBarOptionBottomSheetDialogTitle">Preklapljanje med iskanjem in klepetom UI</string>
-    <string name="newAddressBarOptionBottomSheetDialogSubTitle">Funkcije umetne inteligence so vedno izbirne.</string>
     <string name="newAddressBarOptionBottomSheetDialogPrimaryButton">Potrdi</string>
     <string name="newAddressBarOptionBottomSheetDialogGhostButton">Ne zdaj</string>
     <string name="newAddressBarOptionBottomSheetDialogFooter">Prilagodite v Nastavitve &gt; Funkcije UI.</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchOnly">Samo iskanje</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchAndDuckAi">Iskanje in Duck.ai</string>
     <string name="newAddressBarOptionBottomSheetDialogHeader">Možnost naslovne vrstice</string>
+
+    <!-- Duck AI SERP Settings Title -->
+    <string name="duckAiSerpSettingsTitle">Lastnosti UI</string>
+
+    <!-- Duck AI Search Section Header -->
+    <string name="duckAiSearchSettingsSectionHeader">Iskanje</string>
+
+    <!-- Duck AI Hide Generated Images Settings Option -->
+    <string name="duckAiHideAiGeneratedImagesTitle">Skrij slike, ki jih ustvari umetna inteligenca</string>
+    <string name="duckAiHideAiGeneratedImagesDescription">Iz rezultatov iskanja slik odstrani slike, ki jih je ustvarila umetna inteligenca</string>
+
+    <!-- Duck AI Paid Settings -->
+    <string name="duck_ai_paid_settings_enable_in_settings">Omogočite v nastavitvah funkcij umetne inteligence</string>
+    <string name="duck_ai_paid_settings_manage_in_settings">Upravljajte v nastavitvah funkcij umetne inteligence</string>
+    <string name="duck_ai_paid_settings_manage_secondary">Konfigurirajte Duck.ai v nastavitvah funkcij umetne inteligence.</string>
+
+    <!-- Duck.ai Contextual Bottom Sheet -->
+    <string name="duckAIContextualPromptSummarize">Povzemi to stran</string>
+    <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
+    <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
+    <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
 </resources>

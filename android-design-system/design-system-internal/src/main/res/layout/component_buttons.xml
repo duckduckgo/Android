@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+~ Copyright (C) 2019 The Android Open Source Project
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~      http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Dax Buttons" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Primary Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Primary Small"
+            app:icon="@drawable/ic_add_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Primary Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Primary Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_device_desktop_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/dax_button_primary_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Primary Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/dax_button_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/dax_button_secondary_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Small"
+            app:icon="@drawable/ic_bell" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/dax_button_secondary_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/dax_button_secondary_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_arrow_left_24" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/dax_button_secondary_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Secondary Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/dax_button_destructive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/dax_button_destructive_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Small"
+            app:icon="@drawable/ic_bookmarks_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/dax_button_destructive_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/dax_button_destructive_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_reload_24" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+            android:id="@+id/dax_button_destructive_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Destructive Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/dax_button_ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/dax_button_ghost_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Small"
+            app:icon="@drawable/ic_bookmark_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/dax_button_ghost_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/dax_button_ghost_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Large"
+            app:icon="@drawable/ic_globe_16"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/dax_button_ghost_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Ghost Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Small"
+            app:icon="@drawable/ic_bookmarks_16" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Destructive Secondary Large"
+            app:daxButtonSize="large"
+            app:icon="@drawable/ic_reload_24" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+            android:id="@+id/dax_button_destructive_secondary_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Destructive Secondary Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
+            android:id="@+id/dax_button_ghost_destructive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Destructive Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
+            android:id="@+id/dax_button_ghost_destructive_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_arrow_left_24"
+            android:text="Ghost Destructive Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
+            android:id="@+id/dax_button_ghost_destructive_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Destructive Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
+            android:id="@+id/dax_button_ghost_destructive_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_bell"
+            android:text="Ghost Destructive Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
+            android:id="@+id/dax_button_ghost_destructive_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Ghost Destructive Disabled" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Alt Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_arrow_left_24"
+            android:text="Ghost Alt Small" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghost Alt Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_large_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/ic_bell"
+            android:text="Ghost Alt Large"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+            android:id="@+id/dax_button_ghost_alt_disabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Ghost Alt Disabled" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:primaryText="Icon Buttons" />
+
+        <com.duckduckgo.common.ui.view.button.IconButton
+            android:id="@+id/getIconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            app:srcCompat="@drawable/ic_union" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

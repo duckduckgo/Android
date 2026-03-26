@@ -23,9 +23,9 @@ import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredenti
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
 
 interface CsvCredentialConverter {
     suspend fun readCsv(encodedBlob: String): CsvCredentialImportResult

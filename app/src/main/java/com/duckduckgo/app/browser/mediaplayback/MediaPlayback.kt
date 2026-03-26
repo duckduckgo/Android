@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.mediaplayback
 
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackRepository
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,7 @@ class RealMediaPlayback @Inject constructor(
 
     override fun doesMediaPlaybackRequireUserGestureForUrl(url: String): Boolean {
         val uri = url.toUri()
+        if (mediaPlaybackRepository.exemptedDomains.any { sameOrSubdomain(uri, it) }) return false
         return mediaPlaybackFeature.self().isEnabled() && mediaPlaybackRepository.exceptions.none { it.domain == uri.baseHost }
     }
 }

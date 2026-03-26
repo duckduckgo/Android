@@ -23,29 +23,83 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface DuckChatFeatureRepository {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
+
     suspend fun setInputScreenUserSetting(enabled: Boolean)
+
+    suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean)
+
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
+
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
+    suspend fun setShowInVoiceSearch(showToggle: Boolean)
+
+    suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean)
+
+    suspend fun setNativeInputFieldUserSetting(enabled: Boolean)
+
     fun observeDuckChatUserEnabled(): Flow<Boolean>
+
     fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
+
+    fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?>
+
+    fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean>
+
+    fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean>
+
     fun observeShowInBrowserMenu(): Flow<Boolean>
+
     fun observeShowInAddressBar(): Flow<Boolean>
 
+    fun observeShowInVoiceSearch(): Flow<Boolean>
+
+    fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean>
+
     suspend fun isDuckChatUserEnabled(): Boolean
+
     suspend fun isInputScreenUserSettingEnabled(): Boolean
+
+    suspend fun isFullScreenModeUserSettingEnabled(): Boolean
+
+    suspend fun isAutomaticPageContextAttachmentUserSettingEnabled(): Boolean
+
+    suspend fun isNativeInputFieldUserSettingEnabled(): Boolean
+
     suspend fun shouldShowInBrowserMenu(): Boolean
+
     suspend fun shouldShowInAddressBar(): Boolean
 
+    suspend fun shouldShowInVoiceSearch(): Boolean
+
     suspend fun registerOpened()
+
     suspend fun wasOpenedBefore(): Boolean
+
     suspend fun lastSessionTimestamp(): Long
+
     suspend fun sessionDeltaInMinutes(): Long
+
+    suspend fun setAppBackgroundTimestamp(timestamp: Long?)
+
+    suspend fun getAppBackgroundTimestamp(): Long?
+
+    suspend fun setAIChatHistoryEnabled(enabled: Boolean)
+
+    suspend fun isAIChatHistoryEnabled(): Boolean
+
+    suspend fun setChatSuggestionsUserSetting(enabled: Boolean)
+
+    suspend fun setDefaultTogglePosition(position: String)
+
+    suspend fun getDefaultTogglePosition(): String?
+
+    fun observeDefaultTogglePosition(): Flow<String?>
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -62,6 +116,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setInputScreenUserSetting(enabled)
     }
 
+    override suspend fun setCosmeticInputScreenUserSetting(enabled: Boolean) {
+        duckChatDataStore.setCosmeticInputScreenUserSetting(enabled)
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         duckChatDataStore.setShowInBrowserMenu(showDuckChat)
     }
@@ -70,37 +128,54 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setShowInAddressBar(showDuckChat)
     }
 
-    override fun observeDuckChatUserEnabled(): Flow<Boolean> {
-        return duckChatDataStore.observeDuckChatUserEnabled()
+    override suspend fun setShowInVoiceSearch(showToggle: Boolean) {
+        duckChatDataStore.setShowInVoiceSearch(showToggle)
     }
 
-    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
-        return duckChatDataStore.observeInputScreenUserSettingEnabled()
+    override suspend fun setAutomaticPageContextAttachment(isEnabled: Boolean) {
+        duckChatDataStore.setAutomaticPageContextAttachment(isEnabled)
     }
 
-    override fun observeShowInBrowserMenu(): Flow<Boolean> {
-        return duckChatDataStore.observeShowInBrowserMenu()
+    override suspend fun setNativeInputFieldUserSetting(enabled: Boolean) {
+        duckChatDataStore.setNativeInputFieldUserSetting(enabled)
     }
 
-    override fun observeShowInAddressBar(): Flow<Boolean> {
-        return duckChatDataStore.observeShowInAddressBar()
-    }
+    override fun observeDuckChatUserEnabled(): Flow<Boolean> = duckChatDataStore.observeDuckChatUserEnabled()
 
-    override suspend fun isDuckChatUserEnabled(): Boolean {
-        return duckChatDataStore.isDuckChatUserEnabled()
-    }
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> = duckChatDataStore.observeInputScreenUserSettingEnabled()
 
-    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
-        return duckChatDataStore.isInputScreenUserSettingEnabled()
-    }
+    override fun observeCosmeticInputScreenUserSettingEnabled(): Flow<Boolean?> = duckChatDataStore.observeCosmeticInputScreenUserSettingEnabled()
 
-    override suspend fun shouldShowInBrowserMenu(): Boolean {
-        return duckChatDataStore.getShowInBrowserMenu()
-    }
+    override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeAutomaticContextAttachmentUserSettingEnabled()
 
-    override suspend fun shouldShowInAddressBar(): Boolean {
-        return duckChatDataStore.getShowInAddressBar()
-    }
+    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeNativeInputFieldUserSettingEnabled()
+
+    override fun observeShowInBrowserMenu(): Flow<Boolean> = duckChatDataStore.observeShowInBrowserMenu()
+
+    override fun observeShowInAddressBar(): Flow<Boolean> = duckChatDataStore.observeShowInAddressBar()
+
+    override fun observeShowInVoiceSearch(): Flow<Boolean> = duckChatDataStore.observeShowInVoiceSearch()
+
+    override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> =
+        duckChatDataStore.observeChatSuggestionsUserSettingEnabled()
+
+    override suspend fun isDuckChatUserEnabled(): Boolean = duckChatDataStore.isDuckChatUserEnabled()
+
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean = duckChatDataStore.isInputScreenUserSettingEnabled()
+
+    override suspend fun isFullScreenModeUserSettingEnabled(): Boolean = duckChatDataStore.isFullScreenUserSettingEnabled()
+
+    override suspend fun isAutomaticPageContextAttachmentUserSettingEnabled() = duckChatDataStore.isAutomaticPageContextAttachmentEnabled()
+
+    override suspend fun isNativeInputFieldUserSettingEnabled(): Boolean = duckChatDataStore.isNativeInputFieldUserSettingEnabled()
+
+    override suspend fun shouldShowInBrowserMenu(): Boolean = duckChatDataStore.getShowInBrowserMenu()
+
+    override suspend fun shouldShowInAddressBar(): Boolean = duckChatDataStore.getShowInAddressBar()
+
+    override suspend fun shouldShowInVoiceSearch(): Boolean = duckChatDataStore.getShowInVoiceSearch()
 
     override suspend fun registerOpened() {
         if (!duckChatDataStore.wasOpenedBefore()) {
@@ -109,17 +184,35 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.registerOpened()
     }
 
-    override suspend fun wasOpenedBefore(): Boolean {
-        return duckChatDataStore.wasOpenedBefore()
+    override suspend fun wasOpenedBefore(): Boolean = duckChatDataStore.wasOpenedBefore()
+
+    override suspend fun lastSessionTimestamp(): Long = duckChatDataStore.lastSessionTimestamp()
+
+    override suspend fun sessionDeltaInMinutes(): Long = duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+
+    override suspend fun setAppBackgroundTimestamp(timestamp: Long?) {
+        duckChatDataStore.setAppBackgroundTimestamp(timestamp)
     }
 
-    override suspend fun lastSessionTimestamp(): Long {
-        return duckChatDataStore.lastSessionTimestamp()
+    override suspend fun getAppBackgroundTimestamp(): Long? = duckChatDataStore.getAppBackgroundTimestamp()
+
+    override suspend fun setAIChatHistoryEnabled(enabled: Boolean) {
+        duckChatDataStore.setAIChatHistoryEnabled(enabled)
     }
 
-    override suspend fun sessionDeltaInMinutes(): Long {
-        return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+    override suspend fun isAIChatHistoryEnabled(): Boolean = duckChatDataStore.isAIChatHistoryEnabled()
+
+    override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) {
+        duckChatDataStore.setChatSuggestionsUserSetting(enabled)
     }
+
+    override suspend fun setDefaultTogglePosition(position: String) {
+        duckChatDataStore.setDefaultTogglePosition(position)
+    }
+
+    override suspend fun getDefaultTogglePosition(): String? = duckChatDataStore.getDefaultTogglePosition()
+
+    override fun observeDefaultTogglePosition(): Flow<String?> = duckChatDataStore.observeDefaultTogglePosition()
 
     private fun updateWidgets() {
         val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

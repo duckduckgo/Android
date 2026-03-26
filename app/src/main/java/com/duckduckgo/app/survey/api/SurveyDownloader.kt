@@ -25,14 +25,14 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import io.reactivex.Completable
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
+import retrofit2.Response
 import java.io.IOException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
-import retrofit2.Response
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,

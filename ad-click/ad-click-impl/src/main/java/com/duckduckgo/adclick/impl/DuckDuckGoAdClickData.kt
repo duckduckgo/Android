@@ -21,10 +21,10 @@ import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDao
 import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
 import com.duckduckgo.adclick.impl.store.exemptions.AdClickTabExemptionEntity
 import com.duckduckgo.common.utils.DispatcherProvider
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.util.concurrent.ConcurrentHashMap
 
 interface AdClickData {
 

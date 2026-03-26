@@ -16,6 +16,9 @@
 
 package com.duckduckgo.common.utils.extensions
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 
@@ -23,4 +26,14 @@ fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
     return runCatching {
         getApplicationIcon(packageName)
     }.getOrNull()
+}
+
+@SuppressLint("DenyListedApi")
+fun PackageManager.safeGetInstalledApplications(context: Context): List<ApplicationInfo> {
+    return try {
+        this.getInstalledApplications(PackageManager.GET_META_DATA)
+    } catch (_: Throwable) {
+        // at least we know our app is installed :)
+        listOf(this.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA))
+    }
 }

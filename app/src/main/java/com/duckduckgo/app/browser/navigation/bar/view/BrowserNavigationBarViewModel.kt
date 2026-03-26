@@ -21,9 +21,12 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
+import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.TabManager
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyBookmarksButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyFireButtonClicked
@@ -37,7 +40,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STA
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,28 +50,29 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
 class BrowserNavigationBarViewModel @Inject constructor(
-    private val tabRepository: TabRepository,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
+    tabRepository: TabRepository,
+    dispatcherProvider: DispatcherProvider,
+    browserMenuHighlightState: BrowserMenuHighlightState,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
-    private val isCustomTab = MutableStateFlow(false)
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = combine(
         _viewState.asStateFlow(),
-        isCustomTab,
         tabRepository.flowTabs,
-    ) { state, isCustomTab, tabs ->
+        browserMenuHighlightState.shouldHighlight,
+    ) { state, tabs, shouldHighlightMenu ->
         state.copy(
-            isVisible = !isCustomTab,
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
+            showBrowserMenuHighlight = shouldHighlightMenu,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 
@@ -111,10 +114,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _commands.trySend(NotifyBookmarksButtonClicked)
     }
 
-    fun setCustomTab(customTab: Boolean) {
-        isCustomTab.update { customTab }
-    }
-
     fun setViewMode(viewMode: ViewMode) {
         when (viewMode) {
             NewTab -> {
@@ -122,8 +121,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = false,
                         autofillButtonVisible = true,
-                        fireButtonVisible = true,
-                        tabsButtonVisible = true,
                     )
                 }
             }
@@ -133,8 +130,25 @@ class BrowserNavigationBarViewModel @Inject constructor(
                     it.copy(
                         newTabButtonVisible = true,
                         autofillButtonVisible = false,
-                        fireButtonVisible = true,
-                        tabsButtonVisible = true,
+                    )
+                }
+            }
+
+            TabManager -> {
+                _viewState.update {
+                    it.copy(
+                        newTabButtonVisible = true,
+                        autofillButtonVisible = false,
+                        tabsButtonVisible = false,
+                        bookmarksButtonVisible = false,
+                        showShadow = false,
+                    )
+                }
+            }
+            CustomTab -> {
+                _viewState.update {
+                    it.copy(
+                        isVisible = false,
                     )
                 }
             }
@@ -154,23 +168,22 @@ class BrowserNavigationBarViewModel @Inject constructor(
         data object NotifyTabsButtonClicked : Command()
         data object NotifyTabsButtonLongClicked : Command()
         data object NotifyMenuButtonClicked : Command()
-        data object NotifyBackButtonClicked : Command()
-        data object NotifyBackButtonLongClicked : Command()
-        data object NotifyForwardButtonClicked : Command()
         data object NotifyNewTabButtonClicked : Command()
         data object NotifyAutofillButtonClicked : Command()
         data object NotifyBookmarksButtonClicked : Command()
     }
 
     data class ViewState(
-        val isVisible: Boolean = false,
-        val newTabButtonVisible: Boolean = false,
-        val autofillButtonVisible: Boolean = true,
+        val isVisible: Boolean = true,
+        val newTabButtonVisible: Boolean = true,
+        val autofillButtonVisible: Boolean = false,
         val bookmarksButtonVisible: Boolean = true,
         val fireButtonVisible: Boolean = true,
         val fireButtonHighlighted: Boolean = false,
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
+        val showBrowserMenuHighlight: Boolean = false,
+        val showShadow: Boolean = true,
     )
 }

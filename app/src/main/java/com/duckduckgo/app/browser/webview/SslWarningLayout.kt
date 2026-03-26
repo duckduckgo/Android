@@ -77,6 +77,18 @@ class SslWarningLayout @JvmOverloads constructor(
         }
     }
 
+    fun disableViewStateSaving() {
+        binding.errorLayout.isSaveEnabled = false
+        binding.sslAlertImage.isSaveEnabled = false
+        binding.sslErrorTitle.isSaveEnabled = false
+        binding.sslErrorHeadline.isSaveEnabled = false
+        binding.sslErrorExpandedMessage.isSaveEnabled = false
+        binding.sslErrorExpandedHeadline.isSaveEnabled = false
+        binding.sslErrorLeaveSiteCTA.isSaveEnabled = false
+        binding.sslErrorAdvancedCTA.isSaveEnabled = false
+        binding.sslErrorAcceptCta.isSaveEnabled = false
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()

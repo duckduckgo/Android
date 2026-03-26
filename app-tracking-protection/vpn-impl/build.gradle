@@ -55,7 +55,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':statistics-api')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')

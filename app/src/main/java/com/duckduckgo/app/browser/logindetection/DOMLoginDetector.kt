@@ -25,10 +25,10 @@ import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterfa
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.getValidUrl
-import javax.inject.Inject
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 interface DOMLoginDetector {
     fun addLoginDetection(

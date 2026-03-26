@@ -29,10 +29,10 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -43,7 +43,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class PirWebInitialScanStatusMessageHandlerTest {
@@ -61,14 +64,18 @@ class PirWebInitialScanStatusMessageHandlerTest {
     private val mockJsMessageCallback: JsMessageCallback = mock()
     private val testScope = TestScope()
     private val mockRepository: PirRepository = mock()
+    private val mockPirPixelSender: PirPixelSender = mock()
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(false)
+
         testee = PirWebInitialScanStatusMessageHandler(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = testScope,
             stateProvider = mockStateProvider,
             pirRepository = mockRepository,
+            pirPixelSender = mockPirPixelSender,
         )
         fakeJsMessaging.reset()
     }
@@ -82,7 +89,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
     fun whenProcessWithNoDataThenSendsEmptyResponse() = runTest {
         // Given
         val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(0)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(0)
@@ -123,7 +130,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(emptyList())
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
@@ -164,7 +171,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(5)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(10)
@@ -221,7 +228,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(scanResults)
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(2)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(5)
@@ -239,6 +246,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
 
         // Verify first result
         val result1 = response.resultsFound[0]
+        assertEquals(1L, result1.id)
         assertEquals("John Doe", result1.name)
         assertEquals(listOf("J. Doe", "Johnny"), result1.alternativeNames)
         assertEquals(listOf("Jane Doe"), result1.relatives)
@@ -253,6 +261,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
 
         // Verify second result
         val result2 = response.resultsFound[1]
+        assertEquals(1L, result2.id)
         assertEquals("Jane Smith", result2.name)
         assertEquals(listOf("J. Smith"), result2.alternativeNames)
         assertEquals(listOf("John Smith"), result2.relatives)
@@ -295,7 +304,7 @@ class PirWebInitialScanStatusMessageHandlerTest {
             ),
         )
 
-        whenever(mockRepository.getUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
         whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
         whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
         whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(2)
@@ -325,6 +334,69 @@ class PirWebInitialScanStatusMessageHandlerTest {
         assertEquals(null, scannedBroker2.optOutUrl)
         assertEquals(null, scannedBroker2.parentURL)
         assertEquals("in-progress", scannedBroker2.status)
+    }
+
+    @Test
+    fun whenProcessAndShouldNotRestartScanThenDoesNotEmitPixel() = runTest {
+        // Given - state provider indicates scan should not be restarted
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(3)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(false)
+
+        // When
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then - pixel should NOT be emitted
+        verify(mockPirPixelSender, never()).reportInitialScanIncomplete()
+    }
+
+    @Test
+    fun whenProcessAndShouldRestartScanThenEmitsPixel() = runTest {
+        // Given - state provider indicates scan should be restarted
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(true)
+
+        // When
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then - pixel SHOULD be emitted
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
+    }
+
+    @Test
+    fun whenProcessCalledMultipleTimesThenOnlyEmitsPixelOnce() = runTest {
+        // Given - state provider indicates scan should be restarted
+        val jsMessage = createJsMessage("", PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+        whenever(mockRepository.getValidUserProfileQueries()).thenReturn(listOf(mock()))
+        whenever(mockStateProvider.getScanResults()).thenReturn(emptyList())
+        whenever(mockStateProvider.getFullyCompletedBrokersTotal()).thenReturn(1)
+        whenever(mockStateProvider.getActiveBrokersAndMirrorSitesTotal()).thenReturn(3)
+        whenever(mockStateProvider.getAllScannedBrokersStatus()).thenReturn(emptyList())
+        whenever(mockStateProvider.shouldRestartInitialScan()).thenReturn(true)
+
+        // When - process called first time
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then - pixel should be emitted and shouldRestartInitialScan should be called once
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
+        verify(mockStateProvider).shouldRestartInitialScan()
+
+        // When - process called second time
+        testee.process(jsMessage, fakeJsMessaging, mockJsMessageCallback)
+
+        // Then - shouldRestartInitialScan should still only have been called once (not twice)
+        // and pixel should also only have been emitted once
+        verify(mockStateProvider).shouldRestartInitialScan()
+        verify(mockPirPixelSender).reportInitialScanIncomplete()
     }
 
     private fun verifyInitialScanResponse(

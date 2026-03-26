@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.DUCK_AI_CHATS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
@@ -28,9 +29,12 @@ import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import logcat.LogPriority
 import logcat.logcat
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import javax.inject.Inject
 
 interface SyncApiClient {
 
@@ -39,6 +43,7 @@ interface SyncApiClient {
         type: SyncableType,
         since: String,
     ): Result<SyncChangesResponse>
+    fun delete(request: SyncDeletionRequest): Result<SyncDeletionResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,21 +62,27 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val updates = JSONObject(changes.jsonString)
-        logcat { "Sync-Engine: patch data generated $updates" }
-        return when (val result = syncApi.patch(token, updates)) {
+        logcat { "Sync-Engine: patch data generated for ${changes.type}" }
+        val result = when (changes.type) {
+            DUCK_AI_CHATS -> {
+                val body = changes.jsonString.toRequestBody("application/json".toMediaType())
+                val since = (changes.modifiedSince as? ModifiedSince.Timestamp)?.value
+                syncApi.patchChats(token, body, since)
+            }
+            else -> {
+                val updates = JSONObject(changes.jsonString)
+                syncApi.patchData(token, updates)
+            }
+        }
+        return when (result) {
             is Result.Error -> {
                 syncApiErrorRecorder.record(changes.type, result)
                 result
             }
 
             is Result.Success -> {
-                if (result.data == null) {
-                    Result.Success(SyncChangesResponse.empty(changes.type))
-                } else {
-                    val remoteChanges = mapResponse(changes.type, result.data)
-                    Result.Success(remoteChanges)
-                }
+                val remoteChanges = mapResponse(changes.type, result.data)
+                Result.Success(remoteChanges)
             }
         }
     }
@@ -96,6 +107,7 @@ class AppSyncApiClient @Inject constructor(
             BOOKMARKS -> syncApi.getBookmarks(token, since)
             CREDENTIALS -> syncApi.getCredentials(token, since)
             SETTINGS -> syncApi.getSettings(token, since)
+            DUCK_AI_CHATS -> Result.Error(reason = "DUCK_AI_CHATS does not support GET")
         }
 
         return when (result) {
@@ -130,5 +142,32 @@ class AppSyncApiClient @Inject constructor(
         val jsonString = response.toString()
         logcat { "Sync-Engine: $type response mapped to $jsonString" }
         return SyncChangesResponse(type, jsonString)
+    }
+
+    override fun delete(request: SyncDeletionRequest): Result<SyncDeletionResponse> {
+        val token = syncStore.token.takeUnless { it.isNullOrEmpty() } ?: return Result.Error(reason = "Token Empty")
+
+        return when (request.type) {
+            DeletableType.DUCK_AI_CHATS -> handleDuckAiChatsDeletion(token, request.untilTimestamp ?: "")
+        }
+    }
+
+    private fun handleDuckAiChatsDeletion(
+        token: String,
+        until: String,
+    ): Result<SyncDeletionResponse> {
+        logcat { "Sync-Engine: deleting duck ai chats until $until" }
+
+        return when (val result = syncApi.deleteAiChats(token, until)) {
+            is Result.Error -> {
+                logcat(LogPriority.ERROR) { "DuckChat-Sync: failed to inform sync of of deleted duck ai chats $result" }
+                syncApiErrorRecorder.record(DeletableType.DUCK_AI_CHATS, result)
+                result
+            }
+            is Result.Success -> {
+                logcat(LogPriority.INFO) { "DuckChat-Sync: successfully informed sync of deleted duck ai chats" }
+                Result.Success(SyncDeletionResponse(DeletableType.DUCK_AI_CHATS, until))
+            }
+        }
     }
 }

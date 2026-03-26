@@ -194,7 +194,7 @@
     <string name="netpNotificationCTAReconnectNow">Znovu se připojit</string>
     <string name="netpNotificationSnoozeTitle">VPN je pozastavená</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN se znovu připojí v %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN byla odpojena kvůli vypršení platnosti předplatného. Předplať si službu Privacy Pro, ať můžeš DuckDuckGo VPN dál používat.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN byla odpojena kvůli vypršení platnosti předplatného. Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Umístění VPN</string>
@@ -206,7 +206,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN byla odpojena kvůli vypršení platnosti předplatného</string>
-    <string name="netpDialogVpnAccessRevokedBody">Předplať si službu Privacy Pro, ať můžeš DuckDuckGo VPN dál používat.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Odebírat novinky</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Odmítnout</string>
 
@@ -264,7 +264,4 @@
     <string name="netpExclusionListLabelAutoExclude">Nekompatibilní s VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Některé aplikace, jako jsou bankovní nebo streamovací aplikace, si s VPN moc nerozumí. Pokud je toto nastavení zapnuté, automaticky tyhle aplikace vyloučíme.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN byla odpojená, protože platnost předplatného vypršela. Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
 </resources>

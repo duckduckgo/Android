@@ -19,7 +19,6 @@ package com.duckduckgo.cookies.impl.thirdpartycookienames
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.store.CookiesRepository
-import java.util.concurrent.CopyOnWriteArrayList
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Before
@@ -27,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 
 class RealThirdPartyCookieNamesTest {
     @get:Rule

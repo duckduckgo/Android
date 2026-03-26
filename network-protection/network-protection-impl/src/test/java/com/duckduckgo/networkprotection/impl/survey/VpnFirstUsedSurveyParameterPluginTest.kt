@@ -2,8 +2,6 @@ package com.duckduckgo.networkprotection.impl.survey
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
-import java.time.LocalDate
-import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -11,6 +9,8 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class VpnFirstUsedSurveyParameterPluginTest {
     @Mock

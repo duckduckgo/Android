@@ -27,11 +27,11 @@ import com.squareup.anvil.compiler.internal.reference.asClassName
 import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import java.io.File
-import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
+import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -42,7 +42,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesViewModel::class.fqName) }
@@ -52,7 +52,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateFactoryPlugin(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateFactoryPlugin(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val factoryClassName = "${vmClass.shortName}_ViewModelFactory"
         val scope = vmClass.annotations.first { it.fqName == ContributesViewModel::class.fqName }.scopeOrNull(0)
@@ -122,7 +122,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, factoryClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, factoryClassName, content, setOf(vmClass.containingFileAsJavaFile))
     }
 
     companion object {

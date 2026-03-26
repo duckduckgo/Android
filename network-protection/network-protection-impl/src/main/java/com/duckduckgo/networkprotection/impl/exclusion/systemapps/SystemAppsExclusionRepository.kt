@@ -16,11 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.exclusion.systemapps
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -34,8 +36,8 @@ import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExcl
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface SystemAppsExclusionRepository {
     suspend fun excludeCategory(category: SystemAppCategory)
@@ -68,6 +70,7 @@ class RealSystemAppsExclusionRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val context: Context,
 ) : SystemAppsExclusionRepository {
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(
@@ -200,7 +203,7 @@ class RealSystemAppsExclusionRepository @Inject constructor(
     }
 
     private fun getOtherSystemApps(): Set<String> {
-        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return packageManager.safeGetInstalledApplications(context)
             .asSequence()
             .filter { it.isSystemApp() && !it.isSystemAppOveridden() && !it.isCategorized() }
             .map { it.packageName }

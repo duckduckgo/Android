@@ -32,11 +32,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 interface WebViewCompatContentScopeScripts {
     suspend fun getScript(
@@ -44,6 +44,8 @@ interface WebViewCompatContentScopeScripts {
     ): String
 
     suspend fun isEnabled(): Boolean
+
+    suspend fun isWebMessagingEnabled(): Boolean
 
     val secret: String
     val javascriptInterface: String
@@ -119,6 +121,12 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     override suspend fun isEnabled(): Boolean {
         return withContext(dispatcherProvider.io()) {
             contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        }
+    }
+
+    override suspend fun isWebMessagingEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            isEnabled() && contentScopeScriptsFeature.useWebMessageListener().isEnabled()
         }
     }
 

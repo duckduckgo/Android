@@ -1,0 +1,53 @@
+<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<HTML>
+<HEAD>
+<TITLE>Bookmarks</TITLE>
+</HEAD>
+<BODY>
+<H1>Bookmarks</H1>
+<DL><p>
+    <!-- Valid bookmark -->
+    <DT><A HREF="https://duckduckgo.com" ADD_DATE="1234567890">DuckDuckGo</A>
+    
+    <!-- Invalid bookmark - missing HREF -->
+    <DT><A ADD_DATE="1234567891">Invalid - No URL</A>
+    
+    <!-- Valid bookmark -->
+    <DT><A HREF="https://github.com" ADD_DATE="1234567892">GitHub</A>
+    
+    <!-- Invalid bookmark - malformed HREF -->
+    <DT><A HREF="" ADD_DATE="1234567893">Invalid - Empty URL</A>
+    
+    <!-- Invalid bookmark - not a valid URL -->
+    <DT><A HREF="not-a-valid-url" ADD_DATE="1234567894">Invalid - Malformed URL</A>
+    
+    <!-- Valid bookmark -->
+    <DT><A HREF="https://example.com" ADD_DATE="1234567895">Example Site</A>
+    
+    <!-- Invalid bookmark - broken HTML -->
+    <DT><A HREF="https://broken.com" ADD_DATE="1234567896">Broken HTML
+    
+    <!-- Valid bookmark -->
+    <DT><A HREF="https://stackoverflow.com" ADD_DATE="1234567897">Stack Overflow</A>
+    
+    <!-- Invalid bookmark - missing closing tag -->
+    <DT><A HREF="https://incomplete.com" ADD_DATE="1234567898">Incomplete
+    
+    <!-- Valid folder with mixed content -->
+    <DT><H3 ADD_DATE="1234567899" LAST_MODIFIED="1234567900">Mixed Folder</H3>
+    <DL><p>
+        <!-- Valid bookmark in folder -->
+        <DT><A HREF="https://valid-in-folder.com" ADD_DATE="1234567901">Valid in Folder</A>
+        
+        <!-- Invalid bookmark in folder - javascript URL (security risk) -->
+        <DT><A HREF="javascript:alert('xss')" ADD_DATE="1234567902">Invalid - JavaScript URL</A>
+        
+        <!-- Valid bookmark in folder -->
+        <DT><A HREF="https://another-valid.com" ADD_DATE="1234567903">Another Valid</A>
+    </DL><p>
+    
+    <!-- Valid bookmark -->
+    <DT><A HREF="https://final-valid.com" ADD_DATE="1234567904">Final Valid</A>
+</DL><p>
+</BODY>
+</HTML>

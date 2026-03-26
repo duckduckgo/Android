@@ -31,8 +31,10 @@ import com.duckduckgo.pir.impl.common.PirActionsRunner
 import com.duckduckgo.pir.impl.common.PirJob
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
 import com.duckduckgo.pir.impl.common.RealPirActionsRunner
 import com.duckduckgo.pir.impl.common.splitIntoParts
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
@@ -42,11 +44,11 @@ import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import javax.inject.Inject
 
 interface PirOptOut {
     suspend fun executeOptOutForJobs(
@@ -110,6 +112,7 @@ class RealPirOptOut @Inject constructor(
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewDataCleaner: PirWebViewDataCleaner,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -133,7 +136,14 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
         }
 
-        val processedJobRecords = processJobRecords(jobRecords)
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+        if (activeBrokers.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No active brokers here." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
+        val processedJobRecords = processJobRecords(jobRecords, activeBrokers)
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
@@ -161,13 +171,13 @@ class RealPirOptOut @Inject constructor(
                 partSteps.map { (profileQuery, step) ->
                     logcat {
                         "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                            "broker=${step.broker.name} profile=${profileQuery.id}"
                     }
                     runners[index].start(profileQuery, listOf(step))
                     runners[index].stop()
                     logcat {
                         "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                            "broker=${step.broker.name} profile=${profileQuery.id}"
                     }
                 }
             }
@@ -177,7 +187,11 @@ class RealPirOptOut @Inject constructor(
         return@withContext Result.success(Unit)
     }
 
-    private suspend fun processJobRecords(jobRecords: List<OptOutJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+    private suspend fun processJobRecords(
+        jobRecords: List<OptOutJobRecord>,
+        activeBrokers: Map<String, Broker>,
+    ): List<Pair<ProfileQuery, BrokerStep>> {
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val allUserProfiles = obtainProfiles().associateBy { it.id }
         if (allUserProfiles.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid user profile available. Nothing to opt-out." }
@@ -211,9 +225,11 @@ class RealPirOptOut @Inject constructor(
                 brokerStep = temporaryCache[temporaryCacheKey]?.find { (it as OptOutStep).profileToOptOut.dbId == record.extractedProfileId }
             } else {
                 // Parse broker steps - this will return the extractedProfiles too
+                val broker = activeBrokers[record.brokerName] ?: return@mapNotNull null
+
                 val brokerSteps = brokerOptOutStepsJsons[record.brokerName]?.let { stepsJson ->
                     brokerStepsParser.parseStep(
-                        record.brokerName,
+                        broker,
                         stepsJson,
                         record.userProfileId,
                     )
@@ -246,6 +262,7 @@ class RealPirOptOut @Inject constructor(
 
     private suspend fun completeOptOut() {
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
+        webViewDataCleaner.cleanWebViewData()
         emitCompletedPixel()
         onJobCompleted()
     }
@@ -255,10 +272,11 @@ class RealPirOptOut @Inject constructor(
         webView: WebView,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         onJobStarted()
-        emitStartPixel()
+
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running debug opt-out for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
@@ -276,10 +294,12 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+                brokerStepsParser.parseStep(activeBrokers[broker]!!, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
@@ -287,14 +307,14 @@ class RealPirOptOut @Inject constructor(
         allSteps.forEach { (profileQuery, step) ->
             logcat { "PIR-OPT-OUT: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
             runners[0].startOn(webView, profileQuery, listOf(step))
-            runners[0].stop()
+            // don't call stop() here to avoid destroying the WebView as it's reused for all steps
             logcat { "PIR-OPT-OUT: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
         }
 
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
 
-        emitCompletedPixel()
         onJobCompleted()
+        webViewDataCleaner.cleanWebViewData()
         return@withContext Result.success(Unit)
     }
 
@@ -307,6 +327,7 @@ class RealPirOptOut @Inject constructor(
         if (runners.isNotEmpty()) {
             cleanRunners()
         }
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running opt-out on profiles: $profileQueries on ${Thread.currentThread().name}" }
@@ -318,10 +339,12 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
+        val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
+
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+                brokerStepsParser.parseStep(activeBrokers[broker]!!, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
@@ -349,14 +372,12 @@ class RealPirOptOut @Inject constructor(
             }
         }.awaitAll()
 
-        logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
-        emitCompletedPixel()
-        onJobCompleted()
+        completeOptOut()
         return@withContext Result.success(Unit)
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        return repository.getUserProfileQueries().ifEmpty {
+        return repository.getAllUserProfileQueries().ifEmpty {
             PirConstants.DEFAULT_PROFILE_QUERIES
         }
     }
@@ -377,12 +398,13 @@ class RealPirOptOut @Inject constructor(
 
     override fun stop() {
         logcat { "PIR-OPT-OUT: Stopping all runners" }
+        webViewDataCleaner.cleanWebViewData()
         cleanRunners()
         onJobStopped()
     }
 
     private suspend fun emitStartPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_STARTED,
@@ -391,7 +413,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitCompletedPixel() {
-        eventsRepository.saveScanLog(
+        eventsRepository.saveEventLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_COMPLETED,

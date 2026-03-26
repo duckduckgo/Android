@@ -38,15 +38,15 @@ import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.security.MessageDigest
-import java.util.regex.Pattern
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.security.MessageDigest
+import java.util.regex.Pattern
+import javax.inject.Inject
 
 class WriteInProgressException : Exception("Write in progress")
 

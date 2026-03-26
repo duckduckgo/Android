@@ -285,4 +285,27 @@
     <string name="passwords_import_promo_in_settings_title">Import Passwords from Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Hide</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Import to DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Imported from Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Import Bookmarks From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Import From Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Select Bookmarks File…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Import Bookmarks</string>
+    <string name="importBookmarksProgressTitle">Importing from Google…</string>
+    <string name="importBookmarksProgressSubtitle">Keep this screen open and hang tight — it shouldn\'t take more than a minute or two.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google may ask you to sign in or enter your password to confirm.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google may send you an email confirming your bookmarks are being exported.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Cancel import?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Your bookmarks won\'t be imported if you cancel now.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Cancel Import</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Continue</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Bookmarks: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Close</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Something went wrong</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Please make sure you\'re connected to the internet and try again.</string>
+
 </resources>

@@ -34,13 +34,15 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPS
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.AppTPStateMessagePlugin.DefaultAppTPMessageAction
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message.PProUpsellBannerPlugin.Companion.PRIORITY_PPRO_UPSELL_BANNER
 import com.duckduckgo.subscriptions.api.Subscriptions
-import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = AppTPStateMessagePlugin::class,
     priority = PRIORITY_PPRO_UPSELL_BANNER,
+    featureName = "pluginPProUpsellBannerPlugin",
+    parentFeatureName = "pluginPointAppTPStateMessagePlugin",
 )
 class PProUpsellBannerPlugin @Inject constructor(
     private val subscriptions: Subscriptions,

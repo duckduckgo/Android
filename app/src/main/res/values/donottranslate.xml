@@ -54,12 +54,39 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
-    <!-- Trackers blocked animation-->
-    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
+    <!-- Pre-onboarding Address Bar Position -->
+    <string name="preOnboardingAddressBarPositionTop">Top</string>
+    <string name="preOnboardingAddressBarPositionBottom">Bottom</string>
+    <string name="preOnboardingAddressBarPositionSplit">Split</string>
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
+
+    <!-- ADS -->
+    <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
+
+    <!-- Digital Asset Links -->
+    <string name="asset_statements">
+      [{
+        \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+        \"target\": {
+          \"namespace\": \"web\",
+          \"site\": \"https://duckduckgo.com\"
+        }
+      }]
+    </string>
+
+    <!-- Sync Restore (onboarding) -->
+    <string name="syncRestoreDialogTitle">Let\'s pick up where you left off</string>
+    <string name="syncRestoreDialogDescription">Want to restore your bookmarks, passwords, and more from your previous DuckDuckGo sync?</string>
+    <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
+    <string name="syncRestoreDialogSecondaryCta">Skip</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityOptionTitle">After Inactivity</string>
+    <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
+
 </resources>

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
+import com.duckduckgo.app.fire.AutomaticDataClearing
 import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler
@@ -27,8 +28,10 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
@@ -55,8 +58,18 @@ object NotificationModule {
         context: Context,
         notificationDao: NotificationDao,
         settingsDataStore: SettingsDataStore,
+        automaticDataClearing: AutomaticDataClearing,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        dispatcherProvider: DispatcherProvider,
     ): ClearDataNotification {
-        return ClearDataNotification(context, notificationDao, settingsDataStore)
+        return ClearDataNotification(
+            context,
+            notificationDao,
+            settingsDataStore,
+            automaticDataClearing,
+            androidBrowserConfigFeature,
+            dispatcherProvider,
+        )
     }
 
     @Provides

@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Passwörter von Google importieren</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Ausblenden</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">In DuckDuckGo importieren</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Von Chrome importiert</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Lesezeichen von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Von Google importieren</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Lesezeichendatei auswählen …</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Lesezeichen importieren</string>
+    <string name="importBookmarksProgressTitle">Von Google importieren …</string>
+    <string name="importBookmarksProgressSubtitle">Lass diesen Bildschirm geöffnet und warte – es sollte nicht länger als ein oder zwei Minuten dauern.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
+    <string name="importBookmarksProgressInfoMessage2">Du erhältst vielleicht eine E-Mail von Google, die bestätigt, dass deine Lesezeichen exportiert werden.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Import abbrechen?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Deine Lesezeichen werden nicht importiert, wenn du jetzt abbrichst.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Import abbrechen</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Fortsetzen</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Lesezeichen: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Schließen</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Etwas ist schiefgelaufen</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Bitte stelle sicher, dass du mit dem Internet verbunden bist, und versuche es erneut.</string>
+
 </resources>

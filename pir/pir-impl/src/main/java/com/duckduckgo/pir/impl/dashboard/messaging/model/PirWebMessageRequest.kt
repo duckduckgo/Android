@@ -64,4 +64,8 @@ sealed interface PirWebMessageRequest {
             val state: String,
         )
     }
+
+    data class RemoveOptOutFromDashboardRequest(
+        val recordId: Long,
+    ) : PirWebMessageRequest
 }

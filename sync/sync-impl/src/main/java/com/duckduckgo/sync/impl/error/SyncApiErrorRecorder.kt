@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.error
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.SyncFeatureType
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -26,13 +26,13 @@ import com.duckduckgo.sync.store.model.SyncApiErrorType.REQUEST_SIZE_LIMIT_EXCEE
 import com.duckduckgo.sync.store.model.SyncApiErrorType.TOO_MANY_REQUESTS
 import com.duckduckgo.sync.store.model.SyncApiErrorType.VALIDATION_ERROR
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface SyncApiErrorRecorder {
 
     fun record(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     )
 }
@@ -42,11 +42,12 @@ class RealSyncApiErrorRecorder @Inject constructor(
     private val syncPixels: SyncPixels,
     private val syncApiErrorRepository: SyncApiErrorRepository,
 ) : SyncApiErrorRecorder {
+
     override fun record(
-        feature: SyncableType,
+        feature: SyncFeatureType,
         apiError: Error,
     ) {
-        logcat { "Sync-Error: Recording API Error for $feature as $apiError" }
+        logcat { "Sync-Error: Recording API Error for ${feature.field} as $apiError" }
         when (apiError.code) {
             API_CODE.COUNT_LIMIT.code -> {
                 syncApiErrorRepository.addError(feature, OBJECT_LIMIT_EXCEEDED)

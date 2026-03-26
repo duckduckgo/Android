@@ -9,8 +9,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.indonesiamessage.RealIndonesiaNewTabSectionDataStore.Companion.INTERVAL_HOURS
 import com.duckduckgo.common.test.CoroutineTestRule
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -20,6 +18,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mockConstruction
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class RealIndonesiaNewTabSectionDataStoreTest {

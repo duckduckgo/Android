@@ -21,90 +21,154 @@
     android:layout_height="match_parent"
     android:clipChildren="false">
 
-    <com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
-        android:id="@+id/inputModeWidget"
+    <FrameLayout
+        android:id="@+id/inputModeWidgetContainerTop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="1dp"
+        android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+    <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+        android:id="@+id/inputScreenHatch"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-        android:paddingTop="@dimen/inputScreenContentTopOffset"
-        android:adjustViewBounds="true"
-        android:maxWidth="180dp"
-        android:maxHeight="180dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidget"
-        app:srcCompat="@drawable/logo_full" />
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"/>
+
+    <FrameLayout
+        android:id="@+id/ddgLogoContainer"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="40dp"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputScreenHatch"
+        app:layout_goneMarginTop="180dp">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ddgLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false" />
+
+    </FrameLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
-        android:clipToPadding="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidget" />
+        app:layout_constraintTop_toBottomOf="@id/inputScreenHatch" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/actionSend"
-        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_3"
-        android:layout_marginBottom="@dimen/keyline_3"
-        android:importantForAccessibility="no"
+    <com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView
+        android:id="@+id/newTabContainerScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
         android:visibility="gone"
-        app:backgroundTint="?attr/daxColorButtonPrimaryContainer"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:elevation="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
-        app:rippleColor="?attr/daxColorRipple"
-        app:srcCompat="@drawable/ic_find_search_24"
-        app:tint="?attr/daxColorWhite" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/actionNewLine"
-        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/keyline_3"
-        android:importantForAccessibility="no"
-        android:visibility="visible"
-        app:backgroundTint="?attr/daxColorWindow"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/actionSend"
-        app:layout_goneMarginEnd="@dimen/keyline_3"
-        app:rippleColor="?attr/daxColorRipple"
-        app:srcCompat="@drawable/ic_return_24"
-        app:tint="?attr/daxColorPrimaryIcon" />
+        <FrameLayout
+            android:id="@+id/newTabContainerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/actionVoice"
-        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/keyline_3"
-        android:importantForAccessibility="no"
+    </com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/autoCompleteOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
         android:visibility="gone"
-        app:backgroundTint="?attr/daxColorWindow"
-        app:fabSize="mini"
+        android:elevation="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
+            android:id="@+id/autoCompleteSuggestionsList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <FrameLayout
+            android:id="@+id/autoCompleteBottomFadeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:foreground="@drawable/bottom_fade_overlay" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/chatSuggestionsOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
+        android:visibility="gone"
+        android:elevation="3dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+
+        <com.duckduckgo.duckchat.impl.inputscreen.ui.view.SwipeableRecyclerView
+            android:id="@+id/chatSuggestionsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
+
+        <FrameLayout
+            android:id="@+id/chatSuggestionsBottomFadeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:foreground="@drawable/bottom_fade_overlay" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/inputScreenButtonsContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/actionNewLine"
-        app:rippleColor="?attr/daxColorRipple"
-        app:srcCompat="@drawable/ic_microphone_24"
-        app:tint="?attr/daxColorPrimaryIcon" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/inputModeWidgetContainerBottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

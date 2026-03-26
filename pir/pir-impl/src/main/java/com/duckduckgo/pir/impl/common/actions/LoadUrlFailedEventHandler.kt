@@ -21,9 +21,12 @@ import com.duckduckgo.pir.impl.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.impl.common.actions.EventHandler.Next
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted.StepStatus.Failure
+import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.impl.scripts.models.PirError
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -49,20 +52,40 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
             return Next(state)
         }
 
-        if (actualEvent.url == RECOVERY_URL) {
+        if (state.preseeding) {
+            // if pre-seeding fails, we proceed the scan as usual since pre-seeding is just an optimization and not critical for the run.
             return Next(
                 nextState = state.copy(
                     pendingUrl = null,
                 ),
-                nextEvent = BrokerStepCompleted(false),
+                nextEvent = ExecuteNextBrokerStep,
+            )
+        }
+
+        if (actualEvent.url == RECOVERY_URL) {
+            return Next(
+                nextState =
+                state.copy(
+                    pendingUrl = null,
+                    preseeding = false,
+                ),
+                nextEvent = BrokerStepCompleted(
+                    needsEmailConfirmation = false,
+                    stepStatus = Failure(
+                        error = PirError.UnableToLoadBrokerUrl,
+                    ),
+                ),
             )
         }
 
         return Next(
-            nextState = state.copy(
+            nextState =
+            state.copy(
                 pendingUrl = RECOVERY_URL,
+                preseeding = false,
             ),
-            sideEffect = LoadUrl(
+            sideEffect =
+            LoadUrl(
                 RECOVERY_URL,
             ),
         )

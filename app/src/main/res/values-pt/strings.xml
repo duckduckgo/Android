@@ -47,17 +47,12 @@
     <string name="omnibarInputHint">Pesquisar ou escrever URL</string>
     <string name="clearButtonContentDescription">Limpar introdução da pesquisa</string>
     <string name="no_compatible_third_party_app_installed">Nenhuma aplicação compatível instalada</string>
-    <string name="addBookmarkMenuTitle">Adicionar marcador</string>
-    <string name="editBookmarkMenuTitle">Editar marcador</string>
+
     <string name="addFavoriteMenuTitle">Adicionar favorito</string>
     <string name="removeFavoriteMenuTitle">Remover favorito</string>
     <string name="favoriteAddedMessage">Favorito adicionado</string>
     <string name="bookmarkAddedMessage">Favorito adicionado</string>
-    <string name="requestDesktopSiteMenuTitle">Site para computador de secretária</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Remover barreira de segurança</string>
-    <string name="requestMobileSiteMenuTitle">Site móvel</string>
     <string name="downloadsMenuTitle">Transferências</string>
-    <string name="printMenuTitle">Imprimir página</string>
     <string name="favoriteDeleteConfirmationMessage">Favorito removido</string>
     <string name="fireproofDeleteConfirmationMessage">Barreira de segurança removida</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Proteção de Privacidade ativada para %1$s</string>
@@ -76,11 +71,9 @@
     <!-- Sharing options -->
     <string name="options">Opções</string>
     <string name="shareLink">Partilhar ligação</string>
-    <string name="shareMenuTitle">Partilhar</string>
     <string name="copyUrl">Copiar endereço de ligação</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Encontrar na página</string>
     <string name="nextSearchTermDescription">Encontrar seguinte</string>
     <string name="previousSearchTermDescription">Encontrar anterior</string>
     <string name="closeFindInPageButtonDescription">Fechar a vista de encontrar na página</string>
@@ -125,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Limpar dados</string>
-    <string name="fireClearAll">Limpar todos os separadores e dados</string>
-    <string name="fireClearAllPlusDuckChats">Limpar todos os separadores, dados e conversas do Duck.ai</string>
+    <string name="fireClearAll">Eliminar separadores e dados</string>
+    <string name="fireClearAllPlusDuckChats">Eliminar todos os separadores, dados e conversas do Duck.ai</string>
     <string name="fireCancel">Cancelar</string>
     <string name="fireDataCleared">Dados limpos</string>
 
@@ -135,6 +128,7 @@
     <string name="settingsMenuItemTitle">Definições</string>
     <string name="settingsHeadingProtections">Proteções</string>
     <string name="settingsHeadingAppearance">Aparência</string>
+    <string name="settingsWhatsNew">Novidades</string>
     <string name="settingsHeadingAbout">Acerca de</string>
     <string name="settingsAboutDuckduckgo">Sobre o DuckDuckGo</string>
     <string name="settingsVersion">Versão</string>
@@ -167,6 +161,7 @@
     <string name="settingsAddressBarPosition">Define a Posição da Barra de Endereços</string>
     <string name="settingsEnableVoiceSearch">Ativar pesquisa por voz privada</string>
     <string name="settingsDDGOnOtherPlatforms">DuckDuckGo Noutras Plataformas</string>
+    <string name="settingsDuckAi">Funcionalidades de IA</string>
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Pesquisa Privada</string>
@@ -181,6 +176,8 @@
     <string name="improvedAutoCompleteIAMContent">Agora, as sugestões de preenchimento automático incluem os sites visitados recentemente. Desativa esta funcionalidade nas definições ou limpa os sites guardados em qualquer altura com o 🔥 Fire Button.</string>
     <string name="improvedAutoCompleteIAMTitle">A mesma privacidade.\nMelhores sugestões de pesquisa!</string>
     <string name="openAutoCompleteSettings">Abrir Definições</string>
+    <string name="privateSearchChatSuggestionsToggle">Sugestões de chat</string>
+    <string name="privateSearchAutocompleteHintWithChatSuggestions">Mostra sugestões do teu histórico, marcadores e (opcionalmente) histórico de conversas Duck.ai enquanto escreves na barra de pesquisa. Todas as pesquisas são privadas.</string>
 
     <!-- General Settings -->
     <string name="generalSettingsActivityTitle" instruction="Title of the general settings screen">Gerais</string>
@@ -189,7 +186,6 @@
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[O DuckDuckGo bloqueia automaticamente os rastreadores ocultos enquanto navegas na Internet.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[O navegador DuckDuckGo fornece proteções contra rastreamento, que estão sempre ativas.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Como te protegemos</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloqueia rastreadores de terceiros</string>
@@ -213,12 +209,70 @@
     <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
     <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expressa direitos de exclusão em teu nome, dizendo aos sites para não venderem nem partilharem as tuas informações pessoais.</string>
 
+    <!-- Get Desktop Browser -->
+    <string name="getDesktopBrowserSettingItemTitle">Obter navegador para computador</string>
+    <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo para Mac e Windows</string>
+    <string name="getDesktopBrowserTitle">Protege a tua informação pessoal também no Mac e Windows!</string>
+    <string name="getDesktopBrowserBody">Para transferir o DuckDuckGo no Mac ou Windows, visita:</string>
+    <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+    <string name="getDesktopBrowserShareDownloadLink">Partilhar link de transferência</string>
+    <string name="getDesktopBrowserNoThanks">Não, obrigado</string>
+    <string name="getDesktopBrowserHideItem">Ocultar</string>
+    <string name="getDesktopBrowserUrlLinkCopied" instruction="This is shown after the user taps on the link, to confirm it was copied to their device clipboard">Link copiado</string>
+
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Botão de proteção</string>
     <string name="dataClearingActivityTitle">Limpeza de Dados</string>
+    <string name="dataClearingDescription">Eliminar os teus dados pode ajudar a proteger a tua privacidade online. Utiliza o Fire Button para eliminar dados manualmente ou configura a eliminação automática.</string>
+    <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
+        <item quantity="one">%1$d site excluído da limpeza</item>
+        <item quantity="other">%1$d sites excluídos da limpeza</item>
+    </plurals>
+    <string name="dataClearingAutomaticClearingOn">Ligado</string>
+    <string name="dataClearingAutomaticClearingOff">Desligado</string>
+    <string name="dataClearingClearBrowsingData">Limpar dados de navegação</string>
+    <string name="dataClearingAutomaticDataClearing">Eliminar dados automaticamente</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Eliminar dados automaticamente</string>
+    <string name="dataClearingAutomaticTabsOptionDescription">Fechar todos os separadores abertos</string>
+    <string name="dataClearingAutomaticDataOptionDescription">Eliminar todos os dados do site, incluindo sites visitados. Pode terminar a tua sessão nas contas.</string>
+    <string name="dataClearingAutomaticChatsOptionDescription">Eliminar todos os chats, incluindo os fixados</string>
+
+    <!-- Fire Dialog Granular Options -->
+    <string name="fireDialogTitle">Escolhe o que apagar</string>
+    <string name="dataClearingOptionTabs">Separadores</string>
+    <string name="dataClearingOptionData">Cookies e dados de sites</string>
+    <string name="dataClearingDuckAiChats">Chats Duck.ai</string>
+    <string name="fireDialogOptionDuckAiChatsDescription">Eliminar todas as conversas</string>
+    <string name="fireDialogDeleteButton">Eliminar</string>
+    <plurals name="fireDialogOptionTabsDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Fechar separador</item>
+        <item quantity="other">Fechar os %1$d separadores</item>
+    </plurals>
+    <string name="fireDialogOptionDataDescriptionNoHistory">Pode terminar a tua sessão nas contas.</string>
+    <string name="fireDialogOptionDescriptionNothingToDelete">Nenhum</string>
+    <plurals name="fireDialogOptionDataDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Eliminar de 1 site. Podes terminar a tua sessão nas contas.</item>
+        <item quantity="other">Eliminar de %1$d sites. Podes terminar a tua sessão nas contas.</item>
+    </plurals>
+
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Eliminar separadores e dados do site?</string>
+    <string name="singleTabFireDialogTitleWithChats">Eliminar separadores, dados do site e chats?</string>
+    <string name="singleTabFireDialogDeleteAll">Eliminar tudo</string>
+    <string name="singleTabFireDialogDeleteThisTab">Eliminar este separador</string>
+    <string name="singleTabFireDialogDeleteChat">Eliminar conversa</string>
+    <string name="singleTabFireDialogTitleDuckAi">Eliminar esta conversa?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Eliminar dados do site pode terminar a tua sessão nas contas.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Esta ação vai cancelar as transferências em curso.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d separador e respetivos dados eliminados</item>
+        <item quantity="other">%1$d separadores e respetivos dados eliminados</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Não foi possível apagar os dados do site. Atualiza o WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Não foi possível apagar os dados do site devido a um erro.</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissões</string>
@@ -237,26 +291,28 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Separadores e dados</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Separadores, dados e conversas do Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Limpar em…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Limpar em…</string>
+    <string name="settingsAutomaticallyClearWhen">Eliminar em…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Eliminar em…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Apenas saída da aplicação</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Saída da aplicação, inativa durante 5 segundos</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Saída da aplicação, inativa durante 5 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Saída da aplicação, inativa durante 15 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Saída da aplicação, inativa durante 30 minutos</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Saída da aplicação, inativa por 1 hora</string>
-    <string name="settingsClearAiDataTitle">Limpar conversas do Duck.ai</string>
-    <string name="settingsClearAiDataMessage">O Fire Button também elimina o histórico do Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Eliminar as conversas do Duck.ai</string>
+    <string name="settingsClearAiDataDeleteMessage">O Fire Button também elimina o histórico do Duck.ai, incluindo os chats fixados.</string>
+    <string name="settingsClearDataActionSecondaryText">Fecha todas as abas e limpa os dados de quaisquer sites que não tenha protegido com o Fireproof.</string>
+    <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Limpa todos os separadores, chats do Duck.ai e dados de quaisquer sites que não tenhas protegido com o Fireproof.</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>
     <string name="aboutActivityTitleNew">Acerca de</string>
     <string name="aboutHeaderNewTagLine">Proteção. Privacidade. Tranquilidade.</string>
-    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nA DuckDuckGo é a empresa independente de proteção online para quem quer recuperar o controlo das suas informações pessoais.\n\nAcreditamos que a melhor maneira de proteger as tuas informações pessoais de hackers, burlões e empresas que invadem a privacidade é impedir que sejam recolhidas. É por isso que milhões de pessoas <annotation type="chart_comparison">escolhem o DuckDuckGo em vez do Chrome e de outros navegadores</annotation> para pesquisar e navegar online. O nosso motor de busca incorporado é como o Google, mas nunca rastreia as tuas pesquisas. E as nossas proteções de navegação, como o bloqueio de rastreadores de anúncios e o bloqueio de cookies, ajudam a impedir que outras empresas recolham os teus dados. Além disso, o nosso navegador é gratuito — ganhamos dinheiro com <annotation type="privacy_respecting_ads">anúncios de pesquisa que respeitam a tua privacidade</annotation> e não com a exploração dos teus dados.Também oferecemos o <annotation type="ppro_help_page">Privacy Pro</annotation>, um serviço de subscrição três em um, integrado no nosso navegador. Os subscritores do Privacy Pro têm uma maior proteção da privacidade com uma <annotation type="vpn_help_page">VPN</annotation> rápida e simples que ajuda a proteger a tua atividade online, um serviço que encontra e remove as tuas informações pessoais de sites de pesquisa de pessoas, e um serviço que restaura a tua identidade caso seja roubada.\n\nRecupera o controlo sobre as tuas informações pessoais com o navegador concebido para a proteção de dados e não para a recolha de dados.</string>
+    <string name="aboutDescriptionBrandUpdate2025">Welcome to the Duck Side!\n\nA DuckDuckGo é a empresa independente de proteção online para quem quer recuperar o controlo das suas informações pessoais.\n\nAcreditamos que a melhor maneira de proteger as tuas informações pessoais de hackers, burlões e empresas que invadem a privacidade é impedir que sejam recolhidas. É por isso que milhões de pessoas <annotation type="chart_comparison">escolhem o DuckDuckGo em vez do Chrome e de outros navegadores</annotation> para pesquisar e navegar online. O nosso motor de busca incorporado é como o Google, mas nunca rastreia as tuas pesquisas. E as nossas proteções de navegação, como o bloqueio de rastreadores de anúncios e o bloqueio de cookies, ajudam a impedir que outras empresas recolham os teus dados. Além disso, o nosso navegador é gratuito — ganhamos dinheiro com <annotation type="privacy_respecting_ads">anúncios de pesquisa que respeitam a tua privacidade</annotation> e não com a exploração dos teus dados.Além disso, também oferecemos a <annotation type="ppro_help_page">subscrição da DuckDuckGo</annotation> integrada no nosso navegador. Os subscritores obtêm ainda mais proteção de privacidade com uma <annotation type="vpn_help_page">VPN</annotation> rápida e simples que ajuda a proteger a atividade online, acesso a modelos avançados de IA no serviço privado de conversa com IA Duck.ai, um serviço que encontra e remove as tuas informações pessoais de sites de pesquisa de pessoas, e um serviço que restaura a tua identidade em caso de roubo.\n\nRecupera o controlo sobre as tuas informações pessoais com o navegador concebido para a proteção de dados e não para a recolha de dados.</string>
     <string name="no_suggestions">Sem sugestões</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Denunciar falha no site</string>
+
 
     <string name="brokenSiteProtectionsOn">As proteções estão <b>ATIVADAS</b> para este site</string>
     <string name="brokenSiteProtectionsOff">As proteções estão <b>DESATIVADAS</b> para este site</string>
@@ -279,7 +335,7 @@
     <string name="searchWidgetLabel">Pesquisa e Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Adicionar à Página Inicial</string>
+
     <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Sucesso! %1$s foi adicionado ao seu ecrã inicial.</string>
 
     <!-- User Survey -->
@@ -485,8 +541,6 @@
 
     <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites desprotegidos</string>
-    <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
-    <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
     <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Mais opções para o site desprotegido %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
     <string name="allowlistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
@@ -585,11 +639,9 @@
     <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Pode abrir este link em %1$s.</string>
     <string name="appLinkMultipleSnackBarMessage">Pode abrir este link noutras aplicações.</string>
     <string name="appLinkIntentChooserTitle">Abrir com</string>
-    <string name="appLinkMenuItemTitle">Abrir na app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Novo endereço copiado para a área de transferência</string>
-    <string name="newEmailAliasMenuTitle">Gerar Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizar</string>
@@ -600,7 +652,7 @@
     <string name="waitlistNotificationDialogNotifyMe">NOTIFICAR-ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionActivityTitle">Proteção de E-mail (Beta)</string>
+    <string name="emailProtectionActivityTitle">Proteção de e-mail</string>
     <string name="emailNotSupported">Dispositivo não suportado</string>
     <string name="emailNotSupportedExplanation">A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.</string>
 
@@ -760,10 +812,6 @@
     <string name="autofillLoginSavedSnackbarMessage">Palavra-passe guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Palavra-passe atualizada</string>
 
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Abrir no DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Em execução no DuckDuckGo</string>
-
     <!-- SSL Error -->
     <string name="sslErrorTitle">Aviso: este site pode ser inseguro</string>
     <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">O certificado deste site é inválido. Podes estar a ligar a um servidor que finge ser %1$s, o que pode colocar as tuas informações confidenciais em risco.</string>
@@ -776,36 +824,47 @@
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$s. É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto.</string>
 
     <!-- Extended Onboarding-->
-    <string name="preOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>A postos para uma Internet melhor e mais privada?]]></string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>Pronto para um navegador mais rápido que te mantém protegido?]]></string>
+    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Vamos lá!</string>
-    <string name="preOnboardingDaxDialog2Title">Proteções de privacidade ativadas!</string>
+    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Já estive aqui antes</string>
+    <string name="preOnboardingDaxDialog2Title">Proteções ativadas!</string>
     <string name="preOnboardingDaxDialog2Button">Escolhe o teu navegador</string>
+    <string name="preOnboardingDaxDialog3Title"><![CDATA[Entendido! Vou ignorar as outras dicas.]]></string>
+    <string name="preOnboardingDaxDialog3Text"><![CDATA[Atenção: podes eliminar todos os separadores, o histórico e os dados de navegação em dois toques com o <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Mostrar Tutorial</string>
     <string name="preOnboardingComparisonChartItem1">Pesquisa em privado por predefinição</string>
     <string name="preOnboardingComparisonChartItem2">Bloqueia rastreadores de terceiros</string>
     <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina dados de navegação com um botão</string>
-    <string name="preOnboardingDaxDialog3Title">Fantástico! Damos-te as boas-vindas ao Duck Side.</string>
+    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
+    <string name="preOnboardingAddressBarTitle">Onde devo posicionar a barra de endereços?</string>
+    <string name="preOnboardingAddressBarOkButton">Seguinte</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Title">Topo (predefinição)</string>
+    <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Title">Parte inferior</string>
+    <string name="highlightsPreOnboardingAddressBarOption2Description">Fácil de aceder</string>
     <string name="onboardingSearchDaxDialogTitle">Tente uma pesquisa!</string>
-    <string name="onboardingSearchDaxDialogDescription">As tuas pesquisas no DuckDuckGo são sempre anónimas.</string>
-    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">como dizer \"pato\" em inglês</string>
-    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">como dizer \"pato\" em espanhol</string>
+    <string name="onboardingSearchDaxDialogDescription">As tuas pesquisas no DuckDuckGo são sempre privadas.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">"como dizer pato em inglês"</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">"como dizer pato em espanhol"</string>
     <string name="onboardingSearchQueryOption1">como dizer pato em inglês</string>
     <string name="onboardingSearchQueryOption1English">como dizer pato em espanhol</string>
     <string name="onboardingSearchDaxDialogOption2">elenco de avatar</string>
     <string name="onboardingSearchDaxDialogOption2US">elenco do filme A Hora dos Campeões</string>
     <string name="onboardingSearchDaxDialogOption3">meteorologia local</string>
     <string name="onboardingSearchDaxDialogOption4">Surpreende-me!</string>
-    <string name="onboardingSearchQueryOption4">receitas de jantar</string>
-    <string name="onboardingSearchQueryOption4US">receitas de biscoitos de chocolate</string>
+    <string name="onboardingSearchQueryOption4">patinhos bebés</string>
     <string name="onboardingSitesDaxDialogTitle">Experimenta visitar um site!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloquearei rastreadores para que não te espiem.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surpreende-me!</string>
-    <string name="onboardingSerpDaxDialogDescription">É a DuckDuckGo Search. Privado. Rápido. Menos anúncios.</string>
+    <string name="onboardingSerpDaxDialogDescription"><![CDATA[É o <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anúncios.]]></string>
     <string name="onboardingSerpDaxDialogButton">Entendi!</string>
     <string name="onboardingSitesSuggestionsDaxDialogTitle">Em seguida, experimenta visitar um site!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
@@ -818,47 +877,31 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Entendi!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Limpa instantaneamente a tua atividade de navegação com o <b>Fire Button</b>.<br/><br/>Experimenta! 🔥]]></string>
+    <string name="onboardingFireButtonDaxDialogOkButton">Experimenta-o</string>
+    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorar</string>
     <string name="onboardingEndDaxDialogTitle">"Tu consegues!"</string>
-    <string name="onboardingEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
-    <string name="onboardingEndDaxDialogButton">Já está!</string>
+    <string name="onboardingEndDaxDialogDescription">Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas.</string>
+    <string name="onboardingInContextEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Dá cá cinco!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Antes que me esqueça…</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[O DuckDuckGo também tem uma <b>VPN segura + 2 proteções premium</b>, disponíveis com uma <b>subscrição paga opcional</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo conta também com uma <b>subscrição paga</b> opcional, com uma <b>VPN segura</b> e <b>IA avançada e privada</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Saiba mais</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Experimenta gratuitamente!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorar</string>
+    <string name="onboardingSkippedPrivacyProDaxDialogTitle">Sabias?</string>
 
-    <!-- Highlight Onboarding Experiment-->
-    <string name="highlightsPreOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>Pronto para um navegador mais rápido que te mantém protegido?]]></string>
-    <string name="highlightsPreOnboardingDaxDialog2Title">Proteções ativadas!</string>
-    <string name="highlightsPreOnboardingComparisonChartItem2">Bloqueia rastreadores de terceiros</string>
-    <string name="highlightsPreOnboardingComparisonChartItem3">Bloquear solicitações e pop-ups de cookies</string>
-    <string name="highlightsPreOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
-    <string name="highlightsPreOnboardingComparisonChartItem5">Eliminar dados de navegação rapidamente</string>
-    <string name="highlightsPreOnboardingSelectAppIconTitle">Que cor me fica melhor?</string>
-    <string name="highlightsPreOnboardingSelectAppIconDescription">Escolhe o ícone da aplicação:</string>
-    <string name="highlightsPreOnboardingSelectAppIconOkButton">Seguinte</string>
-    <string name="highlightsPreOnboardingAddressBarTitle">Onde devo posicionar a barra de endereços?</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Title">Topo (predefinição)</string>
-    <string name="highlightsPreOnboardingAddressBarOption1Description">Fácil de ver</string>
-    <string name="highlightsPreOnboardingAddressBarOkButton">Seguinte</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Title">Parte inferior</string>
-    <string name="highlightsPreOnboardingAddressBarOption2Description">Fácil de aceder</string>
-    <string name="highlightsOnboardingSearchQueryOption4">patinhos bebés</string>
-    <string name="highlightsOnboardingSearchDaxDialogDescription">As tuas pesquisas no DuckDuckGo são sempre privadas.</string>
-    <string name="highlightsOnboardingSerpDaxDialogDescription"><![CDATA[É o <b>DuckDuckGo Search</b>! Privado. Rápido. Menos anúncios.]]></string>
-    <string name="highlightsOnboardingEndDaxDialogDescription">Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas.</string>
-    <string name="highlightsOnboardingEndDaxDialogButton">Dá cá cinco!</string>
-    <string name="onboardingFireButtonDaxDialogOkButton">Experimenta-o</string>
-    <string name="onboardingFireButtonDaxDialogCancelButton">Ignorar</string>
-    <string name="preOnboardingDaxDialog1SecondaryButton">Já estive aqui antes</string>
-    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Entendido! Vou ignorar as outras dicas.]]></string>
-    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atenção: podes eliminar todos os separadores, o histórico e os dados de navegação em dois toques com o <b>Fire Button</b> 🔥]]></string>
-    <string name="preOnboardingDaxDialog3SecondaryButton">Mostrar Tutorial</string>
+    <!-- Input Screen Onboarding step -->
+    <string name="preOnboardingInputScreenTitle">Queres acesso fácil ao chat privado com IA?</string>
+    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
+    <string name="preOnboardingInputScreenButton">Seguinte</string>
+    <string name="preOnboardingInputScreenDescription"><![CDATA[As funcionalidades de IA são privadas e opcionais. Podes fazer alterações em <b>Definições > Funcionalidades de IA</b>.]]></string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Barra de endereço</string>
+    <string name="settingsAddressBarPositionHeaderTitle">Posição da barra de endereços</string>
     <string name="settingsAddressBarPositionTop">Topo</string>
     <string name="settingsAddressBarPositionBottom">Parte inferior</string>
+    <string name="settingsAddressBarPositionSplit">Dividir</string>
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Mostrar ao abrir a aplicação</string>
@@ -915,40 +958,17 @@
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Concluir a configuração</string>
 
-    <!-- Buck Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Olá!</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Pronto para um navegador mais rápido que te mantém protegido?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Proteções</b> <i>ativadas!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Olá!<br/>Pronto para um navegador mais rápido que te mantém protegido?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Limpa instantaneamente a tua atividade de navegação com o <font color=\"#F05C2B\">Fire Button</font>]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Experimenta!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one"><![CDATA[ e mais %1$d entidade estavam a tentar rastrear-te aqui. <font color=\"#F05C2B\">Bloqueei-as!</font>]]></item>
-        <item quantity="other"><![CDATA[ e e mais %1$d entidades estavam a tentar rastrear-te aqui. <font color=\"#F05C2B\">Bloqueei-as!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ estava a tentar rastrear-te aqui. <font color=\"#F05C2B\">Bloqueei-a!</font>]]></item>
-        <item quantity="other"><![CDATA[ estavam a tentar rastrear-te aqui. <font color=\"#F05C2B\">Bloqueei-as!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Toca no escudo para obter mais informações.️</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nA DuckDuckGo é a empresa independente de proteção online para quem quer recuperar o controlo das suas informações pessoais.\n\nAcreditamos que a melhor maneira de proteger as tuas informações pessoais de hackers, burlões e empresas que invadem a privacidade é impedir que sejam recolhidas. É por isso que milhões de pessoas <annotation type="chart_comparison">escolhem o DuckDuckGo em vez do Chrome e de outros navegadores</annotation> para pesquisar e navegar online. O nosso motor de busca incorporado é como o Google, mas nunca rastreia as tuas pesquisas. E as nossas proteções de navegação, como o bloqueio de rastreadores de anúncios e o bloqueio de cookies, ajudam a impedir que outras empresas recolham os teus dados. Além disso, o nosso navegador é gratuito — ganhamos dinheiro com <annotation type="privacy_respecting_ads">anúncios de pesquisa que respeitam a tua privacidade</annotation> e não com a exploração dos teus dados.Além disso, também oferecemos a <annotation type="ppro_help_page">subscrição da DuckDuckGo</annotation> integrada no nosso navegador. Os subscritores obtêm ainda mais proteção de privacidade com uma <annotation type="vpn_help_page">VPN</annotation> rápida e simples que ajuda a proteger a atividade online, acesso a modelos avançados de IA no serviço privado de conversa com IA Duck.ai, um serviço que encontra e remove as tuas informações pessoais de sites de pesquisa de pessoas, e um serviço que restaura a tua identidade em caso de roubo.\n\nRecupera o controlo sobre as tuas informações pessoais com o navegador concebido para a proteção de dados e não para a recolha de dados.</string>
-    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo conta também com uma <b>subscrição paga</b> opcional, com uma <b>VPN segura</b> e <b>IA avançada e privada</b>.]]></string>
-    <string name="settingsDuckAiRebranding">Funcionalidades de IA</string>
-    <string name="settingsDuckAi">Duck.ai</string>
-
     <!--TabSwitcher Trackers Animation-->
-    <string name="showTrackerCountInTabSwitcher">Mostrar contagem de rastreadores no Comutador de separadores</string>
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked">&lt;b&gt;%1$s rastreador bloqueado &lt;/b&gt; nos últimos 7 dias</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Esconder a contagem de rastreadores?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Podes voltar a ativar isto em Definições &gt; Aparência.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Manter</string>
+
+    <!-- Trackers blocked animation-->
+    <string name="settingsTrackersBlockedAnimationHeaderTitle">Animação de rastreadores bloqueados</string>
+    <string name="showTrackerCountInAddressBar">Mostrar na barra de endereço</string>
+    <string name="showWeeklyTrackerCountInTabSwitcher">Mostrar no gestor de separadores</string>
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel" instruction="Label for the search-only widget">Pesquisar apenas</string>

@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/duckChatSettingsIcon"
                 android:layout_marginTop="24dp"
-                android:src="@drawable/chat_private_128"
+                android:src="@drawable/ic_ai_128"
                 android:importantForAccessibility="no"
                 android:layout_gravity="center"/>
 
@@ -51,7 +51,7 @@
                 android:id="@+id/duckChatSettingsTitle"
                 android:layout_marginHorizontal="@dimen/keyline_5"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/duck_chat_title"
+                android:text="@string/duck_chat_ai_features_title"
                 android:gravity="center"
                 app:typography="h2"/>
 
@@ -72,22 +72,14 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider"/>
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/userEnabledDuckChatToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_enable_duck_ai_setting"
-                app:showSwitch="true"/>
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/userEnabledDuckChatToggleRebranding"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
                 app:leadingIcon="@drawable/ic_ai_chat_24"
                 app:leadingIconBackground="circular"
-                app:primaryText="@string/duck_chat_enable_duck_ai_setting_rebranding"
-                app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
+                app:primaryText="@string/duck_chat_enable_duck_ai_setting"
+                app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description"
                 app:showSwitch="true" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -113,9 +105,11 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withoutai_active" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -152,19 +146,29 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithAiImage"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withai_inactive" />
 
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
                         android:gravity="center"
-                        android:text="@string/input_screen_user_pref_with_ai"
-                        app:textType="primary"
-                        app:typography="caption" />
+                        android:orientation="horizontal">
+
+                        <com.duckduckgo.common.ui.view.text.DaxTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/input_screen_user_pref_with_ai"
+                            app:textType="primary"
+                            app:typography="caption" />
+
+                    </LinearLayout>
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithAiCheck"
@@ -176,6 +180,14 @@
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiDefaultTogglePosition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiDefaultTogglePositionTitle"
+                app:secondaryText="@string/duckAiDefaultTogglePositionSearch" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/duckAiInputScreenDescription"
@@ -196,10 +208,35 @@
                 app:primaryText="@string/duck_ai_shortcut_settings_title"
                 app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAIAutomaticContext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAIContextualAutomaticContextTitle"
+                app:secondaryText="@string/duckAIContextualAutomaticContextMessage"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiNativeInputField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiNativeInputFieldTitle"
+                app:secondaryText="@string/duckAiNativeInputFieldMessage"
+                app:showSwitch="true" />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/divider2"/>
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/searchSettingsSectionHeader"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duckAiSearchSettingsSectionHeader" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/showDuckChatSearchSettingsLink"
@@ -210,6 +247,21 @@
                 app:leadingIcon="@drawable/ic_assist_24"
                 app:leadingIconBackground="circular"
                 app:showSwitch="false"/>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/keyline_2"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiHideAiGeneratedImagesLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:leadingIcon="@drawable/ic_image_ai_hide_24"
+                app:leadingIconBackground="circular"
+                app:primaryText="@string/duckAiHideAiGeneratedImagesTitle"
+                app:secondaryText="@string/duckAiHideAiGeneratedImagesDescription"
+                app:showSwitch="false" />
 
         </LinearLayout>
     </ScrollView>

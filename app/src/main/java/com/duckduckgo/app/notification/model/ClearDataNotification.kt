@@ -21,11 +21,14 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.AutomaticDataClearing
+import com.duckduckgo.app.firebutton.DataClearingSettingsActivity
 import com.duckduckgo.app.firebutton.FireButtonActivity
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -33,17 +36,21 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 class ClearDataNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
     private val settingsDataStore: SettingsDataStore,
+    private val automaticDataClearing: AutomaticDataClearing,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacytips.autoclear"
@@ -54,12 +61,20 @@ class ClearDataNotification(
             return false
         }
 
-        if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
-            logcat(VERBOSE) { "No need for notification, user already has clear option set" }
-            return false
+        return withContext(dispatcherProvider.io()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
+                if (automaticDataClearing.isAutomaticDataClearingOptionSelected()) {
+                    logcat(VERBOSE) { "No need for notification, user already has automatic data clearing option set" }
+                    return@withContext false
+                }
+            } else {
+                if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
+                    logcat(VERBOSE) { "No need for notification, user already has clear option set" }
+                    return@withContext false
+                }
+            }
+            return@withContext true
         }
-
-        return true
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
@@ -90,7 +105,12 @@ class ClearDataNotificationPlugin @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : SchedulableNotificationPlugin {
+
+    private val useSingleTabFireDialog = coroutineScope.async(dispatcherProvider.io()) {
+        androidBrowserConfigFeature.singleTabFireDialog().isEnabled()
+    }
 
     override fun getSchedulableNotification(): SchedulableNotification {
         return schedulableNotification
@@ -114,8 +134,14 @@ class ClearDataNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = FireButtonActivity.intent(context).apply {
-            putExtra(FireButtonActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+        val intent = if (runBlocking { useSingleTabFireDialog.await() }) {
+            DataClearingSettingsActivity.intent(context).apply {
+                putExtra(DataClearingSettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+            }
+        } else {
+            FireButtonActivity.intent(context).apply {
+                putExtra(FireButtonActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+            }
         }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)

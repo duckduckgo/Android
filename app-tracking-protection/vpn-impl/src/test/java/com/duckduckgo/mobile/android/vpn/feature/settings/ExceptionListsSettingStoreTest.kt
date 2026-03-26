@@ -54,7 +54,7 @@ class ExceptionListsSettingStoreTest {
      */
     private val testJson = """
         {
-            "exceptionLists": { 
+            "exceptionLists": {
                 "appTrackerAllowList": [
                     {
                         "domain": "api.apptentive.com",

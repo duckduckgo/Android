@@ -23,13 +23,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.StatisticsPixelName
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.APP_USE
+import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.DUCKAI
 import com.duckduckgo.app.statistics.user_segments.SegmentCalculation.ActivityType.SEARCH
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class UserSegmentsPixelSender @Inject constructor(
@@ -59,15 +60,35 @@ class UserSegmentsPixelSender @Inject constructor(
         }
     }
 
+    override fun onDuckAiRetentionAtbRefreshed(
+        oldAtb: String,
+        newAtb: String,
+        metadata: Map<String, String?>,
+    ) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val params = handleAtbRefresh(DUCKAI, oldAtb = oldAtb, newAtb = newAtb)
+            if (params.isNotEmpty()) {
+                pixel.fire(StatisticsPixelName.RETENTION_SEGMENTS.pixelName, params)
+            }
+        }
+    }
+
     // Internal for testing only
     internal suspend fun handleAtbRefresh(activityType: ActivityType, oldAtb: String, newAtb: String): Map<String, String> {
         try {
-            val usageHistory = if (activityType == SEARCH) {
-                usageHistory.addSearchUsage(newAtb)
-                usageHistory.getSearchUsageHistory()
-            } else {
-                usageHistory.addAppUsage(newAtb)
-                usageHistory.getAppUsageHistory()
+            val usageHistory = when (activityType) {
+                SEARCH -> {
+                    usageHistory.addSearchUsage(newAtb)
+                    usageHistory.getSearchUsageHistory()
+                }
+                APP_USE -> {
+                    usageHistory.addAppUsage(newAtb)
+                    usageHistory.getAppUsageHistory()
+                }
+                DUCKAI -> {
+                    usageHistory.addDuckAiUsage(newAtb)
+                    usageHistory.getDuckAiHistory()
+                }
             }
 
             if (oldAtb.asNumber() != newAtb.asNumber()) {

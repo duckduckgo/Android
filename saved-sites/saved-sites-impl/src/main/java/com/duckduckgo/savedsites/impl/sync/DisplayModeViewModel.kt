@@ -21,12 +21,12 @@ import com.duckduckgo.app.global.*
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode
-import javax.inject.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.*
 
 class DisplayModeViewModel(
     private val favoritesDisplayModeSettingsRepository: FavoritesDisplayModeSettingsRepository,

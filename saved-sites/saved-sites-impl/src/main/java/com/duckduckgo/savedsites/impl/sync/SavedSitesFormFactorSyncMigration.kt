@@ -24,8 +24,8 @@ import com.duckduckgo.savedsites.store.FavoritesDisplayMode.UNIFIED
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.logcat
+import javax.inject.Inject
 
 interface SavedSitesFormFactorSyncMigration {
     fun onFormFactorFavouritesEnabled()

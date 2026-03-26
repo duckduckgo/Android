@@ -289,4 +289,27 @@
     <string name="passwords_import_promo_in_settings_title">Tuo salasanat Googlesta</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Piilota</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Tuo DuckDuckGo:hon</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Tuotu Chromesta</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Tuo kirjanmerkit Googlesta</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Tuo Googlesta</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Valitse kirjanmerkkitiedosto…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Kirjanmerkkien tuominen</string>
+    <string name="importBookmarksProgressTitle">Tuodaan Googlesta…</string>
+    <string name="importBookmarksProgressSubtitle">Pidä tämä näyttö auki ja odota hetki – tämän ei pitäisi kestää enempää kuin minuutin tai kaksi.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google saattaa lähettää sinulle sähköpostiviestin, jossa vahvistetaan, että kirjanmerkkisi viedään.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Peruutetaanko tuonti?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Kirjanmerkkejäsi ei tuoda, jos peruutat nyt.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Peruuta tuonti</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Jatka</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Kirjanmerkit: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Sulje</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Jokin meni pieleen</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Varmista, että sinulla on yhteys internetiin ja yritä uudelleen.</string>
+
 </resources>

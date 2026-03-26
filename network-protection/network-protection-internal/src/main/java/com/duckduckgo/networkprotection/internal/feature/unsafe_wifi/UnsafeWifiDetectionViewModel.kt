@@ -25,9 +25,9 @@ import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiD
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Disable
 import com.duckduckgo.networkprotection.internal.feature.unsafe_wifi.UnsafeWifiDetectionSettingView.State.Enable
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 class UnsafeWifiDetectionViewModel(
     private val unsafeWifiMonitor: UnsafeWifiMonitor,

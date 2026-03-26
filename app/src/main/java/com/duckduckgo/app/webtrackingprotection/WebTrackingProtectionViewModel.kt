@@ -27,7 +27,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,13 +34,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class WebTrackingProtectionViewModel @Inject constructor(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val webTrackingProtectionsGridFeature: WebTrackingProtectionsGridFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -88,10 +87,6 @@ class WebTrackingProtectionViewModel @Inject constructor(
     }
 
     private fun getProtectionItems(): List<FeatureGridItem> {
-        if (!webTrackingProtectionsGridFeature.self().isEnabled()) {
-            return emptyList()
-        }
-
         return listOf(
             FeatureGridItem(
                 iconRes = R.drawable.ic_shield_protection,

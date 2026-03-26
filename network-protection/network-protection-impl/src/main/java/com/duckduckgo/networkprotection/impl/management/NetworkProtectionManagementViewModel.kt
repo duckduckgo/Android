@@ -64,6 +64,8 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent.EntryPoint.APP_SETTINGS
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
@@ -75,14 +77,14 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -103,6 +105,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val localConfig: NetPSettingsLocalConfig,
     private val autoExcludePrompt: AutoExcludePrompt,
+    private val vpnEnableWideEvent: VpnEnableWideEvent,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -304,12 +307,16 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
+        vpnEnableWideEvent.onAskForVpnPermission()
     }
 
     fun onNetpToggleClicked(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (enabled) {
+                vpnEnableWideEvent.onUserRequestedVpnStart(entryPoint = APP_SETTINGS)
+
                 if (externalVpnDetector.isExternalVpnDetected()) {
+                    vpnEnableWideEvent.onVpnConflictDialogShown()
                     networkProtectionPixels.reportVpnConflictDialogShown()
                     sendCommand(Command.ShowVpnConflictDialog)
                 } else {
@@ -333,10 +340,16 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
         }
         lastVpnRequestTime = -1L
+        vpnEnableWideEvent.onVpnPermissionRejected()
+    }
+
+    fun onVpnConflictDialogCancel() {
+        vpnEnableWideEvent.onVpnConflictDialogCancel()
     }
 
     fun onStartVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
+            vpnEnableWideEvent.onStartVpn()
             networkProtectionState.start()
             networkProtectionRepository.enabledTimeInMillis = -1L
             forceUpdateRunningState()
@@ -426,6 +439,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onExcludeAppSelected() {
         networkProtectionPixels.reportExcludePromptExcludeAppClicked()
+    }
+
+    fun onLaunchedFromNotification(pixelName: String) {
+        networkProtectionPixels.reportNotificationLaunched(pixelName)
     }
 
     sealed class Command {

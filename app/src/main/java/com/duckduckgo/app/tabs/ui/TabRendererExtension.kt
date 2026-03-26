@@ -17,18 +17,25 @@
 package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.isAboutBlank
 import com.duckduckgo.app.tabs.model.isBlank
 import com.duckduckgo.common.utils.AppUrl
 
 fun TabEntity.displayTitle(context: Context): String {
+    // Check for explicit about:blank URL
+    if (isAboutBlank) {
+        return "about:blank"
+    }
+
+    // Check for blank new tab
     if (isBlank) {
         return context.getString(R.string.newTabMenuItem)
     }
 
-    return title ?: Uri.parse(resolvedUrl()).host ?: ""
+    return title ?: resolvedUrl().toUri().host?.take(TabSwitcherAdapter.TabSwitcherViewHolder.MAX_TITLE_LENGTH) ?: ""
 }
 
 private fun TabEntity.resolvedUrl(): String {

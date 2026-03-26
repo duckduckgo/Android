@@ -30,7 +30,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':common-utils')
     implementation project(':navigation-api')
     implementation project(':internal-features-api')

@@ -23,6 +23,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import logcat.logcat
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -30,7 +31,6 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

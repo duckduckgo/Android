@@ -19,6 +19,7 @@ package com.duckduckgo.downloads.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
@@ -33,8 +34,6 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -42,6 +41,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 interface DownloadCallback {
     /**
@@ -95,6 +96,8 @@ class FileDownloadCallback @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val mediaScanner: MediaScanner,
+    private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
+    private val fileDownloadCallbackPlugins: PluginPoint<FileDownloadCallbackPlugin>,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -137,6 +140,7 @@ class FileDownloadCallback @Inject constructor(
                     ),
                 )
             }
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 
@@ -159,6 +163,7 @@ class FileDownloadCallback @Inject constructor(
                     mimeType = mimeType,
                 ),
             )
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 
@@ -201,8 +206,9 @@ class FileDownloadCallback @Inject constructor(
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
         val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(messageId = messageId)
-        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
         appCoroutineScope.launch(dispatchers.io()) {
+            url?.let { failedDownloadRetryUrlStore.saveRetryUrl(downloadId, it) }
+            fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
             command.send(downloadFailedMessage)
         }
     }

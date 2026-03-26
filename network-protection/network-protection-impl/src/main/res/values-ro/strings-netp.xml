@@ -193,7 +193,7 @@
     <string name="netpNotificationCTAReconnectNow">Reconectează-te acum</string>
     <string name="netpNotificationSnoozeTitle">VPN-ul este în repaus</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN-ul se va reconecta la %1$s</string>
-    <string name="netpNotificationVpnAccessRevoked">VPN deconectat din cauza expirării abonamentului. Abonează-te la Privacy Pro pentru a reconecta DuckDuckGo VPN.</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN deconectat din cauza expirării abonamentului. Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">Locația VPN</string>
@@ -205,7 +205,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN-ul s-a deconectat din cauza unui abonament expirat</string>
-    <string name="netpDialogVpnAccessRevokedBody">Abonează-te la Privacy Pro pentru a reconecta DuckDuckGo VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Înscrie-te</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Renunță</string>
 
@@ -261,7 +261,4 @@
     <string name="netpExclusionListLabelAutoExclude">Incompatibilă cu VPN-urile</string>
     <string name="netpExclusionListAutoExcludeDescription">Unele aplicații, cum ar fi cele bancare sau de streaming, nu funcționează bine cu VPN-urile. Când această setare este activată, vom exclude automat acele aplicații.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN deconectat din cauza expirării abonamentului. Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
 </resources>

@@ -16,10 +16,14 @@
 
 package com.duckduckgo.savedsites.impl.bookmarks
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.autofill.api.ImportFromGoogle
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -33,6 +37,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.savedsites.impl.SavedSitesPixelParameters
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
@@ -50,6 +55,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
+@SuppressLint("DenyListedApi")
 class BookmarksViewModelTest {
 
     @get:Rule
@@ -63,6 +69,8 @@ class BookmarksViewModelTest {
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
+
+    private val importFromGoogle: ImportFromGoogle = mock()
 
     private val commandCaptor = argumentCaptor<BookmarksViewModel.Command>()
     private val viewStateCaptor = argumentCaptor<BookmarksViewModel.ViewState>()
@@ -109,6 +117,7 @@ class BookmarksViewModelTest {
             faviconsFetchingPrompt,
             bookmarksDataStore,
             coroutineRule.testDispatcherProvider,
+            importFromGoogle,
             coroutineRule.testScope,
         )
         model.viewState.observeForever(viewStateObserver)
@@ -130,6 +139,18 @@ class BookmarksViewModelTest {
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
         testee.command.removeObserver(commandObserver)
+    }
+
+    @Test
+    fun whenInitSendBookmarksPressedPixels() {
+        verify(pixel).fire(SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
+        verify(pixel).fire(
+            SavedSitesPixelName.MENU_ACTION_BOOKMARKS_PRESSED_DAILY.pixelName,
+            parameters = mapOf(SavedSitesPixelParameters.SORT_MODE to bookmarksDataStore.getSortingMode().name),
+            type = Daily(),
+        )
+        verify(pixel).fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName)
+        verify(pixel).fire(SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName, type = Daily())
     }
 
     @Test
@@ -591,12 +612,28 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenImportBookmarksClickedThenPixelAndCommandSent() {
+    fun whenImportBookmarksClickedThenPixelSent() {
         testee.onImportBookmarksClicked()
 
         verify(pixel).fire(SavedSitesPixelName.BOOKMARK_MENU_IMPORT_CLICKED)
+    }
+
+    @Test
+    fun whenImportBookmarksClickedAndFeatureEnabledThenShowDialog() = runTest {
+        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(Intent())
+        testee.onImportBookmarksClicked()
+
         verify(commandObserver).onChanged(commandCaptor.capture())
-        assertEquals(BookmarksViewModel.Command.LaunchBookmarkImport, commandCaptor.lastValue)
+        assertEquals(BookmarksViewModel.Command.ShowBookmarkImportDialog, commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenImportBookmarksClickedAndFeatureDisabledThenLaunchFileImport() = runTest {
+        whenever(importFromGoogle.getBookmarksImportLaunchIntent()).thenReturn(null)
+        testee.onImportBookmarksClicked()
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(BookmarksViewModel.Command.LaunchBookmarkImportFile, commandCaptor.lastValue)
     }
 
     @Test

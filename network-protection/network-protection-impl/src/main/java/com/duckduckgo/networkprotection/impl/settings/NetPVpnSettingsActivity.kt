@@ -41,11 +41,11 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.RecommendedSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.ViewState
-import javax.inject.Inject
-import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 @InjectWith(
     scope = ActivityScope::class,

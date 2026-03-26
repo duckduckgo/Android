@@ -82,7 +82,6 @@
     <string name="searchBookmarks">Meklēt grāmatzīmes</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Dzēst %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Dzēst grāmatzīmi %1$s?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Grāmatzīme pievienota mapē %1$s</string>
     <string name="addToFavorites">Pievienot izlasei</string>
     <string name="editBookmark">Rediģēt grāmatzīmi</string>
     <string name="importBookmarksDescription">Ja tavas grāmatzīmes ir saglabātas citā pārlūkā,\nvari tās importēt DuckDuckGo.</string>
@@ -114,4 +113,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmju mape.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atcelt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Dzēst</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importēt Google grāmatzīmes</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
+    <string name="bookmarksImportDialogClose">Aizvērt</string>
 </resources>

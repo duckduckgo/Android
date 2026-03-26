@@ -19,12 +19,10 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BbWelcomePageBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BuckWelcomePageBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BrandDesignUpdateWelcomePageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomePageBlueprint
-import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage
-import com.duckduckgo.app.onboarding.ui.page.BuckWelcomePage
+import com.duckduckgo.app.onboarding.ui.page.BrandDesignUpdateWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
@@ -32,8 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 interface OnboardingPageManager {
     fun pageCount(): Int
     fun buildPageBlueprints()
-    fun buildPageBlueprintsBb()
-    fun buildPageBlueprintsBuck()
+    fun buildBrandDesignUpdatePageBlueprints()
     fun buildPage(position: Int): OnboardingPageFragment?
 }
 
@@ -57,22 +54,16 @@ class OnboardingPageManagerWithTrackerBlocking(
         }
     }
 
-    override fun buildPageBlueprintsBb() {
+    override fun buildBrandDesignUpdatePageBlueprints() {
         pages.clear()
-        pages += BbWelcomePageBlueprint
-    }
-
-    override fun buildPageBlueprintsBuck() {
-        pages.clear()
-        pages += BuckWelcomePageBlueprint
+        pages += BrandDesignUpdateWelcomePageBlueprint
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
             is WelcomePageBlueprint -> buildWelcomePage()
-            is BuckWelcomePageBlueprint -> buildBuckWelcomePage()
-            is BbWelcomePageBlueprint -> buildBbWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
+            is BrandDesignUpdateWelcomePageBlueprint -> buildBrandDesignUpdateWelcomePage()
             else -> null
         }
     }
@@ -91,11 +82,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         return onboardingPageBuilder.buildWelcomePage()
     }
 
-    private fun buildBuckWelcomePage(): BuckWelcomePage {
-        return onboardingPageBuilder.buildBuckWelcomePage()
-    }
-
-    private fun buildBbWelcomePage(): BbWelcomePage {
-        return onboardingPageBuilder.buildBbWelcomePage()
+    private fun buildBrandDesignUpdateWelcomePage(): BrandDesignUpdateWelcomePage {
+        return onboardingPageBuilder.buildBrandDesignUpdateWelcomePage()
     }
 }

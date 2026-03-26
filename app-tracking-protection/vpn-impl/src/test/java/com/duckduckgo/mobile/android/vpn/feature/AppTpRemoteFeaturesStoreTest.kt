@@ -9,13 +9,13 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import java.io.IOException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class AppTpRemoteFeaturesStoreTest {
     @get:Rule
@@ -45,6 +45,17 @@ class AppTpRemoteFeaturesStoreTest {
                     multiprocess: Boolean,
                 ): SharedPreferences? {
                     return preferences
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
                 }
             },
             Moshi.Builder().build(),
@@ -97,6 +108,17 @@ class AppTpRemoteFeaturesStoreTest {
                 ): SharedPreferences? {
                     return preferences
                 }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
             },
             Moshi.Builder().build(),
         )
@@ -136,6 +158,17 @@ class AppTpRemoteFeaturesStoreTest {
                     multiprocess: Boolean,
                 ): SharedPreferences? {
                     throw IOException("test")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(
+                    origin: SharedPreferences,
+                    name: String,
+                ): SharedPreferences? {
+                    TODO("Not yet implemented")
+                }
+
+                override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
+                    TODO("Not yet implemented")
                 }
             },
             Moshi.Builder().build(),

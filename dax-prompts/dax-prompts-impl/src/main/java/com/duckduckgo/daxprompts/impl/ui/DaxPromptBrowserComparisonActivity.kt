@@ -16,22 +16,17 @@
 
 package com.duckduckgo.daxprompts.impl.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Annotation
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.SpannedString
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
-import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -39,9 +34,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
 import com.duckduckgo.daxprompts.impl.R
@@ -49,16 +42,18 @@ import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptBrowserCompar
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonViewModel.Command
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DaxPromptBrowserComparisonNoParams::class)
 class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
     private val viewModel: DaxPromptBrowserComparisonViewModel by bindViewModel()
     private val binding: ActivityDaxPromptBrowserComparisonBinding by viewBinding()
+
+    private var lockedInPortraitMode: Boolean = false
 
     private val startBrowserComparisonChartActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -78,14 +73,13 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        if (isDarkThemeEnabled()) {
-            renderDarkUi()
-        } else {
-            renderLightUi()
-        }
-        configureClickableLinks()
+
         setupListeners()
         setupObservers()
+        setupOnBackNavigation()
+        setupOrientationMode()
+
+        viewModel.onPromptShown()
     }
 
     override fun onResume() {
@@ -94,76 +88,11 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         markAsShown()
     }
 
-    private fun renderDarkUi() {
-        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape_dark))
-        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackgroundDark))
-        binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message_dark)
-        binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_dark_with_ripple)
-        binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.black))
-        binding.daxPromptBrowserComparisonChart.featureIcon1.setImageDrawable(
-            ContextCompat.getDrawable(
-                this,
-                R.drawable.ic_comparison_chart_search_dark,
-            ),
-        )
-    }
-
-    private fun renderLightUi() {
-        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape))
-        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackground))
-        binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message)
-        binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_with_ripple)
-        binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.white))
-        binding.daxPromptBrowserComparisonChart.featureIcon1.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_comparison_chart_search))
-    }
-
-    private fun configureClickableLinks() {
-        with(binding.daxPromptBrowserComparisonMoreLink) {
-            text = addClickableLinks()
-            movementMethod = LinkMovementMethod.getInstance()
-        }
-    }
-
-    private fun addClickableLinks(): SpannableString {
-        val fullText = getText(R.string.dax_prompt_browser_comparison_more_link) as SpannedString
-
-        val spannableString = SpannableString(fullText)
-        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-
-        annotations?.find { it.value == LINK_ANNOTATION }?.let {
-            addSpannable(spannableString, fullText, it) {
-                viewModel.onMoreLinkClicked()
-            }
-        }
-
-        return spannableString
-    }
-
-    private fun addSpannable(
-        spannableString: SpannableString,
-        fullText: SpannedString,
-        it: Annotation,
-        onClick: (widget: View) -> Unit,
-    ) {
-        spannableString.apply {
-            setSpan(
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        onClick(widget)
-                    }
-                },
-                fullText.getSpanStart(it),
-                fullText.getSpanEnd(it),
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE,
-            )
-            setSpan(
-                ForegroundColorSpan(
-                    getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue),
-                ),
-                fullText.getSpanStart(it),
-                fullText.getSpanEnd(it),
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE,
-            )
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (lockedInPortraitMode && newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         }
     }
 
@@ -173,6 +102,10 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         }
         binding.daxPromptBrowserComparisonPrimaryButton.setOnClickListener {
             viewModel.onPrimaryButtonClicked()
+        }
+
+        binding.daxPromptBrowserComparisonGhostButton.setOnClickListener {
+            viewModel.onGhostButtonClicked()
         }
     }
 
@@ -200,16 +133,6 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
             is Command.BrowserComparisonChart -> {
                 startBrowserComparisonChartActivityForResult.launch(command.intent)
             }
-
-            is Command.OpenDetailsPage -> {
-                globalActivityStarter.start(
-                    this,
-                    WebViewActivityWithParams(
-                        url = command.url,
-                        screenTitle = "",
-                    ),
-                )
-            }
         }
     }
 
@@ -227,8 +150,30 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         viewModel.markBrowserComparisonPromptAsShown()
     }
 
+    private fun setupOnBackNavigation() { // Added method
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackNavigation()
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            },
+        )
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun setupOrientationMode() {
+        lockedInPortraitMode = resources.getBoolean(R.bool.lockedInPortraitMode)
+        if (lockedInPortraitMode) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+        }
+    }
+
     companion object {
-        private const val LINK_ANNOTATION = "more_link"
         const val DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA = "DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA"
     }
 }

@@ -26,11 +26,11 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
 import com.duckduckgo.app.notification.NotificationScheduler
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class JobCleanerTest {
 

@@ -23,10 +23,10 @@ import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.impl.settings.ManageShortcutItem
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import logcat.logcat
+import javax.inject.Inject
 
 interface NewTabShortcutsProvider {
     fun provideActiveShortcuts(): Flow<List<NewTabPageShortcutPlugin>>
@@ -97,5 +97,6 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
+    featureName = "pluginPointNewTabPageShortcutPlugin",
 )
 private interface NewTabPageShortcutPluginPointTrigger

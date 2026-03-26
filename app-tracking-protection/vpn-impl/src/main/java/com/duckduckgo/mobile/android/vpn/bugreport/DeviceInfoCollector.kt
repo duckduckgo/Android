@@ -27,9 +27,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Provider
-import org.json.JSONObject
 
 @ContributesMultibinding(ActivityScope::class)
 class DeviceInfoCollector @Inject constructor(
@@ -52,9 +52,9 @@ class DeviceInfoCollector @Inject constructor(
 @Module
 @ContributesTo(AppScope::class)
 object DeviceInfoCollectorModule {
+    // this convenience class is just to allow testing
     @Provides
     @BatteryOptimizationState
-    // this convenience class is just to allow testing
     fun provideIsIgnoringBatteryOptimizations(context: Context): Boolean {
         return runCatching {
             context.packageName?.let {

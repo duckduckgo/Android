@@ -1,0 +1,124 @@
+appId: com.duckduckgo.mobile.android
+---
+# verify that autocomplete suggestions are shown when typing in the Input Screen
+- tapOn:
+    id: "omnibarTextInput"
+    optional: true
+- assertVisible:
+    id: "inputModeWidget"
+- inputText: "reddit"
+- assertVisible:
+    id: "autoCompleteSuggestionsList"
+- assertVisible:
+    text: "reddit.com"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# verify that submitting a search query opens SERP
+- pressKey: Enter
+- assertNotVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "browserLayout"
+
+# add the page to favorites (for future assertions)
+- runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
+- tapOn:
+    text: "add bookmark"
+- tapOn:
+    id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
+- tapOn:
+    text: "bookmarks"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
+- tapOn:
+    text: "add to favorites"
+- action: back
+
+# verify that re-opening the Input Screen from SERP pre-fills the last search query and runs autocomplete immediately
+- tapOn:
+    id: "omnibarTextInput"
+- assertVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    text: "reddit"
+- assertVisible:
+    id: "autoCompleteSuggestionsList"
+- assertVisible:
+    text: "reddit.com"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# verify that clearing the Input Screen text and submitting a URL opens the web page
+- tapOn:
+    id: "inputFieldClearText"
+- inputText: "eff.org"
+- pressKey: Enter
+- assertNotVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    text: ".*eff.org.*"
+    childOf:
+      id: "omnibarTextInput"
+
+# verify that favorites are shown when opening the Input Screen from a web page and autocomplete is suppressed
+- tapOn:
+    id: "omnibarTextInput"
+- assertNotVisible:
+    id: "autoCompleteSuggestionsList"
+# dismiss RMF card if it appears
+- tapOn:
+    id: "close"
+    childOf:
+      id: "remoteMessage"
+    optional: true
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/quickAccessFavicon"
+    childOf:
+      id: "focusedFavourites"
+
+# verify that typing shows autocomplete again
+- inputText: "wiki"
+- assertVisible:
+    id: "autoCompleteSuggestionsList"
+- assertVisible:
+    text: "wikipedia.org"
+
+# verify that tapping on a suggestion opens the web page
+- tapOn:
+    text: "wikipedia.org"
+- assertNotVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    text: ".*wikipedia.org.*"
+    childOf:
+      id: "omnibarTextInput"
+
+# verify that tapping on a favorite opens the web page (SERP in this case)
+- tapOn:
+    id: "omnibarTextInput"
+- tapOn:
+    id: "quickAccessFavicon"
+    childOf:
+      id: "focusedFavourites"
+- assertNotVisible:
+    id: "inputModeWidget"
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "omnibarTextInput"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "browserLayout"

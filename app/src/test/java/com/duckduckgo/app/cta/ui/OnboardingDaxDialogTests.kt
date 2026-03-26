@@ -33,7 +33,6 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -41,12 +40,14 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -76,14 +77,13 @@ class OnboardingDaxDialogTests {
     private val onboardingStore: OnboardingStore = mock()
     private val userStageStore: UserStageStore = mock()
     private val tabRepository: TabRepository = mock()
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockSubscriptions: Subscriptions = mock()
     private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
-    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
-    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
+    private val mockDuckChat: DuckChat = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -92,6 +92,7 @@ class OnboardingDaxDialogTests {
     fun before() = runTest {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
 
         testee = CtaViewModel(
@@ -105,14 +106,13 @@ class OnboardingDaxDialogTests {
             userStageStore,
             tabRepository,
             coroutineRule.testDispatcherProvider,
+            mockDuckChat,
             duckDuckGoUrlDetector,
             extendedOnboardingFeatureToggles,
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
             mockOnboardingHomeScreenWidgetToggles,
-            mockOnboardingDesignExperimentManager,
-            mockRebrandingFeatureToggle,
         )
     }
 
@@ -255,5 +255,83 @@ class OnboardingDaxDialogTests {
 
         val inContextDaxDialogsComplete = testee.areInContextDaxDialogsCompleted()
         assertTrue(inContextDaxDialogsComplete)
+    }
+
+    @Test
+    fun whenHideTipsAndSevenDaysSinceInstallAndPrivacyProNotShownThenRefreshCtaReturnsPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+        whenever(mockSubscriptions.isFreeTrialEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertNotNull(result)
+        assertTrue(result is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 3 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertFalse(result is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun whenHideTipsAndSevenDaysButPrivacyProAlreadyDismissedThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertFalse(result is SubscriptionPromoModalCta)
+    }
+
+    @Test
+    fun whenHideTipsAndSevenDaysButSkippedOnboardingToggleOffThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+        whenever(settingsDataStore.hideTips).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
+        whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
+        whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+
+        val result = testee.refreshCta(
+            coroutineRule.testDispatcherProvider.io(),
+            isBrowserShowing = false,
+            site = null,
+            detectedRefreshPatterns = emptySet(),
+        )
+
+        assertFalse(result is SubscriptionPromoModalCta)
     }
 }

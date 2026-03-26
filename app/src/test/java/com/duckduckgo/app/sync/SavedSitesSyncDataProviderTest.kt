@@ -56,8 +56,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -66,6 +64,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncDataProviderTest {
@@ -567,11 +567,11 @@ class SavedSitesSyncDataProviderTest {
 }
 
 class FakeCrypto : SyncCrypto {
-    override fun encrypt(text: String): String {
-        return text
-    }
+    override fun encrypt(text: String) = text
 
-    override fun decrypt(data: String): String {
-        return data
-    }
+    override fun decrypt(data: String) = data
+
+    override fun encrypt(data: ByteArray): ByteArray = data
+
+    override fun decrypt(data: ByteArray): ByteArray = data
 }

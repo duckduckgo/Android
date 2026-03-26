@@ -20,10 +20,13 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -31,10 +34,10 @@ import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.library.loader.LibraryLoader.LibraryLoaderListener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -44,6 +47,10 @@ import logcat.logcat
     scope = AppScope::class,
     boundType = VpnProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PirProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
     private val context: Context,
@@ -51,12 +58,30 @@ class NativeCrashInit @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
-) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener {
+    private val webViewVersionProvider: WebViewVersionProvider,
+    @ProcessName private val processName: String,
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver, LibraryLoaderListener, PirProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
-    private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
 
-    private external fun jni_register_sighandler(logLevel: Int, appVersion: String, processName: String, isCustomTab: Boolean)
+    private val webViewVersion: String by lazy {
+        if (nativeCrashFeature.nativeCrashReportsFullWebViewVersion().isEnabled()) {
+            webViewVersionProvider.getFullVersion()
+        } else {
+            webViewVersionProvider.getMajorVersion()
+        }
+    }
+
+    private val webViewPackage: String by lazy { webViewVersionProvider.getPackageName() }
+
+    private external fun jni_register_sighandler(
+        logLevel: Int,
+        appVersion: String,
+        processName: String,
+        isCustomTab: Boolean,
+        webViewPackage: String,
+        webViewVersion: String,
+    )
 
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
@@ -70,7 +95,15 @@ class NativeCrashInit @Inject constructor(
         if (!isMainProcess) {
             asyncLoadNativeLibrary()
         } else {
-            logcat(ERROR) { "ndk-crash: onCreate wrongly called in the main process" }
+            logcat(ERROR) { "ndk-crash: onVpnProcessCreated wrongly called in the main process" }
+        }
+    }
+
+    override fun onPirProcessCreated() {
+        if (!isMainProcess) {
+            asyncLoadNativeLibrary()
+        } else {
+            logcat(ERROR) { "ndk-crash: onPirProcessCreated wrongly called in the main process" }
         }
     }
 
@@ -89,7 +122,7 @@ class NativeCrashInit @Inject constructor(
             } else {
                 Log.ASSERT
             }
-            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab)
+            jni_register_sighandler(logLevel, appBuildConfig.versionName, processName, isCustomTab, webViewPackage, webViewVersion)
         }.onFailure {
             logcat(ERROR) { "ndk-crash: Error calling jni_register_sighandler: ${it.asLog()}" }
         }

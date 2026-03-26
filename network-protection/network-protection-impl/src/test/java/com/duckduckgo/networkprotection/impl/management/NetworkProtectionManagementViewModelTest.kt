@@ -63,6 +63,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.pixels.VpnEnableWideEvent
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -72,8 +73,6 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.wireguard.config.Config
-import java.io.BufferedReader
-import java.io.StringReader
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -90,6 +89,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.io.BufferedReader
+import java.io.StringReader
 
 class NetworkProtectionManagementViewModelTest {
     @get:Rule
@@ -128,6 +129,9 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    @Mock
+    private lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
     private var autoExcludePrompt = FakeAutoExcludePrompt()
 
     private var vpnRemoteFeatures = FakeFeatureToggleFactory.create(VpnRemoteFeatures::class.java)
@@ -140,7 +144,7 @@ class NetworkProtectionManagementViewModelTest {
         DNS = 1.2.3.4
         MTU = 1280
         PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
-        
+
         [Peer]
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443
@@ -180,6 +184,7 @@ class NetworkProtectionManagementViewModelTest {
             vpnRemoteFeatures,
             localConfig,
             autoExcludePrompt,
+            vpnEnableWideEvent,
         )
     }
 

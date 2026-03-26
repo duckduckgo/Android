@@ -192,7 +192,7 @@
     <string name="netpNotificationCTAReconnectNow">Újrakapcsolódás most</string>
     <string name="netpNotificationSnoozeTitle">A VPN szüneteltetve van</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">A VPN újrakapcsolódik ekkor: %1$s.</string>
-    <string name="netpNotificationVpnAccessRevoked">A VPN-kapcsolat megszakadt, mert lejárt az előfizetésed. Fizess elő a Privacy Pro szolgáltatásra a DuckDuckGo VPN újracsatlakoztatásához.</string>
+    <string name="netpNotificationVpnAccessRevoked">A VPN-kapcsolat megszakadt, mert lejárt az előfizetésed. Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN-helyszín</string>
@@ -204,7 +204,7 @@
 
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">A VPN megszakadt, mert lejárt az előfizetésed</string>
-    <string name="netpDialogVpnAccessRevokedBody">Fizess elő a Privacy Pro szolgáltatásra a DuckDuckGo VPN újracsatlakoztatásához.</string>
+    <string name="netpDialogVpnAccessRevokedBody">Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Feliratkozás</string>
     <string name="netpDialogVpnAccessRevokedNegativeAction">Elutasítás</string>
 
@@ -258,7 +258,4 @@
     <string name="netpExclusionListLabelAutoExclude">Nem kompatibilis a VPN-ekkel</string>
     <string name="netpExclusionListAutoExcludeDescription">Egyes alkalmazások, mint például a banki vagy streaming-alkalmazások, nem működnek jól a VPN-ekkel. Ha ez a beállítás engedélyezve van, automatikusan kizárjuk ezeket az alkalmazásokat.</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">A VPN-kapcsolat megszakadt, mert lejárt az előfizetésed. Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
 </resources>

@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,10 +38,10 @@ import com.duckduckgo.pir.impl.optout.PirForegroundOptOutService.Companion.EXTRA
 import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalOptoutBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirDevOptOutScreenNoParams::class)
@@ -91,7 +92,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             if (selectedBroker != null) {
                 globalActivityStarter.start(
                     this,
-                    PirDevWebViewResultsScreenParams(listOf(selectedBroker!!)),
+                    PirDevWebViewScreenParams.PirDevOptOutWebViewScreenParams(listOf(selectedBroker!!)),
                 )
             }
         }
@@ -100,6 +101,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             stopService(Intent(this, PirForegroundOptOutService::class.java))
             lifecycleScope.launch {
                 eventsRepository.deleteAllOptOutData()
+                eventsRepository.deleteAllEmailConfirmationsLogs()
             }
             pirNotificationManager.cancelNotifications()
         }
@@ -127,12 +129,15 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
 
     private fun bindViews() {
         lifecycleScope.launch {
+            binding.manualConfigWarning.isVisible = repository.hasBrokerConfigBeenManuallyUpdated()
+
             repository.getBrokersForOptOut(formOptOutOnly = true).also {
                 brokerOptions.addAll(it)
                 dropDownAdapter.clear()
                 dropDownAdapter.addAll(brokerOptions)
             }
         }
+
         eventsRepository.getAllSuccessfullySubmittedOptOutFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { optOuts ->

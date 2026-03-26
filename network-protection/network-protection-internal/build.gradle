@@ -43,7 +43,7 @@ dependencies {
     implementation project(':network-protection-store')
     implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':common-ui')
+    implementation project(':design-system')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')

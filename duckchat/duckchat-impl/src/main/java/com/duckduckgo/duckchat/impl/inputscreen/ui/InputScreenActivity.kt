@@ -28,13 +28,13 @@ import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionPr
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
+import com.duckduckgo.duckchat.impl.inputscreen.wideevents.InputScreenOnboardingWideEvent
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(InputScreenActivityParams::class)
 class InputScreenActivity : DuckDuckGoActivity() {
-
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
@@ -44,18 +44,27 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var inputScreenConfigResolver: InputScreenConfigResolver
+
+    @Inject
+    lateinit var inputScreenOnboardingWideEvent: InputScreenOnboardingWideEvent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
         inputScreenDiscoveryFunnel.onInputScreenOpened()
-        val params = mapOf(
-            "orientation" to if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                "landscape"
-            } else {
-                "portrait"
-            },
-        )
+        val params =
+            mapOf(
+                "orientation" to
+                    if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        "landscape"
+                    } else {
+                        "portrait"
+                    },
+            )
         pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
+        inputScreenOnboardingWideEvent.onInputScreenShown()
     }
 
     override fun finish() {
@@ -64,8 +73,8 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation()
-        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation()
+        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation(inputScreenConfigResolver.isTopOmnibar)
+        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation(inputScreenConfigResolver.isTopOmnibar)
 
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(

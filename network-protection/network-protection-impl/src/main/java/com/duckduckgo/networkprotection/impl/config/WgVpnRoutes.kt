@@ -16,8 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.config
 
-import java.net.InetAddress
 import logcat.logcat
+import java.net.InetAddress
 
 typealias IpRange = Pair<String, Int>
 

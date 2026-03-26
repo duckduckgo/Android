@@ -1,0 +1,83 @@
+{
+  "name": "USA People Search",
+  "url": "usa-people-search.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678082400000,
+  "optOutUrl": "https://www.usa-people-search.com/manage",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "3cb9a2ce-6443-4934-9df3-ec63a181d9bb",
+          "url": "https://usa-people-search.com/name/${firstName|downcase}-${lastName|downcase}/${city|downcase}-${state|stateFull|downcase}"
+        },
+        {
+          "_comment": "Wait for CF challenge interstitial to complete",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#main-section"
+            }
+          ],
+          "id": "aaaab20b-1ecb-45b6-8c53-9ee1354e918b"
+        },
+        {
+          "actionType": "extract",
+          "id": "44e9b66c-c43c-4112-b51e-f7decd83049e",
+          "selector": ".card-block",
+          "noResultsSelector": ".redirect-message",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " Age "
+            },
+            "alternativeNamesList": {
+              "selector": "(.//p[@class='card-text max-lines-1'])[1]",
+              "afterText": "AKA:",
+              "separator": ","
+            },
+            "age": {
+              "selector": ".person-age"
+            },
+            "addressCityState": {
+              "selector": "(.//p[@class='card-text'])[1]",
+              "afterText": "Lives in:"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[@class='card-text address-link-list']",
+              "afterText": "Used to live:",
+              "separator": ","
+            },
+            "relativesList": {
+              "selector": "(.//p[@class='card-text max-lines-1'])[2]",
+              "afterText": "Related to:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".link-to-details",
+              "identifierType": "path",
+              "identifier": "https://www.usa-people-search.com/${firstName}-${middleName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

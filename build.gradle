@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 import static de.fayard.refreshVersions.core.Versions.versionFor
+import static com.gradle.develocity.agent.gradle.test.JUnitXmlDialect.*
+import com.gradle.develocity.agent.gradle.test.ImportJUnitXmlReports
 
 buildscript {
 
@@ -32,7 +34,6 @@ plugins {
     id 'org.jetbrains.dokka'
     id 'com.osacky.fulladle'
     id 'org.jetbrains.kotlin.android' apply false
-    id 'org.jmailen.kotlinter' apply false
     id 'com.google.devtools.ksp' apply false
     id 'com.diffplug.spotless' apply false
 }
@@ -54,7 +55,7 @@ subprojects {
         apply plugin: 'org.jetbrains.dokka'
     }
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl"]
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl", "pir-impl", "feature-toggles-impl"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
@@ -141,6 +142,7 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                                 && dependencyPath != ":js-messaging-api"
+                                && dependencyPath != ":browser-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"
@@ -160,11 +162,34 @@ subprojects {
                 }
             }
         }
+        resolutionStrategy.dependencySubstitution {
+            // Use Guava (which already bundles ListenableFuture) everywhere a bare listenablefuture is requested.
+            // Note: refreshVersions placeholders ("_") are not resolved in substitutions, so pin the version explicitly.
+            substitute(module("com.google.guava:listenablefuture"))
+                    .using(module("com.google.guava:guava:33.4.0-android"))
+                    .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
+        }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+// Develocity test retry configuration to detect flaky tests
+def isCI = System.getenv('CI') != null
+subprojects {
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        develocity.testRetry {
+            maxRetries = isCI ? 1 : 0
+            maxFailures = 5
+            failOnPassedAfterRetry = true
+        }
+        develocity.predictiveTestSelection {
+            enabled.set(System.getProperty("pts.enabled", "true").toBoolean())
+        }
+    }
 }
 
 fladle {
@@ -178,6 +203,7 @@ fladle {
             recordVideo.set(false)
             testTargets.set([
                     "notAnnotation com.duckduckgo.espresso.PrivacyTest",
+                    "notAnnotation com.duckduckgo.espresso.InternalPrivacyTest",
                     "notAnnotation com.duckduckgo.espresso.UserJourney",
             ])
             devices.set([
@@ -185,6 +211,28 @@ fladle {
                     ["model": "Pixel2.arm", "version": "28"]
             ])
             localResultsDir.set("fladleResults")
+            // retry once, if it succeeds it will be reported as a flaky test
+            flakyTestAttempts.set(1)
+        }
+    }
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    compilerOptions.freeCompilerArgs.addAll(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+    )
+}
+
+afterEvaluate {
+    // Export Firebase Test Lab (Flank) tests to Develocity
+    tasks.matching { it.name.startsWith("execFlank") }.names.each {
+        ImportJUnitXmlReports.register(
+                tasks,
+                tasks.named(it),
+                ANDROID_FIREBASE
+        ).configure {
+            reports.from(file("build/fladle/fladleResults/JUnitReport.xml"))
         }
     }
 }

@@ -22,17 +22,20 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker.Result.success
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class DataClearingWorker(
@@ -47,6 +50,18 @@ class DataClearingWorker(
     lateinit var clearDataAction: ClearDataAction
 
     @Inject
+    lateinit var dataClearing: AutomaticDataClearing
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
+
+    @Inject
+    lateinit var fireDataStore: FireDataStore
+
+    @Inject
+    lateinit var dataClearingWideEvent: DataClearingWideEvent
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @WorkerThread
@@ -58,7 +73,41 @@ class DataClearingWorker(
 
         settingsDataStore.lastExecutedJobId = id.toString()
 
-        clearData(settingsDataStore.automaticallyClearWhatOption)
+        withContext(dispatchers.io()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
+                // Use new granular clearing - will automatically kill the process
+                val clearOptions = fireDataStore.getAutomaticClearOptions()
+                dataClearingWideEvent.start(
+                    entryPoint = DataClearingWideEvent.EntryPoint.AUTO_BACKGROUND,
+                    clearOptions = clearOptions,
+                )
+                try {
+                    dataClearing.clearDataUsingAutomaticFireOptions()
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
+            } else {
+                val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
+                dataClearingWideEvent.startLegacy(
+                    entryPoint = DataClearingWideEvent.EntryPoint.LEGACY_AUTO_BACKGROUND,
+                    clearWhatOption = clearWhatOption,
+                    clearDuckAiData = settingsDataStore.clearDuckAiData,
+                )
+                try {
+                    clearData(clearWhatOption)
+                    dataClearingWideEvent.finishSuccess()
+                } catch (e: Exception) {
+                    dataClearingWideEvent.finishFailure(e)
+                    throw e
+                }
+                if (clearWhatOption == ClearWhatOption.CLEAR_TABS_AND_DATA) {
+                    logcat(INFO) { "Will kill process now" }
+                    clearDataAction.killProcess()
+                }
+            }
+        }
 
         logcat(INFO) { "Clear data job finished; returning SUCCESS" }
         return success()
@@ -87,13 +136,10 @@ class DataClearingWorker(
     }
 
     private suspend fun clearEverything() {
-        logcat(INFO) { "App is in background, so just outright killing the process" }
         withContext(dispatchers.main()) {
+            // Use legacy clearing
             clearDataAction.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
             clearDataAction.setAppUsedSinceLastClearFlag(false)
-
-            logcat(INFO) { "Will kill process now" }
-            clearDataAction.killProcess()
         }
     }
 

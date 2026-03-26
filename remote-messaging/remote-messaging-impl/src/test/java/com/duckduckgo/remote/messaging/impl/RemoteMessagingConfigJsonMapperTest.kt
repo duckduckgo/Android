@@ -16,22 +16,27 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.CardItem
+import com.duckduckgo.remote.messaging.api.CardItemType
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Surface.MODAL
+import com.duckduckgo.remote.messaging.api.Surface.NEW_TAB_PAGE
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.squareup.moshi.Moshi
-import java.io.BufferedReader
-import java.util.Locale.US
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -40,7 +45,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.BufferedReader
+import java.util.Locale.US
 
+@SuppressLint("DenyListedApi")
 class RemoteMessagingConfigJsonMapperTest {
 
     @get:Rule
@@ -50,11 +58,14 @@ class RemoteMessagingConfigJsonMapperTest {
         whenever(this.deviceLocale).thenReturn(US)
     }
 
+    private val fakeFeatureToggles = FakeFeatureToggleFactory.create(RemoteMessagingFeatureToggles::class.java)
+
     @Test
     fun whenValidJsonParsedThenMessagesMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -72,6 +83,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigSingleActionMessage, config.messages[0])
 
@@ -83,6 +95,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = listOf(5, 6),
             exclusionRules = listOf(7, 8, 9),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(smallMessage, config.messages[2])
 
@@ -95,6 +108,7 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(mediumMessage, config.messages[3])
 
@@ -113,15 +127,17 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(bigTwoActions, config.messages[4])
     }
 
     @Test
     fun whenValidJsonParsedThenRulesMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -149,9 +165,10 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesHaveUnknownTypesThenMessagesNotMappedIntoConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -160,9 +177,10 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesHaveUnknownTypesThenRulesMappedIntoConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -177,9 +195,10 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenJsonMessagesMalformedOrMissingInformationThenMessagesNotParsedIntoConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -192,15 +211,17 @@ class RemoteMessagingConfigJsonMapperTest {
             ),
             matchingRules = listOf(5, 6),
             exclusionRules = listOf(7, 8, 9),
+            surfaces = listOf(NEW_TAB_PAGE),
         )
         assertEquals(smallMessage, config.messages[0])
     }
 
     @Test
     fun whenJsonMatchingAttributesMalformedThenParsedAsUnknownIntoConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
@@ -213,13 +234,122 @@ class RemoteMessagingConfigJsonMapperTest {
 
     @Test
     fun whenUnknownMatchingAttributeDoesNotProvideFallbackThenFallbackIsNull() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
-        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins)
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
 
         val config = testee.map(result)
 
         assertEquals(Unknown(null), config.rules.find { it.id == 7 }?.attributes?.first())
+    }
+
+    @Test
+    fun whenRemoteMessageModalSurfaceEnabledAndCardListMessageThenMessagesMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = true))
+        val result = getConfigFromJson("json/remote_messaging_config_cardslist.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
+
+        val config = testee.map(result)
+
+        assertEquals(2, config.messages.size)
+        val bigSingleActionMessage = RemoteMessage(
+            id = "8274589c-8aeb-4322-a737-3852911569e3",
+            content = Content.BigSingleAction(
+                titleText = "title",
+                descriptionText = "description",
+                placeholder = ANNOUNCE,
+                primaryActionText = "Ok",
+                primaryAction = Action.Url(
+                    value = "https://duckduckgo.com",
+                ),
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
+        )
+        assertEquals(bigSingleActionMessage, config.messages[0])
+
+        val cardsListMessage = RemoteMessage(
+            id = "whats_new_october_2025",
+            content = Content.CardsList(
+                titleText = "What's New",
+                descriptionText = "Some description.",
+                placeholder = Content.Placeholder.DDG_ANNOUNCE,
+                primaryActionText = "Got It",
+                primaryAction = Action.Dismiss,
+                listItems = listOf(
+                    CardItem.ListItem(
+                        id = "hide_search_images",
+                        type = CardItemType.TWO_LINE_LIST_ITEM,
+                        titleText = "Hide AI Images in Search",
+                        descriptionText = "Easily hide AI images in your search results with the \"AI images\" search filter.",
+                        placeholder = Content.Placeholder.IMAGE_AI,
+                        primaryAction = Action.UrlInContext(
+                            value = "https://duckduckgo.com/duckduckgo-help-pages/results/how-to-filter-out-ai-images-in-duckduckgo-search-results",
+                        ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
+                    ),
+                    CardItem.ListItem(
+                        id = "enhanced_scam_blocker",
+                        type = CardItemType.TWO_LINE_LIST_ITEM,
+                        titleText = "Enhanced Scam Blocker",
+                        descriptionText = "Browse confidently with protection against even more sneaky online threats.",
+                        placeholder = Content.Placeholder.RADAR,
+                        imageUrl = "imageUrl",
+                        primaryAction = Action.UrlInContext(
+                            value = "https://spreadprivacy.com/scam-blocker/",
+                        ),
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
+                    ),
+                    CardItem.ListItem(
+                        id = "import_passwords",
+                        type = CardItemType.TWO_LINE_LIST_ITEM,
+                        titleText = "Simpler Password Management",
+                        descriptionText = "Use DuckDuckGo to manage passwords on apps and sites across your whole device.",
+                        placeholder = Content.Placeholder.KEY_IMPORT,
+                        primaryAction = Action.DefaultCredentialProvider,
+                        matchingRules = emptyList(),
+                        exclusionRules = emptyList(),
+                    ),
+                ),
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(MODAL),
+        )
+        assertEquals(cardsListMessage, config.messages[1])
+    }
+
+    @Test
+    fun whenRemoteMessageModalSurfaceDisabledAndCardListMessageThenCardListMessageNotMappedIntoRemoteConfig() = runTest {
+        fakeFeatureToggles.remoteMessageModalSurface().setRawStoredState(State(enable = false))
+        val result = getConfigFromJson("json/remote_messaging_config_cardslist.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(appBuildConfig, jsonMatchingAttributeMappers, messageActionPlugins, fakeFeatureToggles)
+
+        val config = testee.map(result)
+
+        assertEquals(1, config.messages.size)
+        val bigSingleActionMessage = RemoteMessage(
+            id = "8274589c-8aeb-4322-a737-3852911569e3",
+            content = Content.BigSingleAction(
+                titleText = "title",
+                descriptionText = "description",
+                placeholder = ANNOUNCE,
+                primaryActionText = "Ok",
+                primaryAction = Action.Url(
+                    value = "https://duckduckgo.com",
+                ),
+            ),
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(NEW_TAB_PAGE),
+        )
+        assertEquals(bigSingleActionMessage, config.messages[0])
     }
 
     private fun getConfigFromJson(resourceName: String): JsonRemoteMessagingConfig {

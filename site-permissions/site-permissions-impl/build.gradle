@@ -26,7 +26,7 @@ dependencies {
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':design-system')
     implementation project(path: ':di')
     implementation project(path: ':statistics-api')
     implementation project(path: ':browser-api')
@@ -34,6 +34,8 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':duckchat-api')
     api project(path: ':site-permissions-store')
 
     anvil project(path: ':anvil-compiler')

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/fireAnimationView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:lottie_loop="false" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/fireDialogRootView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_top_corners_bottom_sheet_background"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_5"
+                android:paddingEnd="@dimen/keyline_5"
+                android:paddingBottom="@dimen/keyline_5">
+
+            <ImageView
+                android:id="@+id/fireIcon"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/img_fire_96" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="@string/fireDialogTitle"
+                app:textType="primary"
+                app:typography="h2" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginBottom="@dimen/keyline_6"
+            android:background="@drawable/background_large_rounded_surface"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingVertical="@dimen/keyline_1">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/tabsOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_tabs_24"
+                    app:primaryText="@string/dataClearingOptionTabs"
+                    app:secondaryText="Close all tabs"
+                    app:showSwitch="true" />
+
+            </FrameLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/keyline_0"
+                android:background="?attr/daxColorWindow" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingVertical="@dimen/keyline_1">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/dataOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_cookie_24"
+                    app:primaryText="@string/dataClearingOptionData"
+                    app:secondaryText="@string/fireDialogOptionDataDescriptionNoHistory"
+                    app:showSwitch="true" />
+
+            </FrameLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/keyline_0"
+                android:background="?attr/daxColorWindow" />
+
+            <FrameLayout
+                android:id="@+id/duckAiChatsOptionContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingVertical="@dimen/keyline_1">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/duckAiChatsOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_ai_chat_24"
+                    app:primaryText="@string/dataClearingDuckAiChats"
+                    app:secondaryText="@string/fireDialogOptionDuckAiChatsDescription"
+                    app:showSwitch="true" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="40dp">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                android:id="@+id/deleteButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:daxButtonSize="large"
+                android:text="@string/fireDialogDeleteButton" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhostAlt
+                android:id="@+id/cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_4"
+                app:daxButtonSize="large"
+                android:text="@string/fireCancel" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>

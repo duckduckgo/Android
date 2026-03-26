@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -183,7 +184,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
         pirSettingsViewModel.onCreate(mock())
 
@@ -199,7 +200,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
 
         pirSettingsViewModel.onCreate(mock())
 
@@ -230,7 +231,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
         pirSettingsViewModel.onCreate(mock())
 
@@ -246,7 +247,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is not auto renewable and entitled then PirState is enabled and beta FF is true`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(NOT_AUTO_RENEWABLE)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
 
         pirSettingsViewModel.onCreate(mock())
 
@@ -277,7 +278,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is false`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(false)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.DISABLED)
 
         pirSettingsViewModel.onCreate(mock())
 
@@ -293,7 +294,7 @@ class PirSettingViewModelTest {
     fun `when subscription state is grace period and entitled then PirState is enabled and beta FF is true`() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(GRACE_PERIOD)
-        whenever(pirFeature.isPirBetaEnabled()).thenReturn(true)
+        whenever(pirFeature.getPirFeatureState()).thenReturn(PirFeatureState.ENABLED)
 
         pirSettingsViewModel.onCreate(mock())
 

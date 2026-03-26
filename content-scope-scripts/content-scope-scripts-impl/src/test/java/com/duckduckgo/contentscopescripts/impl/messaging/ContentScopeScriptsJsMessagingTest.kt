@@ -28,6 +28,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
@@ -51,13 +52,11 @@ class ContentScopeScriptsJsMessagingTest {
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     private class FakePluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
-        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> {
-            return listOf(FakePlugin())
-        }
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(FakePlugin())
 
         inner class FakePlugin : ContentScopeJsMessageHandlersPlugin {
-            override fun getJsMessageHandler(): JsMessageHandler {
-                return object : JsMessageHandler {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
                     override fun process(
                         jsMessage: JsMessage,
                         jsMessaging: JsMessaging,
@@ -70,7 +69,6 @@ class ContentScopeScriptsJsMessagingTest {
                     override val featureName: String = "webCompat"
                     override val methods: List<String> = listOf("webShare", "permissionsQuery")
                 }
-            }
         }
     }
 
@@ -79,61 +77,69 @@ class ContentScopeScriptsJsMessagingTest {
         whenever(coreContentScopeScripts.secret).thenReturn("secret")
         whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
         whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
-        contentScopeScriptsJsMessaging = ContentScopeScriptsJsMessaging(
-            jsMessageHelper,
-            coroutineRule.testDispatcherProvider,
-            coreContentScopeScripts,
-            handlers,
-        )
+        contentScopeScriptsJsMessaging =
+            ContentScopeScriptsJsMessaging(
+                jsMessageHelper,
+                coroutineRule.testDispatcherProvider,
+                coreContentScopeScripts,
+                handlers,
+            )
     }
 
     @Test
-    fun `when process and message can be handled then execute callback`() = runTest {
-        givenInterfaceIsRegistered()
+    fun `when process and message can be handled then execute callback`() =
+        runTest {
+            givenInterfaceIsRegistered()
 
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
 
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
-        assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun `when processing unknown message do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-
-        contentScopeScriptsJsMessaging.process("", contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
+            assertEquals(1, callback.counter)
+        }
 
     @Test
-    fun `when processing unknown secret do nothing`() = runTest {
-        givenInterfaceIsRegistered()
+    fun `when processing unknown message do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
 
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
+            contentScopeScriptsJsMessaging.process("", contentScopeScriptsJsMessaging.secret)
 
-        contentScopeScriptsJsMessaging.process(message, "test")
-
-        assertEquals(0, callback.counter)
-    }
+            assertEquals(0, callback.counter)
+        }
 
     @Test
-    fun `if interface is not registered do nothing`() = runTest {
-        whenever(mockWebView.url).thenReturn("https://example.com")
+    fun `when processing unknown secret do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
 
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
 
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+            contentScopeScriptsJsMessaging.process(message, "test")
 
-        assertEquals(0, callback.counter)
-    }
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `if interface is not registered do nothing`() =
+        runTest {
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(0, callback.counter)
+        }
 
     @Test
     fun `when registering interface then add javascript interface is called`() {
@@ -143,75 +149,206 @@ class ContentScopeScriptsJsMessagingTest {
     }
 
     @Test
-    fun `when url is not allowed do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-        whenever(mockWebView.url).thenReturn("https://nowAllowed.com")
+    fun `when url is not allowed do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+            whenever(mockWebView.url).thenReturn("https://nowAllowed.com")
 
-        val message = """
-            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
 
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun `when feature does not match do nothing`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"test","id":"myId","method":"webShare","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(0, callback.counter)
-    }
+            assertEquals(0, callback.counter)
+        }
 
     @Test
-    fun `when id does not exist do nothing`() = runTest {
-        givenInterfaceIsRegistered()
+    fun `when feature does not match do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
 
-        val message = """
-            {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
-        """.trimIndent()
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"test","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
 
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
-        assertEquals(0, callback.counter)
-    }
-
-    @Test
-    fun `when processing addDebugFlag message with valid secret and domain then process message`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
-        """.trimIndent()
-
-        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
-
-        assertEquals(1, callback.counter)
-    }
+            assertEquals(0, callback.counter)
+        }
 
     @Test
-    fun `when processing addDebugFlag message with wrong secret then do nothing`() = runTest {
-        givenInterfaceIsRegistered()
+    fun `when id does not exist do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
 
-        val message = """
-            {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
-        """.trimIndent()
+            val message =
+                """
+                {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
+                """.trimIndent()
 
-        contentScopeScriptsJsMessaging.process(message, "wrongSecret")
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
 
-        assertEquals(0, callback.counter)
-    }
+            assertEquals(0, callback.counter)
+        }
 
-    private val callback = object : JsMessageCallback() {
-        var counter = 0
-        override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
-            counter++
+    @Test
+    fun `when processing addDebugFlag message with valid secret and domain then process message`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when processing addDebugFlag message with wrong secret then do nothing`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, "wrongSecret")
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when processing message with subdomain of allowed domain then process message`() =
+        runTest {
+            contentScopeScriptsJsMessaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn("https://subdomain.example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(1, callback.counter)
+        }
+
+    @Test
+    fun `when processing message with null url and handler has allowed domains then do nothing`() =
+        runTest {
+            contentScopeScriptsJsMessaging.register(mockWebView, callback)
+            whenever(mockWebView.url).thenReturn(null)
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(0, callback.counter)
+        }
+
+    @Test
+    fun `when processing webEvents webEvent message then nativeData with webViewId is injected`() =
+        runTest {
+            val webEventsHandlers = WebEventsPluginPoint()
+            val messaging = ContentScopeScriptsJsMessaging(
+                jsMessageHelper,
+                coroutineRule.testDispatcherProvider,
+                coreContentScopeScripts,
+                webEventsHandlers,
+            )
+            messaging.register(mockWebView, webEventsCallback)
+            whenever(mockWebView.url).thenReturn("https://example.com")
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webEvents","id":"e1","method":"webEvent","params":{"type":"adwall.detected"}}
+                """.trimIndent()
+
+            messaging.process(message, messaging.secret)
+
+            assertEquals(1, webEventsCallback.counter)
+            val params = webEventsCallback.lastData!!
+            val nativeData = params.getJSONObject("nativeData")
+            assertEquals(System.identityHashCode(mockWebView).toString(), nativeData.getString("webViewId"))
+        }
+
+    @Test
+    fun `when processing non-webEvent message then nativeData is not injected`() =
+        runTest {
+            givenInterfaceIsRegistered()
+
+            val message =
+                """
+                {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
+                """.trimIndent()
+
+            contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+            assertEquals(1, callback.counter)
+            val params = callback.lastData
+            assertFalse(params?.has("nativeData") ?: false)
+        }
+
+    private val callback =
+        object : JsMessageCallback() {
+            var counter = 0
+            var lastData: JSONObject? = null
+
+            override fun process(
+                featureName: String,
+                method: String,
+                id: String?,
+                data: JSONObject?,
+            ) {
+                counter++
+                lastData = data
+            }
+        }
+
+    private val webEventsCallback =
+        object : JsMessageCallback() {
+            var counter = 0
+            var lastData: JSONObject? = null
+
+            override fun process(
+                featureName: String,
+                method: String,
+                id: String?,
+                data: JSONObject?,
+            ) {
+                counter++
+                lastData = data
+            }
+        }
+
+    private class WebEventsPluginPoint : PluginPoint<ContentScopeJsMessageHandlersPlugin> {
+        override fun getPlugins(): Collection<ContentScopeJsMessageHandlersPlugin> = listOf(WebEventsPlugin())
+
+        inner class WebEventsPlugin : ContentScopeJsMessageHandlersPlugin {
+            override fun getJsMessageHandler(): JsMessageHandler =
+                object : JsMessageHandler {
+                    override fun process(
+                        jsMessage: JsMessage,
+                        jsMessaging: JsMessaging,
+                        jsMessageCallback: JsMessageCallback?,
+                    ) {
+                        jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    override val allowedDomains: List<String> = emptyList()
+                    override val featureName: String = "webEvents"
+                    override val methods: List<String> = listOf("webEvent")
+                }
         }
     }
 

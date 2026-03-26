@@ -127,6 +127,14 @@ class SuggestionMatcherTest {
         assertEquals(1, suggestions.size)
     }
 
+    @Test
+    fun whenQueryIsNotUrlButMatchesSuggestionsDomainThenSuggestionsOffered() = runTest {
+        configureNoShareableCredentials()
+        val creds = listOf(creds("example.com"))
+        val suggestions = testee.getQuerySuggestions("example", creds)
+        assertEquals(1, suggestions.size)
+    }
+
     private suspend fun configureNoShareableCredentials() {
         whenever(shareableCredentials.shareableCredentials(any())).thenReturn(emptyList())
     }

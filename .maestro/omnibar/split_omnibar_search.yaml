@@ -1,0 +1,119 @@
+appId: com.duckduckgo.mobile.android
+name: "Split omnibar test"
+tags:
+  - omnibarTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: ./shared/omnibar_select_split_type.yaml
+
+# verify that autocomplete suggestions are shown when typing
+- tapOn:
+    id: "omnibarTextInput"
+    optional: true
+- inputText: "reddit"
+- assertVisible:
+    id: "autoCompleteSuggestionsList"
+- assertVisible:
+    text: "reddit.com"
+    childOf:
+      id: "autoCompleteSuggestionsList"
+
+# verify that submitting a search query opens SERP
+- pressKey: Enter
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "browserLayout"
+
+# add the page to favorites (for future assertions)
+- runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+- tapOn:
+    text: "add bookmark"
+- action: back
+- tapOn:
+    id: "bookmarksImageView"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
+- tapOn:
+    text: "add to favorites"
+- action: back
+
+# verify that clearing the text and submitting a URL opens the web page
+- tapOn:
+    id: "omnibarTextInput"
+- tapOn:
+    id: "clearTextButton"
+- inputText: "eff.org"
+- pressKey: Enter
+- assertVisible:
+    id: "browserLayout"
+- extendedWaitUntil:
+    visible:
+      id: "omnibarTextInput"
+      text: ".*eff.org.*"
+    timeout: 10000
+
+# verify that tapping on a favorite opens the web page (SERP in this case)
+- tapOn:
+    id: "omnibarTextInput"
+- tapOn:
+    id: "clearTextButton"
+- tapOn:
+    id: "quickAccessFavicon"
+    childOf:
+      id: "focusedFavourites"
+- assertVisible:
+    id: "browserLayout"
+- assertVisible:
+    id: "omnibarTextInput"
+    text: "reddit"
+- assertVisible:
+    text: "reddit"
+    childOf:
+      id: "browserLayout"
+
+# verify that tapping on a tabs menu opens the tab switcher
+- tapOn:
+    id: "tabsButton"
+- assertVisible:
+    id: "newTabButton"
+- assertVisible:
+    id: "fireButton"
+- assertVisible:
+    id: "menuButton"
+- tapOn:
+    id: "cardContentsContainer"
+- assertVisible:
+    id: "omnibarTextInput"
+    text: "reddit"
+
+# verify that tapping on a new tab button opens a new tab
+- tapOn:
+    id: "newTabButton"
+- hideKeyboard
+- assertVisible:
+    text: "2"
+    childOf:
+      id: "tabsButton"
+- assertVisible:
+    id: "autofillButton"
+- assertNotVisible:
+    id: "newTabButton"
+- tapOn:
+    id: "quickAccessFaviconCard"
+- assertVisible:
+    id: "omnibarTextInput"
+    text: "reddit"
+- assertVisible:
+    id: "newTabButton"
+- assertNotVisible:
+    id: "autofillButton"

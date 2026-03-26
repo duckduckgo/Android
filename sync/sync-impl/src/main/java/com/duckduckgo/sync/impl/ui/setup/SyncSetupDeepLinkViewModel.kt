@@ -20,10 +20,10 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkViewModel.ViewMode.CreatingAccount
-import javax.inject.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
+import javax.inject.*
 
 @ContributesViewModel(ActivityScope::class)
 class SyncSetupDeepLinkViewModel @Inject constructor() : ViewModel() {

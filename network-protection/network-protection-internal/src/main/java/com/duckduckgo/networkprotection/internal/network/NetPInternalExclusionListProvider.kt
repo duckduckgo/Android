@@ -16,10 +16,12 @@
 
 package com.duckduckgo.networkprotection.internal.network
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import javax.inject.Inject
@@ -28,6 +30,7 @@ class NetPInternalExclusionListProvider @Inject constructor(
     private val packageManager: PackageManager,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val context: Context,
 ) {
     private val preferences: SharedPreferences by lazy {
         sharedPreferencesProvider.getSharedPreferences(
@@ -41,7 +44,7 @@ class NetPInternalExclusionListProvider @Inject constructor(
         if (!netPInternalFeatureToggles.excludeSystemApps().isEnabled()) return excludeManuallySelectedApps()
 
         // returns the list of system apps for now
-        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return packageManager.safeGetInstalledApplications(context)
             .asSequence()
             .filter { (it.flags and ApplicationInfo.FLAG_SYSTEM) != 0 }
             .map { it.packageName }

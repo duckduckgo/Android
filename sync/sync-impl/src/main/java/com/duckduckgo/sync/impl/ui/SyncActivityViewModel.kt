@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -57,8 +58,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import java.io.File
-import javax.inject.Inject
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -73,6 +73,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -83,7 +85,9 @@ class SyncActivityViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
     private val syncFeatureToggle: SyncFeatureToggle,
+    private val settingsPageFeature: SettingsPageFeature,
     private val syncPixels: SyncPixels,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private var syncStateObserverJob = ConflatedJob()
@@ -149,6 +153,8 @@ class SyncActivityViewModel @Inject constructor(
             showAccount = syncAccountRepository.isSignedIn(),
             syncedDevices = syncedDevices,
             disabledSetupFlows = disabledSetupFlows(),
+            aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
+            newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
         )
     }
 
@@ -168,6 +174,8 @@ class SyncActivityViewModel @Inject constructor(
         val showAccount: Boolean = false,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
         val disabledSetupFlows: List<SetupFlows> = emptyList(),
+        val aiChatSyncEnabled: Boolean = false,
+        val newDesktopBrowserSettingEnabled: Boolean = false,
     )
 
     sealed class SetupFlows {
@@ -216,9 +224,12 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onSyncThisDevice() {
+    fun onSyncThisDevice(source: String? = null) {
         viewModelScope.launch(dispatchers.io()) {
-            requiresSetupAuthentication {
+            syncSetupWideEvent.onFlowStarted(source)
+            requiresSetupAuthentication(
+                onDeviceAuthNotEnrolled = { syncSetupWideEvent.onDeviceAuthNotEnrolled() },
+            ) {
                 command.send(IntroCreateAccount)
             }
         }
@@ -285,6 +296,9 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onConnectionCancelled() {
+        viewModelScope.launch {
+            syncSetupWideEvent.onFlowCancelled()
+        }
         showAccountDetailsIfNeeded()
     }
 
@@ -417,11 +431,14 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun signedOutState(): ViewState = ViewState(
         disabledSetupFlows = disabledSetupFlows(),
+        aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync(),
+        newDesktopBrowserSettingEnabled = settingsPageFeature.newDesktopBrowserSettingEnabled().isEnabled(),
     )
 
-    private suspend fun requiresSetupAuthentication(action: suspend () -> Unit) {
+    private suspend fun requiresSetupAuthentication(onDeviceAuthNotEnrolled: suspend() -> Unit = {}, action: suspend () -> Unit) {
         val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
         if (hasValidDeviceAuthentication.not() && deviceAuthenticator.isAuthenticationRequired()) {
+            onDeviceAuthNotEnrolled()
             command.send(RequestSetupAuthentication)
         } else {
             action()

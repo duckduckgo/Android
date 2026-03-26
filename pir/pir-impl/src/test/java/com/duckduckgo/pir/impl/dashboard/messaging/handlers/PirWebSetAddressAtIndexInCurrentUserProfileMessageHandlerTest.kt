@@ -22,7 +22,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.createJsMessage
 import com.duckduckgo.pir.impl.dashboard.messaging.handlers.PirMessageHandlerUtils.verifyResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -37,14 +37,14 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
 
     private lateinit var testee: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler
 
-    private val mockPirWebOnboardingStateHolder: PirWebOnboardingStateHolder = mock()
+    private val mockPirWebProfileStateHolder: PirWebProfileStateHolder = mock()
     private val mockJsMessaging: JsMessaging = mock()
     private val mockJsMessageCallback: JsMessageCallback = mock()
 
     @Before
     fun setUp() {
         testee = PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler(
-            pirWebOnboardingStateHolder = mockPirWebOnboardingStateHolder,
+            pirWebProfileStateHolder = mockPirWebProfileStateHolder,
         )
     }
 
@@ -60,13 +60,13 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 0, "address": {"city": "New York", "state": "NY"}}""",
             method = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setAddressAtIndex(0, "New York", "NY")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.setAddressAtIndex(0, "New York", "NY")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setAddressAtIndex(0, "New York", "NY")
+        verify(mockPirWebProfileStateHolder).setAddressAtIndex(0, "New York", "NY")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -77,13 +77,13 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 1, "address": {"city": "  Los Angeles  ", "state": "  CA  "}}""",
             method = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setAddressAtIndex(1, "Los Angeles", "CA")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.setAddressAtIndex(1, "Los Angeles", "CA")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setAddressAtIndex(1, "Los Angeles", "CA")
+        verify(mockPirWebProfileStateHolder).setAddressAtIndex(1, "Los Angeles", "CA")
         verifyResponse(jsMessage, true, mockJsMessaging)
     }
 
@@ -94,13 +94,13 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"address": {"city": "Chicago", "state": "IL"}}""",
             method = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setAddressAtIndex(0, "Chicago", "IL")).thenReturn(true)
+        whenever(mockPirWebProfileStateHolder.setAddressAtIndex(0, "Chicago", "IL")).thenReturn(true)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -116,7 +116,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -132,7 +132,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -148,7 +148,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -164,7 +164,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -180,7 +180,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -196,7 +196,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -212,7 +212,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -228,7 +228,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -239,13 +239,13 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 0, "address": {"city": "New York", "state": "NY"}}""",
             method = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setAddressAtIndex(0, "New York", "NY")).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.setAddressAtIndex(0, "New York", "NY")).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setAddressAtIndex(0, "New York", "NY")
+        verify(mockPirWebProfileStateHolder).setAddressAtIndex(0, "New York", "NY")
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -256,13 +256,13 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
             paramsJson = """{"index": 5, "address": {"city": "New York", "state": "NY"}}""",
             method = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE,
         )
-        whenever(mockPirWebOnboardingStateHolder.setAddressAtIndex(5, "New York", "NY")).thenReturn(false)
+        whenever(mockPirWebProfileStateHolder.setAddressAtIndex(5, "New York", "NY")).thenReturn(false)
 
         // When
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder).setAddressAtIndex(5, "New York", "NY")
+        verify(mockPirWebProfileStateHolder).setAddressAtIndex(5, "New York", "NY")
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -278,7 +278,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -294,7 +294,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 
@@ -310,7 +310,7 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockPirWebOnboardingStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
+        verify(mockPirWebProfileStateHolder, org.mockito.kotlin.never()).setAddressAtIndex(any(), any(), any())
         verifyResponse(jsMessage, false, mockJsMessaging)
     }
 }

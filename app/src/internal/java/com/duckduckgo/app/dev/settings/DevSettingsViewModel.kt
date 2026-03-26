@@ -25,7 +25,6 @@ import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +34,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DevSettingsViewModel @Inject constructor(
@@ -55,6 +55,7 @@ class DevSettingsViewModel @Inject constructor(
         data object SendTdsIntent : Command()
         data object OpenUASelector : Command()
         data object ChangePrivacyConfigUrl : Command()
+        data object ChangeDuckAiUrl : Command()
         data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
@@ -117,6 +118,10 @@ class DevSettingsViewModel @Inject constructor(
 
     fun onRemotePrivacyUrlClicked() {
         viewModelScope.launch { command.send(Command.ChangePrivacyConfigUrl) }
+    }
+
+    fun onDuckAiUrlClicked() {
+        viewModelScope.launch { command.send(Command.ChangeDuckAiUrl) }
     }
 
     fun customTabsClicked() {

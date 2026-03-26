@@ -25,7 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
     scope = AppScope::class,
     featureName = "aiChatDownload",
 )
-
 interface AIChatDownloadFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

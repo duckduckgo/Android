@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
-import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
@@ -32,16 +31,10 @@ import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
 @PriorityKey(100)
-class ProSettingsTitle @Inject constructor(
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
-) : ProSettingsPlugin {
+class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return SectionHeaderListItem(context).apply {
-            primaryText = if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
-                context.getString(R.string.subscriptionSettingSectionTitle)
-            } else {
-                context.getString(R.string.privacyPro)
-            }
+            primaryText = context.getString(R.string.subscriptionSettingSectionTitle)
         }
     }
 }

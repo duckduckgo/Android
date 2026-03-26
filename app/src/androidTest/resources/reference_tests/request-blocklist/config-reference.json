@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "features": {
+    "contentBlocking": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "content-blocking-exception.example",
+          "reason": "Example content blocking exception"
+        }
+      ]
+    },
+    "requestBlocklist": {
+      "state": "enabled",
+      "settings": {
+        "blockedRequests": {
+          "request-blocklist.example": {
+            "rules": [
+              {
+                "rule": "request-blocklist.example/block",
+                "domains": ["<all>"],
+                "reason": "Example all-domain blocking rule"
+              },
+              {
+                "rule": "request-blocklist.example/*/block",
+                "domains": ["<all>"],
+                "reason": "Example all-domain wildcard blocking rule"
+              },
+              {
+                "rule": "request-blocklist.example/sometimes-block",
+                "domains": ["sometimes.example", "subdomain.different.example"],
+                "reason": "Example domain-limited blocking rule"
+              },
+              {
+                "rule": "request-blocklist.example/.*/regex",
+                "domains": ["<all>"],
+                "reason": "Example rule incorrectly using regex syntax"
+              },
+              {
+                "rule": "request-blocklist.example/CASE",
+                "domains": ["<all>"],
+                "reason": "Example rule for case sensitive matching"
+              },
+              {
+                "rule": "||request-blocklist.example^adblock-filter",
+                "domains": ["<all>"],
+                "reason": "Example rule incorrectly using adblock filter syntax"
+              },
+              {
+                "rule": "request-blocklist.example/missing-prop",
+                "reason": "Example rule incorrectly missing domains property"
+              },
+              {
+                "rule": "request-blocklist.example/extra-prop",
+                "domains": ["<all>"],
+                "unknown": "value",
+                "reason": "Example rule incorrectly including unknown property"
+              },
+              {
+                "rule": "request-blocklist.example:3000/port-block",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule with port part"
+              },
+              {
+                "rule": "request-blocklist.example:443/incorrect-port-block",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule that incorrectly includes redundant port"
+              },
+              {
+                "rule": "request-blocklist.example/incorrect*query-part",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule that incorrectly matches query string"
+              }
+            ]
+          },
+          "subdomain.request-blocklist.example": {
+            "rules": [
+              {
+                "rule": "subdomain.request-blocklist.example/subdomain",
+                "domains": ["<all>"],
+                "reason": "Example tracker entry and blocking rule for subdomain"
+              }
+            ]
+          },
+          "request-blocklist-ordering.example": {
+            "rules": [
+              {
+                "rule": "request-blocklist-ordering.example/block",
+                "domains": ["sometimes.example"],
+                "reason": "Example domain-specific blocking rule"
+              },
+              {
+                "rule": "request-blocklist-ordering.example/block/path",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule with extra path part"
+              },
+              {
+                "rule": "request-blocklist-ordering.example/block",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule that should still apply to all domains"
+              }
+            ]
+          },
+          "tracker.example": {
+            "rules": [
+              {
+                "rule": "tracker.example/*.js",
+                "domains": ["<all>"],
+                "reason": "Example blocking rule that applies to tracking requests"
+              },
+              {
+                "rule": "tracker.example/block-first-party",
+                "domains": ["tracker.example"],
+                "reason": "Example blocking rule that applies to first-party requests"
+              }
+            ]
+          }
+        }
+      },
+      "exceptions": [
+        {
+          "domain": "request-blocking-exception.example",
+          "reason": "Example request-blocking exception"
+        }
+      ]
+    },
+    "trackerAllowlist": {
+      "state": "enabled",
+      "settings": {
+        "allowlistedTrackers": {
+          "request-blocklist.example": {
+            "rules": [
+              {
+                "rule": "request-blocklist.example/block",
+                "domains": ["allowlisted-website.example"],
+                "reason": "Example tracker allowlist entry"
+              }
+            ]
+          }
+        },
+        "exceptions": []
+      }
+    }
+  },
+  "unprotectedTemporary": [
+    {
+      "domain": "unprotected-temporary.example",
+      "reason": "Unprotected temporary example"
+    }
+  ]
+}

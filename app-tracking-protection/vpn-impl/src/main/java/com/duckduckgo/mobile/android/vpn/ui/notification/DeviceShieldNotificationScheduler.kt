@@ -33,12 +33,12 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.*
+import logcat.logcat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.*
-import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class DeviceShieldNotificationScheduler @Inject constructor(

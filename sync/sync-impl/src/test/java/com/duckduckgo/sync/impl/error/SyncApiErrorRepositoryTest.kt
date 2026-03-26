@@ -24,13 +24,13 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.model.SyncApiErrorType
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import org.junit.After
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class SyncApiErrorRepositoryTest {

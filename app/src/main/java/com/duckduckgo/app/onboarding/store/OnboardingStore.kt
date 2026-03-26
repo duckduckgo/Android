@@ -23,4 +23,8 @@ interface OnboardingStore {
 
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
+    fun storeInputScreenSelection(selected: Boolean)
+    fun getInputScreenSelection(): Boolean?
+    fun isInputScreenSelectionOverriddenByUser(): Boolean
+    fun setInputScreenSelectionOverriddenByUser()
 }

@@ -31,13 +31,13 @@ import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsW
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.NoCredentialsAvailable
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.Initializing
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,6 +48,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
@@ -87,6 +88,11 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     fun onCsvError() {
         logcat(WARN) { "Error decoding CSV" }
         _viewState.value = ViewState.UserFinishedCannotImport(ErrorParsingCsv)
+    }
+
+    fun onWebViewCrash() {
+        logcat(WARN) { "WebView has crashed during password import flow" }
+        _viewState.value = ViewState.UserFinishedCannotImport(WebViewCrash)
     }
 
     fun onCloseButtonPressed(url: String?) {
@@ -237,6 +243,9 @@ class ImportGooglePasswordsWebFlowViewModel @Inject constructor(
     sealed interface UserCannotImportReason : Parcelable {
         @Parcelize
         data object ErrorParsingCsv : UserCannotImportReason
+
+        @Parcelize
+        data object WebViewCrash : UserCannotImportReason
     }
 
     sealed interface BackButtonAction {

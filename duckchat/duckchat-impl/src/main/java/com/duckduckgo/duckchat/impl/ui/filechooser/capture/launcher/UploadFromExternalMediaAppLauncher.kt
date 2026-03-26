@@ -36,12 +36,12 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.permission.ExternalMe
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureDelayedDeleter
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureImageMover
 import com.squareup.anvil.annotations.ContributesBinding
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.asLog
 import logcat.logcat
+import java.io.File
+import javax.inject.Inject
 
 /**
  * Public API for launching any external media capturing app (e.g camera, sound recorder) and capturing.

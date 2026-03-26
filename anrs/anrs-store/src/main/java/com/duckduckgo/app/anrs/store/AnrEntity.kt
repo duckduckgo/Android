@@ -30,4 +30,5 @@ data class AnrEntity(
     val timestamp: String,
     val webView: String,
     val customTab: Boolean,
+    val appVersion: String,
 )

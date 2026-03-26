@@ -33,7 +33,6 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.duckduckgo.privacy.config.store.toGpcException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -41,6 +40,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class GpcHeaderReferenceTest(private val testCase: TestCase) {

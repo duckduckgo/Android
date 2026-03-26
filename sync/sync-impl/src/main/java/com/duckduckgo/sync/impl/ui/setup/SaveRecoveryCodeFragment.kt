@@ -49,9 +49,9 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.Crea
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.*
 
 @InjectWith(FragmentScope::class)
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {

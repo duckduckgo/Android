@@ -16,52 +16,92 @@
 
 package com.duckduckgo.subscriptions.impl.billing
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.subscriptions.impl.PricingPhase
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
+import java.math.BigDecimal
+import java.util.Currency
 
+@RunWith(AndroidJUnit4::class)
 class PricingPhaseTest {
     @Test
     fun billingPeriodParsesDaysCorrectly() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P10D")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "P10D",
+        )
         assertEquals(10, phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodParsesWeeksCorrectly() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P2W")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "P2W",
+        )
         assertEquals(14, phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodParsesMonthsCorrectly() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P2M")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "P2M",
+        )
         assertEquals(60, phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodParsesYearsCorrectly() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P1Y")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "P1Y",
+        )
         assertEquals(365, phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodParsesMixedPeriodCorrectly() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P1Y2M10D")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "P1Y2M10D",
+        )
         val expectedDays = 1 * 365 + 2 * 30 + 10 // 365 + 60 + 10 = 435
         assertEquals(expectedDays, phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodEmptyReturnsNull() {
-        val phase = PricingPhase(formattedPrice = "$0", billingPeriod = "")
+        val phase = PricingPhase(
+            formattedPrice = "$0",
+            billingPeriod = "",
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+        )
         assertNull(phase.getBillingPeriodInDays())
     }
 
     @Test
     fun billingPeriodReturnsNullForInvalidFormat() {
-        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "INVALID")
+        val phase = PricingPhase(
+            priceAmount = BigDecimal.ZERO,
+            priceCurrency = Currency.getInstance("USD"),
+            formattedPrice = "Free",
+            billingPeriod = "INVALID",
+        )
         assertNull(phase.getBillingPeriodInDays())
     }
 }

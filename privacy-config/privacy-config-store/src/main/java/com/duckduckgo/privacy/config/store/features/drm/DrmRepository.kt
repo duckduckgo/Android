@@ -21,9 +21,9 @@ import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toFeatureException
-import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 
 interface DrmRepository {
     fun updateAll(exceptions: List<DrmExceptionEntity>)

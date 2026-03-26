@@ -33,7 +33,6 @@ import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenLe
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.DisabledWithHelpLink
 import com.duckduckgo.duckplayer.impl.DuckPlayerSettingsViewModel.ViewState.Enabled
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,6 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class DuckPlayerSettingsViewModel @Inject constructor(

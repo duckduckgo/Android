@@ -46,6 +46,7 @@ internal class FakePixel : Pixel {
         pixel: PixelName,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
         firedPixels.add(pixel.pixelName)
     }
@@ -54,6 +55,7 @@ internal class FakePixel : Pixel {
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
         firedPixels.add(pixelName)
     }

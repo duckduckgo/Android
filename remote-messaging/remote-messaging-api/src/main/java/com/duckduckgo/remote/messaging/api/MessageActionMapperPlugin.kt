@@ -26,8 +26,10 @@ data class JsonMessageAction(
     val additionalParameters: Map<String, String>?,
 )
 
+@Suppress("ktlint:standard:class-naming")
 sealed class JsonActionType(val jsonValue: String) {
     data object URL : JsonActionType("url")
+    data object URL_IN_CONTEXT : JsonActionType("url_in_context")
     data object PLAYSTORE : JsonActionType("playstore")
     data object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
     data object DISMISS : JsonActionType("dismiss")
@@ -35,4 +37,5 @@ sealed class JsonActionType(val jsonValue: String) {
     data object SHARE : JsonActionType("share")
     data object NAVIGATION : JsonActionType("navigation")
     data object SURVEY : JsonActionType("survey")
+    data object DEFAULT_CREDENTIAL_PROVIDER : JsonActionType("defaultCredentialProvider")
 }

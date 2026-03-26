@@ -19,7 +19,7 @@ package com.duckduckgo.js.messaging.api
 import android.webkit.WebView
 
 interface PostMessageWrapperPlugin {
-    fun postMessage(message: SubscriptionEventData, webView: WebView)
+    suspend fun postMessage(message: SubscriptionEventData, webView: WebView)
 
     val context: String
 }

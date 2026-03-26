@@ -1,0 +1,24 @@
+{
+    "timeout_waiting_for_referrer": {
+        "description": "Referrer data was not obtained in time",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "timeout_atb_pre_initializer_plugin": {
+        "description": "A pre-ATB initialization plugin timed out",
+        "owners": ["CDRussell"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "plugin",
+                "description": "The class name of the plugin which timed out",
+                "type": "string",
+                "enum": ["AuraExperimentManager", "EmptyReferrerStateListener", "PlayStoreAppReferrerStateListener", "ReinstallAtbListener"]
+            }
+        ]
+    }
+}

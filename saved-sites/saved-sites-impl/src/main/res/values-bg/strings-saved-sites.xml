@@ -79,7 +79,6 @@
     <string name="searchBookmarks">Търсене на отметки</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Изтриване на %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Изтриване на %1$s отметки?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Отметката е добавена в %1$s</string>
     <string name="addToFavorites">Добавяне към любими</string>
     <string name="editBookmark">Редактиране на отметка</string>
     <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в DuckDuckGo.</string>
@@ -110,4 +109,11 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие папката с отметки &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Отмени</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Изтрий</string>
+
+    <!-- Bookmark Import -->
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Импортирай отметки от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Импортиране от Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Избери файл с отметки...</string>
+    <string name="bookmarksImportDialogClose">Затваряне</string>
 </resources>

@@ -49,13 +49,13 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.net.SocketTimeoutException
-import javax.inject.Inject
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import java.net.SocketTimeoutException
+import javax.inject.Inject
 
 interface MaliciousSiteRepository {
     /**

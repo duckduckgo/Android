@@ -41,7 +41,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -50,6 +49,7 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, AutofillDeclineStore::class)
@@ -167,11 +167,14 @@ class SecureStoreBackedAutofillStore @Inject constructor(
 
         logcat(INFO) { "Saving login credentials for $url. username=${credentials.username}" }
 
+        val timestamp = lastUpdatedTimeProvider.getInMillis()
+
         val loginDetails = WebsiteLoginDetails(
             domain = url,
             username = credentials.username,
             domainTitle = credentials.domainTitle,
-            lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(),
+            lastUpdatedMillis = timestamp,
+            lastUsedInMillis = timestamp,
         )
         val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
             details = loginDetails,

@@ -17,8 +17,9 @@
 package com.duckduckgo.app.browser.newaddressbaroption
 
 import android.app.Activity
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -30,18 +31,19 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
+import javax.inject.Inject
 
 interface NewAddressBarOptionManager {
     suspend fun showChoiceScreen(
         activity: DuckDuckGoActivity,
         isLaunchedFromExternal: Boolean,
     )
+
     suspend fun setAsShown()
 }
 
@@ -54,9 +56,9 @@ class RealNewAddressBarOptionManager @Inject constructor(
     private val remoteMessagingRepository: RemoteMessagingRepository,
     private val newAddressBarOptionDataStore: NewAddressBarOptionDataStore,
     private val settingsDataStore: SettingsDataStore,
+    private val onboardingStore: OnboardingStore,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarOptionManager {
-
     private val showChoiceScreenMutex = Mutex()
 
     override suspend fun showChoiceScreen(
@@ -97,14 +99,14 @@ class RealNewAddressBarOptionManager @Inject constructor(
             hasNotInteractedWithSearchAndDuckAiRMF() &&
             isNewAddressBarOptionChoiceScreenEnabled() &&
             isNotLaunchedFromExternal(isLaunchedFromExternal) &&
-            isSubsequentLaunch()
+            isSubsequentLaunch() &&
+            hasNoInputScreenSelection()
     }
 
-    private fun isActivityValid(activity: Activity): Boolean {
-        return (!activity.isFinishing && !activity.isDestroyed).also {
+    private fun isActivityValid(activity: Activity): Boolean =
+        (!activity.isFinishing && !activity.isDestroyed).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isActivityValid" }
         }
-    }
 
     private suspend fun isOnboardingCompleted(): Boolean =
         (userStageStore.getUserAppStage() == AppStage.ESTABLISHED).also {
@@ -131,8 +133,13 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isInputScreenDisabled" }
         }
 
+    private fun hasNoInputScreenSelection(): Boolean =
+        (onboardingStore.getInputScreenSelection() == null).also {
+            logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNoInputScreenSelection" }
+        }
+
     private fun isBottomAddressBarDisabled(): Boolean =
-        (settingsDataStore.omnibarPosition != OmnibarPosition.BOTTOM).also {
+        (settingsDataStore.omnibarType != OmnibarType.SINGLE_BOTTOM).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 
@@ -153,8 +160,8 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isNotLaunchedFromExternal" }
         }
 
-    private suspend fun isSubsequentLaunch(): Boolean {
-        return if (newAddressBarOptionDataStore.wasValidated()) {
+    private suspend fun isSubsequentLaunch(): Boolean =
+        if (newAddressBarOptionDataStore.wasValidated()) {
             true
         } else {
             newAddressBarOptionDataStore.setAsValidated()
@@ -162,5 +169,4 @@ class RealNewAddressBarOptionManager @Inject constructor(
         }.also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isSubsequentLaunch" }
         }
-    }
 }

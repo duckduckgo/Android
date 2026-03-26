@@ -29,9 +29,11 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -41,9 +43,9 @@ import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
-import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -52,6 +54,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
+import java.net.URISyntaxException
 
 @RunWith(AndroidJUnit4::class)
 class SpecialUrlDetectorImplTest {
@@ -73,11 +76,18 @@ class SpecialUrlDetectorImplTest {
 
     val mockDuckChat: DuckChat = mock()
 
+    val mockDuckAiFeature: DuckAiFeatureState = mock()
+
     val mockAIChatQueryDetectionFeature: AIChatQueryDetectionFeature = mock()
 
     val mockAIChatQueryDetectionFeatureToggle: Toggle = mock()
 
     val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
+    val appSchemeInterceptionFeature: AppSchemeInterceptionFeature =
+        FakeFeatureToggleFactory.create(AppSchemeInterceptionFeature::class.java)
+
+    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     @Before
     fun setup() = runTest {
@@ -92,12 +102,15 @@ class SpecialUrlDetectorImplTest {
                 duckChat = mockDuckChat,
                 aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
                 androidBrowserConfigFeature = androidBrowserConfigFeature,
+                duckAiFeatureState = mockDuckAiFeature,
+                appSchemeInterceptionFeature = appSchemeInterceptionFeature,
             ),
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
+        whenever(mockDuckAiFeature.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(true))
         androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
     }
@@ -390,6 +403,15 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsDuckChatUrlAndFullscreenModeEnabledThenDuckChatTypeNotDetected() = runTest {
+        mockDuckAiFullScreenMode.emit(true)
+        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
     fun whenUrlIsParametrizedQueryThenSearchQueryTypeDetected() {
         val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
         assertEquals("foo site:duckduckgo.com", type.query)
@@ -617,6 +639,42 @@ class SpecialUrlDetectorImplTest {
 
         assertTrue(result is NonHttpAppLink)
         assertEquals("myapp:foo bar", (result as NonHttpAppLink).uriString)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoButHasFallbackUrlThenReturnNonHttpAppLinkWithFallback() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;S.browser_fallback_url=https%3A%2F%2Fexample.com;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is NonHttpAppLink)
+        val nonHttpAppLink = result as NonHttpAppLink
+        assertEquals("https://example.com", nonHttpAppLink.fallbackUrl)
+    }
+
+    @Test
+    fun whenAppSchemeInterceptionDisabledAndNoResolveInfoButHasFallbackUrlThenReturnUnknown() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        appSchemeInterceptionFeature.self().setRawStoredState(State(false))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;S.browser_fallback_url=https%3A%2F%2Fexample.com;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is Unknown)
+    }
+
+    @Test
+    fun whenValidateIntentResolutionEnabledAndNoResolveInfoAndNoFallbackUrlThenReturnUnknown() {
+        androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
+        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
+
+        val intentUrl = "intent://open/#Intent;scheme=myapp;package=com.example;end"
+        val result = testee.determineType(intentUrl)
+
+        assertTrue(result is Unknown)
     }
 
     private fun randomString(length: Int): String {

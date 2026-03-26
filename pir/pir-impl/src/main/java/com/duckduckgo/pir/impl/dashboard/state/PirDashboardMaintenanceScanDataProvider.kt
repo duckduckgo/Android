@@ -32,9 +32,9 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 interface PirDashboardMaintenanceScanDataProvider {
     /**
@@ -94,13 +94,13 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
     private val pirSchedulingRepository: PirSchedulingRepository,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository), PirDashboardMaintenanceScanDataProvider {
     override suspend fun getInProgressOptOuts(): List<DashboardExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        return@withContext getAllExtractedProfileResults().filter {
+        return@withContext getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = false).filter {
             it.optOutRemovedDateInMillis == null || it.optOutRemovedDateInMillis == 0L
         }
     }
 
     override suspend fun getRemovedOptOuts(): List<DashboardRemovedExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        val allRemovedExtractedProfiles = getAllExtractedProfileResults().filter {
+        val allRemovedExtractedProfiles = getAllExtractedProfileResults(includeResultsForDeprecatedProfileQueries = true).filter {
             it.optOutRemovedDateInMillis != null && it.optOutRemovedDateInMillis != 0L
         }
 
@@ -123,6 +123,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 it.lastScanDateInMillis in startDate..endDate
             },
             getDateMillis = { it.lastScanDateInMillis },
+            keepEarliest = false,
         )
 
         return DashboardScanDetails(
@@ -146,6 +147,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 val schedulingConfig = schedulingConfigMap[it.brokerName] ?: return@getBrokerMatches 0L
                 it.getNextRunMillis(schedulingConfig, nextRunFromOptOutDataMap[it.brokerName], startDate, endDate)
             },
+            keepEarliest = true,
         )
 
         return DashboardScanDetails(
@@ -190,6 +192,11 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         startDate: Long,
         endDate: Long,
     ): Long {
+        if (this.deprecated && this.status != ScanJobRecord.ScanJobStatus.MATCHES_FOUND) {
+            // Canceled and doesn't require a confirmation scan from opt-out, so no next run
+            return 0L
+        }
+
         return when (this.status) {
             ScanJobRecord.ScanJobStatus.NOT_EXECUTED -> {
                 // Should be executed immediately
@@ -219,17 +226,13 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 // Next run would be an error retry
                 lastScanDateInMillis + schedulingConfig.retryErrorInMillis
             }
-
-            ScanJobRecord.ScanJobStatus.INVALID -> {
-                // Canceled, so no next run
-                0L
-            }
         }
     }
 
-    suspend fun getBrokerMatches(
+    private suspend fun getBrokerMatches(
         scanFilter: (ScanJobRecord) -> Boolean,
         getDateMillis: (ScanJobRecord) -> Long,
+        keepEarliest: Boolean,
     ): List<DashboardBrokerMatch> {
         val activeBrokerMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
         // Only consider active brokers and ignore removed ones
@@ -255,7 +258,13 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         }
 
         val mirrorValidScanJobs = validScansJobs.getMirrorSites()
-        return (validScansJobs + mirrorValidScanJobs).sortedBy { it.dateInMillis }
+        val combined = validScansJobs + mirrorValidScanJobs
+        val sorted = if (keepEarliest) {
+            combined.sortedBy { it.dateInMillis }
+        } else {
+            combined.sortedByDescending { it.dateInMillis }
+        }
+        return sorted.distinctBy { it.broker.name }
     }
 
     private suspend fun List<DashboardBrokerMatch>.getMirrorSites(): List<DashboardBrokerMatch> {

@@ -19,7 +19,6 @@ package com.duckduckgo.securestorage
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealSecureStorageKeyGenerator
-import java.security.Key
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -29,6 +28,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.security.Key
 
 class RealSecureStorageKeyGeneratorTest {
     @Mock

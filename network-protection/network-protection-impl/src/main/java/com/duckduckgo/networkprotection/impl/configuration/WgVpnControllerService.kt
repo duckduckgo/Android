@@ -23,8 +23,7 @@ import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Named
-import javax.inject.Qualifier
+import okhttp3.Dns
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.http.Body
@@ -32,6 +31,8 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import javax.inject.Named
+import javax.inject.Qualifier
 
 @Module
 @ContributesTo(scope = VpnScope::class)
@@ -46,10 +47,10 @@ object WgVpnControllerServiceModule {
     @SingleInstanceIn(VpnScope::class)
     fun provideInternalCustomHttpClient(
         @Named("api") okHttpClient: OkHttpClient,
-        vpnLocalDns: VpnLocalDns,
+        dns: Dns,
     ): OkHttpClient {
         return okHttpClient.newBuilder()
-            .dns(vpnLocalDns)
+            .dns(dns)
             .build()
     }
 

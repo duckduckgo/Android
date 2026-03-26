@@ -16,9 +16,11 @@
 
 package com.duckduckgo.networkprotection.impl.exclusion
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetInstalledApplications
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludeAppsRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
@@ -27,8 +29,8 @@ import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface NetPExclusionListRepository {
     suspend fun getExcludedAppPackages(): List<String>
@@ -42,6 +44,7 @@ class RealNetPExclusionListRepository @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val packageManager: PackageManager,
+    private val context: Context,
 ) : NetPExclusionListRepository {
     override suspend fun getExcludedAppPackages(): List<String> {
         return withContext(dispatcherProvider.io()) {
@@ -52,7 +55,7 @@ class RealNetPExclusionListRepository @Inject constructor(
                 emptyList()
             }
 
-            packageManager.getInstalledApplications(PackageManager.GET_META_DATA).asSequence()
+            packageManager.safeGetInstalledApplications(context).asSequence()
                 .filter { isExcludedFromVpn(it, manuallyExcludedApps, autoExcludeApps) }
                 .sortedBy { it.name }
                 .map { it.packageName }

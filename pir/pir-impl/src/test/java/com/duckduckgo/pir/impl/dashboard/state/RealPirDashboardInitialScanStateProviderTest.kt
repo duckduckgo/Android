@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.impl.dashboard.state
 
+import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status
@@ -23,6 +24,7 @@ import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
@@ -49,6 +51,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockPirRepository: PirRepository = mock()
     private val mockPirSchedulingRepository: PirSchedulingRepository = mock()
+    private val mockContext: Context = mock()
 
     private val currentTime = 1640995200000L
 
@@ -59,6 +62,7 @@ class RealPirDashboardInitialScanStateProviderTest {
             currentTimeProvider = mockCurrentTimeProvider,
             pirRepository = mockPirRepository,
             pirSchedulingRepository = mockPirSchedulingRepository,
+            context = mockContext,
         )
 
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(currentTime)
@@ -338,6 +342,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(emptyList())
 
         // When
         val result = testee.getScanResults()
@@ -396,11 +401,14 @@ class RealPirDashboardInitialScanStateProviderTest {
         )
         val brokerOptOutUrls = mapOf("broker1" to "https://broker1.com/optout")
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(brokerOptOutUrls)
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getScanResults()
@@ -441,11 +449,14 @@ class RealPirDashboardInitialScanStateProviderTest {
             ),
         )
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getScanResults()
@@ -494,11 +505,14 @@ class RealPirDashboardInitialScanStateProviderTest {
             createBroker("broker3", parent = "broker1"), // broker2 is child of broker1
         )
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getScanResults()
@@ -532,11 +546,14 @@ class RealPirDashboardInitialScanStateProviderTest {
             ),
         )
 
+        val validProfileQueries = listOf(createProfileQuery(id = 1L))
+
         whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllMirrorSites()).thenReturn(mirrorSites)
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
 
         // When
         val result = testee.getScanResults()
@@ -551,6 +568,154 @@ class RealPirDashboardInitialScanStateProviderTest {
         assertEquals("John Doe", mirrorResult.extractedProfile.name)
         assertEquals("https://broker1.com", mirrorResult.broker.parentUrl)
         assertEquals("https://mirror1.com/optout", mirrorResult.broker.optOutUrl)
+    }
+
+    @Test
+    fun whenProfileQueryIsDeprecatedThenGetScanResultsFiltersItOut() = runTest {
+        // Given
+        val extractedProfiles = listOf(
+            createExtractedProfile(dbId = 1L, brokerName = "broker1", name = "John Doe", profileQueryId = 1L),
+            createExtractedProfile(dbId = 2L, brokerName = "broker1", name = "Jane Smith", profileQueryId = 2L),
+            createExtractedProfile(dbId = 3L, brokerName = "broker1", name = "Joe Smith", profileQueryId = 3L),
+        )
+        val activeBrokers = listOf(createBroker("broker1"))
+        // Only profile queries 1 and 3 are valid (non-deprecated), profile query 2 is deprecated
+        val validProfileQueries = listOf(
+            createProfileQuery(id = 1L),
+            createProfileQuery(id = 3L),
+        )
+
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(extractedProfiles)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+        whenever(mockPirRepository.getValidUserProfileQueries()).thenReturn(validProfileQueries)
+
+        // When
+        val result = testee.getScanResults()
+
+        // Then - profile 2 (Jane Smith) should be filtered out because its profile query is deprecated
+        assertEquals(2, result.size)
+        assertEquals("John Doe", result[0].extractedProfile.name)
+        assertEquals("Joe Smith", result[1].extractedProfile.name)
+    }
+
+    @Test
+    fun whenNoNotExecutedJobsThenShouldNotRestartScan() = runTest {
+        // Given - all jobs are completed (no NOT_EXECUTED jobs)
+        val completedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 3000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(completedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when all jobs are completed", result)
+    }
+
+    @Test
+    fun whenNotExecutedJobsAlreadyScannedThenShouldNotRestartScan() = runTest {
+        // Given - NOT_EXECUTED jobs exist but have been scanned (lastScanDateInMillis != 0)
+        val alreadyScannedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 2000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(alreadyScannedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when NOT_EXECUTED jobs were already scanned", result)
+    }
+
+    @Test
+    fun whenHasUnscannedNotExecutedJobsThenShouldRestartScan() = runTest {
+        // Given - has NOT_EXECUTED jobs with lastScanDateInMillis == 0 (truly unscanned jobs)
+        val unscannedJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(unscannedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan when there are unscanned NOT_EXECUTED jobs", result)
+    }
+
+    @Test
+    fun whenMixedJobStatusesThenOnlyConsidersUnscannedNotExecutedJobs() = runTest {
+        // Given - mix of job statuses with only some qualifying for restart
+        val mixedJobs = listOf(
+            // This one qualifies: NOT_EXECUTED with lastScanDateInMillis == 0
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
+            // These don't qualify:
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.NOT_EXECUTED, 1000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 0L),
+            createScanJobRecord("Broker4", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker5", 1L, ScanJobStatus.ERROR, 3000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(mixedJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan when at least one job qualifies", result)
+    }
+
+    @Test
+    fun whenOnlyOneUnscannedNotExecutedJobThenShouldRestartScan() = runTest {
+        // Given - only one unscanned NOT_EXECUTED job among many completed ones
+        val jobsWithOneUnscanned = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.NO_MATCH_FOUND, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.MATCHES_FOUND, 2000L),
+            createScanJobRecord("Broker3", 1L, ScanJobStatus.NO_MATCH_FOUND, 3000L),
+            createScanJobRecord("Broker4", 1L, ScanJobStatus.NOT_EXECUTED, 0L), // Only this one qualifies
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(jobsWithOneUnscanned)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertTrue("Should restart scan even with just one unscanned NOT_EXECUTED job", result)
+    }
+
+    @Test
+    fun whenEmptyJobListThenShouldNotRestartScan() = runTest {
+        // Given - no jobs at all
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(emptyList())
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when there are no jobs", result)
+    }
+
+    @Test
+    fun whenAllJobsAreErrorsThenShouldNotRestartScan() = runTest {
+        // Given - all jobs failed with errors
+        val errorJobs = listOf(
+            createScanJobRecord("Broker1", 1L, ScanJobStatus.ERROR, 1000L),
+            createScanJobRecord("Broker2", 1L, ScanJobStatus.ERROR, 2000L),
+        )
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(errorJobs)
+
+        // When
+        val result = testee.shouldRestartInitialScan()
+
+        // Then
+        assertFalse("Should not restart scan when all jobs are in ERROR state", result)
     }
 
     private suspend fun setupForEmptyBrokersAndJobs() {
@@ -614,6 +779,7 @@ class RealPirDashboardInitialScanStateProviderTest {
         dbId: Long,
         brokerName: String,
         name: String,
+        profileQueryId: Long = 1L,
         age: String = "30",
         addresses: List<AddressCityState> = emptyList(),
         alternativeNames: List<String> = emptyList(),
@@ -623,7 +789,7 @@ class RealPirDashboardInitialScanStateProviderTest {
     ): ExtractedProfile {
         return ExtractedProfile(
             dbId = dbId,
-            profileQueryId = 1L,
+            profileQueryId = profileQueryId,
             brokerName = brokerName,
             name = name,
             alternativeNames = alternativeNames,
@@ -650,6 +816,25 @@ class RealPirDashboardInitialScanStateProviderTest {
             optOutUrl = optOutUrl,
             addedAt = addedAt,
             removedAt = removedAt,
+        )
+    }
+
+    private fun createProfileQuery(
+        id: Long,
+        firstName: String = "John",
+        lastName: String = "Doe",
+    ): ProfileQuery {
+        return ProfileQuery(
+            id = id,
+            firstName = firstName,
+            lastName = lastName,
+            city = "New York",
+            state = "NY",
+            addresses = emptyList(),
+            birthYear = 1990,
+            fullName = "$firstName $lastName",
+            age = 34,
+            deprecated = false,
         )
     }
 }

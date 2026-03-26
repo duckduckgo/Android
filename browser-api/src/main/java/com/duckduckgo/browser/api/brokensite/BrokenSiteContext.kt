@@ -25,10 +25,13 @@ interface BrokenSiteContext {
 
     var jsPerformance: DoubleArray?
 
+    var breakageData: String?
+
     fun onUserTriggeredRefresh()
     fun inferOpenerContext(
         referrer: String?,
         wasLaunchedExternally: Boolean,
     )
     fun recordJsPerformance(performanceMetrics: JSONArray)
+    fun recordBreakageData(breakageData: String?)
 }

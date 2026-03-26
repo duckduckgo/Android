@@ -22,11 +22,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.pir.api.PirFeature
+import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -37,7 +40,14 @@ interface PirRemoteFeatures {
     fun self(): Toggle
 
     @DefaultValue(DefaultFeatureValue.FALSE)
+    @InternalAlwaysEnabled
     fun pirBeta(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun useBundledBrokerJsons(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun trackerBlocking(): Toggle
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -48,9 +58,20 @@ interface PirRemoteFeatures {
 class PirRemoteFeatureImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
+    private val pirRepository: PirRepository,
 ) : PirFeature {
 
-    override suspend fun isPirBetaEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        pirRemoteFeatures.pirBeta().isEnabled()
+    override suspend fun getPirFeatureState(): PirFeatureState = withContext(dispatcherProvider.io()) {
+        val isEnabled = pirRemoteFeatures.pirBeta().isEnabled()
+        if (!isEnabled) {
+            return@withContext PirFeatureState.DISABLED
+        }
+
+        val isRepositoryAvailable = pirRepository.isRepositoryAvailable()
+        if (!isRepositoryAvailable) {
+            return@withContext PirFeatureState.NOT_AVAILABLE
+        }
+
+        return@withContext PirFeatureState.ENABLED
     }
 }

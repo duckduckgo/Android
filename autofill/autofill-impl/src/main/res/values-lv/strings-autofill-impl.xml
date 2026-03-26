@@ -295,4 +295,27 @@
     <string name="passwords_import_promo_in_settings_title">Importēt paroles no Google</string>
     <string name="passwords_import_promo_in_settings_dismiss_text">Paslēpt</string>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="importToDuckDuckGo">Importēt uz DuckDuckGo</string>
+    <string name="importBookmarksFromGoogleChromeFolderName">Importēts no Chrome</string>
+    <string name="importBookmarksFromGooglePreImportDialogTitle">Importēt Google grāmatzīmes</string>
+    <string name="importBookmarksFromGooglePreImportDialogInstruction">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
+    <string name="importBookmarksFromGooglePreImportDialogImportButton">Importēt no Google</string>
+    <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izvēlies grāmatzīmju failu…</string>
+    <string name="importBookmarksFromGoogleWebFlowTitle">Importēt grāmatzīmes</string>
+    <string name="importBookmarksProgressTitle">Importē no Google…</string>
+    <string name="importBookmarksProgressSubtitle">Atstāj šo ekrānu atvērtu un pacietīgi gaidi — tam nevajadzētu aizņemt vairāk par minūti vai divām.</string>
+    <string name="importBookmarksProgressInfoMessage1">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
+    <string name="importBookmarksProgressInfoMessage2">Google var tev nosūtīt e-pasta vēstuli, kas apstiprina, ka tavas grāmatzīmes tiek eksportētas.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogTitle">Atcelt importu?</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogMessage">Tavas grāmatzīmes netiks importētas, ja atcelsi tagad.</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogCancelImport">Atcelt importu</string>
+    <string name="importBookmarksFromGoogleCancelConfirmationDialogContinue">Turpināt</string>
+    <string name="importBookmarksFromGoogleSuccessBookmarksCount" instruction="Placeholder is the number of bookmarks that were imported">Grāmatzīmes: %1$d</string>
+    <string name="importBookmarksSuccessTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksFinalDoneButton">Aizvērt</string>
+    <string name="importBookmarksErrorTitle">@string/importToDuckDuckGo</string>
+    <string name="importBookmarksErrorGenericMessage">Kaut kas notika nepareizi</string>
+    <string name="importBookmarksErrorGenericMessageSecondary">Lūdzu, pārliecinies, vai esi izveidojis savienojumu ar internetu, un mēģini vēlreiz.</string>
+
 </resources>
