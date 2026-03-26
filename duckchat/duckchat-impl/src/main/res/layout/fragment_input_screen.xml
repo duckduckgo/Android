@@ -79,7 +79,6 @@
         android:clipToOutline="true"
         android:clickable="true"
         android:focusable="true"
-        app:layout_goneMarginTop="114dp"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
