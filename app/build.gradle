@@ -421,6 +421,8 @@ dependencies {
 
     implementation project(':event-hub-impl')
 
+    implementation project(':scriptlet-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
