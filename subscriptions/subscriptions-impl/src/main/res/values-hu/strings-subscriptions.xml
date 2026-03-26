@@ -212,7 +212,6 @@
     <string name="tierPlusName" translatable="false">PLUS</string>
     <string name="tierProName" translatable="false">PRO</string>
 
-
     <!-- Content Descriptions -->
     <string name="subscriptionExpiredStatusIconContentDescription">Az előfizetés lejárt</string>
     <string name="subscriptionActiveStatusIconContentDescription">Az előfizetés aktív</string>
