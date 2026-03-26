@@ -422,6 +422,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             when (onboardingDialogType) {
                 INITIAL, INITIAL_REINSTALL_USER -> {
                     val showSecondaryCta = onboardingDialogType == INITIAL_REINSTALL_USER
+                    if (showSecondaryCta) {
+                        // Pin the title at its current position before the secondaryCta
+                        // visibility change. The CL is wrap_content in landscape, so
+                        // GONE→INVISIBLE increases its height and shifts percentage
+                        // guidelines. Detaching the title prevents the visible shift;
+                        // the logo stays put because it's constrained above the title.
+                        (binding.welcomeTitle.layoutParams as ConstraintLayout.LayoutParams).apply {
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                            topMargin = binding.welcomeTitle.top
+                        }
+                    }
+                    binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
+
                     val showWalkingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
                         rootView = binding.root,
                         dialogView = binding.daxDialogCta.root,
@@ -434,10 +448,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                             bottomToTop = ConstraintLayout.LayoutParams.UNSET
                             bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                         }
-                    }
-
-                    if (showSecondaryCta) {
-                        binding.daxDialogCta.secondaryCta.visibility = View.INVISIBLE
                     }
 
                     playOutroAnimation(
