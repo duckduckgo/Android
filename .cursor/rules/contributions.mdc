@@ -18,15 +18,32 @@ Use the imperative mood in the subject line (e.g. "Add feature X", not "Added fe
 
 ## PR body
 
-PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
+Every PR must use the exact format from `.github/PULL_REQUEST_TEMPLATE.md`. This applies when creating PRs via `gh`, `gt submit`, or the GT MCP — always populate the body from this template:
 
-**Task/Issue URL** — Link to the Asana task for this change.
+```
+Task/Issue URL: <Asana task URL>
+
+### Description
+
+### Steps to test this PR
+
+_Feature 1_
+- [ ]
+- [ ]
+
+### UI changes
+| Before  | After |
+| ------ | ----- |
+!(Upload before screenshot)|(Upload after screenshot)|
+```
+
+**Task/Issue URL** — Plain text line (no heading), link to the Asana task.
 
 **Description** — A short summary of what changed and why.
 
-**Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
+**Steps to test this PR** — Reviewer-facing steps per scenario. Be specific enough that someone unfamiliar with the code can follow them.
 
-**UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
+**UI changes** — Before/After screenshots or recordings. Omit the table and write "N/A" only for pure logic/backend changes with no visual impact.
 
 ## Stacked PRs (Graphite)
 
@@ -43,4 +60,4 @@ Because of the `-api` / `-impl` module split and Dagger constraints, sequence wo
 
 ### Creating stacked PRs
 
-If the GT MCP is available, use it to create and submit stacked PRs. Otherwise, create branches and PRs manually using `gh`.
+If the GT MCP is available, use it to create and submit stacked PRs. Otherwise, create branches and PRs manually using `gh`. In both cases, each PR body must follow the template in the **PR body** section above.
