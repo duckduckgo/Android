@@ -1638,7 +1638,7 @@ class RealDuckChatTest {
     fun `when install timestamp not yet recorded then treat as new user`() = runTest {
         duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
         whenever(mockDuckChatFeatureRepository.getDefaultTogglePosition()).thenReturn(null)
-        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(20000L)
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(Long.MAX_VALUE)
 
         testee.onPrivacyConfigDownloaded()
         coroutineRule.testScope.advanceUntilIdle()
