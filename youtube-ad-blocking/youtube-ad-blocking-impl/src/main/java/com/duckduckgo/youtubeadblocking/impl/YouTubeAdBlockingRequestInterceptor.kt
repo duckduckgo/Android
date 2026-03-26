@@ -28,6 +28,9 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.ByteArrayInputStream
@@ -64,11 +67,18 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 ) : YouTubeAdBlockingRequestInterceptor {
 
     /**
-     * Plain OkHttpClient without API interceptors. The @Named("api") client adds a DDG API
-     * User-Agent header that causes YouTube to reject the request ("device not supported").
-     * We need to forward the WebView's original headers (including its browser User-Agent) faithfully.
+     * OkHttpClient with a CookieJar bridging to WebView's CookieManager.
+     *
+     * - No API interceptors (the @Named("api") client sets a DDG User-Agent that YouTube rejects)
+     * - WebViewCookieJar reads/writes cookies from/to CookieManager so YouTube's cookie flows
+     *   (consent, auth, preferences) work correctly across the OkHttp ↔ WebView boundary
+     * - Follows redirects with cookies intact (OkHttp calls loadForRequest on each redirect hop)
      */
-    private val okHttpClient: OkHttpClient by lazy { OkHttpClient() }
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .cookieJar(WebViewCookieJar())
+            .build()
+    }
 
     private var cachedProbeScript: String? = null
 
@@ -138,10 +148,6 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
             return null
         }
 
-        // Sync Set-Cookie headers into WebView's CookieManager so cookies are persisted.
-        // WebView doesn't process Set-Cookie from synthetic WebResourceResponse objects.
-        syncCookies(url.toString(), response.headers)
-
         // Inject script into <head>
         val injectedBody = injectScript(originalBody, probeScript)
 
@@ -179,18 +185,6 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 
         // Fallback: prepend before <!DOCTYPE> or at the start
         return scriptTag + html
-    }
-
-    private fun syncCookies(url: String, headers: okhttp3.Headers) {
-        try {
-            val cookieManager = CookieManager.getInstance() ?: return
-            headers.values("Set-Cookie").forEach { cookie ->
-                cookieManager.setCookie(url, cookie)
-            }
-            cookieManager.flush()
-        } catch (e: Exception) {
-            logcat(ERROR) { "YouTubeAdBlocking: Failed to sync cookies: ${e.message}" }
-        }
     }
 
     private fun buildResponseHeaders(originalHeaders: okhttp3.Headers): Map<String, String> {
@@ -244,5 +238,32 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     companion object {
         private const val YOUTUBE_HOST = "youtube.com"
         private const val YOUTUBE_MOBILE_HOST = "m.youtube.com"
+    }
+}
+
+/**
+ * Bridges OkHttp's CookieJar to Android WebView's CookieManager.
+ *
+ * On each OkHttp request: reads cookies from CookieManager and sends them.
+ * On each OkHttp response: stores Set-Cookie values back into CookieManager.
+ * This keeps the WebView and OkHttp cookie stores in sync, so YouTube's
+ * cookie-dependent flows (consent, auth, CSRF) work correctly.
+ */
+private class WebViewCookieJar : CookieJar {
+
+    override fun loadForRequest(url: HttpUrl): List<Cookie> {
+        val cookieManager = CookieManager.getInstance() ?: return emptyList()
+        val cookieString = cookieManager.getCookie(url.toString()) ?: return emptyList()
+        return cookieString.split(";").mapNotNull { raw ->
+            Cookie.parse(url, raw.trim())
+        }
+    }
+
+    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+        val cookieManager = CookieManager.getInstance() ?: return
+        cookies.forEach { cookie ->
+            cookieManager.setCookie(url.toString(), cookie.toString())
+        }
+        cookieManager.flush()
     }
 }
