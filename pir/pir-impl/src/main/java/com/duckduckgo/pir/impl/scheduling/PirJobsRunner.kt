@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -82,7 +83,6 @@ class RealPirJobsRunner @Inject constructor(
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
         var activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
-        emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
         // Clean up any already running scan jobs before starting new ones as this function can be called
         // while previous instance is still running in case of profile edits.
@@ -96,6 +96,7 @@ class RealPirJobsRunner @Inject constructor(
         pirScan.stop()
 
         if (profileQueries.isEmpty()) {
+            emitStartPixel(context, executionType, 0, activeBrokers.size)
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
             emitCompletedPixel(context, executionType, startTimeInMillis, totalScanJobs = 0, totalOptOutJobs = 0)
             return@withContext Result.success(Unit)
@@ -109,10 +110,14 @@ class RealPirJobsRunner @Inject constructor(
             try {
                 brokerJsonUpdater.update()
                 activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
+            } catch (e: CancellationException) {
+                throw e
             } catch (_: Exception) {
                 logcat { "PIR-JOB-RUNNER: Failed to update broker data." }
             }
         }
+
+        emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
