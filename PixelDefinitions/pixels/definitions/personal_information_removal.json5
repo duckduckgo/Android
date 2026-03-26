@@ -1203,6 +1203,11 @@
                 "key": "power_saving",
                 "description": "Whether the device is in power saving mode",
                 "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "string"
             }
         ]
     },

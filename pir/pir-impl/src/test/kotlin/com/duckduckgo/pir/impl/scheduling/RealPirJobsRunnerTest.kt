@@ -163,7 +163,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
@@ -272,7 +272,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPirRepository, never()).setLatestBackgroundScanRunInMs(any())
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
         verify(mockPirScan).stop()
         verifyNoMoreInteractions(mockPixelSender)
@@ -322,7 +322,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         // we just dont attempt what the mock for time provider is giving us
         verify(mockPixelSender).reportInitialScanDuration(0L, 2)
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
@@ -373,7 +373,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
         // we just dont attempt what the mock for time provider is giving us
         verify(mockPixelSender).reportInitialScanDuration(0L, 2)
@@ -551,7 +551,7 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockPirScan).stop()
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
         verify(mockPirSchedulingRepository, never()).saveOptOutJobRecords(
             listOf(
@@ -703,7 +703,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted(any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any())
         verify(mockPixelSender).reportManualScanCompleted(any(), any())
         verify(mockPirOptOut, never()).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
     }

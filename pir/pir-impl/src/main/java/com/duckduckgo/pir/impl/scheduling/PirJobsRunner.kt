@@ -76,7 +76,9 @@ class RealPirJobsRunner @Inject constructor(
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
 
-        emitStartPixel(context, executionType)
+        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
+        val profileQueries = obtainProfiles()
+        emitStartPixel(context, executionType, profileQueries.size)
 
         // Clean up any already running scan jobs before starting new ones as this function can be called
         // while previous instance is still running in case of profile edits.
@@ -90,9 +92,6 @@ class RealPirJobsRunner @Inject constructor(
         pirScan.stop()
 
         val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
-
-        // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
-        val profileQueries = obtainProfiles()
 
         if (profileQueries.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
@@ -155,12 +154,13 @@ class RealPirJobsRunner @Inject constructor(
     private fun emitStartPixel(
         context: Context,
         executionType: PirExecutionType,
+        profileQueryCount: Int,
     ) {
         if (executionType == MANUAL) {
             val isPowerSavingEnabled = runCatching {
                 (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
             }.getOrDefault(false)
-            pixelSender.reportManualScanStarted(isPowerSavingEnabled)
+            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount)
         } else {
             pixelSender.reportScheduledScanStarted()
         }

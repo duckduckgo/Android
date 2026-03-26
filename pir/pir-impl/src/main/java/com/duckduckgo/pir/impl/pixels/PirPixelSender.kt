@@ -98,9 +98,11 @@ interface PirPixelSender {
      * Emits a pixel to signal that a manually initiated scan has started.
      *
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
+     * @param profileQueryCount - the number of profile queries used in the scan
      */
     fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
+        profileQueryCount: Int,
     )
 
     /**
@@ -612,9 +614,11 @@ class RealPirPixelSender @Inject constructor(
 ) : PirPixelSender {
     override fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
+        profileQueryCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
