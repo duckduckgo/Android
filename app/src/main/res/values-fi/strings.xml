@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Poistetaanko välilehdet, sivuston tiedot ja keskustelut?</string>
     <string name="singleTabFireDialogDeleteAll">Poista kaikki</string>
     <string name="singleTabFireDialogDeleteThisTab">Poista tämä välilehti</string>
-    <string name="singleTabFireDialogDeleteThisChat">Poista tämä keskustelu</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">\"Poista kaikki\" ei poista Duck.ai-keskusteluhistoriaasi.</string>
+    <string name="singleTabFireDialogDeleteChat">Poista keskustelu</string>
+    <string name="singleTabFireDialogTitleDuckAi">Poistetaanko tämä keskustelu?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Sivustotietojen poistaminen voi kirjata sinut ulos tileiltä.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tämä peruuttaa käynnissä olevat lataukset.</string>
     <plurals name="tabsClearedSnackbarMessage">
