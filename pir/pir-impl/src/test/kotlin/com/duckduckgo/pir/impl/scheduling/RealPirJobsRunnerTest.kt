@@ -1142,8 +1142,8 @@ class RealPirJobsRunnerTest {
 
         // Then
         verify(mockBrokerJsonUpdater).update()
-        verify(mockPixelSender).reportManualScanStarted(any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoMoreInteractions(mockPixelSender)
         verifyNoInteractions(mockEligibleScanJobProvider)
     }
@@ -1195,8 +1195,8 @@ class RealPirJobsRunnerTest {
 
         // Then
         verifyNoInteractions(mockBrokerJsonUpdater)
-        verify(mockPixelSender).reportManualScanStarted(any())
-        verify(mockPixelSender).reportManualScanCompleted(any(), any())
+        verify(mockPixelSender).reportManualScanStarted(any(), any(), any())
+        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoMoreInteractions(mockPixelSender)
     }
 }

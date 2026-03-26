@@ -106,8 +106,12 @@ class RealPirJobsRunner @Inject constructor(
         // (e.g., on first scan after feature flag enablement, or with slow network/VPN).
         if (activeBrokers.isEmpty() && pirRemoteFeatures.ensureBrokerDataBeforeScan().isEnabled()) {
             logcat { "PIR-JOB-RUNNER: No active brokers, attempting to ensure broker data is loaded..." }
-            brokerJsonUpdater.update()
-            activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
+            try {
+                brokerJsonUpdater.update()
+                activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
+            } catch (_: Exception) {
+                logcat { "PIR-JOB-RUNNER: Failed to update broker data." }
+            }
         }
 
         if (activeBrokers.isEmpty()) {
