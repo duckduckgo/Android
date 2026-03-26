@@ -28,13 +28,13 @@
         <item quantity="one">Je bladwijzer voor %1$s kan niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
         <item quantity="other">Je bladwijzers voor %1$s en %2$d andere websites kunnen niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
     </plurals>
-    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
 
     <!-- Content Descriptions -->
     <string name="bookmarksSearchMenuContentDescription">Bladwijzers zoeken</string>
     <string name="bookmarksAddFolderMenuContentDescription">Map toevoegen</string>
     <string name="bookmarksMenuContentDescription">Meer opties</string>
-    <string name="newTabFavoritesToggleContentDescription">Zichtbaarheid van favorieten wisselen</string>
+    <string name="newTabFavoritesToggleContentDescription">Zichtbaarheid van favorieten aanpassen</string>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
@@ -122,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importeren van Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Bladwijzerbestand selecteren...</string>
     <string name="bookmarksImportDialogClose">Sluiten</string>
+
 </resources>
