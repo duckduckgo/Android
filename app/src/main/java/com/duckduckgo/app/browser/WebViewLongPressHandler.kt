@@ -35,7 +35,6 @@ interface LongPressHandler {
     fun handleLongPress(
         longPressTargetType: Int,
         longPressTargetUrl: String?,
-        longPressTargetTitle: String?,
         menu: ContextMenu,
     )
 
@@ -51,7 +50,6 @@ interface LongPressHandler {
         class DownloadFile(val url: String) : RequiredAction()
         class ShareLink(val url: String) : RequiredAction()
         class CopyLink(val url: String) : RequiredAction()
-        class CopyLinkText(val text: String) : RequiredAction()
     }
 }
 
@@ -64,7 +62,6 @@ class WebViewLongPressHandler @Inject constructor(
     override fun handleLongPress(
         longPressTargetType: Int,
         longPressTargetUrl: String?,
-        longPressTargetTitle: String?,
         menu: ContextMenu,
     ) {
         menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
@@ -96,10 +93,7 @@ class WebViewLongPressHandler @Inject constructor(
                     if (!customTabDetector.isCustomTab()) {
                         addLinkMenuOpenInTabOptions(menu)
                     }
-                    if (!longPressTargetTitle.isNullOrEmpty()) {
-                        addLinkMenuCopyLinkTextOptions(menu)
-                    }
-
+                    addLinkMenuCopyLinkTextOptions(menu)
                     addLinkMenuOtherOptions(menu)
                 }
             }
@@ -172,11 +166,6 @@ class WebViewLongPressHandler @Inject constructor(
                 pixel.fire(LONG_PRESS_COPY_URL)
                 val url = longPressTarget.url ?: return None
                 return CopyLink(url)
-            }
-            CONTEXT_MENU_ID_COPY_TEXT -> {
-                // pixel.fire(LONG_PRESS_COPY_TEXT)
-                val text = longPressTarget.text ?: return None
-                return CopyLinkText(text)
             }
             else -> None
         }
