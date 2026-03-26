@@ -68,7 +68,6 @@
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_goneMarginTop="180dp"
         app:layout_constraintTop_toBottomOf="@id/inputScreenHatch" />
 
     <com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView
@@ -80,6 +79,7 @@
         android:elevation="2dp"
         android:clickable="true"
         android:focusable="true"
+        app:layout_goneMarginTop="114dp"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
