@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:ellipsize="end"
-                app:typography="body1"
+                app:typography="h3"
                 tools:text="Site Title" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:textType="secondary"
-                app:typography="body1"
+                app:typography="h4"
                 tools:text="www.url.com" />
 
         </LinearLayout>
