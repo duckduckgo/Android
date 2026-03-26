@@ -74,6 +74,7 @@ interface SecureStorageKeyStore {
     suspend fun canUseEncryption(): Boolean
 }
 
+private const val TAG = "RealSecureStorageKeyStore"
 class RealSecureStorageKeyStore(
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -464,11 +465,12 @@ class RealSecureStorageKeyStore(
                         }
                     }
                     harmonyFlags.readFromHarmony -> {
+                        logcat(TAG) { "Returning $keyName from harmony" }
                         return@withContext harmonyValue
                     }
                 }
             }
-
+            logcat(TAG) { "Returning $keyName from legacy" }
             return@withContext legacyValue
         }
     }
