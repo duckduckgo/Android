@@ -311,7 +311,6 @@ import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
-import com.duckduckgo.youtubeadblocking.impl.YouTubeAdBlockingScriptInjector
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -444,9 +443,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var clipboardImageInjector: ClipboardImageInjector
-
-    @Inject
-    lateinit var youTubeAdBlockingScriptInjector: YouTubeAdBlockingScriptInjector
 
     @Inject
     lateinit var bookmarkAddedConfirmationDialogFactory: BookmarkAddedConfirmationDialogFactory
@@ -3814,7 +3810,6 @@ class BrowserTabFragment :
             )
             configureWebViewForBlobDownload(it)
             configureWebViewForClipboard(it)
-            configureWebViewForYouTubeAdBlocking(it)
             lifecycleScope.launch {
                 webViewCompatTestHelper.configureWebViewForWebViewCompatTest(
                     it,
@@ -4041,12 +4036,6 @@ class BrowserTabFragment :
     private fun configureWebViewForClipboard(webView: DuckDuckGoWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             clipboardImageInjector.configureWebViewForClipboard(webView)
-        }
-    }
-
-    private fun configureWebViewForYouTubeAdBlocking(webView: DuckDuckGoWebView) {
-        lifecycleScope.launch {
-            youTubeAdBlockingScriptInjector.addDocumentStartJavaScript(webView)
         }
     }
 

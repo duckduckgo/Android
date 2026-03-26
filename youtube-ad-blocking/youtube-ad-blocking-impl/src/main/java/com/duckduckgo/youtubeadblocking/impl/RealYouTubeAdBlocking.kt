@@ -16,6 +16,9 @@
 
 package com.duckduckgo.youtubeadblocking.impl
 
+import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.youtubeadblocking.api.YouTubeAdBlocking
@@ -28,6 +31,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealYouTubeAdBlocking @Inject constructor(
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
+    private val requestInterceptor: YouTubeAdBlockingRequestInterceptor,
     private val dispatcherProvider: DispatcherProvider,
 ) : YouTubeAdBlocking {
 
@@ -35,5 +39,13 @@ class RealYouTubeAdBlocking @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             youTubeAdBlockingFeature.self().isEnabled()
         }
+    }
+
+    override suspend fun intercept(
+        request: WebResourceRequest,
+        url: Uri,
+    ): WebResourceResponse? {
+        if (!isEnabled()) return null
+        return requestInterceptor.intercept(request, url)
     }
 }

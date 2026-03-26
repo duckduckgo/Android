@@ -94,6 +94,7 @@ import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.youtubeadblocking.api.YouTubeAdBlocking
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -238,6 +239,7 @@ class BrowserModule {
         trackerAllowlist: TrackerAllowlist,
         userAllowListRepository: UserAllowListRepository,
         duckPlayer: DuckPlayer,
+        youTubeAdBlocking: YouTubeAdBlocking,
         maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
         dispatchers: DispatcherProvider,
@@ -260,6 +262,7 @@ class BrowserModule {
             trackerAllowlist,
             userAllowListRepository,
             duckPlayer,
+            youTubeAdBlocking,
             maliciousSiteBlockerWebViewIntegration,
             dispatchers,
             androidBrowserConfigFeature,

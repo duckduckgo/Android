@@ -4,18 +4,36 @@
 
 ## Overview
 
-This module injects scriptlets into YouTube pages at document start to block ads before YouTube's JavaScript initialises. It uses the existing `addDocumentStartJavaScript` infrastructure (AndroidX WebKit) which is already proven in the DDG Android browser for content scope scripts, clipboard, and blob downloads.
+This module intercepts YouTube HTML document requests and injects scriptlets before any page JavaScript executes, blocking ads before YouTube's ad infrastructure initialises.
 
 ## Architecture
 
-### Injection Mechanism
+### Injection Mechanism — `shouldInterceptRequest` HTML Modification (Mechanism B)
 
-Uses `WebViewCompat.addDocumentStartJavaScript()` which provides:
-- **Pre-page-JS execution** — scripts run before any page JavaScript (`document_start` equivalent)
-- **Automatic iframe coverage** — applies to all frames including ad player iframes
-- **SPA navigation persistence** — persists across `pushState`/`replaceState` navigations
-- **CSP bypass** — not subject to the page's Content Security Policy
-- **Origin scoping** — restricted to `youtube.com` and `m.youtube.com` only
+Uses the WebView's `shouldInterceptRequest` callback to intercept YouTube page loads:
+
+1. **Intercepts** YouTube main-frame and iframe HTML document requests
+2. **Fetches** the response via OkHttp (forwarding original request headers)
+3. **Strips** `Content-Security-Policy` headers (YouTube's CSP blocks inline scripts)
+4. **Injects** `<script>{scriptlet}</script>` immediately after `<head>` in the HTML
+5. **Returns** the modified `WebResourceResponse` to the WebView
+
+Because the HTML is modified before the WebView parser sees it, the injected script executes before any page JavaScript — equivalent to `document_start` timing.
+
+### Why not `addDocumentStartJavaScript`?
+
+The `addDocumentStartJavaScript` API (Mechanism A) is simpler and provides automatic iframe/SPA coverage, but has been observed to cause crashes on some WebView versions. The `shouldInterceptRequest` approach uses only stable, long-standing WebView APIs.
+
+### Trade-offs
+
+| Concern | `shouldInterceptRequest` (this impl) | `addDocumentStartJavaScript` |
+|---------|--------------------------------------|------------------------------|
+| Crashes | ✅ Stable APIs only | ⚠️ Can crash |
+| Timing | ✅ Before any page JS | ✅ Before any page JS |
+| Iframes | ⚠️ Must detect iframe doc requests | ✅ Automatic |
+| SPA nav | ⚠️ Scriptlets must patch pushState | ✅ Automatic |
+| CSP | ⚠️ Must strip CSP headers | ✅ Not subject to CSP |
+| Latency | ⚠️ Buffers full response | ✅ No buffering |
 
 ### Module Structure
 
@@ -32,9 +50,11 @@ Enable via internal settings or local override for testing.
 
 ## Hack Phase: What This Validates
 
-1. **Injection timing** — Does `addDocumentStartJavaScript` fire before YouTube's ad init?
-2. **Iframe coverage** — Are iframes (ad player frames) covered?
-3. **SPA navigation** — Does injection persist across video-to-video navigation?
+1. **Injection timing** — Does the injected script run before YouTube's ad init?
+2. **CSP stripping** — Does removing CSP headers allow the inline script to execute?
+3. **Iframe coverage** — Are iframe document requests detected and injected?
+4. **SPA navigation** — Do the pushState/replaceState patches in the probe maintain coverage?
+5. **Latency** — Does response buffering add perceptible delay?
 
 ### Testing the Probe
 
@@ -45,12 +65,13 @@ Enable via internal settings or local override for testing.
    - `ytInitialData: false` — proves injection beats YouTube init
    - `frame: main/iframe` — frame type detection
    - SPA navigation logs on video clicks
+4. Also check logcat for `YouTubeAdBlocking: Injected probe script into ...` — confirms the interception path
 
 ## What's NOT Included (follow-on work)
 
 - Real scriptlets from `content-blocker-extension`
 - Remote scriptlet loading from CDN
-- `shouldInterceptRequest` ad sub-resource blocking
+- Ad sub-resource blocking via request filtering
 - Auto-update / version checking
 - Production settings UI
 - DuckPlayer interaction handling

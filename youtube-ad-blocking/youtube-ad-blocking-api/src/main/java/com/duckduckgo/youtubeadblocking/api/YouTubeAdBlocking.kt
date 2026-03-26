@@ -16,11 +16,15 @@
 
 package com.duckduckgo.youtubeadblocking.api
 
+import android.net.Uri
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+
 /**
  * Public API for YouTube ad blocking feature.
  *
- * This feature injects scriptlets into YouTube pages at document start
- * to block ads before they initialise.
+ * This feature intercepts YouTube HTML document requests and injects scriptlets
+ * before any page JavaScript executes, blocking ads before they initialise.
  */
 interface YouTubeAdBlocking {
 
@@ -28,4 +32,17 @@ interface YouTubeAdBlocking {
      * @return `true` when YouTube ad blocking is enabled
      */
     suspend fun isEnabled(): Boolean
+
+    /**
+     * Intercept a WebView resource request. If the request is for a YouTube HTML document,
+     * fetches the response, injects the scriptlet bundle into `<head>`, strips CSP headers,
+     * and returns the modified response.
+     *
+     * @return A modified [WebResourceResponse] with injected scriptlets, or `null` if this
+     * request should not be intercepted (not YouTube, not HTML, feature disabled, etc.)
+     */
+    suspend fun intercept(
+        request: WebResourceRequest,
+        url: Uri,
+    ): WebResourceResponse?
 }

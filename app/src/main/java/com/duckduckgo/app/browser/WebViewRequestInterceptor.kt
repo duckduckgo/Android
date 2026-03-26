@@ -46,6 +46,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.youtubeadblocking.api.YouTubeAdBlocking
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
@@ -105,6 +106,7 @@ class WebViewRequestInterceptor(
     private val trackerAllowlist: TrackerAllowlist,
     private val userAllowListRepository: UserAllowListRepository,
     private val duckPlayer: DuckPlayer,
+    private val youTubeAdBlocking: YouTubeAdBlocking,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -196,6 +198,10 @@ class WebViewRequestInterceptor(
 
         if (url != null) {
             duckPlayer.intercept(request, url, webView)?.let { return it }
+        }
+
+        if (url != null) {
+            youTubeAdBlocking.intercept(request, url)?.let { return it }
         }
 
         if (url != null && shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
