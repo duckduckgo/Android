@@ -104,7 +104,7 @@
                     android:layout_marginStart="@dimen/keyline_1"
                     android:layout_marginEnd="@dimen/keyline_1"
                     app:menuActionLabel="@string/browserMenuDuckChat"
-                    app:menuActionSrc="@drawable/ic_ai_chat_24" />
+                    app:menuActionSrc="@drawable/ic_ai_chat_add_24" />
 
                 <com.duckduckgo.common.ui.view.MenuActionButtonView
                     android:id="@+id/settingsMenuItem"
@@ -282,7 +282,7 @@
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_fire_24"
                 app:menuSize="medium"
-                app:primaryText="@string/browserMenuFire" />
+                app:primaryText="@string/browserMenuFireTabsData" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/utilitiesSectionDivider"
