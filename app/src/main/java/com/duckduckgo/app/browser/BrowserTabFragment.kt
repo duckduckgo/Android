@@ -360,6 +360,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -374,6 +375,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
 import kotlin.getValue
 
 @InjectWith(FragmentScope::class)
@@ -4304,6 +4306,24 @@ class BrowserTabFragment :
             }
         }
         return super.onContextItemSelected(item)
+    }
+
+    private suspend fun extractLinkTextAtPoint(): String? {
+        val wv = webView ?: return null
+        return suspendCancellableCoroutine { continuation ->
+            val js = """
+                (function() {
+                    var el = document.elementFromPoint($lastTouchX, $lastTouchY);
+                    while (el && el.tagName !== 'A') { el = el.parentElement; }
+                    if (el && el.innerText) { return el.innerText.trim(); }
+                    return '';
+                })()
+            """.trimIndent()
+            wv.evaluateJavascript(js) { result ->
+                val text = result?.trim('"')?.takeIf { it.isNotEmpty() && it != "null" }
+                continuation.resume(text) {}
+            }
+        }
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
