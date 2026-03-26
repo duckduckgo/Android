@@ -25,7 +25,7 @@ data class PrivacyPassChallenge(
     val tokenType: Int,
     val issuerUrl: String,
     val challenge: String,
-    val tokenKey: String,
+    val tokenKey: String? = null,
 )
 
 interface PrivacyPassManager {

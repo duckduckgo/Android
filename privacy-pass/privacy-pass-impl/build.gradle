@@ -46,6 +46,9 @@ dependencies {
     // HTTP client for issuer communication
     implementation Square.OkHttp3.okHttp
 
+    // JNA for calling act-core native library without JNI C glue
+    implementation "net.java.dev.jna:jna:5.14.0@aar"
+
     // Testing dependencies
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

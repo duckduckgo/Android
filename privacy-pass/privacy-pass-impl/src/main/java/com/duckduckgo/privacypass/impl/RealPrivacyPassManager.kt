@@ -44,6 +44,7 @@ class RealPrivacyPassManager @Inject constructor(
 ) : PrivacyPassManager {
 
     private val credentialStore = ConcurrentHashMap<String, StoredCredential>()
+    private val actCore = ActCoreWrapper()
 
     override fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean {
         if (statusCode != 401) return false
@@ -73,7 +74,7 @@ class RealPrivacyPassManager @Inject constructor(
         val existingCredential = credentialStore[challenge.issuerUrl]
         if (existingCredential != null) {
             logcat { "PrivacyPass: found existing credential for ${challenge.issuerUrl}" }
-            return createSpendProofAndAuthorize(challenge, existingCredential)
+            return spendAndAuthorize(challenge, existingCredential)
         }
 
         return runActProtocol(challenge)
@@ -88,9 +89,8 @@ class RealPrivacyPassManager @Inject constructor(
         val paramMap = parseAuthParams(params)
 
         val challenge = paramMap["challenge"] ?: return null
-        val tokenKey = paramMap["token-key"] ?: return null
         val issuerUrl = paramMap["issuer"] ?: return null
-
+        val tokenKey = paramMap["token-key"]
         val tokenType = paramMap["token-type"]?.let { parseTokenType(it) } ?: TOKEN_TYPE_ACT
 
         return PrivacyPassChallenge(
@@ -105,32 +105,27 @@ class RealPrivacyPassManager @Inject constructor(
         return try {
             logcat { "PrivacyPass: starting ACT protocol with issuer ${challenge.issuerUrl}" }
 
-            val publicKey = fetchIssuerPublicKey(challenge.issuerUrl)
+            val publicKeyCbor = fetchIssuerPublicKey(challenge.issuerUrl)
                 ?: return PrivacyPassResult.Failure("Failed to fetch issuer public key")
-            logcat { "PrivacyPass: fetched issuer public key (${publicKey.length} bytes)" }
+            logcat { "PrivacyPass: fetched issuer public key (${publicKeyCbor.size} bytes CBOR)" }
 
-            // TODO: In production, call Rust FFI via JNI here:
-            //   val preIssuance = ActCore.preIssuance(publicKey, challenge.challenge)
-            //   val issuanceRequest = preIssuance.encodedRequest()
-            // For prototype, we construct a placeholder issuance request that signals
-            // the server to use its own test flow.
-            val issuanceRequestBody = buildPrototypeIssuanceRequest(challenge)
+            val issuanceResult = actCore.performIssuance(publicKeyCbor) { requestCborBase64 ->
+                postIssuanceRequest(challenge.issuerUrl, requestCborBase64)
+            }
+            logcat { "PrivacyPass: issuance complete, token ${issuanceResult.tokenCbor.size} bytes" }
 
-            val issuanceResponse = postIssuanceRequest(challenge.issuerUrl, issuanceRequestBody)
-                ?: return PrivacyPassResult.Failure("Issuance request failed")
-            logcat { "PrivacyPass: received issuance response" }
-
-            // TODO: In production, call Rust FFI via JNI here:
-            //   val credential = ActCore.processIssuanceResponse(preIssuance, issuanceResponse)
             val credential = StoredCredential(
                 issuerUrl = challenge.issuerUrl,
-                issuanceResponseBase64 = issuanceResponse,
-                publicKeyBase64 = publicKey,
+                tokenCbor = issuanceResult.tokenCbor,
+                publicKeyCbor = issuanceResult.publicKeyCbor,
             )
             credentialStore[challenge.issuerUrl] = credential
             logcat { "PrivacyPass: stored credential for ${challenge.issuerUrl}" }
 
-            createSpendProofAndAuthorize(challenge, credential)
+            spendAndAuthorize(challenge, credential)
+        } catch (e: ActCoreException) {
+            logcat(ERROR) { "PrivacyPass: ACT FFI error: ${e.message}" }
+            PrivacyPassResult.Failure("ACT FFI error: ${e.message}")
         } catch (e: Exception) {
             logcat(ERROR) { "PrivacyPass: ACT protocol failed: ${e.message}" }
             PrivacyPassResult.Failure("ACT protocol error: ${e.message}")
@@ -138,30 +133,48 @@ class RealPrivacyPassManager @Inject constructor(
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun createSpendProofAndAuthorize(
+    private fun spendAndAuthorize(
         challenge: PrivacyPassChallenge,
         credential: StoredCredential,
     ): PrivacyPassResult {
-        // TODO: In production, call Rust FFI via JNI here:
-        //   val spendProof = ActCore.proveSpend(credential.nativeHandle, challenge.challenge)
-        //   val tokenBase64 = Base64.encodeToString(spendProof, Base64.NO_WRAP)
+        return try {
+            val spendResult = actCore.spend(credential.tokenCbor)
+            logcat { "PrivacyPass: spend proof generated (${spendResult.spendProofCbor.size} bytes)" }
 
-        val spendResult = postSpendProof(credential)
-        if (spendResult != null) {
-            logcat { "PrivacyPass: spend proof accepted by issuer" }
-            val authHeader = "$PRIVATE_TOKEN_SCHEME token=$spendResult"
-            return PrivacyPassResult.Success(authHeader)
+            try {
+                val spendProofBase64 = Base64.encodeToString(spendResult.spendProofCbor, Base64.NO_WRAP)
+                val refundCborBase64 = postSpendProof(credential.issuerUrl, spendProofBase64)
+
+                if (refundCborBase64 != null) {
+                    val refundCbor = Base64.decode(refundCborBase64, Base64.DEFAULT)
+                    val newTokenCbor = actCore.completeRefund(
+                        spendResult.preRefundPtr,
+                        spendResult.spendProofCbor,
+                        refundCbor,
+                        credential.publicKeyCbor,
+                    )
+                    credentialStore[credential.issuerUrl] = credential.copy(tokenCbor = newTokenCbor)
+                    logcat { "PrivacyPass: refund complete, updated stored credential" }
+                } else {
+                    logcat { "PrivacyPass: no refund response, credential will not be refreshed" }
+                    credentialStore.remove(credential.issuerUrl)
+                }
+
+                val authHeader = "$PRIVATE_TOKEN_SCHEME token=$spendProofBase64"
+                PrivacyPassResult.Success(authHeader)
+            } finally {
+                actCore.freePreRefund(spendResult.preRefundPtr)
+            }
+        } catch (e: ActCoreException) {
+            logcat(ERROR) { "PrivacyPass: spend FFI error: ${e.message}" }
+            PrivacyPassResult.Failure("Spend FFI error: ${e.message}")
+        } catch (e: Exception) {
+            logcat(ERROR) { "PrivacyPass: spend failed: ${e.message}" }
+            PrivacyPassResult.Failure("Spend error: ${e.message}")
         }
-
-        // If the server-side spend flow isn't available, construct the header
-        // from the stored issuance data as a best-effort prototype fallback.
-        val fallbackToken = credential.issuanceResponseBase64
-        logcat { "PrivacyPass: using issuance response as prototype fallback token" }
-        val authHeader = "$PRIVATE_TOKEN_SCHEME token=$fallbackToken"
-        return PrivacyPassResult.Success(authHeader)
     }
 
-    private fun fetchIssuerPublicKey(issuerUrl: String): String? {
+    private fun fetchIssuerPublicKey(issuerUrl: String): ByteArray? {
         val url = "${issuerUrl.trimEnd('/')}/public-key"
         logcat { "PrivacyPass: GET $url" }
 
@@ -175,36 +188,29 @@ class RealPrivacyPassManager @Inject constructor(
             val body = response.body?.string() ?: return null
 
             val json = JSONObject(body)
-            json.optString("public_key").takeIf { it.isNotEmpty() }
-                ?: json.optString("publicKey").takeIf { it.isNotEmpty() }
-                ?: body
+            val cborBase64 = json.optString("cbor").takeIf { it.isNotEmpty() }
+            if (cborBase64 != null) {
+                return Base64.decode(cborBase64, Base64.DEFAULT)
+            }
+
+            logcat(ERROR) { "PrivacyPass: public-key response missing 'cbor' field" }
+            null
         } catch (e: Exception) {
             logcat(ERROR) { "PrivacyPass: public-key fetch error: ${e.message}" }
             null
         }
     }
 
-    private fun buildPrototypeIssuanceRequest(challenge: PrivacyPassChallenge): ByteArray {
-        // TODO: In production this would be a CBOR-encoded IssuanceRequest
-        // generated by the Rust act-core library via JNI.
-        // For prototype, send JSON that the test server can understand.
-        val json = JSONObject().apply {
-            put("token_type", challenge.tokenType)
-            put("challenge", challenge.challenge)
-            put("token_key", challenge.tokenKey)
-        }
-        return json.toString().toByteArray(Charsets.UTF_8)
-    }
-
-    private fun postIssuanceRequest(issuerUrl: String, body: ByteArray): String? {
+    private fun postIssuanceRequest(issuerUrl: String, requestCborBase64: String): String? {
         val url = "${issuerUrl.trimEnd('/')}/token-request"
-        logcat { "PrivacyPass: POST $url (${body.size} bytes)" }
+        logcat { "PrivacyPass: POST $url" }
 
         return try {
+            val json = JSONObject().apply { put("cbor", requestCborBase64) }
             val mediaType = "application/json".toMediaType()
             val request = Request.Builder()
                 .url(url)
-                .post(body.toRequestBody(mediaType))
+                .post(json.toString().toByteArray(Charsets.UTF_8).toRequestBody(mediaType))
                 .build()
             val response = okHttpClient.newCall(request).execute()
             if (!response.isSuccessful) {
@@ -213,31 +219,24 @@ class RealPrivacyPassManager @Inject constructor(
             }
             val responseBody = response.body?.string() ?: return null
 
-            val json = JSONObject(responseBody)
-            json.optString("token_response").takeIf { it.isNotEmpty() }
-                ?: json.optString("tokenResponse").takeIf { it.isNotEmpty() }
-                ?: Base64.encodeToString(responseBody.toByteArray(), Base64.NO_WRAP)
+            val responseJson = JSONObject(responseBody)
+            responseJson.optString("cbor").takeIf { it.isNotEmpty() }
         } catch (e: Exception) {
             logcat(ERROR) { "PrivacyPass: token-request error: ${e.message}" }
             null
         }
     }
 
-    private fun postSpendProof(credential: StoredCredential): String? {
-        val url = "${credential.issuerUrl.trimEnd('/')}/token-spend"
+    private fun postSpendProof(issuerUrl: String, spendProofCborBase64: String): String? {
+        val url = "${issuerUrl.trimEnd('/')}/token-spend"
         logcat { "PrivacyPass: POST $url" }
 
         return try {
-            // TODO: In production, the spend proof would be CBOR-encoded
-            // output from ActCore.proveSpend(). For prototype, send the
-            // issuance response back as a placeholder.
-            val json = JSONObject().apply {
-                put("issuance_response", credential.issuanceResponseBase64)
-            }
+            val json = JSONObject().apply { put("cbor", spendProofCborBase64) }
             val mediaType = "application/json".toMediaType()
             val request = Request.Builder()
                 .url(url)
-                .post(json.toString().toByteArray().toRequestBody(mediaType))
+                .post(json.toString().toByteArray(Charsets.UTF_8).toRequestBody(mediaType))
                 .build()
             val response = okHttpClient.newCall(request).execute()
             if (!response.isSuccessful) {
@@ -247,8 +246,7 @@ class RealPrivacyPassManager @Inject constructor(
             val responseBody = response.body?.string() ?: return null
 
             val responseJson = JSONObject(responseBody)
-            responseJson.optString("token").takeIf { it.isNotEmpty() }
-                ?: responseJson.optString("refund").takeIf { it.isNotEmpty() }
+            responseJson.optString("cbor").takeIf { it.isNotEmpty() }
         } catch (e: Exception) {
             logcat(ERROR) { "PrivacyPass: token-spend error: ${e.message}" }
             null
@@ -303,7 +301,7 @@ class RealPrivacyPassManager @Inject constructor(
 
     data class StoredCredential(
         val issuerUrl: String,
-        val issuanceResponseBase64: String,
-        val publicKeyBase64: String,
+        val tokenCbor: ByteArray,
+        val publicKeyCbor: ByteArray,
     )
 }
