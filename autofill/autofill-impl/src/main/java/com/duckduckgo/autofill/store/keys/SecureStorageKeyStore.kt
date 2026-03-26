@@ -61,7 +61,7 @@ interface SecureStorageKeyStore {
 
     suspend fun updateKey(
         keyName: String,
-        keyValue: ByteArray?,
+        keyValue: ByteArray,
     )
 
     suspend fun getKey(keyName: String): ByteArray?
@@ -167,7 +167,7 @@ class RealSecureStorageKeyStore(
     @SuppressLint("UseKtx")
     override suspend fun updateKey(
         keyName: String,
-        keyValue: ByteArray?,
+        keyValue: ByteArray,
     ) {
         withContext(dispatcherProvider.io()) {
             val harmonyFlags = harmonyFlags()
@@ -207,21 +207,19 @@ class RealSecureStorageKeyStore(
                     type = Daily(),
                 )
                 // Rollback legacy write so we don't cause a corrupted state with out of sync files
-                if (keyValue != null) {
-                    runCatching {
-                        legacyPrefs?.edit(commit = true) { remove(keyName) }
-                    }.onFailure { rollbackError ->
-                        pixel.fire(
-                            AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
-                            getPixelParams(
-                                keyName = keyName,
-                                throwable = rollbackError,
-                                useHarmony = harmonyFlags.useHarmony,
-                                readFromHarmony = harmonyFlags.readFromHarmony,
-                            ),
-                            type = Daily(),
-                        )
-                    }
+                runCatching {
+                    legacyPrefs?.edit(commit = true) { remove(keyName) }
+                }.onFailure { rollbackError ->
+                    pixel.fire(
+                        AutofillPixelNames.AUTOFILL_HARMONY_UPDATE_KEY_ROLLBACK_FAILED,
+                        getPixelParams(
+                            keyName = keyName,
+                            throwable = rollbackError,
+                            useHarmony = harmonyFlags.useHarmony,
+                            readFromHarmony = harmonyFlags.readFromHarmony,
+                        ),
+                        type = Daily(),
+                    )
                 }
                 throw SecureStorageException.InternalSecureStorageException(message, cause)
             }
@@ -245,7 +243,7 @@ class RealSecureStorageKeyStore(
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (keyValue != null && keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName, harmonyFlags.useHarmony)) {
+            if (keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName, harmonyFlags.useHarmony)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
@@ -257,11 +255,7 @@ class RealSecureStorageKeyStore(
             // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
             val legacyCommitted = runCatching {
                 val editor = legacyPrefs.edit()
-                if (keyValue == null) {
-                    editor.remove(keyName)
-                } else {
-                    editor.putString(keyName, keyValue.toByteString().base64())
-                }
+                editor.putString(keyName, keyValue.toByteString().base64())
                 editor.commit()
             }.getOrElse {
                 ensureActive()
@@ -274,11 +268,7 @@ class RealSecureStorageKeyStore(
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
                 val harmonyCommitted = runCatching {
                     val editor = harmonyPrefs.edit()
-                    if (keyValue == null) {
-                        editor.remove(keyName)
-                    } else {
-                        editor.putString(keyName, keyValue.toByteString().base64())
-                    }
+                    editor.putString(keyName, keyValue.toByteString().base64())
                     editor.commit()
                 }.getOrElse {
                     ensureActive()
