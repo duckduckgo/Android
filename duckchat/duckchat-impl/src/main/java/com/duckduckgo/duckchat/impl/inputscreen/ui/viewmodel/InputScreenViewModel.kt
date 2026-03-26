@@ -92,6 +92,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -103,6 +104,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
@@ -204,21 +206,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
-    private val defaultTogglePosition: StateFlow<DefaultTogglePosition> =
-        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
-            duckChat.observeDefaultTogglePosition()
-                .stateIn(appCoroutineScope, SharingStarted.Eagerly, DefaultTogglePosition.SEARCH)
-        } else {
-            MutableStateFlow(DefaultTogglePosition.SEARCH)
-        }
+    private val defaultTogglePosition = MutableStateFlow(DefaultTogglePosition.SEARCH)
 
-    private val lastUsedTogglePosition: StateFlow<String?> =
-        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
-            duckChat.observeLastUsedTogglePosition()
-                .stateIn(appCoroutineScope, SharingStarted.Eagerly, null)
-        } else {
-            MutableStateFlow(null)
-        }
+    private val lastUsedTogglePosition = MutableStateFlow<String?>(null)
 
     /**
      * This becomes true when either:
@@ -344,6 +334,21 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(showChatLogo = !hasChatSuggestions, chatSuggestionsVisible = hasChatSuggestions)
             }
         }.launchIn(viewModelScope)
+
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            // Use UNDISPATCHED so warm upstream StateFlows can synchronously populate these values
+            // before onViewCreated reads them for new-tab initialization.
+            viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                duckChat.observeDefaultTogglePosition().collect { position ->
+                    defaultTogglePosition.value = position
+                }
+            }
+            viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                duckChat.observeLastUsedTogglePosition().collect { position ->
+                    lastUsedTogglePosition.value = position
+                }
+            }
+        }
 
         if (duckChatFeature.aiChatSuggestions().isEnabled()) {
             duckChat.observeChatSuggestionsUserSettingEnabled()

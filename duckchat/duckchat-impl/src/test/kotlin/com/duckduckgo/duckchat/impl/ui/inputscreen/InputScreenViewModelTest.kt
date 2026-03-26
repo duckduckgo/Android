@@ -23,6 +23,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -51,11 +52,14 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -131,13 +135,17 @@ class InputScreenViewModelTest {
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
         }
 
-    private fun createViewModel(currentOmnibarText: String = ""): InputScreenViewModel =
+    private fun createViewModel(
+        currentOmnibarText: String = "",
+        appCoroutineScope: CoroutineScope = coroutineRule.testScope,
+        dispatchers: DispatcherProvider = coroutineRule.testDispatcherProvider,
+    ): InputScreenViewModel =
         InputScreenViewModel(
             currentOmnibarText = currentOmnibarText,
             autoCompleteFactory = autoCompleteFactory,
-            dispatchers = coroutineRule.testDispatcherProvider,
+            dispatchers = dispatchers,
             history = history,
-            appCoroutineScope = coroutineRule.testScope,
+            appCoroutineScope = appCoroutineScope,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
             pixel = pixel,
@@ -2891,6 +2899,20 @@ class InputScreenViewModelTest {
             whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI.name))
 
             val viewModel = createViewModel()
+
+            assertEquals(DefaultTogglePosition.DUCK_AI, viewModel.getNewTabTogglePosition())
+        }
+
+    @Test
+    fun `getNewTabTogglePosition reads latest values without waiting for app scope dispatch`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(MutableStateFlow(DefaultTogglePosition.LAST_USED))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(MutableStateFlow(DefaultTogglePosition.DUCK_AI.name))
+
+            val testDispatcher = StandardTestDispatcher(testScheduler)
+            val viewModel = createViewModel(appCoroutineScope = TestScope(testDispatcher))
 
             assertEquals(DefaultTogglePosition.DUCK_AI, viewModel.getNewTabTogglePosition())
         }
