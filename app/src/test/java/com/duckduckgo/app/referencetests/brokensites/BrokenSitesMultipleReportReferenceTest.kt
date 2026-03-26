@@ -44,7 +44,6 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
-import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
