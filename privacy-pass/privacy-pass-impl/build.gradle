@@ -35,8 +35,6 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':privacy-pass-api')
-    implementation project(path: ':content-scope-scripts-api')
-    implementation project(path: ':js-messaging-api')
 
     // Dagger
     implementation Google.dagger
@@ -44,6 +42,9 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation "com.squareup.logcat:logcat:_"
+
+    // HTTP client for issuer communication
+    implementation Square.OkHttp3.okHttp
 
     // Testing dependencies
     testImplementation Testing.junit4

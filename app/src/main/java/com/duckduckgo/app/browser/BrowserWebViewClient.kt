@@ -83,6 +83,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacypass.api.PrivacyPassManager
+import com.duckduckgo.privacypass.api.PrivacyPassResult
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.*
@@ -135,6 +137,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
+    private val privacyPassManager: PrivacyPassManager,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -864,13 +867,39 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         super.onReceivedHttpError(view, request, errorResponse)
         view?.url?.let {
-            // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationErrorReceived(it)
         }
-        if (request?.isForMainFrame == true) {
-            errorResponse?.let {
-                logcat { "recordHttpErrorCode for ${request.url}" }
-                webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
+        if (request?.isForMainFrame == true && errorResponse != null) {
+            logcat { "recordHttpErrorCode for ${request.url}" }
+            webViewClientListener?.recordHttpErrorCode(errorResponse.statusCode, request.url.toString())
+
+            val responseHeaders = errorResponse.responseHeaders.orEmpty()
+            if (privacyPassManager.isPrivateTokenChallenge(errorResponse.statusCode, responseHeaders)) {
+                val wwwAuth = responseHeaders.entries.firstOrNull {
+                    it.key.equals("WWW-Authenticate", ignoreCase = true)
+                }?.value ?: return
+
+                logcat { "PrivacyPass: 401 + PrivateToken challenge detected for ${request.url}" }
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    val result = privacyPassManager.handlePrivateTokenChallenge(
+                        originalUrl = request.url.toString(),
+                        wwwAuthenticateHeader = wwwAuth,
+                    )
+                    when (result) {
+                        is PrivacyPassResult.Success -> {
+                            logcat { "PrivacyPass: retrying ${request.url} with authorization header" }
+                            withContext(dispatcherProvider.main()) {
+                                view?.loadUrl(
+                                    request.url.toString(),
+                                    mapOf("Authorization" to result.authorizationHeader),
+                                )
+                            }
+                        }
+                        is PrivacyPassResult.Failure -> {
+                            logcat { "PrivacyPass: challenge handling failed — ${result.reason}" }
+                        }
+                    }
+                }
             }
         }
     }

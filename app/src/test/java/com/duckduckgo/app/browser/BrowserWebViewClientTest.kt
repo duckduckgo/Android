@@ -81,6 +81,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacypass.api.PrivacyPassManager
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import junit.framework.TestCase.assertEquals
@@ -173,6 +174,7 @@ class BrowserWebViewClientTest {
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()
     private val mockAppSchemeInterceptionFeature: AppSchemeInterceptionFeature = mock()
+    private val mockPrivacyPassManager: PrivacyPassManager = mock()
     private val appSchemeInterceptionEnabledFlow = MutableStateFlow(true)
 
     @Before
@@ -220,6 +222,7 @@ class BrowserWebViewClientTest {
                     mockDuckChat,
                     mockContentScopeExperiments,
                     mockAppSchemeInterceptionFeature,
+                    mockPrivacyPassManager,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

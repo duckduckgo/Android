@@ -16,30 +16,26 @@
 
 package com.duckduckgo.privacypass.api
 
-data class PrivacyPassCredential(
-    val credentialId: String,
-    val credits: Int,
-)
+sealed class PrivacyPassResult {
+    data class Success(val authorizationHeader: String) : PrivacyPassResult()
+    data class Failure(val reason: String) : PrivacyPassResult()
+}
 
-data class PrivacyPassSpendResult(
-    val credentialId: String,
-    val remainingCredits: Int,
-    val token: String,
-)
-
-data class PrivacyPassBalanceResult(
-    val credentialId: String,
-    val credits: Int,
-)
-
-data class PrivacyPassRedeemResult(
-    val success: Boolean,
-    val message: String,
+data class PrivacyPassChallenge(
+    val tokenType: Int,
+    val issuerUrl: String,
+    val challenge: String,
+    val tokenKey: String,
 )
 
 interface PrivacyPassManager {
-    suspend fun issueCredential(issuer: String, credits: Int): PrivacyPassCredential
-    suspend fun spendCredits(credentialId: String, amount: Int): PrivacyPassSpendResult
-    suspend fun balance(credentialId: String): PrivacyPassBalanceResult
-    suspend fun redeemToken(token: String): PrivacyPassRedeemResult
+
+    fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean
+
+    suspend fun handlePrivateTokenChallenge(
+        originalUrl: String,
+        wwwAuthenticateHeader: String,
+    ): PrivacyPassResult
+
+    fun parseChallenge(wwwAuthenticateHeader: String): PrivacyPassChallenge?
 }
