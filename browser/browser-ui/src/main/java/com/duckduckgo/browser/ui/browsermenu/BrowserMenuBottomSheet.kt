@@ -401,6 +401,8 @@ class BrowserMenuBottomSheet(
                         .load(serpLogoUrl)
                         .placeholder(drawable.ic_dax_icon)
                         .into(binding.menuHeader.headerFavicon)
+                } else if (pageContextHeaderState.isDuckDuckGo) {
+                    binding.menuHeader.headerFavicon.setImageResource(drawable.ic_dax_icon)
                 } else {
                     lifecycle.coroutineScope.launch {
                         faviconManager.loadToViewFromLocalWithPlaceholder(

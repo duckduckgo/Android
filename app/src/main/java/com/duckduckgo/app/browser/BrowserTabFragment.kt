@@ -1513,6 +1513,7 @@ class BrowserTabFragment :
             viewState = viewState,
             customTabsMode = tabDisplayedInCustomTabScreen,
             title = currentSite?.title,
+            siteUrl = currentSite?.url,
             shortUrl = currentSite?.url?.let { addressDisplayFormatter.getShortUrl(it) },
             tabId = tabId,
             omnibarText = omnibarState?.omnibarText,

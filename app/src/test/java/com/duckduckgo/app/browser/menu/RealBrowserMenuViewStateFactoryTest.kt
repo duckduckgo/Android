@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.menu
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -49,13 +50,14 @@ class RealBrowserMenuViewStateFactoryTest {
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
     }
 
     @Test
