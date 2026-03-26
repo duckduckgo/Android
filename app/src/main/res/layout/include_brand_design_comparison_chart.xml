@@ -134,7 +134,7 @@
                 android:padding="8dp"
                 android:scaleX="0"
                 android:scaleY="0"
-                app:srcCompat="@drawable/ic_check_green_24"
+                app:srcCompat="@drawable/avd_check_green_24"
                 tools:alpha="1"
                 tools:scaleX="1"
                 tools:scaleY="1" />
@@ -144,6 +144,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
             android:minHeight="56dp"
             android:orientation="horizontal"
@@ -179,6 +180,60 @@
                 android:layout_marginEnd="4dp" />
 
             <ImageView
+                android:id="@+id/check5"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:alpha="0"
+                android:importantForAccessibility="no"
+                android:padding="8dp"
+                android:scaleX="0"
+                android:scaleY="0"
+                app:srcCompat="@drawable/avd_check_green_24"
+                tools:alpha="1"
+                tools:scaleX="1"
+                tools:scaleY="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/background_comparison_chart_row_highlighted"
+            android:minHeight="56dp"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/temp_ic_onboarding_shield" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/preOnboardingComparisonChartItem2"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:importantForAccessibility="no"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_cross_recolorable_gray60_24" />
+
+            <com.duckduckgo.common.ui.view.divider.VerticalDivider
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="4dp" />
+
+            <ImageView
                 android:id="@+id/check2"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -187,7 +242,7 @@
                 android:padding="8dp"
                 android:scaleX="0"
                 android:scaleY="0"
-                app:srcCompat="@drawable/ic_check_green_24"
+                app:srcCompat="@drawable/avd_check_green_24"
                 tools:alpha="1"
                 tools:scaleX="1"
                 tools:scaleY="1" />
@@ -199,7 +254,6 @@
             android:layout_height="wrap_content"
             android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
-            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:minHeight="56dp"
             android:orientation="horizontal"
             android:paddingVertical="8dp"
@@ -217,7 +271,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="@string/preOnboardingBrandDesignComparisonChartItem3"
+                android:text="@string/preOnboardingComparisonChartItem3"
                 android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
             <ImageView
@@ -242,7 +296,7 @@
                 android:padding="8dp"
                 android:scaleX="0"
                 android:scaleY="0"
-                app:srcCompat="@drawable/ic_check_green_24"
+                app:srcCompat="@drawable/avd_check_green_24"
                 tools:alpha="1"
                 tools:scaleX="1"
                 tools:scaleY="1" />
@@ -253,6 +307,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:minHeight="56dp"
             android:orientation="horizontal"
             android:paddingVertical="8dp"
@@ -270,6 +325,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
+                android:background="@drawable/background_comparison_chart_row_highlighted"
                 android:text="@string/preOnboardingComparisonChartItem4"
                 android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
 
@@ -295,63 +351,7 @@
                 android:padding="8dp"
                 android:scaleX="0"
                 android:scaleY="0"
-                app:srcCompat="@drawable/ic_check_green_24"
-                tools:alpha="1"
-                tools:scaleX="1"
-                tools:scaleY="1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/background_comparison_chart_row_highlighted"
-            android:gravity="center_vertical"
-            android:background="@drawable/background_comparison_chart_row_highlighted"
-            android:minHeight="56dp"
-            android:orientation="horizontal"
-            android:paddingVertical="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="4dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_fire" />
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:background="@drawable/background_comparison_chart_row_highlighted"
-                android:text="@string/preOnboardingBrandDesignComparisonChartItem5"
-                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.ChartComparison" />
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:importantForAccessibility="no"
-                android:padding="8dp"
-                app:srcCompat="@drawable/ic_cross_recolorable_gray60_24" />
-
-            <com.duckduckgo.common.ui.view.divider.VerticalDivider
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="4dp" />
-
-            <ImageView
-                android:id="@+id/check5"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:alpha="0"
-                android:importantForAccessibility="no"
-                android:padding="8dp"
-                android:scaleX="0"
-                android:scaleY="0"
-                app:srcCompat="@drawable/ic_check_green_24"
+                app:srcCompat="@drawable/avd_check_green_24"
                 tools:alpha="1"
                 tools:scaleX="1"
                 tools:scaleY="1" />
