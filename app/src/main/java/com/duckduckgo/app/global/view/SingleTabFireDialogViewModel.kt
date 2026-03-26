@@ -56,7 +56,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -103,8 +102,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val state = viewState.filterIsInstance<ViewState.Loaded>().first()
-            onShow(state.isSiteDataSubtitleVisible)
+            val state = viewState.filterIsInstance<ViewState.Loaded>().firstOrNull()
+            onShow(state?.isSiteDataSubtitleVisible ?: false)
         }
     }
 
