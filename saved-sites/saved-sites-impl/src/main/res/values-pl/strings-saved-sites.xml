@@ -30,13 +30,13 @@
         <item quantity="many">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
         <item quantity="other">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innej witryny, ponieważ niektóre ich pola przekraczają limit znaków.</item>
     </plurals>
-    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
 
     <!-- Content Descriptions -->
     <string name="bookmarksSearchMenuContentDescription">Wyszukaj zakładki</string>
     <string name="bookmarksAddFolderMenuContentDescription">Dodaj folder</string>
     <string name="bookmarksMenuContentDescription">Więcej opcji</string>
-    <string name="newTabFavoritesToggleContentDescription">Przełącz widoczność ulubionych</string>
+    <string name="newTabFavoritesToggleContentDescription">Przełącz widoczność zakładek</string>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>
@@ -130,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importuj z Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Wybierz plik zakładek…</string>
     <string name="bookmarksImportDialogClose">Zamknij</string>
+
 </resources>
