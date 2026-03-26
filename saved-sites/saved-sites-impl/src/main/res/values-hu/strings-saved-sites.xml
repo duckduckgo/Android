@@ -28,13 +28,13 @@
         <item quantity="one">A(z) %1$s webhely könyvjelzője nem szinkronizálható, mert egyik mezője meghaladja a karakterkorlátot.</item>
         <item quantity="other">A(z) %1$s és %2$d másik webhely könyvjelzői nem szinkronizálhatók, mert egyes mezőik meghaladják a karakterkorlátot.</item>
     </plurals>
-    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
 
     <!-- Content Descriptions -->
     <string name="bookmarksSearchMenuContentDescription">Könyvjelzők keresése</string>
     <string name="bookmarksAddFolderMenuContentDescription">Mappa hozzáadása</string>
     <string name="bookmarksMenuContentDescription">További lehetőségek</string>
-    <string name="newTabFavoritesToggleContentDescription">Kedvencek láthatóságának váltása</string>
+    <string name="newTabFavoritesToggleContentDescription">Kedvencek láthatóságának be-/kikapcsolása</string>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
@@ -122,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importálás a Google-ból</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Válaszd ki a könyvjelzőfájlt…</string>
     <string name="bookmarksImportDialogClose">Bezárás</string>
+
 </resources>
