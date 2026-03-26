@@ -228,6 +228,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         val useTopBar = inputScreenConfigResolver.useTopBar()
 
         configureHatchView(params?.showReturnHatch, useTopBar)
+
         val separatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputScreenContentSeparatorHeight)
         contentSeparator =
             View(context).apply {
@@ -267,8 +268,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         if (!useTopBar) {
             binding.autoCompleteBottomFadeContainer.isVisible = false
             binding.chatSuggestionsBottomFadeContainer.isVisible = false
-            binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin -= resources.getDimensionPixelSize(R.dimen.inputScreenLogoBottomBarTopMargin)
+        }
+
+        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = if (useTopBar) {
+                resources.getDimensionPixelSize(CommonR.dimen.keyline_7)
+            } else {
+                resources.getDimensionPixelSize(R.dimen.inputScreenLogoBottomBarTopMargin)
             }
         }
 
