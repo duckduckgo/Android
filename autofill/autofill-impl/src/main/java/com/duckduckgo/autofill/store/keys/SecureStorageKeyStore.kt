@@ -94,12 +94,14 @@ class RealSecureStorageKeyStore(
         val readFromHarmony: Boolean,
     )
 
-    private fun harmonyFlags(): HarmonyFlags {
-        val useHarmonyFlag = autofillFeature.useHarmony().isEnabled()
-        return HarmonyFlags(
-            useHarmony = useHarmonyFlag,
-            readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()),
-        )
+    private suspend fun harmonyFlags(): HarmonyFlags {
+        return withContext(dispatcherProvider.io()) {
+            val useHarmonyFlag = autofillFeature.useHarmony().isEnabled()
+            HarmonyFlags(
+                useHarmony = useHarmonyFlag,
+                readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()),
+            )
+        }
     }
 
     private val encryptedPreferencesDeferred: Deferred<SharedPreferences?> by lazy {
