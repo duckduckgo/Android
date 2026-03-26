@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.launchIn
@@ -47,6 +48,7 @@ class NativeInputCallbacks(
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
+    val onVoiceSearchPressed: (isChatTab: Boolean) -> Unit = {},
 )
 
 interface NativeInputManager {
@@ -59,7 +61,8 @@ interface NativeInputManager {
         query: String = "",
         callbacks: NativeInputCallbacks,
     )
-    fun hideNativeInput(): Boolean
+    fun hideNativeInput(animate: Boolean = true): Boolean
+    fun handleDuckAiVoiceResult(query: String)
     fun onKeyboardVisibilityChanged(isVisible: Boolean)
 }
 
@@ -67,6 +70,7 @@ interface NativeInputManager {
 class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
     private val animator: NativeInputAnimator,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -92,7 +96,19 @@ class RealNativeInputManager @Inject constructor(
 
     override fun isNativeInputEnabled(): Boolean = isNativeInputFieldEnabled
 
-    override fun hideNativeInput(): Boolean {
+    override fun handleDuckAiVoiceResult(query: String) {
+        val widget = widgetFrom(rootView)
+        if (widget != null) {
+            if (!widget.isChatTabSelected()) {
+                widget.selectChatTab()
+            }
+            widget.submitMessage(query)
+        } else {
+            duckChat.openDuckChatWithAutoPrompt(query)
+        }
+    }
+
+    override fun hideNativeInput(animate: Boolean): Boolean {
         if (!isNativeInputFieldEnabled) return false
 
         val widgetView = rootView.findViewById<View?>(R.id.inputModeTopRoot)
@@ -101,6 +117,18 @@ class RealNativeInputManager @Inject constructor(
 
         rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
         rootView.findViewById<View?>(R.id.focusedView)?.gone()
+
+        if (!animate) {
+            animator.cancelAnimation()
+            isExiting = false
+            omnibarController.restore()
+            omnibarController.show()
+            removeWidget()
+            if (omnibarController.isBrowserMode()) {
+                hideNtp()
+            }
+            return !omnibarController.isDuckAiMode()
+        }
 
         val card = widgetView.findViewById<View?>(R.id.inputModeWidgetCard)
         val omnibarCard = omnibarController.getCardView()
@@ -371,6 +399,10 @@ class RealNativeInputManager @Inject constructor(
             onStopTapped = callbacks.onStopTapped
             bindTabCount(lifecycleOwner, tabs.map { it.size })
             hideMainButtons()
+            if (voiceSearchAvailability.isVoiceSearchAvailable) {
+                setVoiceButtonVisible(true)
+                onVoiceClick = { callbacks.onVoiceSearchPressed(true) }
+            }
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)

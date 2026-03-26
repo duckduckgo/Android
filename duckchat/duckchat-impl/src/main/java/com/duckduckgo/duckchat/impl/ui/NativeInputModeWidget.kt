@@ -57,6 +57,7 @@ interface NativeInputWidget {
     var onChatSelected: (() -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
+    var onVoiceClick: (() -> Unit)?
 
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
@@ -67,6 +68,8 @@ interface NativeInputWidget {
     fun selectChatTab()
     fun isChatTabSelected(): Boolean
     fun hideMainButtons()
+    fun setVoiceButtonVisible(visible: Boolean)
+    fun submitMessage(message: String?)
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
