@@ -542,15 +542,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun configureHatchView(
         showReturnHatch: Boolean?,
-        useTopBar: Boolean
+        useTopBar: Boolean,
     ) {
         binding.inputScreenHatch.isVisible = showReturnHatch ?: false
         binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            topMargin = if (useTopBar) {
-                resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
-            } else {
-                resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
-            }
+            topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
         }
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
@@ -562,9 +558,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
-                    if (useTopBar && visible) {
+                    if (useTopBar) {
                         binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            topMargin = resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
+                            topMargin = if (visible) {
+                                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
+                            } else {
+                                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarTopMargin)
+                            }
                         }
                     }
                 }
