@@ -266,13 +266,16 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `onUserAuthCancelled aborts the flow`() = runTest {
+    fun `onUserAuthCancelled finishes flow with cancelled`() = runTest {
         whenever(wideEventClient.getFlowIds(any()))
             .thenReturn(Result.success(listOf(1L)))
 
         wideEvent.onUserAuthCancelled()
 
-        verify(wideEventClient).flowAbort(wideEventId = 1L)
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+        )
     }
 
     @Test
