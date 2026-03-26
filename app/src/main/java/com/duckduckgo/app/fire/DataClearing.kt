@@ -39,7 +39,7 @@ import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -92,15 +92,13 @@ class DataClearing @Inject constructor(
     }
 
     private suspend fun getNewTabUrl(tabUrl: String?): String? {
-        val uri = tabUrl?.toUri()
-        if (uri != null && duckChat.isDuckChatUrl(uri)) {
-            return duckChat.getDuckChatUrl("", autoPrompt = false)
+        val option = showOnAppLaunchOptionDataStore.optionFlow.firstOrNull()
+        val isDuckChat = tabUrl?.toUri()?.let { duckChat.isDuckChatUrl(it) } == true
+        return when {
+            isDuckChat -> duckChat.getDuckChatUrl("", autoPrompt = false)
+            option is ShowOnAppLaunchOption.SpecificPage -> option.url
+            else -> null
         }
-        val option = showOnAppLaunchOptionDataStore.optionFlow.first()
-        if (option is ShowOnAppLaunchOption.SpecificPage) {
-            return option.url
-        }
-        return null
     }
 
     private suspend fun clearContextualChatDataIfNeeded(tabId: String) {
