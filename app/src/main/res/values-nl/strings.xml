@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Tabbladen, sitegegevens en chats verwijderen?</string>
     <string name="singleTabFireDialogDeleteAll">Alles verwijderen</string>
     <string name="singleTabFireDialogDeleteThisTab">Dit tabblad verwijderen</string>
-    <string name="singleTabFireDialogDeleteChat">Chat verwijderen</string>
-    <string name="singleTabFireDialogTitleDuckAi">Deze chat verwijderen?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Deze chat verwijderen</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Als je \'Alles verwijderen\' kiest, wordt je Duck.ai-chatgeschiedenis niet verwijderd.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Als je sitegegevens verwijdert, kun je uitloggen bij je accounts.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Hiermee worden lopende downloads geannuleerd.</string>
     <plurals name="tabsClearedSnackbarMessage">

@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Törlöd a lapokat, a webhelyadatokat és a csevegéseket?</string>
     <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
     <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
-    <string name="singleTabFireDialogDeleteChat">Csevegés törlése</string>
-    <string name="singleTabFireDialogTitleDuckAi">Csevegés törlése?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Az „Összes törlése” lehetőség választása esetén a Duck.ai csevegési előzményei nem törlődnek.</string>
     <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
     <plurals name="tabsClearedSnackbarMessage">

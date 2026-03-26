@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Slet faner, webstedsdata og chats?</string>
     <string name="singleTabFireDialogDeleteAll">Slet alle</string>
     <string name="singleTabFireDialogDeleteThisTab">Slet denne fane</string>
-    <string name="singleTabFireDialogDeleteChat">Slet chat</string>
-    <string name="singleTabFireDialogTitleDuckAi">Slet denne chat?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Slet denne chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Slet alle\" sletter ikke din Duck.ai-chathistorik.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Sletning af webstedsdata kan logge dig ud af konti.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dette annullerer igangværende downloads.</string>
     <plurals name="tabsClearedSnackbarMessage">

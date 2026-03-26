@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">¿Eliminar pestañas, datos del sitio y chats?</string>
     <string name="singleTabFireDialogDeleteAll">Eliminar todo</string>
     <string name="singleTabFireDialogDeleteThisTab">Eliminar esta pestaña</string>
-    <string name="singleTabFireDialogDeleteChat">Borrar chat</string>
-    <string name="singleTabFireDialogTitleDuckAi">¿Borrar este chat?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Borrar este chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">«Eliminar todo» no borrará tu historial de chat de Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar datos del sitio puede hacer que cierres sesión en tus cuentas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta acción cancelará las descargas en curso.</string>
     <plurals name="tabsClearedSnackbarMessage">

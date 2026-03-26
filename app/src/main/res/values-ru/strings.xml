@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Удалить вкладки, данные сайта и чаты?</string>
     <string name="singleTabFireDialogDeleteAll">Удалить все</string>
     <string name="singleTabFireDialogDeleteThisTab">Удалить эту вкладку</string>
-    <string name="singleTabFireDialogDeleteChat">Удалить чат</string>
-    <string name="singleTabFireDialogTitleDuckAi">Удалить этот чат?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Удалить этот чат</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">Функция «Удалить все» не стирает историю чатов с Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Удаление данных сайтов может сопровождаться выходом из учетных записей.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Текущие загрузки будут отменены.</string>
     <plurals name="tabsClearedSnackbarMessage">

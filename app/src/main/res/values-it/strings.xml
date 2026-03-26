@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Eliminare schede, dati del sito e chat?</string>
     <string name="singleTabFireDialogDeleteAll">Elimina tutto</string>
     <string name="singleTabFireDialogDeleteThisTab">Elimina questa scheda</string>
-    <string name="singleTabFireDialogDeleteChat">Elimina chat</string>
-    <string name="singleTabFireDialogTitleDuckAi">Eliminare questa chat?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Elimina questa chat</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Elimina tutto\" non elimina la cronologia chat di Duck.ai.</string>
     <string name="singleTabFireDialogSubtitleSiteData">L\'eliminazione dei dati del sito può comportare la disconnessione dagli account.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Questa operazione annullerà i download in corso.</string>
     <plurals name="tabsClearedSnackbarMessage">

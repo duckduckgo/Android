@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Izbrisati kartice, podatke mrežne lokacije i čavrljanja?</string>
     <string name="singleTabFireDialogDeleteAll">Izbriši sve</string>
     <string name="singleTabFireDialogDeleteThisTab">Izbriši ovu karticu</string>
-    <string name="singleTabFireDialogDeleteChat">Izbriši čavrljanje</string>
-    <string name="singleTabFireDialogTitleDuckAi">Izbrisati ovo čavrljanje?</string>
+    <string name="singleTabFireDialogDeleteThisChat">Izbriši ovo čavrljanje</string>
+    <string name="singleTabFireDialogSubtitleDuckAi">\"Izbriši sve\" neće izbrisati tvoju Duck.ai povijest čavrljanja.</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
     <plurals name="tabsClearedSnackbarMessage">
