@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -33,7 +34,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Compa
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Assert.assertEquals

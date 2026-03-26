@@ -17,13 +17,13 @@
 package com.duckduckgo.tabs.tabs.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter
 import com.duckduckgo.app.tabs.ui.TabSwitcherListener
 import com.duckduckgo.app.tabs.ui.TrackerCountAnimator
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Test
 import org.junit.runner.RunWith

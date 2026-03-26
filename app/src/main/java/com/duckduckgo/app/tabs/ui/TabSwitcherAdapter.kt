@@ -39,9 +39,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
-import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemDuckAiTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
@@ -80,7 +80,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -106,6 +105,7 @@ class TabSwitcherAdapter(
 
     @Volatile
     private var isDragging: Boolean = false
+
     @Volatile
     var isFullUrlEnabled: Boolean = true
     private var layoutType: LayoutType = GRID
