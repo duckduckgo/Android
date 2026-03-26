@@ -28,6 +28,12 @@
         <item quantity="one">Sinu järjehoidjat %1$s jaoks ei saa sünkroonida, sest üks selle väljadest ületab tähemärgipiirangu.</item>
         <item quantity="other">Sinu järjehoidjaid %1$s ja %2$d muu saidi jaoks ei saa sünkroonida, kuna mõned nende väljad ületavad tähemärgipiirangu.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Otsi järjehoidjaid</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Lisa kaust</string>
+    <string name="bookmarksMenuContentDescription">Veel valikuid</string>
+    <string name="newTabFavoritesToggleContentDescription">Lemmikute nähtavuse sisse/välja lülitamine</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Halda järjehoidjaid</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -117,9 +123,4 @@
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vali järjehoidjate fail...</string>
     <string name="bookmarksImportDialogClose">Sulge</string>
 
-    <!-- Content Descriptions -->
-    <string name="bookmarksSearchMenuContentDescription">Otsi järjehoidjaid</string>
-    <string name="bookmarksAddFolderMenuContentDescription">Lisa kaust</string>
-    <string name="bookmarksMenuContentDescription">Veel valikuid</string>
-    <string name="newTabFavoritesToggleContentDescription">Lülita lemmikute nähtavust</string>
 </resources>
