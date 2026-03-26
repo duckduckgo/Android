@@ -258,8 +258,8 @@
     <string name="netpExclusionListLabelAutoExclude">Несъвместими с VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Някои приложения, като банкови или стрийминг приложения, не работят добре с VPN. Когато тази настройка е активирана, ние автоматично ще изключим тези приложения.</string>
 
-
     <!-- Content Descriptions -->
     <string name="netpCloseButtonContentDescription">Затваряне</string>
     <string name="netpVpnIndicatorContentDescription">Индикатор за състоянието на VPN</string>
+
 </resources>
