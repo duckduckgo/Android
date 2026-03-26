@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Pagina-inhoud automatisch verzenden</string>
     <string name="duckAIContextualAutomaticContextMessage">Pagina-inhoud automatisch naar Duck.ai verzenden</string>
     <string name="duckAIContextualAttachPageContent">Pagina-inhoud bijvoegen</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Gegevens wissen</string>
+    <string name="duckChatBrowserMenuContentDescription">Meer opties</string>
 </resources>

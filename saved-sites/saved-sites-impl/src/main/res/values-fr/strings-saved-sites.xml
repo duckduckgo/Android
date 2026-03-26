@@ -28,6 +28,12 @@
         <item quantity="one">Votre favori pour %1$s ne peut pas être synchronisé car l\'un de ses champs dépasse la limite de caractères.</item>
         <item quantity="other">Vos favoris pour %1$s et %2$d autres sites ne peuvent pas être synchronisés car certains de leurs champs dépassent la limite de caractères.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Rechercher des favoris</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Ajouter le dossier</string>
+    <string name="bookmarksMenuContentDescription">Plus d\'options</string>
+    <string name="newTabFavoritesToggleContentDescription">Activer/Désactiver la visibilité des favoris</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gérer les favoris</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer depuis Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Sélectionner le fichier de signets…</string>
     <string name="bookmarksImportDialogClose">Fermer</string>
+
 </resources>

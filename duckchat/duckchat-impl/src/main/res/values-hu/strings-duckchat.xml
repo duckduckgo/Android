@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Oldal tartalmának automatikus küldése</string>
     <string name="duckAIContextualAutomaticContextMessage">Az oldal tartalmának automatikus küldése a Duck.ai részére</string>
     <string name="duckAIContextualAttachPageContent">Oldal tartalmának csatolása</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Adatok törlése</string>
+    <string name="duckChatBrowserMenuContentDescription">További lehetőségek</string>
 </resources>

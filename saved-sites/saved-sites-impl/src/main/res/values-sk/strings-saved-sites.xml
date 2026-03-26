@@ -30,6 +30,12 @@
         <item quantity="many">Vaše záložky pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
         <item quantity="other">Vaše záložky pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Vyhľadávanie v záložkách</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Pridať priečinok</string>
+    <string name="bookmarksMenuContentDescription">Ďalšie možnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Zmeniť viditeľnosť obľúbených položiek</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Správa záložiek</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importovať z Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vyber súbor záložiek…</string>
     <string name="bookmarksImportDialogClose">Zatvoriť</string>
+
 </resources>

@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Trimite automat conținutul paginii</string>
     <string name="duckAIContextualAutomaticContextMessage">Trimite automat conținutul paginii către Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Atașează conținutul paginii</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Ștergere date</string>
+    <string name="duckChatBrowserMenuContentDescription">Mai multe opțiuni</string>
 </resources>

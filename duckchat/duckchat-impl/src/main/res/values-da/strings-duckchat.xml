@@ -99,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Send automatisk sideindhold</string>
     <string name="duckAIContextualAutomaticContextMessage">Send automatisk sideindhold til Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Vedhæft sideindhold</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Ryd data</string>
+    <string name="duckChatBrowserMenuContentDescription">Flere muligheder</string>
 </resources>
