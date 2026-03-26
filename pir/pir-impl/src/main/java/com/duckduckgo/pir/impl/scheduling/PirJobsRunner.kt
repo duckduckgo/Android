@@ -77,7 +77,8 @@ class RealPirJobsRunner @Inject constructor(
 
         // Multiple profile support (includes deprecated profiles as we need to process opt-out for them if there are extracted profiles)
         val profileQueries = obtainProfiles()
-        emitStartPixel(context, executionType, profileQueries.size)
+        val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
+        emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
 
         // Clean up any already running scan jobs before starting new ones as this function can be called
         // while previous instance is still running in case of profile edits.
@@ -89,8 +90,6 @@ class RealPirJobsRunner @Inject constructor(
         // and creating opt-out jobs for them, which we don't want.
         // We only want to continue running opt-outs and confirmation scans for extracted profiles that were found up until the point of profile edit.
         pirScan.stop()
-
-        val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
 
         if (profileQueries.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
@@ -154,12 +153,13 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
         profileQueryCount: Int,
+        brokerCount: Int,
     ) {
         if (executionType == MANUAL) {
             val isPowerSavingEnabled = runCatching {
                 (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode
             }.getOrDefault(false)
-            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount)
+            pixelSender.reportManualScanStarted(isPowerSavingEnabled, profileQueryCount, brokerCount)
         } else {
             pixelSender.reportScheduledScanStarted()
         }

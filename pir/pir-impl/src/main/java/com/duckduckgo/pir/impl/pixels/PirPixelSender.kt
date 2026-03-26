@@ -99,10 +99,12 @@ interface PirPixelSender {
      *
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
     fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
+        brokerCount: Int,
     )
 
     /**
@@ -619,10 +621,12 @@ class RealPirPixelSender @Inject constructor(
     override fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
         profileQueryCount: Int,
+        brokerCount: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
@@ -1519,6 +1523,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_BATTERY_OPTIMIZATIONS = "battery-optimizations"
         private const val PARAM_KEY_TOTAL_SCAN = "total_scan"
         private const val PARAM_KEY_TOTAL_OPTOUT = "total_optout"
+        private const val PARAM_KEY_BROKER_COUNT = "broker_count"
         private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
     }
 }

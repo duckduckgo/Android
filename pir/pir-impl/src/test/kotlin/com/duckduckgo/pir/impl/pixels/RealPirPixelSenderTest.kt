@@ -46,7 +46,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportManualScanStartedThenFiresPixelWithPowerSavingParam() = runTest {
-        testee.reportManualScanStarted(isPowerSavingEnabled = true, profileQueryCount = 3)
+        testee.reportManualScanStarted(isPowerSavingEnabled = true, profileQueryCount = 3, brokerCount = 10)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender, times(2)).fire(
@@ -60,6 +60,8 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["power_saving"] == "true")
         assert(paramsCaptor.firstValue.containsKey("profile_queries"))
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
+        assert(paramsCaptor.firstValue.containsKey("broker_count"))
+        assert(paramsCaptor.firstValue["broker_count"] == "10")
     }
 
     @Test
