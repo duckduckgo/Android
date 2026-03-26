@@ -544,10 +544,17 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         showReturnHatch: Boolean?,
         useTopBar: Boolean,
     ) {
-        binding.inputScreenHatch.isVisible = showReturnHatch ?: false
-        binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
+        val shouldShowHatch = showReturnHatch ?: false
+
+        binding.inputScreenHatch.isVisible = shouldShowHatch
+        if (shouldShowHatch) {
+            binding.inputScreenHatch.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = resources.getDimensionPixelSize(CommonR.dimen.keyline_empty)
+            }
+        } else {
+            restoreLogoTopMargin(shouldShowHatch)
         }
+
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
@@ -558,18 +565,25 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 }
 
                 override fun onHatchRendered(visible: Boolean) {
-                    if (useTopBar) {
-                        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            topMargin = if (visible) {
-                                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
-                            } else {
-                                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarTopMargin)
-                            }
+                    logcat { "Hatch: onHatchRendered $visible shouldShowHatch $shouldShowHatch" }
+                    if (shouldShowHatch) {
+                        if (useTopBar) {
+                            restoreLogoTopMargin(visible)
                         }
                     }
                 }
             },
         )
+    }
+
+    private fun restoreLogoTopMargin(hatchVisible: Boolean) {
+        binding.ddgLogoContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            topMargin = if (hatchVisible) {
+                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarWithHatchTopMargin)
+            } else {
+                resources.getDimensionPixelSize(R.dimen.inputScreenLogoTopBarTopMargin)
+            }
+        }
     }
 
     private fun configureVoice(useTopBar: Boolean) {
