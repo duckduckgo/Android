@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Tabs, Seitendaten und Chats löschen?</string>
     <string name="singleTabFireDialogDeleteAll">Alle löschen</string>
     <string name="singleTabFireDialogDeleteThisTab">Diesen Tab löschen</string>
-    <string name="singleTabFireDialogDeleteThisChat">Diesen Chat löschen</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">Mit „Alle löschen“ wird dein Duck.ai-Chatverlauf nicht gelöscht.</string>
+    <string name="singleTabFireDialogDeleteChat">Chat löschen</string>
+    <string name="singleTabFireDialogTitleDuckAi">Diesen Chat löschen?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Das Löschen von Website-Daten kann dazu führen, dass du aus deinen Konten abgemeldet wirst.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Dadurch werden bereits gestartete Downloads abgebrochen.</string>
     <plurals name="tabsClearedSnackbarMessage">

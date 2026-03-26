@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Eliminar separadores, dados do site e chats?</string>
     <string name="singleTabFireDialogDeleteAll">Eliminar tudo</string>
     <string name="singleTabFireDialogDeleteThisTab">Eliminar este separador</string>
-    <string name="singleTabFireDialogDeleteThisChat">Eliminar esta conversa</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">“Apagar tudo” não apagará o histórico de conversas do Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Eliminar conversa</string>
+    <string name="singleTabFireDialogTitleDuckAi">Eliminar esta conversa?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Eliminar dados do site pode terminar a tua sessão nas contas.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Esta ação vai cancelar as transferências em curso.</string>
     <plurals name="tabsClearedSnackbarMessage">

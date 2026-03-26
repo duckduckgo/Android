@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Izbrisati zavihke, podatke spletnega mesta in klepete?</string>
     <string name="singleTabFireDialogDeleteAll">Izbriši vse</string>
     <string name="singleTabFireDialogDeleteThisTab">Izbriši ta zavihek</string>
-    <string name="singleTabFireDialogDeleteThisChat">Izbriši ta klepet</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">»Izbriši vse« ne bo izbrisalo vaše zgodovine klepetov na Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Izbriši klepet</string>
+    <string name="singleTabFireDialogTitleDuckAi">Želite izbrisati ta klepet?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Brisanje podatkov o spletnem mestu vas lahko odjavi iz računov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">S tem boste preklicali prenose v teku.</string>
     <plurals name="tabsClearedSnackbarMessage">
