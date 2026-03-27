@@ -226,7 +226,13 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
      */
     private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
-            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK", settingsProvider.injectMain, settingsProvider.injectIsolated)
+            val scriptlets = ScriptletBundleBuilder.buildScriptlets(
+                tag = "DDG-YT-ADBLOCK",
+                includeMain = settingsProvider.injectMain,
+                mainJs = cachedMain ?: loadRawResource(R.raw.youtube_ad_blocking_main).also { cachedMain = it },
+                includeIsolated = settingsProvider.injectIsolated,
+                isolatedJs = cachedIsolated ?: loadRawResource(R.raw.youtube_ad_blocking_isolated).also { cachedIsolated = it },
+            )
             val result = buildString {
                 append(scriptlets)
                 if (includeProbe) {
@@ -239,25 +245,6 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
         } catch (e: Exception) {
             logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
             null
-        }
-    }
-
-    private fun buildScriptlets(tag: String, includeMain: Boolean, includeIsolated: Boolean): String {
-        return buildString {
-            if (includeMain) {
-                val main = cachedMain ?: loadRawResource(R.raw.youtube_ad_blocking_main).also { cachedMain = it }
-                append("console.log('[$tag] Running MAIN scriptlet (${main.length} bytes)');\n")
-                append(main)
-            }
-            if (includeIsolated) {
-                val isolated = cachedIsolated ?: loadRawResource(R.raw.youtube_ad_blocking_isolated).also { cachedIsolated = it }
-                if (isNotEmpty()) append("\n")
-                append("console.log('[$tag] Running ISOLATED scriptlet (${isolated.length} bytes)');\n")
-                append(isolated)
-            }
-            if (!includeMain && !includeIsolated) {
-                append("console.log('[$tag] No scriptlets enabled (injectMain=false, injectIsolated=false)');\n")
-            }
         }
     }
 
