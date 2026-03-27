@@ -1,8 +1,4 @@
-# YouTube Ad Blocking
-
-**Status: Hack Phase**
-
-## Overview
+# YouTube Ad Blocking Demo
 
 Test harness for evaluating YouTube ad blocking approaches on Android. Supports three injection mechanisms for delivering ad-blocking scriptlets into YouTube pages, all switchable via remote config. Includes per-mechanism timing probes and per-scriptlet controls to isolate and compare approaches.
 
