@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest, paroolidest ja Duck.ai vestlustest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele ligi.</string>
     <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
     <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
-    <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>
-    <string name="sync_intro_recover_content">Sünkroonitud andmete taastamiseks vajad taastamiskoodi, mille salvestasid sünkroonimise esmakordsel seadistamisel. See kood võis olla salvestatud PDF-vormingus seadmesse, milles sa sünkroonimise algselt seadistasid.</string>
-    <string name="sync_intro_recover_cta">Alustage</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-koodi skannimine</string>
     <string name="login_screen_enter_code_cta">Sisesta kood käsitsi</string>

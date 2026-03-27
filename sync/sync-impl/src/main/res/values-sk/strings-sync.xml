@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tým sa na zabezpečenom serveri DuckDuckGo vytvorí šifrovaná záloha tvojich záložiek, hesiel a četov Duck.ai, ktorú môžeš synchronizovať s tvojimi ostatnými zariadeniami. \n\n Šifrovací kľúč je uložený iba v tvojom zariadení - DuckDuckGo k nemu nemá prístup.</string>
     <string name="sync_intro_enable_footer">S ostatnými zariadeniami môžete synchronizovať neskôr.</string>
     <string name="sync_intro_enable_cta">Zapnite synchronizáciu a zálohovanie</string>
-    <string name="sync_intro_recover_title">Obnovenie synchronizovaných údajov</string>
-    <string name="sync_intro_recover_content">Na obnovenie synchronizovaných údajov budete potrebovať kód na obnovenie, ktorý ste uložili pri prvom nastavení funkcie Sync. Tento kód mohol byť uložený vo formáte PDF v zariadení, ktoré ste pôvodne použili na nastavenie funkcie Sync.</string>
-    <string name="sync_intro_recover_cta">Začnite</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">Skenovanie kódu QR</string>
     <string name="login_screen_enter_code_cta">Manuálne zadajte kód</string>

@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Създава криптирано резервно копие на Вашите отметки, пароли и чатове с Duck.ai на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. \n\n Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
-    <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
-    <string name="sync_intro_recover_content">За възстановяване на синхронизираните данни е необходим Кодът за възстановяване, който сте запазили при първата настройка на функцията за синхронизиране. Този код може да е запазен като PDF файл на устройството, което първоначално сте използвали за настройка на функцията за синхронизиране.</string>
-    <string name="sync_intro_recover_cta">Първи стъпки</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">Сканиране на QR код</string>
     <string name="login_screen_enter_code_cta">Ръчно въвеждане на код</string>

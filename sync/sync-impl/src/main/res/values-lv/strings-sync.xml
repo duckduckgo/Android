@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tas izveido šifrētu tavu grāmatzīmju, paroļu un Duck.ai tērzēšanas dublējumu DuckDuckGo drošajā serverī, ko vari sinhronizēt ar citām tavām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē – DuckDuckGo tai nevar piekļūt.</string>
     <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
     <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
-    <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>
-    <string name="sync_intro_recover_content">Lai atjaunotu sinhronizētos datus, ir nepieciešams atgūšanas kods, ko saglabāji, kad pirmo reizi iestatīji sinhronizāciju. Šis kods, iespējams, ir saglabāts PDF formātā ierīcē, kuru sākotnēji izmantoji sinhronizācijas iestatīšanai.</string>
-    <string name="sync_intro_recover_cta">Sākt darbu</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">Kvadrātkoda skenēšana</string>
     <string name="login_screen_enter_code_cta">Manuāla koda ievadīšana</string>

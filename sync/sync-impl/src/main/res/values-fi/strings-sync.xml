@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tämä luo salatun varmuuskopion kirjanmerkeistäsi, salasanoistasi ja Duck.ai -keskusteluistasi DuckDuckGon suojatulle palvelimelle, ja se voidaan synkronoida muiden laitteidesi kanssa. \n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
-    <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
-    <string name="sync_intro_recover_content">Jos haluat palauttaa synkronoidut tietosi, tarvitset palautuskoodin, jonka tallensit ottaessasi synkronoinnin käyttöön. Koodi on voitu tallentaa PDF-tiedostona laitteelle, jolla määritit synkronoinnin.</string>
-    <string name="sync_intro_recover_cta">Aloita</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">Skannaa QR-koodi</string>
     <string name="login_screen_enter_code_cta">Syötä koodi manuaalisesti</string>

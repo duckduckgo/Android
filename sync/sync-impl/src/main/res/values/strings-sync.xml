@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">This creates an encrypted backup of your bookmarks, passwords, and Duck.ai chats on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.</string>
     <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
     <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
-    <string name="sync_intro_recover_title">Recover Synced Data</string>
-    <string name="sync_intro_recover_content">To restore your synced data, you\'ll need the Recovery Code you saved when you first set up Sync. This code may have been saved as a PDF on the device you originally used to set up Sync.</string>
-    <string name="sync_intro_recover_cta">Get Started</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Recover your synced data</string>
+    <string name="sync_recover_synced_data_content">You\'ll need the Recovery Code you got when you set up Sync &amp; Backup. You may have saved it as a PDF on the device you used.</string>
+    <string name="sync_recover_synced_data_cta">Recover Synced Data</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Scan QR Code</string>

@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Tai sukuria užšifruotą jūsų žymių, slaptažodžių ir Duck.ai pokalbių atsarginę kopiją “DuckDuckGo” saugiame serveryje, kurią galima sinchronizuoti su kitais jūsų įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti.</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
-    <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>
-    <string name="sync_intro_recover_content">Norėdami atkurti sinchronizuotus duomenis, turėsite naudoti atkūrimo kodą, kurį išsaugojote pirmą kartą nustatydami sinchronizavimą. Šis kodas galėjo būti išsaugotas kaip PDF failas įrenginyje, kurį iš pradžių naudojote sinchronizavimui nustatyti.</string>
-    <string name="sync_intro_recover_cta">Pradėti</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">Nuskaityti QR kodą</string>
     <string name="login_screen_enter_code_cta">Įveskite kodą ranka</string>

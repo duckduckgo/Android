@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Ez egy titkosított biztonsági másolatot hoz létre a könyvjelzőidről, a jelszavaidról és a Duck.ai-csevegéseidről a DuckDuckGo biztonságos szerverén, amely szinkronizálható a többi eszközöddel. \n\n A titkosítási kulcs csak az eszközödön kerül eltárolásra, a DuckDuckGo nem fér hozzá.</string>
     <string name="sync_intro_enable_footer">Később szinkronizálhatod más eszközeidet.</string>
     <string name="sync_intro_enable_cta">Szinkronizálás és biztonsági mentés bekapcsolása</string>
-    <string name="sync_intro_recover_title">Szinkronizált adatok helyreállítása</string>
-    <string name="sync_intro_recover_content">A szinkronizált adatok visszaállításához szükség lesz a szinkronizálás első beállításakor mentett helyreállítási kódra. Lehetséges, hogy ez a kód PDF-fájlként lett mentve a szinkronizálás beállításához eredetileg használt eszközre.</string>
-    <string name="sync_intro_recover_cta">Első lépések</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-kód beolvasása</string>
     <string name="login_screen_enter_code_cta">Kód manuális megadása</string>

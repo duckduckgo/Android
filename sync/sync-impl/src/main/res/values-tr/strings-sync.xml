@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Bu işlem, yer işaretleri, şifreler ve Duck.ai sohbetlerinin şifrelenmiş bir yedeğini DuckDuckGo\'nun güvenli sunucusunda oluşturur ve bunlar diğer cihazlarınızla senkronize edilebilir. \n\n Şifreleme anahtarı sadece cihazınızda saklanır ve DuckDuckGo bu anahtara erişemez.</string>
     <string name="sync_intro_enable_footer">Daha sonra diğer cihazlarınızla senkronize edebilirsiniz.</string>
     <string name="sync_intro_enable_cta">Senkronizasyon ve Yedekleme\'yi açın</string>
-    <string name="sync_intro_recover_title">Senkronize Edilen Verileri Kurtar</string>
-    <string name="sync_intro_recover_content">Senkronize edilmiş verilerinizi geri yüklemek için Senkronizasyonu ilk ayarlarken belirlediğiniz Kurtarma Koduna ihtiyacınız olacaktır. Bu kod, Senkronizasyonu yapmak üzere kullandığınız cihaza PDF olarak kaydedilmiş olabilir.</string>
-    <string name="sync_intro_recover_cta">Başlayın</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">QR Kodunu Tara</string>
     <string name="login_screen_enter_code_cta">Kodu Manuel Olarak Yaz</string>

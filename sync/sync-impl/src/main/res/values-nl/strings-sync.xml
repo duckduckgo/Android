@@ -56,10 +56,6 @@
     <string name="sync_intro_enable_content_with_ai_chat">Hiermee maak je een versleutelde back-up van je bladwijzers, wachtwoorden en Duck.ai-chats op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe.</string>
     <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
     <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
-    <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
-    <string name="sync_intro_recover_content">Om je gesynchroniseerde gegevens te herstellen, heb je de herstelcode nodig die je hebt opgeslagen tijdens het instellen van \'Synchronisatie\'. Deze code is mogelijk als PDF opgeslagen op het apparaat dat je gebruikte om \'Synchronisatie\' in te stellen.</string>
-    <string name="sync_intro_recover_cta">Aan de slag</string>
-
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-code scannen</string>
     <string name="login_screen_enter_code_cta">Code handmatig invoeren</string>
