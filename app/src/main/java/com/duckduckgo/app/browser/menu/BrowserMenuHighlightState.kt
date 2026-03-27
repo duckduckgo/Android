@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -26,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -44,14 +47,17 @@ interface BrowserMenuHighlightState {
 @ContributesBinding(AppScope::class)
 class RealBrowserMenuHighlightState @Inject constructor(
     additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    downloadMenuStateProvider: DownloadMenuStateProvider,
+    browserMenuPlugins: PluginPoint<BrowserMenuPlugin>,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : BrowserMenuHighlightState {
-    override val shouldHighlight: StateFlow<Boolean> = combine(
-        additionalDefaultBrowserPrompts.highlightPopupMenu,
-        downloadMenuStateProvider.hasNewDownloadFlow,
-    ) { defaultBrowserHighlight, hasNewDownload ->
-        defaultBrowserHighlight || hasNewDownload
+    override val shouldHighlight: StateFlow<Boolean> = run {
+        val pluginFlows = browserMenuPlugins.getPlugins().map { it.menuHighlightFlow }
+        val allFlows = listOf(additionalDefaultBrowserPrompts.highlightPopupMenu) + pluginFlows
+        if (allFlows.size == 1) {
+            combine(allFlows[0], flowOf(false)) { a, _ -> a }
+        } else {
+            combine(allFlows) { values -> values.any { it } }
+        }
     }.flowOn(dispatcherProvider.io()).stateIn(appCoroutineScope, SharingStarted.Eagerly, false)
 }

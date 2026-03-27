@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
-import com.duckduckgo.app.downloads.DownloadViewItem.Empty
-import com.duckduckgo.app.downloads.DownloadViewItem.Header
-import com.duckduckgo.app.downloads.DownloadViewItem.Item
-import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
+import com.duckduckgo.downloads.impl.DownloadViewItem.Empty
+import com.duckduckgo.downloads.impl.DownloadViewItem.Header
+import com.duckduckgo.downloads.impl.DownloadViewItem.Item
+import com.duckduckgo.downloads.impl.DownloadViewItem.NotifyMe
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.CancelDownload
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.DisplayUndoMessage
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.OpenFile
+import com.duckduckgo.downloads.impl.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter

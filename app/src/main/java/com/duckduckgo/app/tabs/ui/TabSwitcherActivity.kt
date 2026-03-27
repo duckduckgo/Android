@@ -47,7 +47,8 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserv
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
 import com.duckduckgo.app.settings.SettingsActivity
@@ -129,6 +130,9 @@ class TabSwitcherActivity :
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
@@ -753,7 +757,7 @@ class TabSwitcherActivity :
     }
 
     private fun showDownloads() {
-        startActivity(DownloadsActivity.intent(this))
+        globalActivityStarter.start(this, DownloadsScreenNoParams)
         viewModel.onDownloadsMenuPressed()
     }
 

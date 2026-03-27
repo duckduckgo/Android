@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.navigation.api.GlobalActivityStarter

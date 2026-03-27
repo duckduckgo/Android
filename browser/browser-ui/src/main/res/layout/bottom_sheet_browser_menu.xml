@@ -231,13 +231,11 @@
                 app:menuSize="medium"
                 app:primaryText="@string/browserMenuAutofill" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
-                android:id="@+id/downloadsMenuItem"
+            <LinearLayout
+                android:id="@+id/menuPluginsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_downloads_24"
-                app:menuSize="medium"
-                app:primaryText="@string/browserMenuDownloads" />
+                android:orientation="vertical" />
 
             <com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/duckChatHistoryMenuItem"

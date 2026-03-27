@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.downloads.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.downloads.api.model.DownloadItem
 
-dependencies {
-    implementation KotlinX.coroutines.core
-    implementation Google.android.material
-    api project(':navigation-api')
-}
-android {
-  namespace 'com.duckduckgo.downloads.api'
+sealed class DownloadViewItem {
+    data object Empty : DownloadViewItem()
+    data object NotifyMe : DownloadViewItem()
+    data class Header(val text: String) : DownloadViewItem()
+    data class Item(val downloadItem: DownloadItem) : DownloadViewItem()
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
