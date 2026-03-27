@@ -83,7 +83,8 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
             .build()
     }
 
-    private var cachedScriptlets: String? = null
+    private var cachedMain: String? = null
+    private var cachedIsolated: String? = null
     private var cachedProbe: String? = null
 
     override suspend fun intercept(
@@ -226,25 +227,38 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
      */
     private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
-            val scriptlets = cachedScriptlets ?: run {
-                val main = loadRawResource(R.raw.youtube_ad_blocking_main)
-                val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
-                buildString {
-                    append("console.log('[DDG-YT-ADBLOCK] Running MAIN scriptlet (${main.length} bytes)');\n")
-                    append(main)
-                    append("\nconsole.log('[DDG-YT-ADBLOCK] Running ISOLATED scriptlet (${isolated.length} bytes)');\n")
-                    append(isolated)
-                }.also { cachedScriptlets = it }
+            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK", settingsStore.injectMain, settingsStore.injectIsolated)
+            val result = buildString {
+                append(scriptlets)
+                if (includeProbe) {
+                    val probe = cachedProbe ?: loadRawResource(R.raw.youtube_ad_blocking_probe).also { cachedProbe = it }
+                    append("\n")
+                    append(probe)
+                }
             }
-            if (includeProbe) {
-                val probe = cachedProbe ?: loadRawResource(R.raw.youtube_ad_blocking_probe).also { cachedProbe = it }
-                "$scriptlets\n$probe"
-            } else {
-                scriptlets
-            }
+            result.ifEmpty { null }
         } catch (e: Exception) {
             logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
             null
+        }
+    }
+
+    private fun buildScriptlets(tag: String, includeMain: Boolean, includeIsolated: Boolean): String {
+        return buildString {
+            if (includeMain) {
+                val main = cachedMain ?: loadRawResource(R.raw.youtube_ad_blocking_main).also { cachedMain = it }
+                append("console.log('[$tag] Running MAIN scriptlet (${main.length} bytes)');\n")
+                append(main)
+            }
+            if (includeIsolated) {
+                val isolated = cachedIsolated ?: loadRawResource(R.raw.youtube_ad_blocking_isolated).also { cachedIsolated = it }
+                if (isNotEmpty()) append("\n")
+                append("console.log('[$tag] Running ISOLATED scriptlet (${isolated.length} bytes)');\n")
+                append(isolated)
+            }
+            if (!includeMain && !includeIsolated) {
+                append("console.log('[$tag] No scriptlets enabled (injectMain=false, injectIsolated=false)');\n")
+            }
         }
     }
 

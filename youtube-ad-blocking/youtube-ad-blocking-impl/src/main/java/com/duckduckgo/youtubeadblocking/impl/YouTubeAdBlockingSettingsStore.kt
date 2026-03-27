@@ -90,6 +90,16 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
     var injectMethod: InjectMethod = InjectMethod.NONE
         private set
 
+    /** Whether to inject the MAIN world scriptlet (API patching). Default: false (off until settings delivered). */
+    @Volatile
+    var injectMain: Boolean = false
+        private set
+
+    /** Whether to inject the ISOLATED world scriptlet (DOM-level). Default: false (off until settings delivered). */
+    @Volatile
+    var injectIsolated: Boolean = false
+        private set
+
     /** Whether the intercept (Mechanism B) timing probe fires. Default: false (off until settings delivered). */
     @Volatile
     var timingIntercept: Boolean = false
@@ -114,12 +124,13 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
         try {
             jsonAdapter.fromJson(jsonString)?.let {
                 injectMethod = InjectMethod.fromString(it.injectMethod)
+                injectMain = isEnabledString(it.injectMain, default = true)
+                injectIsolated = isEnabledString(it.injectIsolated, default = true)
                 timingIntercept = isEnabledString(it.timingIntercept, default = false)
                 timingEvaluate = isEnabledString(it.timingEvaluate, default = false)
                 timingAdsjs = isEnabledString(it.timingAdsjs, default = false)
                 logcat {
-                    "YouTubeAdBlocking: Settings updated — injectMethod=$injectMethod" +
-                        " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
+                    "YouTubeAdBlocking: Settings updated — ${settingsSummary()}"
                 }
             }
         } catch (e: Exception) {
@@ -129,7 +140,8 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
 
     /** Returns a compact summary of current settings for logcat. */
     fun settingsSummary(): String {
-        return "injectMethod=$injectMethod timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
+        return "injectMethod=$injectMethod injectMain=$injectMain injectIsolated=$injectIsolated" +
+            " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
     }
 
     private fun isEnabledString(value: String?, default: Boolean): Boolean {
@@ -145,6 +157,10 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
 data class YouTubeAdBlockingSetting(
     @field:Json(name = "injectMethod")
     val injectMethod: String?,
+    @field:Json(name = "injectMain")
+    val injectMain: String?,
+    @field:Json(name = "injectIsolated")
+    val injectIsolated: String?,
     @field:Json(name = "timingIntercept")
     val timingIntercept: String?,
     @field:Json(name = "timingEvaluate")
