@@ -45,7 +45,7 @@ object DuckAiBridgeModule {
     fun provideSettingsDao(db: DuckAiBridgeDatabase): DuckAiBridgeSettingsDao = db.settingsDao()
 
     @Provides
-    @DuckAiBridgeImagesDir
-    fun provideImagesDir(context: Context): File =
-        File(context.filesDir, "duck_ai_bridge_images")
+    @DuckAiBridgeFilesDir
+    fun provideFilesDir(context: Context): File =
+        File(context.filesDir, "duck_ai_bridge_files")
 }

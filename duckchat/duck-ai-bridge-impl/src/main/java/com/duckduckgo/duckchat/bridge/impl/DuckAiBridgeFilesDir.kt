@@ -20,4 +20,4 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-internal annotation class DuckAiBridgeImagesDir
+internal annotation class DuckAiBridgeFilesDir

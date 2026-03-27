@@ -81,7 +81,6 @@ import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
-import com.duckduckgo.duckchat.bridge.api.DuckAiBridgeManager
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
@@ -123,9 +122,6 @@ class DuckChatContextualFragment :
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
-
-    @Inject
-    lateinit var bridgeManager: DuckAiBridgeManager
 
     @Inject
     @Named("ContentScopeScripts")
@@ -250,7 +246,6 @@ class DuckChatContextualFragment :
         cookieManager.setAcceptCookie(true)
         cookieManager.setAcceptThirdPartyCookies(simpleWebview, true)
 
-        bridgeManager.attachToWebView(simpleWebview)
         simpleWebview.let {
             it.webViewClient = webViewClient
             webViewClient

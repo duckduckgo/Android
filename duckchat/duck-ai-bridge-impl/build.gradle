@@ -24,9 +24,11 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':duck-ai-bridge-api')
     implementation project(':app-build-config-api')
     implementation project(':common-utils')
+    implementation project(':duckchat-api')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':js-messaging-api')
     implementation project(':di')
 
     anvil project(path: ':anvil-compiler')
@@ -39,18 +41,10 @@ dependencies {
     implementation AndroidX.room.runtime
 
     implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.webkit
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation project(path: ':common-test')
-    testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.room.testing
-    testImplementation(KotlinX.coroutines.test) {
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
