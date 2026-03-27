@@ -40,6 +40,7 @@ interface ContextualNativeInputManager {
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
+        onImageButtonPressed: () -> Unit = {},
     )
 
     fun onWebViewMode()
@@ -61,12 +62,13 @@ class RealContextualNativeInputManager @Inject constructor(
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
         onSearchSubmitted: (String) -> Unit,
+        onImageButtonPressed: () -> Unit,
     ) {
         this.card = card
         this.jsMessaging = jsMessaging
 
         applyCardShape(card)
-        setupWidget(widget, onSearchSubmitted)
+        setupWidget(widget, onSearchSubmitted, onImageButtonPressed)
         observeNativeInputSetting(lifecycleOwner)
     }
 
@@ -90,10 +92,11 @@ class RealContextualNativeInputManager @Inject constructor(
             .build()
     }
 
-    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit) {
+    private fun setupWidget(widget: NativeInputModeWidget, onSearchSubmitted: (String) -> Unit, onImageButtonPressed: () -> Unit) {
         widget.selectChatTab()
         widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
+        widget.onImageClick = onImageButtonPressed
         widget.bindInputEvents(
             onSearchTextChanged = { },
             onSearchSubmitted = { query ->

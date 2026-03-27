@@ -423,6 +423,9 @@ class DuckChatContextualFragment :
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
+            onImageButtonPressed = {
+                // To be implemented
+            },
         )
         observeViewModel()
 

@@ -1296,6 +1296,9 @@ class BrowserTabFragment :
                     hideKeyboard()
                     voiceSearchLauncher.launch(requireActivity(), mode)
                 },
+                onImageButtonPressed = {
+                    // To be implemented
+                },
             ),
         )
     }
