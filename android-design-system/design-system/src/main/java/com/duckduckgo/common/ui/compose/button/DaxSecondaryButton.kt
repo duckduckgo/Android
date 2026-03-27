@@ -45,7 +45,7 @@ import com.duckduckgo.mobile.android.R
 /**
  * DuckDuckGo secondary outlined button.
  *
- * Asana Task: TODO
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213826087792400
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29650
  *
  * @param text The button label.

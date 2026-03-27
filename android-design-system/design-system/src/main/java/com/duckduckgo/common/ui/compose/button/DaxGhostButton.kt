@@ -39,7 +39,7 @@ import com.duckduckgo.mobile.android.R
 /**
  * DuckDuckGo ghost button with transparent background.
  *
- * Asana Task: TODO
+ * Asana Task: https://app.asana.com/1/137249556945/project/1202857801505092/task/1213826087792401
  * Figma reference: https://www.figma.com/design/BOHDESHODUXK7wSRNBOHdu/%F0%9F%A4%96-Android-Components?node-id=12110-29651&t=ZNNQ3qIoJQfTS14R-4
  *
  * @param text The button label.
