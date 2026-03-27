@@ -96,10 +96,12 @@ Values: `"enabled"` / `"disabled"`. All default to `"disabled"` until settings a
 ### How to test
 
 1. Set the config in remote config / internal settings
-2. **Kill and restart the app** — settings must be delivered before they take effect
-3. Navigate to `youtube.com`
-4. Check logcat (filter `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`)
-5. After using the fire button, settings persist in-memory for the current session but a full app restart may be needed if config is lost
+2. **Close and re-open the app** — settings must be delivered before they take effect
+3. **Use the fire button** — this clears any cached YouTube pages and cookies, giving you a clean state. Important when switching between injection methods to avoid stale injected content from a previous approach.
+4. Navigate to `youtube.com`
+5. Check logcat (filter `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`)
+
+**When switching approaches:** close app → re-open → fire button → navigate to YouTube. This ensures you're testing the new config from a clean slate.
 
 ### What to look for in logcat
 
