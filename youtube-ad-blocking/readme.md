@@ -4,33 +4,90 @@
 
 ## Overview
 
-This module intercepts YouTube HTML document requests via `shouldInterceptRequest`, injects ad-blocking scriptlets from `content-blocker-extension` before any page JavaScript executes, and strips Content-Security-Policy headers so the injected scripts run unblocked.
+This module injects ad-blocking scriptlets into YouTube pages before any page JavaScript executes, blocking ads before YouTube's ad infrastructure initialises.
 
 ## Results
 
 ### Hack phase questions answered
 
 **a) Can we reliably inject scriptlets before YouTube's JS init?**
-✅ **Yes.** The `shouldInterceptRequest` HTML modification approach successfully injects scriptlets before YouTube's ad infrastructure initialises. The probe script confirms `ytInitialData: false` at injection time.
+✅ **Yes.** Both injection mechanisms successfully block YouTube ads.
 
 **b) Can we see ad blocking actually working?**
 ✅ **Yes.** Pre-roll and mid-roll ads are blocked. Videos start playing immediately without ad interruptions.
 
-### Mechanism chosen: `shouldInterceptRequest` HTML modification (Mechanism B)
+## Feature flags
 
-`addDocumentStartJavaScript` (Mechanism A) was initially implemented but rejected due to crash risk. Mechanism B uses only stable, long-standing WebView APIs.
+### `youTubeAdBlocking` (parent toggle — defaults OFF)
+
+Controls whether YouTube ad blocking is active. Enable via internal settings.
+
+### `youTubeAdBlocking.useEvaluateJs` (sub-feature — defaults OFF)
+
+Controls the injection mechanism:
+
+| `useEvaluateJs` | Mechanism | How it works |
+|-----------------|-----------|-------------|
+| **OFF** (default) | B: `shouldInterceptRequest` HTML modification | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>` |
+| **ON** | C: `evaluateJavascript` | Injects scriptlets via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp |
+
+### How to test
+
+1. Open DuckDuckGo browser internal settings
+2. Enable the `youTubeAdBlocking` feature flag
+3. Navigate to `youtube.com` and verify ads are blocked
+4. To switch injection mechanism: toggle `youTubeAdBlocking.useEvaluateJs`
+5. **Important:** after toggling, do a full page reload (not SPA navigation) — swipe down to refresh or navigate away and back
+
+### What to look for in logcat
+
+Filter by `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`:
+
+```
+# Mechanism B (shouldInterceptRequest HTML mod) — when useEvaluateJs is OFF:
+YouTubeAdBlocking: Injected probe script into www.youtube.com/...
+[DDG-YT-ADBLOCK] Injected at 0.42 ms | ytInitialData: false | ...
+
+# Mechanism C (evaluateJavascript) — when useEvaluateJs is ON:
+YouTubeAdBlocking: [evaluateJs mode] Injecting full scriptlet bundle for ...
+[DDG-YT-ADBLOCK] Injected at X ms | ytInitialData: false/true | ...
+
+# Timing comparison probe (always fires regardless of mode):
+[DDG-YT-ADBLOCK-EVALUATE] Injected at X ms | ytInitialData: false/true | ...
+```
+
+Key values:
+- `ytInitialData: false` = scriptlet ran **before** YouTube's init ✅
+- `ytInitialData: true` = scriptlet ran **after** YouTube's init ❌ (too late)
+
+### Comparing the two mechanisms
+
+1. Enable `youTubeAdBlocking`, disable `useEvaluateJs`
+2. Navigate to YouTube, check logcat for both `[DDG-YT-ADBLOCK]` and `[DDG-YT-ADBLOCK-EVALUATE]` tags
+3. Compare timing values and `ytInitialData` state for each
+4. Enable `useEvaluateJs`, reload YouTube
+5. Check if ads are still blocked
+
+If `evaluateJavascript` shows `ytInitialData: false` and ads are blocked, it's the preferred approach (simpler, no CSP stripping).
 
 ## Architecture
 
-### How it works
+### Mechanism B: `shouldInterceptRequest` HTML modification (default)
 
-1. `WebViewRequestInterceptor.shouldIntercept()` calls `YouTubeAdBlocking.intercept()` for every request
-2. For YouTube HTML document requests (main frame + iframes), the interceptor:
-   - Fetches the response via OkHttp with a `WebViewCookieJar` bridging to `CookieManager`
-   - Strips `Content-Security-Policy` headers
+1. `WebViewRequestInterceptor` calls `YouTubeAdBlocking.intercept()` for every request
+2. For YouTube HTML documents, the interceptor:
+   - Fetches the response via OkHttp with `WebViewCookieJar` bridging to `CookieManager`
+   - Strips `Content-Security-Policy` headers (YouTube's CSP blocks inline scripts)
    - Injects `<script>{scriptlet bundle}</script>` immediately after `<head>`
    - Returns the modified `WebResourceResponse`
-3. The scriptlet bundle runs before any YouTube JS, patching APIs and blocking ad logic
+3. OkHttp redirect following is disabled — redirects handled natively by WebView
+
+### Mechanism C: `evaluateJavascript` (when `useEvaluateJs` is ON)
+
+1. `YouTubeAdBlockingEvaluateJsPlugin` (a `JsInjectorPlugin`) runs in `onPageStarted`
+2. For YouTube URLs, calls `webView.evaluateJavascript(scriptletBundle, null)`
+3. No HTML modification, no CSP stripping, no OkHttp fetch needed
+4. `evaluateJavascript` is not subject to CSP (injected by the host app)
 
 ### Scriptlet bundle
 
@@ -43,41 +100,32 @@ Three scripts injected in order:
 
 Scriptlets sourced from `duckduckgo/content-blocker-extension` (v2026.3.24), derived from uBlock Origin Lite filters.
 
-### Cookie handling
-
-OkHttp uses a `WebViewCookieJar` that bridges to Android's `CookieManager`:
-- Reads WebView cookies for outgoing requests (so YouTube sees session/consent cookies)
-- Writes YouTube's `Set-Cookie` headers back to `CookieManager` (so consent, auth persist)
-
-### Redirect handling
-
-OkHttp redirect following is disabled. On 3xx responses, `null` is returned so the WebView handles redirects natively — `shouldInterceptRequest` fires again for the target URL.
-
 ### Module structure
 
 ```
 youtube-ad-blocking/
 ├── youtube-ad-blocking-api/    # Public API: YouTubeAdBlocking interface
 └── youtube-ad-blocking-impl/   # Implementation + scriptlet resources
+    ├── YouTubeAdBlockingFeature.kt              # Feature flags (self + useEvaluateJs)
+    ├── RealYouTubeAdBlocking.kt                 # API impl, routes to correct mechanism
+    ├── YouTubeAdBlockingRequestInterceptor.kt   # Mechanism B (shouldInterceptRequest)
+    └── YouTubeAdBlockingTimingComparisonPlugin.kt  # Mechanism C (evaluateJavascript)
 ```
-
-### Feature flag
-
-Controlled by remote config feature `youTubeAdBlocking` (defaults to OFF).
 
 ## Known limitations (hack phase)
 
-- **Response buffering latency** — The full HTML response is buffered in memory before being returned to the WebView. Not yet measured on slow connections.
-- **SPA navigation** — `shouldInterceptRequest` only fires on real HTTP requests. Scriptlets patch `pushState`/`replaceState` to maintain coverage across video-to-video navigation, but this depends on the scriptlets handling it correctly.
-- **Iframe coverage** — Iframe HTML document requests are detected via `Accept: text/html` header check. Not all iframe formats may be caught.
-- **Scriptlets are bundled locally** — No remote loading, CDN, or auto-update mechanism yet.
-- **No DuckPlayer interaction** — When DuckPlayer is active, both features may conflict. Not yet handled.
+- **Response buffering latency** (Mechanism B only) — full HTML buffered in memory
+- **SPA navigation** — `shouldInterceptRequest` only fires on real HTTP requests; scriptlets patch `pushState`/`replaceState`
+- **Iframe coverage** (Mechanism C) — `evaluateJavascript` only runs in the main frame, not iframes
+- **Scriptlets are bundled locally** — no remote loading, CDN, or auto-update
+- **No DuckPlayer interaction** — not yet handled
 
 ## What's next (follow-on work)
 
+- Determine preferred injection mechanism based on timing data
 - Remote scriptlet loading from CDN with auto-update
-- Ad sub-resource blocking via `shouldInterceptRequest` (complementary to scriptlet injection)
+- Ad sub-resource blocking via `shouldInterceptRequest`
 - DuckPlayer interaction handling
 - Production settings UI / onboarding
-- Performance measurement (buffering latency, memory)
+- Performance measurement
 - Broader device/WebView version testing
