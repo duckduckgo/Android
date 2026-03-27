@@ -70,7 +70,6 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.browser.tabs.adapter.TabPagerAdapter
-import com.duckduckgo.app.browser.ui.InsetsWithKeyboardCallback
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dispatchers.ExternalIntentProcessingState
 import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
@@ -116,6 +115,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.common.utils.ui.InsetsWithKeyboardCallback
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat

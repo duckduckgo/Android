@@ -161,7 +161,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
@@ -292,6 +291,7 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -1121,9 +1121,7 @@ class BrowserTabFragment :
         launchDownloadMessagesJob()
 
         val view = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) {
-            omnibar.omnibarView.omniBarContainer
-        } else if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) {
-            binding.navigationBar
+            omnibar.omnibarView.rootView
         } else {
             null
         }

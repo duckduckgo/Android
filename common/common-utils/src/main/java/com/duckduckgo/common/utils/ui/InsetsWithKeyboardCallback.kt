@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.ui
+package com.duckduckgo.common.utils.ui
 
 import android.os.Build
 import android.view.View
