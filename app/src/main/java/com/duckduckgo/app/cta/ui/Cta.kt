@@ -865,7 +865,7 @@ sealed class HomePanelCta(
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
-    data object AddWidgetAutoOnboardingExperiment :
+    data object AddWidgetAutoOnboarding :
         HomePanelCta(
             CtaId.ADD_WIDGET,
             R.drawable.add_widget_cta_icon,

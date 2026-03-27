@@ -188,7 +188,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.PrivacyProSkippedOnboardingBottomSheetDialog
 import com.duckduckgo.app.cta.ui.SubscriptionPromoModalCta
@@ -5360,7 +5360,7 @@ class BrowserTabFragment :
         private fun showBottomSheetCta(configuration: HomePanelCta) {
             widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
                 delay(WIDGET_PROMPT_DELAY)
-                if (configuration is AddWidgetAutoOnboardingExperiment) {
+                if (configuration is AddWidgetAutoOnboarding) {
                     showAlternativeHomeWidgetPrompt(configuration)
                 } else {
                     showHomeCta(configuration)

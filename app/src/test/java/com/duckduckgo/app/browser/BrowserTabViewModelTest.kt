@@ -3097,7 +3097,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaShownThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             testee.ctaViewState.value = CtaViewState(cta = cta)
 
             testee.onCtaShown()
@@ -3133,7 +3133,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+        val cta = HomePanelCta.AddWidgetAutoOnboarding
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
@@ -3187,7 +3187,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissedCtaThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
@@ -3196,7 +3196,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
+            val cta = HomePanelCta.AddWidgetAutoOnboarding
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))

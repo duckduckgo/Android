@@ -214,19 +214,19 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() = runTest {
-        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        testee.onCtaShown(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockPixel).fire(eq(WIDGET_CTA_SHOWN), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() = runTest {
-        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        testee.onUserClickCtaOkButton(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockPixel).fire(eq(WIDGET_CTA_LAUNCHED), any(), any(), eq(Count))
     }
 
     @Test
     fun whenCtaDismissedThenCancelPixelIsFired() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockPixel).fire(eq(WIDGET_CTA_DISMISSED), any(), any(), eq(Count))
     }
 
@@ -250,7 +250,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = runTest {
-        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        testee.onUserDismissedCta(HomePanelCta.AddWidgetAutoOnboarding)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }
 
@@ -367,7 +367,7 @@ class CtaViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertTrue(value is HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        assertTrue(value is HomePanelCta.AddWidgetAutoOnboarding)
     }
 
     @Test
@@ -810,7 +810,7 @@ class CtaViewModelTest {
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertFalse(value is HomePanelCta.AddWidgetAutoOnboardingExperiment)
+        assertFalse(value is HomePanelCta.AddWidgetAutoOnboarding)
     }
 
     @Test
