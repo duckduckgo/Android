@@ -16,36 +16,41 @@
 
 package com.duckduckgo.youtubeadblocking.impl
 
+import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
+import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Timing comparison: injects the probe script via evaluateJavascript in onPageStarted
- * (Mechanism C) alongside the shouldInterceptRequest HTML modification (Mechanism B).
+ * Injects YouTube ad-blocking scriptlets via evaluateJavascript in onPageStarted.
  *
- * This does NOT inject the full ad-blocking scriptlets — only the lightweight timing
- * probe, tagged as [DDG-YT-ADBLOCK-EVALUATE] so it's distinguishable from the
- * HTML-injected [DDG-YT-ADBLOCK] probe in logcat.
+ * Controlled by the `useEvaluateJs` sub-feature toggle:
+ * - When `useEvaluateJs` is OFF: injects only a lightweight timing probe tagged
+ *   [DDG-YT-ADBLOCK-EVALUATE] for comparison with the HTML injection approach.
+ * - When `useEvaluateJs` is ON: injects the full scriptlet bundle (main + isolated + probe).
+ *   The shouldInterceptRequest interceptor stands down in this mode.
  *
- * Compare the two probe outputs in logcat to determine if evaluateJavascript timing
- * is fast enough (ytInitialData: false = before YouTube init).
+ * evaluateJavascript advantages over HTML modification:
+ * - No CSP stripping needed (evaluateJavascript is not subject to page CSP)
+ * - No OkHttp fetch / cookie bridging / redirect handling needed
+ * - Simpler, more stable
  *
- * If evaluateJavascript is fast enough, it would be the preferred approach because:
- * - No HTML modification needed
- * - No CSP stripping needed
- * - No OkHttp fetch / cookie bridging needed
- * - evaluateJavascript is not subject to CSP
+ * evaluateJavascript disadvantage:
+ * - Fires at onPageStarted which may be slightly later than document_start
  */
 @ContributesMultibinding(AppScope::class)
-class YouTubeAdBlockingTimingComparisonPlugin @Inject constructor(
+class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
+    private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
 ) : JsInjectorPlugin {
+
+    private var cachedFullBundle: String? = null
 
     override fun onPageStarted(
         webView: WebView,
@@ -56,9 +61,20 @@ class YouTubeAdBlockingTimingComparisonPlugin @Inject constructor(
         if (!youTubeAdBlockingFeature.self().isEnabled()) return
         if (url == null || !isYouTubeUrl(url)) return
 
-        logcat { "YouTubeAdBlocking: evaluateJavascript timing comparison for $url" }
+        val useEvaluateJs = youTubeAdBlockingFeature.useEvaluateJs().isEnabled()
 
-        webView.evaluateJavascript(TIMING_PROBE_SCRIPT, null)
+        if (useEvaluateJs) {
+            // Full injection mode: inject the complete scriptlet bundle
+            val bundle = getFullBundle()
+            if (bundle != null) {
+                logcat { "YouTubeAdBlocking: [evaluateJs mode] Injecting full scriptlet bundle for $url" }
+                webView.evaluateJavascript(bundle, null)
+            }
+        } else {
+            // Comparison mode: inject only the timing probe
+            logcat { "YouTubeAdBlocking: [timing comparison] evaluateJavascript probe for $url" }
+            webView.evaluateJavascript(TIMING_PROBE_SCRIPT, null)
+        }
     }
 
     override fun onPageFinished(
@@ -73,10 +89,29 @@ class YouTubeAdBlockingTimingComparisonPlugin @Inject constructor(
         return url.contains("youtube.com/", ignoreCase = true)
     }
 
+    private fun getFullBundle(): String? {
+        cachedFullBundle?.let { return it }
+        return try {
+            val main = loadRawResource(R.raw.youtube_ad_blocking_main)
+            val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
+            val probe = loadRawResource(R.raw.youtube_ad_blocking_probe)
+            "$main\n$isolated\n$probe".also { cachedFullBundle = it }
+        } catch (e: Exception) {
+            logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
+            null
+        }
+    }
+
+    private fun loadRawResource(resId: Int): String {
+        return context.resources.openRawResource(resId)
+            .bufferedReader()
+            .use { it.readText() }
+    }
+
     companion object {
         /**
-         * Same probe as youtube_ad_blocking_probe.js but tagged differently so the
-         * two injection mechanisms are distinguishable in logcat.
+         * Lightweight timing probe tagged differently from the HTML-injected probe
+         * so the two mechanisms are distinguishable in logcat.
          */
         private const val TIMING_PROBE_SCRIPT = """
 (function() {

@@ -39,4 +39,19 @@ interface YouTubeAdBlockingFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    /**
+     * Controls the injection mechanism.
+     *
+     * When enabled: scriptlets are injected via `evaluateJavascript` in `onPageStarted`.
+     *   - No HTML modification, no CSP stripping, no OkHttp fetch
+     *   - evaluateJavascript is not subject to CSP
+     *   - Timing may be slightly later than HTML injection
+     *
+     * When disabled (default): scriptlets are injected via `shouldInterceptRequest` HTML modification.
+     *   - Guaranteed pre-init timing (script is in the HTML before parsing)
+     *   - Requires CSP stripping and OkHttp fetch with cookie bridging
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun useEvaluateJs(): Toggle
 }

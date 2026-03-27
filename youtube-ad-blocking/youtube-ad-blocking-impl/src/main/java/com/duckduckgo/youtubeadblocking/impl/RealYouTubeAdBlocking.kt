@@ -46,11 +46,20 @@ class RealYouTubeAdBlocking @Inject constructor(
         request: WebResourceRequest,
         url: Uri,
     ): WebResourceResponse? {
-        val enabled = isEnabled()
-        if (!enabled) {
+        if (!isEnabled()) {
             logcat { "YouTubeAdBlocking: Feature disabled, skipping interception for ${url.host}" }
             return null
         }
+        if (useEvaluateJs()) {
+            // evaluateJs mode: don't intercept requests, scriptlets are injected via JsInjectorPlugin
+            return null
+        }
         return requestInterceptor.intercept(request, url)
+    }
+
+    private suspend fun useEvaluateJs(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            youTubeAdBlockingFeature.useEvaluateJs().isEnabled()
+        }
     }
 }
