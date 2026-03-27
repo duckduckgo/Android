@@ -88,7 +88,12 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
         val scriptlets = cachedFullBundle ?: try {
             val main = loadRawResource(R.raw.youtube_ad_blocking_main)
             val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
-            "$main\n$isolated".also { cachedFullBundle = it }
+            buildString {
+                append("console.log('[DDG-YT-ADBLOCK-EVALUATE] Running MAIN scriptlet (${main.length} bytes)');\n")
+                append(main)
+                append("\nconsole.log('[DDG-YT-ADBLOCK-EVALUATE] Running ISOLATED scriptlet (${isolated.length} bytes)');\n")
+                append(isolated)
+            }.also { cachedFullBundle = it }
         } catch (e: Exception) {
             logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
             return null

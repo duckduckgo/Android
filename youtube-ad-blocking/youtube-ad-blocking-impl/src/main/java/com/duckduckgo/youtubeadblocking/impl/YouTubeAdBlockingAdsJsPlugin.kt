@@ -115,7 +115,12 @@ class YouTubeAdBlockingAdsJsPlugin @Inject constructor(
             val scriptlets = cachedScriptlets ?: run {
                 val main = loadRawResource(R.raw.youtube_ad_blocking_main)
                 val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
-                "$main\n$isolated".also { cachedScriptlets = it }
+                buildString {
+                    append("console.log('[DDG-YT-ADBLOCK-ADSJS] Running MAIN scriptlet (${main.length} bytes)');\n")
+                    append(main)
+                    append("\nconsole.log('[DDG-YT-ADBLOCK-ADSJS] Running ISOLATED scriptlet (${isolated.length} bytes)');\n")
+                    append(isolated)
+                }.also { cachedScriptlets = it }
             }
             if (includeProbe) {
                 val probe = cachedProbe ?: loadRawResource(R.raw.youtube_ad_blocking_probe).also { cachedProbe = it }
