@@ -16,28 +16,61 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
 **b) Can we see ad blocking actually working?**
 ✅ **Yes.** Pre-roll and mid-roll ads are blocked. Videos start playing immediately without ad interruptions.
 
-## Feature flags
+## Configuration
 
-### `youTubeAdBlocking` (parent toggle — defaults OFF)
+### Remote config example
 
-Controls whether YouTube ad blocking is active. Enable via internal settings.
+```json
+{
+  "features": {
+    "youTubeAdBlocking": {
+      "state": "enabled",
+      "settings": {
+        "injectMethod": "intercept"
+      }
+    }
+  }
+}
+```
 
-### `youTubeAdBlocking.useEvaluateJs` (sub-feature — defaults OFF)
+### `injectMethod` values
 
-Controls the injection mechanism:
-
-| `useEvaluateJs` | Mechanism | How it works |
-|-----------------|-----------|-------------|
-| **OFF** (default) | B: `shouldInterceptRequest` HTML modification | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>` |
-| **ON** | C: `evaluateJavascript` | Injects scriptlets via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp |
+| Value | Mechanism | Description |
+|-------|-----------|-------------|
+| `"none"` | — | Disabled. No scriptlet injection (useful for A/B testing while feature is "enabled"). |
+| `"evaluate"` | C: `evaluateJavascript` | Injects scriptlets via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp. Simplest approach, but timing may be slightly later. |
+| `"intercept"` | B: `shouldInterceptRequest` | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>`. Guaranteed pre-init timing, but more complex (cookie bridging, redirect handling). **Default.** |
+| `"adsjs"` | A: `addDocumentStartJavaScript` | Automatic iframe + SPA coverage, no CSP issues. Reserved for future use — may crash on some WebView versions. |
 
 ### How to test
 
 1. Open DuckDuckGo browser internal settings
 2. Enable the `youTubeAdBlocking` feature flag
-3. Navigate to `youtube.com` and verify ads are blocked
-4. To switch injection mechanism: toggle `youTubeAdBlocking.useEvaluateJs`
-5. **Important:** after toggling, do a full page reload (not SPA navigation) — swipe down to refresh or navigate away and back
+3. Navigate to `youtube.com` and verify ads are blocked (default: `intercept` mode)
+4. To switch injection mechanism: change the `injectMethod` setting in the config
+5. **Important:** after changing config, do a full page reload (not SPA navigation) — swipe down to refresh or navigate away and back
+
+### Quick config examples
+
+**Enable with HTML interception (default):**
+```json
+{ "state": "enabled", "settings": { "injectMethod": "intercept" } }
+```
+
+**Enable with evaluateJavascript:**
+```json
+{ "state": "enabled", "settings": { "injectMethod": "evaluate" } }
+```
+
+**Feature enabled but injection disabled (for A/B baseline):**
+```json
+{ "state": "enabled", "settings": { "injectMethod": "none" } }
+```
+
+**Feature fully disabled:**
+```json
+{ "state": "disabled" }
+```
 
 ### What to look for in logcat
 

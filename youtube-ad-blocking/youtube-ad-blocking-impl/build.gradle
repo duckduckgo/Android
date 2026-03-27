@@ -37,6 +37,8 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Google.dagger
     implementation Square.okHttp3.okHttp
+    implementation Square.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4

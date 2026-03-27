@@ -30,24 +30,16 @@ import javax.inject.Inject
 /**
  * Injects YouTube ad-blocking scriptlets via evaluateJavascript in onPageStarted.
  *
- * Controlled by the `useEvaluateJs` sub-feature toggle:
- * - When `useEvaluateJs` is OFF: injects only a lightweight timing probe tagged
- *   [DDG-YT-ADBLOCK-EVALUATE] for comparison with the HTML injection approach.
- * - When `useEvaluateJs` is ON: injects the full scriptlet bundle (main + isolated + probe).
- *   The shouldInterceptRequest interceptor stands down in this mode.
+ * Active when `injectMethod` setting is `"evaluate"`.
  *
- * evaluateJavascript advantages over HTML modification:
- * - No CSP stripping needed (evaluateJavascript is not subject to page CSP)
- * - No OkHttp fetch / cookie bridging / redirect handling needed
- * - Simpler, more stable
- *
- * evaluateJavascript disadvantage:
- * - Fires at onPageStarted which may be slightly later than document_start
+ * When injectMethod is anything else, only a lightweight timing probe is injected
+ * (tagged [DDG-YT-ADBLOCK-EVALUATE]) for comparison with other mechanisms.
  */
 @ContributesMultibinding(AppScope::class)
 class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
     private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
+    private val settingsStore: YouTubeAdBlockingSettingsStore,
 ) : JsInjectorPlugin {
 
     private var cachedFullBundle: String? = null
@@ -61,18 +53,18 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
         if (!youTubeAdBlockingFeature.self().isEnabled()) return
         if (url == null || !isYouTubeUrl(url)) return
 
-        val useEvaluateJs = youTubeAdBlockingFeature.useEvaluateJs().isEnabled()
+        val method = settingsStore.injectMethod
 
-        if (useEvaluateJs) {
+        if (method == InjectMethod.EVALUATE) {
             // Full injection mode: inject the complete scriptlet bundle
             val bundle = getFullBundle()
             if (bundle != null) {
-                logcat { "YouTubeAdBlocking: [evaluateJs mode] Injecting full scriptlet bundle for $url" }
+                logcat { "YouTubeAdBlocking: [evaluate mode] Injecting full scriptlet bundle for $url" }
                 webView.evaluateJavascript(bundle, null)
             }
         } else {
-            // Comparison mode: inject only the timing probe
-            logcat { "YouTubeAdBlocking: [timing comparison] evaluateJavascript probe for $url" }
+            // Timing comparison mode: inject only the lightweight probe
+            logcat { "YouTubeAdBlocking: [timing comparison] evaluateJavascript probe for $url (active method: $method)" }
             webView.evaluateJavascript(TIMING_PROBE_SCRIPT, null)
         }
     }
@@ -109,10 +101,6 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
     }
 
     companion object {
-        /**
-         * Lightweight timing probe tagged differently from the HTML-injected probe
-         * so the two mechanisms are distinguishable in logcat.
-         */
         private const val TIMING_PROBE_SCRIPT = """
 (function() {
     var TAG = '[DDG-YT-ADBLOCK-EVALUATE]';

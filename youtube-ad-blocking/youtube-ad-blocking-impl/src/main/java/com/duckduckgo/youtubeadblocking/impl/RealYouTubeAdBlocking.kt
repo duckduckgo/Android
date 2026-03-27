@@ -32,6 +32,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealYouTubeAdBlocking @Inject constructor(
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
+    private val settingsStore: YouTubeAdBlockingSettingsStore,
     private val requestInterceptor: YouTubeAdBlockingRequestInterceptor,
     private val dispatcherProvider: DispatcherProvider,
 ) : YouTubeAdBlocking {
@@ -46,20 +47,14 @@ class RealYouTubeAdBlocking @Inject constructor(
         request: WebResourceRequest,
         url: Uri,
     ): WebResourceResponse? {
-        if (!isEnabled()) {
-            logcat { "YouTubeAdBlocking: Feature disabled, skipping interception for ${url.host}" }
-            return null
-        }
-        if (useEvaluateJs()) {
-            // evaluateJs mode: don't intercept requests, scriptlets are injected via JsInjectorPlugin
+        if (!isEnabled()) return null
+
+        val method = settingsStore.injectMethod
+        if (method != InjectMethod.INTERCEPT) {
+            // Only intercept requests when injectMethod is "intercept".
+            // Other methods (evaluate, adsjs) inject via different paths.
             return null
         }
         return requestInterceptor.intercept(request, url)
-    }
-
-    private suspend fun useEvaluateJs(): Boolean {
-        return withContext(dispatcherProvider.io()) {
-            youTubeAdBlockingFeature.useEvaluateJs().isEnabled()
-        }
     }
 }
