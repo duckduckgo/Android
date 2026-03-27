@@ -39,7 +39,12 @@ def extract_asana_task_links(commits: List[git.Commit], url_prefix: str) -> List
     Extract Asana task links from commit messages.
     """
     task_links = []
-    url_pattern = re.compile(rf"{re.escape(url_prefix)}\s*(https://app\.asana\.com/\S*)")
+    # Split prefix by whitespace, escape each part, join with \s+ to allow flexible whitespace (including newlines)
+    prefix_parts = url_prefix.split()
+    flexible_prefix = r"\s+".join(re.escape(part) for part in prefix_parts)
+    # Allow optional whitespace around "/" (e.g., "Task / Issue" or "Task/ Issue")
+    flexible_prefix = flexible_prefix.replace("/", r"\s*/\s*")
+    url_pattern = re.compile(rf"{flexible_prefix}\s*(https://app\.asana\.com/\S*)")
     
     for commit in commits:
         message = commit.message
