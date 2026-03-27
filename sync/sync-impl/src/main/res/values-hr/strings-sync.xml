@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Nabavi preglednik za PC</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za Mac i Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Oporavak</string>
+    <string name="sync_settings_download_recovery_code_item">Preuzmi kôd za oporavak kao PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Upotrijebi ovaj kôd za oporavak podataka ako izgubiš pristup ovom uređaju — čuvaj ga na sigurnom.</string>
+    <string name="sync_settings_data_expiration">Podaci sinkronizacije i sigurnosne kopije (Sync &amp; Backup) ne mogu se oporaviti nakon 18 (ili više) mjeseci neaktivnosti. <annotation type="learn_more_link">Saznaj više</annotation></string>
 </resources>

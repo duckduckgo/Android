@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Obține browserul pentru desktop</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo pentru Mac și Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recuperare</string>
+    <string name="sync_settings_download_recovery_code_item">Descarcă codul de recuperare ca PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Folosește acest cod pentru a-ți recupera datele dacă pierzi accesul la acest dispozitiv – păstrează-l în siguranță.</string>
+    <string name="sync_settings_data_expiration">Datele Sync &amp; Backup nu pot fi recuperate după 18 luni de inactivitate. <annotation type="learn_more_link">Află mai multe</annotation></string>
 </resources>

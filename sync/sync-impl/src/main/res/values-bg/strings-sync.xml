@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Вземете браузъра за работен плот</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo за Mac и Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Възстановяване</string>
+    <string name="sync_settings_download_recovery_code_item">Изтегляне на кода за възстановяване като PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Използвайте този код, за да възстановите данните си, ако загубите достъп до това устройство - пазете го на сигурно място.</string>
+    <string name="sync_settings_data_expiration">Данните в Sync &amp; Backup не могат да бъдат възстановени след 18 месеца неактивност. <annotation type="learn_more_link">Научете повече</annotation></string>
 </resources>
