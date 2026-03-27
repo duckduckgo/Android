@@ -162,7 +162,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.dialogs.AutomaticFireproofDialogOptions
 import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.AlternativeHomeScreenWidgetBottomSheetDialog
+import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.HomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -640,7 +640,7 @@ class BrowserTabFragment :
     private var popupMenu: BrowserPopupMenu? = null
     private var bottomSheetMenu: BrowserMenuBottomSheet? = null
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
-    private lateinit var widgetBottomSheetDialog: AlternativeHomeScreenWidgetBottomSheetDialog
+    private lateinit var widgetBottomSheetDialog: HomeScreenWidgetBottomSheetDialog
     private val widgetBottomSheetDialogJob: ConflatedJob = ConflatedJob()
     private var privacyProSkippedOnboardingBottomSheet: PrivacyProSkippedOnboardingBottomSheetDialog? = null
 
@@ -5373,12 +5373,12 @@ class BrowserTabFragment :
 
             if (!::widgetBottomSheetDialog.isInitialized) {
                 widgetBottomSheetDialog =
-                    AlternativeHomeScreenWidgetBottomSheetDialog(
+                    HomeScreenWidgetBottomSheetDialog(
                         context = requireContext(),
                         isLightModeEnabled = appTheme.isLightModeEnabled(),
                     )
                 widgetBottomSheetDialog.eventListener =
-                    object : AlternativeHomeScreenWidgetBottomSheetDialog.EventListener {
+                    object : HomeScreenWidgetBottomSheetDialog.EventListener {
                         override fun onShown() {
                             viewModel.onCtaShown()
                         }
