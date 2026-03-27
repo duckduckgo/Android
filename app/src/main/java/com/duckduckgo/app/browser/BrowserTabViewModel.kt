@@ -3801,20 +3801,18 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         rawErrorCode: String,
     ) {
-        if (errorType != OMITTED) {
-            browserViewState.value =
-                currentBrowserViewState().copy(
-                    browserError = errorType,
-                    showPrivacyShield = HighlightableButton.Visible(enabled = false),
-                )
-            if (androidBrowserConfig.errorPagePixel().isEnabled()) {
-                pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
-            }
-            command.value = WebViewError(errorType, url)
+        browserViewState.value =
+            currentBrowserViewState().copy(
+                browserError = errorType,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+            )
+        if (androidBrowserConfig.errorPagePixel().isEnabled()) {
+            pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
         }
         if (androidBrowserConfig.errorCodePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to rawErrorCode))
         }
+        command.value = WebViewError(errorType, url)
     }
 
     override fun onReceivedMaliciousSiteWarning(

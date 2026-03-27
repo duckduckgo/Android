@@ -994,7 +994,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(eq(OMITTED), anyString(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1006,7 +1006,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(eq(OMITTED), anyString(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test

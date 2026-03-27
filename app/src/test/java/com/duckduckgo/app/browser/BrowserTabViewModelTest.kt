@@ -6897,23 +6897,13 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun givenErrorCodePixelEnabledWhenNonOmittedErrorReceivedThenErrorCodePixelFiredWithCorrectCode() =
+    fun givenErrorCodePixelEnabledWhenErrorReceivedThenErrorCodePixelFiredWithCorrectCode() =
         runTest {
             fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = true))
 
             testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
 
             verify(mockPixel).enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to "ERROR_HOST_LOOKUP"))
-        }
-
-    @Test
-    fun givenErrorCodePixelEnabledWhenOmittedErrorReceivedThenErrorCodePixelStillFired() =
-        runTest {
-            fakeAndroidConfigBrowserFeature.errorCodePixel().setRawStoredState(State(enable = true))
-
-            testee.onReceivedError(OMITTED, "example.com", "ERROR_UNKNOWN")
-
-            verify(mockPixel).enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to "ERROR_UNKNOWN"))
         }
 
     @Test
@@ -6927,16 +6917,7 @@ class BrowserTabViewModelTest {
         }
 
     @Test
-    fun givenOmittedErrorWhenErrorReceivedThenBrowserErrorStateAndCommandNotUpdated() =
-        runTest {
-            testee.onReceivedError(OMITTED, "example.com", "ERROR_UNKNOWN")
-
-            assertEquals(OMITTED, browserViewState().browserError)
-            assertCommandNotIssued<Command.WebViewError>()
-        }
-
-    @Test
-    fun givenNonOmittedErrorWhenErrorReceivedThenBrowserErrorStateAndCommandUpdated() =
+    fun givenErrorReceivedThenBrowserErrorStateAndCommandUpdated() =
         runTest {
             testee.onReceivedError(BAD_URL, "example.com", "ERROR_HOST_LOOKUP")
 
