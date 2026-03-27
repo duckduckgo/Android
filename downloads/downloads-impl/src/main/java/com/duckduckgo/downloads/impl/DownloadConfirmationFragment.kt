@@ -29,7 +29,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
-import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_BUNDLE_KEY
+import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_KEY
 import com.duckduckgo.downloads.impl.databinding.DownloadConfirmationBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -61,9 +61,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     private var file: File? = null
 
-    private val pendingDownload: PendingFileDownload by lazy {
-        requireArguments()[PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
-    }
+    private var pendingDownload: PendingFileDownload? = null
+
+    private var storeKey: String? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -76,43 +76,62 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = DownloadConfirmationBinding.inflate(inflater, container, false)
+
+        storeKey = arguments?.getString(PENDING_DOWNLOAD_KEY)
+        pendingDownload = storeKey?.let { PendingDownloadStore.get(it) }
+        if (pendingDownload == null) {
+            logcat { "PendingFileDownload not found; process may have been killed while dialog was visible" }
+            listener.cancelDownload()
+            return binding.root
+        }
+
         setupDownload()
         setupViews(binding)
         return binding.root
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) {
-            when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
+        val download = pendingDownload ?: return
+        file = if (!download.isDataUrl) {
+            when (val filenameExtraction = filenameExtractor.extract(download)) {
                 is FilenameExtractor.FilenameExtractionResult.Guess -> null
-                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(pendingDownload.directory, filenameExtraction.filename)
+                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(download.directory, filenameExtraction.filename)
             }
         } else {
-            when (val parsed = dataUriParser.generate(pendingDownload.url, pendingDownload.fileName)) {
-                is ParseResult.ParsedDataUri -> File(pendingDownload.directory, parsed.filename.toString())
+            when (val parsed = dataUriParser.generate(download.url, download.fileName)) {
+                is ParseResult.ParsedDataUri -> File(download.directory, parsed.filename.toString())
                 else -> null
             }
         }
     }
 
     private fun setupViews(binding: DownloadConfirmationBinding) {
+        val download = pendingDownload ?: return
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val fileName = file?.name ?: ""
         binding.downloadMessage.text = fileName
         binding.downloadMessageSubtitle.run {
-            val host = runCatching { Uri.parse(pendingDownload.url).baseHost }.getOrNull()
+            val host = if (download.isDataUrl) null else runCatching { Uri.parse(download.url).baseHost }.getOrNull()
 
             isVisible = !host.isNullOrBlank()
             text = getString(R.string.downloadConfirmationSubtitle, host)
         }
         binding.continueDownload.setOnClickListener {
-            listener.continueDownload(pendingDownload)
+            listener.continueDownload(download)
             dismiss()
         }
         binding.cancel.setOnClickListener {
-            logcat { "Cancelled download for url ${pendingDownload.url}" }
+            logcat { "Cancelled download for url ${download.url.take(200)}" }
             listener.cancelDownload()
             dismiss()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val isConfigChange = activity?.isChangingConfigurations == true
+        if (!isConfigChange) {
+            storeKey?.let { PendingDownloadStore.remove(it) }
         }
     }
 }
