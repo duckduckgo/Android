@@ -97,6 +97,11 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val drmSessions = mutableMapOf<String, Boolean>()
 
     override suspend fun isDrmEnabledForSite(url: String): Boolean {
+        val domain = url.extractDomain() ?: url
+
+        drmSessions[domain]?.let { return it }
+        if (isDrmBlockedForUrlByConfig(url)) return false
+
         return isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) ||
             isDomainGranted(url, "", PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
     }
