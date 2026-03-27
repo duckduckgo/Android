@@ -89,19 +89,19 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
     var injectMethod: InjectMethod = InjectMethod.INTERCEPT
         private set
 
-    /** Whether the intercept (Mechanism B) timing probe fires. Default: true. */
+    /** Whether the intercept (Mechanism B) timing probe fires. Default: false (off until settings delivered). */
     @Volatile
-    var timingIntercept: Boolean = true
+    var timingIntercept: Boolean = false
         private set
 
-    /** Whether the evaluateJavascript (Mechanism C) timing probe fires. Default: true. */
+    /** Whether the evaluateJavascript (Mechanism C) timing probe fires. Default: false (off until settings delivered). */
     @Volatile
-    var timingEvaluate: Boolean = true
+    var timingEvaluate: Boolean = false
         private set
 
-    /** Whether the addDocumentStartJavaScript (Mechanism A) timing probe fires. Default: true. */
+    /** Whether the addDocumentStartJavaScript (Mechanism A) timing probe fires. Default: false (off until settings delivered). */
     @Volatile
-    var timingAdsjs: Boolean = true
+    var timingAdsjs: Boolean = false
         private set
 
     private val jsonAdapter: JsonAdapter<YouTubeAdBlockingSetting> by lazy {
@@ -113,9 +113,9 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
         try {
             jsonAdapter.fromJson(jsonString)?.let {
                 injectMethod = InjectMethod.fromString(it.injectMethod)
-                timingIntercept = isEnabledString(it.timingIntercept, default = true)
-                timingEvaluate = isEnabledString(it.timingEvaluate, default = true)
-                timingAdsjs = isEnabledString(it.timingAdsjs, default = true)
+                timingIntercept = isEnabledString(it.timingIntercept, default = false)
+                timingEvaluate = isEnabledString(it.timingEvaluate, default = false)
+                timingAdsjs = isEnabledString(it.timingAdsjs, default = false)
                 logcat {
                     "YouTubeAdBlocking: Settings updated — injectMethod=$injectMethod" +
                         " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
