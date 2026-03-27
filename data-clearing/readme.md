@@ -1,6 +1,6 @@
 # Data Clearing
 
-Plugin-based system for clearing user data across features.
+Plugin-based system for clearing locally-stored data across features.
 
 ## Who can help you better understand this feature?
 - Ondrej Ruttkay
