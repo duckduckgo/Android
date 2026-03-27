@@ -102,7 +102,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_globe" />
+                app:srcCompat="@drawable/ic_vpn_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
@@ -156,7 +156,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_duckai" />
+                app:srcCompat="@drawable/ic_duck_ai_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
@@ -210,7 +210,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_shield" />
+                app:srcCompat="@drawable/ic_shield_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
@@ -264,7 +264,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_cookie" />
+                app:srcCompat="@drawable/ic_cookies_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
@@ -318,7 +318,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:importantForAccessibility="no"
-                app:srcCompat="@drawable/temp_ic_onboarding_profile_blocker" />
+                app:srcCompat="@drawable/ic_profile_blocker_color_24_rebrand" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="0dp"
