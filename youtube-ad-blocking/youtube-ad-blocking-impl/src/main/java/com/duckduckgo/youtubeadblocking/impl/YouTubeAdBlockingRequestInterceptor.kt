@@ -63,6 +63,7 @@ interface YouTubeAdBlockingRequestInterceptor {
 class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
+    private val settingsStore: YouTubeAdBlockingSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : YouTubeAdBlockingRequestInterceptor {
 
@@ -82,7 +83,8 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
             .build()
     }
 
-    private var cachedScriptBundle: String? = null
+    private var cachedScriptlets: String? = null
+    private var cachedProbe: String? = null
 
     override suspend fun intercept(
         request: WebResourceRequest,
@@ -120,7 +122,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     }
 
     private fun fetchAndInject(request: WebResourceRequest, url: Uri): WebResourceResponse? {
-        val scriptBundle = getScriptBundle() ?: return null
+        val scriptBundle = getScriptBundle(includeProbe = settingsStore.timingIntercept) ?: return null
 
         // Build OkHttp request forwarding original headers
         val requestBuilder = Request.Builder().url(url.toString())
@@ -216,17 +218,24 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     /**
      * Loads and concatenates the scriptlet bundle from raw resources.
      * Order matters: main world scriptlets (API patching) first, then isolated
-     * world scriptlets (DOM-level), then the probe (timing diagnostics).
+     * world scriptlets (DOM-level).
      *
-     * All run in the same page JS context since we inject via inline <script>.
+     * The timing probe is conditionally appended based on [includeProbe],
+     * controlled by the `timingIntercept` setting.
      */
-    private fun getScriptBundle(): String? {
-        cachedScriptBundle?.let { return it }
+    private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
-            val main = loadRawResource(R.raw.youtube_ad_blocking_main)
-            val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
-            val probe = loadRawResource(R.raw.youtube_ad_blocking_probe)
-            "$main\n$isolated\n$probe".also { cachedScriptBundle = it }
+            val scriptlets = cachedScriptlets ?: run {
+                val main = loadRawResource(R.raw.youtube_ad_blocking_main)
+                val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
+                "$main\n$isolated".also { cachedScriptlets = it }
+            }
+            if (includeProbe) {
+                val probe = cachedProbe ?: loadRawResource(R.raw.youtube_ad_blocking_probe).also { cachedProbe = it }
+                "$scriptlets\n$probe"
+            } else {
+                scriptlets
+            }
         } catch (e: Exception) {
             logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
             null

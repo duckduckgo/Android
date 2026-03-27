@@ -40,20 +40,26 @@ import javax.inject.Inject
  *     "youTubeAdBlocking": {
  *       "state": "enabled",
  *       "settings": {
- *         "injectMethod": "intercept"
+ *         "injectMethod": "intercept",
+ *         "timingIntercept": true,
+ *         "timingEvaluate": false,
+ *         "timingAdsjs": false
  *       }
  *     }
  *   }
  * }
  * ```
  *
- * Valid values:
+ * `injectMethod` — which mechanism injects the full ad-blocking scriptlet bundle:
  * - `"none"` — disabled, no injection (useful for A/B testing)
  * - `"evaluate"` — evaluateJavascript in onPageStarted (no CSP issues, simpler)
  * - `"intercept"` — shouldInterceptRequest HTML modification (guaranteed timing, strips CSP)
  * - `"adsjs"` — addDocumentStartJavaScript (automatic iframe + SPA, but may crash)
- *
  * Defaults to `"intercept"` if not specified.
+ *
+ * `timingIntercept` / `timingEvaluate` / `timingAdsjs` — independently control whether
+ * each mechanism fires its timing probe. Enable one at a time to get clean measurements
+ * without interference from other mechanisms. All default to `true`.
  */
 enum class InjectMethod {
     NONE,
@@ -83,6 +89,21 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
     var injectMethod: InjectMethod = InjectMethod.INTERCEPT
         private set
 
+    /** Whether the intercept (Mechanism B) timing probe fires. Default: true. */
+    @Volatile
+    var timingIntercept: Boolean = true
+        private set
+
+    /** Whether the evaluateJavascript (Mechanism C) timing probe fires. Default: true. */
+    @Volatile
+    var timingEvaluate: Boolean = true
+        private set
+
+    /** Whether the addDocumentStartJavaScript (Mechanism A) timing probe fires. Default: true. */
+    @Volatile
+    var timingAdsjs: Boolean = true
+        private set
+
     private val jsonAdapter: JsonAdapter<YouTubeAdBlockingSetting> by lazy {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         moshi.adapter(YouTubeAdBlockingSetting::class.java)
@@ -92,7 +113,13 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
         try {
             jsonAdapter.fromJson(jsonString)?.let {
                 injectMethod = InjectMethod.fromString(it.injectMethod)
-                logcat { "YouTubeAdBlocking: Settings updated — injectMethod=$injectMethod" }
+                timingIntercept = it.timingIntercept ?: true
+                timingEvaluate = it.timingEvaluate ?: true
+                timingAdsjs = it.timingAdsjs ?: true
+                logcat {
+                    "YouTubeAdBlocking: Settings updated — injectMethod=$injectMethod" +
+                        " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
+                }
             }
         } catch (e: Exception) {
             logcat { "YouTubeAdBlocking: Failed to parse settings: ${e.asLog()}" }
@@ -104,4 +131,10 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
 data class YouTubeAdBlockingSetting(
     @field:Json(name = "injectMethod")
     val injectMethod: String?,
+    @field:Json(name = "timingIntercept")
+    val timingIntercept: Boolean?,
+    @field:Json(name = "timingEvaluate")
+    val timingEvaluate: Boolean?,
+    @field:Json(name = "timingAdsjs")
+    val timingAdsjs: Boolean?,
 )

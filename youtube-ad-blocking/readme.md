@@ -26,14 +26,19 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
     "youTubeAdBlocking": {
       "state": "enabled",
       "settings": {
-        "injectMethod": "intercept"
+        "injectMethod": "intercept",
+        "timingIntercept": true,
+        "timingEvaluate": true,
+        "timingAdsjs": false
       }
     }
   }
 }
 ```
 
-### `injectMethod` values
+### Settings reference
+
+#### `injectMethod` — which mechanism injects the full ad-blocking scriptlet bundle
 
 | Value | Mechanism | Description |
 |-------|-----------|-------------|
@@ -41,6 +46,16 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
 | `"evaluate"` | C: `evaluateJavascript` | Injects scriptlets via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp. Simplest approach, but timing may be slightly later. |
 | `"intercept"` | B: `shouldInterceptRequest` | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>`. Guaranteed pre-init timing, but more complex (cookie bridging, redirect handling). **Default.** |
 | `"adsjs"` | A: `addDocumentStartJavaScript` | Automatic iframe + SPA coverage, no CSP issues. Reserved for future use — may crash on some WebView versions. |
+
+#### `timingIntercept` / `timingEvaluate` / `timingAdsjs` — timing probe controls
+
+Each boolean independently controls whether that mechanism's timing probe fires. Enable one at a time for clean, isolated measurements. All default to `true`.
+
+| Setting | Controls | Logcat tag |
+|---------|----------|-----------|
+| `timingIntercept` | Probe injected via `shouldInterceptRequest` HTML modification | `[DDG-YT-ADBLOCK]` |
+| `timingEvaluate` | Probe injected via `evaluateJavascript` in `onPageStarted` | `[DDG-YT-ADBLOCK-EVALUATE]` |
+| `timingAdsjs` | Probe injected via `addDocumentStartJavaScript` (not yet wired) | `[DDG-YT-ADBLOCK-ADSJS]` |
 
 ### How to test
 
@@ -52,19 +67,29 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
 
 ### Quick config examples
 
-**Enable with HTML interception (default):**
+**Enable with HTML interception (default), all timing probes active:**
 ```json
 { "state": "enabled", "settings": { "injectMethod": "intercept" } }
 ```
 
-**Enable with evaluateJavascript:**
+**Enable with evaluateJavascript, only evaluate timing probe:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "evaluate" } }
+{ "state": "enabled", "settings": { "injectMethod": "evaluate", "timingIntercept": false, "timingEvaluate": true, "timingAdsjs": false } }
 ```
 
-**Feature enabled but injection disabled (for A/B baseline):**
+**Intercept mode, only intercept timing (no evaluate noise):**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "none" } }
+{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": true, "timingEvaluate": false, "timingAdsjs": false } }
+```
+
+**Compare evaluate vs intercept timing (no scriptlet injection, probes only):**
+```json
+{ "state": "enabled", "settings": { "injectMethod": "none", "timingIntercept": true, "timingEvaluate": true, "timingAdsjs": false } }
+```
+
+**Feature enabled but all probes disabled (clean, no timing noise):**
+```json
+{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": false, "timingEvaluate": false, "timingAdsjs": false } }
 ```
 
 **Feature fully disabled:**

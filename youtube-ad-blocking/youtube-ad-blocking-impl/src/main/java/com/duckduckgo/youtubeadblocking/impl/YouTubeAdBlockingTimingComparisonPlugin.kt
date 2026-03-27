@@ -57,14 +57,15 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
 
         if (method == InjectMethod.EVALUATE) {
             // Full injection mode: inject the complete scriptlet bundle
-            val bundle = getFullBundle()
+            val includeProbe = settingsStore.timingEvaluate
+            val bundle = getFullBundle(includeProbe)
             if (bundle != null) {
-                logcat { "YouTubeAdBlocking: [evaluate mode] Injecting full scriptlet bundle for $url" }
+                logcat { "YouTubeAdBlocking: [evaluate mode] Injecting full scriptlet bundle for $url (timing=$includeProbe)" }
                 webView.evaluateJavascript(bundle, null)
             }
-        } else {
-            // Timing comparison mode: inject only the lightweight probe
-            logcat { "YouTubeAdBlocking: [timing comparison] evaluateJavascript probe for $url (active method: $method)" }
+        } else if (settingsStore.timingEvaluate) {
+            // Timing-only mode: inject only the lightweight probe
+            logcat { "YouTubeAdBlocking: [timing probe] evaluateJavascript for $url (active method: $method)" }
             webView.evaluateJavascript(TIMING_PROBE_SCRIPT, null)
         }
     }
@@ -81,16 +82,19 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
         return url.contains("youtube.com/", ignoreCase = true)
     }
 
-    private fun getFullBundle(): String? {
-        cachedFullBundle?.let { return it }
-        return try {
+    private fun getFullBundle(includeProbe: Boolean): String? {
+        val scriptlets = cachedFullBundle ?: try {
             val main = loadRawResource(R.raw.youtube_ad_blocking_main)
             val isolated = loadRawResource(R.raw.youtube_ad_blocking_isolated)
-            val probe = loadRawResource(R.raw.youtube_ad_blocking_probe)
-            "$main\n$isolated\n$probe".also { cachedFullBundle = it }
+            "$main\n$isolated".also { cachedFullBundle = it }
         } catch (e: Exception) {
             logcat(ERROR) { "YouTubeAdBlocking: Failed to load scriptlet bundle: ${e.message}" }
-            null
+            return null
+        }
+        return if (includeProbe) {
+            "$scriptlets\n$TIMING_PROBE_SCRIPT"
+        } else {
+            scriptlets
         }
     }
 
