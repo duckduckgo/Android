@@ -45,7 +45,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
         get() = Dispatchers.Main + Job()
 
     private var typingAnimationJob: Job? = null
-    private var delayAfterAnimationInMs: Long = 300
+    var delayAfterAnimationInMs: Long = 300
 
     var typingDelayInMs: Long = 20
     private var completeText: Spanned? = null

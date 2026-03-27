@@ -98,14 +98,15 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:importantForAccessibility="no"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:visibility="invisible"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="404dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
         app:layout_constraintVertical_bias="1"
-        tools:layout_constraintHeight_max="404dp"
         tools:src="@drawable/onboarding_welcome_screen_background"
         tools:visibility="visible" />
 
@@ -117,26 +118,33 @@
         android:layout_marginTop="32dp"
         android:alpha="0"
         android:visibility="invisible"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@+id/welcomeScreenWalkingDax"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1"
         app:layout_constraintWidth_max="600dp"
-        tools:alpha="1"
         tools:visibility="visible" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/welcomeScreenWalkingDax"
         android:layout_width="217dp"
         android:layout_height="275dp"
-        android:layout_marginBottom="112dp"
+        android:layout_marginBottom="104dp"
         android:alpha="0"
         android:translationX="-48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/daxDialogCta"
         app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
         tools:alpha="1"
         tools:lottie_progress="1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/welcomeScreenWalkingDaxBottomGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.92" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <attr name="onboardingTextPrimary" format="color" />
+    <attr name="onboardingSurfaceBackdrop" format="color" />
+    <attr name="onboardingSurfaceTertiary" format="color" />
+    <attr name="onboardingAccentAltPrimary" format="color" />
+    <attr name="onboardingAccentBrand" format="color" />
+    <attr name="onboardingAccentContentPrimary" format="color" />
+    <attr name="onboardingAccentPrimary" format="color" />
+    <attr name="onboardingAccentSecondary" format="color" />
+    <color name="onboardingBubbleShadowColor">#08000000</color>
+
+    <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
+
+        <!--Onboarding Colors-->
+        <item name="onboardingTextPrimary">#F5242323</item> <!--96%-->
+        <item name="onboardingSurfaceBackdrop">@color/white</item>
+        <item name="onboardingSurfaceTertiary">@color/white</item>
+        <item name="onboardingAccentAltPrimary">@color/pondwater20</item>
+        <item name="onboardingAccentBrand">@color/mandarin50</item>
+        <item name="onboardingAccentContentPrimary">@color/white</item>
+        <item name="onboardingAccentSecondary">@color/mandarin60</item>
+
+        <!--Surface-->
+        <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
+
+        <!--Text-->
+        <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
+        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
+
+        <!--Button-->
+        <item name="daxButtonPrimary">
+            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary
+        </item>
+        <item name="daxButtonSecondary">
+            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
+        </item>
+
+        <item name="daxColorButtonPrimaryContainer">?attr/onboardingAccentBrand</item>
+        <item name="daxColorButtonPrimaryContainerPressed">?attr/onboardingAccentSecondary</item>
+
+        <item name="daxColorButtonSecondaryContainer">@color/black6</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/black12</item>
+
+        <item name="daxColorButtonPrimaryText">?attr/onboardingAccentContentPrimary</item>
+        <item name="daxColorButtonPrimaryTextPressed">?attr/onboardingAccentContentPrimary</item>
+        <item name="daxColorButtonSecondaryText">?attr/onboardingTextPrimary</item>
+        <item name="daxColorButtonSecondaryTextPressed">?attr/onboardingTextPrimary</item>
+
+        <!-- Text -->
+        <item name="daxColorPrimaryText">?attr/onboardingTextPrimary</item>
+    </style>
+
+    <style name="Theme.DuckDuckGo.Dark.Onboarding" parent="Theme.DuckDuckGo.Dark">
+
+        <!--Onboarding Colors-->
+        <item name="onboardingTextPrimary">@color/white</item>
+        <item name="onboardingSurfaceBackdrop">#133E7C</item>
+        <item name="onboardingSurfaceTertiary">#011D34</item>
+        <item name="onboardingAccentAltPrimary">#133E7C</item>
+        <item name="onboardingAccentBrand">@color/pollen30</item>
+        <item name="onboardingAccentContentPrimary">@color/pollen100</item>
+        <item name="onboardingAccentSecondary">@color/pollen40</item>
+
+        <!--Surface-->
+        <item name="daxColorBackground">?attr/onboardingSurfaceBackdrop</item>
+
+        <!--Text-->
+        <item name="textAppearanceH2">@style/Typography.DuckDuckGo.Onboarding.Title</item>
+        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Onboarding.Button</item>
+
+        <!--Button-->
+        <item name="daxButtonPrimary">
+            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary
+        </item>
+        <item name="daxButtonSecondary">
+            @style/Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary
+        </item>
+
+        <item name="daxColorButtonPrimaryContainer">?attr/onboardingAccentBrand</item>
+        <item name="daxColorButtonPrimaryContainerPressed">?attr/onboardingAccentSecondary</item>
+
+        <item name="daxColorButtonSecondaryContainer">@color/white12</item>
+        <item name="daxColorButtonSecondaryContainerPressed">@color/white24</item>
+
+        <item name="daxColorButtonPrimaryText">?attr/onboardingAccentContentPrimary</item>
+        <item name="daxColorButtonPrimaryTextPressed">?attr/onboardingAccentContentPrimary</item>
+        <item name="daxColorButtonSecondaryText">?attr/onboardingTextPrimary</item>
+        <item name="daxColorButtonSecondaryTextPressed">?attr/onboardingTextPrimary</item>
+
+        <!-- Text -->
+        <item name="daxColorPrimaryText">?attr/onboardingTextPrimary</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding" />
+
+    <!--TODO add ducksans-->
+    <style name="Typography.DuckDuckGo.Onboarding.Title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:lineSpacingExtra">-1sp</item>
+        <item name="fontWeight">700</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--TODO add ducksans-->
+    <style name="Typography.DuckDuckGo.Onboarding.Body">
+        <item name="android:textSize">18sp</item>
+        <item name="android:lineSpacingExtra">0sp</item>
+        <item name="fontWeight">400</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.Onboarding.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="fontWeight">400</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAppearance">?attr/textAppearanceButton</item>
+        <item name="cornerRadius">64dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Primary">
+        <item name="android:textColor">?attr/daxColorButtonPrimaryText</item>
+        <item name="backgroundTint">?attr/daxColorButtonPrimaryContainer</item>
+        <item name="rippleColor">?attr/daxColorButtonPrimaryContainerPressed</item>
+        <item name="iconTint">?attr/daxColorButtonPrimaryText</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.DaxButton.TextButton.Onboarding.Secondary">
+        <item name="android:textColor">?attr/daxColorButtonSecondaryText</item>
+        <item name="backgroundTint">?attr/daxColorButtonSecondaryContainer</item>
+        <item name="rippleColor">?attr/daxColorButtonSecondaryContainerPressed</item>
+        <item name="iconTint">?attr/daxColorButtonSecondaryText</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.Onboarding.Button</item>
+        <item name="strokeColor">?attr/daxColorButtonSecondaryContainer</item>
+    </style>
+
+</resources>
