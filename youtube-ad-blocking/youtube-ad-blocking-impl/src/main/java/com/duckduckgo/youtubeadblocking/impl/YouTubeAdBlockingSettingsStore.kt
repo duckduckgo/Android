@@ -96,15 +96,30 @@ class RealYouTubeAdBlockingSettingsProvider @Inject constructor(
         moshi.adapter(YouTubeAdBlockingSetting::class.java)
     }
 
+    /**
+     * In-memory cache of the last successfully parsed settings.
+     * Survives fire button (which wipes the toggle store's SharedPreferences)
+     * until the process is killed.
+     */
+    @Volatile
+    private var cachedSettings: YouTubeAdBlockingSetting? = null
+
     private val parsedSettings: YouTubeAdBlockingSetting?
         get() {
-            val json = youTubeAdBlockingFeature.self().getSettings() ?: return null
-            return try {
-                jsonAdapter.fromJson(json)
-            } catch (e: Exception) {
-                logcat { "YouTubeAdBlocking: Failed to parse settings JSON: ${e.message}" }
-                null
+            val json = youTubeAdBlockingFeature.self().getSettings()
+            if (json != null) {
+                try {
+                    val parsed = jsonAdapter.fromJson(json)
+                    if (parsed != null) {
+                        cachedSettings = parsed
+                        return parsed
+                    }
+                } catch (e: Exception) {
+                    logcat { "YouTubeAdBlocking: Failed to parse settings JSON: ${e.message}" }
+                }
             }
+            // Toggle store was wiped (fire button) or not yet loaded — use last known good
+            return cachedSettings
         }
 
     override val injectMethod: InjectMethod
