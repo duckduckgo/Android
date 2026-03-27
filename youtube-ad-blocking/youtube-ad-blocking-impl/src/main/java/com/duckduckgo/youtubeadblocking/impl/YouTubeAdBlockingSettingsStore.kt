@@ -41,9 +41,9 @@ import javax.inject.Inject
  *       "state": "enabled",
  *       "settings": {
  *         "injectMethod": "intercept",
- *         "timingIntercept": true,
- *         "timingEvaluate": false,
- *         "timingAdsjs": false
+ *         "timingIntercept": "enabled",
+ *         "timingEvaluate": "disabled",
+ *         "timingAdsjs": "disabled"
  *       }
  *     }
  *   }
@@ -113,9 +113,9 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
         try {
             jsonAdapter.fromJson(jsonString)?.let {
                 injectMethod = InjectMethod.fromString(it.injectMethod)
-                timingIntercept = it.timingIntercept ?: true
-                timingEvaluate = it.timingEvaluate ?: true
-                timingAdsjs = it.timingAdsjs ?: true
+                timingIntercept = isEnabledString(it.timingIntercept, default = true)
+                timingEvaluate = isEnabledString(it.timingEvaluate, default = true)
+                timingAdsjs = isEnabledString(it.timingAdsjs, default = true)
                 logcat {
                     "YouTubeAdBlocking: Settings updated — injectMethod=$injectMethod" +
                         " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
@@ -125,6 +125,14 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
             logcat { "YouTubeAdBlocking: Failed to parse settings: ${e.asLog()}" }
         }
     }
+
+    private fun isEnabledString(value: String?, default: Boolean): Boolean {
+        return when (value?.lowercase()) {
+            "enabled" -> true
+            "disabled" -> false
+            else -> default
+        }
+    }
 }
 
 @JsonClass(generateAdapter = true)
@@ -132,9 +140,9 @@ data class YouTubeAdBlockingSetting(
     @field:Json(name = "injectMethod")
     val injectMethod: String?,
     @field:Json(name = "timingIntercept")
-    val timingIntercept: Boolean?,
+    val timingIntercept: String?,
     @field:Json(name = "timingEvaluate")
-    val timingEvaluate: Boolean?,
+    val timingEvaluate: String?,
     @field:Json(name = "timingAdsjs")
-    val timingAdsjs: Boolean?,
+    val timingAdsjs: String?,
 )

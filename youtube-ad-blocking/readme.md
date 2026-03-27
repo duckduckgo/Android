@@ -27,9 +27,9 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
       "state": "enabled",
       "settings": {
         "injectMethod": "intercept",
-        "timingIntercept": true,
-        "timingEvaluate": true,
-        "timingAdsjs": false
+        "timingIntercept": "enabled",
+        "timingEvaluate": "enabled",
+        "timingAdsjs": "disabled"
       }
     }
   }
@@ -49,7 +49,7 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
 
 #### `timingIntercept` / `timingEvaluate` / `timingAdsjs` — timing probe controls
 
-Each boolean independently controls whether that mechanism's timing probe fires. Enable one at a time for clean, isolated measurements. All default to `true`.
+Each independently controls whether that mechanism's timing probe fires. Values: `"enabled"` / `"disabled"`. Enable one at a time for clean, isolated measurements. All default to `"enabled"`.
 
 | Setting | Controls | Logcat tag |
 |---------|----------|-----------|
@@ -74,22 +74,22 @@ Each boolean independently controls whether that mechanism's timing probe fires.
 
 **Enable with evaluateJavascript, only evaluate timing probe:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "evaluate", "timingIntercept": false, "timingEvaluate": true, "timingAdsjs": false } }
+{ "state": "enabled", "settings": { "injectMethod": "evaluate", "timingIntercept": "disabled", "timingEvaluate": "enabled", "timingAdsjs": "disabled" } }
 ```
 
 **Intercept mode, only intercept timing (no evaluate noise):**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": true, "timingEvaluate": false, "timingAdsjs": false } }
+{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": "enabled", "timingEvaluate": "disabled", "timingAdsjs": "disabled" } }
 ```
 
 **Compare evaluate vs intercept timing (no scriptlet injection, probes only):**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "none", "timingIntercept": true, "timingEvaluate": true, "timingAdsjs": false } }
+{ "state": "enabled", "settings": { "injectMethod": "none", "timingIntercept": "enabled", "timingEvaluate": "enabled", "timingAdsjs": "disabled" } }
 ```
 
 **Feature enabled but all probes disabled (clean, no timing noise):**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": false, "timingEvaluate": false, "timingAdsjs": false } }
+{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": "disabled", "timingEvaluate": "disabled", "timingAdsjs": "disabled" } }
 ```
 
 **Feature fully disabled:**
