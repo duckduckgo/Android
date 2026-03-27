@@ -82,6 +82,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         if (pendingDownload == null) {
             logcat { "PendingFileDownload not found; process may have been killed while dialog was visible" }
             listener.cancelDownload()
+            dismiss()
             return binding.root
         }
 
