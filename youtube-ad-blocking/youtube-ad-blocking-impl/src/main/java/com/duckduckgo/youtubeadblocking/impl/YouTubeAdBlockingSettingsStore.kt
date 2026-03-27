@@ -85,8 +85,9 @@ enum class InjectMethod {
 @RemoteFeatureStoreNamed(YouTubeAdBlockingFeature::class)
 class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Store {
 
+    /** Defaults to NONE until settings are delivered via store(). */
     @Volatile
-    var injectMethod: InjectMethod = InjectMethod.INTERCEPT
+    var injectMethod: InjectMethod = InjectMethod.NONE
         private set
 
     /** Whether the intercept (Mechanism B) timing probe fires. Default: false (off until settings delivered). */
