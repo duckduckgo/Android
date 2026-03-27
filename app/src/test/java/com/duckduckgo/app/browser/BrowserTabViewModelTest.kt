@@ -131,7 +131,6 @@ import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.browser.uilock.BROWSER_UI_LOCK_FEATURE_NAME
 import com.duckduckgo.app.browser.uilock.BrowserUiLockFeature
 import com.duckduckgo.app.browser.urldisplay.UrlDisplayRepository
@@ -604,7 +603,6 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
-    private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val tabManager: TabManager = mock()
     private val mockOmnibarFeatureRepository: OmnibarRepository = mock()
 
@@ -767,7 +765,6 @@ class BrowserTabViewModelTest {
                     subscriptions = subscriptions,
                     duckPlayer = mockDuckPlayer,
                     brokenSitePrompt = mockBrokenSitePrompt,
-                    onboardingHomeScreenWidgetToggles = mockOnboardingHomeScreenWidgetToggles,
                     duckChat = mockDuckChat,
                 )
 
@@ -3100,7 +3097,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaShownThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
             testee.ctaViewState.value = CtaViewState(cta = cta)
 
             testee.onCtaShown()
@@ -3136,14 +3133,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
-        val cta = HomePanelCta.AddWidgetAuto
-        setCta(cta)
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidget>()
-    }
-
-    @Test
-    fun whenUserClickedAddWidgetOnboardingExperimentCtaButtonThenLaunchAddWidgetOnboardingExperimentCommand() {
         val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
@@ -3155,7 +3144,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidget>()
+        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
     }
 
     @Test
@@ -3198,7 +3187,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissedCtaThenFirePixel() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
@@ -3207,7 +3196,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() =
         runTest {
-            val cta = HomePanelCta.AddWidgetAuto
+            val cta = HomePanelCta.AddWidgetAutoOnboardingExperiment
             setCta(cta)
             testee.onUserDismissedCta(cta)
             verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))

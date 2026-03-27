@@ -2673,7 +2673,6 @@ class BrowserTabFragment :
 
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
-            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.LaunchAddWidgetOnboardingExperiment -> addWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt = true)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()

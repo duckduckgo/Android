@@ -251,7 +251,6 @@ sealed class Command {
 
     data object LaunchAppTPOnboarding : Command()
 
-    data object LaunchAddWidget : Command()
     data object LaunchAddWidgetOnboardingExperiment : Command()
 
     class RequiresAuthentication(
