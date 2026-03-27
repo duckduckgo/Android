@@ -16,7 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.ui.view.encodeBitmapToBase64
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -26,6 +28,7 @@ import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -36,6 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -52,6 +56,14 @@ interface DuckChatJSHelper {
     ): JsCallbackData?
 
     fun onNativeAction(action: NativeAction): SubscriptionEventData
+
+    suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String
+
+    fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>)
+
+    fun clearTabContextPromptEvent()
+
+    fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -72,6 +84,9 @@ class RealDuckChatJSHelper @Inject constructor(
     private val dataStore: DuckChatDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pendingTabContextStore: PendingTabContextStore,
+    private val faviconManager: FaviconManager,
+    private val duckChatFeature: DuckChatFeature,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -211,6 +226,69 @@ class RealDuckChatJSHelper @Inject constructor(
             DUCK_CHAT_FEATURE_NAME,
             subscriptionName,
             JSONObject(),
+        )
+    }
+
+    override suspend fun enrichPageContextIfPossible(tabId: String, pageContext: String): String {
+        val json = JSONObject(pageContext)
+        val url = json.optString("url").takeIf { it.isNotBlank() }
+        if (url != null) {
+            val favicon = faviconManager.loadFromDisk(tabId, url)
+            if (favicon != null) {
+                val faviconBase64 = favicon.encodeBitmapToBase64()
+                json.put(
+                    "favicon",
+                    JSONArray().put(
+                        JSONObject().apply {
+                            put("href", faviconBase64)
+                            put("rel", "icon")
+                        },
+                    ),
+                )
+            }
+        }
+        return json.toString()
+    }
+
+    override fun storeTabContextPromptEvent(prompt: String, pageContexts: List<JSONObject>) {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return
+        pendingTabContextStore.store(prompt, pageContexts)
+    }
+
+    override fun clearTabContextPromptEvent() {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return
+        pendingTabContextStore.clear()
+    }
+
+    override fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData? {
+        if (!duckChatFeature.chatTabAttachments().isEnabled()) return null
+        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
+        val pending = pendingTabContextStore.consume() ?: return null
+
+        val params = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            put("tool", "query")
+            put(
+                "query",
+                JSONObject().apply {
+                    put("prompt", pending.prompt)
+                    put("autoSubmit", true)
+                },
+            )
+            // TODO: Switch to "pageContexts" array once C-S-S and frontend support multiple contexts
+            // put(
+            //     "pageContexts",
+            //     JSONArray().apply {
+            //         pending.pageContexts.forEach { put(it) }
+            //     },
+            // )
+            pending.pageContexts.firstOrNull()?.let { put("pageContext", it) }
+        }
+
+        return SubscriptionEventData(
+            featureName = DUCK_CHAT_FEATURE_NAME,
+            subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
+            params = params,
         )
     }
 
@@ -356,5 +434,6 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUBSCRIPTION_NEW_CHAT = "submitNewChatAction"
         private const val SUBSCRIPTION_TOGGLE_SIDEBAR = "submitToggleSidebarAction"
         private const val SUBSCRIPTION_DUCK_AI_SETTINGS = "submitOpenSettingsAction"
+        private const val SUBSCRIPTION_SUBMIT_NATIVE_PROMPT = "submitAIChatNativePrompt"
     }
 }

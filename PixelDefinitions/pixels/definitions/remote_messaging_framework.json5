@@ -44,7 +44,7 @@
                 "type": "string"
             },
             {
-                "key": "dismiss_type",
+                "key": "dismissType",
                 "description": "The type of dismissal. This value is optional",
                 "type": "string",
                 "enum": ["close_button", "back_button_or_gesture"]

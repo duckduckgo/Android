@@ -263,8 +263,8 @@
     <string name="singleTabFireDialogTitleWithChats">Kas kustutada vahekaardid, saidi andmed ja vestlused?</string>
     <string name="singleTabFireDialogDeleteAll">Kustuta kõik</string>
     <string name="singleTabFireDialogDeleteThisTab">Kustuta see vahekaart</string>
-    <string name="singleTabFireDialogDeleteThisChat">Kustuta see vestlus</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">„Kustuta kõik” ei kustuta su Duck.ai vestlusajalugu.</string>
+    <string name="singleTabFireDialogDeleteChat">Kustuta vestlus</string>
+    <string name="singleTabFireDialogTitleDuckAi">Kustutada see vestlus?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Saidi andmete kustutamine võib sind kontodelt välja logida.</string>
     <string name="singleTabFireDialogSubtitleDownloads">See tühistab pooleliolevad allalaadimised.</string>
     <plurals name="tabsClearedSnackbarMessage">

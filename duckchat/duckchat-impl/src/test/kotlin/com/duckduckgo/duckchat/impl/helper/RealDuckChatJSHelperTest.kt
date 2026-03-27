@@ -16,7 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
@@ -26,22 +28,30 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -57,12 +67,19 @@ class RealDuckChatJSHelperTest {
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
+    private val mockPendingTabContextStore: PendingTabContextStore = mock()
+    private val mockFaviconManager: FaviconManager = mock()
+    private val mockDuckChatFeature: DuckChatFeature =
+        FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         duckChatPixels = mockDuckChatPixels,
         dataStore = mockDataStore,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
+        pendingTabContextStore = mockPendingTabContextStore,
+        faviconManager = mockFaviconManager,
+        duckChatFeature = mockDuckChatFeature,
     )
     private val viewModel =
         object {
@@ -1360,4 +1377,150 @@ class RealDuckChatJSHelperTest {
 
         verify(mockDuckChatPixels, times(1)).reportOpen()
     }
+
+    // region enrichPageContextIfPossible
+
+    @Test
+    fun whenEnrichPageContextWithUrlAndFaviconThenFaviconIsAdded() = runTest {
+        val pageContext = """{"title":"Example","url":"https://example.com"}"""
+        val bitmap = android.graphics.Bitmap.createBitmap(1, 1, android.graphics.Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.loadFromDisk("tab1", "https://example.com")).thenReturn(bitmap)
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertTrue(json.has("favicon"))
+        val faviconArray = json.getJSONArray("favicon")
+        assertEquals(1, faviconArray.length())
+        assertEquals("icon", faviconArray.getJSONObject(0).getString("rel"))
+        assertTrue(faviconArray.getJSONObject(0).getString("href").startsWith("data:image/png;base64,"))
+    }
+
+    @Test
+    fun whenEnrichPageContextWithUrlButNoFaviconThenNoFaviconAdded() = runTest {
+        val pageContext = """{"title":"Example","url":"https://example.com"}"""
+        whenever(mockFaviconManager.loadFromDisk("tab1", "https://example.com")).thenReturn(null)
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+    }
+
+    @Test
+    fun whenEnrichPageContextWithNoUrlThenFaviconNotLoaded() = runTest {
+        val pageContext = """{"title":"Example"}"""
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+        verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+    }
+
+    @Test
+    fun whenEnrichPageContextWithBlankUrlThenFaviconNotLoaded() = runTest {
+        val pageContext = """{"title":"Example","url":""}"""
+
+        val result = testee.enrichPageContextIfPossible("tab1", pageContext)
+
+        val json = JSONObject(result)
+        assertFalse(json.has("favicon"))
+        verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+    }
+
+    // endregion
+
+    // region storeTabContextPromptEvent
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenStoreTabContextPromptEventThenDataIsStored() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+
+        testee.storeTabContextPromptEvent("hello", listOf(pageContext))
+
+        verify(mockPendingTabContextStore).store(eq("hello"), any())
+    }
+
+    @Test
+    fun whenStoreTabContextPromptEventWithFeatureDisabledThenNothingStored() {
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+
+        testee.storeTabContextPromptEvent("hello", listOf(pageContext))
+
+        verify(mockPendingTabContextStore, never()).store(any(), any())
+    }
+
+    // endregion
+
+    // region consumeTabContextPromptOnHandoff
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenConsumeTabContextPromptOnHandoffWithHandoffMethodAndFeatureEnabledThenReturnsEvent() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        val pageContext = JSONObject("""{"title":"Example","url":"https://example.com"}""")
+        whenever(mockPendingTabContextStore.consume()).thenReturn(PendingTabContext("hello", listOf(pageContext)))
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+
+        assertNotNull(result)
+        assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
+        assertEquals("submitAIChatNativePrompt", result.subscriptionName)
+        assertEquals("hello", result.params.getJSONObject("query").getString("prompt"))
+        assertTrue(result.params.getJSONObject("query").getBoolean("autoSubmit"))
+        assertEquals("Example", result.params.getJSONObject("pageContext").getString("title"))
+    }
+
+    @Test
+    fun whenConsumeTabContextPromptOnHandoffWithOtherMethodThenReturnsNull() {
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeConfigValues")
+
+        assertNull(result)
+        verify(mockPendingTabContextStore, never()).consume()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenConsumeTabContextPromptOnHandoffWithNothingStoredThenReturnsNull() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+        whenever(mockPendingTabContextStore.consume()).thenReturn(null)
+
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+
+        assertNull(result)
+    }
+
+    @Test
+    fun whenConsumeTabContextPromptOnHandoffWithFeatureDisabledThenReturnsNull() {
+        val result = testee.consumeTabContextPromptOnHandoff("getAIChatNativeHandoffData")
+
+        assertNull(result)
+        verify(mockPendingTabContextStore, never()).consume()
+    }
+
+    // endregion
+
+    // region clearTabContextPromptEvent
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearTabContextPromptEventThenStoreIsCleared() = runTest {
+        mockDuckChatFeature.chatTabAttachments().setRawStoredState(Toggle.State(enable = true))
+
+        testee.clearTabContextPromptEvent()
+
+        verify(mockPendingTabContextStore).clear()
+    }
+
+    @Test
+    fun whenClearTabContextPromptEventWithFeatureDisabledThenNothingCleared() {
+        testee.clearTabContextPromptEvent()
+
+        verify(mockPendingTabContextStore, never()).clear()
+    }
+
+    // endregion
 }

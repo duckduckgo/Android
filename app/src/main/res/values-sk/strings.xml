@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Odstrániť karty, údaje stránok a chaty?</string>
     <string name="singleTabFireDialogDeleteAll">Odstrániť všetko</string>
     <string name="singleTabFireDialogDeleteThisTab">Vymazať túto záložku</string>
-    <string name="singleTabFireDialogDeleteThisChat">Zmazať tento čet</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">Možnosť „Odstrániť všetko“ neodstráni tvoju históriu četu na Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Zmazať chat</string>
+    <string name="singleTabFireDialogTitleDuckAi">Zmazať tento chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Odstránením údajov z webových stránok sa môžeš odhlásiť z účtov.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tým sa zrušia prebiehajúce sťahovania.</string>
     <plurals name="tabsClearedSnackbarMessage">

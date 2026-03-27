@@ -41,6 +41,12 @@
                 "description": "VPN bypass status when the submission succeeded",
                 "type": "string",
                 "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -117,6 +123,12 @@
                 "description": "VPN bypass status when the failure happened",
                 "type": "string",
                 "enum": ["on", "off", "unsupported"]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -399,6 +411,12 @@
                 "enum": ["on", "off", "unsupported"]
             },
             {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
+            },
+            {
                 "key": "parent",
                 "description": "The parent data broker of the broker scanned",
                 "type": "string"
@@ -406,7 +424,7 @@
         ]
     },
     "m_dbp_search_stage_main_status_no_results": {
-        "description": "Pixel for PIR monthly active users.",
+        "description": "Pixel emitted when the scan is completed with no results found.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -468,11 +486,17 @@
                     "solveCaptcha",
                     "condition"
                 ]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
     "m_dbp_search_stage_main_status_error": {
-        "description": "Pixel for PIR monthly active users.",
+        "description": "Pixel emitted when the scan is completed with an error.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -544,6 +568,12 @@
                     "solveCaptcha",
                     "condition"
                 ]
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1089,7 +1119,7 @@
                 "type": "string"
             },
             {
-                "key": "actionID",
+                "key": "action_id",
                 "description": "The unique identifier of the action that failed",
                 "type": "string"
             },
@@ -1134,6 +1164,12 @@
                 "key": "profile_queries",
                 "description": "Total number of profile queries made during the initial scan",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1142,7 +1178,14 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "manufacturer",
+                "description": "Manufacturer of the device",
+                "type": "string"
+            }
+        ]
     },
     "m_dbp_foreground-run_started": {
         "description": "Fired when pir run is started in the foreground",
@@ -1155,6 +1198,21 @@
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
+            },
+            {
+                "key": "power_saving",
+                "description": "Whether the device is in power saving mode",
+                "type": "string"
+            },
+            {
+                "key": "profile_queries",
+                "description": "The number of profile queries used in the scan",
+                "type": "integer"
+            },
+            {
+                "key": "broker_count",
+                "description": "The number of active brokers at the start of the scan",
+                "type": "integer"
             }
         ]
     },
@@ -1174,6 +1232,21 @@
                 "key": "manufacturer",
                 "description": "Manufacturer of the device",
                 "type": "string"
+            },
+            {
+                "key": "battery-optimizations",
+                "description": "Whether battery optimizations are enabled for the app",
+                "type": "string"
+            },
+            {
+                "key": "total_scan",
+                "description": "The number of scan jobs executed during the run",
+                "type": "integer"
+            },
+            {
+                "key": "total_optout",
+                "description": "The number of opt-out jobs executed during the run",
+                "type": "integer"
             }
         ]
     },
@@ -1408,6 +1481,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1442,6 +1521,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1466,6 +1551,12 @@
                 "key": "action_id",
                 "description": "Predefined identifier of the broker action executed in this stage",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },
@@ -1485,6 +1576,12 @@
                 "key": "broker_version",
                 "description": "The version of the broker JSON file",
                 "type": "string"
+            },
+            {
+                "key": "tracker_blocking_state",
+                "description": "Whether tracker blocking was enabled or disabled during the operation",
+                "type": "string",
+                "enum": ["enabled", "disabled"]
             }
         ]
     },

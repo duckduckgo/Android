@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Generera en Duck-adress</string>
     <string name="browserMenuFindInPage">Hitta på sidan</string>
     <string name="browserMenuPrint">Skriv ut sidan</string>
+    <string name="browserMenuPrintSite">Skriv ut</string>
     <string name="browserMenuOpenAppLink">Öppna i appen</string>
     <string name="browserMenuAddToHome">Lägg till på hemskärmen</string>
     <string name="browserMenuReportBrokenSite">Rapportera skadad webbplats</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Ny chatt</string>
     <string name="browserMenuNewAIChat">Ny AI-chatt</string>
     <string name="browserMenuChatHistory">Chattlogg</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai-chattar</string>
     <string name="browserMenuChatSettings">Duck.ai-inställningar</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Tillbaka</string>
     <string name="browserMenuForward">Framåt</string>
     <string name="browserMenuRefresh">Uppdatera</string>
+    <string name="browserMenuFireTabsData">Ta bort flikar och data</string>
 </resources>

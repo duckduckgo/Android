@@ -121,7 +121,7 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
                     setTitle(R.string.afterInactivityOptionTitle)
                     binding.afterInactivityMessage.text = getString(
                         R.string.afterInactivityOptionMessage,
-                        viewState.afterInactivityTimeoutHours.toString(),
+                        viewState.afterInactivityTimeoutMinutes.toString(),
                     )
                     binding.afterInactivityMessage.visibility = View.VISIBLE
                 } else {

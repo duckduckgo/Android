@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.DuckDuckGo.MessageCta"
+    android:id="@+id/returnHatchRoot"
+    android:clipChildren="false"
+    android:visibility="gone">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/returnHatchFavicon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_dax_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/returnHatchFavicon"
+            app:layout_constraintEnd_toStartOf="@id/returnHatchCTA"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="caption"
+                android:text="Return to..." />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchSiteTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:typography="body1"
+                tools:text="Site Title" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/returnHatchSiteURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body1"
+                tools:text="www.url.com" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/returnHatchCTA"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_return_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

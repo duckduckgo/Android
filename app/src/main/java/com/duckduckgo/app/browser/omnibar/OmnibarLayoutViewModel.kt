@@ -25,7 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.animations.AddressBarTrackersAnimationManager
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -102,7 +102,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
-    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
+    private val browserMenuHighlightState: BrowserMenuHighlightState,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -128,14 +128,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
-        additionalDefaultBrowserPrompts.highlightPopupMenu,
+        browserMenuHighlightState.shouldHighlight,
         flow { emit(addressBarTrackersAnimationManager.isFeatureEnabled()) },
-    ) { state, tabs, highlightOverflowMenu, isAddressBarTrackersAnimationEnabled ->
+    ) { state, tabs, shouldHighlightMenu, isAddressBarTrackersAnimationEnabled ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = highlightOverflowMenu,
+            showBrowserMenuHighlight = shouldHighlightMenu,
             viewMode = getViewMode(state),
             isAddressBarTrackersAnimationEnabled = isAddressBarTrackersAnimationEnabled,
         )

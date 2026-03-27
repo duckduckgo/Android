@@ -22,8 +22,6 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomainPair
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -31,6 +29,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.VERBOSE
@@ -39,34 +38,16 @@ import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
-interface TrackerDetector {
-    fun addClient(client: Client)
-
-    fun evaluate(
-        url: Uri,
-        documentUrl: Uri,
-        checkFirstParty: Boolean = true,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent?
-
-    fun evaluate(
-        url: String,
-        documentUrl: Uri,
-        checkFirstParty: Boolean = true,
-        requestHeaders: Map<String, String>,
-    ): TrackingEvent?
-}
-
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = TrackerDetector::class)
+@ContributesBinding(AppScope::class, boundType = TrackerDetectorClientProvider::class)
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
-    private val webTrackersBlockedDao: WebTrackersBlockedDao,
     private val adClickManager: AdClickManager,
-) : TrackerDetector {
+) : TrackerDetector, TrackerDetectorClientProvider {
 
     private val clients = CopyOnWriteArrayList<Client>()
 
@@ -153,11 +134,6 @@ class TrackerDetectorImpl @Inject constructor(
         }
 
         val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
-
-        if (status == TrackerStatus.BLOCKED) {
-            val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
-        }
 
         logcat(VERBOSE) { "$documentUrlString resource $urlString WAS identified as a tracker and status=$status" }
 

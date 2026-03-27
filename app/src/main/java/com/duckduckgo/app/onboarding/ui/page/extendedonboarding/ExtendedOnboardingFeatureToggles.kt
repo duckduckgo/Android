@@ -37,8 +37,11 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun privacyProCta(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProCtaSkippedOnboarding(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun subscriptionPromoModalCta(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment

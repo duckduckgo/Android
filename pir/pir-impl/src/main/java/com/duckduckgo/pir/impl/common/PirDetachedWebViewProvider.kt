@@ -23,13 +23,18 @@ import android.os.Message
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.net.toUri
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
@@ -67,6 +72,8 @@ interface PirDetachedWebViewProvider {
 @ContributesBinding(AppScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
+    private val pirRequestInterceptor: PirRequestInterceptor,
+    private val dispatcherProvider: DispatcherProvider,
 ) :
     PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
@@ -103,6 +110,16 @@ class RealPirDetachedWebViewProvider @Inject constructor(
             webViewClient = object : WebViewClient() {
                 private var requestedUrl: String? = null
                 private var receivedError: Boolean = false
+
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest?,
+                ): WebResourceResponse? {
+                    request ?: return null
+                    return pirRequestInterceptor.shouldInterceptRequest(request) {
+                        runBlocking { withContext(dispatcherProvider.main()) { view?.url } }?.toUri()
+                    }
+                }
 
                 @SuppressLint("RequiresFeature")
                 override fun shouldOverrideUrlLoading(

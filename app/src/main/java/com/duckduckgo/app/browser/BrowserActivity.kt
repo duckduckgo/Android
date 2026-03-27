@@ -683,6 +683,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
+        // ensure any open browser menu is dismissed before processing the intent, to avoid out to date menu being shown after the intent is processed
+        currentTab?.dismissBrowserMenu()
+
         if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
             currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
             logcat(VERBOSE) { "Verification link was consumed, so don't allow it to open in a new tab" }
@@ -816,7 +819,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             // when swiping is enabled, the state is controlled be flows initialized in configureFlowCollectors()
             viewModel.selectedTab.observe(this) {
                 if (it != null) {
-                    selectTab(it)
+                    selectTab(it) // this updates lastAccesstime
                 }
             }
 

@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Izveidot Duck adresi</string>
     <string name="browserMenuFindInPage">Atrast lapā</string>
     <string name="browserMenuPrint">Drukāt lapu</string>
+    <string name="browserMenuPrintSite">Drukāt</string>
     <string name="browserMenuOpenAppLink">Atvērt lietotnē</string>
     <string name="browserMenuAddToHome">Pievienot sākuma ekrānam</string>
     <string name="browserMenuReportBrokenSite">Ziņot par bojātu vietni</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Jauna tērzēšanas saruna</string>
     <string name="browserMenuNewAIChat">Jauns MI tērzēšanas rīks</string>
     <string name="browserMenuChatHistory">Tērzēšanas sarunu vēsture</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai tērzēšanas</string>
     <string name="browserMenuChatSettings">Duck.ai iestatījumi</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Atpakaļ</string>
     <string name="browserMenuForward">Uz priekšu</string>
     <string name="browserMenuRefresh">Atsvaidzināt</string>
+    <string name="browserMenuFireTabsData">Dzēst cilnes un datus</string>
 </resources>

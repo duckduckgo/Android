@@ -60,9 +60,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndElapsedExceedsTimeoutThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -73,9 +73,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndFreshLaunchAndElapsedExceedsTimeoutThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
@@ -86,9 +86,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndElapsedUnderTimeoutThenDoesNothing() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -99,9 +99,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndFreshLaunchAndElapsedUnderTimeoutThenDoesNothing() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()
@@ -112,7 +112,7 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndNoTimestampThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
         whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(0L)
 
         testee.onOpen(isFreshLaunch = false)
@@ -124,9 +124,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledAndElapsedExactlyEqualsTimeoutThenDelegates() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val exactlyThirtyMinutesAgo = System.currentTimeMillis() - (30 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(exactlyThirtyMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val exactlyFiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(exactlyFiveMinutesAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -138,8 +138,8 @@ class FirstScreenHandlerImplTest {
     fun whenIdleReturnEnabledAndSettingsNullThenUsesDefaultTimeout() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn(null)
-        val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -164,8 +164,8 @@ class FirstScreenHandlerImplTest {
     fun whenIdleReturnEnabledAndSettingsMalformedThenUsesDefaultTimeout() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("not json")
-        val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -174,11 +174,11 @@ class FirstScreenHandlerImplTest {
     }
 
     @Test
-    fun whenIdleReturnEnabledAndTimeoutMinutesMissingThenUsesDefaultTimeout() = runTest {
+    fun whenIdleReturnEnabledAndDefaultIdleThresholdSecondsMissingThenUsesDefaultTimeout() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
         whenever(idleReturnToggle.getSettings()).thenReturn("""{"otherKey": 30}""")
-        val thirtyOneMinutesAgo = System.currentTimeMillis() - (31 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtyOneMinutesAgo)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
 
         testee.onOpen(isFreshLaunch = false)
         testScope.testScheduler.advanceUntilIdle()
@@ -189,9 +189,9 @@ class FirstScreenHandlerImplTest {
     @Test
     fun whenIdleReturnEnabledThenDoesNotCheckShowOnAppLaunch() = runTest {
         whenever(idleReturnToggle.isEnabled()).thenReturn(true)
-        whenever(idleReturnToggle.getSettings()).thenReturn("""{"timeoutMinutes": 30}""")
-        val fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000)
-        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fiveMinutesAgo)
+        whenever(idleReturnToggle.getSettings()).thenReturn("""{"defaultIdleThresholdSeconds": 300}""")
+        val twoMinutesAgo = System.currentTimeMillis() - (2 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(twoMinutesAgo)
 
         testee.onOpen(isFreshLaunch = true)
         testScope.testScheduler.advanceUntilIdle()

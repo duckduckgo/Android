@@ -20,6 +20,8 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.autoconsent.api.AutoconsentResult
+import com.duckduckgo.autoconsent.impl.AutoconsentReloadLoopDetector
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -31,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows
 
 @RunWith(AndroidJUnit4::class)
@@ -40,9 +43,11 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
 
     private val mockCallback: AutoconsentCallback = mock()
     private val mockPixelManager: AutoconsentPixelManager = mock()
+    private val mockReloadLoopDetector: AutoconsentReloadLoopDetector = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-    private val handler = OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager)
+    private val handler =
+        OptOutAndAutoconsentDoneMessageHandlerPlugin(TestScope(), coroutineRule.testDispatcherProvider, mockPixelManager, mockReloadLoopDetector)
 
     @Test
     fun whenProcessIfMessageTypeIsNotIncludedInListThenDoNothing() {
@@ -68,21 +73,48 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
     fun whenProcessOptOutIfResultIsFailsThenSendResultWithFailure() {
         handler.process(getOptOut(), optOutMessage(result = false, selfTest = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = true, selfTestFailed = false, isCosmetic = null)
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = true,
+                selfTestFailed = false,
+                isCosmetic = null,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
+        )
     }
 
     @Test
     fun whenProcessAutoconsentDoneIfCosmeticThenResultSentWithCosmeticSetToTrue() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = true)
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = true,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
+        )
     }
 
     @Test
     fun whenProcessAutoconsentDoneIfNotCosmeticThenResultSentWithCosmeticSetToFalse() {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
-        verify(mockCallback).onResultReceived(consentManaged = true, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = "test",
+                consentReloadLoop = false,
+            ),
+        )
     }
 
     @Test
@@ -128,6 +160,38 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
         handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
 
         verify(mockPixelManager).fireDailyPixel(AutoConsentPixel.AUTOCONSENT_DONE_DAILY)
+    }
+
+    @Test
+    fun whenAutoconsentDoneThenRememberLastHandledCMPCalled() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).rememberLastHandledCMP(webView, "test", false)
+    }
+
+    @Test
+    fun whenAutoconsentDoneCosmeticThenRememberLastHandledCMPCalledWithCosmetic() {
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = true), webView, mockCallback)
+
+        verify(mockReloadLoopDetector).rememberLastHandledCMP(webView, "test", true)
+    }
+
+    @Test
+    fun whenReloadLoopDetectedThenAutoconsentDoneResultHasReloadLoopTrue() {
+        whenever(mockReloadLoopDetector.isReloadLoopDetected(webView)).thenReturn(true)
+
+        handler.process(getAutoconsentType(), autoconsentDoneMessage(cosmetic = false), webView, mockCallback)
+
+        verify(mockCallback).onResultReceived(
+            AutoconsentResult(
+                consentManaged = true,
+                optOutFailed = false,
+                selfTestFailed = false,
+                isCosmetic = false,
+                consentRule = "test",
+                consentReloadLoop = true,
+            ),
+        )
     }
 
     private fun getOptOut(): String = handler.supportedTypes.first()

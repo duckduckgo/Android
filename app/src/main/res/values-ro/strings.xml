@@ -267,8 +267,8 @@
     <string name="singleTabFireDialogTitleWithChats">Dorești să ștergi filele, datele site-ului și chaturile?</string>
     <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
     <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
-    <string name="singleTabFireDialogDeleteThisChat">Șterge acest chat</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">„Șterge tot” nu va șterge istoricul chaturilor tale Duck.ai.</string>
+    <string name="singleTabFireDialogDeleteChat">Șterge chatul</string>
+    <string name="singleTabFireDialogTitleDuckAi">Ștergi acest chat?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
     <plurals name="tabsClearedSnackbarMessage">

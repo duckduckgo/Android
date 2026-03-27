@@ -271,8 +271,8 @@
     <string name="singleTabFireDialogTitleWithChats">Ištrinti skirtukus, svetainės duomenis ir pokalbius?</string>
     <string name="singleTabFireDialogDeleteAll">Ištrinti viską</string>
     <string name="singleTabFireDialogDeleteThisTab">Ištrink šį skirtuką</string>
-    <string name="singleTabFireDialogDeleteThisChat">Ištrinti šį pokalbį</string>
-    <string name="singleTabFireDialogSubtitleDuckAi">„Ištrinti viską“ neištrins tavo „Duck.ai“ pokalbių istorijos.</string>
+    <string name="singleTabFireDialogDeleteChat">Ištrinti pokalbį</string>
+    <string name="singleTabFireDialogTitleDuckAi">Ištrinti šį pokalbį?</string>
     <string name="singleTabFireDialogSubtitleSiteData">Ištrynus svetainės duomenis, galite būti atjungti nuo paskyrų.</string>
     <string name="singleTabFireDialogSubtitleDownloads">Tai atšauks vykdomus atsisiuntimus.</string>
     <plurals name="tabsClearedSnackbarMessage">

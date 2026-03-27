@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Vygenerovat adresu Duck</string>
     <string name="browserMenuFindInPage">Vyhledávání na stránce</string>
     <string name="browserMenuPrint">Vytisknout stránku</string>
+    <string name="browserMenuPrintSite">Vytisknout</string>
     <string name="browserMenuOpenAppLink">Otevřít v aplikaci</string>
     <string name="browserMenuAddToHome">Přidat na domovskou obrazovku</string>
     <string name="browserMenuReportBrokenSite">Nahlásit nefunkční webové stránky</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Nový chat</string>
     <string name="browserMenuNewAIChat">Nový AI Chat</string>
     <string name="browserMenuChatHistory">Historie chatu</string>
+    <string name="browserMenuDuckChatHistory">Chaty Duck.ai</string>
     <string name="browserMenuChatSettings">Nastavení Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Zpět</string>
     <string name="browserMenuForward">Dopředu</string>
     <string name="browserMenuRefresh">Obnovit</string>
+    <string name="browserMenuFireTabsData">Mazání karet a dat</string>
 </resources>

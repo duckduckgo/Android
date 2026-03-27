@@ -40,6 +40,7 @@ dependencies {
     implementation project(':remote-messaging-api')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
+    implementation project(':tracker-detection-api')
     implementation project(':user-agent-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
@@ -87,6 +88,7 @@ dependencies {
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation project(path: ':common-test')
+    androidTestImplementation project(path: ':feature-toggles-test')
     androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }

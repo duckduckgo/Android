@@ -64,12 +64,13 @@ class VpnMenuStateProviderTest {
     private lateinit var testee: VpnMenuStateProviderImpl
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         whenever(androidBrowserConfigFeature.vpnMenuItem()).thenReturn(vpnMenuItemToggle)
         whenever(androidBrowserConfigFeature.vpnMenuItemInternational()).thenReturn(vpnMenuItemInternationalToggle)
         whenever(vpnMenuItemToggle.isEnabled()).thenReturn(true)
         whenever(vpnMenuItemInternationalToggle.isEnabled()).thenReturn(true)
         whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(true)
+        whenever(subscriptions.isFreeTrialEligible()).thenReturn(true)
         testee = VpnMenuStateProviderImpl(
             subscriptions,
             networkProtectionState,
@@ -329,6 +330,22 @@ class VpnMenuStateProviderTest {
             whenever(connectionState.isConnected()).thenReturn(false)
             whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
             whenever(vpnMenuStore.canShowVpnMenuForNotSubscribed()).thenReturn(false)
+
+            testee.getVpnMenuState().test {
+                val state = awaitItem()
+                assertEquals(VpnMenuState.NotSubscribedNoPill, state)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `when user not subscribed and not free trial eligible then return NotSubscribedNoPill`() =
+        runTest {
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+            whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
+            whenever(connectionState.isConnected()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(connectionState))
+            whenever(subscriptions.isFreeTrialEligible()).thenReturn(false)
 
             testee.getVpnMenuState().test {
                 val state = awaitItem()

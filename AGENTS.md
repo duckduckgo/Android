@@ -24,6 +24,7 @@ DuckDuckGo Android is a privacy-focused browser with 100+ Gradle modules. The ap
 **Build:** Gradle 7.6, AGP via refreshVersions, Anvil (Dagger2)
 
 ---
+
 ## Build System
 
 ### Module Discovery
@@ -58,6 +59,7 @@ maestro test .maestro/autofill/1_autofill_shown_in_overflow.yaml   # single test
 maestro test .maestro/autofill                                      # all in directory
 maestro test .maestro --include-tags releaseTest                    # by tag
 ```
+
 Note: `jvm_tests` and `jvm_checks` resolve to `testPlayDebugUnitTest` in `:app` and `testDebugUnitTest` in library modules. To run a single test class, use `--tests`:
 ```bash
 ./gradlew :my-feature-impl:testDebugUnitTest --tests "com.duckduckgo.my.feature.RealFooTest"

@@ -59,7 +59,7 @@ class VpnMenuStateProviderImpl @Inject constructor(
                 // User has subscription but no NetP entitlement
                 subscriptionStatus.isActive() -> VpnMenuState.Hidden
                 else -> {
-                    if (vpnMenuStore.canShowVpnMenuForNotSubscribed()) {
+                    if (vpnMenuStore.canShowVpnMenuForNotSubscribed() && subscriptions.isFreeTrialEligible()) {
                         VpnMenuState.NotSubscribed
                     } else {
                         VpnMenuState.NotSubscribedNoPill

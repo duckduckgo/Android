@@ -181,6 +181,14 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiDefaultTogglePosition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiDefaultTogglePositionTitle"
+                app:secondaryText="@string/duckAiDefaultTogglePositionSearch" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/duckAiInputScreenDescription"
                 android:layout_width="match_parent"
