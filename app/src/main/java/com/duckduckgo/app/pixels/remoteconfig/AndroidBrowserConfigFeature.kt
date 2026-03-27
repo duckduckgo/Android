@@ -69,6 +69,14 @@ interface AndroidBrowserConfigFeature {
     fun errorPagePixel(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "errorCodePixel" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun errorCodePixel(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "featuresRequestHeader" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
