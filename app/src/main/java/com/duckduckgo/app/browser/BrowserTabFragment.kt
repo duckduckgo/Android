@@ -48,7 +48,6 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
-import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
@@ -4655,7 +4654,7 @@ class BrowserTabFragment :
             )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation && !URLUtil.isDataUrl(url))
+            downloadFile(requestUserConfirmation)
         } else {
             requestWriteStoragePermission()
         }
