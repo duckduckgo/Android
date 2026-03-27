@@ -892,10 +892,11 @@ class BrowserWebViewClient @Inject constructor(
                         is PrivacyPassResult.Success -> {
                             logcat { "PrivacyPass: retrying ${request.url} with authorization header" }
                             withContext(dispatcherProvider.main()) {
-                                view?.loadUrl(
-                                    request.url.toString(),
-                                    mapOf("Authorization" to result.authorizationHeader),
-                                )
+                                val headers = mutableMapOf("Authorization" to result.authorizationHeader)
+                                view?.url?.let { currentUrl ->
+                                    headers["Referer"] = currentUrl
+                                }
+                                view?.loadUrl(request.url.toString(), headers)
                             }
                         }
                         is PrivacyPassResult.Failure -> {

@@ -17,8 +17,10 @@
 package com.duckduckgo.privacypass.impl
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
 import com.duckduckgo.actcore.ActCoreNative
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
 import com.duckduckgo.privacypass.api.PrivacyPassManager
@@ -56,10 +58,19 @@ class RealPrivacyPassManager @Inject constructor(
     private val context: Context,
     @PrivacyPassClient private val okHttpClient: OkHttpClient,
     private val privacyPassFeature: PrivacyPassFeature,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : PrivacyPassManager {
 
     private val credentialStore = ConcurrentHashMap<String, StoredCredential>()
     private val native = ActCoreNative()
+
+    private val prefs: SharedPreferences? by lazy {
+        sharedPreferencesProvider.getEncryptedSharedPreferences(PREFS_NAME)
+    }
+
+    init {
+        loadPersistedCredentials()
+    }
 
     private fun ensureNativeReady() {
         ActCoreNative.init(context)
@@ -109,10 +120,10 @@ class RealPrivacyPassManager @Inject constructor(
         val params = wwwAuthenticateHeader.substringAfter(PRIVATE_TOKEN_SCHEME).trim()
         val paramMap = parseAuthParams(params)
 
-        val challengeB64url = paramMap["challenge"] ?: return null
-        val tokenKeyB64url = paramMap["token-key"]
+        val challengeB64url = stripStructuredFieldDelimiters(paramMap["challenge"] ?: return null)
+        val tokenKeyB64url = paramMap["token-key"]?.let { stripStructuredFieldDelimiters(it) }
 
-        val challengeBytes = base64urlDecode(challengeB64url) ?: return null
+        val challengeBytes = base64Decode(challengeB64url) ?: base64urlDecode(challengeB64url) ?: return null
 
         if (challengeBytes.size < 4) return null
 
@@ -143,7 +154,8 @@ class RealPrivacyPassManager @Inject constructor(
 
             val tokenKey = challenge.tokenKey
             val publicKeyCborBase64 = if (tokenKey != null) {
-                val pkBytes = base64urlDecode(tokenKey) ?: return PrivacyPassResult.Failure("Invalid token-key base64url")
+                val pkBytes = base64Decode(tokenKey) ?: base64urlDecode(tokenKey)
+                    ?: return PrivacyPassResult.Failure("Invalid token-key base64/base64url")
                 Base64.encodeToString(pkBytes, Base64.NO_WRAP)
             } else {
                 fetchIssuerPublicKeyCborBase64(challenge.issuerUrl)
@@ -170,6 +182,7 @@ class RealPrivacyPassManager @Inject constructor(
                 publicKeyCborBase64 = publicKeyCborBase64,
             )
             credentialStore[challenge.issuerUrl] = credential
+            persistCredential(credential)
 
             spendAndAuthorize(challenge, credential)
         } catch (e: ActCoreException) {
@@ -205,16 +218,19 @@ class RealPrivacyPassManager @Inject constructor(
                     native.completeRefund(preRefundId, paramsId, publicKeyId, spendProofCborBase64, refundCborBase64),
                 )
                 val newTokenCborBase64 = refundJson.getString("tokenCborBase64")
-                credentialStore[credential.issuerUrl] = credential.copy(tokenCborBase64 = newTokenCborBase64)
+                val updatedCredential = credential.copy(tokenCborBase64 = newTokenCborBase64)
+                credentialStore[credential.issuerUrl] = updatedCredential
+                persistCredential(updatedCredential)
             } else {
                 credentialStore.remove(credential.issuerUrl)
+                removePersistedCredential(credential.issuerUrl)
             }
 
             val spendProofBytes = Base64.decode(spendProofCborBase64, Base64.DEFAULT)
             val tokenStruct = buildTokenStruct(challenge, spendProofBytes)
-            val tokenB64url = base64urlEncode(tokenStruct)
+            val tokenB64 = Base64.encodeToString(tokenStruct, Base64.NO_WRAP)
 
-            val authHeader = "$PRIVATE_TOKEN_SCHEME token=$tokenB64url"
+            val authHeader = "$PRIVATE_TOKEN_SCHEME token=:$tokenB64:"
             PrivacyPassResult.Success(authHeader)
         } catch (e: ActCoreException) {
             logcat(ERROR) { "PrivacyPass: spend FFI error: ${e.message}" }
@@ -388,6 +404,21 @@ class RealPrivacyPassManager @Inject constructor(
         }
     }
 
+    private fun stripStructuredFieldDelimiters(value: String): String {
+        if (value.startsWith(":") && value.endsWith(":") && value.length > 2) {
+            return value.substring(1, value.length - 1)
+        }
+        return value
+    }
+
+    private fun base64Decode(input: String): ByteArray? {
+        return try {
+            Base64.decode(input, Base64.DEFAULT)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
+
     private fun base64urlDecode(input: String): ByteArray? {
         return try {
             Base64.decode(input, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
@@ -400,9 +431,63 @@ class RealPrivacyPassManager @Inject constructor(
         return Base64.encodeToString(data, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
     }
 
+    // MARK: - Credential persistence
+
+    private fun persistCredential(credential: StoredCredential) {
+        try {
+            prefs?.edit()
+                ?.putString("${PREF_TOKEN_PREFIX}${credential.issuerUrl}", credential.tokenCborBase64)
+                ?.putString("${PREF_PUBKEY_PREFIX}${credential.issuerUrl}", credential.publicKeyCborBase64)
+                ?.apply()
+        } catch (e: Exception) {
+            logcat(ERROR) { "PrivacyPass: failed to persist credential: ${e.message}" }
+        }
+    }
+
+    private fun removePersistedCredential(issuerUrl: String) {
+        try {
+            prefs?.edit()
+                ?.remove("${PREF_TOKEN_PREFIX}$issuerUrl")
+                ?.remove("${PREF_PUBKEY_PREFIX}$issuerUrl")
+                ?.apply()
+        } catch (e: Exception) {
+            logcat(ERROR) { "PrivacyPass: failed to remove persisted credential: ${e.message}" }
+        }
+    }
+
+    private fun loadPersistedCredentials() {
+        try {
+            val allPrefs = prefs?.all ?: return
+            val tokenKeys = allPrefs.keys.filter { it.startsWith(PREF_TOKEN_PREFIX) }
+
+            for (tokenKey in tokenKeys) {
+                val issuerUrl = tokenKey.removePrefix(PREF_TOKEN_PREFIX)
+                val tokenCbor = allPrefs[tokenKey] as? String ?: continue
+                val pubkeyCbor = allPrefs["${PREF_PUBKEY_PREFIX}$issuerUrl"] as? String ?: continue
+
+                credentialStore[issuerUrl] = StoredCredential(
+                    issuerUrl = issuerUrl,
+                    tokenCborBase64 = tokenCbor,
+                    publicKeyCborBase64 = pubkeyCbor,
+                )
+            }
+            if (credentialStore.isNotEmpty()) {
+                logcat { "PrivacyPass: loaded ${credentialStore.size} persisted credential(s)" }
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "PrivacyPass: failed to load persisted credentials: ${e.message}" }
+        }
+    }
+
     data class StoredCredential(
         val issuerUrl: String,
         val tokenCborBase64: String,
         val publicKeyCborBase64: String,
     )
+
+    companion object {
+        private const val PREFS_NAME = "privacy_pass_credentials"
+        private const val PREF_TOKEN_PREFIX = "credential_"
+        private const val PREF_PUBKEY_PREFIX = "pubkey_"
+    }
 }

@@ -54,8 +54,33 @@ class RealPrivacyPassManagerTest {
         assertNotNull(result)
         assertEquals(0xDA15, result!!.tokenType)
         assertEquals(issuerUrl, result.issuerUrl)
-        assertEquals(challengeB64url, result.challenge)
-        assertEquals(tokenKeyB64url, result.tokenKey)
+        assertArrayEquals(redemptionContext, result.redemptionContext)
+        assertNotNull(result.rawTokenChallenge)
+    }
+
+    @Test
+    fun testParseChallenge_rfc8941StructuredFields_parsesCorrectly() {
+        val issuerUrl = "http://127.0.0.1:8443"
+        val issuerBytes = issuerUrl.toByteArray(Charsets.UTF_8)
+        val redemptionContext = ByteArray(32) { it.toByte() }
+
+        val tokenChallenge = ByteBuffer.allocate(4 + issuerBytes.size + 32 + 2)
+        tokenChallenge.putShort(0xDA15.toShort())
+        tokenChallenge.putShort(issuerBytes.size.toShort())
+        tokenChallenge.put(issuerBytes)
+        tokenChallenge.put(redemptionContext)
+        tokenChallenge.putShort(0)
+        val challengeBytes = tokenChallenge.array()
+
+        val challengeB64 = Base64.getEncoder().encodeToString(challengeBytes)
+        val tokenKeyB64 = Base64.getEncoder().encodeToString(ByteArray(64) { 0xAA.toByte() })
+
+        val header = "PrivateToken challenge=:$challengeB64:, token-key=:$tokenKeyB64:"
+        val result = parser.parseChallenge(header)
+
+        assertNotNull(result)
+        assertEquals(0xDA15, result!!.tokenType)
+        assertEquals(issuerUrl, result.issuerUrl)
         assertArrayEquals(redemptionContext, result.redemptionContext)
         assertNotNull(result.rawTokenChallenge)
     }
@@ -173,10 +198,10 @@ class RealPrivacyPassManagerTest {
             val params = wwwAuthenticateHeader.substringAfter("PrivateToken").trim()
             val paramMap = parseAuthParams(params)
 
-            val challengeB64url = paramMap["challenge"] ?: return null
-            val tokenKeyB64url = paramMap["token-key"]
+            val challengeB64 = stripStructuredFieldDelimiters(paramMap["challenge"] ?: return null)
+            val tokenKeyB64url = paramMap["token-key"]?.let { stripStructuredFieldDelimiters(it) }
 
-            val challengeBytes = base64urlDecode(challengeB64url) ?: return null
+            val challengeBytes = base64Decode(challengeB64) ?: base64urlDecode(challengeB64) ?: return null
 
             if (challengeBytes.size < 4) return null
 
@@ -192,7 +217,7 @@ class RealPrivacyPassManagerTest {
             return PrivacyPassChallenge(
                 tokenType = tokenType,
                 issuerUrl = issuerUrl,
-                challenge = challengeB64url,
+                challenge = challengeB64,
                 tokenKey = tokenKeyB64url,
                 redemptionContext = redemptionContext,
                 rawTokenChallenge = challengeBytes,
@@ -226,6 +251,21 @@ class RealPrivacyPassManagerTest {
                 result[key.lowercase()] = value
             }
             return result
+        }
+
+        private fun stripStructuredFieldDelimiters(value: String): String {
+            if (value.startsWith(":") && value.endsWith(":") && value.length > 2) {
+                return value.substring(1, value.length - 1)
+            }
+            return value
+        }
+
+        private fun base64Decode(input: String): ByteArray? {
+            return try {
+                Base64.getDecoder().decode(input)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
         }
 
         private fun base64urlDecode(input: String): ByteArray? {
