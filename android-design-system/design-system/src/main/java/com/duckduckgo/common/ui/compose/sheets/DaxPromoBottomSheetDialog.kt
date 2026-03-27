@@ -127,7 +127,7 @@ fun DaxPromoBottomSheetDialog(
     )
 }
 
-object DaxPromoBottomSheetDefaults {
+private object DaxPromoBottomSheetDefaults {
     internal val sheetPadding = 24.dp
     internal val sheetVerticalGap = 16.dp
     internal val sheetHorizontalGap = 16.dp
