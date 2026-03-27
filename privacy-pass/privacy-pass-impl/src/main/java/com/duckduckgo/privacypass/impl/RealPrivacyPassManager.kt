@@ -57,7 +57,6 @@ class ActCoreException(message: String) : Exception(message)
 class RealPrivacyPassManager @Inject constructor(
     private val context: Context,
     @PrivacyPassClient private val okHttpClient: OkHttpClient,
-    private val privacyPassFeature: PrivacyPassFeature,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : PrivacyPassManager {
 
@@ -90,10 +89,8 @@ class RealPrivacyPassManager @Inject constructor(
         originalUrl: String,
         wwwAuthenticateHeader: String,
     ): PrivacyPassResult {
-        if (!privacyPassFeature.self().isEnabled()) {
-            logcat(VERBOSE) { "PrivacyPass: feature disabled via remote config" }
-            return PrivacyPassResult.Failure("Privacy Pass feature is disabled")
-        }
+        // TODO: Check privacyPass remote config feature flag
+        // Currently always enabled for prototype
 
         val challenge = parseChallenge(wwwAuthenticateHeader)
             ?: return PrivacyPassResult.Failure("Failed to parse WWW-Authenticate header")
