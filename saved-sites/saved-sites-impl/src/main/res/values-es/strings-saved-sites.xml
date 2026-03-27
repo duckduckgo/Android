@@ -28,6 +28,12 @@
         <item quantity="one">El marcador de %1$s no se puede sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
         <item quantity="other">Los marcadores de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Buscar marcadores</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Añadir carpeta</string>
+    <string name="bookmarksMenuContentDescription">Más opciones</string>
+    <string name="newTabFavoritesToggleContentDescription">Alternar visibilidad de favoritos</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Gestionar marcadores</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importar desde Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Seleccionar Archivo de marcadores…</string>
     <string name="bookmarksImportDialogClose">Cerrar</string>
+
 </resources>

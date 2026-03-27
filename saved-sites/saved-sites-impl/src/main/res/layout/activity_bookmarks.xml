@@ -72,6 +72,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/addFolderMenu"
                         app:layout_constraintTop_toTopOf="parent"
+                        android:contentDescription="@string/bookmarksSearchMenuContentDescription"
                         tools:visibility="visible">
 
                         <ImageView
@@ -80,6 +81,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/ic_find_search_24" />
                     </FrameLayout>
 
@@ -89,6 +91,7 @@
                         android:layout_height="match_parent"
                         android:padding="@dimen/keyline_2"
                         android:layout_marginEnd="6dp"
+                        android:contentDescription="@string/bookmarksAddFolderMenuContentDescription"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/browserMenu"
                         app:layout_constraintTop_toTopOf="parent"
@@ -100,6 +103,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/ic_folder_add_24" />
                     </FrameLayout>
 
@@ -109,6 +113,7 @@
                         android:layout_height="match_parent"
                         android:padding="@dimen/keyline_2"
                         android:layout_marginEnd="@dimen/keyline_0"
+                        android:contentDescription="@string/bookmarksMenuContentDescription"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -120,6 +125,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/ic_menu_vertical_24" />
 
                     </FrameLayout>

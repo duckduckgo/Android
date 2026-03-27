@@ -1949,7 +1949,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="63"
+            line="65"
             column="13"/>
     </issue>
 
@@ -1960,7 +1960,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/newtab/AutofillNewTabShortcut.kt"
-            line="65"
+            line="67"
             column="13"/>
     </issue>
 
@@ -2510,7 +2510,7 @@
         errorLine2="        ~~">
         <location
             file="src/main/res/layout/popup_window_import_passwords_menu.xml"
-            line="31"
+            line="33"
             column="9"/>
     </issue>
 
@@ -5011,7 +5011,7 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="29"
+            line="31"
             column="10"/>
     </issue>
 
@@ -5022,18 +5022,18 @@
         errorLine2="         ~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="36"
+            line="38"
             column="10"/>
     </issue>
 
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="    android:background=&quot;@color/gray0&quot;>"
+        errorLine1="    android:background=&quot;@color/gray0&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="11"
+            line="12"
             column="5"/>
     </issue>
 
@@ -5044,7 +5044,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="34"
+            line="36"
             column="13"/>
     </issue>
 
@@ -5055,7 +5055,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/autofill_remote_view.xml"
-            line="41"
+            line="43"
             column="13"/>
     </issue>
 

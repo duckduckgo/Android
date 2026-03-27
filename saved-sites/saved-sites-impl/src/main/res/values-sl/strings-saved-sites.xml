@@ -30,6 +30,12 @@
         <item quantity="few">Vaših zaznamkov za %1$s in za %2$d druga spletna mesta ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>
         <item quantity="other">Vaših zaznamkov za %1$s in za %2$d drugih spletnih mest ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Iskanje zaznamkov</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Dodaj mapo</string>
+    <string name="bookmarksMenuContentDescription">Več možnosti</string>
+    <string name="newTabFavoritesToggleContentDescription">Preklop vidnosti priljubljenih</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -124,4 +130,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Uvozi iz Googla</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Izberite datoteko z zaznamki …</string>
     <string name="bookmarksImportDialogClose">Zapri</string>
+
 </resources>

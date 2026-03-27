@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_chat_tab_selector"
         android:layout_marginStart="@dimen/keyline_0"
+        android:importantForAccessibility="no"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

@@ -173,6 +173,7 @@
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatFireButtonContentDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
                 app:layout_constraintStart_toStartOf="parent"
@@ -184,6 +185,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_fire_24" />
             </FrameLayout>
 
@@ -201,6 +203,7 @@
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:background="@drawable/selectable_item_rounded_corner_background"
+                android:contentDescription="@string/duckChatBrowserMenuContentDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
@@ -212,6 +215,7 @@
                     android:layout_height="@dimen/bottomNavIcon"
                     android:layout_gravity="center"
                     android:scaleType="center"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_menu_vertical_24" />
 
             </FrameLayout>

@@ -68,6 +68,7 @@
         android:paddingStart="16dp"
         android:layout_marginStart="@dimen/keyline_2"
         android:layout_marginEnd="4dp"
+        android:contentDescription="@string/bookmarkFavoriteContentDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingIconContainer"
         app:layout_constraintTop_toTopOf="parent" />

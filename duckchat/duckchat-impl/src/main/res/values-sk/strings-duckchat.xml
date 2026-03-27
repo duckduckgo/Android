@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Vyhľadajte alebo zadajte adresu</string>
     <string name="input_screen_chat_hint">Spýtaj sa súkromne</string>
     <string name="input_screen_user_pref_without_ai">Len vyhľadávanie</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Vyhľadávanie &amp; Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Vyskúšaj novú možnosť pýtať sa Duck.ai priamo z panela s adresou. <annotation type="share_feedback">Zdieľaj spätnú väzbu</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Automaticky odoslať obsah stránky</string>
     <string name="duckAIContextualAutomaticContextMessage">Automaticky odoslať obsah stránky do Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Pripoj obsah stránky</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Vymazať údaje</string>
+    <string name="duckChatBrowserMenuContentDescription">Ďalšie možnosti</string>
 </resources>
