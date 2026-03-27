@@ -144,7 +144,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
             android:minHeight="56dp"
             android:orientation="horizontal"
@@ -252,7 +251,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/background_comparison_chart_row_highlighted"
             android:gravity="center_vertical"
             android:minHeight="56dp"
             android:orientation="horizontal"
