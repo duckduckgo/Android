@@ -3136,7 +3136,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.AddWidgetAutoOnboarding
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
+        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
     }
 
     @Test
@@ -3144,7 +3144,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidgetOnboardingExperiment>()
+        assertCommandIssued<Command.LaunchAddWidgetOnboarding>()
     }
 
     @Test
