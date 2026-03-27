@@ -95,7 +95,7 @@ Values: `"enabled"` / `"disabled"`. All default to `"disabled"` until settings a
 2. **Close and re-open the app** — settings must be delivered before they take effect
 3. **Use the fire button** — this clears any cached YouTube pages and cookies, giving you a clean state. Important when switching between injection methods to avoid stale injected content from a previous approach.
 4. Navigate to `youtube.com`
-5. Check logcat (filter `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`)
+5. Check logcat with filter: `YouTubeAdBlocking | DDG-YT-ADBLOCK`
 
 **When switching approaches:** close app → re-open → fire button → navigate to YouTube. This ensures you're testing the new config from a clean slate.
 
