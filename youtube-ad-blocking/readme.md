@@ -4,19 +4,16 @@
 
 ## Overview
 
-This module injects ad-blocking scriptlets into YouTube pages before any page JavaScript executes, blocking ads before YouTube's ad infrastructure initialises.
+This module injects ad-blocking scriptlets into YouTube pages before any page JavaScript executes, blocking ads before YouTube's ad infrastructure initialises. Three injection mechanisms are supported and switchable via remote config.
 
 ## Results
 
-### Hack phase questions answered
-
-**a) Can we reliably inject scriptlets before YouTube's JS init?**
-✅ **Yes.** Both injection mechanisms successfully block YouTube ads.
-
-**b) Can we see ad blocking actually working?**
-✅ **Yes.** Pre-roll and mid-roll ads are blocked. Videos start playing immediately without ad interruptions.
+**a) Can we reliably inject scriptlets before YouTube's JS init?** ✅ Yes.
+**b) Can we see ad blocking actually working?** ✅ Yes — pre-roll and mid-roll ads blocked.
 
 ## Configuration
+
+All settings default to inactive until remote config delivers them. Nothing fires on cold start before settings arrive.
 
 ### Remote config example
 
@@ -27,8 +24,10 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
       "state": "enabled",
       "settings": {
         "injectMethod": "intercept",
+        "injectMain": "enabled",
+        "injectIsolated": "enabled",
         "timingIntercept": "enabled",
-        "timingEvaluate": "enabled",
+        "timingEvaluate": "disabled",
         "timingAdsjs": "disabled"
       }
     }
@@ -38,58 +37,58 @@ This module injects ad-blocking scriptlets into YouTube pages before any page Ja
 
 ### Settings reference
 
-#### `injectMethod` — which mechanism injects the full ad-blocking scriptlet bundle
+#### `injectMethod` — which mechanism injects the scriptlet bundle
 
 | Value | Mechanism | Description |
 |-------|-----------|-------------|
-| `"none"` | — | Disabled. No scriptlet injection (useful for A/B testing while feature is "enabled"). |
-| `"evaluate"` | C: `evaluateJavascript` | Injects scriptlets via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp. Simplest approach, but timing may be slightly later. |
-| `"intercept"` | B: `shouldInterceptRequest` | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>`. Guaranteed pre-init timing, but more complex (cookie bridging, redirect handling). **Default.** |
-| `"adsjs"` | A: `addDocumentStartJavaScript` | Automatic iframe + SPA coverage, no CSP issues. Reserved for future use — may crash on some WebView versions. |
+| `"none"` | — | No scriptlet injection. Timing probes still fire if enabled. |
+| `"evaluate"` | C: `evaluateJavascript` | Injects via `evaluateJavascript` in `onPageStarted`. No HTML modification, no CSP stripping, no OkHttp. Simplest approach. |
+| `"intercept"` | B: `shouldInterceptRequest` | Intercepts YouTube HTML, fetches via OkHttp, strips CSP, injects `<script>` into `<head>`. Guaranteed pre-init timing, but complex (cookie bridging, redirect handling). |
+| `"adsjs"` | A: `addDocumentStartJavaScript` | Automatic iframe + SPA coverage, no CSP issues. May crash on some WebView versions. |
+
+Default: `"none"` (until settings are delivered).
+
+#### `injectMain` / `injectIsolated` — which scriptlets to include
+
+| Setting | Controls | Default |
+|---------|----------|---------|
+| `injectMain` | MAIN world scriptlet — patches YouTube APIs, intercepts ad calls (113KB) | `"enabled"` (when settings delivered) |
+| `injectIsolated` | ISOLATED world scriptlet — DOM-level element hiding and cleanup (34KB) | `"enabled"` (when settings delivered) |
+
+Values: `"enabled"` / `"disabled"`.
 
 #### `timingIntercept` / `timingEvaluate` / `timingAdsjs` — timing probe controls
 
-Each independently controls whether that mechanism's timing probe fires. Values: `"enabled"` / `"disabled"`. Enable one at a time for clean, isolated measurements. All default to `"enabled"`.
+Each independently controls whether that mechanism fires its timing probe. Use these to get clean, isolated timing measurements without interference.
 
-| Setting | Controls | Logcat tag |
-|---------|----------|-----------|
-| `timingIntercept` | Probe injected via `shouldInterceptRequest` HTML modification | `[DDG-YT-ADBLOCK]` |
-| `timingEvaluate` | Probe injected via `evaluateJavascript` in `onPageStarted` | `[DDG-YT-ADBLOCK-EVALUATE]` |
-| `timingAdsjs` | Probe injected via `addDocumentStartJavaScript` (not yet wired) | `[DDG-YT-ADBLOCK-ADSJS]` |
+| Setting | Logcat tag | Default |
+|---------|-----------|---------|
+| `timingIntercept` | `[DDG-YT-ADBLOCK]` | `"disabled"` |
+| `timingEvaluate` | `[DDG-YT-ADBLOCK-EVALUATE]` | `"disabled"` |
+| `timingAdsjs` | `[DDG-YT-ADBLOCK-ADSJS]` | `"disabled"` |
 
-### How to test
-
-1. Open DuckDuckGo browser internal settings
-2. Enable the `youTubeAdBlocking` feature flag
-3. Navigate to `youtube.com` and verify ads are blocked (default: `intercept` mode)
-4. To switch injection mechanism: change the `injectMethod` setting in the config
-5. **Important:** after changing config, do a full page reload (not SPA navigation) — swipe down to refresh or navigate away and back
+Values: `"enabled"` / `"disabled"`. All default to `"disabled"` until settings are delivered.
 
 ### Quick config examples
 
-**Enable with HTML interception (default), all timing probes active:**
+**Intercept mode, both scriptlets, intercept timing only:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "intercept" } }
+{ "state": "enabled", "settings": { "injectMethod": "intercept", "injectMain": "enabled", "injectIsolated": "enabled", "timingIntercept": "enabled" } }
 ```
 
-**Enable with evaluateJavascript, only evaluate timing probe:**
+**Evaluate mode, main scriptlet only:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "evaluate", "timingIntercept": "disabled", "timingEvaluate": "enabled", "timingAdsjs": "disabled" } }
+{ "state": "enabled", "settings": { "injectMethod": "evaluate", "injectMain": "enabled", "injectIsolated": "disabled", "timingEvaluate": "enabled" } }
 ```
 
-**Intercept mode, only intercept timing (no evaluate noise):**
+**addDocumentStartJavaScript mode, all scriptlets:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": "enabled", "timingEvaluate": "disabled", "timingAdsjs": "disabled" } }
+{ "state": "enabled", "settings": { "injectMethod": "adsjs", "injectMain": "enabled", "injectIsolated": "enabled", "timingAdsjs": "enabled" } }
 ```
 
-**Compare evaluate vs intercept timing (no scriptlet injection, probes only):**
+**No injection, compare all three timing probes:**
 ```json
-{ "state": "enabled", "settings": { "injectMethod": "none", "timingIntercept": "enabled", "timingEvaluate": "enabled", "timingAdsjs": "disabled" } }
-```
-
-**Feature enabled but all probes disabled (clean, no timing noise):**
-```json
-{ "state": "enabled", "settings": { "injectMethod": "intercept", "timingIntercept": "disabled", "timingEvaluate": "disabled", "timingAdsjs": "disabled" } }
+{ "state": "enabled", "settings": { "injectMethod": "none", "timingIntercept": "enabled", "timingEvaluate": "enabled", "timingAdsjs": "enabled" } }
 ```
 
 **Feature fully disabled:**
@@ -97,77 +96,67 @@ Each independently controls whether that mechanism's timing probe fires. Values:
 { "state": "disabled" }
 ```
 
+### How to test
+
+1. Set the config in remote config / internal settings
+2. **Kill and restart the app** (or wait for settings delivery) — settings must be delivered via `store()` before they take effect
+3. Navigate to `youtube.com`
+4. Check logcat (filter `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`)
+
 ### What to look for in logcat
 
-Filter by `YouTubeAdBlocking` or `DDG-YT-ADBLOCK`:
-
+**Settings dump** — every plugin logs the full settings state when it runs on a YouTube page:
 ```
-# Mechanism B (shouldInterceptRequest HTML mod) — when useEvaluateJs is OFF:
-YouTubeAdBlocking: Injected probe script into www.youtube.com/...
-[DDG-YT-ADBLOCK] Injected at 0.42 ms | ytInitialData: false | ...
+YouTubeAdBlocking [evaluate plugin] onPageStarted https://... | injectMethod=INTERCEPT injectMain=true injectIsolated=true timingIntercept=true timingEvaluate=false timingAdsjs=false
+```
 
-# Mechanism C (evaluateJavascript) — when useEvaluateJs is ON:
-YouTubeAdBlocking: [evaluateJs mode] Injecting full scriptlet bundle for ...
-[DDG-YT-ADBLOCK] Injected at X ms | ytInitialData: false/true | ...
+**Injection decisions** — each plugin logs what it's doing:
+```
+YouTubeAdBlocking [intercept plugin] INJECTING SCRIPTLETS via shouldInterceptRequest HTML mod into www.youtube.com/watch (timing=true)
+YouTubeAdBlocking [evaluate plugin] SKIPPED — not active method and timing disabled
+YouTubeAdBlocking [adsjs plugin] SKIPPED — not active method and timing disabled
+```
 
-# Timing comparison probe (always fires regardless of mode):
-[DDG-YT-ADBLOCK-EVALUATE] Injected at X ms | ytInitialData: false/true | ...
+**Scriptlet markers** — which scriptlets actually ran in the page:
+```
+[DDG-YT-ADBLOCK] Running MAIN scriptlet (112981 bytes)
+[DDG-YT-ADBLOCK] Running ISOLATED scriptlet (33992 bytes)
+```
+
+**Timing probe** — injection timing relative to YouTube's init:
+```
+[DDG-YT-ADBLOCK] Injected at 0.42 ms | ytInitialData: false | ytcfg: false | ytPlayerResponse: false | frame: main
 ```
 
 ### Understanding the probe values
 
 | Field | What it is | `false` means | `true` means |
 |-------|-----------|---------------|-------------|
-| `Injected at X ms` | `performance.now()` — time since the document context was created | — | — |
-| `ytInitialData` | `window.ytInitialData` — YouTube's server-rendered page data blob. Set by an inline `<script>` in `<head>` that bootstraps the page, including ad configuration. | ✅ We beat YouTube's init. Scriptlets can intercept ad setup. | ❌ YouTube's init already ran. Scriptlets may be too late to block ads. |
-| `ytcfg` | `window.ytcfg` — YouTube's configuration object. Set early in page init, contains feature flags, experiment IDs, and client config. | ✅ Injected before YouTube configured itself. | ⚠️ YouTube config already loaded, but ad blocking may still work depending on which APIs are patched. |
-| `ytPlayerResponse` | `window.ytInitialPlayerResponse` — the initial video + ad payload. Contains `adPlacements`, `playerAds`, and other ad metadata that the player reads on init. | ✅ Injected before the player payload was set. Scriptlets can strip ad fields. | ❌ Player payload already set. Pre-roll ad data is already available to the player. |
-| `frame` | Whether we're in the main frame or an iframe. YouTube's ad player sometimes runs in an iframe with its own JS context. | — | — |
+| `Injected at X ms` | `performance.now()` — time since document context created | — | — |
+| `ytInitialData` | YouTube's server-rendered page data blob, including ad config. Set by an inline `<script>` in `<head>`. | ✅ We beat YouTube's init. | ❌ YouTube's init already ran. |
+| `ytcfg` | YouTube's configuration object (feature flags, experiments). | ✅ Before YouTube configured itself. | ⚠️ Config loaded, but ad blocking may still work. |
+| `ytPlayerResponse` | Initial video + ad payload (`adPlacements`, `playerAds`). | ✅ Can strip ad fields before player reads them. | ❌ Player payload already set. |
+| `frame` | `main` or `iframe`. YouTube's ad player sometimes runs in an iframe. | — | — |
 
-**What "success" looks like:**
-```
-[DDG-YT-ADBLOCK] Injected at 0.42 ms | ytInitialData: false | ytcfg: false | ytPlayerResponse: false | frame: main
-```
-
-All three `false` = we beat YouTube's init completely. The scriptlets have full control over the ad APIs before YouTube touches them.
-
-### Comparing the two mechanisms
-
-1. Enable `youTubeAdBlocking`, disable `useEvaluateJs`
-2. Navigate to YouTube, check logcat for both `[DDG-YT-ADBLOCK]` and `[DDG-YT-ADBLOCK-EVALUATE]` tags
-3. Compare timing values and `ytInitialData` state for each
-4. Enable `useEvaluateJs`, reload YouTube
-5. Check if ads are still blocked
-
-If `evaluateJavascript` shows `ytInitialData: false` and ads are blocked, it's the preferred approach (simpler, no CSP stripping).
+**Success** = all three `false` + low `ms` value.
 
 ## Architecture
 
-### Mechanism B: `shouldInterceptRequest` HTML modification (default)
+### Three injection mechanisms
 
-1. `WebViewRequestInterceptor` calls `YouTubeAdBlocking.intercept()` for every request
-2. For YouTube HTML documents, the interceptor:
-   - Fetches the response via OkHttp with `WebViewCookieJar` bridging to `CookieManager`
-   - Strips `Content-Security-Policy` headers (YouTube's CSP blocks inline scripts)
-   - Injects `<script>{scriptlet bundle}</script>` immediately after `<head>`
-   - Returns the modified `WebResourceResponse`
-3. OkHttp redirect following is disabled — redirects handled natively by WebView
-
-### Mechanism C: `evaluateJavascript` (when `useEvaluateJs` is ON)
-
-1. `YouTubeAdBlockingEvaluateJsPlugin` (a `JsInjectorPlugin`) runs in `onPageStarted`
-2. For YouTube URLs, calls `webView.evaluateJavascript(scriptletBundle, null)`
-3. No HTML modification, no CSP stripping, no OkHttp fetch needed
-4. `evaluateJavascript` is not subject to CSP (injected by the host app)
+| Mechanism | Plugin | Scope | How it works |
+|-----------|--------|-------|-------------|
+| **intercept** | `YouTubeAdBlockingRequestInterceptor` | `AppScope` | Intercepts YouTube HTML in `shouldInterceptRequest`, fetches via OkHttp + `WebViewCookieJar`, strips CSP, injects `<script>` into `<head>` |
+| **evaluate** | `YouTubeAdBlockingEvaluateJsPlugin` | `AppScope` | `JsInjectorPlugin` — calls `evaluateJavascript` in `onPageStarted`. Not subject to CSP. |
+| **adsjs** | `YouTubeAdBlockingAdsJsPlugin` | `FragmentScope` | `AddDocumentStartJavaScriptPlugin` — registers via `WebViewCompatWrapper.addDocumentStartJavaScript`. Auto covers iframes + SPA. |
 
 ### Scriptlet bundle
 
-Three scripts injected in order:
 | Script | Size | Purpose |
 |--------|------|---------|
 | `youtube_ad_blocking_main.js` | 113KB | MAIN world: patches YouTube APIs, intercepts ad-related calls |
 | `youtube_ad_blocking_isolated.js` | 34KB | ISOLATED world: DOM-level element hiding and cleanup |
-| `youtube_ad_blocking_probe.js` | 2KB | Timing diagnostics (logs injection timing to logcat) |
+| `youtube_ad_blocking_probe.js` | 2KB | Timing diagnostics (logs injection timing to console/logcat) |
 
 Scriptlets sourced from `duckduckgo/content-blocker-extension` (v2026.3.24), derived from uBlock Origin Lite filters.
 
@@ -177,17 +166,21 @@ Scriptlets sourced from `duckduckgo/content-blocker-extension` (v2026.3.24), der
 youtube-ad-blocking/
 ├── youtube-ad-blocking-api/    # Public API: YouTubeAdBlocking interface
 └── youtube-ad-blocking-impl/   # Implementation + scriptlet resources
-    ├── YouTubeAdBlockingFeature.kt              # Feature flags (self + useEvaluateJs)
-    ├── RealYouTubeAdBlocking.kt                 # API impl, routes to correct mechanism
+    ├── YouTubeAdBlockingFeature.kt              # Remote feature toggle
+    ├── YouTubeAdBlockingSettingsStore.kt         # Settings: injectMethod, injectMain, injectIsolated, timing*
+    ├── RealYouTubeAdBlocking.kt                 # API impl, routes to intercept mechanism
     ├── YouTubeAdBlockingRequestInterceptor.kt   # Mechanism B (shouldInterceptRequest)
-    └── YouTubeAdBlockingTimingComparisonPlugin.kt  # Mechanism C (evaluateJavascript)
+    ├── YouTubeAdBlockingTimingComparisonPlugin.kt  # Mechanism C (evaluateJavascript)
+    └── YouTubeAdBlockingAdsJsPlugin.kt          # Mechanism A (addDocumentStartJavaScript)
 ```
 
 ## Known limitations (hack phase)
 
-- **Response buffering latency** (Mechanism B only) — full HTML buffered in memory
-- **SPA navigation** — `shouldInterceptRequest` only fires on real HTTP requests; scriptlets patch `pushState`/`replaceState`
-- **Iframe coverage** (Mechanism C) — `evaluateJavascript` only runs in the main frame, not iframes
+- **Settings delivery timing** — all defaults are `NONE`/`false` until `store()` is called. The first page load after cold start won't have ad blocking until settings arrive. Restart the app after changing config.
+- **Response buffering latency** (intercept only) — full HTML response buffered in memory before injection
+- **SPA navigation** (intercept only) — `shouldInterceptRequest` doesn't fire on pushState navigations; scriptlets patch pushState/replaceState
+- **Iframe coverage** (evaluate only) — `evaluateJavascript` only runs in the main frame, not iframes
+- **Cookie bridging** (intercept only) — `WebViewCookieJar` bridges OkHttp ↔ CookieManager; may have edge cases
 - **Scriptlets are bundled locally** — no remote loading, CDN, or auto-update
 - **No DuckPlayer interaction** — not yet handled
 
