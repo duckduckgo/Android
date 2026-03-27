@@ -5361,14 +5361,14 @@ class BrowserTabFragment :
             widgetBottomSheetDialogJob += viewLifecycleOwner.lifecycleScope.launch {
                 delay(WIDGET_PROMPT_DELAY)
                 if (configuration is AddWidgetAutoOnboarding) {
-                    showAlternativeHomeWidgetPrompt(configuration)
+                    showHomeWidgetPrompt(configuration)
                 } else {
                     showHomeCta(configuration)
                 }
             }
         }
 
-        private fun showAlternativeHomeWidgetPrompt(configuration: HomePanelCta) {
+        private fun showHomeWidgetPrompt(configuration: HomePanelCta) {
             hideDaxCta()
 
             if (!::widgetBottomSheetDialog.isInitialized) {
