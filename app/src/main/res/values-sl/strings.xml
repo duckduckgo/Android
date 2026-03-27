@@ -74,6 +74,7 @@
     <string name="options">Možnosti</string>
     <string name="shareLink">Daj povezavo v skupno rabo</string>
     <string name="copyUrl">Kopiraj naslov povezave</string>
+    <string name="urlCopiedToClipboard">URL je kopiran v odložišče</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Najdi naslednje</string>

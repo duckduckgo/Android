@@ -72,6 +72,7 @@
     <string name="options">Valgmuligheder</string>
     <string name="shareLink">Del link</string>
     <string name="copyUrl">Kopiér linkadresse</string>
+    <string name="urlCopiedToClipboard">URL kopieret til udklipsholder</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Find næste</string>

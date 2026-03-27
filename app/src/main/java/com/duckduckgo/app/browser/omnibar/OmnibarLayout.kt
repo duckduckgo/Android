@@ -39,6 +39,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -100,6 +101,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.clipboard.ClipboardInteractor
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -205,6 +207,9 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarRepository: OmnibarRepository
+
+    @Inject
+    lateinit var clipboardInteractor: ClipboardInteractor
 
     private var previousTransitionState: TransitionState? = null
 
@@ -715,6 +720,17 @@ class OmnibarLayout @JvmOverloads constructor(
             }
 
             is Command.CancelEasterEggLogoAnimation -> cancelEasterEggLogoAnimation()
+
+            is Command.CopyUrlToClipboard -> {
+                copyUrlToClipboardAndShowToast(command)
+            }
+        }
+    }
+
+    private fun copyUrlToClipboardAndShowToast(command: Command.CopyUrlToClipboard) {
+        val notificationShownAutomatically = clipboardInteractor.copyToClipboard(toCopy = command.url, isSensitive = false)
+        if (!notificationShownAutomatically) {
+            Toast.makeText(context, R.string.urlCopiedToClipboard, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -1177,6 +1193,11 @@ class OmnibarLayout @JvmOverloads constructor(
                     customTabToolbar.setOnClickListener {
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED)
                         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY, type = PixelType.Daily())
+                    }
+
+                    customTabToolbar.setOnLongClickListener {
+                        viewModel.onCustomTabUrlLongClicked()
+                        true
                     }
 
                     daxIcon.setOnClickListener {

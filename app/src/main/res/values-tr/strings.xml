@@ -72,6 +72,7 @@
     <string name="options">Seçenekler</string>
     <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
+    <string name="urlCopiedToClipboard">URL panoya kopyalandı</string>
 
     <!-- Find in page -->
     <string name="nextSearchTermDescription">Sonrakini bul</string>

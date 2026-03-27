@@ -248,6 +248,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
         data class EasterEggLogoClicked(val url: String) : Command()
         data object FocusInputField : Command()
+        data class CopyUrlToClipboard(val url: String) : Command()
         data object CancelEasterEggLogoAnimation : Command()
     }
 
@@ -1125,6 +1126,15 @@ class OmnibarLayoutViewModel @Inject constructor(
     fun onCancelAddressBarAnimations() {
         viewModelScope.launch {
             command.send(Command.CancelEasterEggLogoAnimation)
+        }
+    }
+
+    fun onCustomTabUrlLongClicked() {
+        viewModelScope.launch {
+            val url = _viewState.value.url
+            if (url.isNotEmpty()) {
+                command.send(Command.CopyUrlToClipboard(url))
+            }
         }
     }
 
