@@ -45,7 +45,8 @@ class TabSwitcherItemDiffCallback(
                     oldItem.tabEntity.viewed == newItem.tabEntity.viewed &&
                     oldItem.tabEntity.title == newItem.tabEntity.title &&
                     oldItem.tabEntity.url == newItem.tabEntity.url &&
-                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected
+                    (oldItem as? SelectableTab)?.isSelected == (newItem as? SelectableTab)?.isSelected &&
+                    (oldItem as? SelectableTab)?.isDuckAi == (newItem as? SelectableTab)?.isDuckAi
             }
             else -> false
         }
@@ -56,6 +57,10 @@ class TabSwitcherItemDiffCallback(
         newItem: TabSwitcherItem,
     ): Bundle? {
         if (oldItem is TabSwitcherItem.Tab && newItem is TabSwitcherItem.Tab && oldItem::class != newItem::class) {
+            return null
+        }
+
+        if ((oldItem as? SelectableTab)?.isDuckAi != (newItem as? SelectableTab)?.isDuckAi) {
             return null
         }
 

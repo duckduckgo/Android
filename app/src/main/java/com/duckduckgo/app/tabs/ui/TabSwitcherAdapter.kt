@@ -87,6 +87,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.io.File
 import java.security.MessageDigest
+import com.duckduckgo.browser.ui.R as BrowserUiR
 import com.duckduckgo.mobile.android.R as AndroidR
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -272,7 +273,7 @@ class TabSwitcherAdapter(
     private fun bindDuckAiListTab(holder: TabSwitcherViewHolder.DuckAiTabListViewHolder, tab: Tab) {
         holder.cancelLoadJobs()
         val context = holder.rootView.context
-        holder.title.text = context.getString(R.string.duck_ai_tab_label)
+        holder.title.text = context.getString(BrowserUiR.string.duck_ai_tab_label)
         holder.url.text = tab.tabEntity.title ?: ""
         holder.url.visibility = View.VISIBLE
         holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
