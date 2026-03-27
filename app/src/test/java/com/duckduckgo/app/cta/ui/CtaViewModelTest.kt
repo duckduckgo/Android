@@ -1025,4 +1025,10 @@ class CtaViewModelTest {
         whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
         return site
     }
+
+    @Test
+    fun whenOnUserClickCtaOkButtonWithSubscriptionPromoModalCtaThenDismissedCtaIsInserted() = runTest {
+        testee.onUserClickCtaOkButton(SubscriptionPromoModalCta(isFreeTrialCopy = false))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO_PRIVACY_PRO))
+    }
 }
