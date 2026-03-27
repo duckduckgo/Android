@@ -44,7 +44,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.extensions.toBinaryString
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -139,7 +138,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
     private val duckChat: DuckChat,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatFeature: DuckChatFeature,
     private val pixel: Pixel,
     private val sessionStore: InputScreenSessionStore,
@@ -182,7 +180,6 @@ class InputScreenViewModel @AssistedInject constructor(
                 newLineButtonVisible = false,
                 mainButtonsVisible = false,
                 searchMode = true,
-                fullScreenMode = duckAiFeatureState.showFullScreenMode.value,
             ),
         )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -391,13 +388,9 @@ class InputScreenViewModel @AssistedInject constructor(
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
         }
-        if (visibilityState.value.fullScreenMode) {
-            onChatSubmitted(prompt)
-        } else {
-            duckChatJSHelper.clearTabContextPromptEvent()
-            command.value = Command.SubmitChat(prompt)
-            duckChat.openDuckChatWithAutoPrompt(prompt)
-        }
+        duckChatJSHelper.clearTabContextPromptEvent()
+        command.value = Command.SubmitChat(prompt)
+        duckChat.openDuckChatWithAutoPrompt(prompt)
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -885,16 +878,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     private fun navigateToDuckChat(query: String) {
-        when {
-            visibilityState.value.fullScreenMode -> {
-                val url = duckChat.getDuckChatUrl(query, true)
-                command.value = Command.SubmitSearch(url)
-            }
-            else -> {
-                command.value = Command.SubmitChat(query)
-                duckChat.openDuckChatWithAutoPrompt(query)
-            }
-        }
+        command.value = Command.SubmitChat(query)
+        duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     private suspend fun buildAndStorePendingPrompt(query: String, attachedTabs: List<TabAttachmentItem>): Boolean {

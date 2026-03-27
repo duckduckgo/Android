@@ -299,7 +299,6 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
@@ -585,9 +584,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var duckChat: DuckChat
-
-    @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
@@ -1595,11 +1591,7 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                if (duckAiFeatureState.showFullScreenMode.value) {
-                    viewModel.openNewDuckChat(omnibar.viewMode)
-                } else {
-                    viewModel.onDuckChatMenuClicked()
-                }
+                viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
                 viewModel.onBookmarksMenuItemClicked()
@@ -1783,11 +1775,7 @@ class BrowserTabFragment :
                     it.hideKeyboard()
                     it.clearFocus()
                 }
-                if (duckAiFeatureState.showFullScreenMode.value) {
-                    viewModel.openNewDuckChat(omnibar.viewMode)
-                } else {
-                    viewModel.onDuckChatMenuClicked()
-                }
+                viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(duckChatHistoryMenuItem) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_SETTINGS_SIDEBAR_TAPPED)
@@ -2219,12 +2207,6 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
 
         browserNavigationBarIntegration.configureBrowserViewMode()
-    }
-
-    private fun showDuckAI(browserViewState: BrowserViewState) {
-        renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
-        omnibar.setViewMode(ViewMode.DuckAI)
-        showNativeInput()
     }
 
     private fun showMaliciousWarning(
@@ -2828,15 +2810,6 @@ class BrowserTabFragment :
             is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
             is Command.EnqueueCookiesAnimation -> enqueueCookiesAnimation(it.isCosmetic)
             is Command.PageStarted -> onPageStarted()
-            is Command.EnableDuckAIFullScreen -> showDuckAI(it.browserViewState)
-            is Command.DuckAIFullScreenDisabled -> {
-                if (omnibar.viewMode == DuckAI) {
-                    nativeInputManager.hideNativeInput()
-                }
-                omnibar.setViewMode(Browser(it.url))
-                sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
-            }
-
             is Command.ShowDuckAIContextualMode -> showDuckChatContextualSheet(it.tabId)
             is Command.StartAddressBarTrackersAnimation -> {
                 omnibar.startTrackersAnimation(it.trackerEntities)

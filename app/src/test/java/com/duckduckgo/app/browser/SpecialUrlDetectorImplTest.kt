@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -45,7 +44,6 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -76,8 +74,6 @@ class SpecialUrlDetectorImplTest {
 
     val mockDuckChat: DuckChat = mock()
 
-    val mockDuckAiFeature: DuckAiFeatureState = mock()
-
     val mockAIChatQueryDetectionFeature: AIChatQueryDetectionFeature = mock()
 
     val mockAIChatQueryDetectionFeatureToggle: Toggle = mock()
@@ -86,8 +82,6 @@ class SpecialUrlDetectorImplTest {
 
     val appSchemeInterceptionFeature: AppSchemeInterceptionFeature =
         FakeFeatureToggleFactory.create(AppSchemeInterceptionFeature::class.java)
-
-    private val mockDuckAiFullScreenMode = MutableStateFlow(false)
 
     @Before
     fun setup() = runTest {
@@ -102,7 +96,6 @@ class SpecialUrlDetectorImplTest {
                 duckChat = mockDuckChat,
                 aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
                 androidBrowserConfigFeature = androidBrowserConfigFeature,
-                duckAiFeatureState = mockDuckAiFeature,
                 appSchemeInterceptionFeature = appSchemeInterceptionFeature,
             ),
         )
@@ -110,7 +103,6 @@ class SpecialUrlDetectorImplTest {
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
-        whenever(mockDuckAiFeature.showFullScreenMode).thenReturn(mockDuckAiFullScreenMode)
         androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(true))
         androidBrowserConfigFeature.validateIntentResolution().setRawStoredState(State(true))
     }
@@ -397,15 +389,6 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsDuckChatUrlAndFeatureIsDisabledThenSearchQueryTypeDetected() {
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        val result = testee.determineType("duckduckgo.com")
-        assertTrue(result is SearchQuery)
-    }
-
-    @Test
-    fun whenUrlIsDuckChatUrlAndFullscreenModeEnabledThenDuckChatTypeNotDetected() = runTest {
-        mockDuckAiFullScreenMode.emit(true)
-        whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is SearchQuery)

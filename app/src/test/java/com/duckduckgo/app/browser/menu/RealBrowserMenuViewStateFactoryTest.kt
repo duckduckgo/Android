@@ -26,16 +26,12 @@ import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class RealBrowserMenuViewStateFactoryTest {
 
@@ -46,9 +42,6 @@ class RealBrowserMenuViewStateFactoryTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
-    private val fullscreenModeFlow = MutableStateFlow(false)
     private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
@@ -56,8 +49,7 @@ class RealBrowserMenuViewStateFactoryTest {
 
     @Before
     fun setup() {
-        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
+        testee = RealBrowserMenuViewStateFactory(downloadMenuStateProvider, duckDuckGoUrlDetector)
     }
 
     @Test
@@ -268,73 +260,6 @@ class RealBrowserMenuViewStateFactoryTest {
         assertTrue(viewState.canGoForward)
         assertTrue(viewState.showDuckChatOption)
         assertFalse(viewState.showNewDuckChatTabOption)
-        assertTrue(viewState.canSharePage)
-        assertFalse(viewState.showSelectDefaultBrowserMenuItem)
-        assertTrue(viewState.canSaveSite)
-        assertFalse(viewState.isBookmark)
-        assertTrue(viewState.canFireproofSite)
-        assertTrue(viewState.isFireproofWebsite)
-        assertTrue(viewState.isEmailSignedIn)
-        assertTrue(viewState.canChangeBrowsingMode)
-        assertTrue(viewState.isDesktopBrowsingMode)
-        assertFalse(viewState.hasPreviousAppLink)
-        assertTrue(viewState.canFindInPage)
-        assertTrue(viewState.addToHomeVisible)
-        assertTrue(viewState.canChangePrivacyProtection)
-        assertTrue(viewState.isPrivacyProtectionDisabled)
-        assertTrue(viewState.canReportSite)
-        assertTrue(viewState.showAutofill)
-        assertFalse(viewState.isSSLError)
-        assertTrue(viewState.canPrintPage)
-    }
-
-    @Test
-    fun `when creating menu in browser mode with fullscreen eanbled we return the proper state`() = runTest {
-        fullscreenModeFlow.emit(true)
-
-        val browserViewState = BrowserViewState(
-            canGoBack = true,
-            canGoForward = true,
-            showDuckChatOption = true,
-            canSharePage = true,
-            showSelectDefaultBrowserMenuItem = false,
-            canSaveSite = true,
-            bookmark = null,
-            canFireproofSite = true,
-            isFireproofWebsite = true,
-            isEmailSignedIn = true,
-            canChangeBrowsingMode = true,
-            isDesktopBrowsingMode = true,
-            previousAppLink = null,
-            canFindInPage = true,
-            addToHomeVisible = true,
-            addToHomeEnabled = true,
-            canChangePrivacyProtection = true,
-            isPrivacyProtectionDisabled = true,
-            canReportSite = true,
-            showAutofill = true,
-            sslError = NONE,
-            canPrintPage = true,
-        )
-
-        val initialUrl = "https://example.com/page"
-        val omnibarViewMode = ViewMode.Browser(initialUrl)
-
-        val result = testee.create(
-            omnibarViewMode = omnibarViewMode,
-            viewState = browserViewState,
-            customTabsMode = false,
-            tabId = "",
-            title = null,
-            shortUrl = null,
-            omnibarText = null,
-        )
-        val viewState = result as BrowserMenuViewState.Browser
-
-        assertTrue(viewState.canGoBack)
-        assertTrue(viewState.canGoForward)
-        assertFalse(viewState.showDuckChatOption)
-        assertTrue(viewState.showNewDuckChatTabOption)
         assertTrue(viewState.canSharePage)
         assertFalse(viewState.showSelectDefaultBrowserMenuItem)
         assertTrue(viewState.canSaveSite)

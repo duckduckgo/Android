@@ -51,12 +51,7 @@ import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.BrowserActivity.Companion.DUCK_AI_ANIM_READY_DELAY_MS
 import com.duckduckgo.app.browser.BrowserViewModel.Command
-import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
-import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
-import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
-import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
@@ -112,15 +107,11 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_TABS
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -218,20 +209,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var fireDialogProvider: FireDialogProvider
 
     private val lastActiveTabs = TabList()
-
-    private var duckAiFragment: DuckChatWebViewFragment? = null
-
-    /**
-     * Whether [duckAiFragment] should animate in.
-     *
-     * True only if [BrowserActivity] has been visible (`STARTED`) for at least [DUCK_AI_ANIM_READY_DELAY_MS].
-     * Otherwise, the fragment is shown immediately (e.g., when the activity was just launched from elsewhere) to avoid janky transitions.
-     *
-     * Delay is required because [onNewIntent] (which shows Duck.ai) always runs after [onStart].
-     * We must ensure the animation is executed only if the activity was already visible before the intent was delivered.
-     */
-    private var duckAiShouldAnimate: Boolean = false
-    private var duckAiAnimDelayJob: Job? = null
 
     private var currentTabRef: BrowserTabFragment? = null
     private var currentTab: BrowserTabFragment?
@@ -488,20 +465,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        duckAiAnimDelayJob =
-            lifecycleScope.launch {
-                delay(DUCK_AI_ANIM_READY_DELAY_MS)
-                duckAiShouldAnimate = true
-            }
     }
 
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
         super.onStop()
-
-        duckAiAnimDelayJob?.cancel()
-        duckAiShouldAnimate = false
     }
 
     override fun onDestroy() {
@@ -717,30 +686,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
             if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
                 externalIntentProcessingState.onIntentRequestToOpenDuckAi()
             }
-
-            if (duckAiFeatureState.showFullScreenMode.value) {
-                val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
-                if (currentTab != null) {
-                    currentTab?.submitQuery(url)
-                } else {
-                    if (swipingTabsFeature.isEnabled) {
-                        launchNewTab(query = url, skipHome = true)
-                    } else {
-                        lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
-                    }
-                }
+            val url = intent.getStringExtra(DUCK_CHAT_URL) ?: duckChat.getDuckChatUrl("", false)
+            if (currentTab != null) {
+                currentTab?.submitQuery(url)
             } else {
-                val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
-                viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
+                if (swipingTabsFeature.isEnabled) {
+                    launchNewTab(query = url, skipHome = true)
+                } else {
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = url, skipHome = true) }
+                }
             }
             return
         }
 
         if (intent.getBooleanExtra(CLOSE_DUCK_CHAT, false)) {
-            if (duckAiFeatureState.showFullScreenMode.value && currentTab?.isInDuckAiMode() == true) {
+            if (currentTab?.isInDuckAiMode() == true) {
                 closeDuckChatFullScreen()
-            } else {
-                closeDuckChat()
             }
             return
         }
@@ -756,7 +717,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val sharedText = intent.intentText
         if (sharedText != null) {
-            closeDuckChat()
             if (duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value) {
                 externalIntentProcessingState.onIntentRequestToChangeTab()
             }
@@ -886,13 +846,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
-            is Command.OpenDuckChat -> openDuckChat(
-                command.duckChatUrl,
-                command.duckChatSessionActive,
-                command.withTransition,
-                command.tabs,
-            )
-
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -966,133 +919,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.closeCurrentTab()
     }
 
-    fun closeDuckChat() {
-        isDuckChatVisible = false
-        externalIntentProcessingState.onDuckAiClosed()
-        val fragment = duckAiFragment
-        if (fragment?.isVisible == true) {
-            animateDuckAiFragmentOut {
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.hide(fragment)
-                transaction.commitAllowingStateLoss() // allow state loss in case the transition finishes after onSaveInstanceState
-            }
-        }
-    }
-
-    private fun openDuckChat(
-        url: String?,
-        duckChatSessionActive: Boolean,
-        withTransition: Boolean,
-        tabs: Int,
-    ) {
-        duckAiFragment?.let { fragment ->
-            if (duckChatSessionActive) {
-                restoreDuckChat(fragment, withTransition)
-            } else {
-                launchNewDuckChat(url, withTransition, tabs)
-            }
-        } ?: run {
-            launchNewDuckChat(url, withTransition, tabs)
-        }
-
-        currentTab?.getOmnibar()?.omnibarView?.omnibarTextInput?.let {
-            hideKeyboard(it)
-        }
-    }
-
-    private fun launchNewDuckChat(
-        duckChatUrl: String?,
-        withTransition: Boolean,
-        tabs: Int,
-    ) {
-        val wasFragmentVisible = duckAiFragment?.isVisible ?: false
-        val fragment =
-            DuckChatWebViewFragment().apply {
-                duckChatUrl?.let {
-                    arguments =
-                        Bundle().apply {
-                            putString(KEY_DUCK_AI_URL, duckChatUrl)
-                            putInt(KEY_DUCK_AI_TABS, tabs)
-                        }
-                }
-            }
-
-        duckAiFragment = fragment
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(binding.duckAiFragmentContainer.id, fragment)
-        transaction.commit()
-
-        // If the fragment was already visible but needs to be force-reloaded, we don't want to animate it in again.
-        if (!wasFragmentVisible) {
-            if (withTransition) {
-                animateDuckAiFragmentIn()
-            } else {
-                showDuckAiFragmentImmediately()
-            }
-        } else if (!binding.duckAiFragmentContainer.isVisible) {
-            // in case of lost fragment manager state, ensure the container is visible and show it immediately if not
-            showDuckAiFragmentImmediately()
-        }
-    }
-
-    private fun restoreDuckChat(
-        fragment: DuckChatWebViewFragment,
-        withTransition: Boolean,
-    ) {
-        if (fragment.isVisible) {
-            return
-        }
-
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.show(fragment)
-        transaction.commit()
-
-        if (withTransition) {
-            animateDuckAiFragmentIn()
-        } else {
-            showDuckAiFragmentImmediately()
-        }
-    }
-
-    private fun showDuckAiFragmentImmediately() {
-        val duckAiContainer = binding.duckAiFragmentContainer
-        duckAiContainer.isVisible = true
-        duckAiContainer.alpha = 1f
-        duckAiContainer.translationX = 0f
-
-        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
-        browserContainer.alpha = 0f
-    }
-
-    private fun animateDuckAiFragmentIn() {
-        val duckAiContainer = binding.duckAiFragmentContainer
-        duckAiContainer.isVisible = true
-        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
-
-        duckAiContainer.slideAndFadeInFromRight()
-        browserContainer.slideAndFadeOutToLeft()
-    }
-
-    private fun animateDuckAiFragmentOut(onComplete: () -> Unit) {
-        val duckAiContainer = binding.duckAiFragmentContainer
-        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
-
-        duckAiContainer.slideAndFadeOutToRight {
-            onComplete()
-            duckAiContainer.isVisible = false
-        }
-        browserContainer.slideAndFadeInFromLeft()
-    }
-
     private fun configureOnBackPressedListener() {
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val duckAiFragmentRef = duckAiFragment
-                    if (duckAiFragmentRef != null && duckAiFragmentRef.onBackPressed()) {
-                        return
-                    }
                     if (currentTab?.onBackPressed() != true) {
                         // signal user press back button to exit the app so that BrowserApplicationStateInfo
                         // can call the right callback
@@ -1139,7 +970,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         }
 
                         is DuckChatSharedViewModel.Command.SearchRequested -> {
-                            closeDuckChat()
                             currentTab?.submitQuery(command.query)
                         }
 
@@ -1250,7 +1080,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val DISABLE_SWIPING_DELAY = 1000L
 
-        private const val DUCK_AI_ANIM_READY_DELAY_MS = 300L
         private const val DELETED_TAB_COUNT_EXTRA = "DELETED_TAB_COUNT_EXTRA"
     }
 

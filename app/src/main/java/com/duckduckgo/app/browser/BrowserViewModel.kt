@@ -26,7 +26,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
-import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
@@ -64,7 +63,6 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import kotlinx.coroutines.CoroutineScope
@@ -73,7 +71,7 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -81,7 +79,6 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
@@ -103,7 +100,6 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val duckAiFeatureState: DuckAiFeatureState,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -113,7 +109,6 @@ class BrowserViewModel @Inject constructor(
         val hideWebContent: Boolean = true,
         private val isInEditMode: Boolean = false,
         private val isInFullScreenMode: Boolean = false,
-        private val duckAiFullScreenMode: Boolean = false,
     ) {
         val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode
     }
@@ -135,25 +130,13 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(
-            val duckChatUrl: String?,
-            val duckChatSessionActive: Boolean,
-            val withTransition: Boolean,
-            val tabs: Int,
-        ) : Command()
     }
 
     private val _viewState = MutableStateFlow(
         ViewState(),
     )
 
-    val viewState =
-        combine(
-            duckAiFeatureState.showFullScreenMode,
-            _viewState,
-        ) { duckAiFullScreenMode, viewState ->
-            viewState.copy(duckAiFullScreenMode = duckAiFullScreenMode)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    val viewState = _viewState.asStateFlow()
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
@@ -487,16 +470,6 @@ class BrowserViewModel @Inject constructor(
 
     fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
         sendCommand(ShowUndoDeleteTabsMessage(tabIds))
-    }
-
-    fun openDuckChat(
-        duckChatUrl: String?,
-        duckChatSessionActive: Boolean,
-        withTransition: Boolean,
-    ) {
-        logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        val tabsCount = tabs.value?.size ?: 0
-        sendCommand(OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition, tabsCount))
     }
 
     fun sendPixelEventForLandscapeOrientation() {

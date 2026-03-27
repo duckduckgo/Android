@@ -35,7 +35,6 @@ import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
-import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.BrokenSitePromptDialogCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -504,9 +503,6 @@ sealed class Command {
         val isCosmetic: Boolean,
     ) : Command()
     data object PageStarted : Command()
-
-    data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
-    data class DuckAIFullScreenDisabled(val url: String) : Command()
 
     data class ShowDuckAIContextualMode(val tabId: String) : Command()
 

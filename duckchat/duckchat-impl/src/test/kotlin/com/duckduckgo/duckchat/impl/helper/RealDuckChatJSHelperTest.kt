@@ -536,48 +536,6 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
-    fun whenGetAIChatNativeConfigValuesAndDuckChatFeatureEnabledAndFullScreenModeEnabledAndModeFullThenReturnCorrectData() = runTest {
-        val featureName = "aiChat"
-        val method = "getAIChatNativeConfigValues"
-        val id = "123"
-
-        whenever(mockDuckChat.isDuckChatFeatureEnabled()).thenReturn(true)
-        whenever(mockDuckChat.isDuckChatFullScreenModeEnabled()).thenReturn(true)
-        whenever(mockDataStore.isNativeInputFieldUserSettingEnabled()).thenReturn(false)
-
-        val result = testee.processJsCallbackMessage(
-            featureName,
-            method,
-            id,
-            null,
-            pageContext = viewModel.updatedPageContext,
-        )
-
-        val jsonPayload = JSONObject().apply {
-            put("platform", "android")
-            put("isAIChatHandoffEnabled", true)
-            put("supportsClosingAIChat", true)
-            put("supportsOpeningSettings", true)
-            put("supportsNativeChatInput", false)
-            put("supportsURLChatIDRestoration", true)
-            put("supportsImageUpload", false)
-            put("supportsStandaloneMigration", false)
-            put("supportsAIChatFullMode", true)
-            put("supportsAIChatContextualMode", false)
-            put("supportsAIChatSync", false)
-            put("supportsPageContext", false)
-            put("supportsMultipleContexts", false)
-        }
-
-        val expected = JsCallbackData(jsonPayload, featureName, method, id)
-
-        assertEquals(expected.id, result!!.id)
-        assertEquals(expected.method, result.method)
-        assertEquals(expected.featureName, result.featureName)
-        assertEquals(expected.params.toString(), result.params.toString())
-    }
-
-    @Test
     fun `when get AI chat page context for user action then return payload`() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatPageContext"

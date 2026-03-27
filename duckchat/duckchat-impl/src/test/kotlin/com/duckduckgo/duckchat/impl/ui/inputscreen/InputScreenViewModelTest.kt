@@ -24,7 +24,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.extensions.toBinaryString
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenConfigResolver
@@ -103,11 +102,8 @@ class InputScreenViewModelTest {
     private val tabPageContextRepository: com.duckduckgo.app.tabs.model.TabPageContextRepository = mock()
     private val duckChatJSHelper: com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper = mock()
 
-    private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val chatSuggestionsReader: com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader = mock()
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
-    private val fullScreenModeDisabledFlow = MutableStateFlow(false)
-    private val fullScreenModeEnabledFlow = MutableStateFlow(true)
     private val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
     @Before
@@ -124,7 +120,6 @@ class InputScreenViewModelTest {
             whenever(inputScreenConfigResolver.useTopBar()).thenReturn(true)
             whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
             whenever(omnibarRepository.omnibarType).thenReturn(OmnibarType.SINGLE_TOP)
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
             whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
             whenever(queryUrlPredictor.isReady()).thenReturn(true)
@@ -146,7 +141,6 @@ class InputScreenViewModelTest {
             inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
             inputScreenConfigResolver = inputScreenConfigResolver,
             omnibarRepository = omnibarRepository,
-            duckAiFeatureState = duckAiFeatureState,
             duckChatFeature = duckChatFeature,
             chatSuggestionsReader = chatSuggestionsReader,
             queryUrlPredictor = queryUrlPredictor,
@@ -2106,41 +2100,8 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when fullscreen mode enabled submitting chat sends a query to the main fragment`() =
-        runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
-            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-
-            val viewModel = createViewModel()
-            val query = "example"
-
-            viewModel.onChatSubmitted(query)
-
-            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
-        }
-
-    @Test
-    fun `when fullscreen mode enabled submitting a URL navigates directly instead of opening DuckChat`() =
-        runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
-            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
-            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
-            whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
-
-            val viewModel = createViewModel()
-            val url = "bbc.com"
-
-            viewModel.onChatSubmitted(url)
-
-            assertEquals(SubmitSearch(url), viewModel.command.value)
-            verify(duckChat, never()).getDuckChatUrl(url, true)
-        }
-
-    @Test
     fun `when onChatSubmitted with URL in non-fullscreen mode then SubmitSearch command is emitted`() =
         runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(queryUrlPredictor.isUrl("bbc.com")).thenReturn(true)
 
             val viewModel = createViewModel()
@@ -2200,8 +2161,6 @@ class InputScreenViewModelTest {
     @Test
     fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen disabled then SubmitChat command sent and openDuckChatWithAutoPrompt`() =
         runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
-
             val viewModel = createViewModel()
             val prompt = "prompt"
 
@@ -2212,22 +2171,8 @@ class InputScreenViewModelTest {
         }
 
     @Test
-    fun `when userSelectedAutocomplete with DuckAI prompt and fullscreen enabled then onChatSubmitted`() =
-        runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeEnabledFlow)
-
-            val viewModel = createViewModel()
-
-            viewModel.userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
-
-            assertEquals(SubmitSearch(duckChatURL), viewModel.command.value)
-            verify(duckChat, never()).openDuckChatWithAutoPrompt(any())
-        }
-
-    @Test
     fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was used before then pixel fired with was_used_before true`() =
         runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(duckChat.wasOpenedBefore()).thenReturn(true)
 
             createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
@@ -2241,7 +2186,6 @@ class InputScreenViewModelTest {
     @Test
     fun `when userSelectedAutocomplete with DuckAI prompt and DuckAI was not used before then pixel fired with was_used_before false`() =
         runTest {
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(duckChat.wasOpenedBefore()).thenReturn(false)
 
             createViewModel().userSelectedAutocomplete(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("prompt"))
@@ -2629,7 +2573,6 @@ class InputScreenViewModelTest {
     fun `when chat submitted with attached tabs but no page contexts then falls back to normal submission`() =
         runTest {
             duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
             whenever(tabPageContextRepository.getPageContexts(any())).thenReturn(emptyMap())
 
             val viewModel = createViewModel()
@@ -2645,7 +2588,6 @@ class InputScreenViewModelTest {
     fun `when chat submitted without attached tabs then query is not enriched`() =
         runTest {
             duckChatFeature.chatTabAttachments().setRawStoredState(State(enable = true))
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
 
             val viewModel = createViewModel()
             viewModel.onChatSubmitted("hello")
@@ -2728,8 +2670,6 @@ class InputScreenViewModelTest {
     fun `when chat submitted with flag disabled then query is not enriched`() =
         runTest {
             // Flag is disabled by default
-            whenever(duckAiFeatureState.showFullScreenMode).thenReturn(fullScreenModeDisabledFlow)
-
             val viewModel = createViewModel()
             viewModel.onChatSubmitted("hello")
 

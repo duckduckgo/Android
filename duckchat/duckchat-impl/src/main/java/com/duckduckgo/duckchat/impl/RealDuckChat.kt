@@ -349,8 +349,6 @@ class RealDuckChat @Inject constructor(
     private val _chatState = MutableStateFlow(ChatState.HIDE)
     private val _showInputScreenOnSystemSearchLaunch = MutableStateFlow(false)
     private val _showVoiceSearchToggle = MutableStateFlow(false)
-    private val _showFullScreenMode = MutableStateFlow(false)
-    private val _showFullScreenModeToggle = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
@@ -375,7 +373,6 @@ class RealDuckChat @Inject constructor(
     private var clearChatHistory: Boolean = true
     private var inputScreenMainButtonsEnabled = false
     private var showInputScreenOnSystemSearchLaunchEnabled: Boolean = true
-    private var isFullscreenModeEnabled: Boolean = false
     private var isContextualModeEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
@@ -444,7 +441,7 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSyncFeatureEnabled(): Boolean = isChatSyncFeatureEnabled
 
-    override fun isDuckChatFullScreenModeEnabled(): Boolean = isFullscreenModeEnabled
+    override fun isDuckChatFullScreenModeEnabled(): Boolean = false
 
     override fun isDuckChatContextualModeEnabled(): Boolean = isContextualModeEnabled
 
@@ -546,10 +543,6 @@ class RealDuckChat @Inject constructor(
     override val showInputScreenOnSystemSearchLaunch: StateFlow<Boolean> = _showInputScreenOnSystemSearchLaunch.asStateFlow()
 
     override val showVoiceSearchToggle: StateFlow<Boolean> = _showVoiceSearchToggle.asStateFlow()
-
-    override val showFullScreenMode: StateFlow<Boolean> = _showFullScreenMode.asStateFlow()
-
-    override val showFullScreenModeToggle: StateFlow<Boolean> = _showFullScreenModeToggle.asStateFlow()
 
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
 
@@ -868,11 +861,6 @@ class RealDuckChat @Inject constructor(
                 duckChatFeatureRepository.shouldShowInVoiceSearch() &&
                     isDuckChatFeatureEnabled && isDuckChatUserEnabled && isVoiceSearchEntryPointEnabled
             _showVoiceSearchToggle.emit(showVoiceSearchToggle)
-
-            val showFullScreenMode = isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-                (duckChatFeature.fullscreenMode().isEnabled() || duckChatFeatureRepository.isFullScreenModeUserSettingEnabled())
-            isFullscreenModeEnabled = showFullScreenMode
-            _showFullScreenMode.emit(showFullScreenMode)
 
             val isContextualModeKillSwitch = duckChatFeature.contextualModeKillSwitch().isEnabled()
 

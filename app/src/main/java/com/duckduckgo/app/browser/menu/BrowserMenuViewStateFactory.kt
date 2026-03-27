@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.browser.ui.browsermenu.BrowserMenuViewState
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -47,7 +46,6 @@ interface BrowserMenuViewStateFactory {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val downloadMenuStateProvider: DownloadMenuStateProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : BrowserMenuViewStateFactory {
@@ -132,12 +130,11 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         serpLogoUrl: String? = null,
         siteUrl: String? = null,
     ): BrowserMenuViewState.Browser {
-        val isDuckAIFullscreenModeEnabled = duckAiFeatureState.showFullScreenMode.value
         return BrowserMenuViewState.Browser(
             canGoBack = browserViewState.canGoBack,
             canGoForward = browserViewState.canGoForward,
-            showDuckChatOption = browserViewState.showDuckChatOption && !isDuckAIFullscreenModeEnabled,
-            showNewDuckChatTabOption = isDuckAIFullscreenModeEnabled,
+            showDuckChatOption = browserViewState.showDuckChatOption,
+            showNewDuckChatTabOption = false,
             canSharePage = browserViewState.canSharePage,
             showSelectDefaultBrowserMenuItem = browserViewState.showSelectDefaultBrowserMenuItem,
             canSaveSite = browserViewState.canSaveSite,

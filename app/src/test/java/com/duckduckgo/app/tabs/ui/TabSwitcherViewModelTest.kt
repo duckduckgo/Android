@@ -136,8 +136,6 @@ class TabSwitcherViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
 
-    private val mockDuckAiFeatureStateFullScreenModeFlow = MutableStateFlow(false)
-
     private lateinit var testee: TabSwitcherViewModel
 
     private var tabList = listOf(
@@ -160,7 +158,6 @@ class TabSwitcherViewModelTest {
         whenever(mockTabSwitcherPrefsDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
-        whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(mockDuckAiFeatureStateFullScreenModeFlow)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             whenever(mockWebTrackersBlockedAppRepository.getTrackerCountForLast7Days()).thenReturn(0)
@@ -821,23 +818,6 @@ class TabSwitcherViewModelTest {
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
         verify(duckChatMock).openDuckChat()
-    }
-
-    @Test
-    fun `when Duck Chat menu item clicked and fullscreen mode enabled then new tab created and screen closed`() = runTest {
-        mockDuckAiFeatureStateFullScreenModeFlow.emit(true)
-
-        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
-
-        val duckChatURL = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn(duckChatURL)
-
-        testee.onDuckAIButtonClicked()
-
-        verify(mockTabRepository).add(duckChatURL, true)
-
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
     }
 
     @Test

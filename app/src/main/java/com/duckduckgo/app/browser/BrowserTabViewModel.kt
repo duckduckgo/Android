@@ -1729,7 +1729,6 @@ class BrowserTabViewModel @Inject constructor(
                         }
                     } else {
                         withContext(dispatchers.main()) {
-                            evaluateDuckAIPage(stateChange.url)
                             pageChanged(stateChange.url, stateChange.title)
                         }
                     }
@@ -2167,7 +2166,6 @@ class BrowserTabViewModel @Inject constructor(
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
 
-            evaluateDuckAIPage(url)
             serpLogoJob += viewModelScope.launch {
                 evaluateSerpLogoState(url)
             }
@@ -2196,18 +2194,6 @@ class BrowserTabViewModel @Inject constructor(
             }
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
-        }
-    }
-
-    private fun evaluateDuckAIPage(url: String?) {
-        url?.let {
-            if (duckAiFeatureState.showFullScreenMode.value) {
-                if (duckChat.isDuckChatUrl(Uri.parse(it))) {
-                    command.value = Command.EnableDuckAIFullScreen(currentBrowserViewState())
-                } else {
-                    command.value = Command.DuckAIFullScreenDisabled(url)
-                }
-            }
         }
     }
 
@@ -4818,16 +4804,6 @@ class BrowserTabViewModel @Inject constructor(
         when {
             duckAiFeatureState.showContextualMode.value && !isNtp -> {
                 command.value = Command.ShowDuckAIContextualMode(tabId)
-            }
-
-            duckAiFeatureState.showFullScreenMode.value -> {
-                val url = when {
-                    hasFocus && isNtp && query.isNullOrBlank() -> duckChat.getDuckChatUrl(query ?: "", false)
-                    hasFocus && queryUrlPredictor.isUrl(query ?: "") -> query ?: ""
-                    hasFocus -> duckChat.getDuckChatUrl(query ?: "", true)
-                    else -> duckChat.getDuckChatUrl(query ?: "", false)
-                }
-                onUserSubmittedQuery(url)
             }
 
             else -> {
