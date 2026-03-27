@@ -28,6 +28,7 @@ sealed class TabSwitcherItem(val id: String) {
         data class SelectableTab(
             private val entity: TabEntity,
             val isSelected: Boolean,
+            val isDuckAi: Boolean = false,
         ) : Tab(entity)
 
         data class DuckAiTab(

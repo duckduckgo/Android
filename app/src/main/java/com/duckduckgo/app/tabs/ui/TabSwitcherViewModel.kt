@@ -600,8 +600,10 @@ class TabSwitcherViewModel @Inject constructor(
         mode: Mode,
     ): List<TabSwitcherItem> {
         if (mode is Selection) {
-            return tabEntities.map {
-                SelectableTab(it, isSelected = it.tabId in mode.selectedTabs)
+            return tabEntities.map { entity ->
+                val uri = entity.url?.let { Uri.parse(it) }
+                val isDuckAi = uri != null && duckChat.isDuckChatUrl(uri)
+                SelectableTab(entity, isSelected = entity.tabId in mode.selectedTabs, isDuckAi = isDuckAi)
             }
         }
 

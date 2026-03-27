@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.AddressDisplayFormatter
@@ -35,13 +34,11 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class TabSwitcherAdapterTest {
@@ -52,7 +49,6 @@ class TabSwitcherAdapterTest {
     private val faviconManager: FaviconManager = mock()
     private val dispatchers: DispatcherProvider = mock()
     private val trackerCountAnimator: TrackerCountAnimator = mock()
-    private val duckChat: DuckChat = mock()
     private val addressDisplayFormatter: AddressDisplayFormatter = mock()
 
     private lateinit var adapter: TabSwitcherAdapter
@@ -66,7 +62,6 @@ class TabSwitcherAdapterTest {
             faviconManager = faviconManager,
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
-            duckChat = duckChat,
             addressDisplayFormatter = addressDisplayFormatter,
         )
     }
@@ -92,41 +87,33 @@ class TabSwitcherAdapterTest {
     // --- SelectableTab with duck.ai URL routing ---
 
     @Test
-    fun `SelectableTab with duck ai url in grid mode returns SELECTABLE_DUCK_AI_GRID`() {
-        val url = "https://duck.ai/chat"
-        val entity = TabEntity("1", url = url, position = 0)
-        whenever(duckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
-        adapter.updateData(listOf(SelectableTab(entity, isSelected = false)))
+    fun `SelectableTab with duck ai flag in grid mode returns SELECTABLE_DUCK_AI_GRID`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = true)))
         adapter.onLayoutTypeChanged(GRID)
         assertEquals(SELECTABLE_DUCK_AI_GRID, adapter.getItemViewType(0))
     }
 
     @Test
-    fun `SelectableTab with duck ai url in list mode returns SELECTABLE_DUCK_AI_LIST`() {
-        val url = "https://duck.ai/chat"
-        val entity = TabEntity("1", url = url, position = 0)
-        whenever(duckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
-        adapter.updateData(listOf(SelectableTab(entity, isSelected = false)))
+    fun `SelectableTab with duck ai flag in list mode returns SELECTABLE_DUCK_AI_LIST`() {
+        val entity = TabEntity("1", url = "https://duck.ai/chat", position = 0)
+        adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = true)))
         adapter.onLayoutTypeChanged(LIST)
         assertEquals(SELECTABLE_DUCK_AI_LIST, adapter.getItemViewType(0))
     }
 
     @Test
-    fun `SelectableTab with regular url in grid mode returns GRID_TAB`() {
-        val url = "https://example.com"
-        val entity = TabEntity("1", url = url, position = 0)
-        whenever(duckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(false)
-        adapter.updateData(listOf(SelectableTab(entity, isSelected = false)))
+    fun `SelectableTab without duck ai flag in grid mode returns GRID_TAB`() {
+        val entity = TabEntity("1", url = "https://example.com", position = 0)
+        adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = false)))
         adapter.onLayoutTypeChanged(GRID)
         assertEquals(GRID_TAB, adapter.getItemViewType(0))
     }
 
     @Test
-    fun `SelectableTab with regular url in list mode returns LIST_TAB`() {
-        val url = "https://example.com"
-        val entity = TabEntity("1", url = url, position = 0)
-        whenever(duckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(false)
-        adapter.updateData(listOf(SelectableTab(entity, isSelected = false)))
+    fun `SelectableTab without duck ai flag in list mode returns LIST_TAB`() {
+        val entity = TabEntity("1", url = "https://example.com", position = 0)
+        adapter.updateData(listOf(SelectableTab(entity, isSelected = false, isDuckAi = false)))
         adapter.onLayoutTypeChanged(LIST)
         assertEquals(LIST_TAB, adapter.getItemViewType(0))
     }

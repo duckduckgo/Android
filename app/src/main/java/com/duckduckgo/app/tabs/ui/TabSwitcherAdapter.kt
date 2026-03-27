@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.TouchDelegate
@@ -80,7 +79,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,7 +97,6 @@ class TabSwitcherAdapter(
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider,
     private val trackerCountAnimator: TrackerCountAnimator,
-    private val duckChat: DuckChat,
     private val addressDisplayFormatter: AddressDisplayFormatter,
 ) : Adapter<ViewHolder>() {
 
@@ -158,16 +155,11 @@ class TabSwitcherAdapter(
                 GRID -> DUCK_AI_GRID
                 LIST -> DUCK_AI_LIST
             }
-            is SelectableTab -> {
-                val isDuckAi = item.tabEntity.url
-                    ?.let { Uri.parse(it) }
-                    ?.let { duckChat.isDuckChatUrl(it) } == true
-                when {
-                    isDuckAi && layoutType == GRID -> SELECTABLE_DUCK_AI_GRID
-                    isDuckAi && layoutType == LIST -> SELECTABLE_DUCK_AI_LIST
-                    layoutType == GRID -> GRID_TAB
-                    else -> LIST_TAB
-                }
+            is SelectableTab -> when {
+                item.isDuckAi && layoutType == GRID -> SELECTABLE_DUCK_AI_GRID
+                item.isDuckAi && layoutType == LIST -> SELECTABLE_DUCK_AI_LIST
+                layoutType == GRID -> GRID_TAB
+                else -> LIST_TAB
             }
             is Tab -> when (layoutType) {
                 GRID -> GRID_TAB

@@ -129,9 +129,6 @@ class TabSwitcherActivity :
     lateinit var trackerCountAnimator: TrackerCountAnimator
 
     @Inject
-    lateinit var duckChat: com.duckduckgo.duckchat.api.DuckChat
-
-    @Inject
     lateinit var addressDisplayFormatter: com.duckduckgo.app.browser.AddressDisplayFormatter
 
     @Inject
@@ -153,7 +150,6 @@ class TabSwitcherActivity :
             faviconManager = faviconManager,
             dispatchers = dispatchers,
             trackerCountAnimator = trackerCountAnimator,
-            duckChat = duckChat,
             addressDisplayFormatter = addressDisplayFormatter,
         )
     }

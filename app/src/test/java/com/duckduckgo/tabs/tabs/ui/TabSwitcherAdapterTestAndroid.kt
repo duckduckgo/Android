@@ -24,7 +24,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter
 import com.duckduckgo.app.tabs.ui.TabSwitcherListener
 import com.duckduckgo.app.tabs.ui.TrackerCountAnimator
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.duckchat.api.DuckChat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -64,7 +63,6 @@ class TabSwitcherAdapterTestAndroid {
             faviconManager = mock<FaviconManager>(),
             dispatchers = mock<DispatcherProvider>(),
             trackerCountAnimator = mock<TrackerCountAnimator>(),
-            duckChat = mock<DuckChat>(),
             addressDisplayFormatter = mock<AddressDisplayFormatter>(),
         )
     }
