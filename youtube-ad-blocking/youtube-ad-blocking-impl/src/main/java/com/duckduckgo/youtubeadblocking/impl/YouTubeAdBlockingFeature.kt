@@ -44,7 +44,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "youTubeAdBlocking",
-    settingsStore = YouTubeAdBlockingSettingsStore::class,
 )
 interface YouTubeAdBlockingFeature {
 

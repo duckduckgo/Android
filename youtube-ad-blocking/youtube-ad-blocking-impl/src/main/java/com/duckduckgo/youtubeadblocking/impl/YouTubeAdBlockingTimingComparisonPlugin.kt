@@ -39,7 +39,7 @@ import javax.inject.Inject
 class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
     private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
-    private val settingsStore: YouTubeAdBlockingSettingsStore,
+    private val settingsProvider: YouTubeAdBlockingSettingsProvider,
 ) : JsInjectorPlugin {
 
     private var cachedMain: String? = null
@@ -54,10 +54,10 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
         if (!youTubeAdBlockingFeature.self().isEnabled()) return
         if (url == null || !isYouTubeUrl(url)) return
 
-        val method = settingsStore.injectMethod
-        val timingEnabled = settingsStore.timingEvaluate
+        val method = settingsProvider.injectMethod
+        val timingEnabled = settingsProvider.timingEvaluate
 
-        logcat { "YouTubeAdBlocking [evaluate plugin] onPageStarted $url | ${settingsStore.settingsSummary()}" }
+        logcat { "YouTubeAdBlocking [evaluate plugin] onPageStarted $url | ${settingsProvider.settingsSummary()}" }
 
         if (method == InjectMethod.EVALUATE) {
             logcat { "YouTubeAdBlocking [evaluate plugin] INJECTING SCRIPTLETS via evaluateJavascript (timing=$timingEnabled)" }
@@ -87,7 +87,7 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
 
     private fun getFullBundle(includeProbe: Boolean): String? {
         return try {
-            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK-EVALUATE", settingsStore.injectMain, settingsStore.injectIsolated)
+            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK-EVALUATE", settingsProvider.injectMain, settingsProvider.injectIsolated)
             buildString {
                 append(scriptlets)
                 if (includeProbe) {

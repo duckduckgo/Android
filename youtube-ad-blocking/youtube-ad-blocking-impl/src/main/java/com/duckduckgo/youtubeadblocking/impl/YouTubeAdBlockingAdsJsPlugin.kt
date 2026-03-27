@@ -53,7 +53,7 @@ import javax.inject.Inject
 class YouTubeAdBlockingAdsJsPlugin @Inject constructor(
     private val appContext: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
-    private val settingsStore: YouTubeAdBlockingSettingsStore,
+    private val settingsProvider: YouTubeAdBlockingSettingsProvider,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val webViewCompatWrapper: WebViewCompatWrapper,
@@ -69,10 +69,10 @@ class YouTubeAdBlockingAdsJsPlugin @Inject constructor(
         if (!youTubeAdBlockingFeature.self().isEnabled()) return
         if (!webViewCapabilityChecker.isSupported(DocumentStartJavaScript)) return
 
-        val method = settingsStore.injectMethod
-        val timingEnabled = settingsStore.timingAdsjs
+        val method = settingsProvider.injectMethod
+        val timingEnabled = settingsProvider.timingAdsjs
 
-        logcat { "YouTubeAdBlocking [adsjs plugin] addDocumentStartJavaScript called | ${settingsStore.settingsSummary()}" }
+        logcat { "YouTubeAdBlocking [adsjs plugin] addDocumentStartJavaScript called | ${settingsProvider.settingsSummary()}" }
 
         // Only register if adsjs is the active method OR timing probe is enabled
         if (method != InjectMethod.ADSJS && !timingEnabled) {
@@ -113,7 +113,7 @@ class YouTubeAdBlockingAdsJsPlugin @Inject constructor(
 
     private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
-            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK-ADSJS", settingsStore.injectMain, settingsStore.injectIsolated)
+            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK-ADSJS", settingsProvider.injectMain, settingsProvider.injectIsolated)
             val result = buildString {
                 append(scriptlets)
                 if (includeProbe) {

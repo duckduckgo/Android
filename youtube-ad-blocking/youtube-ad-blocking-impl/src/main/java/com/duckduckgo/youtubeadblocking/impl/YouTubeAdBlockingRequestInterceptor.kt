@@ -63,7 +63,7 @@ interface YouTubeAdBlockingRequestInterceptor {
 class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     private val context: Context,
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
-    private val settingsStore: YouTubeAdBlockingSettingsStore,
+    private val settingsProvider: YouTubeAdBlockingSettingsProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : YouTubeAdBlockingRequestInterceptor {
 
@@ -123,7 +123,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     }
 
     private fun fetchAndInject(request: WebResourceRequest, url: Uri): WebResourceResponse? {
-        val scriptBundle = getScriptBundle(includeProbe = settingsStore.timingIntercept) ?: return null
+        val scriptBundle = getScriptBundle(includeProbe = settingsProvider.timingIntercept) ?: return null
 
         // Build OkHttp request forwarding original headers
         val requestBuilder = Request.Builder().url(url.toString())
@@ -173,7 +173,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 
         val modifiedStream = ByteArrayInputStream(injectedBody.toByteArray(charset(charset)))
 
-        logcat { "YouTubeAdBlocking [intercept plugin] INJECTING SCRIPTLETS via shouldInterceptRequest HTML mod into ${url.host}${url.path} | ${settingsStore.settingsSummary()}" }
+        logcat { "YouTubeAdBlocking [intercept plugin] INJECTING SCRIPTLETS via shouldInterceptRequest HTML mod into ${url.host}${url.path} | ${settingsProvider.settingsSummary()}" }
 
         return WebResourceResponse(
             mimeType,
@@ -226,7 +226,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
      */
     private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
-            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK", settingsStore.injectMain, settingsStore.injectIsolated)
+            val scriptlets = buildScriptlets("DDG-YT-ADBLOCK", settingsProvider.injectMain, settingsProvider.injectIsolated)
             val result = buildString {
                 append(scriptlets)
                 if (includeProbe) {

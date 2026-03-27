@@ -17,8 +17,6 @@
 package com.duckduckgo.youtubeadblocking.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureSettings
-import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
@@ -26,40 +24,11 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
-import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
 
 /**
  * Injection method for YouTube ad blocking scriptlets.
- *
- * Configured via remote config:
- * ```json
- * {
- *   "features": {
- *     "youTubeAdBlocking": {
- *       "state": "enabled",
- *       "settings": {
- *         "injectMethod": "intercept",
- *         "timingIntercept": "enabled",
- *         "timingEvaluate": "disabled",
- *         "timingAdsjs": "disabled"
- *       }
- *     }
- *   }
- * }
- * ```
- *
- * `injectMethod` — which mechanism injects the full ad-blocking scriptlet bundle:
- * - `"none"` — disabled, no injection (useful for A/B testing)
- * - `"evaluate"` — evaluateJavascript in onPageStarted (no CSP issues, simpler)
- * - `"intercept"` — shouldInterceptRequest HTML modification (guaranteed timing, strips CSP)
- * - `"adsjs"` — addDocumentStartJavaScript (automatic iframe + SPA, but may crash)
- * Defaults to `"intercept"` if not specified.
- *
- * `timingIntercept` / `timingEvaluate` / `timingAdsjs` — independently control whether
- * each mechanism fires its timing probe. Enable one at a time to get clean measurements
- * without interference from other mechanisms. All default to `true`.
  */
 enum class InjectMethod {
     NONE,
@@ -74,77 +43,94 @@ enum class InjectMethod {
                 "evaluate" -> EVALUATE
                 "intercept" -> INTERCEPT
                 "adsjs" -> ADSJS
-                else -> INTERCEPT // default
+                else -> NONE // default to NONE until explicitly set
             }
         }
     }
 }
 
+/**
+ * Reads settings from the feature toggle's `getSettings()` JSON on each access.
+ *
+ * Uses `Toggle.getSettings()` (the current API) rather than the deprecated
+ * `FeatureSettings.Store` pattern. Settings are parsed fresh each time from
+ * the toggle, so changes take effect immediately without needing `store()`.
+ *
+ * Config example:
+ * ```json
+ * {
+ *   "features": {
+ *     "youTubeAdBlocking": {
+ *       "state": "enabled",
+ *       "settings": {
+ *         "injectMethod": "intercept",
+ *         "injectMain": "enabled",
+ *         "injectIsolated": "enabled",
+ *         "timingIntercept": "enabled",
+ *         "timingEvaluate": "disabled",
+ *         "timingAdsjs": "disabled"
+ *       }
+ *     }
+ *   }
+ * }
+ * ```
+ */
+interface YouTubeAdBlockingSettingsProvider {
+    val injectMethod: InjectMethod
+    val injectMain: Boolean
+    val injectIsolated: Boolean
+    val timingIntercept: Boolean
+    val timingEvaluate: Boolean
+    val timingAdsjs: Boolean
+    fun settingsSummary(): String
+}
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-@RemoteFeatureStoreNamed(YouTubeAdBlockingFeature::class)
-class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Store {
-
-    /** Defaults to NONE until settings are delivered via store(). */
-    @Volatile
-    var injectMethod: InjectMethod = InjectMethod.NONE
-        private set
-
-    /** Whether to inject the MAIN world scriptlet (API patching). Default: false (off until settings delivered). */
-    @Volatile
-    var injectMain: Boolean = false
-        private set
-
-    /** Whether to inject the ISOLATED world scriptlet (DOM-level). Default: false (off until settings delivered). */
-    @Volatile
-    var injectIsolated: Boolean = false
-        private set
-
-    /** Whether the intercept (Mechanism B) timing probe fires. Default: false (off until settings delivered). */
-    @Volatile
-    var timingIntercept: Boolean = false
-        private set
-
-    /** Whether the evaluateJavascript (Mechanism C) timing probe fires. Default: false (off until settings delivered). */
-    @Volatile
-    var timingEvaluate: Boolean = false
-        private set
-
-    /** Whether the addDocumentStartJavaScript (Mechanism A) timing probe fires. Default: false (off until settings delivered). */
-    @Volatile
-    var timingAdsjs: Boolean = false
-        private set
+class RealYouTubeAdBlockingSettingsProvider @Inject constructor(
+    private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
+) : YouTubeAdBlockingSettingsProvider {
 
     private val jsonAdapter: JsonAdapter<YouTubeAdBlockingSetting> by lazy {
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         moshi.adapter(YouTubeAdBlockingSetting::class.java)
     }
 
-    override fun store(jsonString: String) {
-        try {
-            jsonAdapter.fromJson(jsonString)?.let {
-                injectMethod = InjectMethod.fromString(it.injectMethod)
-                injectMain = isEnabledString(it.injectMain, default = true)
-                injectIsolated = isEnabledString(it.injectIsolated, default = true)
-                timingIntercept = isEnabledString(it.timingIntercept, default = false)
-                timingEvaluate = isEnabledString(it.timingEvaluate, default = false)
-                timingAdsjs = isEnabledString(it.timingAdsjs, default = false)
-                logcat {
-                    "YouTubeAdBlocking: Settings updated — ${settingsSummary()}"
-                }
+    private val parsedSettings: YouTubeAdBlockingSetting?
+        get() {
+            val json = youTubeAdBlockingFeature.self().getSettings() ?: return null
+            return try {
+                jsonAdapter.fromJson(json)
+            } catch (e: Exception) {
+                logcat { "YouTubeAdBlocking: Failed to parse settings JSON: ${e.message}" }
+                null
             }
-        } catch (e: Exception) {
-            logcat { "YouTubeAdBlocking: Failed to parse settings: ${e.asLog()}" }
         }
-    }
 
-    /** Returns a compact summary of current settings for logcat. */
-    fun settingsSummary(): String {
+    override val injectMethod: InjectMethod
+        get() = InjectMethod.fromString(parsedSettings?.injectMethod)
+
+    override val injectMain: Boolean
+        get() = isEnabled(parsedSettings?.injectMain, default = true)
+
+    override val injectIsolated: Boolean
+        get() = isEnabled(parsedSettings?.injectIsolated, default = true)
+
+    override val timingIntercept: Boolean
+        get() = isEnabled(parsedSettings?.timingIntercept, default = false)
+
+    override val timingEvaluate: Boolean
+        get() = isEnabled(parsedSettings?.timingEvaluate, default = false)
+
+    override val timingAdsjs: Boolean
+        get() = isEnabled(parsedSettings?.timingAdsjs, default = false)
+
+    override fun settingsSummary(): String {
         return "injectMethod=$injectMethod injectMain=$injectMain injectIsolated=$injectIsolated" +
             " timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
     }
 
-    private fun isEnabledString(value: String?, default: Boolean): Boolean {
+    private fun isEnabled(value: String?, default: Boolean): Boolean {
         return when (value?.lowercase()) {
             "enabled" -> true
             "disabled" -> false

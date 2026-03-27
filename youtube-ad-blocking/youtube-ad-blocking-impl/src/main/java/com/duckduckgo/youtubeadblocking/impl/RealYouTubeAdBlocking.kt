@@ -31,7 +31,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealYouTubeAdBlocking @Inject constructor(
     private val youTubeAdBlockingFeature: YouTubeAdBlockingFeature,
-    private val settingsStore: YouTubeAdBlockingSettingsStore,
+    private val settingsProvider: YouTubeAdBlockingSettingsProvider,
     private val requestInterceptor: YouTubeAdBlockingRequestInterceptor,
     private val dispatcherProvider: DispatcherProvider,
 ) : YouTubeAdBlocking {
@@ -47,7 +47,7 @@ class RealYouTubeAdBlocking @Inject constructor(
         url: Uri,
     ): WebResourceResponse? {
         if (!isEnabled()) return null
-        if (settingsStore.injectMethod != InjectMethod.INTERCEPT) return null
+        if (settingsProvider.injectMethod != InjectMethod.INTERCEPT) return null
         return requestInterceptor.intercept(request, url)
     }
 }
