@@ -16,10 +16,13 @@
 
 package com.duckduckgo.browser.ui.newtab.hatch
 
+import android.net.Uri
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -28,16 +31,19 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class NewTabReturnHatchViewModelTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
     private val mockTabRepository: TabRepository = mock()
+    private val mockDuckChat: DuckChat = mock()
     private val lastAccessedTabFlow = MutableStateFlow<TabEntity?>(null)
 
     private lateinit var testee: NewTabReturnHatchViewModel
@@ -49,6 +55,7 @@ class NewTabReturnHatchViewModelTest {
         testee = NewTabReturnHatchViewModel(
             tabRepository = mockTabRepository,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
+            duckChat = mockDuckChat,
         )
     }
 
@@ -143,6 +150,46 @@ class NewTabReturnHatchViewModelTest {
             assertEquals("", state.tabTitle)
             assertEquals("", state.url)
             assertEquals("tab1", state.tabId)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabIsDuckChatUrlThenIsDuckChatIsTrue() = runTest {
+        val url = "https://duck.ai/chat"
+        val tab = TabEntity(tabId = "tab1", url = url, title = "Duck.ai")
+        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.isDuckChat)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabIsRegularUrlThenIsDuckChatIsFalse() = runTest {
+        val url = "https://example.com"
+        val tab = TabEntity(tabId = "tab1", url = url, title = "Example")
+        whenever(mockDuckChat.isDuckChatUrl(Uri.parse(url))).thenReturn(false)
+
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isDuckChat)
+        }
+    }
+
+    @Test
+    fun whenLastAccessedTabHasNullUrlThenIsDuckChatIsFalse() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = null, title = null)
+
+        lastAccessedTabFlow.emit(tab)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.isDuckChat)
         }
     }
 
