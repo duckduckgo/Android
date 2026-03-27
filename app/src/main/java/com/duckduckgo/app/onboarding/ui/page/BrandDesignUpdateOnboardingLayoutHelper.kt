@@ -38,7 +38,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         dialogView: View,
         decorationView: View,
     ): Boolean {
-        if (rootView.height == 0) return true
+        if (rootView.height == 0) return false
         if (isInScrollableContainer(dialogView, rootView)) return true
 
         val insets = ViewCompat.getRootWindowInsets(rootView)

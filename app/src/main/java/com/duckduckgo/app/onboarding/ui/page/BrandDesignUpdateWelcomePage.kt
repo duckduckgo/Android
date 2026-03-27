@@ -524,6 +524,25 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
+                    // Swap content before measuring so the dialog height reflects the comparison chart
+                    binding.daxDialogCta.welcomeContent.root.isVisible = false
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = true
+
+                    val showBottomWingAnimation = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = binding.bottomWingAnimation,
+                    )
+                    if (!showBottomWingAnimation) {
+                        binding.bottomWingAnimation.isVisible = false
+                        (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
+
                     val transition = androidx.transition.ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
@@ -568,19 +587,20 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         start()
                     }
 
-                    playBottomWingAnimation()
+                    if (showBottomWingAnimation) playBottomWingAnimation()
 
                     binding.welcomeScreenWalkingDax.isVisible = false
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                        verticalBias = 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        if (showBottomWingAnimation) {
+                            verticalBias = 0.5f
+                            bottomToTop = binding.bottomWingAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
                     }
-
-                    binding.daxDialogCta.welcomeContent.root.isVisible = false
-                    binding.daxDialogCta.secondaryCta.isVisible = false
-
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -662,23 +682,36 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
-                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    verticalBias = 0f
-                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                }
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
                 cardView.setArrowAnimationFraction(1f)
+
+                // Swap content before measuring so the dialog height reflects the comparison chart
+                binding.daxDialogCta.welcomeContent.root.isVisible = false
+                binding.daxDialogCta.secondaryCta.isVisible = false
+                binding.daxDialogCta.comparisonChartContent.root.isVisible = true
+
+                val showWing = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                    rootView = binding.root,
+                    dialogView = binding.daxDialogCta.root,
+                    decorationView = binding.bottomWingAnimation,
+                )
                 binding.bottomWingAnimation?.apply {
-                    isVisible = true
+                    isVisible = showWing
                     alpha = 1f
                     progress = WING_STOP_PROGRESS
                 }
-                binding.daxDialogCta.welcomeContent.root.isVisible = false
-                binding.daxDialogCta.secondaryCta.isVisible = false
-
-                binding.daxDialogCta.comparisonChartContent.root.isVisible = true
+                (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    if (showWing) {
+                        verticalBias = 0.5f
+                        bottomToTop = binding.bottomWingAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                }
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
                 binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.text =
                     getString(R.string.preOnboardingDaxDialog2Title)
@@ -814,7 +847,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     }
 
     private fun playBottomWingAnimation() {
-        binding.bottomWingAnimation?.apply {
+        binding.bottomWingAnimation.apply {
             isVisible = true
             alpha = 0f
             setMaxProgress(WING_STOP_PROGRESS)

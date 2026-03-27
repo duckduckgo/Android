@@ -35,7 +35,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
-    fun whenRootViewHeightIsZeroThenReturnTrue() {
+    fun whenRootViewHeightIsZeroThenReturnFalse() {
         val root = createViewWithSize(width = 1080, height = 0)
         val dialog = createViewWithSize(width = 1080, height = 400)
         val decoration = createViewWithSize(width = 200, height = 200)
@@ -43,7 +43,7 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         root.addView(dialog)
         root.addView(decoration)
 
-        assertTrue(BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(root, dialog, decoration))
+        assertFalse(BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(root, dialog, decoration))
     }
 
     @Test
