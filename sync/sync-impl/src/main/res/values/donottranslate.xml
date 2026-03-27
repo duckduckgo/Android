@@ -43,7 +43,13 @@
     <string name="sync_restore_on_reinstall_description">If you reinstall the DuckDuckGo app, we\'ll ask if you want to restore your data on this device.</string>
 
     <string name="sync_internal_launch_recover_data_screen">Launch Recover Data Screen</string>
-    <string name="sync_internal_block_store_write_recovery_code">Save Recovery Code to Persistent Storage</string>
+    <string name="sync_internal_block_store_write_recovery_code">Save account recovery code &amp; device ID to Block Store</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recovery</string>
+    <string name="sync_settings_download_recovery_code_item">Download Recovery Code as PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Use this code to recover your data if you lose access to this device — keep it safe.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup data can\'t be recovered after 18 months of inactivity. <annotation type="learn_more_link">Learn more</annotation></string>
 
     <!-- Block Store -->
     <string name="sync_internal_block_store_header">Persistent Storage / Block Store</string>

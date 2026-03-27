@@ -88,6 +88,7 @@ constructor(
         val connectedDevices: List<ConnectedDevice> = emptyList(),
         val useDevEnvironment: Boolean = false,
         val environment: String = "",
+        val recoveryCode: String = "",
         val syncAutoRestoreEnabled: Boolean = false,
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
@@ -224,6 +225,7 @@ constructor(
 
     private suspend fun updateViewState() {
         val accountInfo = syncAccountRepository.getAccountInfo()
+        val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()?.rawCode ?: ""
         viewState.emit(
             viewState.value.copy(
                 userId = accountInfo.userId,
@@ -233,6 +235,7 @@ constructor(
                 token = syncAccountRepository.latestToken(),
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
+                recoveryCode = recoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
             ),
@@ -393,24 +396,32 @@ constructor(
 
     fun onBlockStoreWriteRecoveryCode() {
         viewModelScope.launch(dispatchers.io()) {
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
+            }
             val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()
             if (recoveryCode == null) {
                 command.send(ShowMessage("No recovery code available"))
                 return@launch
             }
             val deviceId = syncAccountRepository.getAccountInfo().deviceId
-            runCatching {
-                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode.rawCode, deviceId)
-                refreshBlockStoreValue()
+            val success = syncAutoRestoreManager.saveAutoRestoreData(recoveryCode.rawCode, deviceId)
+            refreshBlockStoreValue()
+            if (success) {
                 command.send(ShowMessage("Recovery code stored successfully"))
-            }.onFailure { error ->
-                command.send(ShowMessage("Store failed: ${error.message}"))
+            } else {
+                command.send(ShowMessage("Store failed — unexpected error"))
             }
         }
     }
 
     fun onBlockStoreWriteClicked(recoveryCode: String, deviceId: String?) {
         viewModelScope.launch(dispatchers.io()) {
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
+            }
             if (recoveryCode.isBlank()) {
                 command.send(ShowMessage("Recovery code is required"))
                 return@launch
@@ -420,25 +431,25 @@ constructor(
                 command.send(ShowMessage("Device ID must be 8–64 chars (or leave blank)"))
                 return@launch
             }
-            runCatching {
-                syncAutoRestoreManager.saveRecoveryPayload(recoveryCode, deviceId?.takeIf { it.isNotBlank() })
-                refreshBlockStoreValue()
+            val success = syncAutoRestoreManager.saveAutoRestoreData(recoveryCode, deviceId?.takeIf { it.isNotBlank() })
+            refreshBlockStoreValue()
+            if (success) {
                 command.send(ShowMessage("Stored successfully"))
-            }.onFailure { error ->
-                command.send(ShowMessage("Store failed: ${error.message}"))
+            } else {
+                command.send(ShowMessage("Store failed — unexpected error"))
             }
         }
     }
 
     fun onBlockStoreClearClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            runCatching {
-                syncAutoRestoreManager.clearRecoveryCode()
-                refreshBlockStoreValue()
-                command.send(ShowMessage("Cleared successfully"))
-            }.onFailure { error ->
-                command.send(ShowMessage("Clear failed: ${error.message}"))
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
             }
+            syncAutoRestoreManager.clearAutoRestoreData()
+            refreshBlockStoreValue()
+            command.send(ShowMessage("Cleared successfully"))
         }
     }
 }

@@ -126,6 +126,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
         binding.blockStoreWriteRecoveryCodeButton.setOnClickListener { viewModel.onBlockStoreWriteRecoveryCode() }
+        binding.recoveryCodeTextView.setOnClickListener { copyToClipboard("Recovery Code", binding.recoveryCodeTextView.text.toString()) }
     }
 
     private fun observeUiEvents() {
@@ -202,6 +203,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deviceNameTextView.text = viewState.deviceName
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
+        binding.recoveryCodeTextView.text = viewState.recoveryCode.ifEmpty { "(not signed in)" }
         binding.connectedDevicesList.removeAllViews()
         binding.blockStoreFeatureFlag.text = if (viewState.syncAutoRestoreEnabled) {
             "✅ syncAutoRestore flag enabled"
