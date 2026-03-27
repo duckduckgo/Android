@@ -56,9 +56,22 @@ YouTubeAdBlocking: [evaluateJs mode] Injecting full scriptlet bundle for ...
 [DDG-YT-ADBLOCK-EVALUATE] Injected at X ms | ytInitialData: false/true | ...
 ```
 
-Key values:
-- `ytInitialData: false` = scriptlet ran **before** YouTube's init ✅
-- `ytInitialData: true` = scriptlet ran **after** YouTube's init ❌ (too late)
+### Understanding the probe values
+
+| Field | What it is | `false` means | `true` means |
+|-------|-----------|---------------|-------------|
+| `Injected at X ms` | `performance.now()` — time since the document context was created | — | — |
+| `ytInitialData` | `window.ytInitialData` — YouTube's server-rendered page data blob. Set by an inline `<script>` in `<head>` that bootstraps the page, including ad configuration. | ✅ We beat YouTube's init. Scriptlets can intercept ad setup. | ❌ YouTube's init already ran. Scriptlets may be too late to block ads. |
+| `ytcfg` | `window.ytcfg` — YouTube's configuration object. Set early in page init, contains feature flags, experiment IDs, and client config. | ✅ Injected before YouTube configured itself. | ⚠️ YouTube config already loaded, but ad blocking may still work depending on which APIs are patched. |
+| `ytPlayerResponse` | `window.ytInitialPlayerResponse` — the initial video + ad payload. Contains `adPlacements`, `playerAds`, and other ad metadata that the player reads on init. | ✅ Injected before the player payload was set. Scriptlets can strip ad fields. | ❌ Player payload already set. Pre-roll ad data is already available to the player. |
+| `frame` | Whether we're in the main frame or an iframe. YouTube's ad player sometimes runs in an iframe with its own JS context. | — | — |
+
+**What "success" looks like:**
+```
+[DDG-YT-ADBLOCK] Injected at 0.42 ms | ytInitialData: false | ytcfg: false | ytPlayerResponse: false | frame: main
+```
+
+All three `false` = we beat YouTube's init completely. The scriptlets have full control over the ad APIs before YouTube touches them.
 
 ### Comparing the two mechanisms
 
