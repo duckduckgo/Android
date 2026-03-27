@@ -227,7 +227,7 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
     private fun getScriptBundle(includeProbe: Boolean): String? {
         return try {
             val scriptlets = ScriptletBundleBuilder.buildScriptlets(
-                tag = "DDG-YT-ADBLOCK",
+                tag = "DDG-YT-ADBLOCK-INTERCEPT",
                 includeMain = settingsProvider.injectMain,
                 mainJs = cachedMain ?: loadRawResource(R.raw.youtube_ad_blocking_main).also { cachedMain = it },
                 includeIsolated = settingsProvider.injectIsolated,

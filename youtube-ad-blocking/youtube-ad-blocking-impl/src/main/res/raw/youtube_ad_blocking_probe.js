@@ -20,7 +20,7 @@
 (function() {
     'use strict';
 
-    var TAG = '[DDG-YT-ADBLOCK]';
+    var TAG = '[DDG-YT-ADBLOCK-PROBE]';
     var timing = performance.now();
     var ytDataDefined = typeof window.ytInitialData !== 'undefined';
     var ytcfgDefined = typeof window.ytcfg !== 'undefined';
