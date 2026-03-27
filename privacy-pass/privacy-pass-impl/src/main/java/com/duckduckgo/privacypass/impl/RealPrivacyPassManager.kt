@@ -18,6 +18,7 @@ package com.duckduckgo.privacypass.impl
 
 import android.content.Context
 import android.util.Base64
+import com.duckduckgo.actcore.ActCoreNative
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
 import com.duckduckgo.privacypass.api.PrivacyPassManager
@@ -25,6 +26,7 @@ import com.duckduckgo.privacypass.api.PrivacyPassResult
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
+import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -53,6 +55,7 @@ class ActCoreException(message: String) : Exception(message)
 class RealPrivacyPassManager @Inject constructor(
     private val context: Context,
     @PrivacyPassClient private val okHttpClient: OkHttpClient,
+    private val privacyPassFeature: PrivacyPassFeature,
 ) : PrivacyPassManager {
 
     private val credentialStore = ConcurrentHashMap<String, StoredCredential>()
@@ -72,13 +75,15 @@ class RealPrivacyPassManager @Inject constructor(
         return wwwAuth.startsWith(PRIVATE_TOKEN_SCHEME, ignoreCase = true)
     }
 
-    // TODO: Gate on privacyPass remote config feature flag before handling challenges
     override suspend fun handlePrivateTokenChallenge(
         originalUrl: String,
         wwwAuthenticateHeader: String,
     ): PrivacyPassResult {
-        // TODO: Check privacyPass remote config feature flag before handling
-        // @ContributesRemoteFeature(scope = AppScope::class, featureName = "privacyPass")
+        if (!privacyPassFeature.self().isEnabled()) {
+            logcat(VERBOSE) { "PrivacyPass: feature disabled via remote config" }
+            return PrivacyPassResult.Failure("Privacy Pass feature is disabled")
+        }
+
         val challenge = parseChallenge(wwwAuthenticateHeader)
             ?: return PrivacyPassResult.Failure("Failed to parse WWW-Authenticate header")
 

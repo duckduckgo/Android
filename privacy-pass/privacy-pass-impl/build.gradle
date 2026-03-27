@@ -46,6 +46,9 @@ dependencies {
     // HTTP client for issuer communication
     implementation Square.OkHttp3.okHttp
 
+    // ACT core native library (JNI bindings + .so files)
+    implementation project(path: ':act-core-android')
+
     // Native library loader
     implementation project(path: ':library-loader-api')
 

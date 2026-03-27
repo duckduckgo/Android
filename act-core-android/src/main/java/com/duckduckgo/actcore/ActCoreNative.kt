@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacypass.impl
+package com.duckduckgo.actcore
 
 import android.content.Context
 import com.duckduckgo.library.loader.LibraryLoader
