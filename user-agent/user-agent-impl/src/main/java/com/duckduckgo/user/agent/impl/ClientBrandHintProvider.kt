@@ -28,6 +28,7 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.impl.remoteconfig.BrandingChange
 import com.duckduckgo.user.agent.impl.remoteconfig.BrandingChange.Change
 import com.duckduckgo.user.agent.impl.remoteconfig.BrandingChange.None
+import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintDomain
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintFeature
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintFeatureSettingsRepository
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints
@@ -89,8 +90,8 @@ class RealClientBrandHintProvider @Inject constructor(
                 return None
             }
 
-            val customBranding = repository.clientBrandHints.filter { it.domain == documentDomain }
-            if (customBranding.isEmpty()) {
+            val customBranding = findBrandForDomain(documentDomain)
+            if (customBranding == null) {
                 logcat(INFO) { "ClientBrandHintProvider: $documentDomain doesn't have custom branding" }
                 return if (currentBranding == DEFAULT_ENABLED_BRANDING) {
                     logcat(INFO) { "ClientBrandHintProvider: branding already active, skipping" }
@@ -100,7 +101,7 @@ class RealClientBrandHintProvider @Inject constructor(
                     Change(DEFAULT_ENABLED_BRANDING)
                 }
             } else {
-                val branding = customBranding.first().brand
+                val branding = customBranding.brand
                 return if (branding == currentBranding) {
                     logcat(INFO) { "ClientBrandHintProvider: branding already active, skipping" }
                     None
@@ -198,8 +199,38 @@ class RealClientBrandHintProvider @Inject constructor(
         WebSettingsCompat.setUserAgentMetadata(settings, ua)
     }
 
+    /**
+     * Finds a matching brand hint for the given domain, supporting subdomain matching.
+     * For example, a config entry for "audible.com" will match "www.audible.com".
+     * Checks remote config first, then falls back to built-in Chrome branding domains.
+     */
+    private fun findBrandForDomain(documentDomain: String?): ClientBrandHintDomain? {
+        if (documentDomain == null) return null
+
+        // Check remote config domains first (supports subdomain matching)
+        repository.clientBrandHints.firstOrNull { entry ->
+            documentDomain == entry.domain || documentDomain.endsWith(".${entry.domain}")
+        }?.let { return it }
+
+        // Fall back to built-in domains that need Chrome branding
+        BUILT_IN_CHROME_BRANDING_DOMAINS.firstOrNull { domain ->
+            documentDomain == domain || documentDomain.endsWith(".$domain")
+        }?.let { return ClientBrandHintDomain(it, CHROME) }
+
+        return null
+    }
+
     companion object {
         private val DEFAULT_ENABLED_BRANDING: ClientBrandsHints = DDG
         private val DEFAULT_DISABLED_BRANDING: ClientBrandsHints = CHROME
+
+        /**
+         * Domains that are known to require Chrome branding in Client Hints to function correctly.
+         * These serve as a fallback when remote config has not yet been updated.
+         * Audible.com checks Sec-CH-UA server-side and omits the navigation bar for unknown brands.
+         */
+        private val BUILT_IN_CHROME_BRANDING_DOMAINS = listOf(
+            "audible.com",
+        )
     }
 }

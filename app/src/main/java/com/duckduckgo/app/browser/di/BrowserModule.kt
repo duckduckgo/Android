@@ -103,6 +103,7 @@ import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
 import dagger.Provides
@@ -239,6 +240,7 @@ class BrowserModule {
         dispatchers: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
+        clientBrandHintProvider: ClientBrandHintProvider,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -260,6 +262,7 @@ class BrowserModule {
             androidBrowserConfigFeature,
             appCoroutineScope,
             isMainProcess,
+            clientBrandHintProvider,
         )
 
     @Provides

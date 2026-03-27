@@ -53,6 +53,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -108,6 +109,7 @@ class WebViewRequestInterceptor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
+    private val clientBrandHintProvider: ClientBrandHintProvider? = null,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -164,6 +166,13 @@ class WebViewRequestInterceptor(
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(dispatchers.main()) {
                 webView.settings?.userAgentString = it
+                webView.loadUrl(urlString, getHeaders(request))
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (shouldChangeClientBrandHint(request, webView)) {
+            withContext(dispatchers.main()) {
                 webView.loadUrl(urlString, getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
@@ -404,6 +413,26 @@ class WebViewRequestInterceptor(
             val webBackForwardList = webView.copyBackForwardList()
             webBackForwardList.currentItem?.url == url.toString()
         }
+    }
+
+    /**
+     * Checks if the Client Hints branding needs to change for the current request.
+     * If so, updates the branding on the WebView settings and returns true to trigger a reload.
+     * This ensures the correct Sec-CH-UA header is sent on the initial main frame request.
+     */
+    private suspend fun shouldChangeClientBrandHint(
+        request: WebResourceRequest,
+        webView: WebView,
+    ): Boolean {
+        if (clientBrandHintProvider == null) return false
+        if (!request.isForMainFrame || request.method != "GET") return false
+        val url = request.url ?: return false
+        val urlString = url.toString()
+        if (!clientBrandHintProvider.shouldChangeBranding(urlString)) return false
+        withContext(dispatchers.main()) {
+            clientBrandHintProvider.setOn(webView.settings, urlString)
+        }
+        return true
     }
 
     private suspend fun newUserAgent(
