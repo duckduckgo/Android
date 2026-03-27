@@ -172,7 +172,8 @@ class RealYouTubeAdBlockingRequestInterceptor @Inject constructor(
 
         val modifiedStream = ByteArrayInputStream(injectedBody.toByteArray(charset(charset)))
 
-        logcat { "YouTubeAdBlocking: Injected probe script into ${url.host}${url.path}" }
+        val timingEnabled = settingsStore.timingIntercept
+        logcat { "YouTubeAdBlocking [intercept plugin] INJECTING SCRIPTLETS via shouldInterceptRequest HTML mod into ${url.host}${url.path} (timing=$timingEnabled)" }
 
         return WebResourceResponse(
             mimeType,

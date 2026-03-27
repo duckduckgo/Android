@@ -54,19 +54,21 @@ class YouTubeAdBlockingEvaluateJsPlugin @Inject constructor(
         if (url == null || !isYouTubeUrl(url)) return
 
         val method = settingsStore.injectMethod
+        val timingEnabled = settingsStore.timingEvaluate
+
+        logcat { "YouTubeAdBlocking [evaluate plugin] onPageStarted $url | ${settingsStore.settingsSummary()}" }
 
         if (method == InjectMethod.EVALUATE) {
-            // Full injection mode: inject the complete scriptlet bundle
-            val includeProbe = settingsStore.timingEvaluate
-            val bundle = getFullBundle(includeProbe)
+            logcat { "YouTubeAdBlocking [evaluate plugin] INJECTING SCRIPTLETS via evaluateJavascript (timing=$timingEnabled)" }
+            val bundle = getFullBundle(includeProbe = timingEnabled)
             if (bundle != null) {
-                logcat { "YouTubeAdBlocking: [evaluate mode] Injecting full scriptlet bundle for $url (timing=$includeProbe)" }
                 webView.evaluateJavascript(bundle, null)
             }
-        } else if (settingsStore.timingEvaluate) {
-            // Timing-only mode: inject only the lightweight probe
-            logcat { "YouTubeAdBlocking: [timing probe] evaluateJavascript for $url (active method: $method)" }
+        } else if (timingEnabled) {
+            logcat { "YouTubeAdBlocking [evaluate plugin] TIMING PROBE ONLY (active injection method: $method)" }
             webView.evaluateJavascript(TIMING_PROBE_SCRIPT, null)
+        } else {
+            logcat { "YouTubeAdBlocking [evaluate plugin] SKIPPED — not active method and timing disabled" }
         }
     }
 

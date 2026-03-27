@@ -126,6 +126,11 @@ class YouTubeAdBlockingSettingsStore @Inject constructor() : FeatureSettings.Sto
         }
     }
 
+    /** Returns a compact summary of current settings for logcat. */
+    fun settingsSummary(): String {
+        return "injectMethod=$injectMethod timingIntercept=$timingIntercept timingEvaluate=$timingEvaluate timingAdsjs=$timingAdsjs"
+    }
+
     private fun isEnabledString(value: String?, default: Boolean): Boolean {
         return when (value?.lowercase()) {
             "enabled" -> true

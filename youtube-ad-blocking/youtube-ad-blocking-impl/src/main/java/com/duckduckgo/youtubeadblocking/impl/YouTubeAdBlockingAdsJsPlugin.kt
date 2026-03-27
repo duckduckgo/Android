@@ -71,24 +71,33 @@ class YouTubeAdBlockingAdsJsPlugin @Inject constructor(
         val method = settingsStore.injectMethod
         val timingEnabled = settingsStore.timingAdsjs
 
+        logcat { "YouTubeAdBlocking [adsjs plugin] addDocumentStartJavaScript called | ${settingsStore.settingsSummary()}" }
+
         // Only register if adsjs is the active method OR timing probe is enabled
-        if (method != InjectMethod.ADSJS && !timingEnabled) return
+        if (method != InjectMethod.ADSJS && !timingEnabled) {
+            logcat { "YouTubeAdBlocking [adsjs plugin] SKIPPED — not active method and timing disabled" }
+            return
+        }
 
         // Only register once per WebView lifecycle
-        if (scriptHandler != null) return
+        if (scriptHandler != null) {
+            logcat { "YouTubeAdBlocking [adsjs plugin] SKIPPED — already registered for this WebView" }
+            return
+        }
 
         val script = withContext(dispatcherProvider.io()) {
             if (method == InjectMethod.ADSJS) {
-                // Full injection: scriptlets + optional probe
                 getScriptBundle(includeProbe = timingEnabled)
             } else {
-                // Timing-only mode: just the probe
                 getTimingProbe()
             }
         } ?: return
 
-        val label = if (method == InjectMethod.ADSJS) "adsjs mode" else "timing probe"
-        logcat { "YouTubeAdBlocking: [$label] Registering addDocumentStartJavaScript for YouTube origins" }
+        if (method == InjectMethod.ADSJS) {
+            logcat { "YouTubeAdBlocking [adsjs plugin] INJECTING SCRIPTLETS via addDocumentStartJavaScript (timing=$timingEnabled)" }
+        } else {
+            logcat { "YouTubeAdBlocking [adsjs plugin] TIMING PROBE ONLY (active injection method: $method)" }
+        }
 
         webViewCompatWrapper.addDocumentStartJavaScript(
             webView,
