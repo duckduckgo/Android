@@ -60,8 +60,9 @@
                 android:alpha="0"
                 android:paddingHorizontal="24dp"
                 android:text="@string/preOnboardingDaxDialog1Button"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
                 tools:alpha="1"
-                tools:ignore="DeprecatedWidgetInXml" />
+                tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/secondaryCta"
@@ -69,9 +70,10 @@
                 android:layout_height="wrap_content"
                 android:alpha="0"
                 android:text="@string/preOnboardingDaxDialog1SecondaryButton"
+                android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
                 android:visibility="gone"
                 tools:alpha="1"
-                tools:ignore="DeprecatedWidgetInXml"
+                tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty"
                 tools:visibility="visible" />
         </LinearLayout>
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>

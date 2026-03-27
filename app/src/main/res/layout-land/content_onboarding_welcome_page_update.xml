@@ -70,17 +70,14 @@
 
             <TextView
                 android:id="@+id/welcomeTitle"
+                style="@style/Typography.DuckDuckGo.Onboarding.WelcomeTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:alpha="0"
                 android:gravity="center"
-                android:lineSpacingExtra="-10sp"
-                android:maxLines="2"
                 android:text="@string/onboardingWelcomeTitle"
                 android:textColor="?attr/onboardingTextPrimary"
-                android:textFontWeight="500"
-                android:textSize="44sp"
                 app:layout_constraintBottom_toTopOf="@id/textGuideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -110,6 +110,12 @@
 
     <style name="Typography.DuckDuckGo.Onboarding" />
 
+    <style name="Typography.DuckDuckGo.Onboarding.WelcomeTitle">
+        <item name="android:textSize">44sp</item>
+        <item name="android:textColor">?attr/onboardingTextPrimary</item>
+        <item name="android:lineSpacingExtra">-10sp</item>
+    </style>
+
     <!--TODO add ducksans-->
     <style name="Typography.DuckDuckGo.Onboarding.Title">
         <item name="android:textSize">24sp</item>
