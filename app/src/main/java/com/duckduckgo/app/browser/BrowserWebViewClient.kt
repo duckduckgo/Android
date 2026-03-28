@@ -61,6 +61,7 @@ import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.privacypass.PrivacyPassHttpErrorHandler
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -83,8 +84,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.privacypass.api.PrivacyPassManager
-import com.duckduckgo.privacypass.api.PrivacyPassResult
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.*
@@ -102,8 +101,6 @@ import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
 private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
-private const val PRIVACY_PASS_RETRY_HEADER = "X-DuckDuckGo-PrivacyPass-Retry"
-private const val PRIVACY_PASS_RETRY_HEADER_VALUE = "1"
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -139,7 +136,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
-    private val privacyPassManager: PrivacyPassManager,
+    private val privacyPassHttpErrorHandler: PrivacyPassHttpErrorHandler,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -874,51 +871,7 @@ class BrowserWebViewClient @Inject constructor(
         if (request?.isForMainFrame == true && errorResponse != null) {
             logcat { "recordHttpErrorCode for ${request.url}" }
             webViewClientListener?.recordHttpErrorCode(errorResponse.statusCode, request.url.toString())
-
-            val responseHeaders = errorResponse.responseHeaders.orEmpty()
-            if (request.method == "GET" &&
-                privacyPassManager.isPrivateTokenChallenge(errorResponse.statusCode, responseHeaders)
-            ) {
-                val hasPrivacyPassRetryHeader = request.requestHeaders
-                    .orEmpty()
-                    .entries
-                    .firstOrNull { it.key.equals(PRIVACY_PASS_RETRY_HEADER, ignoreCase = true) }
-                    ?.value == PRIVACY_PASS_RETRY_HEADER_VALUE
-                if (hasPrivacyPassRetryHeader) {
-                    logcat { "PrivacyPass: retry already attempted for ${request.url}, skipping to avoid loops" }
-                    return
-                }
-
-                val wwwAuth = responseHeaders.entries.firstOrNull {
-                    it.key.equals("WWW-Authenticate", ignoreCase = true)
-                }?.value ?: return
-
-                logcat { "PrivacyPass: 401 + PrivateToken challenge detected for ${request.url}" }
-                appCoroutineScope.launch(dispatcherProvider.io()) {
-                    val result = privacyPassManager.handlePrivateTokenChallenge(
-                        originalUrl = request.url.toString(),
-                        wwwAuthenticateHeader = wwwAuth,
-                    )
-                    when (result) {
-                        is PrivacyPassResult.Success -> {
-                            logcat { "PrivacyPass: retrying ${request.url} with authorization header" }
-                            withContext(dispatcherProvider.main()) {
-                                val headers = mutableMapOf(
-                                    "Authorization" to result.authorizationHeader,
-                                    PRIVACY_PASS_RETRY_HEADER to PRIVACY_PASS_RETRY_HEADER_VALUE,
-                                )
-                                view?.url?.let { currentUrl ->
-                                    headers["Referer"] = currentUrl
-                                }
-                                view?.loadUrl(request.url.toString(), headers)
-                            }
-                        }
-                        is PrivacyPassResult.Failure -> {
-                            logcat { "PrivacyPass: challenge handling failed — ${result.reason}" }
-                        }
-                    }
-                }
-            }
+            privacyPassHttpErrorHandler.handle(view, request, errorResponse)
         }
     }
 
