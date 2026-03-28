@@ -986,6 +986,64 @@ class BrowserWebViewClientTest {
             )
         }
 
+    @Test
+    fun whenOnReceivedHttpErrorWithPrivateTokenChallengeAndRetryHeaderThenChallengeHandlerNotInvoked() =
+        runTest {
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            val mockRequest: WebResourceRequest = mock()
+            val mockErrorResponse: WebResourceResponse = mock()
+            val challengedUrl = "https://example.com/protected"
+            val wwwAuthenticate = "PrivateToken challenge=:dGVzdA==:"
+
+            whenever(mockWebView.url).thenReturn(challengedUrl)
+            whenever(mockRequest.isForMainFrame).thenReturn(true)
+            whenever(mockRequest.method).thenReturn("GET")
+            whenever(mockRequest.url).thenReturn(challengedUrl.toUri())
+            whenever(mockRequest.requestHeaders).thenReturn(mapOf("X-DuckDuckGo-PrivacyPass-Retry" to "1"))
+            whenever(mockErrorResponse.statusCode).thenReturn(401)
+            whenever(mockErrorResponse.responseHeaders).thenReturn(mapOf("WWW-Authenticate" to wwwAuthenticate))
+            whenever(mockPrivacyPassManager.isPrivateTokenChallenge(401, mapOf("WWW-Authenticate" to wwwAuthenticate))).thenReturn(true)
+
+            testee.onReceivedHttpError(mockWebView, mockRequest, mockErrorResponse)
+            coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+            verify(mockPrivacyPassManager, never()).handlePrivateTokenChallenge(any(), any())
+        }
+
+    @Test
+    fun whenOnReceivedHttpErrorWithPrivateTokenChallengeSuccessThenRetryLoadAddsLoopGuardHeader() =
+        runTest {
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            val mockRequest: WebResourceRequest = mock()
+            val mockErrorResponse: WebResourceResponse = mock()
+            val challengedUrl = "https://example.com/protected"
+            val wwwAuthenticate = "PrivateToken challenge=:dGVzdA==:"
+            val authorizationHeader = "PrivateToken token=:dG9rZW4=:"
+
+            whenever(mockWebView.url).thenReturn(challengedUrl)
+            whenever(mockRequest.isForMainFrame).thenReturn(true)
+            whenever(mockRequest.method).thenReturn("GET")
+            whenever(mockRequest.url).thenReturn(challengedUrl.toUri())
+            whenever(mockErrorResponse.statusCode).thenReturn(401)
+            whenever(mockErrorResponse.responseHeaders).thenReturn(mapOf("WWW-Authenticate" to wwwAuthenticate))
+            whenever(mockPrivacyPassManager.isPrivateTokenChallenge(401, mapOf("WWW-Authenticate" to wwwAuthenticate))).thenReturn(true)
+            whenever(
+                mockPrivacyPassManager.handlePrivateTokenChallenge(
+                    originalUrl = challengedUrl,
+                    wwwAuthenticateHeader = wwwAuthenticate,
+                ),
+            ).thenReturn(PrivacyPassResult.Success(authorizationHeader))
+
+            testee.onReceivedHttpError(mockWebView, mockRequest, mockErrorResponse)
+            coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+            val headersCaptor = argumentCaptor<Map<String, String>>()
+            verify(mockWebView).loadUrl(eq(challengedUrl), headersCaptor.capture())
+            assertEquals(authorizationHeader, headersCaptor.firstValue["Authorization"])
+            assertEquals("1", headersCaptor.firstValue["X-DuckDuckGo-PrivacyPass-Retry"])
+            assertEquals(challengedUrl, headersCaptor.firstValue["Referer"])
+        }
+
     private fun getImmediatelyInvokedMockWebView(): WebView {
         val mockWebView = mock<WebView>()
         whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)

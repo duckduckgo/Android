@@ -43,7 +43,7 @@ class PrivacyPassFeaturePlugin @Inject constructor(
         privacyFeatureTogglesRepository.insert(
             PrivacyFeatureToggles(
                 featureName = this.featureName,
-                isEnabled = isEnabled,
+                enabled = isEnabled,
                 minSupportedVersion = parsedFeature.minSupportedVersion,
             ),
         )

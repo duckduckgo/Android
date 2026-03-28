@@ -102,6 +102,8 @@ import javax.inject.Inject
 
 private const val ABOUT_BLANK = "about:blank"
 private val STANDARD_WEB_SCHEMES = setOf("http", "https", "about", "data", "javascript", "file", "blob")
+private const val PRIVACY_PASS_RETRY_HEADER = "X-DuckDuckGo-PrivacyPass-Retry"
+private const val PRIVACY_PASS_RETRY_HEADER_VALUE = "1"
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -877,6 +879,16 @@ class BrowserWebViewClient @Inject constructor(
             if (request.method == "GET" &&
                 privacyPassManager.isPrivateTokenChallenge(errorResponse.statusCode, responseHeaders)
             ) {
+                val hasPrivacyPassRetryHeader = request.requestHeaders
+                    .orEmpty()
+                    .entries
+                    .firstOrNull { it.key.equals(PRIVACY_PASS_RETRY_HEADER, ignoreCase = true) }
+                    ?.value == PRIVACY_PASS_RETRY_HEADER_VALUE
+                if (hasPrivacyPassRetryHeader) {
+                    logcat { "PrivacyPass: retry already attempted for ${request.url}, skipping to avoid loops" }
+                    return
+                }
+
                 val wwwAuth = responseHeaders.entries.firstOrNull {
                     it.key.equals("WWW-Authenticate", ignoreCase = true)
                 }?.value ?: return
@@ -891,7 +903,10 @@ class BrowserWebViewClient @Inject constructor(
                         is PrivacyPassResult.Success -> {
                             logcat { "PrivacyPass: retrying ${request.url} with authorization header" }
                             withContext(dispatcherProvider.main()) {
-                                val headers = mutableMapOf("Authorization" to result.authorizationHeader)
+                                val headers = mutableMapOf(
+                                    "Authorization" to result.authorizationHeader,
+                                    PRIVACY_PASS_RETRY_HEADER to PRIVACY_PASS_RETRY_HEADER_VALUE,
+                                )
                                 view?.url?.let { currentUrl ->
                                     headers["Referer"] = currentUrl
                                 }
