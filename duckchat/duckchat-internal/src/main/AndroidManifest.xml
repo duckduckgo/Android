@@ -4,6 +4,7 @@
 
     <application>
         <activity android:name=".DuckAiUrlSettingsActivity" android:exported="false"/>
+        <activity android:name=".DuckAiDevActivity" android:exported="false"/>
     </application>
 
 </manifest>
