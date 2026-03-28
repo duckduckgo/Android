@@ -46,6 +46,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.LogPriority.WARN
 import logcat.logcat
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 
@@ -305,5 +306,14 @@ class ClearPersonalDataAction(
         }
     }
 
-    private val duckDuckGoDomains: Set<String> = setOf("duckduckgo.com", duckAiHostProvider.getHost())
+    // Domains whose web storage must never be cleared by the fire button.
+    // Entries are normalised to eTLD+1 at runtime so that subdomains (e.g. a custom
+    // internal duck.ai host) are correctly matched against the eTLD+1 values that
+    // clearDataForSpecificDomains receives from the visited-sites repository.
+    // To protect a new domain, add its hostname here — normalisation is handled automatically.
+    private val duckDuckGoDomains: Set<String> by lazy {
+        setOf("duckduckgo.com", duckAiHostProvider.getHost())
+            .map { host -> "https://$host".toHttpUrlOrNull()?.topPrivateDomain() ?: host }
+            .toSet()
+    }
 }
