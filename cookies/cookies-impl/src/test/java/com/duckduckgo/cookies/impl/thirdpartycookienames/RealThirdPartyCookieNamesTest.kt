@@ -44,13 +44,13 @@ class RealThirdPartyCookieNamesTest {
     @Test
     fun whenHasExcludedCookieNameCalledAndContainsCookieNameThenReturnTrue() {
         whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName", COOKIE_NAME)))
-        assertTrue(testee.hasExcludedCookieName(COOKIE_NAME))
+        assertTrue(testee.hasExcludedCookieName("foo=bar; $COOKIE_NAME=value"))
     }
 
     @Test
     fun whenHasExcludedCookieNameCalledAndDoesNotContainCookieNameThenReturnFalse() {
         whenever(cookiesRepository.cookieNames).thenReturn(CopyOnWriteArrayList(listOf("anotherCookieName")))
-        assertFalse(testee.hasExcludedCookieName(COOKIE_NAME))
+        assertFalse(testee.hasExcludedCookieName("foo=bar; $COOKIE_NAME=value"))
     }
 
     companion object {

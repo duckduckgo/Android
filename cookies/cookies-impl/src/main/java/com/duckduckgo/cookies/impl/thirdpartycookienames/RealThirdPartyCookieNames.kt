@@ -16,6 +16,8 @@
 
 package com.duckduckgo.cookies.impl.thirdpartycookienames
 
+import com.cookies.kmp.core.CookieMatchInput
+import com.cookies.kmp.core.CookiesHostParityFacade
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
@@ -28,6 +30,13 @@ class RealThirdPartyCookieNames @Inject constructor(
 ) : ThirdPartyCookieNames {
 
     override fun hasExcludedCookieName(cookieString: String): Boolean {
-        return cookiesRepository.cookieNames.any { cookieString.contains(it) }
+        return CookiesHostParityFacade.evaluateCookie(
+            CookieMatchInput(
+                cookieString = cookieString,
+                cookieDomain = "",
+                excludedCookieNames = cookiesRepository.cookieNames.toList(),
+                allowedDomains = emptyList(),
+            ),
+        ).hasExcludedCookieName
     }
 }
