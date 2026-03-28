@@ -56,6 +56,11 @@
     <string name="sync_intro_enable_content_with_ai_chat">DuckDuckGo создаст зашифрованную резервную копию ваших закладок, паролей и чатов Duck.ai на надежном сервере. Копию можно синхронизировать с другими устройствами. \n\n Ключ шифрования хранится только на вашем устройстве. У DuckDuckGo нет к нему доступа.</string>
     <string name="sync_intro_enable_footer">Синхронизацию с другими устройствами можно выполнить позже.</string>
     <string name="sync_intro_enable_cta">Включить синхронизацию и копирование</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Восстановление синхронизированных данных</string>
+    <string name="sync_recover_synced_data_content">Вам потребуется код восстановления, полученный при настройке синхронизации и резервного копирования. Возможно, вы сохранили его в виде PDF на устройстве, где выполнялась настройка.</string>
+    <string name="sync_recover_synced_data_cta">Восстановить синхронизированные данные</string>
+
     <!-- Recover data screen -->
     <string name="login_screen_title">Сканирование QR-кода</string>
     <string name="login_screen_enter_code_cta">Ручной ввод кода</string>
