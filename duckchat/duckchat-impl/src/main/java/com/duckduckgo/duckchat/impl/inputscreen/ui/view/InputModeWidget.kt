@@ -101,8 +101,8 @@ open class InputModeWidget @JvmOverloads constructor(
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onChatSent: ((String) -> Unit)? = null
-    var onSearchSelected: (() -> Unit)? = null
-    var onChatSelected: (() -> Unit)? = null
+    var onSearchSelected: ((animate: Boolean) -> Unit)? = null
+    var onChatSelected: ((animate: Boolean) -> Unit)? = null
     var onSubmitMessageAvailable: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
@@ -203,12 +203,12 @@ open class InputModeWidget @JvmOverloads constructor(
         }
     }
 
-    fun initOnSearch() {
-        onSearchSelected?.invoke()
+    fun initOnSearch(animate: Boolean = true) {
+        onSearchSelected?.invoke(animate)
     }
 
-    fun initOnChat() {
-        onChatSelected?.invoke()
+    fun initOnChat(animate: Boolean = true) {
+        onChatSelected?.invoke(animate)
     }
 
     fun clearInputFocus() {
@@ -349,8 +349,8 @@ open class InputModeWidget @JvmOverloads constructor(
                     val isSearchTab = tab.position == 0
                     applyModeSpecificInputBehaviour(isSearchTab = isSearchTab)
                     when (tab.position) {
-                        0 -> onSearchSelected?.invoke()
-                        1 -> onChatSelected?.invoke()
+                        0 -> onSearchSelected?.invoke(true)
+                        1 -> onChatSelected?.invoke(true)
                     }
                 }
 
