@@ -27,6 +27,7 @@ import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient.ERROR_FAILED_SSL_HANDSHAKE
 import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
@@ -82,6 +83,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailab
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacypass.api.PrivacyPassManager
+import com.duckduckgo.privacypass.api.PrivacyPassResult
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import junit.framework.TestCase.assertEquals
@@ -951,6 +953,38 @@ class BrowserWebViewClientTest {
 
         verify(internalTestUserChecker).verifyVerificationErrorReceived(EXAMPLE_URL)
     }
+
+    @Test
+    fun whenOnReceivedHttpErrorWithPrivateTokenChallengeThenChallengeHandlerInvokedWithoutReadinessGate() =
+        runTest {
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            val mockRequest: WebResourceRequest = mock()
+            val mockErrorResponse: WebResourceResponse = mock()
+            val challengedUrl = "https://example.com/protected"
+            val wwwAuthenticate = "PrivateToken challenge=:dGVzdA==:"
+
+            whenever(mockWebView.url).thenReturn(challengedUrl)
+            whenever(mockRequest.isForMainFrame).thenReturn(true)
+            whenever(mockRequest.method).thenReturn("GET")
+            whenever(mockRequest.url).thenReturn(challengedUrl.toUri())
+            whenever(mockErrorResponse.statusCode).thenReturn(401)
+            whenever(mockErrorResponse.responseHeaders).thenReturn(mapOf("WWW-Authenticate" to wwwAuthenticate))
+            whenever(mockPrivacyPassManager.isPrivateTokenChallenge(401, mapOf("WWW-Authenticate" to wwwAuthenticate))).thenReturn(true)
+            whenever(
+                mockPrivacyPassManager.handlePrivateTokenChallenge(
+                    originalUrl = challengedUrl,
+                    wwwAuthenticateHeader = wwwAuthenticate,
+                ),
+            ).thenReturn(PrivacyPassResult.Failure("disabled"))
+
+            testee.onReceivedHttpError(mockWebView, mockRequest, mockErrorResponse)
+            coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+            verify(mockPrivacyPassManager).handlePrivateTokenChallenge(
+                originalUrl = challengedUrl,
+                wwwAuthenticateHeader = wwwAuthenticate,
+            )
+        }
 
     private fun getImmediatelyInvokedMockWebView(): WebView {
         val mockWebView = mock<WebView>()

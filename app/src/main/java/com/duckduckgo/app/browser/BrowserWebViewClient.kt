@@ -875,7 +875,6 @@ class BrowserWebViewClient @Inject constructor(
 
             val responseHeaders = errorResponse.responseHeaders.orEmpty()
             if (request.method == "GET" &&
-                privacyPassManager.isReady() &&
                 privacyPassManager.isPrivateTokenChallenge(errorResponse.statusCode, responseHeaders)
             ) {
                 val wwwAuth = responseHeaders.entries.firstOrNull {

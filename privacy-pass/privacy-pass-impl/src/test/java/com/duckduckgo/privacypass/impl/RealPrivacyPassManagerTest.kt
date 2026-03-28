@@ -17,6 +17,8 @@
 package com.duckduckgo.privacypass.impl
 
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -24,12 +26,34 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.nio.ByteBuffer
 import java.util.Base64
 
 class RealPrivacyPassManagerTest {
 
     private val parser = ChallengeParser()
+
+    @Test
+    fun testIsReadyReflectsRemoteFeatureToggle() {
+        val togglesRepository = mock<PrivacyFeatureTogglesRepository>()
+        whenever(
+            togglesRepository.get(
+                featureName = PrivacyFeatureName.PrivacyPassFeatureName,
+                defaultValue = false,
+            ),
+        ).thenReturn(true)
+        assertTrue(isReady(togglesRepository))
+
+        whenever(
+            togglesRepository.get(
+                featureName = PrivacyFeatureName.PrivacyPassFeatureName,
+                defaultValue = false,
+            ),
+        ).thenReturn(false)
+        assertFalse(isReady(togglesRepository))
+    }
 
     @Test
     fun testParseChallenge_validHeader_parsesCorrectly() {
@@ -157,6 +181,13 @@ class RealPrivacyPassManagerTest {
             it.key.equals("WWW-Authenticate", ignoreCase = true)
         }?.value ?: return false
         return wwwAuth.startsWith("PrivateToken", ignoreCase = true)
+    }
+
+    private fun isReady(togglesRepository: PrivacyFeatureTogglesRepository): Boolean {
+        return togglesRepository.get(
+            featureName = PrivacyFeatureName.PrivacyPassFeatureName,
+            defaultValue = false,
+        )
     }
 
     private fun buildTokenStructForTest(challenge: PrivacyPassChallenge, spendProofCbor: ByteArray): ByteArray {

@@ -25,10 +25,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacypass.api.PrivacyPassChallenge
 import com.duckduckgo.privacypass.api.PrivacyPassManager
 import com.duckduckgo.privacypass.api.PrivacyPassResult
+import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import logcat.LogPriority.ERROR
-import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -58,6 +59,7 @@ class RealPrivacyPassManager @Inject constructor(
     private val context: Context,
     @PrivacyPassClient private val okHttpClient: OkHttpClient,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
 ) : PrivacyPassManager {
 
     private val credentialStore = ConcurrentHashMap<String, StoredCredential>()
@@ -75,7 +77,10 @@ class RealPrivacyPassManager @Inject constructor(
         ActCoreNative.init(context)
     }
 
-    override fun isReady(): Boolean = ActCoreNative.isReady()
+    override fun isReady(): Boolean = privacyFeatureTogglesRepository.get(
+        featureName = PrivacyFeatureName.PrivacyPassFeatureName,
+        defaultValue = false,
+    )
 
     override fun isPrivateTokenChallenge(statusCode: Int, headers: Map<String, String>): Boolean {
         if (statusCode != 401) return false
@@ -89,8 +94,9 @@ class RealPrivacyPassManager @Inject constructor(
         originalUrl: String,
         wwwAuthenticateHeader: String,
     ): PrivacyPassResult {
-        // TODO: Check privacyPass remote config feature flag
-        // Currently always enabled for prototype
+        if (!isReady()) {
+            return PrivacyPassResult.Failure("privacy pass disabled")
+        }
 
         val challenge = parseChallenge(wwwAuthenticateHeader)
             ?: return PrivacyPassResult.Failure("Failed to parse WWW-Authenticate header")
@@ -387,18 +393,6 @@ class RealPrivacyPassManager @Inject constructor(
         }
 
         return result
-    }
-
-    private fun parseTokenType(value: String): Int {
-        return try {
-            if (value.startsWith("0x", ignoreCase = true)) {
-                value.substring(2).toInt(16)
-            } else {
-                value.toInt()
-            }
-        } catch (_: NumberFormatException) {
-            TOKEN_TYPE_ACT
-        }
     }
 
     private fun stripStructuredFieldDelimiters(value: String): String {
