@@ -29,6 +29,8 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':common-utils')
 
+    implementation "io.github.fernandafbmarques:cookies-kmp-core:0.1.4"
+
     implementation AndroidX.core.ktx
 
     implementation "com.squareup.logcat:logcat:_"

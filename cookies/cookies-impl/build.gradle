@@ -39,6 +39,8 @@ dependencies {
     implementation project(':content-scope-scripts-api')
     implementation project(':duckchat-api')
 
+    implementation "io.github.fernandafbmarques:cookies-kmp-core:0.1.4"
+
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.retrofit2.converter.moshi
 

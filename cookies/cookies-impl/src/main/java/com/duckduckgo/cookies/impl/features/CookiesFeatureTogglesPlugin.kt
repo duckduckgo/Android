@@ -16,6 +16,9 @@
 
 package com.duckduckgo.cookies.impl.features
 
+import com.cookies.kmp.core.CookiesFeatureName
+import com.cookies.kmp.core.CookiesHostParityFacade
+import com.cookies.kmp.core.ToggleEvaluationInput
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.cookies.impl.cookiesFeatureValueOf
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
@@ -31,7 +34,15 @@ class CookiesFeatureTogglesPlugin @Inject constructor(
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: String, defaultValue: Boolean): Boolean? {
         val cookiesFeature = cookiesFeatureValueOf(featureName) ?: return null
-        return cookiesFeatureToggleRepository.get(cookiesFeature, defaultValue) &&
-            appBuildConfig.versionCode >= cookiesFeatureToggleRepository.getMinSupportedVersion(cookiesFeature)
+
+        val input = ToggleEvaluationInput(
+            featureName = CookiesFeatureName.Cookie,
+            defaultValue = defaultValue,
+            appVersionCode = appBuildConfig.versionCode,
+            enabled = cookiesFeatureToggleRepository.get(cookiesFeature, defaultValue),
+            minSupportedVersion = cookiesFeatureToggleRepository.getMinSupportedVersion(cookiesFeature),
+        )
+
+        return CookiesHostParityFacade.evaluateToggle(input).isEnabled
     }
 }
