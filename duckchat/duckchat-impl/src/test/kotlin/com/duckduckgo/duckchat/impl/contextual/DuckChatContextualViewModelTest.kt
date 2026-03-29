@@ -21,7 +21,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -64,9 +66,13 @@ class DuckChatContextualViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val duckChatFeature: DuckChatFeature = mock()
+    private val contextualFireButtonToggle: Toggle = mock()
 
     @Before
     fun setup() {
+        whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
@@ -87,6 +93,7 @@ class DuckChatContextualViewModelTest {
             sessionTimeoutProvider = sessionTimeoutProvider,
             timeProvider = timeProvider,
             duckChatPixels = duckChatPixels,
+            duckChatFeature = duckChatFeature,
         )
     }
 
@@ -314,6 +321,7 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
                 )
 
             val tabId = "tab-1"
@@ -679,6 +687,7 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
                 )
 
             val serializedPageData =
@@ -713,6 +722,7 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
                 )
 
             val serializedPageData =

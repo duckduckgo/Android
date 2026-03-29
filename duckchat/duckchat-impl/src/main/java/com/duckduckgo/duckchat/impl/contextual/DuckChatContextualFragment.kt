@@ -674,7 +674,7 @@ class DuckChatContextualFragment :
                 binding.contextualModeNativeContent.gone()
                 binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
-                binding.contextualFire.show()
+                if (viewState.isFireButtonEnabled) binding.contextualFire.show() else binding.contextualFire.gone()
                 contextualNativeInputManager.onWebViewMode()
             }
         }

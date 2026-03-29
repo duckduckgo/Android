@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -56,6 +57,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val sessionTimeoutProvider: DuckChatContextualSessionTimeoutProvider,
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -98,6 +100,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
+                isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled(),
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
@@ -112,6 +115,7 @@ class DuckChatContextualViewModel @Inject constructor(
         val contextTitle: String = "",
         val tabId: String = "",
         val prompt: String = "",
+        val isFireButtonEnabled: Boolean = false,
     )
 
     fun onSheetReopened() {
