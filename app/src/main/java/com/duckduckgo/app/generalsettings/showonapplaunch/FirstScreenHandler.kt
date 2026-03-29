@@ -26,7 +26,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -50,9 +49,9 @@ class FirstScreenHandlerImpl @Inject constructor(
 
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-            val timeoutMs = getTimeoutMs()
+            val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            logcat { "FirstScreen: timeout is $timeoutMs and lastBackgrounded is $lastBackgrounded" }
+            logcat { "FirstScreen: timeout is $timeoutMs ms and lastBackgrounded is $lastBackgrounded" }
             val elapsed = System.currentTimeMillis() - lastBackgrounded
             logcat { "FirstScreen: time elapsed $elapsed" }
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
@@ -71,15 +70,18 @@ class FirstScreenHandlerImpl @Inject constructor(
         settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
     }
 
-    private fun getTimeoutMs(): Long {
-        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return DEFAULT_TIMEOUT_MS
-        return runCatching {
-            JSONObject(settings).getLong("defaultIdleThresholdSeconds") * 1000
-        }.getOrDefault(DEFAULT_TIMEOUT_MS)
-    }
+    internal fun getTimeoutSeconds(): Long {
+        val userSelected = settingsDataStore.userSelectedIdleThresholdSeconds
+        if (userSelected != null) return userSelected
 
-    companion object {
-        private const val DEFAULT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+        val settings = parseIdleThresholdSettings(
+            androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
+        ) ?: return DEFAULT_IDLE_THRESHOLD_SECONDS
+
+        return if (settings.idleThresholdOptions.isEmpty() || settings.defaultIdleThresholdSeconds in settings.idleThresholdOptions) {
+            settings.defaultIdleThresholdSeconds
+        } else {
+            DEFAULT_IDLE_THRESHOLD_SECONDS
+        }
     }
 }

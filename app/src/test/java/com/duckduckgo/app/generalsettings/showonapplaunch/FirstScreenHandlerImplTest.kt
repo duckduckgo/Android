@@ -45,6 +45,7 @@ class FirstScreenHandlerImplTest {
     fun setup() {
         whenever(androidBrowserConfigFeature.showNTPAfterIdleReturn()).thenReturn(idleReturnToggle)
         whenever(showOnAppLaunchFeature.self()).thenReturn(showOnAppLaunchToggle)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
 
         testee = FirstScreenHandlerImpl(
             androidBrowserConfigFeature = androidBrowserConfigFeature,
@@ -241,5 +242,96 @@ class FirstScreenHandlerImplTest {
         testee.onClose()
 
         verify(settingsDataStore).lastSessionBackgroundTimestamp = org.mockito.kotlin.any()
+    }
+
+    // --- User preference overrides RC default ---
+
+    @Test
+    fun whenUserPreferenceSetThenIgnoresRCAndUsesUserValue() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 300, "idleThresholdOptions": [60, 300, 900]}""",
+        )
+        // User set 60s; last backgrounded 61s ago → should trigger (61 >= 60)
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(60L)
+        val sixtyOneSecondsAgo = System.currentTimeMillis() - (61 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixtyOneSecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    @Test
+    fun whenUserPreferenceSetAndUnderUserThresholdThenDoesNothing() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 300, "idleThresholdOptions": [60, 300, 900]}""",
+        )
+        // User set 60s; RC says 300s; last backgrounded 30s ago → should NOT trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(60L)
+        val thirtySecondsAgo = System.currentTimeMillis() - (30 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(thirtySecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    // --- RC default not in options → 300s fallback ---
+
+    @Test
+    fun whenRCDefaultNotInOptionsThenUsesFiveMinuteFallback() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 120, "idleThresholdOptions": [60, 300, 900]}""",
+        )
+        // 120s is not in [60, 300, 900] → fallback 300s; last backgrounded 4 min ago → should NOT trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        val fourMinutesAgo = System.currentTimeMillis() - (4 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(fourMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verifyNoInteractions(showOnAppLaunchOptionHandler)
+    }
+
+    @Test
+    fun whenRCDefaultNotInOptionsAndOverFiveMinutesThenDelegates() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 120, "idleThresholdOptions": [60, 300, 900]}""",
+        )
+        // 120s is not in [60, 300, 900] → fallback 300s; last backgrounded 6 min ago → should trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        val sixMinutesAgo = System.currentTimeMillis() - (6 * 60 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixMinutesAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
+    }
+
+    // --- RC default in options → use RC default ---
+
+    @Test
+    fun whenRCDefaultInOptionsThenUsesRCDefault() = runTest {
+        whenever(idleReturnToggle.isEnabled()).thenReturn(true)
+        whenever(idleReturnToggle.getSettings()).thenReturn(
+            """{"defaultIdleThresholdSeconds": 60, "idleThresholdOptions": [1, 60, 300]}""",
+        )
+        // 60s is in [1, 60, 300] → RC default 60s; last backgrounded 61s ago → should trigger
+        whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(null)
+        val sixtyOneSecondsAgo = System.currentTimeMillis() - (61 * 1000)
+        whenever(settingsDataStore.lastSessionBackgroundTimestamp).thenReturn(sixtyOneSecondsAgo)
+
+        testee.onOpen(isFreshLaunch = false)
+        testScope.testScheduler.advanceUntilIdle()
+
+        verify(showOnAppLaunchOptionHandler).handleAppLaunchOption()
     }
 }
