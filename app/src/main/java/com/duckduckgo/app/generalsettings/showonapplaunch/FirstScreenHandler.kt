@@ -70,7 +70,7 @@ class FirstScreenHandlerImpl @Inject constructor(
         settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
     }
 
-    internal fun getTimeoutSeconds(): Long {
+    private fun getTimeoutSeconds(): Long {
         val userSelected = settingsDataStore.userSelectedIdleThresholdSeconds
         if (userSelected != null) return userSelected
 

@@ -141,7 +141,11 @@ class FakeSettingsDataStore :
     override var userSelectedIdleThresholdSeconds: Long?
         get() = store["userSelectedIdleThresholdSeconds"] as Long?
         set(value) {
-            store["userSelectedIdleThresholdSeconds"] = value
+            if (value == null) {
+                store.remove("userSelectedIdleThresholdSeconds")
+            } else {
+                store["userSelectedIdleThresholdSeconds"] = value
+            }
         }
 
     override var appNotificationsEnabled: Boolean
