@@ -915,6 +915,7 @@ class OmnibarLayout @JvmOverloads constructor(
             pageLoadingIndicator.isVisible = viewState.isLoading
         }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+        renderPulseAnimation(viewState)
     }
 
     private fun updatePageLoadProgressBar(viewState: ViewState) {
