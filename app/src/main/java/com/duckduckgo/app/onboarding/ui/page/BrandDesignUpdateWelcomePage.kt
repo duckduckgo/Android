@@ -527,6 +527,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 COMPARISON_CHART -> {
+                    backgroundAnimator?.transitionTo(
+                        step = OnboardingBackgroundStep.ComparisonChart,
+                    )
+
                     // Swap content before measuring so the dialog height reflects the comparison chart
                     binding.daxDialogCta.welcomeContent.root.isVisible = false
                     binding.daxDialogCta.secondaryCta.isVisible = false
@@ -684,7 +688,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.ComparisonChart)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 val cardView = binding.daxDialogCta.cardView

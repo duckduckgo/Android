@@ -90,16 +90,23 @@ class OnboardingBackgroundAnimator(
 
         cancel()
 
+        // Layouts that use fitCenter (tablet, landscape) need dimensionRatio to eliminate gaps
+        val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
+        if (usesFitCenter && inView == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
+            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+
         val density = inView.resources.displayMetrics.density
         val screenWidth = inView.rootView.width.toFloat()
 
         with(inView) {
+            setImageResource(step.backgroundRes)
             updateLayoutParams<ConstraintLayout.LayoutParams> {
                 constrainedHeight = true
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
                 verticalBias = 1f
+                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
             }
-            setImageResource(step.backgroundRes)
 
             val startX = enterStartX ?: (screenWidth + centerCropOverflow(inView, screenWidth))
             translationX = startX
@@ -136,12 +143,14 @@ class OnboardingBackgroundAnimator(
         val density = backgroundSecondary.resources.displayMetrics.density
 
         with(backgroundSecondary) {
+            setImageResource(step.backgroundRes)
             updateLayoutParams<ConstraintLayout.LayoutParams> {
                 constrainedHeight = true
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
                 verticalBias = 1f
+                val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
+                dimensionRatio = if (usesFitCenter) imageDimensionRatio(backgroundSecondary) else null
             }
-            setImageResource(step.backgroundRes)
             translationX = 0f
             alpha = 1f
             isVisible = true
@@ -203,6 +212,19 @@ class OnboardingBackgroundAnimator(
         val scale = maxOf(viewWidth / intrinsicW, viewHeight / intrinsicH)
         val scaledWidth = intrinsicW * scale
         return maxOf(0f, (scaledWidth - viewWidth) / 2f)
+    }
+
+    /**
+     * Returns a ConstraintLayout dimension ratio string derived from the view's current
+     * drawable, so the view's height is computed from its width to match the image's
+     * aspect ratio. This eliminates fitCenter gaps by making the view exactly the
+     * height the fitted image needs. Returns null when dimensions are unavailable.
+     */
+    private fun imageDimensionRatio(view: ImageView): String? {
+        val d = view.drawable ?: return null
+        val w = d.intrinsicWidth.takeIf { it > 0 } ?: return null
+        val h = d.intrinsicHeight.takeIf { it > 0 } ?: return null
+        return "H,$w:$h"
     }
 
     companion object {
