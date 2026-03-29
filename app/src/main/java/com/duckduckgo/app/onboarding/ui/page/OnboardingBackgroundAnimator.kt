@@ -95,7 +95,9 @@ class OnboardingBackgroundAnimator(
 
         with(inView) {
             updateLayoutParams<ConstraintLayout.LayoutParams> {
+                constrainedHeight = true
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+                verticalBias = 1f
             }
             setImageResource(step.backgroundRes)
 
@@ -135,7 +137,9 @@ class OnboardingBackgroundAnimator(
 
         with(backgroundSecondary) {
             updateLayoutParams<ConstraintLayout.LayoutParams> {
+                constrainedHeight = true
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+                verticalBias = 1f
             }
             setImageResource(step.backgroundRes)
             translationX = 0f

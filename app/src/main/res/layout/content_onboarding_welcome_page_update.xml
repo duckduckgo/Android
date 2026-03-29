@@ -84,6 +84,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/backgroundGuideline"
+        app:layout_constraintVertical_bias="1"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/onboarding_launch_screen_background"
         tools:lottie_progress="1"
