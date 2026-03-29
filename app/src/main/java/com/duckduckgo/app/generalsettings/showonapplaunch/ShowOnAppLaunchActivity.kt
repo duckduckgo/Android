@@ -119,14 +119,14 @@ class ShowOnAppLaunchActivity : DuckDuckGoActivity() {
 
                 if (viewState.showNTPAfterIdleReturn) {
                     setTitle(R.string.afterInactivityOptionTitle)
-                    binding.afterInactivityMessage.text = getString(
-                        R.string.afterInactivityOptionMessage,
-                        viewState.afterInactivityTimeoutMinutes.toString(),
+                    val timeoutMinutes = (viewState.selectedIdleThresholdSeconds / 60).toInt()
+                    binding.afterInactivityTimeoutRow.setSecondaryText(
+                        getString(R.string.afterInactivityOptionMessage, timeoutMinutes.toString()),
                     )
-                    binding.afterInactivityMessage.visibility = View.VISIBLE
+                    binding.afterInactivityTimeoutRow.visibility = View.VISIBLE
                 } else {
                     setTitle(R.string.showOnAppLaunchOptionTitle)
-                    binding.afterInactivityMessage.visibility = View.GONE
+                    binding.afterInactivityTimeoutRow.visibility = View.GONE
                 }
 
                 if (binding.specificPageUrlInput.text.isBlank()) {

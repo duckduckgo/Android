@@ -21,17 +21,21 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
+import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -40,17 +44,29 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val urlConverter: UrlConverter,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val settingsDataStore: SettingsDataStore,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
         val selectedOption: ShowOnAppLaunchOption,
         val specificPageUrl: String,
         val showNTPAfterIdleReturn: Boolean = false,
-        val afterInactivityTimeoutMinutes: Int = DEFAULT_TIMEOUT_MINUTES,
+        val selectedIdleThresholdSeconds: Long = DEFAULT_IDLE_THRESHOLD_SECONDS,
+        val idleThresholdOptions: List<Long> = DEFAULT_IDLE_THRESHOLD_OPTIONS,
     )
+
+    sealed class Command {
+        data class ShowTimeoutDialog(val options: List<Long>, val currentSelection: Long) : Command()
+    }
 
     private val _viewState = MutableStateFlow<ViewState?>(null)
     val viewState = _viewState.asStateFlow().filterNotNull()
+
+    private val _commands = Channel<Command>(Channel.BUFFERED)
+    val commands = _commands.receiveAsFlow()
+
+    private val userSelectedThreshold = MutableStateFlow(settingsDataStore.userSelectedIdleThresholdSeconds)
 
     init {
         observeShowOnAppLaunchOptionChanges()
@@ -61,12 +77,18 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             showOnAppLaunchOptionDataStore.optionFlow,
             showOnAppLaunchOptionDataStore.specificPageUrlFlow,
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
-        ) { option, specificPageUrl, showNTPAfterIdleReturn ->
+            userSelectedThreshold,
+        ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold ->
+            val settings = parseIdleThresholdSettings(
+                androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
+            )
+            val options = settings?.idleThresholdOptions ?: DEFAULT_IDLE_THRESHOLD_OPTIONS
             _viewState.value = ViewState(
                 selectedOption = option,
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                afterInactivityTimeoutMinutes = getTimeoutMinutes(),
+                selectedIdleThresholdSeconds = resolveSelectedThreshold(userThreshold, settings),
+                idleThresholdOptions = options,
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -85,16 +107,25 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         }
     }
 
-    private fun getTimeoutMinutes(): Int {
-        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return DEFAULT_TIMEOUT_MINUTES
-        return runCatching {
-            val timeoutSeconds = JSONObject(settings).getInt("defaultIdleThresholdSeconds")
-            timeoutSeconds / 60
-        }.getOrDefault(DEFAULT_TIMEOUT_MINUTES)
+    fun onTimeoutRowClicked() {
+        val state = _viewState.value ?: return
+        viewModelScope.launch {
+            _commands.send(Command.ShowTimeoutDialog(state.idleThresholdOptions, state.selectedIdleThresholdSeconds))
+        }
     }
 
-    companion object {
-        private const val DEFAULT_TIMEOUT_MINUTES = 5
+    fun onTimeoutSelected(seconds: Long) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.userSelectedIdleThresholdSeconds = seconds
+            userSelectedThreshold.value = seconds
+            pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
+        }
+    }
+
+    private fun resolveSelectedThreshold(userSelected: Long?, settings: IdleThresholdSettings?): Long {
+        if (userSelected != null) return userSelected
+        val default = settings?.defaultIdleThresholdSeconds ?: DEFAULT_IDLE_THRESHOLD_SECONDS
+        val options = settings?.idleThresholdOptions ?: DEFAULT_IDLE_THRESHOLD_OPTIONS
+        return if (options.isEmpty() || default in options) default else DEFAULT_IDLE_THRESHOLD_SECONDS
     }
 }
