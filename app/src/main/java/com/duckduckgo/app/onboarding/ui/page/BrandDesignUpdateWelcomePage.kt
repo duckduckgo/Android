@@ -39,6 +39,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -612,6 +613,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 ADDRESS_BAR_POSITION -> {
+                    dismissBottomWingAnimation()
                     // TODO
                 }
 
@@ -745,10 +747,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             }
 
             ADDRESS_BAR_POSITION -> {
+                binding.bottomWingAnimation.isVisible = false
                 // TODO
             }
 
             INPUT_SCREEN -> {
+                binding.bottomWingAnimation.isVisible = false
                 // TODO
             }
         }
@@ -858,6 +862,22 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     .start()
                 playAnimation()
             }
+        }
+    }
+
+    private fun dismissBottomWingAnimation() {
+        binding.bottomWingAnimation.apply {
+            if (!isVisible) return
+            setMinProgress(WING_STOP_PROGRESS)
+            setMaxProgress(1f)
+            speed = 1f
+            addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isInvisible = true
+                    removeAnimatorListener(this)
+                }
+            })
+            playAnimation()
         }
     }
 
