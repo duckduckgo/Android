@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -162,6 +163,29 @@ class SingleTabFireDialogViewModel @Inject constructor(
     fun onDeleteThisTabClicked() {
         viewModelScope.launch {
             shouldRestartAfterClearing = false
+
+            if (origin.value == DUCK_AI_CONTEXTUAL_CHAT) {
+                command.send(Command.OnClearStarted)
+
+                val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
+                    settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
+                }
+
+                pixel.enqueueFire(
+                    pixel = FIRE_DIALOG_ANIMATION,
+                    parameters = mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()),
+                )
+
+                if (fireAnimationEnabled) {
+                    command.send(Command.PlayAnimation)
+                }
+
+                // Chat deletion is handled by DuckChatContextualFragment via the shared ViewModel
+                // round-trip: OnSingleTabClearComplete → onSingleTabFireCompleted → ClearContextualChat → duckChat.deleteChat()
+                command.send(Command.OnSingleTabClearComplete)
+                return@launch
+            }
+
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
 
@@ -221,7 +245,8 @@ class SingleTabFireDialogViewModel @Inject constructor(
         val shownCount = settingsDataStore.singleTabFireDialogShownCount
         val downloads = downloadsRepository.getDownloads()
         val selectedTabUrl = tabRepository.getSelectedTab()?.url
-        val isDuckAiTab = selectedTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
+        val isDuckAiTab = dialogOrigin == DUCK_AI_CONTEXTUAL_CHAT ||
+            selectedTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
         val tabCount = tabRepository.getOpenTabCount()
         return ViewState.Loaded(
             stateData = ViewState.Loaded.StateData(
@@ -265,13 +290,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
             val origin: FireDialogOrigin,
         ) : ViewState() {
             val isDuckAiTabInBrowser: Boolean
-                get() = stateData.isDuckAiTab && origin == BROWSER
+                get() = (stateData.isDuckAiTab && origin == BROWSER) || origin == DUCK_AI_CONTEXTUAL_CHAT
 
             val isDeleteThisTabButtonVisible: Boolean
-                get() = stateData.isSingleTabEnabled && origin == BROWSER
+                get() = (stateData.isSingleTabEnabled && origin == BROWSER) || origin == DUCK_AI_CONTEXTUAL_CHAT
 
             val isDeleteAllButtonVisible: Boolean
-                get() = !(isDuckAiTabInBrowser && stateData.isSingleTabEnabled)
+                get() = !(isDuckAiTabInBrowser && (stateData.isSingleTabEnabled || origin == DUCK_AI_CONTEXTUAL_CHAT))
 
             val isSiteDataSubtitleVisible: Boolean
                 get() = stateData.isSiteDataSubtitleEligible && !isDuckAiTabInBrowser

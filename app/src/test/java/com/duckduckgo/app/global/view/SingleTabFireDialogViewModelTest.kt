@@ -1245,4 +1245,176 @@ class SingleTabFireDialogViewModelTest {
     }
 
     // endregion
+
+    // region DUCK_AI_CONTEXTUAL_CHAT origin
+
+    @Test
+    fun `when origin is duck ai contextual chat then isDuckAiTab is true regardless of selected tab url`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://example.com", title = "Example"),
+        )
+        // isDuckChatUrl returns false — but origin should force isDuckAiTab true
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.stateData.isDuckAiTab)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is duck ai contextual chat then isDeleteThisTabButtonVisible is true`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertTrue(state.isDeleteThisTabButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is duck ai contextual chat then isDeleteAllButtonVisible is false`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.isDeleteAllButtonVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is duck ai contextual chat then showSiteDataSubtitle is false`() = runTest {
+        whenever(mockSettingsDataStore.singleTabFireDialogShownCount).thenReturn(0)
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.isSiteDataSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when origin is duck ai contextual chat then showDownloadsSubtitle is false even with active downloads`() = runTest {
+        whenever(mockTabRepository.getOpenTabCount()).thenReturn(1)
+        whenever(mockDownloadsRepository.getDownloads()).thenReturn(
+            listOf(
+                DownloadItem(
+                    downloadId = 1L,
+                    downloadStatus = DownloadStatus.STARTED,
+                    fileName = "file.zip",
+                    contentLength = 1000L,
+                    createdAt = "2025-12-15",
+                    filePath = "/path/file.zip",
+                ),
+            ),
+        )
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.viewState.filterIsInstance<SingleTabFireDialogViewModel.ViewState.Loaded>().test {
+            val state = awaitItem()
+
+            assertFalse(state.isDownloadsSubtitleVisible)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin then OnSingleTabClearComplete is sent`() = runTest {
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            awaitItem() // OnShow (triggered by setOrigin)
+
+            testee.onDeleteThisTabClicked()
+            assertEquals(Command.OnClearStarted, awaitItem())
+            assertEquals(Command.PlayAnimation, awaitItem())
+            assertEquals(Command.OnSingleTabClearComplete, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin then clearSingleTabData is not called`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing, never()).clearSingleTabData(any())
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin then single tab pixels are not fired`() = runTest {
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
+        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin and animation enabled then PlayAnimation is sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(true)
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            awaitItem() // OnShow (triggered by setOrigin)
+
+            testee.onDeleteThisTabClicked()
+            awaitItem() // OnClearStarted
+            assertEquals(Command.PlayAnimation, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin and animation disabled then PlayAnimation is not sent`() = runTest {
+        whenever(mockSettingsDataStore.fireAnimationEnabled).thenReturn(false)
+        testee = createViewModel()
+
+        testee.commands().test {
+            testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+            awaitItem() // OnShow (triggered by setOrigin)
+
+            testee.onDeleteThisTabClicked()
+
+            val commands = cancelAndConsumeRemainingEvents().mapNotNull { (it as? app.cash.turbine.Event.Item)?.value }
+            assertTrue(commands.none { it is Command.PlayAnimation })
+        }
+    }
+
+    // endregion
 }

@@ -82,6 +82,8 @@ class DuckChatContextualViewModel @Inject constructor(
         data class OpenFullscreenMode(val url: String) : Command()
         data class ChangeSheetState(val newState: Int) : Command()
         data object RequestPageContext : Command()
+        // Swap this for DuckChatSharedViewModel.onFireButtonClicked() when wiring SingleTabFireDialog
+        data object ShowFireConfirmation : Command()
     }
 
     private val _viewState: MutableStateFlow<ViewState> =
@@ -582,7 +584,23 @@ class DuckChatContextualViewModel @Inject constructor(
         duckChatPixels.reportContextualSheetNewChat()
     }
 
-    private fun renderNewChatState() {
+    fun onFireButtonClicked() {
+        viewModelScope.launch {
+            commandChannel.trySend(Command.ShowFireConfirmation)
+        }
+    }
+
+    fun onFireConfirmed() {
+        val url = fullModeUrl
+        viewModelScope.launch(dispatchers.io()) {
+            if (url.isNotBlank()) {
+                duckChat.deleteChat(url)
+            }
+        }
+        renderNewChatState(BottomSheetBehavior.STATE_HIDDEN)
+    }
+
+    private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
         viewModelScope.launch(dispatchers.io()) {
             val currentTabId = _viewState.value.tabId
             if (currentTabId.isNotBlank()) {
@@ -596,7 +614,7 @@ class DuckChatContextualViewModel @Inject constructor(
                             prompt = "",
                         )
                     }
-                    commandChannel.trySend(Command.ChangeSheetState(BottomSheetBehavior.STATE_HALF_EXPANDED))
+                    commandChannel.trySend(Command.ChangeSheetState(sheetState))
 
                     val subscriptionEvent = duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT)
                     _subscriptionEventDataChannel.trySend(subscriptionEvent)

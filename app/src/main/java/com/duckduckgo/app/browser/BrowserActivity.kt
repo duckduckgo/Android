@@ -86,6 +86,7 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.FireDialogProvider
 import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -437,6 +438,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
+                    duckChatViewModel.onFireCanceled()
                 }
                 FireDialog.EVENT_ON_CLEAR_STARTED -> {
                     isDataClearingInProgress = true
@@ -448,6 +450,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
                     showSnackbar(resources.getQuantityString(R.plurals.tabsClearedSnackbarMessage, 1, 1))
+                    duckChatViewModel.onSingleTabFireCompleted()
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)
@@ -1133,6 +1136,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 duckChatViewModel.command.collect { command ->
                     when (command) {
                         DuckChatSharedViewModel.Command.LaunchFire -> launchFire()
+                        DuckChatSharedViewModel.Command.LaunchContextualChatFire -> {
+                            lifecycleScope.launch {
+                                val dialog = fireDialogProvider.createFireDialog(DUCK_AI_CONTEXTUAL_CHAT)
+                                dialog.show(supportFragmentManager)
+                            }
+                        }
                         DuckChatSharedViewModel.Command.LaunchTabSwitcher -> {
                             val intent = TabSwitcherActivity.intent(this@BrowserActivity)
                             tabSwitcherActivityResult.launch(intent)
