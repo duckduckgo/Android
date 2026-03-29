@@ -18,8 +18,11 @@ package com.duckduckgo.common.ui.view.shape
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Outline
 import android.os.Build
 import android.util.AttributeSet
+import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.toPx
@@ -37,6 +40,7 @@ constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     private var animatableEdgeTreatment: AnimatableOffsetEdgeTreatment? = null
+    private val cornerRadius: Float
 
     init {
         val attr = context.theme.obtainStyledAttributes(
@@ -59,7 +63,7 @@ constructor(
             throw IllegalArgumentException("Only one of arrowOffsetStart or arrowOffsetEnd can be set")
         }
 
-        val cornerRadius = resources.getDimension(R.dimen.dax_brand_design_bubble_card_view_corner_radius)
+        cornerRadius = resources.getDimension(R.dimen.dax_brand_design_bubble_card_view_corner_radius)
 
         setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.onboardingSurfaceTertiary)))
         setStrokeColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.onboardingAccentAltPrimary)))
@@ -84,6 +88,27 @@ constructor(
         if (Build.VERSION.SDK_INT >= 28) {
             outlineAmbientShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
             outlineSpotShadowColor = ContextCompat.getColor(context, R.color.onboardingBubbleShadowColor)
+        }
+    }
+
+    /**
+     * Clips the first child (typically a ScrollView) to a rounded-rect outline matching the
+     * card's corner radius. This prevents foreground-drawn elements like scrollbars from
+     * rendering outside the rounded corners.
+     *
+     * The card itself uses a non-convex [ShapeAppearanceModel] (due to the bubble tail), so
+     * Android's [View.setClipToOutline] cannot clip to the full card shape. Applying a
+     * simple rounded-rect outline to the child works because its shape IS convex.
+     */
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        getChildAt(0)?.apply {
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, cornerRadius)
+                }
+            }
+            clipToOutline = true
         }
     }
 
