@@ -360,7 +360,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     isAnimating -> { /* animation in progress — ignore re-emissions from onDialogAnimationStarted() */ }
                     state.hasAnimatedCurrentDialog -> {
                         val dialog = state.currentDialog ?: return@onEach
-                        showDialogWithoutAnimation(dialog, state.showSplitOption)
+                        binding.root.doOnLayout {
+                            showDialogWithoutAnimation(dialog, state.showSplitOption)
+                        }
                     }
                     else -> {
                         val dialog = state.currentDialog ?: return@onEach
