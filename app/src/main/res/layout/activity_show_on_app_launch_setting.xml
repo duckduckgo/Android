@@ -36,15 +36,13 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/keyline_4">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/afterInactivityMessage"
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/afterInactivityTimeoutRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/keyline_4"
                 android:visibility="gone"
-                app:textType="secondary"
-                app:typography="body2"
-                tools:text="@string/afterInactivityOptionMessage"
+                app:primaryText="@string/afterInactivityOptionTitle"
+                tools:secondaryText="5 minutes"
                 tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
