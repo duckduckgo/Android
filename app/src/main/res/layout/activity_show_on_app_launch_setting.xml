@@ -41,9 +41,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:primaryText="@string/afterInactivityOptionTitle"
+                app:primaryText="@string/afterInactivityTimeoutRowTitle"
                 tools:secondaryText="5 minutes"
                 tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingBottom="@dimen/keyline_2"
+                android:text="@string/afterInactivityScreenSectionHeader"
+                app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.RadioListItem
                 android:id="@+id/lastOpenedTabCheckListItem"
