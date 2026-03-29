@@ -23,11 +23,11 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -1308,6 +1308,31 @@ class DuckChatContextualViewModelTest {
         testee.onSheetClosed()
 
         assertFalse(testee.isPageContextRequested)
+    }
+
+    @Test
+    fun `when fire button clicked then tapped pixel is fired`() = runTest {
+        testee.onFireButtonClicked()
+        verify(duckChatPixels).reportContextualFireButtonTapped()
+    }
+
+    @Test
+    fun `when fire confirmed then confirmed pixel is fired`() = runTest {
+        testee.onFireConfirmed()
+        verify(duckChatPixels).reportContextualFireButtonConfirmed()
+    }
+
+    @Test
+    fun `when fire confirmed then sheet is hidden`() = runTest {
+        testee.commands.test {
+            testee.onSheetOpened("tab-1")
+            expectMostRecentItem() // drain onSheetOpened commands
+
+            testee.onFireConfirmed()
+            val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_HIDDEN, command.newState)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {

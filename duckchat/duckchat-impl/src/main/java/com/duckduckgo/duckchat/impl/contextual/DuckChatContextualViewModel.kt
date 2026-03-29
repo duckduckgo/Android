@@ -26,10 +26,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -84,6 +84,7 @@ class DuckChatContextualViewModel @Inject constructor(
         data class OpenFullscreenMode(val url: String) : Command()
         data class ChangeSheetState(val newState: Int) : Command()
         data object RequestPageContext : Command()
+
         // Swap this for DuckChatSharedViewModel.onFireButtonClicked() when wiring SingleTabFireDialog
         data object ShowFireConfirmation : Command()
     }
@@ -589,12 +590,14 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onFireButtonClicked() {
+        duckChatPixels.reportContextualFireButtonTapped()
         viewModelScope.launch {
             commandChannel.trySend(Command.ShowFireConfirmation)
         }
     }
 
     fun onFireConfirmed() {
+        duckChatPixels.reportContextualFireButtonConfirmed()
         val url = fullModeUrl
         viewModelScope.launch(dispatchers.io()) {
             if (url.isNotBlank()) {
