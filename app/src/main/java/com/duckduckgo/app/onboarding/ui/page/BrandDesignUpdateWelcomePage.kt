@@ -595,7 +595,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.welcomeScreenWalkingDax.isVisible = false
                     (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                         if (showBottomWingAnimation) {
-                            verticalBias = 0.5f
+                            val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+                            verticalBias = if (isTablet) 0.5f else 0f
                             bottomToTop = binding.bottomWingAnimation.id
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                         } else {
@@ -707,7 +708,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
                     if (showWing) {
-                        verticalBias = 0.5f
+                        val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+                        verticalBias = if (isTablet) 0.5f else 0f
                         bottomToTop = binding.bottomWingAnimation.id
                         bottomToBottom = ConstraintLayout.LayoutParams.UNSET
                     } else {
