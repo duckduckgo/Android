@@ -82,6 +82,7 @@ interface SettingsDataStore {
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
     var lastSessionBackgroundTimestamp: Long
+    var userSelectedIdleThresholdSeconds: Long?
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
@@ -228,6 +229,19 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, 0)
         set(value) = preferences.edit(commit = true) { putLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, value) }
 
+    override var userSelectedIdleThresholdSeconds: Long?
+        get() {
+            val value = preferences.getLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, Long.MIN_VALUE)
+            return if (value == Long.MIN_VALUE) null else value
+        }
+        set(value) = preferences.edit(commit = true) {
+            if (value == null) {
+                remove(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS)
+            } else {
+                putLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, value)
+            }
+        }
+
     override var appNotificationsEnabled: Boolean
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
@@ -354,6 +368,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
         const val KEY_LAST_SESSION_BACKGROUND_TIMESTAMP = "LAST_SESSION_BACKGROUND_TIMESTAMP"
+        const val KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS = "KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS"
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
