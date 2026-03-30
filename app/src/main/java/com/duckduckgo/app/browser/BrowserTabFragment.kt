@@ -1521,6 +1521,11 @@ class BrowserTabFragment :
     ) {
         val currentSite = viewModel.siteLiveData.value
         val omnibarState = viewModel.omnibarViewState.value
+        val serpLogoUrl = if (viewModel.isSerpLogoInMenuEnabled) {
+            (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl
+        } else {
+            null
+        }
         val browseMenuState = browserMenuViewStateFactory.create(
             omnibarViewMode = omnibarViewMode,
             viewState = viewState,
@@ -1530,7 +1535,7 @@ class BrowserTabFragment :
             shortUrl = currentSite?.url?.let { addressDisplayFormatter.getShortUrl(it) },
             tabId = tabId,
             omnibarText = omnibarState?.omnibarText,
-            serpLogoUrl = (omnibarState?.serpLogo as? SerpLogo.EasterEgg)?.logoUrl,
+            serpLogoUrl = serpLogoUrl,
         )
         logcat { "BrowserMenu: viewMode ${omnibar.viewMode} render browseMenuState $browseMenuState" }
         val useBottomSheetMenu = viewModel.browserViewState.value?.useBottomSheetMenu ?: false
