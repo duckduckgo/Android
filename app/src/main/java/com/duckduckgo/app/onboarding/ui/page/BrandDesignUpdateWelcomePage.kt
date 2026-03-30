@@ -1013,6 +1013,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.daxDialogCta.root.isVisible = true
                 binding.daxDialogCta.daxCtaContainer.alpha = 1f
 
+                binding.bobbingDaxAnimation?.apply {
+                    isVisible = true
+                    alpha = 1f
+                    translationX = 0f
+                    playAnimation()
+                }
+
                 setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
             }
 
