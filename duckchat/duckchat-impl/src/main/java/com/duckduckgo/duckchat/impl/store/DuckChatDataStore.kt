@@ -150,7 +150,16 @@ interface DuckChatDataStore {
     suspend fun setLastUsedTogglePosition(position: String)
 
     fun observeLastUsedTogglePosition(): Flow<String?>
+
+    suspend fun getSelectedModel(): SelectedModel?
+
+    suspend fun setSelectedModel(model: SelectedModel?)
 }
+
+data class SelectedModel(
+    val id: String,
+    val shortName: String,
+)
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -180,6 +189,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_AI_TERMS_ACCEPTED = booleanPreferencesKey(name = "DUCK_AI_TERMS_ACCEPTED")
         val DUCK_AI_DEFAULT_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_DEFAULT_TOGGLE_POSITION")
         val DUCK_AI_LAST_USED_TOGGLE_POSITION = stringPreferencesKey(name = "DUCK_AI_LAST_USED_TOGGLE_POSITION")
+        val DUCK_AI_SELECTED_MODEL_ID = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_ID")
+        val DUCK_AI_SELECTED_MODEL_SHORT_NAME = stringPreferencesKey(name = "DUCK_AI_SELECTED_MODEL_SHORT_NAME")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean =
@@ -426,4 +437,23 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override fun observeLastUsedTogglePosition(): Flow<String?> = lastUsedTogglePositionFlow
+
+    override suspend fun getSelectedModel(): SelectedModel? {
+        val prefs = store.data.firstOrNull() ?: return null
+        val id = prefs[Keys.DUCK_AI_SELECTED_MODEL_ID] ?: return null
+        val shortName = prefs[Keys.DUCK_AI_SELECTED_MODEL_SHORT_NAME] ?: return null
+        return SelectedModel(id, shortName)
+    }
+
+    override suspend fun setSelectedModel(model: SelectedModel?) {
+        store.edit { prefs ->
+            if (model == null) {
+                prefs.remove(Keys.DUCK_AI_SELECTED_MODEL_ID)
+                prefs.remove(Keys.DUCK_AI_SELECTED_MODEL_SHORT_NAME)
+            } else {
+                prefs[Keys.DUCK_AI_SELECTED_MODEL_ID] = model.id
+                prefs[Keys.DUCK_AI_SELECTED_MODEL_SHORT_NAME] = model.shortName
+            }
+        }
+    }
 }
