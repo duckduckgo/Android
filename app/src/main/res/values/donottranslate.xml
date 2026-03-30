@@ -105,4 +105,7 @@
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that keeps you protected?</string>
 
+    <!--Duck.ai contextual fire-->
+    <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
+
 </resources>
