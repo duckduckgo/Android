@@ -56,6 +56,11 @@
     <string name="sync_intro_enable_content_with_ai_chat">Time se stvara šifrirana sigurnosna kopija tvojih oznaka, lozinki i Duck.ai čavrljanja na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.</string>
     <string name="sync_intro_enable_footer">Kasnije možeš sinkronizirati s drugim uređajima.</string>
     <string name="sync_intro_enable_cta">Uključi sinkronizaciju i sigurnosno kopiranje</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Oporavi sinkronizirane podatke</string>
+    <string name="sync_recover_synced_data_content">Trebat će ti šifra za oporavak dobivena prilikom postavljanja Sync &amp; Backupa. Možda si je spremio kao PDF na uređaju koji si koristio.</string>
+    <string name="sync_recover_synced_data_cta">Oporavak sinkroniziranih podataka</string>
+
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniraj QR kôd</string>
     <string name="login_screen_enter_code_cta">Ručno unesi šifru</string>
