@@ -1323,6 +1323,12 @@ class DuckChatContextualViewModelTest {
     }
 
     @Test
+    fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
+        testee.onFireConfirmed()
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
     fun `when fire confirmed then sheet is hidden`() = runTest {
         testee.commands.test {
             testee.onSheetOpened("tab-1")

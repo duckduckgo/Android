@@ -84,8 +84,6 @@ class DuckChatContextualViewModel @Inject constructor(
         data class OpenFullscreenMode(val url: String) : Command()
         data class ChangeSheetState(val newState: Int) : Command()
         data object RequestPageContext : Command()
-
-        // Swap this for DuckChatSharedViewModel.onFireButtonClicked() when wiring SingleTabFireDialog
         data object ShowFireConfirmation : Command()
     }
 
@@ -604,7 +602,7 @@ class DuckChatContextualViewModel @Inject constructor(
                 duckChat.deleteChat(url)
             }
         }
-        renderNewChatState(BottomSheetBehavior.STATE_HIDDEN)
+        renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
     }
 
     private fun renderNewChatState(sheetState: Int = BottomSheetBehavior.STATE_HALF_EXPANDED) {
@@ -628,7 +626,9 @@ class DuckChatContextualViewModel @Inject constructor(
                 }
             }
         }
-        duckChatPixels.reportContextualPlaceholderContextShown()
+        if (sheetState != BottomSheetBehavior.STATE_HIDDEN) {
+            duckChatPixels.reportContextualPlaceholderContextShown()
+        }
     }
 
     private fun hasChatId(url: String?): Boolean {

@@ -28,4 +28,11 @@
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
     <string name="duckAiModelPickerBasicModels" translatable="false">Basic Models</string>
     <string name="duckAiModelPickerPremiumModels" translatable="false">Advanced Models \u2014 DuckDuckGo subscription</string>
+
+    <!-- duck.ai contextual fire button -->
+    <string name="duckAIContextualFireButtonContentDescription">Clear chat</string>
+    <string name="duckAIContextualFireDialogTitle">Clear this chat?</string>
+    <string name="duckAIContextualFireDialogMessage">This will permanently delete your current Duck.ai conversation.</string>
+    <string name="duckAIContextualFireDialogPositive">Clear</string>
+    <string name="duckAIContextualFireDialogNegative">Cancel</string>
 </resources>

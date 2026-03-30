@@ -98,11 +98,6 @@
     <string name="duckAIContextualAutomaticContextTitle">Automatically Send Page Content</string>
     <string name="duckAIContextualAutomaticContextMessage">Automatically send page content to Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Attach Page Content</string>
-    <string name="duckAIContextualFireButtonContentDescription">Clear chat</string>
-    <string name="duckAIContextualFireDialogTitle">Clear this chat?</string>
-    <string name="duckAIContextualFireDialogMessage">This will permanently delete your current Duck.ai conversation.</string>
-    <string name="duckAIContextualFireDialogPositive">Clear</string>
-    <string name="duckAIContextualFireDialogNegative">Cancel</string>
 
     <!-- Content Descriptions -->
     <string name="duckChatFireButtonContentDescription">Clear data</string>
