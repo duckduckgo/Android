@@ -25,7 +25,7 @@ data class IdleThresholdSettings(
 
 const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
 
-val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 900L, 1800L, 3600L, 43200L, 86400L)
+val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 3600L, 43200L, 86400L)
 
 fun parseIdleThresholdSettings(json: String?): IdleThresholdSettings? {
     json ?: return null
