@@ -57,7 +57,6 @@ jobs:
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
           commit-message: "Update PIR broker bundle - ${{ env.current_date }}"
-          labels: pir, automated pr
           branch: automated/update-pir-broker-bundle-${{ env.current_date }}
           add-paths: pir/pir-impl/src/main/assets/brokers
           body: |
@@ -73,6 +72,12 @@ jobs:
 
             - [ ] Verify broker changes look correct
             - [ ] All tests must pass
+
+      - name: Apply labels to PR
+        if: ${{ steps.broker-check.outputs.has_changes == 'true' && steps.create-pr.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+        run: gh pr edit ${{ steps.create-pr.outputs.pull-request-number }} --add-label "pir" --add-label "automated pr"
 
       - name: Create Asana task
         if: ${{ steps.broker-check.outputs.has_changes == 'true' }}
