@@ -101,7 +101,6 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
 import com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
-import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -201,9 +200,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var progressBarUpgradeFeature: ProgressBarUpgradeFeature
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -879,7 +875,7 @@ class OmnibarLayout @JvmOverloads constructor(
             setExpanded(true, viewState.expandedAnimated)
         }
 
-        if (progressBarUpgradeFeature.self().isEnabled()) {
+        if (viewState.isProgressBarUpgradeEnabled) {
             updatePageLoadProgressBar(viewState)
         } else {
             if (viewState.isLoading) {
@@ -915,7 +911,7 @@ class OmnibarLayout @JvmOverloads constructor(
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
-        if (progressBarUpgradeFeature.self().isEnabled()) {
+        if (viewState.isProgressBarUpgradeEnabled) {
             updatePageLoadProgressBar(viewState)
         } else {
             pageLoadingIndicator.isVisible = viewState.isLoading
