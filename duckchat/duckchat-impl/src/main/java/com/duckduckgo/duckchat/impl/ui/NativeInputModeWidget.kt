@@ -43,6 +43,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
@@ -86,6 +87,7 @@ interface NativeInputWidget {
     fun setFloatingSubmitContainer(container: ViewGroup)
     fun getSelectedModelId(): String?
     fun isModelMenuVisible(): Boolean
+    fun storePendingPrompt(query: String)
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -123,6 +125,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     @Inject
     lateinit var subscriptions: Subscriptions
+
+    @Inject
+    lateinit var pendingNativePromptStore: PendingNativePromptStore
 
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
@@ -359,6 +364,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun getSelectedModelId(): String? = modelPickerView.getSelectedModelId()
 
     override fun isModelMenuVisible(): Boolean = modelPickerView.isMenuVisible()
+
+    override fun storePendingPrompt(query: String) {
+        // TODO: This should not be the widget's responsibility
+        pendingNativePromptStore.store(query, getSelectedModelId())
+    }
 
     override fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,

@@ -35,7 +35,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -344,7 +343,7 @@ class RealNativeInputManager @Inject constructor(
                     widget.hideKeyboard()
                     callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
                 } else {
-                    pendingNativePromptStore.store(query, widget.getSelectedModelId())
+                    widget.storePendingPrompt(query)
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
