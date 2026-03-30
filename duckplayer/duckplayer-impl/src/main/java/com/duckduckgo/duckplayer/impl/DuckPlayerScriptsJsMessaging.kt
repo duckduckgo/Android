@@ -64,9 +64,9 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
-                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, url)) {
                     handlers.firstOrNull {
-                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
+                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName && isUrlAllowed(it.allowedDomains, url)
                     }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
@@ -107,9 +107,9 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
     override val context: String = "specialPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf()
+    override val allowedDomains: List<String> = handlers.flatMap { it.allowedDomains }
 
-    private fun isUrlAllowed(url: String?): Boolean {
+    private fun isUrlAllowed(allowedDomains: List<String>, url: String?): Boolean {
         if (allowedDomains.isEmpty()) return true
         val eTld = url?.toTldPlusOne() ?: return false
         return (allowedDomains.contains(eTld))
