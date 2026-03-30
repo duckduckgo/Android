@@ -234,7 +234,7 @@
     <string name="dataClearingAutomaticClearingOn">Be</string>
     <string name="dataClearingAutomaticClearingOff">Ki</string>
     <string name="dataClearingClearBrowsingData">Böngészési adatok törlése</string>
-    <string name="dataClearingAutomaticDataClearing">Automatikus adattörlés</string>
+    <string name="dataClearingAutomaticDataClearing">Adatok automatikus törlése</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Adatok automatikus törlése</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Összes megnyitott lap bezárása</string>
     <string name="dataClearingAutomaticDataOptionDescription">Összes webhelyadat törlése, beleértve a meglátogatott webhelyeket is. Fiókokból való kijelentkezést eredményezhet.</string>
@@ -258,6 +258,22 @@
         <item quantity="other">Törlés %1$d webhelyről. Fiókokból való kijelentkezést eredményezhet.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Törlöd a lapokat és a webhelyadatokat?</string>
+    <string name="singleTabFireDialogTitleWithChats">Törlöd a lapokat, a webhelyadatokat és a csevegéseket?</string>
+    <string name="singleTabFireDialogDeleteAll">Összes törlése</string>
+    <string name="singleTabFireDialogDeleteThisTab">Lap törlése</string>
+    <string name="singleTabFireDialogDeleteChat">Csevegés törlése</string>
+    <string name="singleTabFireDialogTitleDuckAi">Csevegés törlése?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">A webhelyadatok törlése kijelentkeztethet a fiókjaidból.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ez megszakítja a folyamatban lévő letöltéseket.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d lap és adatai törölve</item>
+        <item quantity="other">%1$d lap és adataik törölve</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Nem sikerült törölni a webhelyadatokat. Kérlek, frissítsd a WebView-t.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Egy hiba miatt nem sikerült törölni a webhelyadatokat.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Engedélyek</string>
 
@@ -275,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Lapok és adatok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Lapok, adatok és Duck.ai-csevegések</string>
 
-    <string name="settingsAutomaticallyClearWhen">Törlés ideje: …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés ideje: …</string>
+    <string name="settingsAutomaticallyClearWhen">Törlés feltételei…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Törlés feltételei…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Kilépés csak az alkalmazásból</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Kilépés az alkalmazásból 5 másodperc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Kilépés az alkalmazásból 5 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Kilépés az alkalmazásból 15 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Kilépés az alkalmazásból 30 perc inaktivitás után</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Kilépés az alkalmazásból 1 óra inaktivitás után</string>
-    <string name="settingsClearAiDataTitle">Duck.ai-csevegések törlése</string>
+    <string name="settingsClearAiDataTitle">Duck.ai csevegések törlése</string>
     <string name="settingsClearAiDataDeleteMessage">A Fire Button a Duck.ai-előzményeket is törli, a rögzített csevegéseket is beleértve.</string>
     <string name="settingsClearDataActionSecondaryText">Törli az összes lapot és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Törli az összes lapot, Duck.ai-csevegést és minden olyan webhely adatát, amit nem tettél tűzállóvá.</string>

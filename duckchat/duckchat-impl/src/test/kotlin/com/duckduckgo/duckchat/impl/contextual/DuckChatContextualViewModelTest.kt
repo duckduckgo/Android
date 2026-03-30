@@ -665,6 +665,98 @@ class DuckChatContextualViewModelTest {
         }
 
     @Test
+    fun `when page context received without request and attachments disabled then context ignored`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
+            testee =
+                DuckChatContextualViewModel(
+                    dispatchers = coroutineRule.testDispatcherProvider,
+                    duckChat = duckChat,
+                    duckChatInternal = duckChatInternal,
+                    duckChatJSHelper = duckChatJSHelper,
+                    contextualDataStore = contextualDataStore,
+                    sessionTimeoutProvider = sessionTimeoutProvider,
+                    timeProvider = timeProvider,
+                    duckChatPixels = duckChatPixels,
+                )
+
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData, isStorePageContextEnabled = true)
+
+            val state = testee.viewState.value
+            assertEquals("", state.contextTitle)
+            assertEquals("", state.contextUrl)
+            assertEquals("", testee.updatedPageContext)
+        }
+
+    @Test
+    fun `when page context received after sheet opened and attachments disabled then context processed`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(false)
+            whenever(duckChatInternal.areMultipleContentAttachmentsEnabled()).thenReturn(false)
+            testee =
+                DuckChatContextualViewModel(
+                    dispatchers = coroutineRule.testDispatcherProvider,
+                    duckChat = duckChat,
+                    duckChatInternal = duckChatInternal,
+                    duckChatJSHelper = duckChatJSHelper,
+                    contextualDataStore = contextualDataStore,
+                    sessionTimeoutProvider = sessionTimeoutProvider,
+                    timeProvider = timeProvider,
+                    duckChatPixels = duckChatPixels,
+                )
+
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onSheetOpened("tab-1")
+            coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+            testee.onPageContextReceived("tab-1", serializedPageData, isStorePageContextEnabled = true)
+
+            val state = testee.viewState.value
+            assertEquals("Ctx Title", state.contextTitle)
+            assertEquals("https://ctx.com", state.contextUrl)
+            assertEquals(serializedPageData, testee.updatedPageContext)
+        }
+
+    @Test
+    fun `when page context received with storePageContext enabled and auto attachment enabled then context processed`() =
+        runTest {
+            whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+            val serializedPageData =
+                """
+                {
+                    "title": "Ctx Title",
+                    "url": "https://ctx.com",
+                    "content": "content"
+                }
+                """.trimIndent()
+
+            testee.onPageContextReceived("tab-1", serializedPageData, isStorePageContextEnabled = true)
+
+            val state = testee.viewState.value
+            assertEquals("Ctx Title", state.contextTitle)
+            assertEquals("https://ctx.com", state.contextUrl)
+            assertEquals(serializedPageData, testee.updatedPageContext)
+        }
+
+    @Test
     fun `when page context received after user removed context then auto-attached pixel not fired`() =
         runTest {
             val serializedPageData =
@@ -1174,6 +1266,40 @@ class DuckChatContextualViewModelTest {
         }
     }
 
+    @Test
+    fun `when main browser page finished with storePageContext enabled then no command emitted and flag reset`() = runTest {
+        whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(testee.isPageContextRequested)
+
+        // drain any pending commands from onSheetOpened
+        testee.commands.test {
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands.test {
+            testee.onMainBrowserPageFinished(isStorePageContextEnabled = true)
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertFalse(testee.isPageContextRequested)
+    }
+
+    @Test
+    fun `when sheet closed then isPageContextRequested is reset`() = runTest {
+        val tabId = "tab-1"
+        testee.onSheetOpened(tabId)
+        assertTrue(testee.isPageContextRequested)
+
+        testee.onSheetClosed()
+
+        assertFalse(testee.isPageContextRequested)
+    }
+
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""
         private val automaticContextAttachment = MutableStateFlow(true)
@@ -1207,6 +1333,7 @@ class DuckChatContextualViewModelTest {
         override suspend fun setChatSuggestionsUserSetting(enabled: Boolean) = Unit
         override fun isChatSuggestionsFeatureAvailable(): Boolean = true
         override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = flowOf(true)
+        override fun openVoiceDuckChat() { }
     }
 
     private class FakeDuckChatContextualDataStore : DuckChatContextualDataStore {

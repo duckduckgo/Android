@@ -109,6 +109,7 @@
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:scaleType="fitXY"
+                        android:importantForAccessibility="no"
                         android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withoutai_active" />
 
@@ -126,6 +127,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/ic_check_accent_24" />
 
                 </LinearLayout>
@@ -150,6 +152,7 @@
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:scaleType="fitXY"
+                        android:importantForAccessibility="no"
                         android:foreground="@drawable/selectable_large_rounded_ripple"
                         android:src="@drawable/searchbox_withai_inactive" />
 
@@ -175,11 +178,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/ic_shape_circle_24" />
 
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiDefaultTogglePosition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duckAiDefaultTogglePositionTitle"
+                app:secondaryText="@string/duckAiDefaultTogglePositionSearch" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/duckAiInputScreenDescription"

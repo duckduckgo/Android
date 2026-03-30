@@ -41,7 +41,10 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -54,10 +57,11 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
@@ -71,6 +75,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -112,6 +117,7 @@ class WebViewRequestInterceptorTest {
     )
     private var fakeMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration(true)
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
 
     private var webView: WebView = mock()
 
@@ -141,6 +147,7 @@ class WebViewRequestInterceptorTest {
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
+            webTrackersBlockedDao = mockWebTrackersBlockedDao,
         )
     }
 
@@ -211,6 +218,7 @@ class WebViewRequestInterceptorTest {
             appCoroutineScope = coroutinesTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
+            webTrackersBlockedDao = mockWebTrackersBlockedDao,
         )
         testee.shouldIntercept(
             request = mockRequest,
@@ -681,6 +689,41 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
+    fun whenInterceptFromServiceWorkerAndDirectTrackerBlockedThenInsertIntoWebTrackersBlockedDao() = runTest {
+        whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
+        whenever(mockRequest.url).thenReturn("foo.com".toUri())
+        whenever(mockRequest.requestHeaders).thenReturn(emptyMap())
+        configureShouldBlock()
+
+        testee.shouldInterceptFromServiceWorker(
+            request = mockRequest,
+            documentUrl = "foo.com".toUri(),
+        )
+
+        verify(mockWebTrackersBlockedDao).insert(any())
+    }
+
+    @Test
+    fun whenInterceptFromServiceWorkerAndCloakedCnameTrackerBlockedThenInsertIntoWebTrackersBlockedDao() = runTest {
+        whenever(mockRequest.requestHeaders).thenReturn(emptyMap())
+        configureNull()
+        configureBlockedCnameTrackingEvent(trackerUrl = "uncloaked-host.com")
+
+        val uri = "host.com".toUri()
+        whenever(mockRequest.url).thenReturn(uri)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
+
+        testee.shouldInterceptFromServiceWorker(
+            request = mockRequest,
+            documentUrl = "foo.com".toUri(),
+        )
+
+        val captor = argumentCaptor<WebTrackerBlocked>()
+        verify(mockWebTrackersBlockedDao).insert(captor.capture())
+        assertEquals("uncloaked-host.com", captor.firstValue.trackerUrl)
+    }
+
+    @Test
     fun whenIsAppUrlPixelThenShouldContinueToLoad() = runTest {
         whenever(mockRequest.url).thenReturn(
             "https://improving.duckduckgo.com/t/m_nav_nt_p_android_phone?atb=v336-7&appVersion=5.131.0&test=1".toUri(),
@@ -775,6 +818,29 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
+    fun whenCloakedCnameTrackerIsBlockedThenInsertIntoWebTrackersBlockedDaoWithUncloakedUrl() = runTest {
+        configureNull()
+        configureShouldNotUpgrade()
+        configureBlockedCnameTrackingEvent(trackerUrl = "uncloaked-host.com", entity = TdsEntity("Tracker Inc", "Tracker Inc", 10.0))
+
+        val uri = "host.com".toUri()
+        whenever(mockRequest.url).thenReturn(uri)
+        whenever(mockCloakedCnameDetector.detectCnameCloakedHost(anyString(), any())).thenReturn("uncloaked-host.com")
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = "foo.com".toUri(),
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        val captor = argumentCaptor<WebTrackerBlocked>()
+        verify(mockWebTrackersBlockedDao).insert(captor.capture())
+        assertEquals("uncloaked-host.com", captor.firstValue.trackerUrl)
+        assertEquals("Tracker Inc", captor.firstValue.trackerCompany)
+    }
+
+    @Test
     fun whenRequestIsInBlocklistAndNotMainFrameAndNotAllowlistedThenBlockRequest() = runTest {
         configureShouldNotUpgrade()
         configureSubframeRequest()
@@ -841,7 +907,7 @@ class WebViewRequestInterceptorTest {
     fun whenRequestIsNotInBlocklistThenContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         configureSubframeRequest()
-        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(false)
+        whenever(requestBlocklist.containedInBlocklist(any(), any())).thenReturn(false)
         val response = testee.shouldIntercept(
             request = mockRequest,
             documentUri = "foo.com".toUri(),
@@ -861,7 +927,7 @@ class WebViewRequestInterceptorTest {
     }
 
     private fun configureRequestInBlocklist() {
-        whenever(requestBlocklist.containedInBlocklist(anyString(), anyString())).thenReturn(true)
+        whenever(requestBlocklist.containedInBlocklist(any(), any())).thenReturn(true)
     }
 
     private fun configureShouldBlock() {
@@ -896,21 +962,21 @@ class WebViewRequestInterceptorTest {
         whenever(mockTrackerDetector.evaluate(anyString(), any<Uri>(), eq(true), anyMap())).thenReturn(null)
     }
 
-    private fun configureBlockedCnameTrackingEvent() {
-        configureCnameTrackingEvent(TrackerStatus.BLOCKED)
+    private fun configureBlockedCnameTrackingEvent(trackerUrl: String = "", entity: Entity? = null) {
+        configureCnameTrackingEvent(TrackerStatus.BLOCKED, trackerUrl = trackerUrl, entity = entity)
     }
 
     private fun configureAllowedCnameTrackingEvent() {
         configureCnameTrackingEvent(TrackerStatus.ALLOWED)
     }
 
-    private fun configureCnameTrackingEvent(status: TrackerStatus) {
+    private fun configureCnameTrackingEvent(status: TrackerStatus, trackerUrl: String = "", entity: Entity? = null) {
         val trackingEvent = TrackingEvent(
             status = status,
             type = TrackerType.OTHER,
             documentUrl = "",
-            trackerUrl = "",
-            entity = null,
+            trackerUrl = trackerUrl,
+            entity = entity,
             categories = null,
             surrogateId = null,
         )

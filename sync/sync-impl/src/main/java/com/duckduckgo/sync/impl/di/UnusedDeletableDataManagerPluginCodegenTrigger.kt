@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.di
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.DeletableDataManager
-import com.duckduckgo.sync.api.engine.PatchableDataManager
 
 @ContributesPluginPoint(
     scope = AppScope::class,
@@ -27,10 +26,3 @@ import com.duckduckgo.sync.api.engine.PatchableDataManager
 )
 @Suppress("unused")
 private interface UnusedDeletableDataManagerPluginCodegenTrigger
-
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = PatchableDataManager::class,
-)
-@Suppress("unused")
-private interface UnusedPatchableDataManagerPluginCodegenTrigger

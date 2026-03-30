@@ -112,7 +112,7 @@ class AutomaticDataClearer @Inject constructor(
             val appIconChanged = settingsDataStore.appIconChanged
             settingsDataStore.appIconChanged = false
 
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 clearDataIfNeeded(appUsedSinceLastClear, appIconChanged)
             } else {
                 clearDataIfNeededLegacy(appUsedSinceLastClear, appIconChanged)
@@ -174,7 +174,7 @@ class AutomaticDataClearer @Inject constructor(
             withContext(dispatchers.io()) {
                 settingsDataStore.appBackgroundedTimestamp = timeNow
 
-                if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+                if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                     val clearWhenOption = fireDataStore.getAutomaticallyClearWhenOption()
                     val clearOptions = fireDataStore.getAutomaticClearOptions()
 
@@ -200,7 +200,7 @@ class AutomaticDataClearer @Inject constructor(
     override fun onExit() {
         launch(dispatchers.io()) {
             // the app does not have any activity in CREATED state we kill the process
-            val shouldKillProcess = if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            val shouldKillProcess = if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 dataClearing.isAutomaticDataClearingOptionSelected()
             } else {
                 settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE

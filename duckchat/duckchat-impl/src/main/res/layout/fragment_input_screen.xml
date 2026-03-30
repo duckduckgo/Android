@@ -30,11 +30,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+        android:id="@+id/inputScreenHatch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/inputScreenHatchTopMarginWithTopBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop"/>
+
     <FrameLayout
         android:id="@+id/ddgLogoContainer"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="@dimen/inputScreenLogoTopBarTopMargin"
         android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +67,7 @@
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop" />
+        app:layout_constraintTop_toBottomOf="@id/inputScreenHatch" />
 
     <com.duckduckgo.duckchat.impl.inputscreen.ui.view.TouchThroughNestedScrollView
         android:id="@+id/newTabContainerScrollView"
@@ -67,17 +76,18 @@
         android:layout_marginHorizontal="@dimen/inputScreenMarginHorizontal"
         android:visibility="gone"
         android:elevation="2dp"
+        android:clipToOutline="true"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintBottom_toTopOf="@id/inputModeWidgetContainerBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/inputModeWidgetContainerTop">
+        app:layout_constraintTop_toBottomOf="@id/inputScreenHatch">
 
         <FrameLayout
             android:id="@+id/newTabContainerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true" />
 

@@ -41,4 +41,14 @@
 
     <dimen name="dax_onboarding_bubble_card_view_corner_radius">24dp</dimen>
 
+    <!-- DaxOnboardingBubbleBrandDesignUpdateCardView -->
+    <declare-styleable name="DaxOnboardingBubbleBrandDesignUpdateCardView">
+        <attr name="arrowOffsetStart" />
+        <attr name="arrowOffsetEnd" />
+    </declare-styleable>
+
+    <dimen name="dax_brand_design_bubble_card_view_corner_radius">36dp</dimen>
+    <dimen name="dax_brand_design_bubble_stroke_width">1.5dp</dimen>
+    <dimen name="dax_brand_design_bubble_card_elevation">7dp</dimen>
+
 </resources>

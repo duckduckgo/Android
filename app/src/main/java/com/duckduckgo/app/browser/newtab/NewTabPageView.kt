@@ -58,10 +58,12 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -109,6 +111,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var androidBrowserConfig: AndroidBrowserConfigFeature
 
+    @Inject
+    lateinit var duckChat: DuckChat
+
     private val binding: ViewNewTabBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -123,6 +128,7 @@ class NewTabPageView @JvmOverloads constructor(
 
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
+    private val conflatedNativeInputJob = ConflatedJob()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -138,6 +144,10 @@ class NewTabPageView @JvmOverloads constructor(
             .onEach { processCommands(it) }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
 
+        conflatedNativeInputJob += duckChat.observeNativeInputFieldUserSettingEnabled()
+            .onEach { enabled -> updateLogoMargin(enabled) }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope!!)
+
         disableViewStateSaving()
     }
 
@@ -147,6 +157,7 @@ class NewTabPageView @JvmOverloads constructor(
         findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         conflatedStateJob.cancel()
         conflatedCommandJob.cancel()
+        conflatedNativeInputJob.cancel()
     }
 
     private fun disableViewStateSaving() {
@@ -157,6 +168,15 @@ class NewTabPageView @JvmOverloads constructor(
             if (disableViewStateSaving) {
                 binding.messageCta.disableStateSaving()
             }
+        }
+    }
+
+    private fun updateLogoMargin(nativeInputEnabled: Boolean) {
+        val baseMargin = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.homeTabDdgLogoTopMargin)
+        val extraMargin = if (nativeInputEnabled) 48.toPx() else 0
+        (binding.ddgLogo.layoutParams as? MarginLayoutParams)?.let {
+            it.topMargin = baseMargin + extraMargin
+            binding.ddgLogo.requestLayout()
         }
     }
 

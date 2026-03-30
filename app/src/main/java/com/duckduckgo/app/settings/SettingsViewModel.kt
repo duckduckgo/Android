@@ -130,7 +130,6 @@ class SettingsViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
-    private val postCtaExperienceToggles: PostCtaExperienceToggles,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -159,7 +158,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
-        data class LaunchAddHomeScreenWidget(val simpleWidgetPrompt: Boolean) : Command()
+        data object LaunchAddHomeScreenWidget : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
@@ -285,8 +284,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val simpleWidgetPrompt = postCtaExperienceToggles.self().isEnabled() && postCtaExperienceToggles.simpleSearchWidgetPrompt().isEnabled()
-            command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            command.send(LaunchAddHomeScreenWidget)
             if (!currentViewState().widgetsInstalled) {
                 widgetPromptShown = true
             }
@@ -400,7 +398,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireButtonSettingClicked() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 command.send(Command.LaunchDataClearingSettingsScreen)
             } else {
                 command.send(LaunchFireButtonScreen)

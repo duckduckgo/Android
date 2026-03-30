@@ -291,6 +291,12 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                             contentScopeScripts.onResponse(response)
                                         }
                                     }
+                                    duckChatJSHelper.consumeTabContextPromptOnHandoff(method)?.let { event ->
+                                        // There is a pending subscription event waiting to be sent
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.sendSubscriptionEvent(event)
+                                        }
+                                    }
                                 }
                             }
 

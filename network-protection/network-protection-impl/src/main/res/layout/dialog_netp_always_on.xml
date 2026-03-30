@@ -30,6 +30,7 @@
         android:layout_marginEnd="@dimen/keyline_4"
         android:layout_marginBottom="@dimen/keyline_1"
         android:background="?selectableItemBackground"
+        android:contentDescription="@string/netpCloseButtonContentDescription"
         android:src="@drawable/ic_close_24" />
 
     <com.airbnb.lottie.LottieAnimationView

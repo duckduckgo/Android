@@ -18,6 +18,7 @@ package com.duckduckgo.sync.settings.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.*

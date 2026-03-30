@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Get Desktop Browser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo for Mac and Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Recovery</string>
+    <string name="sync_settings_download_recovery_code_item">Download Recovery Code as PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Use this code to recover your data if you lose access to this device — keep it safe.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup data can\'t be recovered after 18 months of inactivity. <annotation type="learn_more_link">Learn more</annotation></string>
 </resources>

@@ -19,6 +19,7 @@ package com.duckduckgo.downloads.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
@@ -96,6 +97,7 @@ class FileDownloadCallback @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val mediaScanner: MediaScanner,
     private val failedDownloadRetryUrlStore: FailedDownloadRetryUrlStore,
+    private val fileDownloadCallbackPlugins: PluginPoint<FileDownloadCallbackPlugin>,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -138,6 +140,7 @@ class FileDownloadCallback @Inject constructor(
                     ),
                 )
             }
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 
@@ -160,6 +163,7 @@ class FileDownloadCallback @Inject constructor(
                     mimeType = mimeType,
                 ),
             )
+            fileDownloadCallbackPlugins.getPlugins().forEach { it.onFileDownloaded() }
         }
     }
 

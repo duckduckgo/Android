@@ -77,6 +77,8 @@ interface Site {
     var consentOptOutFailed: Boolean
     var consentSelfTestFailed: Boolean
     var consentCosmeticHide: Boolean?
+    var consentRule: String?
+    var consentReloadLoop: Boolean
     var isDesktopMode: Boolean
     var nextUrl: String
 

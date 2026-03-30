@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
     <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Prova la nuova opzione per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Invia automaticamente il contenuto della pagina</string>
     <string name="duckAIContextualAutomaticContextMessage">Invia automaticamente il contenuto della pagina a Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Allega il contenuto della pagina</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Elimina dati</string>
+    <string name="duckChatBrowserMenuContentDescription">Altre opzioni</string>
 </resources>

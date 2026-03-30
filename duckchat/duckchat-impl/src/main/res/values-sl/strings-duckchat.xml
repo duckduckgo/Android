@@ -55,9 +55,7 @@
     <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
     <string name="input_screen_chat_hint">Vprašaj zasebno</string>
     <string name="input_screen_user_pref_without_ai">Samo iskanje</string>
-    <string name="input_screen_user_pref_without_ai_updated" translatable="false">Search only</string>
     <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai</string>
-    <string name="input_screen_user_pref_with_ai_updated" translatable="false">Toggle between\nSearch and Duck.ai</string>
     <string name="input_screen_user_pref_description">Preizkusite novo možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
 
     <!-- Duck.ai Pro settings -->
@@ -101,4 +99,8 @@
     <string name="duckAIContextualAutomaticContextTitle">Samodejno pošiljanje vsebine strani</string>
     <string name="duckAIContextualAutomaticContextMessage">Vsebino strani samodejno pošljite Duck.ai</string>
     <string name="duckAIContextualAttachPageContent">Priloži vsebino strani</string>
+
+    <!-- Content Descriptions -->
+    <string name="duckChatFireButtonContentDescription">Počisti podatke</string>
+    <string name="duckChatBrowserMenuContentDescription">Več možnosti</string>
 </resources>

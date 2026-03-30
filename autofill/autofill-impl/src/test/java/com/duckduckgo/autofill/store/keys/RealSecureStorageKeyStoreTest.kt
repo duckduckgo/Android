@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import okio.ByteString.Companion.toByteString
@@ -44,6 +45,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -139,17 +141,6 @@ class RealSecureStorageKeyStoreTest {
         assertNull(result)
     }
 
-    @Test
-    fun whenUpdateKeyWithNullValueThenKeyIsRemoved() = runTest {
-        configureHarmonyDisabled()
-        createTestee()
-
-        testee.updateKey(KEY_NAME, null)
-
-        verify(legacyEditor).remove(KEY_NAME)
-        verify(legacyEditor).commit()
-    }
-
     // endregion
 
     // region canUseEncryption
@@ -212,17 +203,6 @@ class RealSecureStorageKeyStoreTest {
         verify(harmonyEditor).putString(eq(KEY_NAME), eq(expectedBase64))
     }
 
-    @Test
-    fun whenHarmonyEnabledAndUpdateKeyWithNullThenKeyRemovedFromBothStores() = runTest {
-        configureHarmonyEnabled()
-        createTestee()
-
-        testee.updateKey(KEY_NAME, null)
-
-        verify(legacyEditor).remove(KEY_NAME)
-        verify(harmonyEditor).remove(KEY_NAME)
-    }
-
     // endregion
 
     // region Write guard (key already exists)
@@ -278,19 +258,6 @@ class RealSecureStorageKeyStoreTest {
 
         assertTrue(exceptionThrown)
         verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
-    }
-
-    @Test
-    fun whenWritingNullValueThenWriteGuardDoesNotBlock() = runTest {
-        configureHarmonyEnabled()
-        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
-        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
-        createTestee()
-
-        // Should not throw - removing a key is always allowed
-        testee.updateKey(KEY_NAME, null)
-
-        verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
     }
 
     // endregion
@@ -588,6 +555,187 @@ class RealSecureStorageKeyStoreTest {
 
     // endregion
 
+    // region Fix — explicit harmony failure handling
+
+    @Test
+    fun whenLegacyCommitReturnsFalseThenUpdateKeyThrowsAndFiresFailurePixel() = runTest {
+        configureHarmonyDisabled()
+        whenever(legacyPrefs.getString(any(), anyOrNull())).thenReturn(null) // key absent — write guard passes
+        whenever(legacyEditor.commit()).thenReturn(false) // commit() returns false without throwing (e.g. fsync failure)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_PREFERENCES_UPDATE_KEY_FAILED), any(), any(), any())
+    }
+
+    @Test
+    fun whenHarmonyCommitReturnsFalseThenUpdateKeyThrowsAndFiresFailurePixel() = runTest {
+        configureHarmonyEnabled()
+        val failingHarmonyEditor: SharedPreferences.Editor = mock {
+            on { putString(any(), any()) } doReturn it
+            on { remove(any()) } doReturn it
+            on { commit() } doReturn false // returns false without throwing (e.g. fsync failure)
+        }
+        val failingHarmonyPrefs: SharedPreferences = mock {
+            on { edit() } doReturn failingHarmonyEditor
+            on { getString(any(), anyOrNull()) } doReturn null // key absent — write guard passes
+        }
+        sharedPreferencesProvider.stub {
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn failingHarmonyPrefs
+        }
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_FAILED), any(), any(), any())
+        // Legacy write should be rolled back since harmony write failed
+        verify(legacyEditor).remove(KEY_NAME)
+    }
+
+    @Test
+    fun whenHarmonyGetKeyThrowsThenFiresPixelAndRethrows() = runTest {
+        configureReadFromHarmonyEnabled()
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenThrow(RuntimeException("Keystore transient fault"))
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.getKey(KEY_NAME)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_FAILED), any(), any(), any())
+    }
+
+    @Test
+    fun whenHarmonyKeyAlreadyExistsCheckThrowsThenWriteIsBlockedByWriteGuard() = runTest {
+        configureHarmonyEnabled()
+        whenever(legacyPrefs.getString(any(), anyOrNull())).thenReturn(null)
+        whenever(harmonyPrefs.getString(any(), anyOrNull())).thenThrow(RuntimeException("Transient Keystore fault"))
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        // Conservative: exception during harmony existence check is treated as "key exists" — write is blocked
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
+    }
+
+    @Test
+    fun whenLegacyKeyAlreadyExistsCheckThrowsThenWriteIsNotBlocked() = runTest {
+        configureHarmonyEnabled()
+        whenever(legacyPrefs.getString(any(), anyOrNull())).thenThrow(RuntimeException("Legacy read fault"))
+        whenever(harmonyPrefs.getString(any(), anyOrNull())).thenReturn(null) // key not in harmony either
+        createTestee()
+
+        // Legacy exception in keyAlreadyExists() returns false (structural failure, not transient Keystore issue)
+        // so the write should proceed without triggering the write guard
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
+        verify(legacyEditor).putString(eq(KEY_NAME), any())
+    }
+
+    @Test
+    fun whenLegacyGetKeyReturnsNonNullButDecodeFailsThenThrowsAndFiresDecodePixel() = runTest {
+        configureHarmonyDisabled()
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(INVALID_BASE64)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.getKey(KEY_NAME)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+            assertEquals("Legacy preferences key value is present but cannot be decoded", e.message)
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_DECODE_FAILED), any(), any(), any())
+    }
+
+    @Test
+    fun whenHarmonyGetKeyReturnsNonNullButDecodeFailsAndReadFromHarmonyThenThrowsAndFiresDecodePixel() = runTest {
+        configureReadFromHarmonyEnabled()
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(INVALID_BASE64)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.getKey(KEY_NAME)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+            assertEquals("Harmony preferences key value is present but cannot be decoded", e.message)
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED), any(), any(), any())
+    }
+
+    @Test
+    fun whenHarmonyGetKeyReturnsNonNullButDecodeFailsAndNotReadFromHarmonyThenFiresDecodePixelAndReturnsLegacyValue() = runTest {
+        configureHarmonyEnabled() // useHarmony=true, readFromHarmony=false
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(INVALID_BASE64)
+        createTestee()
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertArrayEquals(TEST_VALUE, result)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_DECODE_FAILED), any(), any(), any())
+    }
+
+    @Test
+    fun whenUseHarmonyFlipsDuringGetKeyCallThenSnapshotPreventsReturningNull() = runTest {
+        // Simulate TOCTOU: useHarmony() returns false on the first call (snapshot), true on all subsequent calls.
+        // then readFromHarmony()=true would return harmonyValue (null) instead of legacyValue.
+        val useHarmonyToggle: Toggle = mock()
+        whenever(useHarmonyToggle.isEnabled()).thenReturn(false, true)
+        val readFromHarmonyToggle: Toggle = mock()
+        whenever(readFromHarmonyToggle.isEnabled()).thenReturn(true)
+        val mockAutofillFeature: AutofillFeature = mock {
+            on { useHarmony() } doReturn useHarmonyToggle
+            on { readFromHarmony() } doReturn readFromHarmonyToggle
+        }
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        testee = RealSecureStorageKeyStore(
+            coroutineScope = coroutineTestRule.testScope,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            autofillFeature = mockAutofillFeature,
+            sharedPreferencesProvider = sharedPreferencesProvider,
+            pixel = pixel,
+            encryptedPreferencesFactory = encryptedPreferencesFactory,
+        )
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertArrayEquals(TEST_VALUE, result)
+    }
+
+    // endregion
+
     // region Helper methods
 
     private fun configureHarmonyDisabled() {
@@ -618,6 +766,7 @@ class RealSecureStorageKeyStoreTest {
         private val TEST_VALUE = "test_value".toByteArray()
         private val EXISTING_VALUE = "existing_value".toByteArray()
         private val DIFFERENT_VALUE = "different_value".toByteArray()
+        private const val INVALID_BASE64 = "!!!not-valid-base64!!!"
     }
 
     /**

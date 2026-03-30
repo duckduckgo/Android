@@ -51,6 +51,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
+private const val TAG = "SharedPreferencesProviderImpl"
 
 @ContributesBinding(AppScope::class)
 class SharedPreferencesProviderImpl @Inject constructor(
@@ -105,9 +106,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
         name: String,
     ): SharedPreferences? {
         logcat { "Migrate and return encrypted preferences to Harmony" }
-        return migrateEncryptedToHarmonyIfNecessary(origin, name)?.let {
-            SafeSharedPreferences(it, crashLogger.get())
-        }
+        return migrateEncryptedToHarmonyIfNecessary(origin, name)
     }
 
     private fun getEncryptedSharedPreferencesInternal(
@@ -346,6 +345,8 @@ class SharedPreferencesProviderImpl @Inject constructor(
             )
             throw it
         }
+
+        logcat(TAG) { "Migrating keys to harmony: ${contents?.keys}" }
 
         runCatching {
             contents?.keys?.forEach { key ->

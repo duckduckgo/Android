@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
+import com.duckduckgo.app.tabs.model.TabAtomicOperations
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.FavoritesObserver
@@ -55,6 +56,9 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindTabRepository(tabRepository: TabDataRepository): TabRepository
+
+    @Binds
+    abstract fun bindTabAtomicOperations(tabRepository: TabDataRepository): TabAtomicOperations
 
     @Binds
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore

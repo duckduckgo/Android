@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.api.DuckAiChatDeletionListener
+import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
@@ -78,7 +79,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
@@ -89,6 +90,7 @@ import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.experiments.api.VariantManager
@@ -96,12 +98,13 @@ import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.RequestBlocklist
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.api.RequestBlocklist
 import com.duckduckgo.settings.api.SerpSettingsFeature
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
 import dagger.Provides
@@ -204,6 +207,7 @@ class BrowserModule {
         duckChaFeatureState: DuckAiFeatureState,
         aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
         androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        appSchemeInterceptionFeature: AppSchemeInterceptionFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -215,6 +219,7 @@ class BrowserModule {
         duckChaFeatureState,
         aiChatQueryDetectionFeature,
         androidBrowserConfigFeature,
+        appSchemeInterceptionFeature,
     )
 
     @Provides
@@ -238,6 +243,7 @@ class BrowserModule {
         dispatchers: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         @IsMainProcess isMainProcess: Boolean,
+        webTrackersBlockedDao: WebTrackersBlockedDao,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -259,6 +265,7 @@ class BrowserModule {
             androidBrowserConfigFeature,
             appCoroutineScope,
             isMainProcess,
+            webTrackersBlockedDao,
         )
 
     @Provides
@@ -361,8 +368,9 @@ class BrowserModule {
         cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
         thirdPartyCookieNames: ThirdPartyCookieNames,
+        duckAiHostProvider: DuckAiHostProvider,
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames, duckAiHostProvider)
     }
 
     @Provides

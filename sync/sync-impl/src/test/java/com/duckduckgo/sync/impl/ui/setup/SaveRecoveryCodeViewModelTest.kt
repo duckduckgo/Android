@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Next
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -42,6 +43,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -54,6 +56,7 @@ class SaveRecoveryCodeViewModelTest {
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncSetupWideEvent: SyncSetupWideEvent = mock()
 
     private val testee = SaveRecoveryCodeViewModel(
         recoveryPDF,
@@ -61,6 +64,7 @@ class SaveRecoveryCodeViewModelTest {
         clipboard,
         coroutineTestRule.testDispatcherProvider,
         syncPixels,
+        syncSetupWideEvent,
     )
 
     @Test
@@ -140,6 +144,62 @@ class SaveRecoveryCodeViewModelTest {
             testee.generateRecoveryCode(mock())
             val command = awaitItem()
             assertTrue(command is RecoveryCodePDFSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedInThenOnRecoveryCodeShownCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+
+        testee.viewState().test {
+            awaitItem()
+            verify(syncSetupWideEvent).onRecoveryCodeShown()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserNotSignedInAndAccountCreatedThenOnRecoveryCodeShownNotCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+
+        testee.viewState().test {
+            awaitItem()
+            verifyNoInteractions(syncSetupWideEvent)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCreateAccountFailsThenOnRecoveryCodeShownNotCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(accountCreatedFailInvalid)
+
+        testee.viewState().test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verifyNoInteractions(syncSetupWideEvent)
+    }
+
+    @Test
+    fun whenUserSignedInAndRecoveryCodeNullThenOnRecoveryCodeGenerationFailedCalled() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "error"))
+
+        testee.commands().test {
+            testee.viewState().test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            val command = awaitItem()
+            assertTrue(command is Command.FinishWithError)
+            verify(syncSetupWideEvent).onRecoveryCodeGenerationFailed()
             cancelAndIgnoreRemainingEvents()
         }
     }

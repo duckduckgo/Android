@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
@@ -30,6 +31,9 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_FAILURE
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_LOADED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CAN_RUN_PIR
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_CPU_USAGE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DASHBOARD_OPENED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_DOWNLOAD_BROKER_JSON_FAILURE
@@ -92,16 +96,30 @@ import javax.inject.Inject
 interface PirPixelSender {
     /**
      * Emits a pixel to signal that a manually initiated scan has started.
+     *
+     * @param isPowerSavingEnabled - whether the device is currently in power saving mode
+     * @param profileQueryCount - the number of profile queries used in the scan
+     * @param brokerCount - the number of active brokers at the start of the scan
      */
-    fun reportManualScanStarted()
+    fun reportManualScanStarted(
+        isPowerSavingEnabled: Boolean,
+        profileQueryCount: Int,
+        brokerCount: Int,
+    )
 
     /**
      * Emits a pixel to signal that a manually initiated scan has been completed.
      *
      * @param totalTimeInMillis - how long it took for the scan to complete
+     * @param batteryOptimizationsEnabled - whether battery optimizations are enabled for the app
+     * @param totalScanJobs - the number of scan jobs executed during the run
+     * @param totalOptOutJobs - the number of opt-out jobs executed during the run
      */
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
+        batteryOptimizationsEnabled: Boolean,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
     )
 
     /**
@@ -364,6 +382,11 @@ interface PirPixelSender {
     fun reportBrokerOptOutUnconfirmed42Days(brokerUrl: String)
 
     /**
+     * Emits a daily pixel to report that the user is eligible to run PIR.
+     */
+    fun reportCanRunPir()
+
+    /**
      * Emits a pixel to report Daily Active Users for PIR.
      */
     fun reportDAU()
@@ -548,6 +571,12 @@ interface PirPixelSender {
         message: String,
     )
 
+    suspend fun reportBundleBrokerJsonLoaded()
+
+    fun reportBundleBrokerJsonFailure(
+        message: String,
+    )
+
     fun reportBrokerActionFailure(
         brokerUrl: String,
         brokerVersion: String,
@@ -587,16 +616,32 @@ interface PirPixelSender {
 class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
     private val networkProtectionState: NetworkProtectionState,
+    private val pirRemoteFeatures: PirRemoteFeatures,
 ) : PirPixelSender {
-    override fun reportManualScanStarted() {
-        fire(PIR_FOREGROUND_RUN_STARTED)
+    override fun reportManualScanStarted(
+        isPowerSavingEnabled: Boolean,
+        profileQueryCount: Int,
+        brokerCount: Int,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
+            PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+        )
+        fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
 
     override fun reportManualScanCompleted(
         totalTimeInMillis: Long,
+        batteryOptimizationsEnabled: Boolean,
+        totalScanJobs: Int,
+        totalOptOutJobs: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
+            PARAM_KEY_BATTERY_OPTIMIZATIONS to batteryOptimizationsEnabled.toString(),
+            PARAM_KEY_TOTAL_SCAN to totalScanJobs.toString(),
+            PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -640,16 +685,9 @@ class RealPirPixelSender @Inject constructor(
             PARAM_TRIES to optOutAttemptCount.toString(),
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
-    }
-
-    private fun Boolean.toVpnConnectionState(): String {
-        return if (this) {
-            "connected"
-        } else {
-            "disconnected"
-        }
     }
 
     override suspend fun reportOptOutFailed(
@@ -674,6 +712,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
@@ -759,6 +798,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS, params)
     }
@@ -776,6 +816,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ATTEMPT_NUMBER to attemptNumber.toString(),
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED, params)
     }
@@ -789,6 +830,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
             PARAM_ACTION_ID to actionId,
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
         fire(PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED, params)
     }
@@ -800,6 +842,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
             PARAM_BROKER_VERSION to brokerVersion,
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
         fire(PIR_EMAIL_CONFIRMATION_JOB_SUCCESS, params)
     }
@@ -901,6 +944,10 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT, params)
     }
 
+    override fun reportCanRunPir() {
+        enqueueFire(PIR_CAN_RUN_PIR)
+    }
+
     override fun reportDAU() {
         enqueueFire(PIR_ENGAGEMENT_DAU)
     }
@@ -970,6 +1017,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_MANUAL_STARTED to inManualStarted.toString(),
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
@@ -993,6 +1041,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
@@ -1020,6 +1069,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
@@ -1307,6 +1357,20 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_DOWNLOAD_BROKER_JSON_FAILURE, params)
     }
 
+    override suspend fun reportBundleBrokerJsonLoaded() {
+        val params = mapOf(
+            PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
+        )
+        enqueueFire(PIR_BUNDLE_BROKER_JSON_LOADED, params)
+    }
+
+    override fun reportBundleBrokerJsonFailure(message: String) {
+        val params = mapOf(
+            PARAM_KEY_ERROR_DETAILS to message,
+        )
+        fire(PIR_BUNDLE_BROKER_JSON_FAILURE, params)
+    }
+
     override fun reportBrokerActionFailure(
         brokerUrl: String,
         brokerVersion: String,
@@ -1342,6 +1406,7 @@ class RealPirPixelSender @Inject constructor(
         val params = mapOf(
             PARAM_KEY_DURATION_MS to durationMs.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
+            PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
         )
 
         fire(PIR_INITIAL_SCAN_DURATION, params)
@@ -1404,6 +1469,22 @@ class RealPirPixelSender @Inject constructor(
         return runCatching { this.isRunning() }.getOrElse { false }
     }
 
+    private fun Boolean.toVpnConnectionState(): String {
+        return if (this) {
+            "connected"
+        } else {
+            "disconnected"
+        }
+    }
+
+    private fun trackerBlockingState(): String {
+        return if (pirRemoteFeatures.trackerBlocking().isEnabled()) {
+            "enabled"
+        } else {
+            "disabled"
+        }
+    }
+
     companion object {
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
@@ -1438,5 +1519,11 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_PROFILE_QUERY_COUNT = "profile_queries"
         private const val PARAM_KEY_SCAN_FREQUENCY = "scanFrequencyWithinThreshold"
         private const val PARAM_KEY_VPN_STATE = "vpn_connection_state"
+        private const val PARAM_KEY_POWER_SAVING = "power_saving"
+        private const val PARAM_KEY_BATTERY_OPTIMIZATIONS = "battery-optimizations"
+        private const val PARAM_KEY_TOTAL_SCAN = "total_scan"
+        private const val PARAM_KEY_TOTAL_OPTOUT = "total_optout"
+        private const val PARAM_KEY_BROKER_COUNT = "broker_count"
+        private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
     }
 }

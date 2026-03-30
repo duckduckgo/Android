@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.menu.DownloadMenuStateProvider
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -56,6 +57,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val downloadMenuStateProvider: DownloadMenuStateProvider,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -152,6 +154,7 @@ class DownloadsViewModel @Inject constructor(
             if (staleDownloadIds.isNotEmpty()) {
                 downloadsRepository.delete(staleDownloadIds)
             }
+            downloadMenuStateProvider.onDownloadsScreenViewed()
         }
     }
 

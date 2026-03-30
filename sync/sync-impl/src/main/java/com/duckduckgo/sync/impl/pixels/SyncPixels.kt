@@ -494,17 +494,6 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_DISMISSED("sync_setup_promo_bookmark_added_dialog_dismissed"),
     SYNC_SETUP_PROMO_BOOKMARK_ADDED_DIALOG_CONFIRMED("sync_setup_promo_bookmark_added_dialog_confirmed"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
-
-    // temporary pixels for testing block store integration
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_ENCRYPTED_DAILY("sync_auto_recovery_blockstore_available_encrypted_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_AVAILABLE_UNENCRYPTED_DAILY("sync_auto_recovery_blockstore_available_unencrypted_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_UNAVAILABLE_DAILY("sync_auto_recovery_blockstore_unavailable_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_CHECK_ERROR_DAILY("sync_auto_recovery_blockstore_check_error_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_WRITE_SUCCESS_DAILY("sync_auto_recovery_blockstore_write_success_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_WRITE_ERROR_DAILY("sync_auto_recovery_blockstore_write_error_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_SUCCESS_DAILY("sync_auto_recovery_blockstore_read_success_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_ERROR_DAILY("sync_auto_recovery_blockstore_read_error_daily"),
-    SYNC_AUTO_RECOVERY_BLOCKSTORE_READ_MISMATCH_DAILY("sync_auto_recovery_blockstore_read_mismatch_daily"),
 }
 
 object SyncPixelParameters {

@@ -24,6 +24,7 @@
         android:layout_height="match_parent"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
+        android:background="@android:color/black"
         android:visibility="gone"
         app:lottie_loop="false" />
 
@@ -34,25 +35,35 @@
         android:background="@drawable/rounded_top_corners_bottom_sheet_background"
         android:fillViewport="true">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:paddingVertical="30dp"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineStart"
+                style="@style/FireDialogContentGuidelineStart" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineEnd"
+                style="@style/FireDialogContentGuidelineEnd" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/headerContainer"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:paddingStart="@dimen/keyline_5"
-                android:paddingEnd="@dimen/keyline_5"
-                android:paddingBottom="@dimen/keyline_5">
+                android:paddingBottom="@dimen/keyline_4"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/fireIcon"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
+                    android:layout_marginBottom="@dimen/keyline_1"
                     android:importantForAccessibility="no"
                     app:lottie_rawRes="@raw/fire_dialog_animation"
                     app:lottie_autoPlay="true"
@@ -60,18 +71,18 @@
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/dialogTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
                     android:text="@string/singleTabFireDialogTitle"
+                    android:gravity="center"
                     app:textType="primary"
                     app:typography="h2" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/dialogSubtitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
+                    android:layout_marginTop="@dimen/keyline_1"
                     android:gravity="center"
                     android:visibility="gone"
                     app:textType="secondary"
@@ -81,33 +92,39 @@
 
             <LinearLayout
                 android:id="@+id/buttonsContainer"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginHorizontal="40dp">
+                android:layout_marginTop="@dimen/keyline_4"
+                app:layout_constraintTop_toBottomOf="@id/headerContainer"
+                app:layout_constraintStart_toStartOf="@id/guidelineStart"
+                app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
-                    android:id="@+id/deleteAllButton"
+                    android:id="@+id/deleteThisTabButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:daxButtonSize="large"
+                    android:text="@string/singleTabFireDialogDeleteThisTab" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                    android:id="@+id/deleteAllPrimaryButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:daxButtonSize="large"
+                    android:text="@string/singleTabFireDialogDeleteAll" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
+                    android:id="@+id/deleteAllSecondaryButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:daxButtonSize="large"
                     android:text="@string/singleTabFireDialogDeleteAll" />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonDestructiveSecondary
-                    android:id="@+id/deleteThisTabButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_2"
-                    app:daxButtonSize="large"
-                    android:text="@string/singleTabFireDialogDeleteThisTab" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/keyline_4" />
-
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>

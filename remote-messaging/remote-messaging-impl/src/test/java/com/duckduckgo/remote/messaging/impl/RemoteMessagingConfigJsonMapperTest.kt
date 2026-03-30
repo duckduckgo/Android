@@ -298,6 +298,7 @@ class RemoteMessagingConfigJsonMapperTest {
                         titleText = "Enhanced Scam Blocker",
                         descriptionText = "Browse confidently with protection against even more sneaky online threats.",
                         placeholder = Content.Placeholder.RADAR,
+                        imageUrl = "imageUrl",
                         primaryAction = Action.UrlInContext(
                             value = "https://spreadprivacy.com/scam-blocker/",
                         ),

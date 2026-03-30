@@ -142,6 +142,7 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                                 && dependencyPath != ":js-messaging-api"
+                                && dependencyPath != ":browser-api"
                         ) {
                             if (projectPath.endsWith(":feature-toggles-api") &&
                                     (dependencyPath == ":experiments-api"
@@ -179,10 +180,14 @@ task clean(type: Delete) {
 def isCI = System.getenv('CI') != null
 subprojects {
     tasks.withType(Test).configureEach {
+        useJUnitPlatform()
         develocity.testRetry {
             maxRetries = isCI ? 1 : 0
             maxFailures = 5
             failOnPassedAfterRetry = true
+        }
+        develocity.predictiveTestSelection {
+            enabled.set(System.getProperty("pts.enabled", "true").toBoolean())
         }
     }
 }

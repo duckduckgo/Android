@@ -176,6 +176,9 @@ class DuckChatContextualFragment :
     @Inject
     lateinit var faviconManager: FaviconManager
 
+    @Inject
+    lateinit var contextualNativeInputManager: ContextualNativeInputManager
+
     private val cookieManager: CookieManager by lazy { CookieManager.getInstance() }
 
     private var pendingFileDownload: FileDownloader.PendingFileDownload? = null
@@ -411,6 +414,19 @@ class DuckChatContextualFragment :
 
         configureBottomSheet(view)
         setupBackPressHandling()
+        contextualNativeInputManager.init(
+            card = binding.contextualNativeInputCard,
+            widget = binding.contextualNativeInputWidget,
+            jsMessaging = contentScopeScripts,
+            lifecycleOwner = viewLifecycleOwner,
+            onSearchSubmitted = { query ->
+                viewModel.onContextualClose()
+                startActivity(browserNav.openInNewTab(requireContext(), query))
+            },
+            onImageButtonPressed = {
+                // To be implemented
+            },
+        )
         observeViewModel()
 
         requireArguments().getString(KEY_DUCK_AI_CONTEXTUAL_TAB_ID)?.let { tabId ->
@@ -571,11 +587,11 @@ class DuckChatContextualFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
                     }
 
-                    DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
-                        viewModel.onMainBrowserPageFinished()
+                    is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
+                        viewModel.onMainBrowserPageFinished(command.isStorePageContextEnabled)
                     }
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {
@@ -612,7 +628,8 @@ class DuckChatContextualFragment :
         when (viewState.sheetMode) {
             DuckChatContextualViewModel.SheetMode.INPUT -> {
                 binding.contextualModeNativeContent.show()
-                binding.simpleWebview.gone()
+                binding.contextualWebviewContainer.gone()
+                contextualNativeInputManager.onInputMode()
 
                 binding.contextualNewChat.gone()
 
@@ -635,8 +652,9 @@ class DuckChatContextualFragment :
 
             DuckChatContextualViewModel.SheetMode.WEBVIEW -> {
                 binding.contextualModeNativeContent.gone()
-                binding.simpleWebview.show()
+                binding.contextualWebviewContainer.show()
                 binding.contextualNewChat.show()
+                contextualNativeInputManager.onWebViewMode()
             }
         }
     }

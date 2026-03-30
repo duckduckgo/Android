@@ -16,14 +16,19 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +37,9 @@ class SetupAccountViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val testee = SetupAccountViewModel(coroutineTestRule.testDispatcherProvider)
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
+
+    private val testee = SetupAccountViewModel(coroutineTestRule.testDispatcherProvider, syncFeature)
 
     @Test
     fun whenFlowStartedFromSyncSetupScreenViewModeThenCreateAccountCommandSent() = runTest {
@@ -138,5 +145,31 @@ class SetupAccountViewModelTest {
             }
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenRecoverDataEasilySetupScreenEnabledThenRecoveryCodeScreenUsesNewScreen() = runTest {
+        setRawFeatureFlagState(true)
+        testee.viewState(Screen.RECOVERY_CODE).test {
+            val viewState = awaitItem()
+            val viewMode = viewState.viewMode as ViewMode.AskSaveRecoveryCode
+            assertTrue(viewMode.useNewScreen)
+        }
+    }
+
+    @Test
+    fun whenRecoverDataEasilySetupScreenDisabledThenRecoveryCodeScreenUsesOldScreen() = runTest {
+        setRawFeatureFlagState(false)
+        val testee = SetupAccountViewModel(coroutineTestRule.testDispatcherProvider, syncFeature)
+        testee.viewState(Screen.RECOVERY_CODE).test {
+            val viewState = awaitItem()
+            val viewMode = viewState.viewMode as ViewMode.AskSaveRecoveryCode
+            assertFalse(viewMode.useNewScreen)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun setRawFeatureFlagState(state: Boolean) {
+        syncFeature.recoverDataEasilySetupScreen().setRawStoredState(State(enable = state))
     }
 }

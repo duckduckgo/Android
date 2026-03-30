@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Generiraj Duck Address</string>
     <string name="browserMenuFindInPage">Pronađi na stranici</string>
     <string name="browserMenuPrint">Ispiši stranicu</string>
+    <string name="browserMenuPrintSite">Ispis</string>
     <string name="browserMenuOpenAppLink">Otvori u aplikaciji</string>
     <string name="browserMenuAddToHome">Dodaj na početni zaslon</string>
     <string name="browserMenuReportBrokenSite">Prijavi neispravno web-mjesto</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Novo čavrljanje</string>
     <string name="browserMenuNewAIChat">Nova opcija AI čavrljanja</string>
     <string name="browserMenuChatHistory">Povijest čavrljanja</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai čavrljanja</string>
     <string name="browserMenuChatSettings">Postavke usluge Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Natrag</string>
     <string name="browserMenuForward">Naprijed</string>
     <string name="browserMenuRefresh">Osvježi</string>
+    <string name="browserMenuFireTabsData">Izbriši kartice i podatke</string>
 </resources>

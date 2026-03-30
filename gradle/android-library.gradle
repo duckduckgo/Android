@@ -54,6 +54,7 @@ android {
 }
 dependencies {
     lintChecks project(':lint-rules')
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
 }
 
 tasks.register('checks') {

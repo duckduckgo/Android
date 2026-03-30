@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Hanki pöytäkoneselain</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo Mac- ja Windows-laitteeseen</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Palautus</string>
+    <string name="sync_settings_download_recovery_code_item">Lataa palautuskoodi PDF-muodossa</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Käytä koodia tietojesi palauttamiseen, jos menetät pääsyn tähän laitteeseen – pidä se turvassa.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup -tietoja ei voida palauttaa 18 kuukauden toimettomuuden jälkeen. <annotation type="learn_more_link">Lue lisää</annotation></string>
 </resources>

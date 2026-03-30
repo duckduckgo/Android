@@ -28,7 +28,8 @@ import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.TAB_SWITCHER
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin
+import com.duckduckgo.app.global.view.FireDialogProvider.FireDialogOrigin.BROWSER
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
@@ -38,6 +39,7 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DateProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -47,14 +49,22 @@ import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -74,32 +84,15 @@ class SingleTabFireDialogViewModel @Inject constructor(
     private val duckChat: DuckChat,
 ) : ViewModel() {
 
-    data class ViewState(
-        val isDuckAiChatsSelected: Boolean = false,
-        val isSingleTabEnabled: Boolean = false,
-        val isFromTabSwitcher: Boolean = false,
-        val isDuckAiTab: Boolean = false,
-        val showDuckAiSubtitle: Boolean = false,
-        val showSiteDataSubtitle: Boolean = false,
-        val showDownloadsSubtitle: Boolean = false,
-        val shouldRestartAfterClearing: Boolean = true,
-    )
+    var shouldRestartAfterClearing: Boolean = true
+        private set
 
-    sealed class Command {
-        data object PlayAnimation : Command()
-        data object ClearingComplete : Command()
-        data object OnShow : Command()
-        data object OnCancel : Command()
-        data object OnClearStarted : Command()
-        data object OnSingleTabClearComplete : Command()
-        data object OnSingleTabClearFeatureNotSupported : Command()
-        data object OnSingleTabClearError : Command()
-    }
-
-    private val _viewState = MutableStateFlow(ViewState())
-    val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
-
-    private var hasFiredDialogShownPixel: Boolean = false
+    private val origin = MutableStateFlow<FireDialogOrigin?>(null)
+    val viewState: StateFlow<ViewState> = origin
+        .filterNotNull()
+        .map { mapToViewState(it) }
+        .flowOn(dispatcherProvider.io())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ViewState.Loading)
 
     // Capacity set to 3 to handle the onDeleteAllClicked() command burst:
     // OnClearStarted -> PlayAnimation -> ClearingComplete
@@ -108,43 +101,14 @@ class SingleTabFireDialogViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     init {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val isDuckAiChatsSelected = fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
-            val isDeleteBrowsingDataSupported = webViewCapabilityChecker.isSupported(DeleteBrowsingData)
-            val shownCount = settingsDataStore.singleTabFireDialogShownCount
-            val downloads = downloadsRepository.getDownloads()
-            val selectedTabUrl = tabRepository.getSelectedTab()?.url
-            val isDuckAiTab = selectedTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
-            _viewState.update {
-                it.copy(
-                    isDuckAiChatsSelected = isDuckAiChatsSelected,
-                    isSingleTabEnabled = isDeleteBrowsingDataSupported,
-                    isDuckAiTab = isDuckAiTab,
-                    showDuckAiSubtitle = isDuckAiTab && !isDuckAiChatsSelected,
-                    showSiteDataSubtitle = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
-                    showDownloadsSubtitle = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
-                )
-            }
-        }
-    }
-
-    fun setOrigin(origin: FireDialogProvider.FireDialogOrigin) {
-        _viewState.update { it.copy(isFromTabSwitcher = origin == TAB_SWITCHER) }
-    }
-
-    fun onShow() {
         viewModelScope.launch {
-            command.send(Command.OnShow)
-            if (!hasFiredDialogShownPixel) {
-                hasFiredDialogShownPixel = true
-                pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
-                withContext(dispatcherProvider.io()) {
-                    if (settingsDataStore.singleTabFireDialogShownCount <= DIALOG_WARNING_MESSAGE_SHOWN_LIMIT) {
-                        settingsDataStore.singleTabFireDialogShownCount++
-                    }
-                }
-            }
+            val state = viewState.filterIsInstance<ViewState.Loaded>().firstOrNull()
+            onShow(state?.isSiteDataSubtitleVisible ?: false)
         }
+    }
+
+    fun setOrigin(dialogOrigin: FireDialogOrigin) {
+        origin.update { dialogOrigin }
     }
 
     fun onCancel() {
@@ -158,6 +122,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
             command.send(Command.OnClearStarted)
             trySendDailyDeleteClicked()
             pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY, type = Daily())
             pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
@@ -196,14 +161,11 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
     fun onDeleteThisTabClicked() {
         viewModelScope.launch {
-            _viewState.update {
-                it.copy(
-                    shouldRestartAfterClearing = false,
-                )
-            }
+            shouldRestartAfterClearing = false
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
+            pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
 
             command.send(Command.OnClearStarted)
-            pixel.enqueueFire(PRODUCT_TELEMETRY_SURFACE_DATA_CLEARING)
 
             val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
                 settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
@@ -218,10 +180,13 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 command.send(Command.PlayAnimation)
             }
 
+            val originalTabId = withContext(dispatcherProvider.io()) {
+                tabRepository.getSelectedTab()?.tabId
+            }
+
             val result = withContext(dispatcherProvider.io()) {
-                val selectedTabId = tabRepository.getSelectedTab()?.tabId
-                if (selectedTabId != null) {
-                    dataClearing.clearSingleTabData(selectedTabId)
+                if (originalTabId != null) {
+                    dataClearing.clearSingleTabData(originalTabId)
                 } else {
                     null
                 }
@@ -229,10 +194,55 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             when (result) {
                 is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
-                is ClearDataResult.Success -> command.send(Command.OnSingleTabClearComplete)
+                is ClearDataResult.Success -> {
+                    waitForTabsToUpdate(originalTabId)
+                    command.send(Command.OnSingleTabClearComplete)
+                }
                 else -> command.send(Command.OnSingleTabClearError)
             }
         }
+    }
+
+    private suspend fun onShow(isDataSubtitleVisible: Boolean) {
+        command.send(Command.OnShow)
+        pixel.fire(AppPixelName.FIRE_DIALOG_SHOWN)
+
+        if (isDataSubtitleVisible) {
+            withContext(dispatcherProvider.io()) {
+                settingsDataStore.singleTabFireDialogShownCount++
+            }
+        }
+    }
+
+    private suspend fun mapToViewState(dialogOrigin: FireDialogOrigin): ViewState.Loaded {
+        val isDuckAiChatsSelected =
+            fireDataStore.isManualClearOptionSelected(FireClearOption.DUCKAI_CHATS)
+        val isDeleteBrowsingDataSupported = webViewCapabilityChecker.isSupported(DeleteBrowsingData)
+        val shownCount = settingsDataStore.singleTabFireDialogShownCount
+        val downloads = downloadsRepository.getDownloads()
+        val selectedTabUrl = tabRepository.getSelectedTab()?.url
+        val isDuckAiTab = selectedTabUrl?.let { duckChat.isDuckChatUrl(it.toUri()) } ?: false
+        val tabCount = tabRepository.getOpenTabCount()
+        return ViewState.Loaded(
+            stateData = ViewState.Loaded.StateData(
+                isDuckAiChatsSelected = isDuckAiChatsSelected,
+                isSingleTabEnabled = isDeleteBrowsingDataSupported,
+                isDuckAiTab = isDuckAiTab,
+                tabCount = tabCount,
+                isSiteDataSubtitleEligible = shownCount < DIALOG_WARNING_MESSAGE_SHOWN_LIMIT,
+                isDownloadsSubtitleEligible = downloads.any { download -> download.downloadStatus == DownloadStatus.STARTED },
+                isFirePictogramVisible = settingsDataStore.fireAnimationEnabled,
+            ),
+            origin = dialogOrigin,
+        )
+    }
+
+    private suspend fun waitForTabsToUpdate(originalTabId: String?) {
+        // wait for the tab selection to change before signaling completion
+        withTimeoutOrNull(TAB_UPDATE_TIMEOUT_MS) {
+            tabRepository.flowSelectedTab.firstOrNull { it?.tabId != originalTabId }
+        }
+        delay(500)
     }
 
     private suspend fun trySendDailyDeleteClicked() {
@@ -247,7 +257,53 @@ class SingleTabFireDialogViewModel @Inject constructor(
         }
     }
 
+    sealed class ViewState {
+        data object Loading : ViewState()
+
+        data class Loaded(
+            val stateData: StateData,
+            val origin: FireDialogOrigin,
+        ) : ViewState() {
+            val isDuckAiTabInBrowser: Boolean
+                get() = stateData.isDuckAiTab && origin == BROWSER
+
+            val isDeleteThisTabButtonVisible: Boolean
+                get() = stateData.isSingleTabEnabled && origin == BROWSER
+
+            val isDeleteAllButtonVisible: Boolean
+                get() = !(isDuckAiTabInBrowser && stateData.isSingleTabEnabled)
+
+            val isSiteDataSubtitleVisible: Boolean
+                get() = stateData.isSiteDataSubtitleEligible && !isDuckAiTabInBrowser
+
+            val isDownloadsSubtitleVisible: Boolean
+                get() = stateData.isDownloadsSubtitleEligible && !isDuckAiTabInBrowser
+
+            data class StateData(
+                val isDuckAiChatsSelected: Boolean = false,
+                val isSingleTabEnabled: Boolean = false,
+                val isDuckAiTab: Boolean = false,
+                val tabCount: Int = 0,
+                val isSiteDataSubtitleEligible: Boolean = false,
+                val isDownloadsSubtitleEligible: Boolean = false,
+                val isFirePictogramVisible: Boolean = true,
+            )
+        }
+    }
+
+    sealed class Command {
+        data object PlayAnimation : Command()
+        data object ClearingComplete : Command()
+        data object OnShow : Command()
+        data object OnCancel : Command()
+        data object OnClearStarted : Command()
+        data object OnSingleTabClearComplete : Command()
+        data object OnSingleTabClearFeatureNotSupported : Command()
+        data object OnSingleTabClearError : Command()
+    }
+
     companion object {
         private const val DIALOG_WARNING_MESSAGE_SHOWN_LIMIT = 2
+        private const val TAB_UPDATE_TIMEOUT_MS = 5000L
     }
 }

@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Download de desktopbrowser</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo voor Mac en Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Herstellen</string>
+    <string name="sync_settings_download_recovery_code_item">Herstelcode downloaden als PDF-bestand</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Gebruik deze code om je gegevens te herstellen als je de toegang tot dit apparaat verliest — bewaar hem veilig.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup-gegevens kunnen niet worden hersteld na 18 maanden inactiviteit. <annotation type="learn_more_link">Meer informatie</annotation></string>
 </resources>

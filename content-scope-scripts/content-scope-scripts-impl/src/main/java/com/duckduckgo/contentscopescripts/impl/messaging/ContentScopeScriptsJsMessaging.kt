@@ -143,7 +143,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         url: String?,
     ): Boolean {
         if (allowedDomains.isEmpty()) return true
-        val eTld = url?.toTldPlusOne() ?: return false
-        return (allowedDomains.contains(eTld))
+        val host = url ?: return false
+        val eTld = host.toTldPlusOne()
+        return allowedDomains.contains(host) || (eTld != null && allowedDomains.contains(eTld))
     }
 }

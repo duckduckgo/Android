@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
-import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.httperrors.HttpErrorPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
@@ -37,6 +36,7 @@ import com.duckduckgo.newtabpage.impl.pixels.NewTabPixelNames
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.site.permissions.impl.SitePermissionsPixelName
+import com.duckduckgo.sqlcipher.loader.impl.SqlCipherPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -155,12 +155,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             NewTabPixelNames.PRODUCT_SURFACE_TELEMETRY_NEW_TAB_DISPLAYED_DAILY.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED.pixelName to PixelParameter.removeAtb(),
             SavedSitesPixelName.PRODUCT_TELEMETRY_SURFACE_BOOKMARKS_OPENED_DAILY.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_ADDRESS_BAR_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_DAX_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED.pixelName to PixelParameter.removeAtb(),
-            CustomTabPixelNames.CUSTOM_TABS_TRACKER_ANIMATION_CLICKED_DAILY.pixelName to PixelParameter.removeAtb(),
             AppPixelName.FIRE_DIALOG_SHOWN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
@@ -202,6 +196,15 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.GET_DESKTOP_BROWSER_SHARE_DOWNLOAD_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.GET_DESKTOP_BROWSER_LINK_CLICK.pixelName to PixelParameter.removeAtb(),
             AppPixelName.MENU_ACTION_VPN_PRESSED.pixelName to PixelParameter.removeAtb(),
+            SqlCipherPixelName.LIBRARY_LOAD_FAILURE_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
+            SqlCipherPixelName.LIBRARY_LOAD_TIMEOUT_SQLCIPHER.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_BROWSING_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_SETTINGS.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FORGET_ALL_PRESSED_SETTINGS_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED.pixelName to PixelParameter.removeAtb(),
+            AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

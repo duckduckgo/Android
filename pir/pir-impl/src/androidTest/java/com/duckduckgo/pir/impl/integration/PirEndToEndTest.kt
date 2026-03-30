@@ -22,6 +22,9 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdater
 import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
@@ -242,7 +245,7 @@ class PirEndToEndTest {
 
         fakePixel = FakePixel()
         fakeNetworkProtectionState = FakeNetworkProtectionState()
-        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState)
+        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState, FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
         fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
 
         pirRepository = RealPirRepository(
@@ -360,6 +363,10 @@ class PirEndToEndTest {
             pirOptOut = pirOptOut,
             currentTimeProvider = fakeTimeProvider,
             pixelSender = pixelSender,
+            brokerJsonUpdater = object : BrokerJsonUpdater {
+                override suspend fun update(): Boolean = true
+            },
+            pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
         )
 
         pirEmailConfirmation = RealPirEmailConfirmation(

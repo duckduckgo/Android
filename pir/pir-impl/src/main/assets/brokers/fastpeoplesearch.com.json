@@ -1,0 +1,111 @@
+{
+  "name": "FastPeopleSearch",
+  "url": "fastpeoplesearch.com",
+  "version": "0.6.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1675317600000,
+  "optOutUrl": "https://www.fastpeoplesearch.com/removal",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "040e0a0a-095a-490e-8c55-ee7b66732030",
+          "url": "https://www.fastpeoplesearch.com/name/${firstName}-${lastName}_${city}-${state}"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector because CF challenge page has class 'page-manage-challenge' on the html element",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//html[not(contains(@class, 'page-manage-challenge'))]"
+            }
+          ],
+          "id": "98a2a63e-1d47-45e9-a1f3-c1780b29cd1f"
+        },
+        {
+          "actionType": "condition",
+          "_comment": "captcha is not always present at this stage",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#bot-check",
+              "failSilently": true
+            }
+          ],
+          "actions": [
+            {
+              "actionType": "getCaptchaInfo",
+              "selector": ".g-recaptcha",
+              "id": "9991b50e-2459-4933-b57b-043426699aaf"
+            },
+            {
+              "actionType": "solveCaptcha",
+              "selector": ".g-recaptcha",
+              "id": "99912c72-9ae2-447e-96aa-ed4238102535"
+            },
+            {
+              "actionType": "click",
+              "elements": [
+                {
+                  "type": "button",
+                  "selector": ".btn-success"
+                }
+              ],
+              "id": "9991ae1a-12d0-48a8-852e-c2cc5b0a8fe3"
+            }
+          ],
+          "id": "99915607-e720-4e68-b464-5eb2f75ba5a0"
+        },
+        {
+          "actionType": "extract",
+          "id": "f7a316c3-f4c0-46b5-be2d-b8df71852a26",
+          "selector": ".card",
+          "noResultsSelector": "#notfound_container",
+          "profile": {
+            "name": {
+              "selector": ".larger"
+            },
+            "alternativeNamesList": {
+              "selector": ".//h3[contains(strong, 'AKA')]/following-sibling::span | .//span[contains(text(), 'Goes By')]/strong",
+              "findElements": true
+            },
+            "age": {
+              "selector": "//h3[normalize-space(.)='Age:']/following-sibling::text()[1]"
+            },
+            "addressFullList": {
+              "selector": ".//h3[contains(strong, 'Past Addresses')]/following-sibling::div/div/a",
+              "findElements": true
+            },
+            "addressCityState": {
+              "selector": ".grey"
+            },
+            "relativesList": {
+              "selector": ".//h3[contains(strong, 'Relatives')]/following-sibling::a[@class='nowrap']",
+              "findElements": true,
+              "separator": "•"
+            },
+            "profileUrl": {
+              "selector": ".link-to-details"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

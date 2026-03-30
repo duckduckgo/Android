@@ -354,7 +354,7 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items + bookmarkFolder.id))
         }
-        command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
+        command.value = ConfirmDeleteBookmarkFolder(bookmarkFolder)
     }
 
     private suspend fun onSavedSitesItemsChanged(

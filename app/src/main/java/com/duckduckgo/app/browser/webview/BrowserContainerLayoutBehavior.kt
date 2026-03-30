@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.webview
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -44,6 +45,13 @@ class TopOmnibarBrowserContainerLayoutBehavior(
     attrs: AttributeSet?,
 ) : ScrollingViewBehavior(context, attrs) {
     private val marginOffsetPx = (MARGIN_OFFSET_DP * context.resources.displayMetrics.density).toInt()
+
+    override fun onRequestChildRectangleOnScreen(
+        parent: CoordinatorLayout,
+        child: View,
+        rectangle: Rect,
+        immediate: Boolean,
+    ): Boolean = false
 
     override fun layoutDependsOn(
         parent: CoordinatorLayout,

@@ -21,7 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.menu.BrowserMenuHighlightState
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.CustomTab
@@ -58,7 +58,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
     private val pixel: Pixel,
     tabRepository: TabRepository,
     dispatcherProvider: DispatcherProvider,
-    additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
+    browserMenuHighlightState: BrowserMenuHighlightState,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val _commands = Channel<Command>(capacity = Channel.CONFLATED)
     val commands: Flow<Command> = _commands.receiveAsFlow()
@@ -67,12 +67,12 @@ class BrowserNavigationBarViewModel @Inject constructor(
     val viewState = combine(
         _viewState.asStateFlow(),
         tabRepository.flowTabs,
-        additionalDefaultBrowserPrompts.highlightPopupMenu,
-    ) { state, tabs, highlightOverflowMenu ->
+        browserMenuHighlightState.shouldHighlight,
+    ) { state, tabs, shouldHighlightMenu ->
         state.copy(
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = highlightOverflowMenu,
+            showBrowserMenuHighlight = shouldHighlightMenu,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ViewState())
 

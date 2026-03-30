@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Δημιουργήστε Duck Address</string>
     <string name="browserMenuFindInPage">Εύρεση στη σελίδα</string>
     <string name="browserMenuPrint">Εκτύπωση σελίδας</string>
+    <string name="browserMenuPrintSite">Εκτύπωση</string>
     <string name="browserMenuOpenAppLink">Ανοίξτε στην εφαρμογή</string>
     <string name="browserMenuAddToHome">Προσθήκη στην Αρχική Οθόνη</string>
     <string name="browserMenuReportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Νέα συνομιλία</string>
     <string name="browserMenuNewAIChat">Νέο AI Chat</string>
     <string name="browserMenuChatHistory">Ιστορικό συνομιλίας</string>
+    <string name="browserMenuDuckChatHistory">Συνομιλίες Duck.ai</string>
     <string name="browserMenuChatSettings">Ρυθμίσεις Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Πίσω</string>
     <string name="browserMenuForward">Εμπρός</string>
     <string name="browserMenuRefresh">Ανανέωση</string>
+    <string name="browserMenuFireTabsData">Διαγραφή καρτελών και δεδομένων</string>
 </resources>

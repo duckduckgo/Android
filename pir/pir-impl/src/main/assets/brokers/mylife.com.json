@@ -1,0 +1,172 @@
+{
+  "name": "mylife",
+  "url": "mylife.com",
+  "version": "0.7.0",
+  "addedDatetime": 1715797497496,
+  "optOutUrl": "https://mylife.jotform.com/260284407610047",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "31285970-27bd-4ec6-a4c1-afc5fb501624",
+          "url": "https://www.mylife.com/pub-multisearch.pubview?searchFirstName=${firstName}&searchLastName=${lastName}&searchLocation=${city}%2C+${state|upcase}&whyReg=peoplesearch&whySub=Member+Profile+Sub&pageType=ps"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".container"
+            }
+          ],
+          "id": "0d1a75e9-74c0-4602-acc1-0038bb087ef9"
+        },
+        {
+          "actionType": "extract",
+          "id": "9a08be56-d596-48e5-8745-0574b541e9df",
+          "selector": ".ais-InfiniteHits-item",
+          "noResultsSelector": "//h1[@class='search-result-heading' and contains(text(), \"We didn't find\")]",
+          "profile": {
+            "name": {
+              "selector": ".hit-name",
+              "beforeText": ","
+            },
+            "alternativeNamesList": {
+              "selector": ".hit-akas .hit-values",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".hit-name",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".hit-location"
+            },
+            "addressCityStateList": {
+              "selector": ".hit-pastAddresses .hit-values",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".hit-btn-lg",
+              "identifierType": "path",
+              "identifier": "https://www.mylife.com/${firstName}-${lastName}/${id}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "8c7e8f10-5bd2-4dba-b99a-d198b3c0bbc9",
+          "url": "https://mylife.jotform.com/260284407610047"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "form.jotform-form"
+            }
+          ],
+          "id": "1e00a6b5-cab3-4523-a095-87fe69a28d84"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "1cd0b2b7-7203-4ae1-9d22-d76aa6de8a26",
+          "selector": "form.jotform-form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "fullState",
+              "selector": "select[data-component='dropdown']"
+            },
+            {
+              "type": "firstName",
+              "selector": "input[data-component='first']"
+            },
+            {
+              "type": "lastName",
+              "selector": "input[data-component='last']"
+            },
+            {
+              "type": "city",
+              "selector": "input[data-component='city']"
+            },
+            {
+              "type": "middleName",
+              "selector": "input[name='q13_middleInitial']"
+            },
+            {
+              "type": "birthYear",
+              "selector": "input[name='q15_birthYear']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "ed570894-ebbe-4f9c-a9f7-9d58e81bdc28",
+          "selector": "form.jotform-form",
+          "dataSource": "extractedProfile",
+          "elements": [
+            {
+              "type": "$generated_zip_code$",
+              "selector": "input[data-component='zip']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "input[name='q12_enterThe']"
+            },
+            {
+              "type": "email",
+              "selector": "input[data-component='email']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "aeda8b17-92cf-43ce-8974-12a13fb9bcfd",
+          "selector": "div[data-component='recaptcha']"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "6b8a962e-19ed-4f33-8c56-4f4a1f17cad3",
+          "selector": "div[data-component='recaptcha']"
+        },
+        {
+          "actionType": "click",
+          "id": "6cb0e6f4-e881-4937-872e-29627223bdb8",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "button.form-submit-button"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "fe7201a7-4e92-4ad3-90fb-d836019d71e0",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "body.thankyou"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

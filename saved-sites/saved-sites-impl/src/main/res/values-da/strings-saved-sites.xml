@@ -28,6 +28,12 @@
         <item quantity="one">Dit bogmærke for %1$s kan ikke synkroniseres, fordi et af dets felter overskrider tegngrænsen.</item>
         <item quantity="other">Dine bogmærker for %1$s og %2$d andre sider kan ikke synkroniseres, fordi nogle af deres felter overskrider tegngrænsen.</item>
     </plurals>
+
+    <!-- Content Descriptions -->
+    <string name="bookmarksSearchMenuContentDescription">Søg i bogmærker</string>
+    <string name="bookmarksAddFolderMenuContentDescription">Tilføj mappe</string>
+    <string name="bookmarksMenuContentDescription">Flere muligheder</string>
+    <string name="newTabFavoritesToggleContentDescription">Slå synligheden af favoritter til/fra</string>
     <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Administrer bogmærker</annotation></string>
 
     <!-- Bookmarks Activity -->
@@ -116,4 +122,5 @@
     <string name="importBookmarksFromGooglePreImportDialogImportButton">Importer fra Google</string>
     <string name="importBookmarksFromGooglePreImportDialogSelectFileButton">Vælg bogmærkefil…</string>
     <string name="bookmarksImportDialogClose">Luk</string>
+
 </resources>

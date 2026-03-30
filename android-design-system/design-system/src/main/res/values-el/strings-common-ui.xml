@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Μάθετε περισσότερα</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Κλείσιμο</string>
+    <string name="bookmarkFavoriteContentDescription">Αγαπημένο</string>
+
 </resources>

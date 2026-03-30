@@ -29,6 +29,7 @@ import java.io.Serializable
  * @param browserButtonsConfig configuration for displaying browser buttons (Fire Button, Tab Switcher, Menu)
  * @param showInstalledApps whether apps installed on the device should appear in autocomplete results
  * @param launchWithVoice whether to immediately launch voice input on activity start, if supported and enabled
+ * @param isNewTab whether the input screen is being launched as part of a new tab creation action
  */
 data class InputScreenActivityParams(
     val query: String,
@@ -38,6 +39,8 @@ data class InputScreenActivityParams(
     val launchWithVoice: Boolean = false,
     val launchOnChat: Boolean = false,
     val useBottomSheetMenu: Boolean = false,
+    val showReturnHatch: Boolean = false,
+    val isNewTab: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 /**

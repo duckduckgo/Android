@@ -252,6 +252,7 @@ fladle {
 dependencies {
 	implementation project(":duckchat-api")
 	implementation project(":duckchat-impl")
+	internalImplementation project(":duckchat-internal")
 	implementation project(":malicious-site-protection-impl")
 	implementation project(":malicious-site-protection-api")
 	implementation project(":custom-tabs-impl")
@@ -314,6 +315,11 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':privacy-config-impl')
     implementation project(':privacy-config-store')
+    implementation project(':request-interception-api')
+    implementation project(':request-interception-impl')
+    implementation project(':sqlcipher-loader-api')
+    implementation project(':sqlcipher-loader-impl')
+    implementation project(':tracker-detection-api')
     internalImplementation project(':privacy-config-internal')
 
     implementation project(':anrs-api')
@@ -582,6 +588,7 @@ dependencies {
 
     testImplementation project(':vpn-api-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core

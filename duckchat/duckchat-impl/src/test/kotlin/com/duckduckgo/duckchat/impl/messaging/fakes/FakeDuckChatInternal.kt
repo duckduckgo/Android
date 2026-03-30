@@ -21,9 +21,11 @@ import android.net.Uri
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 /**
  * Fake implementation of [DuckChatInternal] for testing purposes.
@@ -170,6 +172,21 @@ class FakeDuckChatInternal(
     override fun isChatSuggestionsFeatureAvailable(): Boolean = true
 
     override fun observeChatSuggestionsUserSettingEnabled(): Flow<Boolean> = chatSuggestionsUserSettingEnabled
+
+    override fun openVoiceDuckChat() { }
+
+    private val _defaultTogglePosition = MutableStateFlow<String?>(null)
+
+    override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
+        _defaultTogglePosition.value = position.name
+    }
+
+    override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
+        _defaultTogglePosition.map { DefaultTogglePosition.fromName(it) }
+
+    override suspend fun saveLastUsedTogglePosition(position: String) { }
+
+    override fun observeLastUsedTogglePosition(): Flow<String?> = MutableStateFlow(null)
 
     fun setDuckChatUserEnabled(enabled: Boolean) {
         enableDuckChatUserSetting.value = enabled

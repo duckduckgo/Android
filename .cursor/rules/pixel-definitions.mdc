@@ -1,0 +1,280 @@
+---
+description: Rules for creating and maintaining pixel definition JSON files that document pixels and wide events.
+alwaysApply: false
+---
+# Pixel Registry Definitions
+
+## Overview
+
+Pixel definitions are JSON (or JSON5) files that document every pixel and wide event fired by the app. They live in:
+
+- **Pixels:** `PixelDefinitions/pixels/definitions/`
+- **Wide events:** Wide events may be defined as pixel definitions (using `widePixel*` parameters from the params dictionary) or in a dedicated wide events directory, depending on the product.
+
+Each product has a `params_dictionary` and `suffixes_dictionary` for reusable definitions.
+
+**Note:** The definitions directory contains a `TEMPLATE.json5` file. This is a scaffold for creating new definition files — it is not a real pixel definition. Ignore it when reviewing or auditing existing definitions.
+
+## Pixel Definition Structure
+
+Each definition file is a JSON object where keys are pixel names and values describe the pixel:
+
+```json5
+{
+    "pixel_name_here": {
+        "description": "When and why this pixel fires",
+        "owners": ["githubUsername"],
+        "triggers": ["other"],
+        "suffixes": ["first_daily_count"],
+        "parameters": ["appVersion", "channel"],
+        // Only for temporary pixels — omit for permanent ones
+        "expires": "2026-06-30"
+    }
+}
+```
+
+### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `description` | string | When the pixel fires and its purpose |
+| `owners` | string[] | GitHub usernames of responsible people |
+| `triggers` | string[] | What causes the pixel to fire (see trigger values below) |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `suffixes` | array | Dynamic parts appended to the pixel name |
+| `parameters` | array | Query parameters sent with the pixel |
+| `expires` | string | ISO date (`YYYY-MM-DD`) for temporary pixels |
+
+### Trigger Values
+
+Valid trigger values: `"other"`, `"scheduled"`, `"startup"`, `"page_load"`, `"new_tab"`, `"exception"`, `"user_submitted"`, `"search_ddg"`.
+
+Most pixels use `"other"`. Use `"scheduled"` for daily/periodic pixels, `"startup"` for app-launch pixels, and `"page_load"` for navigation-related pixels.
+
+## Parameters
+
+Pixel definitions must document **all** query parameters sent over the wire, including default ones.
+
+### Reusing Parameters from the Dictionary
+
+`params_dictionary` defines common parameters. Reference them by key name as a string:
+
+```json5
+"parameters": [
+    "appVersion",       // Reuses definition from params_dictionary
+    "channel"           // Reuses definition from params_dictionary
+]
+```
+
+To define a custom inline parameter, use an object instead:
+
+```json5
+"parameters": [
+    "appVersion",
+    {
+        "key": "customParam",
+        "type": "string",
+        "description": "What this parameter represents",
+        "enum": ["value1", "value2"]
+    }
+]
+```
+
+### Parameter Object Fields
+
+- `key` — the actual query parameter key sent in the pixel (use for fixed keys)
+- `keyPattern` — regex pattern for dynamic keys (e.g. `"^error[0-9]?$"`)
+- `type` — `"string"`, `"integer"`, `"number"`, or `"boolean"`
+- `description` — what the parameter represents
+- `enum` — allowed values (optional)
+- `pattern` — regex validation pattern (optional)
+- `examples` — example values (optional)
+
+Use `key` or `keyPattern`, not both.
+
+### Type Correctness
+
+Do not define parameters with `"type": "string"` and an enum containing only `"true"` and/or `"false"`. Use `"type": "boolean"` instead with no enum.
+
+## Suffixes
+
+A suffix is a string appended to the base pixel name to create distinct variants of the same pixel. When a pixel has multiple suffix sets, the schema validator generates all combinations.
+
+### Reusing Suffixes from the Dictionary
+
+`suffixes_dictionary` defines common suffixes. Reference them by key name:
+
+```json5
+"suffixes": ["first_daily_count"]
+```
+
+For custom inline suffixes, use an object:
+
+```json5
+"suffixes": [
+    "first_daily_count",
+    {
+        "description": "The result of the operation",
+        "enum": ["success", "failure"]
+    }
+]
+```
+
+Inline suffix objects support `description`, `enum`, and optionally `key`, `type`, and `pattern` (same fields as parameter objects).
+
+### Suffix Rules
+
+- Suffixes should be defined as `"enum"` unless using a bounded type such as `"boolean"`. Unbounded numeric and string values should be defined as parameters instead.
+- Suffixes are **order-sensitive and required**. Suffix enums must not contain empty values such as `null` or `""`.
+- If a pixel has optional suffixes, use nested arrays in the pixel definition itself (not in the suffix dictionary):
+
+```json5
+"suffixes": [["required", "optional"], ["required"]]
+```
+
+- A suffix definition can contain an optional `"key"` property indicating the suffix always occurs as a key-value pair in the pixel name. Only use `"key"` when the key string actually appears in the full pixel name.
+
+### Compound Suffixes
+
+Suffixes can be nested in an inner array to form compound suffixes (combined into a single suffix segment):
+
+```json5
+"suffixes": [["platform", "form_factor"]]
+```
+
+This produces suffixes like `platform_formfactor` rather than separate independent suffix positions.
+
+## Wide Event Definitions
+
+Wide events use a richer schema than regular pixels. There are two patterns for defining wide events:
+
+### Pattern 1: Wide Events as Pixel Definitions
+
+Some products define wide events in the same `pixels/definitions/` directory, using `widePixel*` parameters from the params dictionary to carry the wide event payload via standard pixel parameters:
+
+```json5
+{
+    "product_wide_feature-name": {
+        "description": "Wide pixel sent when completing the feature flow",
+        "owners": ["githubUsername"],
+        "triggers": ["other"],
+        "parameters": [
+            "appVersion",
+            "widePixelAppName",
+            "widePixelAppVersion",
+            "widePixelPlatform",
+            "widePixelType",
+            "widePixelSampleRate",
+            "widePixelFeatureStatus",
+            "widePixelErrorMessage",
+            {
+                "key": "feature.name",
+                "type": "string",
+                "description": "Feature identifier",
+                "enum": ["feature-name"]
+            },
+            {
+                "key": "feature.data.ext.last_step",
+                "type": "string",
+                "description": "Last step reached when the flow ended",
+                "enum": ["step_one", "step_two", "step_three"]
+            }
+        ]
+    }
+}
+```
+
+### Pattern 2: Dedicated Wide Event Definitions
+
+Some products use a separate `wide_events/definitions/` directory with a hierarchical schema:
+
+```json5
+{
+    "event-name": {
+        "description": "The purpose of the wide event",
+        "owners": ["githubUsername"],
+        "meta": {
+            "type": "unique-event-name",
+            "version": "0.0"
+        },
+        "feature": {
+            "name": "feature-name",
+            "status": ["SUCCESS", "FAILURE", "UNKNOWN"],
+            "data": {
+                "ext": {
+                    "custom_field": {
+                        "type": "string",
+                        "description": "A custom extension field",
+                        "enum": ["val1", "val2"]
+                    }
+                },
+                "error": {
+                    "domain": { "type": "string", "description": "Error domain" },
+                    "code": { "type": "integer", "description": "Error code" }
+                }
+            }
+        }
+    }
+}
+```
+
+### Wide Event Definition Checklist
+
+When defining a wide event, ensure:
+
+- `feature.status` includes all possible terminal states (`SUCCESS`, `FAILURE`, `CANCELLED`, `UNKNOWN` as applicable)
+- A `last_step` field is defined for flows that can fail or end unexpectedly
+- All latency parameters use bucketed values, not raw milliseconds
+- Custom fields under `feature.data.ext.*` use bounded enums where possible
+- No PII or high-cardinality unbounded strings appear in any field
+- Error field `failure_reason` is included when the flow can end with `FAILURE` status
+- Sample rate is documented
+
+## Expiry Dates
+
+- Temporary pixels must have an `expires` field with a valid `YYYY-MM-DD` date.
+- Permanent pixels should not have an `expires` field.
+- Set expiry dates far enough in the future to cover the expected analysis period, but not so far that the pixel is effectively permanent.
+
+## File Organization
+
+Group related pixels into a single definition file named after the feature area, for example:
+
+- `burn_pixels.json` — Burn/clear-data pixels
+- `subscription.json` — Subscription flow pixels
+- `vpn_auth_pixels.json` — VPN authentication pixels
+
+See existing files in the definitions directory for naming patterns.
+
+## Avoiding Duplication
+
+- **Prefer dictionary references** over inline definitions. If a parameter or suffix is used by multiple pixels, add it to `params_dictionary` or `suffixes_dictionary` and reference it by key.
+- **Do not redefine dictionary entries inline.** If a parameter already exists in the dictionary with the same type, enum, and semantics, reference it by key instead of duplicating the definition.
+
+## Validation
+
+Run validation locally before pushing:
+
+```bash
+cd PixelDefinitions
+npm ci
+npm run validate-defs-without-formatting   # Schema validation
+npm run lint                                # Prettier formatting check
+npm run lint.fix                            # Auto-fix formatting
+```
+
+Always run `validate-defs-without-formatting` after making changes. CI will run this automatically on pull requests.
+
+## Quick Reference: Adding a New Pixel
+
+1. Determine the pixel name and all parameters from the codebase
+2. Find or create the appropriate definition file in `PixelDefinitions/pixels/definitions/`
+3. Add your pixel entry with `description`, `owners`, `triggers`
+4. Add `suffixes` and `parameters` — reuse dictionary entries wherever possible
+5. If the pixel is temporary, add `"expires": "YYYY-MM-DD"`
+6. Run `npm run validate-defs-without-formatting` from the `PixelDefinitions` directory
+7. Run `npm run lint.fix` if formatting issues are reported

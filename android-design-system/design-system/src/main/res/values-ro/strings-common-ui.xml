@@ -40,4 +40,9 @@
 
     <!-- Page Header -->
     <string name="pageHeaderLearnMore">Află mai multe</string>
+
+    <!-- Content Descriptions -->
+    <string name="closeButtonContentDescription">Închidere</string>
+    <string name="bookmarkFavoriteContentDescription">Preferință</string>
+
 </resources>

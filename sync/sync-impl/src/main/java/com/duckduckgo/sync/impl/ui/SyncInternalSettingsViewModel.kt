@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.autorestore.SyncRecoveryPersistentStorageKey
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
@@ -65,6 +66,7 @@ constructor(
     private val dispatchers: DispatcherProvider,
     private val syncPromotionDataStore: SyncPromotionDataStore,
     private val persistentStorage: PersistentStorage,
+    private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val syncFeature: SyncFeature,
 ) : ViewModel() {
 
@@ -86,6 +88,7 @@ constructor(
         val connectedDevices: List<ConnectedDevice> = emptyList(),
         val useDevEnvironment: Boolean = false,
         val environment: String = "",
+        val recoveryCode: String = "",
         val syncAutoRestoreEnabled: Boolean = false,
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
@@ -104,6 +107,7 @@ constructor(
         data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
         data object LoginSuccess : Command()
+        data object LaunchRecoverDataScreen : Command()
     }
 
     init {
@@ -112,6 +116,22 @@ constructor(
             checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
+        }
+    }
+
+    fun onResume() {
+        viewModelScope.launch(dispatchers.io()) {
+            refreshBlockStoreValue()
+        }
+    }
+
+    fun onLaunchRecoverDataScreen() {
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncAccountRepository.isSignedIn()) {
+                command.send(Command.LaunchRecoverDataScreen)
+            } else {
+                command.send(Command.ShowMessage("Not signed in — create an account first"))
+            }
         }
     }
 
@@ -205,6 +225,7 @@ constructor(
 
     private suspend fun updateViewState() {
         val accountInfo = syncAccountRepository.getAccountInfo()
+        val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()?.rawCode ?: ""
         viewState.emit(
             viewState.value.copy(
                 userId = accountInfo.userId,
@@ -214,6 +235,7 @@ constructor(
                 token = syncAccountRepository.latestToken(),
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
+                recoveryCode = recoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
             ),
@@ -364,37 +386,70 @@ constructor(
     }
 
     private suspend fun refreshBlockStoreValue() {
-        val result = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
+        val bytes = persistentStorage.retrieve(SyncRecoveryPersistentStorageKey).getOrNull()
         val blockStoreValue = when {
-            result == null -> BlockStoreValue.NotSet
-            else -> BlockStoreValue.HasValue(String(result))
+            bytes == null -> BlockStoreValue.NotSet
+            else -> BlockStoreValue.HasValue(String(bytes, Charsets.UTF_8))
         }
         viewState.update { it.copy(blockStoreCurrentValue = blockStoreValue) }
     }
 
-    fun onBlockStoreWriteClicked(data: String) {
+    fun onBlockStoreWriteRecoveryCode() {
         viewModelScope.launch(dispatchers.io()) {
-            persistentStorage.store(SyncRecoveryPersistentStorageKey, data.toByteArray())
-                .onSuccess {
-                    refreshBlockStoreValue()
-                    command.send(ShowMessage("Stored successfully"))
-                }
-                .onFailure { error ->
-                    command.send(ShowMessage("Store failed: ${error.message}"))
-                }
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
+            }
+            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull()
+            if (recoveryCode == null) {
+                command.send(ShowMessage("No recovery code available"))
+                return@launch
+            }
+            val deviceId = syncAccountRepository.getAccountInfo().deviceId
+            val success = syncAutoRestoreManager.saveAutoRestoreData(recoveryCode.rawCode, deviceId)
+            refreshBlockStoreValue()
+            if (success) {
+                command.send(ShowMessage("Recovery code stored successfully"))
+            } else {
+                command.send(ShowMessage("Store failed — unexpected error"))
+            }
+        }
+    }
+
+    fun onBlockStoreWriteClicked(recoveryCode: String, deviceId: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
+            }
+            if (recoveryCode.isBlank()) {
+                command.send(ShowMessage("Recovery code is required"))
+                return@launch
+            }
+            val trimmedDeviceId = deviceId?.takeIf { it.isNotBlank() }
+            if (trimmedDeviceId != null && trimmedDeviceId.length !in 8..64) {
+                command.send(ShowMessage("Device ID must be 8–64 chars (or leave blank)"))
+                return@launch
+            }
+            val success = syncAutoRestoreManager.saveAutoRestoreData(recoveryCode, deviceId?.takeIf { it.isNotBlank() })
+            refreshBlockStoreValue()
+            if (success) {
+                command.send(ShowMessage("Stored successfully"))
+            } else {
+                command.send(ShowMessage("Store failed — unexpected error"))
+            }
         }
     }
 
     fun onBlockStoreClearClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            persistentStorage.clear(SyncRecoveryPersistentStorageKey)
-                .onSuccess {
-                    refreshBlockStoreValue()
-                    command.send(ShowMessage("Cleared successfully"))
-                }
-                .onFailure { error ->
-                    command.send(ShowMessage("Clear failed: ${error.message}"))
-                }
+            if (!syncAutoRestoreManager.isAutoRestoreAvailable()) {
+                command.send(ShowMessage("Block Store not available on this device"))
+                return@launch
+            }
+            syncAutoRestoreManager.clearAutoRestoreData()
+            refreshBlockStoreValue()
+            command.send(ShowMessage("Cleared successfully"))
         }
     }
 }

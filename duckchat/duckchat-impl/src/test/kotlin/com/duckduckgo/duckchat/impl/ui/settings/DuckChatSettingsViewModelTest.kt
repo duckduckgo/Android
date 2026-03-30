@@ -27,10 +27,12 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.ShowDefaultTogglePositionDialog
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.settings.api.SettingsPageFeature
@@ -72,6 +74,7 @@ class DuckChatSettingsViewModelTest {
             whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeAutomaticContextAttachmentUserSettingEnabled()).thenReturn(flowOf(false))
             whenever(duckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
             testee = DuckChatSettingsViewModel(
                 duckChatActivityParams = DuckChatSettingsNoParams,
                 duckChat = duckChat,
@@ -830,5 +833,160 @@ class DuckChatSettingsViewModelTest {
             testee.viewState.test {
                 assertFalse(awaitItem().isNativeInputFieldEnabled)
             }
+        }
+
+    @Test
+    fun `default toggle position - visible when all conditions met`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertTrue(awaitItem().isDefaultTogglePositionVisible)
+            }
+        }
+
+    @Test
+    fun `default toggle position - hidden when duck chat disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDefaultTogglePositionVisible)
+            }
+        }
+
+    @Test
+    fun `default toggle position - hidden when input screen disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false))
+            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDefaultTogglePositionVisible)
+            }
+        }
+
+    @Test
+    fun `default toggle position - hidden when feature flag disabled`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(true)
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDefaultTogglePositionVisible)
+            }
+        }
+
+    @Test
+    fun `default toggle position - hidden when input screen feature not available`() =
+        runTest {
+            whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
+            whenever(duckChat.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+            whenever(duckChat.isInputScreenFeatureAvailable()).thenReturn(false)
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                assertFalse(awaitItem().isDefaultTogglePositionVisible)
+            }
+        }
+
+    @Test
+    fun `when default toggle position clicked then show dialog command emitted`() =
+        runTest {
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            testee = DuckChatSettingsViewModel(
+                duckChatActivityParams = DuckChatSettingsNoParams,
+                duckChat = duckChat,
+                pixel = mockPixel,
+                inputScreenDiscoveryFunnel = mockInputScreenDiscoveryFunnel,
+                settingsPageFeature = settingsPageFeature,
+                duckChatPixels = mockDuckChatPixels,
+                dispatcherProvider = coroutineRule.testDispatcherProvider,
+                duckChatFeature = duckChatFeature,
+            )
+
+            testee.viewState.test {
+                awaitItem()
+                testee.onDefaultTogglePositionClicked()
+
+                testee.commands.test {
+                    val command = awaitItem()
+                    assertTrue(command is ShowDefaultTogglePositionDialog)
+                    assertEquals(DefaultTogglePosition.DUCK_AI, (command as ShowDefaultTogglePositionDialog).currentPosition)
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `when default toggle position selected then set user setting`() =
+        runTest {
+            testee.onDefaultTogglePositionSelected(DefaultTogglePosition.LAST_USED)
+            verify(duckChat).setDefaultTogglePosition(DefaultTogglePosition.LAST_USED)
         }
 }

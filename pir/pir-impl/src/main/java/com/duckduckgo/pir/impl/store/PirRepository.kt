@@ -95,6 +95,8 @@ interface PirRepository {
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
 
+    suspend fun getAllBrokerObjects(): List<Broker>
+
     suspend fun getBrokerForName(name: String): Broker?
 
     suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite>
@@ -364,32 +366,17 @@ class RealPirRepository(
 
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getAllActiveBrokers()?.map {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }.orEmpty()
+            return@withContext brokerDao()?.getAllActiveBrokers()?.map { it.toBroker() }.orEmpty()
+        }
+
+    override suspend fun getAllBrokerObjects(): List<Broker> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao()?.getAllBrokers()?.map { it.toBroker() }.orEmpty()
         }
 
     override suspend fun getBrokerForName(name: String): Broker? =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao()?.getBrokerDetails(name)?.let {
-                Broker(
-                    name = it.name,
-                    fileName = it.fileName,
-                    url = it.url,
-                    version = it.version,
-                    parent = it.parent,
-                    addedDatetime = it.addedDatetime,
-                    removedAt = it.removedAt,
-                )
-            }
+            return@withContext brokerDao()?.getBrokerDetails(name)?.toBroker()
         }
 
     override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> =
@@ -903,6 +890,16 @@ class RealPirRepository(
             birthYear = this.birthYear,
             deprecated = this.deprecated,
         )
+
+    private fun BrokerEntity.toBroker() = Broker(
+        name = name,
+        fileName = fileName,
+        url = url,
+        version = version,
+        parent = parent,
+        addedDatetime = addedDatetime,
+        removedAt = removedAt,
+    )
 
     private suspend fun prepareDatabase(): PirDatabase? {
         val database = databaseFactory.getDatabase()

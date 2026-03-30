@@ -20,12 +20,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -50,6 +48,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -85,7 +84,6 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val onboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -103,7 +101,7 @@ class CtaViewModel @Inject constructor(
             }
 
     private suspend fun isPrivacyProCtaAvailable(): Boolean =
-        subscriptions.isEligible() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
+        subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
@@ -261,31 +259,19 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxPrivacyProCta(
                     onboardingStore,
                     appInstallStore,
-                    onboardingSkipped = false,
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                 )
             }
 
             // Privacy Pro onboarding for returning users who skipped onboarding
             canShowPrivacyProCtaForSkippedOnboarding() -> {
-                DaxBubbleCta.DaxPrivacyProCta(
-                    onboardingStore,
-                    appInstallStore,
-                    onboardingSkipped = true,
-                    isFreeTrialCopy = freeTrialCopyAvailable(),
-                )
+                SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
             // Add Widget
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                    val showOnboardingHomeScreenWidgetPrompt = onboardingHomeScreenWidgetToggles.self().isEnabled() &&
-                        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().isEnabled()
-                    if (showOnboardingHomeScreenWidgetPrompt) {
-                        AddWidgetAutoOnboardingExperiment
-                    } else {
-                        AddWidgetAuto
-                    }
+                    AddWidgetAutoOnboarding
                 } else {
                     AddWidgetInstructions
                 }
@@ -312,7 +298,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
-        extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding().isEnabled() &&
+        extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
             hideTips() &&
             appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
             !daxDialogPrivacyProShown() &&
@@ -499,22 +485,12 @@ class CtaViewModel @Inject constructor(
 
     fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
 
-    suspend fun getPrivacyProOnboardingOrigin(): String =
-        withContext(dispatchers.io()) {
-            val skippedOnboarding = hideTips()
-            val isFreeTrialCopy = freeTrialCopyAvailable()
-            when {
-                skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_reinstall_tryfreecopy"
-                skippedOnboarding && !isFreeTrialCopy -> "funnel_onboarding_android_reinstall_subscribecopy"
-                !skippedOnboarding && isFreeTrialCopy -> "funnel_onboarding_android_newinstall_tryfreecopy"
-                else -> "funnel_onboarding_android_newinstall_subscribecopy"
-            }
-        }
-
     suspend fun isPromoOnboardingDialogShowing(): Boolean =
         withContext(dispatchers.io()) {
             canShowPrivacyProCtaForSkippedOnboarding()
         }
+
+    private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2

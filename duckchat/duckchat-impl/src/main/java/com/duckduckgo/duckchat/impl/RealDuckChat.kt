@@ -34,10 +34,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatConstants.CHAT_ID_PARAM
-import com.duckduckgo.duckchat.impl.DuckChatConstants.HOST_DUCK_AI
 import com.duckduckgo.duckchat.impl.clearing.DuckChatDeleter
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -51,6 +51,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRES
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_NEW_ADDRESS_BAR_PICKER_NOT_NOW
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters.NEW_ADDRESS_BAR_SELECTION
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -67,6 +68,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -103,6 +105,26 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether the native input field should be used.
      */
     suspend fun setNativeInputFieldUserSetting(isEnabled: Boolean)
+
+    /**
+     * Sets the user's preferred default toggle position.
+     */
+    suspend fun setDefaultTogglePosition(position: DefaultTogglePosition)
+
+    /**
+     * Observes the user's preferred default toggle position.
+     */
+    fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition>
+
+    /**
+     * Saves the last used toggle position. Called on submission from the input screen.
+     */
+    suspend fun saveLastUsedTogglePosition(position: String)
+
+    /**
+     * Observes the last used toggle position.
+     */
+    fun observeLastUsedTogglePosition(): Flow<String?>
 
     /**
      * Observes whether DuckChat is user enabled or disabled.
@@ -318,6 +340,7 @@ class RealDuckChat @Inject constructor(
     private val duckChatDeleter: DuckChatDeleter,
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val syncEngine: SyncEngine,
+    private val duckAiHostProvider: DuckAiHostProvider,
 ) : DuckChatInternal,
     DuckAiFeatureState,
     PrivacyConfigCallbackPlugin {
@@ -498,7 +521,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun canHandleOnAiWebView(url: String): Boolean {
-        return runCatching { HOST_DUCK_AI == url.toHttpUrl().topPrivateDomain() || url == REVOKE_URL }.getOrElse { false }
+        return runCatching { url.toHttpUrl().host == duckAiHostProvider.getHost() || url == REVOKE_URL }.getOrElse { false }
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean = isAddressBarEntryPointEnabled
@@ -571,7 +594,7 @@ class RealDuckChat @Inject constructor(
         sidebar: Boolean,
     ): String {
         val parameters = addChatParameters(query, autoPrompt = autoPrompt, sidebar = sidebar)
-        val url = appendParameters(parameters, duckChatLink)
+        val url = appendParameters(parameters, getDuckChatLink())
         return url
     }
 
@@ -603,6 +626,12 @@ class RealDuckChat @Inject constructor(
         return query.replace(bangPattern, "").trim()
     }
 
+    override fun openVoiceDuckChat() {
+        logcat { "Duck.ai: openVoiceDuckChat" }
+        val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
+        openDuckChat(parameters, forceNewSession = true)
+    }
+
     override fun openNewDuckChatSession() {
         openDuckChat(emptyMap(), forceNewSession = true)
     }
@@ -611,7 +640,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
     ) {
-        val url = appendParameters(parameters, duckChatLink)
+        val url = appendParameters(parameters, getDuckChatLink())
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
@@ -638,6 +667,10 @@ class RealDuckChat @Inject constructor(
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
             }
+    }
+
+    private fun getDuckChatLink(): String {
+        return duckChatLink.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
     }
 
     private fun appendParameters(
@@ -670,7 +703,7 @@ class RealDuckChat @Inject constructor(
 
         if (isDuckChatBang(uri)) return true
 
-        if (uri.host == DUCK_AI_HOST || uri.toString() == DUCK_AI_HOST) return true
+        if (uri.host == duckAiHostProvider.getHost() || uri.toString() == duckAiHostProvider.getHost()) return true
         if (uri.host != DUCKDUCKGO_HOST) return false
 
         return runCatching {
@@ -742,6 +775,21 @@ class RealDuckChat @Inject constructor(
 
     override fun isChatSuggestionsFeatureAvailable(): Boolean =
         duckChatFeature.aiChatSuggestions().isEnabled()
+
+    override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {
+        duckChatFeatureRepository.setDefaultTogglePosition(position.name)
+    }
+
+    override fun observeDefaultTogglePosition(): Flow<DefaultTogglePosition> =
+        duckChatFeatureRepository.observeDefaultTogglePosition()
+            .map { DefaultTogglePosition.fromName(it) }
+
+    override suspend fun saveLastUsedTogglePosition(position: String) {
+        duckChatFeatureRepository.setLastUsedTogglePosition(position)
+    }
+
+    override fun observeLastUsedTogglePosition(): Flow<String?> =
+        duckChatFeatureRepository.observeLastUsedTogglePosition()
 
     private suspend fun hasActiveSession(): Boolean {
         val now = System.currentTimeMillis()
@@ -860,9 +908,8 @@ class RealDuckChat @Inject constructor(
         }
 
     companion object {
-        private const val DUCK_CHAT_WEB_LINK = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        private const val DUCK_CHAT_WEB_LINK = "https://duck.ai/chat?duckai=5"
         private const val DUCKDUCKGO_HOST = "duckduckgo.com"
-        private const val DUCK_AI_HOST = "duck.ai"
         private const val CHAT_QUERY_NAME = "ia"
         private const val CHAT_QUERY_VALUE = "chat"
         private const val PROMPT_QUERY_NAME = "prompt"
@@ -871,6 +918,8 @@ class RealDuckChat @Inject constructor(
         private const val PLACEMENT_QUERY_VALUE = "sidebar"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
+        private const val MODE_QUERY_NAME = "mode"
+        private const val VOICE_MODE_QUERY_VALUE = "voice-mode"
         private const val DEFAULT_SESSION_ALIVE = 60
         private const val REVOKE_URL = "https://duckduckgo.com/revoke-duckai-access"
     }

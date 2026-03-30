@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Namesti namizni brskalnik</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo za računalnike Mac in Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Obnovitev</string>
+    <string name="sync_settings_download_recovery_code_item">Prenesite kodo za obnovitev kot PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Uporabite to kodo za obnovitev podatkov, če izgubite dostop do te naprave – hranite jo na varnem.</string>
+    <string name="sync_settings_data_expiration">Podatkov funkcije Sync &amp; Backup ni mogoče obnoviti po 18 mesecih nedejavnosti. <annotation type="learn_more_link">Več o tem</annotation></string>
 </resources>

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -72,6 +73,9 @@ class DuckChatContextualViewModel @Inject constructor(
     var updatedPageContext: String = ""
     var sheetTabId: String = ""
 
+    @VisibleForTesting
+    internal var isPageContextRequested: Boolean = false
+
     sealed class Command {
         data class LoadUrl(val url: String) : Command()
         data object SendSubscriptionAuthUpdateEvent : Command()
@@ -114,6 +118,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: requesting page context after sheet reopened" }
+                isPageContextRequested = true
                 commandChannel.trySend(Command.RequestPageContext)
             }
 
@@ -175,6 +180,7 @@ class DuckChatContextualViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             logcat { "Duck.ai: onSheetOpened for tab=$tabId" }
             withContext(dispatchers.main()) {
+                isPageContextRequested = true
                 commandChannel.trySend(Command.RequestPageContext)
             }
             sheetTabId = tabId
@@ -365,6 +371,7 @@ class DuckChatContextualViewModel @Inject constructor(
     }
 
     fun onSheetClosed() {
+        isPageContextRequested = false
         persistTabClosed()
         duckChatPixels.reportContextualSheetDismissed()
     }
@@ -499,7 +506,14 @@ class DuckChatContextualViewModel @Inject constructor(
     fun onPageContextReceived(
         tabId: String,
         pageContext: String,
+        isStorePageContextEnabled: Boolean = false,
     ) {
+        if (isStorePageContextEnabled && !isPageContextRequested && !duckChatInternal.isAutomaticContextAttachmentEnabled()) {
+            // Only applies when storePageContext is enabled.
+            // We don't process what we receive if the sheet did not specifically request it and automatic context attachment is disabled
+            return
+        }
+
         if (isContextValid(pageContext)) {
             updatedPageContext = pageContext
             val json = JSONObject(updatedPageContext)
@@ -606,8 +620,13 @@ class DuckChatContextualViewModel @Inject constructor(
         return elapsedMs <= timeoutMs
     }
 
-    fun onMainBrowserPageFinished() {
+    fun onMainBrowserPageFinished(isStorePageContextEnabled: Boolean = false) {
         logcat { "Duck.ai: onMainBrowserPageFinished" }
+        if (isStorePageContextEnabled) {
+            isPageContextRequested = false
+            // When storePageContext is enabled, page context is already collected on page load by the browser
+            return
+        }
         val currentState = _viewState.value
         if (currentState.sheetMode != SheetMode.INPUT) return
 

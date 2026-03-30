@@ -16,6 +16,9 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
@@ -38,6 +41,7 @@ import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -81,6 +85,11 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         configureListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
+    }
+
     private fun configureListeners() {
         binding.showQRCode.setOnClickListener {
             viewModel.onShowQRClicked()
@@ -101,8 +110,23 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.clearHistoryBookmarkAddedDialogPromo.setOnClickListener { viewModel.onClearHistoryBookmarkAddedDialogPromoClicked() }
         binding.clearHistoryBookmarkScreenPromo.setOnClickListener { viewModel.onClearHistoryBookmarkScreenPromoClicked() }
         binding.clearHistoryPasswordScreenPromo.setOnClickListener { viewModel.onClearHistoryPasswordScreenPromoClicked() }
-        binding.blockStoreWriteButton.setOnClickListener { viewModel.onBlockStoreWriteClicked(binding.blockStoreInput.text) }
+        binding.userIdTextView.setOnClickListener { copyToClipboard("User ID", binding.userIdTextView.text.toString()) }
+        binding.deviceNameTextView.setOnClickListener { copyToClipboard("Device Name", binding.deviceNameTextView.text.toString()) }
+        binding.deviceIdTextView.setOnClickListener { copyToClipboard("Device ID", binding.deviceIdTextView.text.toString()) }
+        binding.secretKeyTextView.setOnClickListener { copyToClipboard("Secret Key", binding.secretKeyTextView.text.toString()) }
+        binding.tokenTextView.setOnClickListener { copyToClipboard("Token", binding.tokenTextView.text.toString()) }
+        binding.launchRecoverDataScreenButton.setOnClickListener {
+            viewModel.onLaunchRecoverDataScreen()
+        }
+        binding.blockStoreWriteButton.setOnClickListener {
+            viewModel.onBlockStoreWriteClicked(
+                recoveryCode = binding.blockStoreRecoveryCodeInput.text,
+                deviceId = binding.blockStoreDeviceIdInput.text.takeIf { it.isNotBlank() },
+            )
+        }
         binding.blockStoreClearButton.setOnClickListener { viewModel.onBlockStoreClearClicked() }
+        binding.blockStoreWriteRecoveryCodeButton.setOnClickListener { viewModel.onBlockStoreWriteRecoveryCode() }
+        binding.recoveryCodeTextView.setOnClickListener { copyToClipboard("Recovery Code", binding.recoveryCodeTextView.text.toString()) }
     }
 
     private fun observeUiEvents() {
@@ -147,7 +171,17 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             LoginSuccess -> {
                 Snackbar.make(binding.syncRecoveryCodeCta, "Login Success", Snackbar.LENGTH_SHORT).show()
             }
+
+            Command.LaunchRecoverDataScreen -> {
+                startActivity(SetupAccountActivity.intent(this, SetupAccountActivity.Companion.Screen.RECOVERY_CODE, null))
+            }
         }
+    }
+
+    private fun copyToClipboard(label: String, value: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText(label, value))
+        Toast.makeText(this, "$label copied", Toast.LENGTH_SHORT).show()
     }
 
     private fun getScanOptions(): ScanOptions {
@@ -169,6 +203,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deviceNameTextView.text = viewState.deviceName
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
+        binding.recoveryCodeTextView.text = viewState.recoveryCode.ifEmpty { "(not signed in)" }
         binding.connectedDevicesList.removeAllViews()
         binding.blockStoreFeatureFlag.text = if (viewState.syncAutoRestoreEnabled) {
             "✅ syncAutoRestore flag enabled"
@@ -189,9 +224,7 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.blockStoreCurrentValue.text = when (val value = viewState.blockStoreCurrentValue) {
             is SyncInternalSettingsViewModel.BlockStoreValue.Loading -> "Loading..."
             is SyncInternalSettingsViewModel.BlockStoreValue.NotSet -> "(key not set)"
-            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> {
-                if (value.value.isEmpty()) "(empty string)" else value.value
-            }
+            is SyncInternalSettingsViewModel.BlockStoreValue.HasValue -> value.value
         }
 
         binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->

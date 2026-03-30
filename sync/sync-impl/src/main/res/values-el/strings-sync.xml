@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">DuckDuckGo για Mac και Windows</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Ανάκτηση</string>
+    <string name="sync_settings_download_recovery_code_item">Κάντε λήψη του κώδικα ανάκτησης σε μορφή PDF</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Χρησιμοποιήστε αυτόν τον κωδικό για να ανακτήσετε τα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε αυτήν τη συσκευή — κρατήστε τον ασφαλή.</string>
+    <string name="sync_settings_data_expiration">Δεν είναι δυνατή η ανάκτηση δεδομένων Sync &amp; Backup έπειτα από 18 μήνες αδράνειας. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
 </resources>

@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
@@ -67,11 +68,13 @@ class ClearPersonalDataActionTest {
     private val mockWebTrackersBlockedRepository: WebTrackersBlockedRepository = mock()
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val mockDuckAiHostProvider: DuckAiHostProvider = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
     @Before
     fun setup() {
+        whenever(mockDuckAiHostProvider.getHost()).thenReturn("duck.ai")
         testee = ClearPersonalDataAction(
             context = InstrumentationRegistry.getInstrumentation().targetContext,
             dataManager = mockDataManager,
@@ -89,6 +92,7 @@ class ClearPersonalDataActionTest {
             webTrackersBlockedRepository = mockWebTrackersBlockedRepository,
             tabVisitedSitesRepository = mockTabVisitedSitesRepository,
             webViewCapabilityChecker = mockWebViewCapabilityChecker,
+            duckAiHostProvider = mockDuckAiHostProvider,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(true)

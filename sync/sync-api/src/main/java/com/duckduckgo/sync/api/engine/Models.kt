@@ -80,28 +80,6 @@ data class SyncDeletionResponse(
     val untilTimestamp: String? = null,
 )
 
-/**
- * Represents a request to update individual entries for a deletable type.
- * @param type The type of data to update.
- * @param jsonString A JSON array string of entries to send (e.g. [{"id":"x","deleted":"..."}]).
- */
-data class SyncPatchRequest(
-    val type: DeletableType,
-    val jsonString: String,
-) {
-    fun isEmpty(): Boolean = jsonString.isEmpty()
-}
-
-/**
- * Represents a response to a patch request.
- * @param type The type of data that was updated.
- * @param entryIds The IDs of entries that were sent, for race-safe cleanup by the caller.
- */
-data class SyncPatchResponse(
-    val type: DeletableType,
-    val entryIds: List<String>,
-)
-
 data class SyncErrorResponse(
     val type: SyncFeatureType,
     val featureSyncError: FeatureSyncError,
@@ -124,12 +102,15 @@ interface SyncFeatureType {
 }
 
 /**
- * Features that support bidirectional sync (PATCH/GET operations).
+ * Features that support sync operations (PATCH/GET).
  */
-enum class SyncableType(override val field: String) : SyncFeatureType {
+enum class SyncableType(
+    override val field: String,
+) : SyncFeatureType {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
     SETTINGS("settings"),
+    DUCK_AI_CHATS("ai_chats"),
 }
 
 /**

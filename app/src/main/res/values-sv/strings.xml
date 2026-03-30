@@ -118,8 +118,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Rensa data</string>
-    <string name="fireClearAll">Rensa flikar och data</string>
-    <string name="fireClearAllPlusDuckChats">Rensa flikar, data och Duck.ai-chattar</string>
+    <string name="fireClearAll">Ta bort flikar och data</string>
+    <string name="fireClearAllPlusDuckChats">Ta bort flikar, data och Duck.ai-chattar</string>
     <string name="fireCancel">Avbryt</string>
     <string name="fireDataCleared">Data rensad</string>
 
@@ -226,7 +226,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>
     <string name="dataClearingActivityTitle">Datarensning</string>
-    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att rensa data manuellt eller ställa in automatisk rensning.</string>
+    <string name="dataClearingDescription">Att radera dina data kan bidra till att skydda din integritet online. Använd Fire Button för att radera data manuellt eller ställ in automatisk radering.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d webbplats undantas från rensning</item>
         <item quantity="other">%1$d webbplatser undantas från rensning</item>
@@ -234,8 +234,8 @@
     <string name="dataClearingAutomaticClearingOn">På</string>
     <string name="dataClearingAutomaticClearingOff">Av</string>
     <string name="dataClearingClearBrowsingData">Rensa webbläsardata</string>
-    <string name="dataClearingAutomaticDataClearing">Automatisk datarensning</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Rensa data automatiskt</string>
+    <string name="dataClearingAutomaticDataClearing">Radera data automatiskt</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Radera data automatiskt</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Stäng alla öppna flikar</string>
     <string name="dataClearingAutomaticDataOptionDescription">Radera all webbplatsdata, inklusive besökta webbplatser. Kan logga ut dig från konton.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Ta bort alla chattar, inklusive fästa chattar</string>
@@ -258,6 +258,22 @@
         <item quantity="other">Ta bort från %1$d webbplatser. Kan logga ut dig från konton.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Ta bort flikar och webbplatsdata?</string>
+    <string name="singleTabFireDialogTitleWithChats">Vill du ta bort flikar, webbplatsdata och chattar?</string>
+    <string name="singleTabFireDialogDeleteAll">Radera allt</string>
+    <string name="singleTabFireDialogDeleteThisTab">Ta bort denna flik</string>
+    <string name="singleTabFireDialogDeleteChat">Radera chatt</string>
+    <string name="singleTabFireDialogTitleDuckAi">Radera den här chatten?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Om du tar bort webbplatsdata kan du loggas ut från konton.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Detta kommer att avbryta pågående nerladdningar.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d flik och dess data raderades</item>
+        <item quantity="other">%1$d flikar och deras data raderades</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Webbplatsdata kunde inte raderas. Uppdatera WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Webbplatsdata kunde inte raderas på grund av ett fel.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Behörigheter</string>
 
@@ -275,15 +291,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Flikar och data</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Flikar, data och Duck.ai-chattar</string>
 
-    <string name="settingsAutomaticallyClearWhen">Rensa den …</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Rensa den …</string>
+    <string name="settingsAutomaticallyClearWhen">Radera den...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Radera den...</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Gå bara ur appen</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Avsluta app, inaktiv i 5 sekunder</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Avsluta app, inaktiv i 5 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Avsluta app, inaktiv i 15 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Avsluta app, inaktiv i 30 minuter</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
-    <string name="settingsClearAiDataTitle">Rensa Duck.ai-chattar</string>
+    <string name="settingsClearAiDataTitle">Ta bort Duck.ai-chattar</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button raderar också Duck.ai-historik, inklusive fästa chattar.</string>
     <string name="settingsClearDataActionSecondaryText">Rensar alla flikar och data för webbplatser som inte har Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Rensar alla flikar, Duck.ai-chattar och data för webbplatser som inte har Fireproof.</string>
