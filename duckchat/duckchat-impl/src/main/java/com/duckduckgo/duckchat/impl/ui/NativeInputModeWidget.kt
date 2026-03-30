@@ -152,6 +152,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
         super.onAttachedToWindow()
         imageButton.setOnClickListener { onImageClick?.invoke() }
         modelPickerView.setPickerEnabled(isChatTabSelected())
+        modelPickerView.onMenuDismissed = {
+            if (hasInputFocus()) {
+                (context as? Activity)?.showKeyboard(inputField)
+            }
+        }
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
