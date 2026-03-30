@@ -56,6 +56,11 @@
     <string name="sync_intro_enable_content_with_ai_chat">Dadurch wird ein verschlüsseltes Backup deiner Lesezeichen, Passwörter und Duck.ai-Chats auf dem sicheren Server von DuckDuckGo erstellt, das mit deinen anderen Geräten synchronisiert werden kann. Der Verschlüsselungsschlüssel wird nur auf deinem Gerät gespeichert, DuckDuckGo kann nicht darauf zugreifen.</string>
     <string name="sync_intro_enable_footer">Du kannst später mit deinen anderen Geräten synchronisieren.</string>
     <string name="sync_intro_enable_cta">„Synchronisieren und sichern“ aktivieren</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Stelle deine synchronisierten Daten wieder her</string>
+    <string name="sync_recover_synced_data_content">Du benötigst den Wiederherstellungscode, den du bei der Einrichtung von Sync &amp; Backup erhalten hast. Möglicherweise hast du ihn auf dem verwendeten Gerät als PDF gespeichert.</string>
+    <string name="sync_recover_synced_data_cta">Synchronisierte Daten wiederherstellen</string>
+
     <!-- Recover data screen -->
     <string name="login_screen_title">QR-Code scannen</string>
     <string name="login_screen_enter_code_cta">Code manuell eingeben</string>
