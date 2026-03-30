@@ -825,9 +825,7 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>
     <string name="preOnboardingDaxDialog2Title">Bescherming geactiveerd!</string>
     <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
@@ -839,7 +837,6 @@
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
     <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="preOnboardingAddressBarTitle">Waar moet ik je adresbalk plaatsen?</string>
     <string name="preOnboardingAddressBarOkButton">Volgende</string>
@@ -892,7 +889,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Wil je eenvoudig toegang tot privé AI-chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Volgende</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-functies zijn privé en optioneel. Je kunt wijzigingen aanbrengen in <b>Instellingen > AI-functies</b>.]]></string>
 

@@ -861,9 +861,7 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
     <string name="preOnboardingDaxDialog2Title">Zaštite su aktivirane!</string>
     <string name="preOnboardingDaxDialog2Button">Odaberi preglednik</string>
@@ -875,7 +873,6 @@
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
     <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="preOnboardingAddressBarTitle">Gdje trebam staviti tvoju adresnu traku?</string>
     <string name="preOnboardingAddressBarOkButton">Dalje</string>
@@ -932,7 +929,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Želiš jednostavan pristup privatnom AI čavrljanju?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Dalje</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Značajke umjetne inteligencije privatne su i neobavezne. Izmjene možeš napraviti u izborniku <b>Postavke > AI značajke</b>.]]></string>
 

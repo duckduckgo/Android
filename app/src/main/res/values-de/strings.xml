@@ -825,9 +825,7 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
-    <string name="preOnboardingDaxDialog1TitleDuckAi" translatable="false"><![CDATA[Hi there.<br/><br/>Ready for a faster browser that protects you and lets you decide when and how to use AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
-    <string name="preOnboardingDaxDialog1ButtonDuckAi" translatable="false">Let\&apos;s get started!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
     <string name="preOnboardingDaxDialog2Title">Schutz aktiviert!</string>
     <string name="preOnboardingDaxDialog2Button">Wähle deinen Browser</string>
@@ -839,7 +837,6 @@
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
     <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
-    <string name="preOnboardingComparisonChartDuckAi" translatable="false">Use ChatGPT privately with Duck.ai built in</string>
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
     <string name="preOnboardingAddressBarTitle">Wo soll deine Adressleiste platziert werden?</string>
     <string name="preOnboardingAddressBarOkButton">Weiter</string>
@@ -892,7 +889,6 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Möchtest du einfachen Zugriff auf den privaten KI-Chat?</string>
-    <string name="preOnboardingInputScreenTitleUpdated" translatable="false">Want easy access to private AI chat in the address bar?</string>
     <string name="preOnboardingInputScreenButton">Weiter</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Die KI-Funktionen sind privat und optional. Unter <b>Einstellungen > KI-Funktionen</b> kannst du Änderungen vornehmen.]]></string>
 
