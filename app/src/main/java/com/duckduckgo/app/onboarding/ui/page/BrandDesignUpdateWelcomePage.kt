@@ -1011,7 +1011,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     isVisible = true
                     alpha = 1f
                     translationX = 0f
-                    playAnimation()
+                    if (!isAnimating) playAnimation()
                 }
 
                 setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
