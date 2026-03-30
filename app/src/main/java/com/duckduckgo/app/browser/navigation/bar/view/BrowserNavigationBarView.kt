@@ -120,6 +120,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun setLockedForOnboarding(locked: Boolean) {
+        doOnAttach {
+            viewModel.setLockedForOnboarding(locked)
+        }
+    }
+
     fun setBrowserMenuIcon(@DrawableRes icon: Int) {
         doOnAttach {
             ContextCompat.getDrawable(this.context, icon)?.let {
@@ -208,6 +214,29 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.shadowView.isVisible = viewState.showShadow
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
+        applyOnboardingLock(viewState)
+    }
+
+    private fun applyOnboardingLock(viewState: ViewState) {
+        val locked = viewState.isLockedForOnboarding
+        val alpha = if (locked) 0.4f else 1.0f
+
+        binding.newTabButton.isEnabled = !locked
+        binding.newTabButton.alpha = alpha
+        binding.autofillButton.isEnabled = !locked
+        binding.autofillButton.alpha = alpha
+        binding.bookmarksButton.isEnabled = !locked
+        binding.bookmarksButton.alpha = alpha
+        binding.tabsButton.isEnabled = !locked
+        binding.tabsButton.alpha = alpha
+        binding.menuButton.isEnabled = !locked
+        binding.menuButton.alpha = alpha
+
+        // Fire button is exempt from the lock
+        val fireButtonLocked = locked && !viewState.fireButtonHighlighted
+        val fireButtonAlpha = if (fireButtonLocked) 0.4f else 1.0f
+        binding.fireButton.isEnabled = !fireButtonLocked
+        binding.fireButton.alpha = fireButtonAlpha
     }
 
     private fun processCommands(command: Command) {

@@ -1880,6 +1880,7 @@ class BrowserTabViewModel @Inject constructor(
         if (uri != null && duckChat.isDuckChatUrl(uri) && uri.getQueryParameter("flow") == "mobile-app-onboarding") {
             // Delay showing onboarding CTA until FE finishes generating response to initial prompt.
             suppressDuckAiOnboardingCta = true
+            browserViewState.value = currentBrowserViewState().copy(isOmnibarLockedForOnboarding = true)
         }
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -4708,6 +4709,10 @@ class BrowserTabViewModel @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_FIRE_BUTTON_TAPPED)
         }
         val cta = currentCtaViewState().cta
+
+        // Defer cleanup (CTA dismiss, highlight removal) until the fire action actually completes.
+        if (cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta) return
+
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
