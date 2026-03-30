@@ -113,7 +113,6 @@ class BrowserChromeClient @Inject constructor(
         view: WebView,
         title: String,
     ) {
-        logcat { "Hatch: onReceivedTitle $title" }
         webViewClientListener?.titleReceived(title)
     }
 
