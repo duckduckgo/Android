@@ -23,7 +23,6 @@
     android:orientation="vertical"
     tools:alpha="1">
 
-    <!-- Title -->
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/addressBarTitle"
         android:layout_width="match_parent"
@@ -34,7 +33,6 @@
         android:text="@string/preOnboardingAddressBarTitle"
         app:typography="onboarding_title" />
 
-    <!-- Address Bar Position Options -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/addressBarPositionContainer"
         android:layout_width="match_parent"
@@ -44,7 +42,7 @@
 
         <LinearLayout
             android:id="@+id/topOmnibarContainer"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
@@ -79,6 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:background="@null"
                 android:checked="true"
                 android:clickable="false"
                 android:focusable="false"
@@ -86,15 +85,15 @@
                 android:minHeight="0dp"
                 android:padding="0dp"
                 app:buttonTint="@color/onboarding_radio_button_tint"
-                tools:ignore="DeprecatedWidgetInXml" />
+                tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/bottomOmnibarContainer"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+            android:layout_marginStart="56dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="@dimen/keyline_2"
@@ -127,21 +126,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:background="@null"
                 android:clickable="false"
                 android:focusable="false"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:padding="0dp"
                 app:buttonTint="@color/onboarding_radio_button_tint"
-                tools:ignore="DeprecatedWidgetInXml" />
+                tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/splitOmnibarContainer"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+            android:layout_marginStart="56dp"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="@dimen/keyline_2"
@@ -174,13 +174,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:background="@null"
                 android:clickable="false"
                 android:focusable="false"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:padding="0dp"
                 app:buttonTint="@color/onboarding_radio_button_tint"
-                tools:ignore="DeprecatedWidgetInXml" />
+                tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         </LinearLayout>
 
