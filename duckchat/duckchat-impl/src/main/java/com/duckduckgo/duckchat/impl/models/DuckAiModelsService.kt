@@ -22,7 +22,7 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 @ContributesNonCachingServiceApi(AppScope::class)
-interface DuckChatModelsService {
+interface DuckAiModelsService {
     @GET
     suspend fun getModels(@Url url: String): AIChatModelsResponse
 }
