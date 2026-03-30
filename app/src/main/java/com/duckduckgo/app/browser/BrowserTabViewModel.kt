@@ -629,6 +629,9 @@ class BrowserTabViewModel @Inject constructor(
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
+    var isSerpLogoInMenuEnabled: Boolean = true
+        private set
+
     private val isFullUrlEnabled = urlDisplayRepository.isFullUrlEnabled
         .stateIn(
             scope = viewModelScope,
@@ -724,6 +727,10 @@ class BrowserTabViewModel @Inject constructor(
 
         viewModelScope.launch {
             addressBarTrackersAnimationManager.fetchFeatureState()
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            isSerpLogoInMenuEnabled = androidBrowserConfig.serpLogoInMenu().isEnabled()
         }
 
         observeSyncStatusChangesForDuckChat()
