@@ -84,6 +84,8 @@ interface NativeInputWidget {
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
+    fun getSelectedModelId(): String?
+    fun isModelMenuVisible(): Boolean
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -144,10 +146,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
 
     private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
+    private val modelPickerView: ModelPicker by lazy { findViewById<ModelPickerView>(R.id.modelPickerView) }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         imageButton.setOnClickListener { onImageClick?.invoke() }
+        modelPickerView.setEnabled(isChatTabSelected())
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -282,10 +286,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
+                    modelPickerView.setEnabled(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
+                    modelPickerView.setEnabled(isChatTabSelected())
                 }
             },
         )
@@ -345,6 +351,10 @@ class NativeInputModeWidget @JvmOverloads constructor(
         ancestors.zip(saved).forEach { (vg, lt) -> vg.layoutTransition = lt }
     }
 
+    override fun getSelectedModelId(): String? = modelPickerView.getSelectedModelId()
+
+    override fun isModelMenuVisible(): Boolean = modelPickerView.isMenuVisible()
+
     override fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
         onSearchSubmitted: (String) -> Unit,
@@ -355,7 +365,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
             onSearchTextChanged(text)
         }
         this.onSearchSent = onSearchSubmitted
-        this.onChatSent = onChatSubmitted
+        this.onChatSent = { query ->
+            onChatSubmitted(query)
+        }
     }
 
     override fun bindTabCount(

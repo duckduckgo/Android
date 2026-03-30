@@ -168,13 +168,30 @@
                         app:srcCompat="@drawable/ic_image_24"
                         tools:visibility="visible" />
 
-                    <FrameLayout
-                        android:id="@+id/inputScreenButtonsContainer"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginEnd="8dp"
-                        android:visibility="invisible" />
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="@dimen/keyline_1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.duckduckgo.duckchat.impl.ui.ModelPickerView
+                            android:id="@+id/modelPickerView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="@dimen/keyline_1"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
+                            android:id="@+id/inputScreenButtonsContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible" />
+
+                    </LinearLayout>
 
                 </FrameLayout>
 

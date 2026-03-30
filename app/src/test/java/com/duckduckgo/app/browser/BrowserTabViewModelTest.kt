@@ -7216,6 +7216,54 @@ class BrowserTabViewModelTest {
         }
 
     @Test
+    fun whenProcessJsCallbackForDuckChatAndNativePromptPendingThenSubscriptionEventSent() =
+        runTest {
+            whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+            val expectedEvent = SubscriptionEventData(
+                featureName = DUCK_CHAT_FEATURE_NAME,
+                subscriptionName = "submitAIChatNativePrompt",
+                params = JSONObject().put("prompt", "hello"),
+            )
+            whenever(mockDuckChatJSHelper.consumeNativePromptOnHandoff(eq("method"))).thenReturn(expectedEvent)
+
+            testee.processJsCallbackMessage(
+                DUCK_CHAT_FEATURE_NAME,
+                "method",
+                "id",
+                data = null,
+                false,
+            ) { "someUrl" }
+
+            testee.subscriptionEventDataFlow.test {
+                val emittedEvent = awaitItem()
+                assertEquals(expectedEvent.featureName, emittedEvent.featureName)
+                assertEquals(expectedEvent.subscriptionName, emittedEvent.subscriptionName)
+                assertEquals(expectedEvent.params.toString(), emittedEvent.params.toString())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun whenProcessJsCallbackForDuckChatAndNoNativePromptPendingThenNoSubscriptionEventSent() =
+        runTest {
+            whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
+            whenever(mockDuckChatJSHelper.consumeNativePromptOnHandoff(any())).thenReturn(null)
+
+            testee.processJsCallbackMessage(
+                DUCK_CHAT_FEATURE_NAME,
+                "method",
+                "id",
+                data = null,
+                false,
+            ) { "someUrl" }
+
+            testee.subscriptionEventDataFlow.test {
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun whenDuckChatMenuItemClickedAndItWasntUsedBeforeThenOpenDuckChatAndSendPixel() =
         runTest {
             whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)

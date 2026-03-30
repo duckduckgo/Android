@@ -48,7 +48,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 interface ModelPicker {
-    fun isMenuShowing(): Boolean
+    fun isMenuVisible(): Boolean
     fun getSelectedModelId(): String?
     fun setEnabled(enabled: Boolean)
 }
@@ -73,7 +73,7 @@ class ModelPickerView @JvmOverloads constructor(
         inflate(context, R.layout.view_model_picker, this)
     }
 
-    override fun isMenuShowing(): Boolean = viewModel.menuShowing
+    override fun isMenuVisible(): Boolean = viewModel.menuShowing
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 

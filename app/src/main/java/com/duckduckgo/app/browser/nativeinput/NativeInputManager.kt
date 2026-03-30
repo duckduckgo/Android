@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
@@ -48,7 +49,7 @@ import javax.inject.Inject
 class NativeInputCallbacks(
     val onSearchTextChanged: (String) -> Unit,
     val onSearchSubmitted: (String) -> Unit,
-    val onDuckAiChatSubmitted: (String) -> Unit,
+    val onDuckAiChatSubmitted: (query: String, modelId: String?) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val onClearAutocomplete: () -> Unit,
     val onStopTapped: () -> Unit,
@@ -77,6 +78,7 @@ class RealNativeInputManager @Inject constructor(
     private val animator: NativeInputAnimator,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val pendingNativePromptStore: PendingNativePromptStore,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -222,6 +224,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun onKeyboardHidden(widget: NativeInputWidget, widgetRoot: View?) {
+        if (widget.isModelMenuVisible()) return
         updateWidgetFocus(widget)
         if (!omnibarController.isDuckAiMode() && !omnibarController.isSplitMode()) {
             showTabsAndMenuButtons(widgetRoot)
@@ -339,8 +342,9 @@ class RealNativeInputManager @Inject constructor(
                 if (omnibarController.isDuckAiMode()) {
                     widget.text = ""
                     widget.hideKeyboard()
-                    callbacks.onDuckAiChatSubmitted(query)
+                    callbacks.onDuckAiChatSubmitted(query, widget.getSelectedModelId())
                 } else {
+                    pendingNativePromptStore.store(query, widget.getSelectedModelId())
                     animator.cancelAnimation()
                     rootView.findViewById<View?>(R.id.autoCompleteSuggestionsList)?.gone()
                     rootView.findViewById<View?>(R.id.focusedView)?.gone()
