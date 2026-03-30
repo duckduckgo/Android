@@ -629,6 +629,7 @@ class BrowserTabViewModel @Inject constructor(
     private var alreadyShownKeyboard: Boolean = false
     private var pendingDuckChatAuthUpdate: Boolean = false
 
+    @Volatile
     var isSerpLogoInMenuEnabled: Boolean = true
         private set
 
