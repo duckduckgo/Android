@@ -2052,8 +2052,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun titleUpdated(title: String?) {
-        logcat(VERBOSE) { "Page title updated: $title" }
-        site?.title = title
+        if (title != null){
+            logcat(VERBOSE) { "Page title updated: $title" }
+            viewModelScope.launch(dispatchers.main()) {
+                updateTabTitle(tabId, newTitle = title)
+            }
+        }
     }
 
     @VisibleForTesting
