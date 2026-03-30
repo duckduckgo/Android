@@ -1,9 +1,9 @@
 {
   "name": "mylife",
   "url": "mylife.com",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "addedDatetime": 1715797497496,
-  "optOutUrl": "https://www.mylife.com/ccpa/index.pubview",
+  "optOutUrl": "https://mylife.jotform.com/260284407610047",
   "steps": [
     {
       "stepType": "scan",
@@ -65,60 +65,79 @@
         {
           "actionType": "navigate",
           "id": "8c7e8f10-5bd2-4dba-b99a-d198b3c0bbc9",
-          "url": "https://www.mylife.com/ccpa/index.pubview"
+          "url": "https://mylife.jotform.com/260284407610047"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "form.jotform-form"
+            }
+          ],
+          "id": "1e00a6b5-cab3-4523-a095-87fe69a28d84"
         },
         {
           "actionType": "fillForm",
           "id": "1cd0b2b7-7203-4ae1-9d22-d76aa6de8a26",
-          "selector": "//form",
+          "selector": "form.jotform-form",
           "dataSource": "userProfile",
           "elements": [
             {
+              "type": "fullState",
+              "selector": "select[data-component='dropdown']"
+            },
+            {
               "type": "firstName",
-              "selector": ".//input[@name='firstname']"
+              "selector": "input[data-component='first']"
             },
             {
               "type": "lastName",
-              "selector": ".//input[@name='lastname']"
+              "selector": "input[data-component='last']"
             },
             {
               "type": "city",
-              "selector": ".//input[@name='city']"
+              "selector": "input[data-component='city']"
             },
             {
-              "type": "state",
-              "selector": ".//input[@name='state']"
+              "type": "middleName",
+              "selector": "input[name='q13_middleInitial']"
+            },
+            {
+              "type": "birthYear",
+              "selector": "input[name='q15_birthYear']"
             }
           ]
         },
         {
           "actionType": "fillForm",
           "id": "ed570894-ebbe-4f9c-a9f7-9d58e81bdc28",
-          "selector": "//form",
+          "selector": "form.jotform-form",
+          "dataSource": "extractedProfile",
           "elements": [
             {
-              "type": "email",
-              "selector": ".//input[@name='emailAddress']"
-            },
-            {
               "type": "$generated_zip_code$",
-              "selector": ".//input[@name='zipcode']"
+              "selector": "input[data-component='zip']"
             },
             {
               "type": "profileUrl",
-              "selector": ".//input[@name='profileUrl']"
+              "selector": "input[name='q12_enterThe']"
+            },
+            {
+              "type": "email",
+              "selector": "input[data-component='email']"
             }
           ]
         },
         {
           "actionType": "getCaptchaInfo",
           "id": "aeda8b17-92cf-43ce-8974-12a13fb9bcfd",
-          "selector": ".g-recaptcha"
+          "selector": "div[data-component='recaptcha']"
         },
         {
           "actionType": "solveCaptcha",
           "id": "6b8a962e-19ed-4f33-8c56-4f4a1f17cad3",
-          "selector": ".g-recaptcha"
+          "selector": "div[data-component='recaptcha']"
         },
         {
           "actionType": "click",
@@ -126,7 +145,7 @@
           "elements": [
             {
               "type": "button",
-              "selector": ".//input[@type='submit']"
+              "selector": "button.form-submit-button"
             }
           ]
         },
@@ -135,9 +154,8 @@
           "id": "fe7201a7-4e92-4ad3-90fb-d836019d71e0",
           "expectations": [
             {
-              "type": "text",
-              "selector": "#successRequest",
-              "expect": "Your request has been received."
+              "type": "element",
+              "selector": "body.thankyou"
             }
           ]
         }
