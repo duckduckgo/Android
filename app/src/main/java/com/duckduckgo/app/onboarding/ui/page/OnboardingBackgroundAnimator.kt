@@ -200,7 +200,7 @@ class OnboardingBackgroundAnimator(
                 val progress = animator.animatedValue as Float
                 inView.translationX = startX * (1f - progress)
                 // Fade in during last 25% — inverse of exit's first-25% fade-out
-                inView.alpha = minOf(1f, maxOf(0f, (progress - 0.75f) * 4f))
+                inView.alpha = enterAlpha(progress)
             }
         }
     }
@@ -235,7 +235,14 @@ class OnboardingBackgroundAnimator(
 
     companion object {
         private const val EXIT_DURATION = 1500L
-        private const val ENTER_DURATION = 1000L
-        private val EASE_IN_OUT = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+        const val ENTER_DURATION = 1000L
+        val EASE_IN_OUT = PathInterpolator(0.42f, 0f, 0.58f, 1f)
+
+        /**
+         * Computes the alpha for the entering view given [progress] (a [0,1] animator fraction).
+         * The view is fully transparent for the first 75% of the animation and fades in to fully
+         * opaque during the final 25%.
+         */
+        internal fun enterAlpha(progress: Float): Float = minOf(1f, maxOf(0f, (progress - 0.75f) * 4f))
     }
 }
