@@ -482,6 +482,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
+        bobbingDaxAnimator?.cancel()
+        bobbingDaxAnimator = null
+        binding.bobbingDaxAnimation?.cancelAnimation()
         backgroundAnimator?.cancel()
         backgroundAnimator = null
         isAnimating = false
@@ -765,8 +768,16 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 bobbingDax.alpha = OnboardingBackgroundAnimator.enterAlpha(progress)
                             }
                             addListener(object : AnimatorListenerAdapter() {
+                                private var cancelled = false
+
+                                override fun onAnimationCancel(animation: Animator) {
+                                    cancelled = true
+                                }
+
                                 override fun onAnimationEnd(animation: Animator) {
-                                    bobbingDax.playAnimation()
+                                    if (!cancelled) {
+                                        bobbingDax.playAnimation()
+                                    }
                                 }
                             })
                             start()
