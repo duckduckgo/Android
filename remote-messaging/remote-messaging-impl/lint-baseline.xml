@@ -34,15 +34,4 @@
             column="29"/>
     </issue>
 
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_remote_message_header.xml"
-            line="43"
-            column="6"/>
-    </issue>
-
 </issues>

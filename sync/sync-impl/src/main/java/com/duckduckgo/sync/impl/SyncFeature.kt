@@ -74,4 +74,10 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun syncAutoRestore(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun recoverDataEasilySetupScreen(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendSyncSetupWideEvent(): Toggle
 }

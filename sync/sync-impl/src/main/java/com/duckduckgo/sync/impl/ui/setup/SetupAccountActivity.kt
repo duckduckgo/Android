@@ -142,10 +142,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListen
                 }
             }
 
-            AskSaveRecoveryCode -> {
+            is AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
+                val fragment = if (viewState.viewMode.useNewScreen) {
+                    RecoverDataFragment.instance()
+                } else {
+                    SaveRecoveryCodeFragment.instance()
+                }
                 supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SaveRecoveryCodeFragment.instance(), TAG_RECOVER_ACCOUNT)
+                    replace(id.fragment_container_view, fragment, TAG_RECOVER_ACCOUNT)
                 }
             }
 

@@ -227,7 +227,7 @@
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Butonul Foc</string>
     <string name="dataClearingActivityTitle">Ștergerea datelor</string>
-    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
+    <string name="dataClearingDescription">Ștergerea datelor poate ajuta la protejarea confidențialității tale online. Folosește Fire Button pentru a șterge datele manual sau configurează ștergerea automată.</string>
     <plurals name="dataClearingExcludedSites" tools:ignore="ImpliedQuantity">
         <item quantity="one">%1$d site exclus de la ștergere</item>
         <item quantity="few">%1$d site-uri excluse de la ștergere</item>
@@ -236,7 +236,7 @@
     <string name="dataClearingAutomaticClearingOn">Activat</string>
     <string name="dataClearingAutomaticClearingOff">Dezactivat</string>
     <string name="dataClearingClearBrowsingData">Șterge datele de navigare</string>
-    <string name="dataClearingAutomaticDataClearing">Ștergerea automată a datelor</string>
+    <string name="dataClearingAutomaticDataClearing">Șterge automat datele</string>
     <string name="dataClearingAutomaticallyClearDataToggle">Șterge automat datele</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Închide toate filele deschise</string>
     <string name="dataClearingAutomaticDataOptionDescription">Șterge toate datele privind site-urile, inclusiv site-urile vizitate. S-ar putea să fii deconectat de la conturi.</string>
@@ -262,6 +262,23 @@
         <item quantity="other">Șterge de pe %1$d de site-uri. S-ar putea să fii deconectat de la conturi.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Dorești să ștergi filele și datele site-ului?</string>
+    <string name="singleTabFireDialogTitleWithChats">Dorești să ștergi filele, datele site-ului și chaturile?</string>
+    <string name="singleTabFireDialogDeleteAll">Șterge toate</string>
+    <string name="singleTabFireDialogDeleteThisTab">Șterge această filă</string>
+    <string name="singleTabFireDialogDeleteChat">Șterge chatul</string>
+    <string name="singleTabFireDialogTitleDuckAi">Ștergi acest chat?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Ștergerea datelor de pe site te poate deconecta de la conturi.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Aceasta va anula descărcările în desfășurare.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d filă și datele aferente au fost șterse</item>
+        <item quantity="few">%1$d file și datele aferente au fost șterse</item>
+        <item quantity="other">%1$d file și datele aferente au fost șterse</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Datele site-ului nu au putut fi șterse. Actualizează WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Datele site-ului nu au putut fi șterse din cauza unei erori.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permisiuni</string>
 
@@ -279,8 +296,8 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">File și date</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">File, date și chaturi Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Șterge la…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge la…</string>
+    <string name="settingsAutomaticallyClearWhen">Șterge pe...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Șterge pe…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Doar la ieșirea din aplicație</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ieșire din aplicație, inactiv timp de 5 secunde</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ieșire din aplicație, inactiv timp de 5 minute</string>

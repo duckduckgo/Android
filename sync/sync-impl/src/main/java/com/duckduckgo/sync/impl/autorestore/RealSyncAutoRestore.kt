@@ -69,7 +69,10 @@ class RealSyncAutoRestore @Inject constructor(
 
                 val parsedCode = syncAccountRepository.parseSyncAuthCode(payload.recoveryCode)
                 when (val result = syncAccountRepository.processCode(parsedCode, existingDeviceId = payload.deviceId)) {
-                    is Result.Success -> logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
+                    is Result.Success -> {
+                        logcat(LogPriority.INFO) { "Sync-Recovery: account restored successfully" }
+                        manager.saveAutoRestoreData(payload.recoveryCode, payload.deviceId)
+                    }
                     is Result.Error -> logcat(LogPriority.WARN) { "Sync-Recovery: restore failed - code=${result.code}, reason=${result.reason}" }
                 }
             } catch (t: Throwable) {

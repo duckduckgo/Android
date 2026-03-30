@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.Recover
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +44,7 @@ import javax.inject.*
 class SyncSetupIntroViewModel @Inject constructor(
     private val syncFeatureToggle: SyncFeatureToggle,
     private val dispatchers: DispatcherProvider,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -50,7 +52,10 @@ class SyncSetupIntroViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         val viewMode = when (screen) {
-            SYNC_INTRO -> CreateAccountIntro
+            SYNC_INTRO -> {
+                syncSetupWideEvent.onIntroScreenShown()
+                CreateAccountIntro
+            }
             else -> RecoverAccountIntro
         }
         val aiChatSyncEnabled = syncFeatureToggle.allowAiChatSync()
@@ -77,6 +82,7 @@ class SyncSetupIntroViewModel @Inject constructor(
 
     fun onTurnSyncOnClicked() {
         viewModelScope.launch {
+            syncSetupWideEvent.onSyncEnabled()
             command.send(StartSetupFlow)
         }
     }

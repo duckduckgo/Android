@@ -46,6 +46,7 @@
         android:layout_height="@dimen/keyline_2"
         android:src="@drawable/indicator_vpn_disconnected"
         android:layout_marginEnd="@dimen/keyline_2"
+        android:contentDescription="@string/netpVpnIndicatorContentDescription"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/secondaryText"
         app:layout_constraintStart_toStartOf="@+id/primaryText"

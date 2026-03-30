@@ -90,6 +90,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
 
     data class ViewState(
         val hasPlayedIntroAnimation: Boolean = false,
+        val hasAnimatedCurrentDialog: Boolean = false,
         val currentDialog: PreOnboardingDialogType? = null,
         val selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
         val inputScreenSelected: Boolean = true,
@@ -122,8 +123,12 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data object OnboardingSkipped : Command
     }
 
+    fun onDialogAnimationStarted() {
+        _viewState.update { it.copy(hasAnimatedCurrentDialog = true) }
+    }
+
     private fun setCurrentDialog(dialogType: PreOnboardingDialogType) {
-        _viewState.update { it.copy(currentDialog = dialogType) }
+        _viewState.update { it.copy(currentDialog = dialogType, hasAnimatedCurrentDialog = false) }
         fireDialogShownPixel(dialogType)
     }
 
@@ -155,6 +160,7 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
                 it.copy(
                     isReinstallUser = isReinstall,
                     currentDialog = dialogType,
+                    hasAnimatedCurrentDialog = false,
                 )
             }
             fireDialogShownPixel(dialogType)

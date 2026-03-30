@@ -120,8 +120,8 @@
 
     <!-- Fire -->
     <string name="fireMenu">Obriši podatke</string>
-    <string name="fireClearAll">Obriši kartice i podatke</string>
-    <string name="fireClearAllPlusDuckChats">Izbriši kartice, podatke i razgovore s Duck.ai</string>
+    <string name="fireClearAll">Izbriši kartice i podatke</string>
+    <string name="fireClearAllPlusDuckChats">Izbriši kartice, podatke i razgovore s Duck.ai-om</string>
     <string name="fireCancel">Odustani</string>
     <string name="fireDataCleared">Podaci su obrisani</string>
 
@@ -238,8 +238,8 @@
     <string name="dataClearingAutomaticClearingOn">Uključeno</string>
     <string name="dataClearingAutomaticClearingOff">Isključeno</string>
     <string name="dataClearingClearBrowsingData">Izbriši podatke o pregledavanju</string>
-    <string name="dataClearingAutomaticDataClearing">Automatsko brisanje podataka</string>
-    <string name="dataClearingAutomaticallyClearDataToggle">Automatsko brisanje podataka</string>
+    <string name="dataClearingAutomaticDataClearing">Automatski izbrisati podatke</string>
+    <string name="dataClearingAutomaticallyClearDataToggle">Automatski izbrisati podatke</string>
     <string name="dataClearingAutomaticTabsOptionDescription">Zatvori sve otvorene kartice</string>
     <string name="dataClearingAutomaticDataOptionDescription">Izbriši sve podatke mrežne lokacije, uključujući posjećene mrežne lokacije. Možda će te odjaviti s računa.</string>
     <string name="dataClearingAutomaticChatsOptionDescription">Izbriši sve razgovore, uključujući prikvačene razgovore</string>
@@ -266,6 +266,24 @@
         <item quantity="other">Izbriši s %1$d mrežnih lokacija. Možda će te odjaviti s računa.</item>
     </plurals>
 
+    <!-- Single tab burning -->
+    <string name="singleTabFireDialogTitle">Izbrisati kartice i podatke mrežne lokacije?</string>
+    <string name="singleTabFireDialogTitleWithChats">Izbrisati kartice, podatke mrežne lokacije i čavrljanja?</string>
+    <string name="singleTabFireDialogDeleteAll">Izbriši sve</string>
+    <string name="singleTabFireDialogDeleteThisTab">Izbriši ovu karticu</string>
+    <string name="singleTabFireDialogDeleteChat">Izbriši čavrljanje</string>
+    <string name="singleTabFireDialogTitleDuckAi">Izbrisati ovo čavrljanje?</string>
+    <string name="singleTabFireDialogSubtitleSiteData">Brisanje podataka mrežnih lokacija može te odjaviti s računa.</string>
+    <string name="singleTabFireDialogSubtitleDownloads">Ovo će otkazati preuzimanja u tijeku.</string>
+    <plurals name="tabsClearedSnackbarMessage">
+        <item quantity="one">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="few">%1$d kartice i njihovi podaci izbrisani</item>
+        <item quantity="many">%1$d kartica i njihovi podaci izbrisani</item>
+        <item quantity="other">%1$d kartica i njihovi podaci izbrisani</item>
+    </plurals>
+    <string name="singleTabFireDialogClearNotSupportedSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani. Ažuriraj WebView.</string>
+    <string name="singleTabFireDialogClearErrorSnackbar">Podaci mrežne lokacije nisu mogli biti izbrisani zbog pogreške.</string>
+
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Dozvole</string>
 
@@ -283,15 +301,15 @@
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Kartice i podaci</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndDataAndChats">Kartice, podaci i razgovori s Duck.ai</string>
 
-    <string name="settingsAutomaticallyClearWhen">Očisti na…</string>
-    <string name="settingsAutomaticallyClearWhenDialogTitle">Očisti na…</string>
+    <string name="settingsAutomaticallyClearWhen">Izbriši dana…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Izbriši dana…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Samo izlaz iz aplikacije</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Izlaz iz aplikacije, neaktivna 5 sekundi</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Izlaz iz aplikacije, neaktivna 5 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Izlaz iz aplikacije, neaktivna 15 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Izlaz iz aplikacije, neaktivna 30 minuta</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izlaz iz aplikacije, neaktivna 1 sat</string>
-    <string name="settingsClearAiDataTitle">Izbriši razgovore s Duck.ai</string>
+    <string name="settingsClearAiDataTitle">Izbriši Duck.ai čavrljanja</string>
     <string name="settingsClearAiDataDeleteMessage">Fire Button će također izbrisati povijest Duck.ai, uključujući prikvačene razgovore.</string>
     <string name="settingsClearDataActionSecondaryText">Briše sve kartice i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>
     <string name="settingsClearDataActionPlusDuckChatsSecondaryText">Briše sve kartice, razgovore na Duck.ai i podatke za sve mrežne lokacije koje nisu označene kao Fireproof.</string>

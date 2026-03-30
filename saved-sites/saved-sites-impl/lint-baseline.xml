@@ -8,7 +8,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/savedsites/impl/newtab/BookmarksShortcut.kt"
-            line="67"
+            line="69"
             column="13"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/savedsites/impl/newtab/BookmarksShortcut.kt"
-            line="69"
+            line="71"
             column="13"/>
     </issue>
 
@@ -447,61 +447,6 @@
             file="src/main/res/menu/edit_saved_site_menu.xml"
             line="30"
             column="9"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="77"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="97"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="                        &lt;ImageView"
-        errorLine2="                         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_bookmarks.xml"
-            line="117"
-            column="26"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_new_tab_favourites_section.xml"
-            line="80"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageView"
-        errorLine2="         ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_saved_site_empty_hint.xml"
-            line="31"
-            column="10"/>
     </issue>
 
     <issue

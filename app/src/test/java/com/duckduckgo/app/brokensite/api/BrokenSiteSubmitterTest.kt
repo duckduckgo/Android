@@ -693,6 +693,8 @@ class BrokenSiteSubmitterTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            consentRule = null,
+            consentReloadLoop = false,
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,

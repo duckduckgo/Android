@@ -74,7 +74,7 @@ class DataClearingWorker(
         settingsDataStore.lastExecutedJobId = id.toString()
 
         withContext(dispatchers.io()) {
-            if (androidBrowserConfigFeature.improvedDataClearingOptions().isEnabled()) {
+            if (androidBrowserConfigFeature.singleTabFireDialog().isEnabled()) {
                 // Use new granular clearing - will automatically kill the process
                 val clearOptions = fireDataStore.getAutomaticClearOptions()
                 dataClearingWideEvent.start(

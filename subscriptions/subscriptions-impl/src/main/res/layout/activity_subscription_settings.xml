@@ -42,6 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_4"
+                android:importantForAccessibility="no"
                 android:src="@drawable/ic_subscription_128" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -68,6 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
                     android:layout_marginEnd="10dp"
+                    android:contentDescription="@string/subscriptionExpiredStatusIconContentDescription"
                     android:src="@drawable/ic_exclamation_recolorable_16" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -95,6 +97,7 @@
                     android:layout_marginTop="1dp"
                     android:layout_marginEnd="4dp"
                     android:padding="1dp"
+                    android:contentDescription="@string/subscriptionActiveStatusIconContentDescription"
                     android:src="@drawable/ic_dot_green" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView

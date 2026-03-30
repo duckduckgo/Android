@@ -21,27 +21,40 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.sync.DuckChatSyncDataManager.Adapters.Companion.patchResponseAdapter
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 import com.duckduckgo.sync.api.engine.DeletableType
-import com.duckduckgo.sync.api.engine.PatchableDataManager
+import com.duckduckgo.sync.api.engine.ModifiedSince
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDeletionRequest
 import com.duckduckgo.sync.api.engine.SyncDeletionResponse
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
-import com.duckduckgo.sync.api.engine.SyncPatchRequest
-import com.duckduckgo.sync.api.engine.SyncPatchResponse
+import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
+import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.jvm.java
 
 @ContributesMultibinding(scope = AppScope::class, boundType = DeletableDataManager::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = PatchableDataManager::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class DuckChatSyncDataManager @Inject constructor(
     private val duckChatSyncRepository: DuckChatSyncRepository,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
@@ -49,9 +62,30 @@ class DuckChatSyncDataManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val duckChatFeature: DuckChatFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DeletableDataManager, PatchableDataManager {
+) : DeletableDataManager, SyncableDataProvider, SyncableDataPersister {
 
-    override fun getType(): DeletableType = DeletableType.DUCK_AI_CHATS
+    override fun getDeletableType(): DeletableType = DeletableType.DUCK_AI_CHATS
+
+    override fun getType(): SyncableType = SyncableType.DUCK_AI_CHATS
+
+    override fun getChanges(): SyncChangesRequest {
+        if (appBuildConfig.isInternalBuild()) checkMainThread()
+
+        return runBlocking(dispatchers.io()) {
+            if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
+                logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping patches" }
+                return@runBlocking getEmptyRequest()
+            }
+
+            if (!duckChatFeatureRepository.isAIChatHistoryEnabled()) {
+                logcat { "DuckChat-Sync: Chat history disabled, skipping patches" }
+                return@runBlocking getEmptyRequest()
+            }
+
+            val pendingIds = duckChatSyncRepository.getPendingChatDeletions()
+            formatPatchRequest(pendingIds)
+        }
+    }
 
     override fun getDeletions(): SyncDeletionRequest? {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
@@ -68,7 +102,7 @@ class DuckChatSyncDataManager @Inject constructor(
             }
 
             val deletionTimestamp = duckChatSyncRepository.getLastDuckAiChatDeletionTimestamp()
-            formatRequest(deletionTimestamp)
+            formatDeletionRequest(deletionTimestamp)
         }
     }
 
@@ -86,35 +120,36 @@ class DuckChatSyncDataManager @Inject constructor(
         // no-op, keep timestamp around for next time
     }
 
-    override fun getPatches(): SyncPatchRequest? {
-        if (appBuildConfig.isInternalBuild()) checkMainThread()
-
-        return runBlocking(dispatchers.io()) {
-            if (!duckChatFeature.supportsSyncChatsDeletion().isEnabled()) {
-                logcat { "DuckChat-Sync: Duck AI chat sync disabled, skipping patches" }
-                return@runBlocking null
-            }
-
-            if (!duckChatFeatureRepository.isAIChatHistoryEnabled()) {
-                logcat { "DuckChat-Sync: Chat history disabled, skipping patches" }
-                return@runBlocking null
-            }
-
-            val pendingIds = duckChatSyncRepository.getPendingChatDeletions()
-            formatPatchRequest(pendingIds)
-        }
+    override fun onSyncEnabled() {
+        // no-op, we'll just sync the chats
     }
 
-    override fun onPatchSuccess(response: SyncPatchResponse) {
-        logcat { "DuckChat-Sync: patch successful for ${response.entryIds.size} entries" }
-        appCoroutineScope.launch(dispatchers.io()) {
-            duckChatSyncRepository.removePendingChatDeletions(response.entryIds.toSet())
+    override fun onSuccess(
+        changes: SyncChangesResponse,
+        conflictResolution: SyncableDataPersister.SyncConflictResolution,
+    ): SyncMergeResult {
+        if (changes.jsonString.isNotEmpty() && changes.type == SyncableType.DUCK_AI_CHATS) {
+            val response = runCatching {
+                patchResponseAdapter.fromJson(changes.jsonString)!!
+            }.getOrElse {
+                logcat(INFO) { "DuckChat-Sync: error parsing patch response ${it.message}" }
+                return SyncMergeResult.Error(reason = "Error parsing patch response ${it.message}")
+            }
+
+            val entryIds = response.aiChats.entries.map { it.id }
+            logcat { "DuckChat-Sync: patch successful for ${entryIds.size} entries" }
+            appCoroutineScope.launch(dispatchers.io()) {
+                duckChatSyncRepository.removePendingChatDeletions(entryIds.toSet())
+            }
         }
+        return SyncMergeResult.Success()
     }
 
-    override fun onPatchError(syncErrorResponse: SyncErrorResponse) {
-        logcat(LogPriority.ERROR) { "DuckChat-Sync: patch failed with ${syncErrorResponse.featureSyncError}" }
-        // no-op, keep pending IDs for retry as queue is cleared by bulk delete or sync disable
+    override fun onError(error: SyncErrorResponse) {
+        if (error.type == SyncableType.DUCK_AI_CHATS) {
+            logcat(LogPriority.ERROR) { "DuckChat-Sync: patch failed with ${error.featureSyncError}" }
+            // no-op, keep pending IDs for retry as queue is cleared by bulk delete or sync disable
+        }
     }
 
     override fun onSyncDisabled() {
@@ -123,7 +158,13 @@ class DuckChatSyncDataManager @Inject constructor(
         }
     }
 
-    private fun formatRequest(deletionTimestamp: String?): SyncDeletionRequest? {
+    private fun getEmptyRequest() = SyncChangesRequest(
+        SyncableType.DUCK_AI_CHATS,
+        "",
+        ModifiedSince.Timestamp(SyncDateProvider.now()),
+    )
+
+    private fun formatDeletionRequest(deletionTimestamp: String?): SyncDeletionRequest? {
         if (deletionTimestamp == null) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no need to inform sync of duck ai chat deletion, no timestamp available" }
             return null
@@ -137,10 +178,10 @@ class DuckChatSyncDataManager @Inject constructor(
         )
     }
 
-    private fun formatPatchRequest(pendingIds: Set<String>): SyncPatchRequest? {
+    private fun formatPatchRequest(pendingIds: Set<String>): SyncChangesRequest {
         if (pendingIds.isEmpty()) {
             logcat(LogPriority.DEBUG) { "DuckChat-Sync: no pending chat deletions to patch" }
-            return null
+            return getEmptyRequest()
         }
 
         logcat { "DuckChat-Sync: formatting patch request for ${pendingIds.size} pending chat deletions" }
@@ -155,9 +196,25 @@ class DuckChatSyncDataManager @Inject constructor(
             )
         }
 
-        return SyncPatchRequest(
-            type = DeletableType.DUCK_AI_CHATS,
+        return SyncChangesRequest(
+            type = SyncableType.DUCK_AI_CHATS,
             jsonString = jsonArray.toString(),
+            modifiedSince = ModifiedSince.Timestamp(SyncDateProvider.now()),
         )
+    }
+
+    private class Adapters {
+        companion object {
+            private val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory()).build()
+            val patchResponseAdapter: JsonAdapter<SyncPatchResponse> =
+                moshi.adapter(SyncPatchResponse::class.java)
+        }
+    }
+
+    data class SyncPatchResponse(@property:Json(name = "ai_chats") val aiChats: AiChatsResponse) {
+        data class AiChatsResponse(val entries: List<AiChatEntry>) {
+            data class AiChatEntry(val id: String, val deleted: String? = null)
+        }
     }
 }

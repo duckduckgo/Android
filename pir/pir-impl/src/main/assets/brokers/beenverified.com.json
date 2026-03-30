@@ -1,7 +1,7 @@
 {
   "name": "BeenVerified",
   "url": "beenverified.com",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "optOutUrl": "https://www.beenverified.com/svc/optout/search/optouts",
   "mirrorSites": [
     {
@@ -161,7 +161,7 @@
     },
     {
       "stepType": "optOut",
-      "scanType": "formOptOut",
+      "optOutType": "formOptOut",
       "actions": [
         {
           "actionType": "navigate",
@@ -220,7 +220,6 @@
           ],
           "id": "018eb6ef-b469-41a6-af92-da9056c00781"
         },
-
         {
           "actionType": "expectation",
           "expectations": [

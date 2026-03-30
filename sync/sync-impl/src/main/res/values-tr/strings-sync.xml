@@ -220,4 +220,10 @@
     <string name="getDesktopBrowserSettingItemTitle">Masaüstü Tarayıcısını Edinin</string>
     <string name="getDesktopBrowserSettingItemSubtitleTitle">Mac ve Windows için DuckDuckGo</string>
     <string name="getDesktopBrowserUrl">duckduckgo.com/browser</string>
+
+    <!-- Sync Settings Recovery Section -->
+    <string name="sync_settings_recovery_section_header">Kurtarma</string>
+    <string name="sync_settings_download_recovery_code_item">Kurtarma Kodunu PDF Olarak İndir</string>
+    <string name="sync_settings_download_recovery_code_item_hint">Bu kodu kaydedin ve güvenli bir yerde tutun. Böylece bu cihaza erişiminizi kaybederseniz verilerinizi kurtarabilirsiniz.</string>
+    <string name="sync_settings_data_expiration">Sync &amp; Backup verileri 18 ay kullanılmadıktan sonra kurtarılamaz. <annotation type="learn_more_link">Daha fazla bilgi</annotation></string>
 </resources>

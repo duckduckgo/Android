@@ -423,6 +423,9 @@ class DuckChatContextualFragment :
                 viewModel.onContextualClose()
                 startActivity(browserNav.openInNewTab(requireContext(), query))
             },
+            onImageButtonPressed = {
+                // To be implemented
+            },
         )
         observeViewModel()
 
@@ -584,11 +587,11 @@ class DuckChatContextualFragment :
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached -> {
-                        viewModel.onPageContextReceived(command.tabId, command.pageContext)
+                        viewModel.onPageContextReceived(command.tabId, command.pageContext, command.isStorePageContextEnabled)
                     }
 
-                    DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
-                        viewModel.onMainBrowserPageFinished()
+                    is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished -> {
+                        viewModel.onMainBrowserPageFinished(command.isStorePageContextEnabled)
                     }
 
                     DuckChatContextualSharedViewModel.Command.OpenSheet -> {

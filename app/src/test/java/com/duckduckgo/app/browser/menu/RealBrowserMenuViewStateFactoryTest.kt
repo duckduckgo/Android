@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.menu
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -48,13 +49,15 @@ class RealBrowserMenuViewStateFactoryTest {
     @Mock
     private var duckAiFeatureStateMock: DuckAiFeatureState = mock()
     private val fullscreenModeFlow = MutableStateFlow(false)
+    private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
     @Before
     fun setup() {
         whenever(duckAiFeatureStateMock.showFullScreenMode).thenReturn(fullscreenModeFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, downloadMenuStateProvider, duckDuckGoUrlDetector)
     }
 
     @Test
@@ -370,6 +373,26 @@ class RealBrowserMenuViewStateFactoryTest {
         assertEquals("TAB_ID", visible.tabId)
         assertEquals("example.com", visible.shortUrl)
         assertEquals("Example Site", visible.title)
+        assertNull(visible.serpLogoUrl)
+    }
+
+    @Test
+    fun `when serpLogoUrl is provided then page context header contains it`() = runTest {
+        val result = testee.create(
+            omnibarViewMode = ViewMode.Browser("https://www.example.com/"),
+            viewState = BrowserViewState(),
+            customTabsMode = false,
+            tabId = "TAB_ID",
+            title = "Example Site",
+            shortUrl = "example.com",
+            omnibarText = null,
+            serpLogoUrl = "https://duckduckgo.com/logo.png",
+        )
+        val header = (result as BrowserMenuViewState.Browser).pageContextHeader
+
+        assertTrue(header is PageContextHeaderState.Visible)
+        val visible = header as PageContextHeaderState.Visible
+        assertEquals("https://duckduckgo.com/logo.png", visible.serpLogoUrl)
     }
 
     @Test

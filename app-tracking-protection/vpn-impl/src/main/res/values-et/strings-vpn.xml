@@ -432,4 +432,8 @@
     <string name="apptp_PproUpsellBannerMessage_freeTrial">Telli DuckDuckGo ja saa ainus VPN, mis ühildub App Tracking Protectioniga.</string>
     <string name="apptp_PproUpsellBannerAction_freeTrial">Proovi tasuta!</string>
 
+    <!-- Content Descriptions -->
+    <string name="atp_onboarding_close_button_content_description">Sulge</string>
+    <string name="atp_close_button_content_description">Sulge</string>
+
 </resources>

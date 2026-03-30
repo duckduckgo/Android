@@ -25,6 +25,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.browser.ui.R
 import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState.Visible
+import com.duckduckgo.common.ui.view.StatusIndicatorView
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -120,6 +121,157 @@ class BrowserMenuBottomSheetTest {
         assertTrue(menuHeader.isVisible)
         assertEquals("test.com", headerShortUrl.text.toString())
         assertFalse(headerTitle.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithFireMenuItemThenFireMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.Browser(showFireMenuItem = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithoutFireMenuItemThenFireMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.Browser(showFireMenuItem = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuThenFireMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.DuckAi(pageContextHeader = PageContextHeaderState.DuckAi(tabId = "tab1", title = null))
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.fireMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithVpnMenuItemThenVpnMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.Browser(vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true))
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.vpnMenuItem.isVisible)
+        assertTrue(dialog.vpnMenuItem.findViewById<StatusIndicatorView>(R.id.statusIndicator).isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithVpnMenuHiddenStateThenVpnMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.Browser(vpnMenuState = VpnMenuState.Hidden)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.vpnMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithEmailSignedInThenCreateAliasMenuItemIsVisible() {
+        val viewState = BrowserMenuViewState.NewTabPage(isEmailSignedIn = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.createAliasMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabPageMenuWithEmailNotSignedInThenCreateAliasMenuItemIsHidden() {
+        val viewState = BrowserMenuViewState.NewTabPage(isEmailSignedIn = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.createAliasMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderCustomTabsModeThenMenuActionItemsShouldBeUpdated() {
+        val viewState = BrowserMenuViewState.CustomTabs()
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertFalse(dialog.newTabMenuItem.isVisible)
+        assertFalse(dialog.newDuckChatTabMenuItem.isVisible)
+        assertFalse(dialog.newDuckChatMenuItem.isVisible)
+        assertFalse(dialog.settingsMenuItem.isVisible)
+        assertFalse(dialog.refreshMenuItem.isVisible)
+        assertTrue(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.Browser(showDuckChatOption = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertTrue(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderDuckAIModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.DuckAi()
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatTabMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertTrue(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderNewTabModeThenMenuActionItemIsUpdated() {
+        val viewState = BrowserMenuViewState.NewTabPage(showDuckChatOption = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.backMenuItem.isVisible)
+        assertTrue(dialog.forwardMenuItem.isVisible)
+        assertTrue(dialog.newTabMenuItem.isVisible)
+        assertTrue(dialog.newDuckChatMenuItem.isVisible)
+        assertTrue(dialog.settingsMenuItem.isVisible)
+        assertFalse(dialog.refreshMenuItem.isVisible)
+        assertFalse(dialog.refreshActionMenuItem.isVisible)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithShowDownloadDotTrueThenDownloadDotIndicatorIsVisible() {
+        val viewState = BrowserMenuViewState.Browser(showDownloadDot = true)
+
+        dialog.render(viewState)
+
+        assertTrue(dialog.downloadsMenuItem.showDotIndicator)
+    }
+
+    @Test
+    fun whenRenderBrowserMenuWithShowDownloadDotFalseThenDownloadDotIndicatorIsHidden() {
+        val viewState = BrowserMenuViewState.Browser(showDownloadDot = false)
+
+        dialog.render(viewState)
+
+        assertFalse(dialog.downloadsMenuItem.showDotIndicator)
+    }
+
+    @Test
+    fun whenDialogShownThenPeekHeightIsEightyPercentOfScreenHeight() {
+        val screenHeight = dialog.context.resources.displayMetrics.heightPixels
+        val expectedHeight = screenHeight * BrowserMenuBottomSheet.PEEK_HEIGHT_PERCENT / 100
+
+        assertEquals(expectedHeight, dialog.computePeekHeight())
     }
 
     // region Helpers

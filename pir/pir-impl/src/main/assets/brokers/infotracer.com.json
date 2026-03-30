@@ -1,7 +1,7 @@
 {
   "name": "InfoTracer",
   "url": "infotracer.com",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "addedDatetime": 1770227618445,
   "optOutUrl": "https://members.infotracer.com/removeMyData",
   "steps": [
@@ -198,5 +198,5 @@
     "confirmOptOutScan": 72,
     "maintenanceScan": 240
   },
-  "removedAt": null
+  "removedAt": 1774014286261
 }

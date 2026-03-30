@@ -212,4 +212,8 @@
     <string name="tierPlusName" translatable="false">PLUS</string>
     <string name="tierProName" translatable="false">PRO</string>
 
+    <!-- Content Descriptions -->
+    <string name="subscriptionExpiredStatusIconContentDescription">Prenumerationen har gått ut</string>
+    <string name="subscriptionActiveStatusIconContentDescription">Prenumerationen är aktiv</string>
+
 </resources>

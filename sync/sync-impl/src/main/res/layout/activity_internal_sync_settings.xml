@@ -156,6 +156,25 @@
                     android:text="@string/sync_internal_block_store_clear" />
 
             </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/blockStoreWriteRecoveryCodeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                app:daxButtonSize="large"
+                android:text="@string/sync_internal_block_store_write_recovery_code" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/launchRecoverDataScreenButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                app:daxButtonSize="large"
+                android:text="@string/sync_internal_launch_recover_data_screen"/>
+
         </LinearLayout>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -274,6 +293,21 @@
                 android:maxLines="3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Recovery Code" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/recoveryCodeTextView"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
                 app:typography="body1" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

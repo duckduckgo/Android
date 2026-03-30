@@ -75,11 +75,11 @@ class FirstScreenHandlerImpl @Inject constructor(
         val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
             ?: return DEFAULT_TIMEOUT_MS
         return runCatching {
-            JSONObject(settings).getLong("timeoutMinutes") * 60 * 1000
+            JSONObject(settings).getLong("defaultIdleThresholdSeconds") * 1000
         }.getOrDefault(DEFAULT_TIMEOUT_MS)
     }
 
     companion object {
-        private const val DEFAULT_TIMEOUT_MS = 30 * 60 * 1000L // 30 minutes
+        private const val DEFAULT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
     }
 }

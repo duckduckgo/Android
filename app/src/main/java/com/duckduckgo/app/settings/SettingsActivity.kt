@@ -454,7 +454,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
             is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
-            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget(it.simpleWidgetPrompt)
+            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
             is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
@@ -506,9 +506,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun launchAddHomeScreenWidget(simpleWidgetPrompt: Boolean) {
+    private fun launchAddHomeScreenWidget() {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
-        addWidgetLauncher.launchAddWidget(this, simpleWidgetPrompt)
+        addWidgetLauncher.launchAddWidget(this, true)
     }
 
     private fun launchFeedback() {

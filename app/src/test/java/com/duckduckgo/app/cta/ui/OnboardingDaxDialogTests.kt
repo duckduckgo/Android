@@ -18,7 +18,6 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_NETWORK
 import com.duckduckgo.app.cta.model.CtaId.DAX_DIALOG_OTHER
@@ -81,7 +80,6 @@ class OnboardingDaxDialogTests {
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockSubscriptions: Subscriptions = mock()
-    private val mockOnboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles = mock()
     private val mockDuckChat: DuckChat = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
 
@@ -92,7 +90,7 @@ class OnboardingDaxDialogTests {
     fun before() = runTest {
         whenever(extendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockDisabledToggle)
-        whenever(extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
 
         testee = CtaViewModel(
@@ -112,7 +110,6 @@ class OnboardingDaxDialogTests {
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
-            mockOnboardingHomeScreenWidgetToggles,
         )
     }
 
@@ -263,7 +260,7 @@ class OnboardingDaxDialogTests {
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockEnabledToggle)
         whenever(extendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockSubscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
@@ -277,7 +274,7 @@ class OnboardingDaxDialogTests {
         )
 
         assertNotNull(result)
-        assertTrue(result is DaxBubbleCta.DaxPrivacyProCta)
+        assertTrue(result is SubscriptionPromoModalCta)
     }
 
     @Test
@@ -295,7 +292,7 @@ class OnboardingDaxDialogTests {
             detectedRefreshPatterns = emptySet(),
         )
 
-        assertFalse(result is DaxBubbleCta.DaxPrivacyProCta)
+        assertFalse(result is SubscriptionPromoModalCta)
     }
 
     @Test
@@ -313,7 +310,7 @@ class OnboardingDaxDialogTests {
             detectedRefreshPatterns = emptySet(),
         )
 
-        assertFalse(result is DaxBubbleCta.DaxPrivacyProCta)
+        assertFalse(result is SubscriptionPromoModalCta)
     }
 
     @Test
@@ -322,7 +319,7 @@ class OnboardingDaxDialogTests {
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(extendedOnboardingFeatureToggles.subscriptionPromoModalCta()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
 
         val result = testee.refreshCta(
@@ -332,6 +329,6 @@ class OnboardingDaxDialogTests {
             detectedRefreshPatterns = emptySet(),
         )
 
-        assertFalse(result is DaxBubbleCta.DaxPrivacyProCta)
+        assertFalse(result is SubscriptionPromoModalCta)
     }
 }

@@ -21,17 +21,27 @@
             {
                 "key": "consentManaged",
                 "description": "1 if the Cookie Prompt Management (CPM) feature ran on the page.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
             },
             {
                 "key": "consentOptoutFailed",
                 "description": "1 if the Cookie Prompt Management (CPM) feature failed to run on the page.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
             },
             {
                 "key": "consentSelftestFailed",
                 "description": "1 if the Cookie Prompt Management (CPM) feature's self-test of the page's consent settings detected an issue.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "consentRule",
+                "description": "Name of the CMP rule that was applied on the page, if any.",
+                "type": "string"
+            },
+            {
+                "key": "consentReloadLoop",
+                "description": "1 if a CPM reload loop was detected on the page.",
+                "enum": ["0", "1"]
             },
             {
                 "key": "description",
@@ -211,17 +221,27 @@
             {
                 "key": "consentManaged",
                 "description": "1 if the Cookie Prompt Management (CPM) feature ran on the page.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
             },
             {
                 "key": "consentOptoutFailed",
                 "description": "1 if the Cookie Prompt Management (CPM) feature failed to run on the page.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
             },
             {
                 "key": "consentSelftestFailed",
                 "description": "1 if the Cookie Prompt Management (CPM) feature's self-test of the page's consent settings detected an issue.",
-                "enum": ["", "0", "1"]
+                "enum": ["0", "1"]
+            },
+            {
+                "key": "consentRule",
+                "description": "Name of the CMP rule that was applied on the page, if any.",
+                "type": "string"
+            },
+            {
+                "key": "consentReloadLoop",
+                "description": "1 if a CPM reload loop was detected on the page.",
+                "enum": ["0", "1"]
             },
             {
                 "key": "errorDescriptions",

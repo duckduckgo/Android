@@ -639,7 +639,7 @@ class AutomaticDataClearerTest {
 
         verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @UiThreadTest
@@ -654,7 +654,7 @@ class AutomaticDataClearerTest {
 
         verify(mockDataClearing).shouldClearDataAutomatically(false, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @UiThreadTest
@@ -670,7 +670,7 @@ class AutomaticDataClearerTest {
         verify(mockDataClearing).shouldClearDataAutomatically(true, true, false)
         verify(mockDataClearing).clearDataUsingAutomaticFireOptions(false)
         verify(mockClearAction, never()).setAppUsedSinceLastClearFlag(false)
-        verify(mockClearAction, never()).killAndRestartProcess(any(), any())
+        verify(mockClearAction, never()).killAndRestartProcess(any(), any(), any())
     }
 
     @Test
@@ -773,11 +773,11 @@ class AutomaticDataClearerTest {
     }
 
     private fun enableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(true))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(true))
     }
 
     private fun disableGranularFeature() {
-        fakeAndroidBrowserConfigFeature.improvedDataClearingOptions().setRawStoredState(State(false))
+        fakeAndroidBrowserConfigFeature.singleTabFireDialog().setRawStoredState(State(false))
     }
 
     private suspend fun configureShouldClearAutomatically(shouldClear: Boolean) {

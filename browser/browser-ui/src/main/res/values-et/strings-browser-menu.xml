@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Loo Duck Address</string>
     <string name="browserMenuFindInPage">Otsi lehel</string>
     <string name="browserMenuPrint">Prindi leht</string>
+    <string name="browserMenuPrintSite">Prindi</string>
     <string name="browserMenuOpenAppLink">Ava rakenduses</string>
     <string name="browserMenuAddToHome">Lisa kodukuvale</string>
     <string name="browserMenuReportBrokenSite">Teata mittetoimivast saidist</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Uus vestlus</string>
     <string name="browserMenuNewAIChat">Uus AI vestlus</string>
     <string name="browserMenuChatHistory">Vestluse ajalugu</string>
+    <string name="browserMenuDuckChatHistory">Duck.ai vestlused</string>
     <string name="browserMenuChatSettings">Duck.ai seaded</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Tagasi</string>
     <string name="browserMenuForward">Edasi</string>
     <string name="browserMenuRefresh">Värskenda</string>
+    <string name="browserMenuFireTabsData">Kustuta vahekaardid ja andmed</string>
 </resources>

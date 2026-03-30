@@ -202,6 +202,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 consentManaged = report.consentManaged.toBoolean(),
                 consentOptOutFailed = report.consentOptOutFailed.toBoolean(),
                 consentSelfTestFailed = report.consentSelfTestFailed.toBoolean(),
+                consentRule = null,
+                consentReloadLoop = false,
                 errorCodes = "",
                 httpErrorCodes = "",
                 loginSite = null,

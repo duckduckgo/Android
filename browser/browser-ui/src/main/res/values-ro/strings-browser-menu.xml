@@ -33,6 +33,7 @@
     <string name="browserMenuEmailAlias">Generează Duck Address</string>
     <string name="browserMenuFindInPage">Caută în pagină</string>
     <string name="browserMenuPrint">Imprimă pagina</string>
+    <string name="browserMenuPrintSite">Tipărire</string>
     <string name="browserMenuOpenAppLink">Deschide în aplicație</string>
     <string name="browserMenuAddToHome">Adaugă pe ecranul de pornire</string>
     <string name="browserMenuReportBrokenSite">Raportează Site-ul Defect</string>
@@ -45,6 +46,7 @@
     <string name="browserMenuNewChat">Chat nou</string>
     <string name="browserMenuNewAIChat">Chat AI nou</string>
     <string name="browserMenuChatHistory">Istoricul chaturilor</string>
+    <string name="browserMenuDuckChatHistory">Chaturi Duck.ai</string>
     <string name="browserMenuChatSettings">Setări Duck.ai</string>
     <string name="browserMenuVPN">VPN</string>
     <!-- smartling.character_limit = 15 -->
@@ -54,4 +56,5 @@
     <string name="browserMenuBack">Înapoi</string>
     <string name="browserMenuForward">Înainte</string>
     <string name="browserMenuRefresh">Reîncărcare</string>
+    <string name="browserMenuFireTabsData">Șterge filele și datele</string>
 </resources>

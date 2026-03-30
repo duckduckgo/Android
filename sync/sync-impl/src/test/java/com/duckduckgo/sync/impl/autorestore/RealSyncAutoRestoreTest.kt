@@ -105,6 +105,7 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenRestoreSyncAccountCalledThenRetrievesKeyAndCallsProcessCode() = runTest {
+        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
         val deviceId = "device-abc-123"
         configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = deviceId))
@@ -114,6 +115,29 @@ class RealSyncAutoRestoreTest {
 
         verify(syncAccountRepository).parseSyncAuthCode(recoveryCodeString)
         verify(syncAccountRepository).processCode(any(), eq(deviceId))
+    }
+
+    @Test
+    fun whenRestoreSucceedsThenSavesAutoRestoreDataToReaffirmPreferenceAndPayload() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        val deviceId = "device-abc-123"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = deviceId))
+        configureProcessCodeResult(SyncResult.Success(true))
+
+        testee.restoreSyncAccount()
+
+        verify(manager).saveAutoRestoreData(recoveryCodeString, deviceId)
+    }
+
+    @Test
+    fun whenRestoreFailsThenDoesNotSaveAutoRestoreData() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = "device-123"))
+        configureProcessCodeResult(SyncResult.Error(code = 52, reason = "Login failed"))
+
+        testee.restoreSyncAccount()
+
+        verify(manager, never()).saveAutoRestoreData(any(), anyOrNull())
     }
 
     @Test
@@ -156,12 +180,23 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenParseSyncAuthCodeThrowsThenRestoreSyncAccountDoesNotCrash() = runTest {
+        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "invalid_not_base64"
         configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = "device-123"))
         whenever(syncAccountRepository.parseSyncAuthCode(recoveryCodeString)).thenThrow(RuntimeException("Parse error"))
 
         testee.restoreSyncAccount()
 
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenRestoreSyncAccountCalledButFFDisabledThenDoesNotAccessStorage() = runTest {
+        configureAutoRestoreEnabled(false)
+
+        testee.restoreSyncAccount()
+
+        verify(manager, never()).retrieveRecoveryPayload()
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 

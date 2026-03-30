@@ -12,5 +12,47 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "tabs", "data", "chats"]
+    },
+    "m_fire_dialog_single_tab_clear_pressed": {
+        "description": "The user pressed clear in the single tab fire dialog",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_dialog_clear_pressed_daily": {
+        "description": "The user pressed clear in the fire dialog (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_button_tapped_settings": {
+        "description": "The fire button was tapped from settings",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": [["form_factor"], ["first_daily_count", "form_factor"]],
+        "parameters": ["appVersion"]
+    },
+    "m_fire_button_tapped_browser_daily": {
+        "description": "The fire button was tapped from the browser (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "from_focused_ntp",
+                "description": "Whether the fire button was tapped while the address bar was focused on the new tab page",
+                "type": "boolean"
+            }
+        ]
+    },
+    "m_fire_button_tapped_tab_switcher_daily": {
+        "description": "The fire button was tapped from the tab switcher (daily)",
+        "owners": ["0nko"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
