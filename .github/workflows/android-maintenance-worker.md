@@ -6,7 +6,6 @@ description: |
   and project recommendations.
 
 on:
-  schedule: daily
   workflow_dispatch:
 
 permissions:
