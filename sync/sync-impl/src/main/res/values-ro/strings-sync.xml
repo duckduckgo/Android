@@ -56,6 +56,11 @@
     <string name="sync_intro_enable_content_with_ai_chat">Aceasta creează o copie de rezervă criptată a marcajelor, parolelor și chaturilor Duck.ai pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive ale tale. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa.</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Recuperează-ți datele sincronizate</string>
+    <string name="sync_recover_synced_data_content">Vei avea nevoie de codul de recuperare pe care l-ai primit când ai configurat Sync &amp; Backup. Este posibil să-l fi salvat ca PDF pe dispozitivul pe care l-ai folosit.</string>
+    <string name="sync_recover_synced_data_cta">Recuperează datele sincronizate</string>
+
     <!-- Recover data screen -->
     <string name="login_screen_title">Scanează codul QR</string>
     <string name="login_screen_enter_code_cta">Completează manual codul</string>
