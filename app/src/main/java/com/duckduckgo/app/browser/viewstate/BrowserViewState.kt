@@ -63,6 +63,7 @@ data class BrowserViewState(
     val vpnMenuState: VpnMenuState = VpnMenuState.Hidden,
     val currentPdfCachedUri: Uri? = null,
     val currentPdfFileName: String? = null,
+    val isOmnibarLockedForOnboarding: Boolean = false,
 )
 
 sealed class HighlightableButton {

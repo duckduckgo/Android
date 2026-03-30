@@ -5720,6 +5720,7 @@ class BrowserTabFragment :
                 }
 
                 browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
+                browserNavigationBarIntegration.configureLockForOnboarding(locked = viewState.isOmnibarLockedForOnboarding)
 
                 renderBrowserMenu(viewState)
 
