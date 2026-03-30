@@ -428,7 +428,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     state.hasAnimatedCurrentDialog -> {
                         val dialog = state.currentDialog ?: return@onEach
                         binding.root.doOnLayout {
-                            showDialogWithoutAnimation(dialog, state.showSplitOption)
+                            showDialogWithoutAnimation(dialog, state.showSplitOption, state.selectedAddressBarPosition)
                         }
                     }
                     else -> {
@@ -836,6 +836,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private fun showDialogWithoutAnimation(
         onboardingDialogType: PreOnboardingDialogType,
         showSplitOption: Boolean = false,
+        selectedAddressBarPosition: OmnibarType = OmnibarType.SINGLE_TOP,
     ) {
         snapToIntroEndState()
 
@@ -1031,7 +1032,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     playAnimation()
                 }
 
-                setAddressBarPositionOptions(OmnibarType.SINGLE_TOP, showSplitOption)
+                setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
             }
 
             INPUT_SCREEN -> {
