@@ -1698,6 +1698,9 @@ class BrowserTabFragment :
             onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
             }
+            onMenuItemLongClicked(backMenuItem) {
+                onBackArrowLongClicked()
+            }
             onMenuItemClicked(forwardMenuItem) {
                 onForwardArrowClicked()
             }
