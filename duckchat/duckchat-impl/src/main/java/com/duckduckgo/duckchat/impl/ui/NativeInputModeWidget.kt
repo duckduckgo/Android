@@ -151,7 +151,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         imageButton.setOnClickListener { onImageClick?.invoke() }
-        modelPickerView.setEnabled(isChatTabSelected())
+        modelPickerView.setPickerEnabled(isChatTabSelected())
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -286,12 +286,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
-                    modelPickerView.setEnabled(isChatTabSelected())
+                    modelPickerView.setPickerEnabled(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
-                    modelPickerView.setEnabled(isChatTabSelected())
+                    modelPickerView.setPickerEnabled(isChatTabSelected())
                 }
             },
         )

@@ -50,7 +50,7 @@ import javax.inject.Inject
 interface ModelPicker {
     fun isMenuVisible(): Boolean
     fun getSelectedModelId(): String?
-    fun setEnabled(enabled: Boolean)
+    fun setPickerEnabled(enabled: Boolean)
 }
 
 @InjectWith(ViewScope::class)
@@ -77,15 +77,15 @@ class ModelPickerView @JvmOverloads constructor(
 
     override fun getSelectedModelId(): String? = viewModel.getSelectedModelId()
 
-    private var enabled = false
+    private var pickerEnabled = false
 
-    override fun setEnabled(enabled: Boolean) {
-        this.enabled = enabled
+    override fun setPickerEnabled(enabled: Boolean) {
+        this.pickerEnabled = enabled
         if (isAttachedToWindow) updateVisibility()
     }
 
     private fun updateVisibility() {
-        isVisible = enabled && viewModel.state.value.models.isNotEmpty()
+        isVisible = pickerEnabled && viewModel.state.value.models.isNotEmpty()
     }
 
     override fun onAttachedToWindow() {
