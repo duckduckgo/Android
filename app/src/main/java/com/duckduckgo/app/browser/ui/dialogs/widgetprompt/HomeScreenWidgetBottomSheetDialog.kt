@@ -26,8 +26,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
-class AlternativeHomeScreenWidgetBottomSheetDialog(
-    private val context: Context,
+class HomeScreenWidgetBottomSheetDialog(
+    context: Context,
     isLightModeEnabled: Boolean,
 ) : BottomSheetDialog(context) {
 

@@ -865,8 +865,7 @@ sealed class HomePanelCta(
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
-    // Base class to hold the shared configuration. This is temporary, for an experiment.
-    open class AddWidgetAutoBase :
+    data object AddWidgetAutoOnboarding :
         HomePanelCta(
             CtaId.ADD_WIDGET,
             R.drawable.add_widget_cta_icon,
@@ -878,10 +877,6 @@ sealed class HomePanelCta(
             AppPixelName.WIDGET_CTA_LAUNCHED,
             AppPixelName.WIDGET_CTA_DISMISSED,
         )
-
-    data object AddWidgetAuto : AddWidgetAutoBase()
-
-    data object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
 
     data object AddWidgetInstructions : HomePanelCta(
         CtaId.ADD_WIDGET,

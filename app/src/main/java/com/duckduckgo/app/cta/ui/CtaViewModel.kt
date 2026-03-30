@@ -20,12 +20,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.ui.dialogs.widgetprompt.OnboardingHomeScreenWidgetToggles
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
-import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboarding
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -86,7 +84,6 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val onboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -274,13 +271,7 @@ class CtaViewModel @Inject constructor(
             // Add Widget
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                    val showOnboardingHomeScreenWidgetPrompt = onboardingHomeScreenWidgetToggles.self().isEnabled() &&
-                        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetPrompt().isEnabled()
-                    if (showOnboardingHomeScreenWidgetPrompt) {
-                        AddWidgetAutoOnboardingExperiment
-                    } else {
-                        AddWidgetAuto
-                    }
+                    AddWidgetAutoOnboarding
                 } else {
                     AddWidgetInstructions
                 }
