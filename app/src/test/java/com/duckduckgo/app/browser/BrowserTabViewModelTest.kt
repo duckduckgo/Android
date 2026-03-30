@@ -9773,4 +9773,69 @@ class BrowserTabViewModelTest {
 
         assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
     }
+
+    @Test
+    fun whenNavigatingToDuckAiOnboardingUrlThenOmnibarLockedForOnboarding() = runTest {
+        val onboardingUrl = "https://duck.ai/chat?flow=mobile-app-onboarding"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        loadUrl(onboardingUrl)
+
+        assertTrue(browserViewState().isOmnibarLockedForOnboarding)
+    }
+
+    @Test
+    fun whenNavigatingToDuckAiUrlWithoutOnboardingParamThenOmnibarNotLocked() = runTest {
+        val regularDuckAiUrl = "https://duck.ai/chat"
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+
+        loadUrl(regularDuckAiUrl)
+
+        assertFalse(browserViewState().isOmnibarLockedForOnboarding)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndOmnibarLockedThenLockIsPreserved() = runTest {
+        testee.browserViewState.value = browserViewState().copy(isOmnibarLockedForOnboarding = true)
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+
+        assertTrue(browserViewState().isOmnibarLockedForOnboarding)
+    }
+
+    @Test
+    fun whenFireMenuSelectedWithHighlightAndLockThenBothArePreserved() = runTest {
+        dismissedCtaDaoChannel.send(emptyList())
+
+        // Set the CTA so showPulseAnimation keeps emitting true and sustains the highlight
+        testee.ctaViewState.value = ctaViewState().copy(
+            cta = DaxDuckAiFireButtonCta(mockOnboardingStore, mockAppInstallStore),
+        )
+        testee.browserViewState.value = browserViewState().copy(
+            isOmnibarLockedForOnboarding = true,
+        )
+        advanceUntilIdle()
+
+        // Highlight should be set by the pulse animation observer
+        assertTrue((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.DuckAI)
+        advanceUntilIdle()
+
+        val viewState = browserViewState()
+        assertTrue((viewState.fireButton as HighlightableButton.Visible).highlighted)
+        assertTrue(viewState.isOmnibarLockedForOnboarding)
+    }
+
+    @Test
+    fun whenFireMenuSelectedWithHighlightButNoLockThenHighlightIsCleared() = runTest {
+        testee.browserViewState.value = browserViewState().copy(
+            fireButton = HighlightableButton.Visible(highlighted = true),
+            isOmnibarLockedForOnboarding = false,
+        )
+
+        testee.onFireMenuSelected(Omnibar.ViewMode.Browser(exampleUrl))
+
+        assertFalse((browserViewState().fireButton as HighlightableButton.Visible).highlighted)
+    }
 }

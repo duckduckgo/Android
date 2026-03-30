@@ -851,7 +851,8 @@ class OmnibarLayout @JvmOverloads constructor(
 
         previousTransitionState = newTransitionState
 
-        enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
+        enableTextInputClickCatcher(viewState.showTextInputClickCatcher || viewState.isLockedForOnboarding)
+        applyOnboardingLock(viewState)
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {
@@ -996,6 +997,10 @@ class OmnibarLayout @JvmOverloads constructor(
 
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
+            }
+
+            is Decoration.LockForOnboarding -> {
+                viewModel.onLockForOnboarding(decoration.locked)
             }
 
             is Decoration.CancelEasterEggLogoAnimation -> viewModel.onCancelAddressBarAnimations()
@@ -1471,6 +1476,43 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    private fun applyOnboardingLock(viewState: ViewState) {
+        val locked = viewState.isLockedForOnboarding
+        val lockedAlpha = if (locked) ONBOARDING_LOCK_DISABLED_ALPHA else 1.0f
+        tabsMenu.isEnabled = !locked
+        tabsMenu.alpha = lockedAlpha
+        browserMenu.isEnabled = !locked
+        browserMenu.alpha = lockedAlpha
+        aiChatMenu?.isEnabled = !locked
+        aiChatMenu?.alpha = lockedAlpha
+        voiceSearchButton.isEnabled = !locked
+        voiceSearchButton.alpha = lockedAlpha
+        clearTextButton.isEnabled = !locked
+        clearTextButton.alpha = lockedAlpha
+        duckAISidebar.isEnabled = !locked
+        duckAISidebar.alpha = lockedAlpha
+        duckAIHeader.isEnabled = !locked
+        duckAIHeader.alpha = lockedAlpha
+        shieldIcon.isEnabled = !locked
+        shieldIcon.alpha = lockedAlpha
+        omnibarTextInput.alpha = lockedAlpha
+
+        // Fire button is exempt from the lock when highlighted
+        val fireButtonLocked = locked && !viewState.highlightFireButton.isHighlighted()
+        val fireButtonAlpha = if (fireButtonLocked) ONBOARDING_LOCK_DISABLED_ALPHA else 1.0f
+        fireIconMenu.isEnabled = !fireButtonLocked
+        fireIconMenu.alpha = fireButtonAlpha
+
+        // When locked, the click catcher should not launch the input screen
+        if (locked) {
+            omnibarTextInputClickCatcher.setOnClickListener(null)
+        } else if (omnibarInputScreenLaunchListener != null) {
+            omnibarTextInputClickCatcher.setOnClickListener {
+                viewModel.onTextInputClickCatcherClicked()
+            }
+        }
+    }
+
     override fun setInputScreenLaunchListener(listener: InputScreenLaunchListener) {
         omnibarInputScreenLaunchListener = listener
         omnibarTextInputClickCatcher.setOnClickListener {
@@ -1559,5 +1601,6 @@ class OmnibarLayout @JvmOverloads constructor(
 
     companion object {
         private const val EASTER_EGG_ANIMATION_DELAY_MS = 1000L
+        private const val ONBOARDING_LOCK_DISABLED_ALPHA = 0.4f
     }
 }

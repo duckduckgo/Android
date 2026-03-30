@@ -78,6 +78,10 @@ class BrowserNavigationBarViewIntegration(
         navigationBarView.setFireButtonHighlight(highlighted)
     }
 
+    fun configureLockForOnboarding(locked: Boolean) {
+        navigationBarView.setLockedForOnboarding(locked)
+    }
+
     fun configureBrowserMenuIcon(@DrawableRes icon: Int) {
         navigationBarView.setBrowserMenuIcon(icon)
     }

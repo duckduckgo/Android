@@ -2650,4 +2650,61 @@ class OmnibarLayoutViewModelTest {
             )
         }
     }
+
+    @Test
+    fun whenOnLockForOnboardingTrueThenViewStateIsLocked() = runTest {
+        testee.onLockForOnboarding(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isLockedForOnboarding)
+        }
+    }
+
+    @Test
+    fun whenOnLockForOnboardingFalseThenViewStateIsUnlocked() = runTest {
+        testee.onLockForOnboarding(true)
+        testee.onLockForOnboarding(false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.isLockedForOnboarding)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndLockedForOnboardingThenHighlightPreserved() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onLockForOnboarding(true)
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = true,
+                ),
+            )
+            assertFalse(viewState.scrollingEnabled)
+            assertTrue(viewState.isLockedForOnboarding)
+        }
+    }
+
+    @Test
+    fun whenFireIconPressedAndNotLockedForOnboardingThenHighlightCleared() = runTest {
+        testee.onHighlightItem(Decoration.HighlightOmnibarItem(fireButton = true, privacyShield = false))
+        testee.onFireIconPressed(true)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(
+                viewState.highlightFireButton == HighlightableButton.Visible(
+                    enabled = true,
+                    highlighted = false,
+                ),
+            )
+            assertTrue(viewState.scrollingEnabled)
+        }
+    }
 }

@@ -230,6 +230,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showDuckAISidebar: Boolean = false,
         val isAddressBarTrackersAnimationEnabled: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
+        val isLockedForOnboarding: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(
             isFullUrlEnabled: Boolean,
@@ -668,7 +669,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onFireIconPressed(pulseAnimationPlaying: Boolean) {
         logcat { "Omnibar: onFireIconPressed" }
-        if (_viewState.value.highlightFireButton.isHighlighted()) {
+        if (_viewState.value.highlightFireButton.isHighlighted() && !_viewState.value.isLockedForOnboarding) {
             _viewState.update {
                 it.copy(
                     highlightFireButton = HighlightableButton.Visible(
@@ -772,6 +773,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 ),
                 scrollingEnabled = !isScrollingDisabled,
             )
+        }
+    }
+
+    fun onLockForOnboarding(locked: Boolean) {
+        _viewState.update {
+            it.copy(isLockedForOnboarding = locked)
         }
     }
 

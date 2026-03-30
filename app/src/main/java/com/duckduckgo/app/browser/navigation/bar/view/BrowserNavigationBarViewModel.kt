@@ -163,6 +163,14 @@ class BrowserNavigationBarViewModel @Inject constructor(
         }
     }
 
+    fun setLockedForOnboarding(locked: Boolean) {
+        _viewState.update {
+            it.copy(
+                isLockedForOnboarding = locked,
+            )
+        }
+    }
+
     sealed class Command {
         data object NotifyFireButtonClicked : Command()
         data object NotifyTabsButtonClicked : Command()
@@ -185,5 +193,6 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val hasUnreadTabs: Boolean = false,
         val showBrowserMenuHighlight: Boolean = false,
         val showShadow: Boolean = true,
+        val isLockedForOnboarding: Boolean = false,
     )
 }

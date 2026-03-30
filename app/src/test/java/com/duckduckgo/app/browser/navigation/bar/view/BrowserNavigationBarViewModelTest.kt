@@ -221,4 +221,26 @@ class BrowserNavigationBarViewModelTest {
             Assert.assertFalse(hidden.isVisible)
         }
     }
+
+    @Test
+    fun `when setLockedForOnboarding true then viewState is locked`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setLockedForOnboarding(true)
+            val updated = awaitItem()
+            Assert.assertTrue(updated.isLockedForOnboarding)
+        }
+    }
+
+    @Test
+    fun `when setLockedForOnboarding false then viewState is unlocked`() = runTest {
+        testee.viewState.test {
+            awaitItem() // initial
+            testee.setLockedForOnboarding(true)
+            awaitItem() // locked
+            testee.setLockedForOnboarding(false)
+            val updated = awaitItem()
+            Assert.assertFalse(updated.isLockedForOnboarding)
+        }
+    }
 }
