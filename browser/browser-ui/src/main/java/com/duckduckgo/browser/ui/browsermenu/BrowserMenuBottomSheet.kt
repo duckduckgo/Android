@@ -398,6 +398,7 @@ class BrowserMenuBottomSheet(
                 val serpLogoUrl = pageContextHeaderState.serpLogoUrl
                 if (serpLogoUrl != null) {
                     Glide.with(binding.menuHeader.headerFavicon)
+                        .asBitmap()
                         .load(serpLogoUrl)
                         .placeholder(drawable.ic_dax_icon)
                         .error(drawable.ic_dax_icon)
