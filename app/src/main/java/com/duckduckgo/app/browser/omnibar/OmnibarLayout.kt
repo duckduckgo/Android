@@ -99,6 +99,7 @@ import com.duckduckgo.app.browser.omnibar.model.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.model.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.model.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.model.StateChange
+import com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -304,6 +305,7 @@ class OmnibarLayout @JvmOverloads constructor(
         findViewById(R.id.addressBarTrackersBlockedAnimationShieldIcon)
     }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
+    internal val pageLoadProgressBar: PageLoadProgressBar by lazy { findViewById(R.id.pageLoadProgressBar) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     override val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
     internal val globeIcon: ImageView by lazy { findViewById(R.id.globeIcon) }
@@ -871,12 +873,16 @@ class OmnibarLayout @JvmOverloads constructor(
             setExpanded(true, viewState.expandedAnimated)
         }
 
-        if (viewState.isLoading) {
-            pageLoadingIndicator.show()
-        }
-        smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
-            if (!viewState.isLoading) {
-                pageLoadingIndicator.hide()
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            if (viewState.isLoading) {
+                pageLoadingIndicator.show()
+            }
+            smoothProgressAnimator.onNewProgress(viewState.loadingProgress) {
+                if (!viewState.isLoading) {
+                    pageLoadingIndicator.hide()
+                }
             }
         }
 
@@ -903,8 +909,25 @@ class OmnibarLayout @JvmOverloads constructor(
         logcat { "Omnibar: renderDuckAiMode $viewState" }
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
-        pageLoadingIndicator.isVisible = viewState.isLoading
+        if (viewState.isProgressBarUpgradeEnabled) {
+            updatePageLoadProgressBar(viewState)
+        } else {
+            pageLoadingIndicator.isVisible = viewState.isLoading
+        }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+    }
+
+    private fun updatePageLoadProgressBar(viewState: ViewState) {
+        if (viewState.isLoading) {
+            if (!pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.start()
+            }
+            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+        } else {
+            if (pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.triggerCompletion()
+            }
+        }
     }
 
     private fun renderCustomTabMode(
@@ -1408,6 +1431,7 @@ class OmnibarLayout @JvmOverloads constructor(
         newCustomTabToolbarContainer.customTabDomain.isSaveEnabled = false
 
         pageLoadingIndicator.isSaveEnabled = false
+        pageLoadProgressBar.isSaveEnabled = false
         shieldIcon.isSaveEnabled = false
         omnibarTextInput.isSaveEnabled = false
     }
