@@ -160,4 +160,23 @@
         tools:lottie_progress="0.5"
         tools:visibility="gone" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/bobbingDaxAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="156dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="32dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_address_bar_bobbing_dax"
+        tools:alpha="1"
+        app:lottie_loop="true"
+        tools:lottie_progress="0.5"
+        tools:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
