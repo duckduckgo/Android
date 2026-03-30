@@ -21,6 +21,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -106,6 +107,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var addressBarFadeInAnimatorSet: AnimatorSet? = null
+    private var bobbingDaxAnimator: ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var changeBoundsTransition: androidx.transition.Transition? = null
     private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
@@ -751,6 +753,29 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.AddressBar,
                     )
+
+                    bobbingDaxAnimator?.cancel()
+                    val screenWidth = binding.root.rootView.width.toFloat()
+                    binding.bobbingDaxAnimation?.also { bobbingDax ->
+                        bobbingDax.isVisible = true
+                        bobbingDax.alpha = 0f
+                        bobbingDax.translationX = screenWidth
+                        bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = OnboardingBackgroundAnimator.ENTER_DURATION
+                            interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
+                            addUpdateListener { animator ->
+                                val progress = animator.animatedValue as Float
+                                bobbingDax.translationX = screenWidth * (1f - progress)
+                                bobbingDax.alpha = OnboardingBackgroundAnimator.enterAlpha(progress)
+                            }
+                            addListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator) {
+                                    bobbingDax.playAnimation()
+                                }
+                            })
+                            start()
+                        }
+                    }
 
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
