@@ -2249,7 +2249,7 @@ class BrowserTabViewModel @Inject constructor(
         // trigger tracker animations before the new page's progress events arrive
         val progress = currentLoadingViewState()
         if (progressBarUpgradeFeature.self().isEnabled() && progress.progress == 100) {
-            loadingViewState.value = progress.copy(isLoading = true, progress = 0)
+            loadingViewState.value = progress.copy(progress = 0)
         }
 
         command.value = Command.PageStarted

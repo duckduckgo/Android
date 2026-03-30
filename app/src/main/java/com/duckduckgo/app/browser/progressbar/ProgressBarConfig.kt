@@ -29,6 +29,6 @@ data class ProgressBarConfig(
     val shimmerBandDelay: Long = 1600L,
     val shimmerBandStartWidthDp: Float = 100f,
     val shimmerBandEndWidthDp: Float = 20f,
-    val shimmerBandStartOpacity: Float = 0.6f,
-    val shimmerBandEndOpacity: Float = 0.8f,
+    val shimmerBandStartOpacity: Float = 0.4f,
+    val shimmerBandEndOpacity: Float = 0.55f,
 )

@@ -158,11 +158,12 @@ class PageLoadProgressBar @JvmOverloads constructor(
 
         val progressWidth = (state.displayProgress / 100f) * width
         val cornerRadius = barHeightPx / 2f
+        val top = height - barHeightPx
         // Draw round rect starting off-screen left so left corners are clipped by the view bounds
-        canvas.drawRoundRect(-cornerRadius, 0f, progressWidth, barHeightPx, cornerRadius, cornerRadius, progressPaint)
+        canvas.drawRoundRect(-cornerRadius, top, progressWidth, height.toFloat(), cornerRadius, cornerRadius, progressPaint)
 
         if (shimmerRenderer.isActive) {
-            shimmerRenderer.draw(canvas, progressWidth, barHeightPx, SystemClock.elapsedRealtime())
+            shimmerRenderer.draw(canvas, progressWidth, top, height.toFloat(), SystemClock.elapsedRealtime())
         }
     }
 

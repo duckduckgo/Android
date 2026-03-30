@@ -52,13 +52,14 @@ class ShimmerRenderer(
     fun draw(
         canvas: Canvas,
         progressWidth: Float,
-        trackHeight: Float,
+        top: Float,
+        bottom: Float,
         now: Long,
     ) {
         if (!isActive || progressWidth <= 0f) return
 
         canvas.save()
-        canvas.clipRect(0f, 0f, progressWidth, trackHeight)
+        canvas.clipRect(0f, top, progressWidth, bottom)
 
         val elapsed = now - shimmerStartTime
 
@@ -85,7 +86,7 @@ class ShimmerRenderer(
             bandPaint.shader = gradient
             bandPaint.alpha = (alpha * 255).roundToInt()
 
-            canvas.drawRect(bandLeft, 0f, bandLeft + bandWidth, trackHeight, bandPaint)
+            canvas.drawRect(bandLeft, top, bandLeft + bandWidth, bottom, bandPaint)
         }
 
         canvas.restore()
