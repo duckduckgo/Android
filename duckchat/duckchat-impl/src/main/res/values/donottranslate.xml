@@ -21,8 +21,6 @@
     <string name="duckAiDefaultTogglePositionSearch">Search</string>
     <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
     <string name="duckAiDefaultTogglePositionLastUsed">Last Used</string>
-    <string name="input_screen_user_pref_without_ai_updated">Search only</string>
-    <string name="input_screen_user_pref_with_ai_updated">Toggle between\nSearch and Duck.ai</string>
 
     <!-- Model Picker -->
     <string name="duckAiModelPickerAdvancedModels" translatable="false">Advanced Models</string>
