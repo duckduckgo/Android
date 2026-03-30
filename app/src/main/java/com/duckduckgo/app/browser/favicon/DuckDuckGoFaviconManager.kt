@@ -90,7 +90,25 @@ class DuckDuckGoFaviconManager constructor(
         return withContext(dispatcherProvider.io()) {
             val domain = url.extractDomain() ?: return@withContext null
 
+            // Reset cache if the user navigated to a new domain; no-op if same domain.
+            invalidateCacheIfNewDomain(tabId, domain)
+
+            // Build the two favicon URLs we would attempt to download.
+            val faviconUrl = getFaviconUrl(domain)?.toString() ?: return@withContext null
+            val touchFaviconUrl = getTouchFaviconUrl(domain)?.toString() ?: return@withContext null
+
+            // If we already attempted (success OR 404) for this domain in this tab session, skip.
+            if (shouldSkipNetworkRequest(tabId, FaviconSource.UrlFavicon(faviconUrl, url)) &&
+                shouldSkipNetworkRequest(tabId, FaviconSource.UrlFavicon(touchFaviconUrl, url))
+            ) {
+                return@withContext null
+            }
+
             val favicon = downloadFaviconFor(domain)
+
+            // Record both URLs as attempted so future onPageFinished calls are skipped.
+            addFaviconUrlToCache(tabId, FaviconSource.UrlFavicon(faviconUrl, url))
+            addFaviconUrlToCache(tabId, FaviconSource.UrlFavicon(touchFaviconUrl, url))
 
             return@withContext if (favicon != null) {
                 saveFavicon(tabId, favicon, domain)
