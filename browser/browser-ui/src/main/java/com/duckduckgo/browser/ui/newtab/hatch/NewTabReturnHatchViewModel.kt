@@ -22,6 +22,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
@@ -39,6 +40,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckChat: DuckChat,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -48,6 +50,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
         val currentTabId: String = "",
         val shouldShow: Boolean = false,
         val isDuckChat: Boolean = false,
+        val isSerp: Boolean = false,
     )
 
     val viewState = tabRepository.flowLastAccessedTab
@@ -61,6 +64,7 @@ class NewTabReturnHatchViewModel @Inject constructor(
                     currentTabId = lastTab.tabId,
                     shouldShow = true,
                     isDuckChat = url.isNotEmpty() && duckChat.isDuckChatUrl(Uri.parse(url)),
+                    isSerp = url.isNotEmpty() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url),
                 )
             } else {
                 ViewState(shouldShow = false)
