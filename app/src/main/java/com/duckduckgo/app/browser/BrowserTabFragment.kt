@@ -1273,9 +1273,10 @@ class BrowserTabFragment :
                                     JSONObject().apply {
                                         put("prompt", query)
                                         put("autoSubmit", true)
-                                        if (modelId != null) {
-                                            put("modelId", modelId)
-                                        }
+                                        // TODO: This currently causes a new chat to be sent if set
+                                        // if (modelId != null) {
+                                        //     put("modelId", modelId)
+                                        // }
                                     },
                                 )
                             },
