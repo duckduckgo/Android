@@ -44,7 +44,7 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     private val playBillingManager: PlayBillingManager,
     private val subscriptionsCachedService: SubscriptionsCachedService,
     private val authRepository: AuthRepository,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
@@ -62,14 +62,14 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     }
 
     private suspend fun isFeaturesApiEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        privacyProFeature.featuresApi().isEnabled()
+        subscriptionsFeature.featuresApi().isEnabled()
     }
 
     private suspend fun fetchSubscriptionFeatures() {
         playBillingManager.productsFlow
             .firstOrNull() { it.isNotEmpty() }
             ?.filter {
-                if (privacyProFeature.fetchProTierEntitlements().isEnabled()) {
+                if (subscriptionsFeature.fetchProTierEntitlements().isEnabled()) {
                     it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
                 } else {
                     it.productId == BASIC_SUBSCRIPTION
@@ -82,7 +82,7 @@ class SubscriptionFeaturesFetcher @Inject constructor(
                 logcat {
                     "fetchSubscriptionFeatures: found base plan ids: $basePlanIds"
                 }
-                if (privacyProFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
+                if (subscriptionsFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
                     basePlanIds
                 } else {
                     basePlanIds.filter {
@@ -92,7 +92,7 @@ class SubscriptionFeaturesFetcher @Inject constructor(
             }
             ?.forEach { basePlanId ->
                 runCatching {
-                    if (privacyProFeature.tierMessagingEnabled().isEnabled()) {
+                    if (subscriptionsFeature.tierMessagingEnabled().isEnabled()) {
                         val features = subscriptionsCachedService.featuresV2(basePlanId).features[basePlanId] ?: emptyList()
                         logcat { "fetchSubscriptionFeatures: Subscription features for base plan $basePlanId fetched: $features" }
                         if (features.isNotEmpty()) {

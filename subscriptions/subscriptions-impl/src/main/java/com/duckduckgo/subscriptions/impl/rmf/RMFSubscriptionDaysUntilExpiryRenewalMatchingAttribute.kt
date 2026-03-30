@@ -38,7 +38,7 @@ import javax.inject.Inject
     boundType = AttributeMatcherPlugin::class,
 )
 @SingleInstanceIn(AppScope::class)
-class RMFPProDaysUntilExpiryRenewalMatchingAttribute @Inject constructor(
+class RMFSubscriptionDaysUntilExpiryRenewalMatchingAttribute @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {

@@ -15,16 +15,16 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
-class RMFPProBillingPeriodMatchingAttributeTest {
+class RMFSubscriptionBillingPeriodMatchingAttributeTest {
     @Mock
     private lateinit var subscriptionsManager: SubscriptionsManager
 
-    private lateinit var matcher: RMFPProBillingPeriodMatchingAttribute
+    private lateinit var matcher: RMFSubscriptionBillingPeriodMatchingAttribute
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        matcher = RMFPProBillingPeriodMatchingAttribute(subscriptionsManager)
+        matcher = RMFSubscriptionBillingPeriodMatchingAttribute(subscriptionsManager)
     }
 
     @Test

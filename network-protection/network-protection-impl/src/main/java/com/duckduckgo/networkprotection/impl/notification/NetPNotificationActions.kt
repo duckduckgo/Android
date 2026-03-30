@@ -26,9 +26,9 @@ import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.SubscriptionFeedbackScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -43,13 +43,13 @@ interface NetPNotificationActions {
 class RealNetPNotificationActions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     @NetpBreakageCategories private val breakageCategories: Provider<List<AppBreakageCategory>>,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
 ) : NetPNotificationActions {
     override fun getReportIssueNotificationAction(context: Context): NotificationCompat.Action {
-        val launchIntent = if (runBlocking { privacyProUnifiedFeedback.shouldUseUnifiedFeedback(VPN_MANAGEMENT) }) {
+        val launchIntent = if (runBlocking { subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(VPN_MANAGEMENT) }) {
             globalActivityStarter.startIntent(
                 context,
-                PrivacyProFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
+                SubscriptionFeedbackScreenWithParams(feedbackSource = VPN_MANAGEMENT),
             )
         } else {
             globalActivityStarter.startIntent(

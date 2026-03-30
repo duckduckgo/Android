@@ -301,7 +301,7 @@ class RealSubscriptionsManager @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val authClient: AuthClient,
     private val authJwtValidator: AuthJwtValidator,
     private val pkceGenerator: PkceGenerator,
@@ -356,7 +356,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun shouldUseAuthV2(): Boolean = withContext(dispatcherProvider.io()) {
-        privacyProFeature.get().authApiV2().isEnabled() || isSignedInV2()
+        subscriptionsFeature.get().authApiV2().isEnabled() || isSignedInV2()
     }
 
     private fun emitEntitlementsValues() {
@@ -429,20 +429,20 @@ class RealSubscriptionsManager @Inject constructor(
         val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
-        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
+        return !userHadFreeTrial && subscriptionsFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun isSwitchPlanAvailable(): Boolean = withContext(dispatcherProvider.io()) {
         val subscription = authRepository.getSubscription()
         val hasActiveSubscription = subscription?.isActive() ?: false
         val isOnFreeTrial = subscription?.activeOffers?.any { it == ActiveOfferType.TRIAL } ?: false
-        val isSwitchFeatureEnabled = privacyProFeature.get().supportsSwitchSubscription().isEnabled()
+        val isSwitchFeatureEnabled = subscriptionsFeature.get().supportsSwitchSubscription().isEnabled()
 
         return@withContext hasActiveSubscription && !isOnFreeTrial && isSwitchFeatureEnabled
     }
 
     override suspend fun blackFridayOfferAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext privacyProFeature.get().blackFridayOffer2025().isEnabled()
+        return@withContext subscriptionsFeature.get().blackFridayOffer2025().isEnabled()
     }
 
     override suspend fun getSwitchPlanPricing(isUpgrade: Boolean): SwitchPlanPricingInfo? = withContext(dispatcherProvider.io()) {
@@ -760,7 +760,7 @@ class RealSubscriptionsManager @Inject constructor(
                 subscriptionPurchaseWideEvent.onPurchaseConfirmationSuccess()
                 if (subscription.activeOffers.contains(ActiveOfferType.TRIAL)) {
                     freeTrialConversionWideEvent.onFreeTrialStarted(subscription.productId)
-                    if (privacyProFeature.get().vpnReminderNotification().isEnabled()) {
+                    if (subscriptionsFeature.get().vpnReminderNotification().isEnabled()) {
                         vpnReminderNotificationScheduler.scheduleVpnReminderNotification()
                     }
                 }
@@ -1139,7 +1139,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (isLaunchedRow()) {
                 addAll(listOf(YEARLY_PLAN_ROW, MONTHLY_PLAN_ROW))
             }
-            if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+            if (subscriptionsFeature.get().allowProTierPurchase().isEnabled()) {
                 addAll(LIST_OF_PRO_PLANS)
             }
         }
@@ -1147,7 +1147,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionOffer(): List<SubscriptionOffer> =
         playBillingManager.products
             .filter {
-                if (privacyProFeature.get().allowProTierPurchase().isEnabled()) {
+                if (subscriptionsFeature.get().allowProTierPurchase().isEnabled()) {
                     it.productId == BASIC_SUBSCRIPTION || it.productId == ADVANCED_SUBSCRIPTION
                 } else {
                     it.productId == BASIC_SUBSCRIPTION
@@ -1197,7 +1197,7 @@ class RealSubscriptionsManager @Inject constructor(
      * When tierMessagingEnabled is OFF: Converts legacy features to entitlements with default tier "plus".
      */
     private suspend fun getEntitlementsForPlan(planId: String): Set<Entitlement> {
-        if (privacyProFeature.get().tierMessagingEnabled().isEnabled()) {
+        if (subscriptionsFeature.get().tierMessagingEnabled().isEnabled()) {
             val v2Entitlements = authRepository.getFeaturesV2(planId)
             if (v2Entitlements.isNotEmpty()) {
                 return v2Entitlements
@@ -1213,7 +1213,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun getLegacyFeatures(planId: String): Set<String> {
-        return if (privacyProFeature.get().featuresApi().isEnabled()) {
+        return if (subscriptionsFeature.get().featuresApi().isEnabled()) {
             authRepository.getFeatures(planId)
         } else {
             when (planId) {
@@ -1468,7 +1468,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun isLaunchedRow(): Boolean = withContext(dispatcherProvider.io()) {
-        privacyProFeature.get().isLaunchedROW().isEnabled()
+        subscriptionsFeature.get().isLaunchedROW().isEnabled()
     }
 
     private fun parseError(e: HttpException): ResponseError? {

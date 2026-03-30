@@ -27,7 +27,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
@@ -39,7 +39,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsJSHelper @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionsFeature: SubscriptionsFeature,
     private val globalActivityStarter: GlobalActivityStarter,
     private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionsJSHelper {
@@ -56,7 +56,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
         logcat { "SubscriptionsJSHelper: processJsCallbackMessage called with method=$method" }
         when (method) {
             METHOD_HANDSHAKE -> id?.let {
-                val availableMethods = if (privacyProFeature.duckAISubscriptionMessaging().isEnabled()) {
+                val availableMethods = if (subscriptionsFeature.duckAISubscriptionMessaging().isEnabled()) {
                     JSONArray().apply {
                         put(SUBSCRIPTION_DETAILS)
                         put(GET_AUTH_ACCESS_TOKEN)
@@ -85,12 +85,12 @@ class RealSubscriptionsJSHelper @Inject constructor(
             }
 
             METHOD_GET_AUTH_ACCESS_TOKEN -> id?.let {
-                if (privacyProFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
+                if (subscriptionsFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
                 getAuthAccessTokenData(featureName, method, it)
             }
 
             METHOD_GET_FEATURE_CONFIG -> id?.let {
-                if (privacyProFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
+                if (subscriptionsFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
                 getFeatureConfigData(featureName, method, it)
             }
 
@@ -196,8 +196,8 @@ class RealSubscriptionsJSHelper @Inject constructor(
         id: String,
     ): JsCallbackData {
         val jsonPayload = JSONObject().apply {
-            put(USE_PAID_DUCK_AI, privacyProFeature.duckAiPlus().isEnabled())
-            put(USE_PRO_TIER, privacyProFeature.allowProTierPurchase().isEnabled())
+            put(USE_PAID_DUCK_AI, subscriptionsFeature.duckAiPlus().isEnabled())
+            put(USE_PRO_TIER, subscriptionsFeature.allowProTierPurchase().isEnabled())
         }
         logcat { "SubscriptionsJSHelper: getFeatureConfig response: $jsonPayload" }
         return JsCallbackData(jsonPayload, featureName, method, id)

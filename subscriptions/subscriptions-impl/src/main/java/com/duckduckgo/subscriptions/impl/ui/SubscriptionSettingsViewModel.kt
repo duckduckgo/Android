@@ -25,14 +25,14 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
@@ -63,8 +63,8 @@ import javax.inject.Inject
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
-    private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
-    private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionUnifiedFeedback: SubscriptionUnifiedFeedback,
+    private val subscriptionsFeature: SubscriptionsFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -110,7 +110,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
 
         // Use firstOrNull() for UI display
-        val pendingPlan = if (privacyProFeature.showPendingPlanHint().isEnabled()) {
+        val pendingPlan = if (subscriptionsFeature.showPendingPlanHint().isEnabled()) {
             subscription.pendingPlans.firstOrNull()
         } else {
             null
@@ -131,7 +131,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             getPendingPlanDisplayName(it.tier, it.billingPeriod)
         }
 
-        val effectiveTier = if (privacyProFeature.showPendingPlanHint().isEnabled()) {
+        val effectiveTier = if (subscriptionsFeature.showPendingPlanHint().isEnabled()) {
             pendingPlan?.tier ?: subscription.tier
         } else {
             subscription.tier
@@ -144,11 +144,11 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 status = subscription.status,
                 platform = subscription.platform,
                 email = account.email?.takeUnless { it.isBlank() },
-                showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
+                showFeedback = subscriptionUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
                 switchPlanAvailable = switchPlanAvailable,
                 savingsPercentage = savingsPercentage,
-                isProTierEnabled = privacyProFeature.allowProTierPurchase().isEnabled(),
+                isProTierEnabled = subscriptionsFeature.allowProTierPurchase().isEnabled(),
                 subscriptionTier = subscription.tier,
                 pendingPlan = pendingPlan,
                 pendingEffectiveDate = pendingEffectiveDate,

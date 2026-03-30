@@ -39,9 +39,9 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_ETLD
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
@@ -65,7 +65,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
-    private val subscriptionsFeature: Lazy<PrivacyProFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
 ) : Subscriptions {
@@ -125,27 +125,27 @@ class RealSubscriptions @Inject constructor(
             }.toSet()
     }
 
-    override fun launchPrivacyPro(context: Context, uri: Uri?) {
+    override fun launchSubscription(context: Context, uri: Uri?) {
         val origin = uri?.getQueryParameter("origin")
         val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
-        val privacyPro = globalActivityStarter.startIntent(
+        val subscriptionIntent = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
                 url = buildSubscriptionUrl(uri),
                 origin = origin,
             ),
         ) ?: return
-        val intents: Array<Intent> = listOf(settings, privacyPro).toTypedArray<Intent>()
+        val intents: Array<Intent> = listOf(settings, subscriptionIntent).toTypedArray<Intent>()
         intents[0] = Intent(intents[0])
         if (!ContextCompat.startActivities(context, intents)) {
             val topIntent = Intent(intents[intents.size - 1])
             context.startActivity(topIntent)
         }
-        pixel.reportPrivacyProRedirect()
+        pixel.reportSubscriptionRedirect()
     }
 
-    override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
-        return if (isPrivacyProUrl(url.toUri())) {
+    override fun shouldLaunchSubscriptionForUrl(url: String): Boolean {
+        return if (isSubscriptionUrl(url.toUri())) {
             runBlocking {
                 isEligible()
             }
@@ -154,11 +154,11 @@ class RealSubscriptions @Inject constructor(
         }
     }
 
-    override fun isPrivacyProUrl(uri: Uri): Boolean {
+    override fun isSubscriptionUrl(uri: Uri): Boolean {
         val eTld = uri.host?.toTldPlusOne() ?: return false
         val size = uri.pathSegments.size
         val path = uri.pathSegments.firstOrNull()
-        return eTld == PRIVACY_PRO_ETLD && size == 1 && (path == PRIVACY_PRO_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
+        return eTld == SUBSCRIPTIONS_ETLD && size == 1 && (path == SUBSCRIPTIONS_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -178,9 +178,9 @@ class RealSubscriptions @Inject constructor(
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "privacyPro",
-    toggleStore = PrivacyProFeatureStore::class,
+    toggleStore = SubscriptionsFeatureStore::class,
 )
-interface PrivacyProFeature {
+interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
@@ -308,8 +308,8 @@ interface PrivacyProFeature {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-@RemoteFeatureStoreNamed(PrivacyProFeature::class)
-class PrivacyProFeatureStore @Inject constructor(
+@RemoteFeatureStoreNamed(SubscriptionsFeature::class)
+class SubscriptionsFeatureStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

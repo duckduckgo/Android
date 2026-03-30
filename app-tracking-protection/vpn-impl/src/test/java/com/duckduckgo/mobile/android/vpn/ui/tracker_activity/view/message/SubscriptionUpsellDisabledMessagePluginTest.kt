@@ -24,14 +24,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class PproUpsellDisabledMessagePluginTest {
+class SubscriptionUpsellDisabledMessagePluginTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val browserNav: BrowserNav = mock()
     private val subscriptions: Subscriptions = mock()
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val vpnDetector: ExternalVpnDetector = mock()
     private val appTPStateMessageToggle: AppTPStateMessageToggle = mock()
-    private lateinit var plugin: PproUpsellDisabledMessagePlugin
+    private lateinit var plugin: SubscriptionUpsellDisabledMessagePlugin
 
     private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
 
@@ -39,11 +39,11 @@ class PproUpsellDisabledMessagePluginTest {
     fun setUp() = runTest {
         whenever(subscriptions.isFreeTrialEligible()).thenReturn(false)
         whenever(appTPStateMessageToggle.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        plugin = PproUpsellDisabledMessagePlugin(subscriptions, vpnDetector, browserNav, deviceShieldPixels, appTPStateMessageToggle)
+        plugin = SubscriptionUpsellDisabledMessagePlugin(subscriptions, vpnDetector, browserNav, deviceShieldPixels, appTPStateMessageToggle)
     }
 
     @Test
-    fun whenVPNIsDisabledWith3rdPartyOnAndUserNotEligibleToPProThenGetViewReturnsNull() = runTest {
+    fun whenVPNIsDisabledWith3rdPartyOnAndUserNotEligibleToSubscriptionThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
@@ -54,7 +54,7 @@ class PproUpsellDisabledMessagePluginTest {
     }
 
     @Test
-    fun whenVPNIsDisabledWith3rdPartyOnAndUserIsSubscriberToPProThenGetViewReturnsNull() = runTest {
+    fun whenVPNIsDisabledWith3rdPartyOnAndUserIsSubscriberToSubscriptionThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(true)
@@ -65,7 +65,7 @@ class PproUpsellDisabledMessagePluginTest {
     }
 
     @Test
-    fun whenVPNIsDisabledWith3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNotNull() = runTest {
+    fun whenVPNIsDisabledWith3rdPartyOnAndUserIsEligibleToSubscriptionThenGetViewReturnsNotNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
@@ -76,7 +76,7 @@ class PproUpsellDisabledMessagePluginTest {
     }
 
     @Test
-    fun whenVPNIsDisabledBy3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
+    fun whenVPNIsDisabledBy3rdPartyOnAndUserIsEligibleToSubscriptionThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
@@ -87,7 +87,7 @@ class PproUpsellDisabledMessagePluginTest {
     }
 
     @Test
-    fun whenVPNIsEnablingWith3rdPartyOnAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
+    fun whenVPNIsEnablingWith3rdPartyOnAndUserIsEligibleToSubscriptionThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)
@@ -98,7 +98,7 @@ class PproUpsellDisabledMessagePluginTest {
     }
 
     @Test
-    fun whenVPNIsEnabledAndUserIsEligibleToPproThenGetViewReturnsNull() = runTest {
+    fun whenVPNIsEnabledAndUserIsEligibleToSubscriptionThenGetViewReturnsNull() = runTest {
         whenever(vpnDetector.isExternalVpnDetected()).thenReturn(true)
         whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(subscriptions.isSignedIn()).thenReturn(false)

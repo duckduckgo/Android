@@ -258,7 +258,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysSinceInstallAndPrivacyProNotShownThenRefreshCtaReturnsPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysSinceInstallAndSubscriptionNotShownThenRefreshCtaReturnsSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -281,7 +281,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsButLessThanSevenDaysSinceInstallThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 3 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
@@ -299,7 +299,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysButPrivacyProAlreadyDismissedThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysButSubscriptionAlreadyDismissedThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(true)
@@ -317,7 +317,7 @@ class OnboardingDaxDialogTests {
     }
 
     @Test
-    fun whenHideTipsAndSevenDaysButSkippedOnboardingToggleOffThenRefreshCtaDoesNotReturnPrivacyProCta() = runTest {
+    fun whenHideTipsAndSevenDaysButSkippedOnboardingToggleOffThenRefreshCtaDoesNotReturnSubscriptionCta() = runTest {
         whenever(settingsDataStore.hideTips).thenReturn(true)
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 8 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)

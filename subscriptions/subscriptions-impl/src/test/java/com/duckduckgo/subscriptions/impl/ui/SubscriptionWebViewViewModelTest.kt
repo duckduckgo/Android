@@ -19,7 +19,6 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PricingPhase
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -33,6 +32,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -79,7 +79,7 @@ class SubscriptionWebViewViewModelTest {
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java, FakeToggleStore())
     private val pirFeature: PirFeature = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
@@ -94,7 +94,7 @@ class SubscriptionWebViewViewModelTest {
             subscriptionsChecker,
             networkProtectionAccessState,
             pixelSender,
-            privacyProFeature,
+            subscriptionsFeature,
             pirFeature,
         )
         givenSubscriptionStatus(UNKNOWN)
@@ -253,7 +253,7 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -272,7 +272,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
         viewModel.commands().test {
@@ -324,7 +324,7 @@ class SubscriptionWebViewViewModelTest {
                 entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
 
         viewModel.commands().test {
@@ -418,7 +418,7 @@ class SubscriptionWebViewViewModelTest {
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -509,7 +509,7 @@ class SubscriptionWebViewViewModelTest {
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -969,7 +969,7 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -992,7 +992,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionTierOptionsAndNoOfferThenSendCommandWithEmptyProducts() = runTest {
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
 
@@ -1044,7 +1044,7 @@ class SubscriptionWebViewViewModelTest {
                 entitlements = setOf(Entitlement("subscriber", SubscriptionsConstants.NETP)),
             ),
         )
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
 
         viewModel.commands().test {
@@ -1102,7 +1102,7 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1196,8 +1196,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1271,8 +1271,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1367,8 +1367,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1428,8 +1428,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1489,8 +1489,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1594,8 +1594,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {
@@ -1708,8 +1708,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = true))
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false) // User not eligible
 
         viewModel.commands().test {
@@ -1824,8 +1824,8 @@ class SubscriptionWebViewViewModelTest {
             ),
         )
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
-        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
-        privacyProFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false)) // Kill switch
+        subscriptionsFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.allowProTierPurchase().setRawStoredState(Toggle.State(enable = false)) // Kill switch
         whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
 
         viewModel.commands().test {

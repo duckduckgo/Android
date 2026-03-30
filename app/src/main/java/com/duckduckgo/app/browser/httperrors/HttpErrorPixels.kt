@@ -66,7 +66,7 @@ class RealHttpErrorPixels @Inject constructor(
             return
         }
 
-        val pProVpnConnected = runCatching {
+        val subscriptionVpnConnected = runCatching {
             networkProtectionState.isRunning()
         }.getOrDefault(false)
 
@@ -76,7 +76,7 @@ class RealHttpErrorPixels @Inject constructor(
 
         val webViewFullVersion = webViewVersionProvider.getFullVersion()
 
-        val pixelPrefKey = "${httpErrorPixelName.pixelName}|$statusCode|$pProVpnConnected|$externalVpnConnected|$webViewFullVersion|_count"
+        val pixelPrefKey = "${httpErrorPixelName.pixelName}|$statusCode|$subscriptionVpnConnected|$externalVpnConnected|$webViewFullVersion|_count"
 
         val updatedSet = pixel5xxKeys
         updatedSet.add(pixelPrefKey)
@@ -124,7 +124,7 @@ class RealHttpErrorPixels @Inject constructor(
                         if (split.size == 6) {
                             val httpErrorPixelName = HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY
                             val statusCode = split[1].toInt()
-                            val pProVpnConnected = split[2].toBoolean()
+                            val subscriptionVpnConnected = split[2].toBoolean()
                             val externalVpnConnected = split[3].toBoolean()
                             val webViewFullVersion = split[4]
                             pixel.fire(
@@ -132,7 +132,7 @@ class RealHttpErrorPixels @Inject constructor(
                                 mapOf(
                                     HttpErrorPixelParameters.HTTP_ERROR_CODE_COUNT to count.toString(),
                                     "error_code" to statusCode.toString(),
-                                    "ppro_user" to pProVpnConnected.toString(),
+                                    "ppro_user" to subscriptionVpnConnected.toString(),
                                     "vpn_user" to externalVpnConnected.toString(),
                                     "webview_version" to webViewFullVersion,
                                 ),

@@ -28,10 +28,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.databinding.ContentFeedbackCategoryBinding
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
@@ -52,7 +52,7 @@ class SubscriptionFeedbackCategoryFragment : SubscriptionFeedbackFragment(R.layo
     lateinit var authRepository: AuthRepository
 
     @Inject
-    lateinit var subscriptionFeature: PrivacyProFeature
+    lateinit var subscriptionFeature: SubscriptionsFeature
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider

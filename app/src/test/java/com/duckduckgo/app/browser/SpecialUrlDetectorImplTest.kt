@@ -366,17 +366,17 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsNotPrivacyProThenQueryTypeDetected() {
-        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
+    fun whenUrlIsNotSubscriptionThenQueryTypeDetected() {
+        whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(false)
         val result = testee.determineType("duckduckgo.com")
         assertTrue(result is SearchQuery)
     }
 
     @Test
-    fun whenUrlIsPrivacyProThenPrivacyProTypeDetected() {
-        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
+    fun whenUrlIsSubscriptionThenSubscriptionTypeDetected() {
+        whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(true)
         val result = testee.determineType("duckduckgo.com")
-        assertTrue(result is ShouldLaunchPrivacyProLink)
+        assertTrue(result is ShouldLaunchSubscriptionLink)
     }
 
     @Test
@@ -542,12 +542,12 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsPrivacyProThenPrivacyProLinkDetected() {
-        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
+    fun whenUrlIsSubscriptionThenSubscriptionLinkDetected() {
+        whenever(subscriptions.shouldLaunchSubscriptionForUrl(any())).thenReturn(true)
 
         val actual =
             testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com".toUri())
-        assertTrue(actual is ShouldLaunchPrivacyProLink)
+        assertTrue(actual is ShouldLaunchSubscriptionLink)
     }
 
     @Test

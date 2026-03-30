@@ -43,7 +43,7 @@ import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
+import com.duckduckgo.app.pixels.AppPixelName.SUBSCRIPTION_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
@@ -64,8 +64,8 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchFireButtonScr
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchGeneralSettingsScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchOtherPlatforms
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPermissionsScreen
-import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSubscriptionUnifiedFeedback
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -99,7 +99,7 @@ import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
-import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionFeedbackScreens.GeneralSubscriptionFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -183,7 +183,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         get() = binding.includeSettings.contentSettingsInternal
 
     private val viewsPro
-        get() = binding.includeSettings.contentSettingsPrivacyPro
+        get() = binding.includeSettings.contentSettingsSubscription
 
     private val viewsCompleteSetup
         get() = binding.includeSettings.contentSettingsCompleteSetup
@@ -326,7 +326,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
-                    updatePrivacyPro(it.isPrivacyProEnabled)
+                    updateSubscription(it.isSubscriptionEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
@@ -344,9 +344,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {
-        if (isPrivacyProEnabled) {
-            pixel.fire(PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE, type = Daily())
+    private fun updateSubscription(isSubscriptionEnabled: Boolean) {
+        if (isSubscriptionEnabled) {
+            pixel.fire(SUBSCRIPTION_IS_ENABLED_AND_ELIGIBLE, type = Daily())
             viewsPro.show()
         } else {
             viewsPro.gone()
@@ -467,7 +467,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAboutScreen -> launchScreen(AboutScreenNoParams)
             is LaunchGeneralSettingsScreen -> launchScreen(GeneralSettingsScreenNoParams)
             is LaunchFeedback -> launchFeedback()
-            is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
+            is LaunchSubscriptionUnifiedFeedback -> launchScreen(GeneralSubscriptionFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
             is Command.LaunchGetDesktopBrowser -> launchScreen(GetDesktopBrowserActivityParams(source = GetDesktopBrowserActivityParams.Source.OTHER))
             is Command.LaunchWhatsNew -> launchScreen(ModalSurfaceActivityFromMessageId(it.messageId, it.messageType))

@@ -166,7 +166,7 @@ class RealHttpErrorPixelsTest {
         whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
         whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
 
-        // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
+        // The pixelKey format is: pixelName|statusCode|subscriptionVpnConnected|externalVpnConnected|webViewVersion|_count
         val expectedKey = "${HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName}|503|true|false|123.45.67.89|_count"
 
         testee.update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 503)
@@ -183,7 +183,7 @@ class RealHttpErrorPixelsTest {
         whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
         whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
 
-        // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
+        // The pixelKey format is: pixelName|statusCode|subscriptionVpnConnected|externalVpnConnected|webViewVersion|_count
         val expectedKey = "${HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName}|503|true|false|123.45.67.89|_count"
 
         testee.update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 503)
@@ -200,7 +200,7 @@ class RealHttpErrorPixelsTest {
         whenever(mockExternalVpnDetector.isExternalVpnDetected()).thenReturn(false)
         whenever(mockWebViewVersionProvider.getFullVersion()).thenReturn("123.45.67.89")
 
-        // The pixelKey format is: pixelName|statusCode|pProVpnConnected|externalVpnConnected|webViewVersion|_count
+        // The pixelKey format is: pixelName|statusCode|subscriptionVpnConnected|externalVpnConnected|webViewVersion|_count
         val expectedKey = "${HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName}|503|true|false|123.45.67.89|_count"
 
         testee.update5xxCountPixel(HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY, 503)

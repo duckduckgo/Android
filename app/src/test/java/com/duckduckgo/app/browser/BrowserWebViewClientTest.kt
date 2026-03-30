@@ -513,11 +513,11 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPrivacyProLinkDetectedThenLaunchPrivacyProAndReturnTrue() {
-        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
+    fun whenSubscriptionLinkDetectedThenLaunchSubscriptionAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchSubscriptionLink
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(subscriptions).launchPrivacyPro(any(), any())
+        verify(subscriptions).launchSubscription(any(), any())
     }
 
     @Test

@@ -103,13 +103,13 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-    private suspend fun isPrivacyProCtaAvailable(): Boolean =
+    private suspend fun isSubscriptionCtaAvailable(): Boolean =
         subscriptions.isEligible() && hasNoSubscription() && extendedOnboardingFeatureToggles.privacyProCta().isEnabled()
 
     // Exposed for onboarding dev settings and tests. Used internally for completion checks
     @VisibleForTesting
     suspend fun requiredDaxOnboardingCtas(): List<CtaId> {
-        return if (isPrivacyProCtaAvailable()) {
+        return if (isSubscriptionCtaAvailable()) {
             listOf(
                 CtaId.DAX_INTRO,
                 CtaId.DAX_DIALOG_SERP,
@@ -257,17 +257,17 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
-            // Privacy Pro onboarding
-            canShowPrivacyProCta() -> {
-                DaxBubbleCta.DaxPrivacyProCta(
+            // Subscription onboarding
+            canShowSubscriptionCta() -> {
+                DaxBubbleCta.DaxSubscriptionCta(
                     onboardingStore,
                     appInstallStore,
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                 )
             }
 
-            // Privacy Pro onboarding for returning users who skipped onboarding
-            canShowPrivacyProCtaForSkippedOnboarding() -> {
+            // Subscription onboarding for returning users who skipped onboarding
+            canShowSubscriptionCtaForSkippedOnboarding() -> {
                 SubscriptionPromoModalCta(isFreeTrialCopy = freeTrialCopyAvailable())
             }
 
@@ -302,16 +302,16 @@ class CtaViewModel @Inject constructor(
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() && !daxDialogEndShown() && daxDialogIntroShown() && !hideTips()
 
     @WorkerThread
-    private suspend fun canShowPrivacyProCta(): Boolean =
-        daxOnboardingActive() && !hideTips() && !daxDialogPrivacyProShown() && isPrivacyProCtaAvailable()
+    private suspend fun canShowSubscriptionCta(): Boolean =
+        daxOnboardingActive() && !hideTips() && !daxDialogSubscriptionShown() && isSubscriptionCtaAvailable()
 
     @WorkerThread
-    private suspend fun canShowPrivacyProCtaForSkippedOnboarding(): Boolean =
+    private suspend fun canShowSubscriptionCtaForSkippedOnboarding(): Boolean =
         extendedOnboardingFeatureToggles.subscriptionPromoModalCta().isEnabled() &&
             hideTips() &&
-            appInstallStore.daysInstalled() >= PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS &&
-            !daxDialogPrivacyProShown() &&
-            isPrivacyProCtaAvailable()
+            appInstallStore.daysInstalled() >= SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS &&
+            !daxDialogSubscriptionShown() &&
+            isSubscriptionCtaAvailable()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -392,7 +392,7 @@ class CtaViewModel @Inject constructor(
     private fun isSiteNotAllowedForOnboarding(site: Site): Boolean {
         val uri = site.url.toUri()
 
-        if (subscriptions.isPrivacyProUrl(uri)) return true
+        if (subscriptions.isSubscriptionUrl(uri)) return true
 
         if (duckChat.isDuckChatUrl(uri)) return true
 
@@ -409,7 +409,7 @@ class CtaViewModel @Inject constructor(
     suspend fun areBubbleDaxDialogsCompleted(): Boolean {
         return withContext(dispatchers.io()) {
             val noBrowserCtaExperiment = extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled()
-            val isLastContextDialogShown = if (isPrivacyProCtaAvailable()) daxDialogPrivacyProShown() else daxDialogEndShown()
+            val isLastContextDialogShown = if (isSubscriptionCtaAvailable()) daxDialogSubscriptionShown() else daxDialogEndShown()
             noBrowserCtaExperiment || isLastContextDialogShown || hideTips() || !userStageStore.daxOnboardingActive()
         }
     }
@@ -438,7 +438,7 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 
-    private fun daxDialogPrivacyProShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
+    private fun daxDialogSubscriptionShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_PRIVACY_PRO)
 
     private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 
@@ -496,13 +496,13 @@ class CtaViewModel @Inject constructor(
 
     suspend fun isPromoOnboardingDialogShowing(): Boolean =
         withContext(dispatchers.io()) {
-            canShowPrivacyProCtaForSkippedOnboarding()
+            canShowSubscriptionCtaForSkippedOnboarding()
         }
 
     private suspend fun hasNoSubscription(): Boolean = subscriptions.getSubscriptionStatus() == SubscriptionStatus.UNKNOWN
 
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private const val PRIVACY_PRO_SKIPPED_ONBOARDING_MIN_DAYS = 7L
+        private const val SUBSCRIPTION_SKIPPED_ONBOARDING_MIN_DAYS = 7L
     }
 }

@@ -11,8 +11,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.model.Entitlement
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import kotlinx.coroutines.test.runTest
@@ -28,12 +28,12 @@ class RealAuthRepositoryTest {
 
     private val authStore = FakeSubscriptionsDataStore()
     private val serpPromo = FakeSerpPromo()
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+    private val subscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
     private val authRepository: AuthRepository = RealAuthRepository(
         authStore,
         coroutineRule.testDispatcherProvider,
         serpPromo,
-        dagger.Lazy { privacyProFeature },
+        dagger.Lazy { subscriptionsFeature },
     )
 
     @Test
@@ -150,7 +150,7 @@ class RealAuthRepositoryTest {
             FakeSubscriptionsDataStore(supportEncryption = false),
             coroutineRule.testDispatcherProvider,
             serpPromo,
-            dagger.Lazy { privacyProFeature },
+            dagger.Lazy { subscriptionsFeature },
         )
         assertFalse(repository.canSupportEncryption())
     }
@@ -291,7 +291,7 @@ class RealAuthRepositoryTest {
 
     @Test
     fun whenGetFeaturesAndTierFlagOnThenReturnV2ProductNames() = runTest {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
         authStore.subscriptionEntitlements = """{"plan1":[
             |{"name":"plus","product":"Network Protection"},
             |{"name":"plus","product":"Data Broker Protection"}
@@ -306,7 +306,7 @@ class RealAuthRepositoryTest {
 
     @Test
     fun whenGetFeaturesAndTierFlagOnAndV2EmptyThenFallbackToV1() = runTest {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
         authStore.subscriptionEntitlements = null
         authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
 
@@ -318,7 +318,7 @@ class RealAuthRepositoryTest {
 
     @Test
     fun whenGetFeaturesAndTierFlagOnAndV2EmptyForPlanThenFallbackToV1() = runTest {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = true))
         authStore.subscriptionEntitlements = """{"plan2":[{"name":"plus","product":"Network Protection"}]}"""
         authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
 
@@ -330,7 +330,7 @@ class RealAuthRepositoryTest {
 
     @Test
     fun whenGetFeaturesAndTierFlagOffThenReturnV1Features() = runTest {
-        privacyProFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = false))
+        subscriptionsFeature.tierMessagingEnabled().setRawStoredState(Toggle.State(enable = false))
         authStore.subscriptionEntitlements = """{"plan1":[{"name":"plus","product":"Network Protection"}]}"""
         authStore.subscriptionFeatures = """{"plan1":["feature1","feature2"]}"""
 

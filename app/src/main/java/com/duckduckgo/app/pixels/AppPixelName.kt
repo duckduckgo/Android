@@ -355,7 +355,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_ACTION_CLICKED("m_remote_message_action_clicked"),
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
 
-    PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
+    SUBSCRIPTION_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
 
     SSL_CERTIFICATE_WARNING_CLOSE_PRESSED("m_certificate_warning_leave_clicked"),
     SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED("m_certificate_warning_advanced_clicked"),

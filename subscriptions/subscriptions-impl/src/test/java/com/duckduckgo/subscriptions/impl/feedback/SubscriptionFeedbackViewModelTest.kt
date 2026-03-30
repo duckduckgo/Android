@@ -2,11 +2,11 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.PIR_DASHBOARD
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
-import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.PIR_DASHBOARD
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_EXCLUDED_APPS
+import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
@@ -27,7 +27,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackFragmentState.FeedbackSubmit
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackViewModel.FeedbackMetadata
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.BROWSER_CRASH_FREEZE
-import com.duckduckgo.subscriptions.impl.feedback.pixels.PrivacyProUnifiedFeedbackPixelSender
+import com.duckduckgo.subscriptions.impl.feedback.pixels.SubscriptionUnifiedFeedbackPixelSender
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -47,7 +47,7 @@ class SubscriptionFeedbackViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var pixelSender: PrivacyProUnifiedFeedbackPixelSender
+    private lateinit var pixelSender: SubscriptionUnifiedFeedbackPixelSender
 
     @Mock
     private lateinit var feedbackHelpUrlProvider: FeedbackHelpUrlProvider
@@ -80,7 +80,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackGeneralScreenShown()
+            verify(pixelSender).reportSubscriptionFeedbackGeneralScreenShown()
         }
     }
 
@@ -98,7 +98,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "settings",
                 ),
@@ -120,7 +120,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "ppro",
                 ),
@@ -142,7 +142,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "vpn",
                 ),
@@ -164,7 +164,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "vpnExcludedApps",
                 ),
@@ -186,7 +186,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "pir",
                 ),
@@ -215,7 +215,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                 mapOf(
                     "source" to "vpnExcludedApps",
                     "reportType" to "reportIssue",
@@ -243,7 +243,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                     mapOf(
                         "source" to "ppro",
                         "reportType" to "requestFeature",
@@ -271,7 +271,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                     mapOf(
                         "source" to "vpn",
                         "reportType" to "general",
@@ -299,7 +299,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackCategoryScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackCategoryScreenShown(
                     mapOf(
                         "source" to "settings",
                         "reportType" to "reportIssue",
@@ -326,7 +326,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackCategoryScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackCategoryScreenShown(
                     mapOf(
                         "source" to "ppro",
                         "reportType" to "reportIssue",
@@ -352,7 +352,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                 mapOf(
                     "source" to "vpn",
                     "reportType" to "reportIssue",
@@ -380,7 +380,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                     mapOf(
                         "source" to "vpnExcludedApps",
                         "reportType" to "reportIssue",
@@ -408,7 +408,7 @@ class SubscriptionFeedbackViewModelTest {
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                     mapOf(
                         "source" to "pir",
                         "reportType" to "reportIssue",
@@ -493,7 +493,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                 mapOf(
                     "source" to "vpn",
                     "reportType" to "reportIssue",
@@ -524,7 +524,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                 mapOf(
                     "source" to "ppro",
                     "reportType" to "reportIssue",
@@ -554,7 +554,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubmitScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubmitScreenShown(
                 mapOf(
                     "source" to "pir",
                     "reportType" to "reportIssue",
@@ -579,7 +579,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "settings",
                 ),
@@ -605,7 +605,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                 mapOf(
                     "source" to "settings",
                     "reportType" to "reportIssue",
@@ -633,7 +633,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                 mapOf(
                     "source" to "settings",
                     "reportType" to "reportIssue",
@@ -661,7 +661,7 @@ class SubscriptionFeedbackViewModelTest {
             )
 
             cancelAndConsumeRemainingEvents()
-            verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+            verify(pixelSender).reportSubscriptionFeedbackSubcategoryScreenShown(
                 mapOf(
                     "source" to "settings",
                     "reportType" to "reportIssue",
@@ -677,7 +677,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.allowUserToReportAppIssue("test", "com.test")
         viewModel.onFaqOpenedFromSubmit()
 
-        verify(pixelSender).reportPproFeedbackSubmitScreenFaqClicked(
+        verify(pixelSender).reportSubscriptionFeedbackSubmitScreenFaqClicked(
             mapOf(
                 "source" to "vpnExcludedApps",
                 "reportType" to "reportIssue",
@@ -1046,7 +1046,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproFeatureRequest(
+        verify(pixelSender).sendSubscriptionFeatureRequest(
             mapOf(
                 "source" to "settings",
                 "description" to "Test",
@@ -1064,7 +1064,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproGeneralFeedback(
+        verify(pixelSender).sendSubscriptionGeneralFeedback(
             mapOf(
                 "source" to "settings",
                 "description" to "Test",
@@ -1083,7 +1083,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "ppro",
                 "category" to "subscription",
@@ -1106,7 +1106,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "vpn",
                 "category" to "vpn",
@@ -1127,7 +1127,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "vpnExcludedApps",
                 "category" to "vpn",
@@ -1151,7 +1151,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "settings",
                 "category" to "pir",
@@ -1174,7 +1174,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "pir",
                 "category" to "pir",
@@ -1198,7 +1198,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.commands().test {
             assertEquals(FeedbackCompleted, expectMostRecentItem())
         }
-        verify(pixelSender).sendPproReportIssue(
+        verify(pixelSender).sendSubscriptionReportIssue(
             mapOf(
                 "source" to "settings",
                 "category" to "itr",

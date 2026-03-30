@@ -24,8 +24,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -45,9 +45,9 @@ class SubscriptionSwitchWideEventTest {
     private val wideEventClient: WideEventClient = org.mockito.kotlin.mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendSubscriptionSwitchWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var subscriptionSwitchWideEvent: SubscriptionSwitchWideEventImpl
@@ -56,7 +56,7 @@ class SubscriptionSwitchWideEventTest {
     fun setup() {
         subscriptionSwitchWideEvent = SubscriptionSwitchWideEventImpl(
             wideEventClient = wideEventClient,
-            privacyProFeature = { privacyProFeature },
+            subscriptionsFeature = { subscriptionsFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -420,7 +420,7 @@ class SubscriptionSwitchWideEventTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `when feature disabled then no events are sent`() = runTest {
-        privacyProFeature.sendSubscriptionSwitchWideEvent().setRawStoredState(Toggle.State(false))
+        subscriptionsFeature.sendSubscriptionSwitchWideEvent().setRawStoredState(Toggle.State(false))
 
         // Mock getFlowIds to return empty list when methods try to retrieve flow ID
         whenever(wideEventClient.getFlowIds(any()))

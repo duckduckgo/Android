@@ -26,7 +26,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -57,9 +57,9 @@ class FreeTrialConversionWideEventTest {
     private val pixelSender: SubscriptionPixelSender = mock()
 
     @SuppressLint("DenyListedApi")
-    private val privacyProFeature: PrivacyProFeature =
+    private val subscriptionsFeature: SubscriptionsFeature =
         FakeFeatureToggleFactory
-            .create(PrivacyProFeature::class.java)
+            .create(SubscriptionsFeature::class.java)
             .apply { sendFreeTrialConversionWideEvent().setRawStoredState(Toggle.State(true)) }
 
     private lateinit var freeTrialConversionWideEvent: FreeTrialConversionWideEventImpl
@@ -68,7 +68,7 @@ class FreeTrialConversionWideEventTest {
     fun setup() {
         freeTrialConversionWideEvent = FreeTrialConversionWideEventImpl(
             wideEventClient = wideEventClient,
-            privacyProFeature = { privacyProFeature },
+            subscriptionsFeature = { subscriptionsFeature },
             authRepository = authRepository,
             timeProvider = timeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
@@ -341,7 +341,7 @@ class FreeTrialConversionWideEventTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun `when feature disabled then no wide events are sent but pixels still fire`() = runTest {
-        privacyProFeature.sendFreeTrialConversionWideEvent().setRawStoredState(Toggle.State(false))
+        subscriptionsFeature.sendFreeTrialConversionWideEvent().setRawStoredState(Toggle.State(false))
 
         val subscriptionStartedAt = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(12)
         val subscription = createSubscription(
