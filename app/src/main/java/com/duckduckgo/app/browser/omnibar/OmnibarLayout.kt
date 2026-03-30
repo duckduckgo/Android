@@ -880,16 +880,7 @@ class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (progressBarUpgradeFeature.self().isEnabled()) {
-            if (viewState.isLoading) {
-                if (!pageLoadProgressBar.isStarted) {
-                    pageLoadProgressBar.start()
-                }
-                pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
-            } else {
-                if (pageLoadProgressBar.isStarted) {
-                    pageLoadProgressBar.triggerCompletion()
-                }
-            }
+            updatePageLoadProgressBar(viewState)
         } else {
             if (viewState.isLoading) {
                 pageLoadingIndicator.show()
@@ -925,20 +916,24 @@ class OmnibarLayout @JvmOverloads constructor(
         renderTabIcon(viewState)
         renderOmnibarText(viewState)
         if (progressBarUpgradeFeature.self().isEnabled()) {
-            if (viewState.isLoading) {
-                if (!pageLoadProgressBar.isStarted) {
-                    pageLoadProgressBar.start()
-                }
-                pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
-            } else {
-                if (pageLoadProgressBar.isStarted) {
-                    pageLoadProgressBar.triggerCompletion()
-                }
-            }
+            updatePageLoadProgressBar(viewState)
         } else {
             pageLoadingIndicator.isVisible = viewState.isLoading
         }
         voiceSearchButton.isVisible = viewState.showVoiceSearch
+    }
+
+    private fun updatePageLoadProgressBar(viewState: ViewState) {
+        if (viewState.isLoading) {
+            if (!pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.start()
+            }
+            pageLoadProgressBar.onProgressUpdate(viewState.loadingProgress.toFloat())
+        } else {
+            if (pageLoadProgressBar.isStarted) {
+                pageLoadProgressBar.triggerCompletion()
+            }
+        }
     }
 
     private fun renderCustomTabMode(
