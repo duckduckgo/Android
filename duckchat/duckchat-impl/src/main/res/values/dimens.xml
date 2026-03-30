@@ -26,4 +26,11 @@
     <dimen name="inputScreenLogoTopBarTopMargin">180dp</dimen>
     <dimen name="inputScreenLogoTopBarWithHatchTopMargin">260dp</dimen>
     <dimen name="inputScreenHatchTopMarginWithTopBar">136dp</dimen>
+
+    <!-- Model Picker -->
+    <dimen name="modelPickerChipHeight">32dp</dimen>
+    <dimen name="modelPickerChipCornerRadius">16dp</dimen>
+    <dimen name="modelPickerChipStrokeWidth">1dp</dimen>
+    <dimen name="modelPickerChipTextSize">13sp</dimen>
+    <dimen name="modelPickerMenuElevation">6dp</dimen>
 </resources>
