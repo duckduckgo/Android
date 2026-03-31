@@ -27,7 +27,13 @@ enum class SitePermissionsPixelName(override val pixelName: String) : Pixel.Pixe
 object SitePermissionsPixelParameters {
     const val PERMISSION_TYPE = "type"
     const val PERMISSION_SELECTION = "selection"
-    const val IS_THIRD_PARTY = "isThirdParty"
+    const val PARTY_CONTEXT = "partyContext"
+}
+
+object SitePermissionsPartyContextValues {
+    const val FIRST_PARTY = "first_party"
+    const val THIRD_PARTY = "third_party"
+    const val UNKNOWN = "unknown"
 }
 
 object SitePermissionsPixelValues {

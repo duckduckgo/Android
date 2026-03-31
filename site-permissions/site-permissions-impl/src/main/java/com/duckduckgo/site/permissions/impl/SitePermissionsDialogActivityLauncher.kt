@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -345,20 +346,23 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun sendPermissionPromptShownPixel(type: String) {
-        val isThirdParty = isPermissionRequestThirdParty()
         pixel.fire(
             SitePermissionsPixelName.PERMISSION_PROMPT_SHOWN,
             mapOf(
                 SitePermissionsPixelParameters.PERMISSION_TYPE to type,
-                SitePermissionsPixelParameters.IS_THIRD_PARTY to isThirdParty.toString(),
+                SitePermissionsPixelParameters.PARTY_CONTEXT to resolvePartyContext(),
             ),
         )
     }
 
-    private fun isPermissionRequestThirdParty(): Boolean {
-        val requestOriginDomain = siteURL.extractDomain() ?: return false
-        val pageDomain = pageUrl?.extractDomain() ?: return false
-        return !requestOriginDomain.equals(pageDomain, ignoreCase = true)
+    private fun resolvePartyContext(): String {
+        val originETldPlusOne = siteURL.toHttpUrlOrNull()?.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
+        val pageETldPlusOne = pageUrl?.toHttpUrlOrNull()?.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
+        return if (originETldPlusOne.equals(pageETldPlusOne, ignoreCase = true)) {
+            SitePermissionsPartyContextValues.FIRST_PARTY
+        } else {
+            SitePermissionsPartyContextValues.THIRD_PARTY
+        }
     }
 
     private fun sendNegativeDialogClickPixel(

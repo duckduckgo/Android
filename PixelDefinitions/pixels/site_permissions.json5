@@ -12,9 +12,10 @@
                 "enum": ["camera", "microphone", "camera_and_microphone", "drm", "location"]
             },
             {
-                "key": "isThirdParty",
-                "description": "Whether the permission request originated from a third-party context (different domain than the top-level page)",
-                "type": "boolean"
+                "key": "partyContext",
+                "description": "Whether the permission request is first-party (same eTLD+1 as page), third-party, or unknown",
+                "type": "string",
+                "enum": ["first_party", "third_party", "unknown"]
             }
         ],
         "expires": "2026-09-30"
