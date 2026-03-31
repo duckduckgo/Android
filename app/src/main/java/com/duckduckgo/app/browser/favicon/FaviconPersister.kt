@@ -96,10 +96,20 @@ class FileBasedFaviconPersister(
     ) {
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
-            try {
-                file.copyTo(persistedFile, overwrite = true)
-            } catch (e: FileAlreadyExistsException) {
-                logcat { "FaviconPersister: failed to overwrite ${persistedFile.name}: ${e.message}" }
+            if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
+                val tmp = File(persistedFile.parent, "${persistedFile.name}.tmp")
+                try {
+                    file.copyTo(tmp, overwrite = true)
+                    tmp.renameTo(persistedFile)
+                } catch (e: FileAlreadyExistsException) {
+                    tmp.delete()
+                }
+            } else {
+                try {
+                    file.copyTo(persistedFile, overwrite = true)
+                } catch (e: FileAlreadyExistsException) {
+                    logcat { "FaviconPersister copyToDirectory [legacy]: failed to overwrite ${persistedFile.name}: ${e.message}" }
+                }
             }
         }
     }
@@ -218,9 +228,18 @@ class FileBasedFaviconPersister(
 
             val faviconFile = prepareDestinationFile(directory, subFolder, domain)
             runCatching {
-                FileOutputStream(faviconFile).use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    outputStream.flush()
+                if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
+                    val tmp = File(faviconFile.parent, "${faviconFile.name}.tmp")
+                    FileOutputStream(tmp).use { outputStream ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        outputStream.flush()
+                    }
+                    tmp.renameTo(faviconFile)
+                } else {
+                    FileOutputStream(faviconFile).use { outputStream ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                        outputStream.flush()
+                    }
                 }
             }
 
@@ -238,9 +257,18 @@ class FileBasedFaviconPersister(
         bitmap: Bitmap,
     ) {
         runCatching {
-            FileOutputStream(file).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.flush()
+            if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
+                val tmp = File(file.parent, "${file.name}.tmp")
+                FileOutputStream(tmp).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
+                }
+                tmp.renameTo(file)
+            } else {
+                FileOutputStream(file).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
+                }
             }
         }
     }
