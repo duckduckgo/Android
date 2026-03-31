@@ -66,6 +66,9 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.airbnb.android:lottie:_"
 
+    implementation Square.retrofit2.retrofit
+    implementation Square.moshi
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')

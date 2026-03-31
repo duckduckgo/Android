@@ -43,6 +43,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
@@ -84,6 +85,9 @@ interface NativeInputWidget {
     fun setImageButtonVisible(visible: Boolean)
     fun setToggleVisible(visible: Boolean)
     fun setFloatingSubmitContainer(container: ViewGroup)
+    fun getSelectedModelId(): String?
+    fun isModelMenuVisible(): Boolean
+    fun storePendingPrompt(query: String)
 
     fun bindInputEvents(
         onSearchTextChanged: (String) -> Unit,
@@ -122,6 +126,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var subscriptions: Subscriptions
 
+    @Inject
+    lateinit var pendingNativePromptStore: PendingNativePromptStore
+
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
@@ -144,10 +151,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
 
     private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
+    private val modelPickerView: ModelPicker by lazy { findViewById<ModelPickerView>(R.id.modelPickerView) }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         imageButton.setOnClickListener { onImageClick?.invoke() }
+        modelPickerView.setPickerEnabled(isChatTabSelected())
+        modelPickerView.onMenuDismissed = {
+            if (hasInputFocus()) {
+                (context as? Activity)?.showKeyboard(inputField)
+            }
+        }
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
@@ -282,10 +296,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
+                    modelPickerView.setPickerEnabled(isChatTabSelected())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab) {}
                 override fun onTabReselected(tab: TabLayout.Tab) {
                     updateDuckAiSubmitButton()
+                    modelPickerView.setPickerEnabled(isChatTabSelected())
                 }
             },
         )
@@ -343,6 +359,15 @@ class NativeInputModeWidget @JvmOverloads constructor(
         ancestors.forEach { it.layoutTransition = null }
         block()
         ancestors.zip(saved).forEach { (vg, lt) -> vg.layoutTransition = lt }
+    }
+
+    override fun getSelectedModelId(): String? = modelPickerView.getSelectedModelId()
+
+    override fun isModelMenuVisible(): Boolean = modelPickerView.isMenuVisible()
+
+    override fun storePendingPrompt(query: String) {
+        // TODO: This should not be the widget's responsibility
+        pendingNativePromptStore.store(query, getSelectedModelId())
     }
 
     override fun bindInputEvents(

@@ -85,6 +85,7 @@ class RealDuckChatJSHelper @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val pendingTabContextStore: PendingTabContextStore,
+    private val pendingNativePromptStore: PendingNativePromptStore,
     private val faviconManager: FaviconManager,
     private val duckChatFeature: DuckChatFeature,
 ) : DuckChatJSHelper {
@@ -118,6 +119,11 @@ class RealDuckChatJSHelper @Inject constructor(
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
                     getAIChatNativeConfigValues(featureName, method, it, mode)
+                }
+
+            METHOD_GET_AI_CHAT_NATIVE_PROMPT ->
+                id?.let {
+                    getAIChatNativePrompt(featureName, method, it)
                 }
 
             METHOD_OPEN_AI_CHAT -> {
@@ -319,6 +325,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_CLOSING_AI_CHAT, true)
                 put(SUPPORTS_OPENING_SETTINGS, true)
                 put(SUPPORTS_NATIVE_CHAT_INPUT, dataStore.isNativeInputFieldUserSettingEnabled())
+                put(SUPPORTS_NATIVE_PROMPT, dataStore.isNativeInputFieldUserSettingEnabled())
                 put(SUPPORTS_CHAT_ID_RESTORATION, duckChat.isDuckChatFullScreenModeEnabled())
                 put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
                 put(SUPPORTS_STANDALONE_MIGRATION, duckChat.isStandaloneMigrationEnabled())
@@ -332,6 +339,31 @@ class RealDuckChatJSHelper @Inject constructor(
                         duckChat.areMultipleContentAttachmentsEnabled(),
                 )
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private fun getAIChatNativePrompt(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val pending = pendingNativePromptStore.consume()
+        val jsonPayload = JSONObject().apply {
+            put(PLATFORM, ANDROID)
+            if (pending != null) {
+                put("tool", "query")
+                put(
+                    "query",
+                    JSONObject().apply {
+                        put("prompt", pending.prompt)
+                        put("autoSubmit", true)
+                        if (pending.modelId != null) {
+                            put("modelId", pending.modelId)
+                        }
+                    },
+                )
+            }
+        }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
@@ -396,6 +428,7 @@ class RealDuckChatJSHelper @Inject constructor(
         const val DUCK_CHAT_FEATURE_NAME = "aiChat"
         const val METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA = "getAIChatNativeHandoffData"
         const val METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES = "getAIChatNativeConfigValues"
+        private const val METHOD_GET_AI_CHAT_NATIVE_PROMPT = "getAIChatNativePrompt"
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
@@ -412,6 +445,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
+        private const val SUPPORTS_NATIVE_PROMPT = "supportsNativePrompt"
         private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val SUPPORTS_CHAT_ID_RESTORATION = "supportsURLChatIDRestoration"
         private const val SUPPORTS_STANDALONE_MIGRATION = "supportsStandaloneMigration"

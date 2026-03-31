@@ -1261,7 +1261,7 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query ->
+                onDuckAiChatSubmitted = { query, modelId ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -1273,6 +1273,10 @@ class BrowserTabFragment :
                                     JSONObject().apply {
                                         put("prompt", query)
                                         put("autoSubmit", true)
+                                        // TODO: This currently causes a new chat to be sent if set
+                                        // if (modelId != null) {
+                                        //     put("modelId", modelId)
+                                        // }
                                     },
                                 )
                             },

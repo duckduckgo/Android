@@ -68,6 +68,7 @@ class RealDuckChatJSHelperTest {
     private val mockDataStore: DuckChatDataStore = mock()
     private val mockDuckChatPixels: DuckChatPixels = mock()
     private val mockPendingTabContextStore: PendingTabContextStore = mock()
+    private val mockPendingNativePromptStore: PendingNativePromptStore = mock()
     private val mockFaviconManager: FaviconManager = mock()
     private val mockDuckChatFeature: DuckChatFeature =
         FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
@@ -78,6 +79,7 @@ class RealDuckChatJSHelperTest {
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         pendingTabContextStore = mockPendingTabContextStore,
+        pendingNativePromptStore = mockPendingNativePromptStore,
         faviconManager = mockFaviconManager,
         duckChatFeature = mockDuckChatFeature,
     )
@@ -265,6 +267,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -517,6 +520,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -559,6 +563,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", true)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -710,6 +715,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -754,6 +760,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -795,6 +802,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", true)
@@ -1058,6 +1066,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", true)
             put("supportsStandaloneMigration", false)
@@ -1095,6 +1104,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", true)
+            put("supportsNativePrompt", true)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1133,6 +1143,7 @@ class RealDuckChatJSHelperTest {
             put("supportsClosingAIChat", true)
             put("supportsOpeningSettings", true)
             put("supportsNativeChatInput", false)
+            put("supportsNativePrompt", false)
             put("supportsURLChatIDRestoration", false)
             put("supportsImageUpload", false)
             put("supportsStandaloneMigration", false)
@@ -1523,4 +1534,75 @@ class RealDuckChatJSHelperTest {
     }
 
     // endregion
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
+        val pending = PendingNativePrompt("test prompt", "model")
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+        assertNotNull(result)
+        assertEquals("android", result!!.params.getString("platform"))
+        assertEquals("query", result.params.getString("tool"))
+
+        val query = result.params.getJSONObject("query")
+        assertEquals("test prompt", query.getString("prompt"))
+        assertTrue(query.getBoolean("autoSubmit"))
+        assertEquals("model", query.getString("modelId"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithPendingPromptButNoModelIdThenModelIdOmitted() = runTest {
+        val pending = PendingNativePrompt("test prompt", null)
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+        assertNotNull(result)
+
+        val query = result!!.params.getJSONObject("query")
+        assertEquals("test prompt", query.getString("prompt"))
+        assertFalse(query.has("modelId"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoPendingPromptThenReturnsPlatformOnly() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            "123",
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+        assertNotNull(result)
+        assertEquals("android", result!!.params.getString("platform"))
+        assertFalse(result.params.has("tool"))
+        assertFalse(result.params.has("query"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNullIdThenReturnsNull() = runTest {
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativePrompt",
+            null,
+            null,
+            pageContext = viewModel.updatedPageContext,
+        )
+
+        assertNull(result)
+    }
 }
