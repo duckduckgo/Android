@@ -248,8 +248,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
-                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1Title_2 else R.string.preOnboardingDaxDialog1Title
-                    val ctaText = it.getString(titleRes)
+                    val ctaText = if (showDuckAiCopy) {
+                        it.getString(R.string.preOnboardingDaxDialog1Title_2) + "<br/><br/>" + it.getString(R.string.preOnboardingDaxDialog1Text)
+                    } else {
+                        it.getString(R.string.preOnboardingDaxDialog1Title)
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
@@ -273,8 +276,11 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
-                    val titleRes = if (showDuckAiCopy) R.string.preOnboardingDaxDialog1Title_2 else R.string.preOnboardingDaxDialog1Title
-                    val ctaText = it.getString(titleRes)
+                    val ctaText = if (showDuckAiCopy) {
+                        it.getString(R.string.preOnboardingDaxDialog1Title_2) + "<br/><br/>" + it.getString(R.string.preOnboardingDaxDialog1Text)
+                    } else {
+                        it.getString(R.string.preOnboardingDaxDialog1Title)
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
                     afterAnimation = {
