@@ -75,32 +75,21 @@ class FirstScreenHandlerImpl @Inject constructor(
         val userPref = settingsDataStore.userSelectedIdleThresholdSeconds
         if (userPref != null) return userPref
 
-        val (rcDefault, options) = parseIdleReturnSettings(androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings())
-        return if (rcDefault != null && options != null && rcDefault in options) {
-            rcDefault
-        } else {
-            DEFAULT_IDLE_THRESHOLD_SECONDS
-        }
+        return parseDefaultIdleThresholdSeconds(androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings())
+            ?: DEFAULT_IDLE_THRESHOLD_SECONDS
     }
 
     companion object {
         const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
         val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 3600L, 43200L, 86400L)
 
-        fun parseIdleReturnSettings(settingsJson: String?): Pair<Long?, List<Long>?> {
-            if (settingsJson == null) return Pair(null, null)
+        fun parseDefaultIdleThresholdSeconds(settingsJson: String?): Long? {
+            if (settingsJson == null) return null
             return try {
                 val json = JSONObject(settingsJson)
-                val defaultSeconds = if (json.has("defaultIdleThresholdSeconds")) json.getLong("defaultIdleThresholdSeconds") else null
-                val options = if (json.has("idleThresholdOptions")) {
-                    val arr = json.getJSONArray("idleThresholdOptions")
-                    (0 until arr.length()).map { arr.getLong(it) }
-                } else {
-                    null
-                }
-                Pair(defaultSeconds, options)
+                if (json.has("defaultIdleThresholdSeconds")) json.getLong("defaultIdleThresholdSeconds") else null
             } catch (e: Exception) {
-                Pair(null, null)
+                null
             }
         }
     }

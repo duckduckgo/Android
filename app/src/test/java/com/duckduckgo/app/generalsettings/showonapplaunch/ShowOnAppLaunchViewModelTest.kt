@@ -147,9 +147,9 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
-    fun whenRCDefaultInOptionsThenSelectedIsRCDefault() = runTest {
+    fun whenRCDefaultSetThenSelectedIsRCDefault() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":60,"idleThresholdOptions":[1,60,300]}"""),
+            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":60}"""),
         )
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
@@ -162,55 +162,8 @@ class ShowOnAppLaunchViewModelTest {
     }
 
     @Test
-    fun whenRCDefaultNotInOptionsThenSelectedIsFiveMinuteFallback() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":120,"idleThresholdOptions":[1,60,300,900]}"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
-        )
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(300L, state.selectedIdleThresholdSeconds)
-        }
-    }
-
-    @Test
     fun whenUserPreferenceSetThenSelectedIsUserPreference() = runTest {
         whenever(settingsDataStore.userSelectedIdleThresholdSeconds).thenReturn(1L)
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300,"idleThresholdOptions":[1,60,300]}"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
-        )
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(1L, state.selectedIdleThresholdSeconds)
-        }
-    }
-
-    // --- idleThresholdOptions ---
-
-    @Test
-    fun whenOptionsInRCThenExposedInViewState() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300,"idleThresholdOptions":[1,60,300,900]}"""),
-        )
-        testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
-        )
-
-        testee.viewState.test {
-            val state = awaitItem()
-            assertEquals(listOf(1L, 60L, 300L, 900L), state.idleThresholdOptions)
-        }
-    }
-
-    @Test
-    fun whenNoOptionsInRCThenDefaultOptionsExposed() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
             Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300}"""),
         )
@@ -220,7 +173,7 @@ class ShowOnAppLaunchViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
+            assertEquals(1L, state.selectedIdleThresholdSeconds)
         }
     }
 
@@ -236,7 +189,6 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertEquals(300L, state.selectedIdleThresholdSeconds)
-            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
         }
     }
 
@@ -262,13 +214,26 @@ class ShowOnAppLaunchViewModelTest {
         }
     }
 
+    // --- idleThresholdOptions ---
+
+    @Test
+    fun whenViewStateCreatedThenDefaultOptionsExposed() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
+        testee = ShowOnAppLaunchViewModel(
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+        )
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
+        }
+    }
+
     // --- onTimeoutRowClicked command ---
 
     @Test
     fun whenTimeoutRowClickedThenEmitsShowTimeoutDialogCommand() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(
-            Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300,"idleThresholdOptions":[1,60,300]}"""),
-        )
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
             dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
         )
@@ -278,7 +243,7 @@ class ShowOnAppLaunchViewModelTest {
             val command = awaitItem()
             assertTrue(command is ShowTimeoutDialog)
             val dialog = command as ShowTimeoutDialog
-            assertEquals(listOf(1L, 60L, 300L), dialog.options)
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, dialog.options)
             assertEquals(300L, dialog.currentSelection)
         }
     }
