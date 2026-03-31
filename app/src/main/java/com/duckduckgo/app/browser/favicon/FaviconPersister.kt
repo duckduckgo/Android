@@ -27,6 +27,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.LogPriority
 import logcat.LogPriority.INFO
 import logcat.logcat
 import java.io.File
@@ -98,10 +99,13 @@ class FileBasedFaviconPersister(
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
             if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
                 val tmp = File(persistedFile.parent, "${persistedFile.name}.tmp")
-                try {
+                runCatching {
                     file.copyTo(tmp, overwrite = true)
-                    tmp.renameTo(persistedFile)
-                } catch (e: FileAlreadyExistsException) {
+                    if (!tmp.renameTo(persistedFile)) {
+                        tmp.delete()
+                        logcat(LogPriority.WARN) { "FaviconPersister [copyToDirectory][atomic]: failed to rename to ${persistedFile.name}" }
+                    }
+                }.onFailure {
                     tmp.delete()
                 }
             } else {
@@ -229,12 +233,7 @@ class FileBasedFaviconPersister(
             val faviconFile = prepareDestinationFile(directory, subFolder, domain)
             runCatching {
                 if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
-                    val tmp = File(faviconFile.parent, "${faviconFile.name}.tmp")
-                    FileOutputStream(tmp).use { outputStream ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                        outputStream.flush()
-                    }
-                    tmp.renameTo(faviconFile)
+                    writeBitmapAtomically(faviconFile, bitmap)
                 } else {
                     FileOutputStream(faviconFile).use { outputStream ->
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
@@ -258,18 +257,26 @@ class FileBasedFaviconPersister(
     ) {
         runCatching {
             if (androidBrowserConfigFeature.atomicFaviconWrites().isEnabled()) {
-                val tmp = File(file.parent, "${file.name}.tmp")
-                FileOutputStream(tmp).use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    outputStream.flush()
-                }
-                tmp.renameTo(file)
+                writeBitmapAtomically(file, bitmap)
             } else {
                 FileOutputStream(file).use { outputStream ->
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
                     outputStream.flush()
                 }
             }
+        }
+    }
+
+    private fun writeBitmapAtomically(file: File, bitmap: Bitmap) {
+        val tmp = File(file.parent, "${file.name}.tmp")
+        FileOutputStream(tmp).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+        }
+        if (!tmp.renameTo(file)) {
+            // should be very unlikely to get here; try to clean up tmp file if it happens
+            tmp.delete()
+            logcat(LogPriority.WARN) { "FaviconPersister [atomic]: failed to rename ${tmp.name} to ${file.name}" }
         }
     }
 
