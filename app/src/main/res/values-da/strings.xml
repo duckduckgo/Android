@@ -825,7 +825,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Hej<br/><br/>Er du klar til en hurtigere browser, der beskytter dig og lader dig bestemme, hvornår og hvordan du vil bruge AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Lad os komme i gang!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
     <string name="preOnboardingDaxDialog2Title">Beskyttelse aktiveret!</string>
     <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
@@ -837,6 +839,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
     <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
+    <string name="preOnboardingComparisonChartDuckAi">Brug ChatGPT privat med indbygget Duck.ai</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
     <string name="preOnboardingAddressBarTitle">Hvor skal jeg placere din adresselinje?</string>
     <string name="preOnboardingAddressBarOkButton">Næste</string>
@@ -889,6 +892,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vil du have nem adgang til privat AI-chat?</string>
+    <string name="preOnboardingInputScreenTitle_2">Vil du have nem adgang til privat AI-chat i adresselinjen?</string>
     <string name="preOnboardingInputScreenButton">Næste</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[AI-funktioner er private og valgfrie. Du kan foretage ændringer i <b>Indstillinger > AI-funktioner</b>.]]></string>
 
