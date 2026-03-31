@@ -356,10 +356,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun resolvePartyContext(): String {
-        val originETldPlusOne = siteURL.toHttpUrlOrNull()?.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
-        val pageETldPlusOne = pageUrl?.toHttpUrlOrNull()?.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
+        val originUrl = siteURL.toHttpUrlOrNull() ?: return SitePermissionsPartyContextValues.UNKNOWN
+        val pageHttpUrl = pageUrl?.toHttpUrlOrNull() ?: return SitePermissionsPartyContextValues.UNKNOWN
+
+        val originHost = originUrl.host
+        val pageHost = pageHttpUrl.host
+        if (originHost.equals(pageHost, ignoreCase = true)) {
+            return SitePermissionsPartyContextValues.FIRST_PARTY
+        }
+
+        val originETldPlusOne = originUrl.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
+        val pageETldPlusOne = pageHttpUrl.topPrivateDomain() ?: return SitePermissionsPartyContextValues.UNKNOWN
         return if (originETldPlusOne.equals(pageETldPlusOne, ignoreCase = true)) {
-            SitePermissionsPartyContextValues.FIRST_PARTY
+            SitePermissionsPartyContextValues.SAME_SITE
         } else {
             SitePermissionsPartyContextValues.THIRD_PARTY
         }

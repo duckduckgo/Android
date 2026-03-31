@@ -32,6 +32,7 @@ object SitePermissionsPixelParameters {
 
 object SitePermissionsPartyContextValues {
     const val FIRST_PARTY = "first_party"
+    const val SAME_SITE = "same_site"
     const val THIRD_PARTY = "third_party"
     const val UNKNOWN = "unknown"
 }

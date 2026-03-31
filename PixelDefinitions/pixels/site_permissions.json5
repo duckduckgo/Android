@@ -13,9 +13,9 @@
             },
             {
                 "key": "partyContext",
-                "description": "Whether the permission request is first-party (same eTLD+1 as page), third-party, or unknown",
+                "description": "Relationship between the requesting origin and the top-level page: first_party (same hostname), same_site (same eTLD+1, different hostname), third_party (different eTLD+1), unknown (could not determine)",
                 "type": "string",
-                "enum": ["first_party", "third_party", "unknown"]
+                "enum": ["first_party", "same_site", "third_party", "unknown"]
             }
         ],
         "expires": "2026-09-30"
