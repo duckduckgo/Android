@@ -65,6 +65,11 @@
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
 
+    <!-- Duck.ai header tier -->
+    <string name="duckAiHeaderFreePlan">Free Plan</string>
+    <string name="duckAiHeaderUpgrade">Upgrade</string>
+    <string name="duckAiHeaderPaidTitle">Duck.ai</string>
+
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 

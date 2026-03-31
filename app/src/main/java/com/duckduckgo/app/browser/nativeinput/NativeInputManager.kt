@@ -36,6 +36,8 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.NativeInputWidget
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.google.android.material.card.MaterialCardView
 import com.squareup.anvil.annotations.ContributesBinding
@@ -74,6 +76,7 @@ class RealNativeInputManager @Inject constructor(
     private val duckChat: DuckChat,
     private val animator: NativeInputAnimator,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
@@ -418,6 +421,10 @@ class RealNativeInputManager @Inject constructor(
                 onVoiceClick = { callbacks.onVoiceSearchPressed(isChatTabSelected()) }
             }
             onImageClick = { callbacks.onImageButtonPressed() }
+            onPaidTierChanged = { isPaid ->
+                val tier = if (isPaid) DuckAiTier.Paid else DuckAiTier.Free
+                omnibarController.updateTierTitle(tier) { launchUpgrade() }
+            }
             if (!layoutCoordinator.isWidgetBottom()) {
                 setFloatingSubmitContainer(createFloatingSubmitContainer())
             }
@@ -558,8 +565,13 @@ class RealNativeInputManager @Inject constructor(
         }
     }
 
+    private fun launchUpgrade() {
+        globalActivityStarter.start(rootView.context, SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE))
+    }
+
     companion object {
         private const val WIDGET_ELEVATION_DP = 8f
         private const val FADE_OUT_DURATION_MS = 150L
+        private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
 }
