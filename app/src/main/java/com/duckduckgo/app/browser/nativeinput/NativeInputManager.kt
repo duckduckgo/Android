@@ -515,7 +515,7 @@ class RealNativeInputManager @Inject constructor(
         widget.bindChatSuggestions(
             lifecycleOwner = lifecycleOwner,
             onChatSuggestionSelected = { query ->
-                hideNativeInput()
+                hideNativeInput(animate = false)
                 onChatSuggestionSelected(query)
             },
             onShowSuggestions = { chatAdapter ->
