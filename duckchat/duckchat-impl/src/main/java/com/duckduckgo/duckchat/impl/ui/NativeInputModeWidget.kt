@@ -380,9 +380,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             onSearchTextChanged(text)
         }
         this.onSearchSent = onSearchSubmitted
-        this.onChatSent = { query ->
-            onChatSubmitted(query)
-        }
+        this.onChatSent = onChatSubmitted
     }
 
     override fun bindTabCount(
