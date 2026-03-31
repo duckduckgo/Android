@@ -3462,6 +3462,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener = {
+                    nativeInputManager.hideNativeInput(animate = false)
                     viewModel.userSelectedAutocomplete(it)
                 },
                 editableSearchClickListener = {

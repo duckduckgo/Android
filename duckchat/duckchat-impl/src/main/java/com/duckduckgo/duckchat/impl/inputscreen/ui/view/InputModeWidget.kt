@@ -373,24 +373,29 @@ open class InputModeWidget @JvmOverloads constructor(
                 )
                 minLines = 1
                 maxLines = if (canExpand) MAX_LINES else 1
+                setHorizontallyScrolling(!canExpand)
             } else {
                 hint = context.getString(R.string.input_screen_chat_hint)
-                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
-                setRawInputType(
-                    InputType.TYPE_CLASS_TEXT or
-                        InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
-                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
-                )
+                setHorizontallyScrolling(!canExpand)
+                applyChatInputType()
                 val chatMin = if (bottomButtonsMode) 1 else CHAT_MIN_LINES
                 minLines = chatMin
                 maxLines = if (canExpand) MAX_LINES else chatMin
             }
-            setHorizontallyScrolling(!canExpand)
             post {
                 requestLayout()
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
+    }
+
+    protected open fun EditText.applyChatInputType() {
+        imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+        setRawInputType(
+            InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
+                InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+        )
     }
 
     private fun beginChangeBoundsTransition() {
