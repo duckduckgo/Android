@@ -1,7 +1,7 @@
 {
     "m_site_permissions_prompt_shown": {
         "description": "Fired when a website permission prompt (camera, mic, location, DRM) is shown to the user.",
-        "owners": ["AnyBooker"],
+        "owners": ["jonathanKingston"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
