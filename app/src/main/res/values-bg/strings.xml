@@ -825,7 +825,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-бърз браузър, който осигурява защита и позволява да решавате кога и как да използвате AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Да започваме!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Вече знам за това</string>
     <string name="preOnboardingDaxDialog2Title">Защитите са активирани!</string>
     <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
@@ -837,6 +839,7 @@
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
     <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
+    <string name="preOnboardingComparisonChartDuckAi">Използвайте ChatGPT поверително с вграден Duck.ai</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="preOnboardingAddressBarTitle">Къде да сложа адресната лента?</string>
     <string name="preOnboardingAddressBarOkButton">Следващ</string>
@@ -889,6 +892,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Искаш ли лесен достъп до поверителен чат с изкуствен интелект?</string>
+    <string name="preOnboardingInputScreenTitle_2">Искате лесен достъп до поверителен чат с AI в адресната лента?</string>
     <string name="preOnboardingInputScreenButton">Следващ</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Функциите на изкуствения интелект са поверителни и незадължителни. Можеш да направиш промени в <b>Настройки > ИИ функции</b>.]]></string>
 
