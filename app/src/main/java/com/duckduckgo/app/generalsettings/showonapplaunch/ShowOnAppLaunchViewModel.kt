@@ -79,12 +79,21 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
             userSelectedThreshold,
         ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold ->
+            val (rcDefault, rcOptions) = FirstScreenHandlerImpl.parseIdleReturnSettings(
+                androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
+            )
+            val effectiveOptions = rcOptions ?: FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS
+            val effectiveThreshold = when {
+                userThreshold != null -> userThreshold
+                rcDefault != null && rcOptions != null && rcDefault in rcOptions -> rcDefault
+                else -> FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS
+            }
             _viewState.value = ViewState(
                 selectedOption = option,
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                selectedIdleThresholdSeconds = userThreshold ?: FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
-                idleThresholdOptions = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
+                selectedIdleThresholdSeconds = effectiveThreshold,
+                idleThresholdOptions = effectiveOptions,
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)

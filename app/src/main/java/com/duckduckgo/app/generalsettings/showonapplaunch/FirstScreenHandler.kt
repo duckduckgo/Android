@@ -26,6 +26,7 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
+import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -71,11 +72,36 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private fun getTimeoutSeconds(): Long {
-        return settingsDataStore.userSelectedIdleThresholdSeconds ?: DEFAULT_IDLE_THRESHOLD_SECONDS
+        val userPref = settingsDataStore.userSelectedIdleThresholdSeconds
+        if (userPref != null) return userPref
+
+        val (rcDefault, options) = parseIdleReturnSettings(androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings())
+        return if (rcDefault != null && options != null && rcDefault in options) {
+            rcDefault
+        } else {
+            DEFAULT_IDLE_THRESHOLD_SECONDS
+        }
     }
 
     companion object {
         const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
         val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 3600L, 43200L, 86400L)
+
+        fun parseIdleReturnSettings(settingsJson: String?): Pair<Long?, List<Long>?> {
+            if (settingsJson == null) return Pair(null, null)
+            return try {
+                val json = JSONObject(settingsJson)
+                val defaultSeconds = if (json.has("defaultIdleThresholdSeconds")) json.getLong("defaultIdleThresholdSeconds") else null
+                val options = if (json.has("idleThresholdOptions")) {
+                    val arr = json.getJSONArray("idleThresholdOptions")
+                    (0 until arr.length()).map { arr.getLong(it) }
+                } else {
+                    null
+                }
+                Pair(defaultSeconds, options)
+            } catch (e: Exception) {
+                Pair(null, null)
+            }
+        }
     }
 }
