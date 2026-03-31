@@ -124,7 +124,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         }
     }
 
-    private fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
+    private suspend fun buildViewState(cardsList: Content.CardsList, imageFilePath: String?): ViewState {
         val items = mutableListOf<ModalListItem>()
 
         items.add(
@@ -137,8 +137,13 @@ class CardsListRemoteMessageViewModel @Inject constructor(
         )
 
         items.addAll(
-            cardsList.listItems.map {
-                ModalListItem.CardListItem(id = it.id, cardItem = it)
+            cardsList.listItems.map { cardItem ->
+                val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
+                    remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
+                } else {
+                    null
+                }
+                ModalListItem.CardListItem(id = cardItem.id, cardItem = cardItem, imageFilePath = itemImagePath)
             },
         )
 

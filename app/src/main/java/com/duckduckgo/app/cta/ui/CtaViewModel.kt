@@ -188,6 +188,11 @@ class CtaViewModel @Inject constructor(
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
         }
+        if (cta is SubscriptionPromoModalCta) {
+            withContext(dispatchers.io()) {
+                dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+            }
+        }
     }
 
     suspend fun refreshCta(

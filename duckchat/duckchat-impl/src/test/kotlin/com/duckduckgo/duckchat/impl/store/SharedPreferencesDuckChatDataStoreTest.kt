@@ -430,4 +430,36 @@ class SharedPreferencesDuckChatDataStoreTest {
 
         assertEquals(listOf(null, "DUCK_AI"), results)
     }
+
+    @Test
+    fun whenNoModelStoredThenGetSelectedModelReturnsNull() = runTest {
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelStoredThenGetSelectedModelReturnsIt() = runTest {
+        testee.setSelectedModel(SelectedModel("id", "model"))
+
+        val result = testee.getSelectedModel()
+        assertEquals("id", result?.id)
+        assertEquals("model", result?.shortName)
+    }
+
+    @Test
+    fun whenNullModelStoredThenGetSelectedModelReturnsNull() = runTest {
+        testee.setSelectedModel(SelectedModel("id", "model"))
+        testee.setSelectedModel(null)
+
+        assertNull(testee.getSelectedModel())
+    }
+
+    @Test
+    fun whenModelOverwrittenThenGetSelectedModelReturnsLatest() = runTest {
+        testee.setSelectedModel(SelectedModel("id1", "model1"))
+        testee.setSelectedModel(SelectedModel("id2", "model2"))
+
+        val result = testee.getSelectedModel()
+        assertEquals("id2", result?.id)
+        assertEquals("model2", result?.shortName)
+    }
 }

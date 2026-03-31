@@ -184,6 +184,14 @@ class BrowserMenuBottomSheet(
         }
     }
 
+    fun onMenuItemLongClicked(menuView: View, onClick: () -> Unit) {
+        menuView.setOnLongClickListener {
+            onClick()
+            dismiss()
+            true
+        }
+    }
+
     private fun hideAllMenuItems() {
         menuItemsContainer.children.forEach { menuItem ->
             menuItem.gone()

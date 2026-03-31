@@ -18,6 +18,12 @@ package com.duckduckgo.app.browser.nativeinput
 
 import android.graphics.Color
 import android.os.Build
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +43,12 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.google.android.material.card.MaterialCardView
 
+sealed class DuckAiTier {
+    data object Free : DuckAiTier()
+    data object Paid : DuckAiTier()
+    data object Unknown : DuckAiTier()
+}
+
 interface OmnibarState {
     fun isDuckAiMode(): Boolean
     fun isBrowserMode(): Boolean
@@ -54,6 +66,7 @@ interface NativeInputOmnibarController : OmnibarState {
     fun getCardView(): View?
     fun restore()
     fun forceToTop()
+    fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit)
 }
 
 class RealNativeInputOmnibarController(
@@ -129,6 +142,9 @@ class RealNativeInputOmnibarController(
         omnibarView.findViewById<View?>(R.id.pageLoadingIndicator)?.gone()
     }
 
+    private var currentTier: DuckAiTier = DuckAiTier.Unknown
+    private var currentUpgradeClick: (() -> Unit)? = null
+
     private fun showDuckAiTitle(omnibarView: View) {
         val header = omnibarView.findViewById<android.widget.LinearLayout?>(R.id.duckAIHeader)
         val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
@@ -137,7 +153,58 @@ class RealNativeInputOmnibarController(
         header?.gravity = Gravity.CENTER_VERTICAL or Gravity.START
         header?.setBackgroundColor(Color.TRANSPARENT)
         aiTitle?.show()
-        aiTitle?.setTextAppearance(com.google.android.material.R.style.TextAppearance_MaterialComponents_Headline6)
+        aiTitle?.textSize = 16f
+        applyTierText(aiTitle)
+    }
+
+    override fun updateTierTitle(tier: DuckAiTier, onUpgradeClicked: () -> Unit) {
+        currentTier = tier
+        currentUpgradeClick = onUpgradeClicked
+        val omnibarView = omnibar.omnibarView as? View ?: return
+        val aiTitle = omnibarView.findViewById<TextView?>(R.id.aiTitle)
+        applyTierText(aiTitle)
+    }
+
+    private fun applyTierText(aiTitle: TextView?) {
+        aiTitle ?: return
+        when (currentTier) {
+            is DuckAiTier.Free -> {
+                val context = aiTitle.context
+                val freePlan = context.getString(R.string.duckAiHeaderFreePlan)
+                val upgrade = context.getString(R.string.duckAiHeaderUpgrade)
+                val full = "$freePlan · $upgrade ↑"
+                val spannable = SpannableStringBuilder(full)
+                val upgradeStart = full.indexOf(upgrade)
+                val upgradeEnd = full.length
+                val accentColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+                spannable.setSpan(
+                    object : ClickableSpan() {
+                        override fun onClick(widget: View) {
+                            currentUpgradeClick?.invoke()
+                        }
+                        override fun updateDrawState(ds: TextPaint) {
+                            ds.isUnderlineText = false
+                        }
+                    },
+                    upgradeStart,
+                    upgradeEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                spannable.setSpan(
+                    ForegroundColorSpan(accentColor),
+                    upgradeStart,
+                    upgradeEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                aiTitle.text = spannable
+                aiTitle.movementMethod = LinkMovementMethod.getInstance()
+                aiTitle.highlightColor = Color.TRANSPARENT
+            }
+            is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
+                aiTitle.text = aiTitle.context.getString(R.string.duckAiHeaderPaidTitle)
+                aiTitle.movementMethod = null
+            }
+        }
     }
 
     private fun applyOnLayout(omnibarView: View, block: () -> Unit) {
@@ -168,6 +235,8 @@ class RealNativeInputOmnibarController(
     }
 
     override fun restore() {
+        currentTier = DuckAiTier.Unknown
+        currentUpgradeClick = null
         (omnibar.omnibarView as? View)?.let { removeLayoutListener(it) }
         restoreOmnibarColors()
         restoreOmnibarContent()

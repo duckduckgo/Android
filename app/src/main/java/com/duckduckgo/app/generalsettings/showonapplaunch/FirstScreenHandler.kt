@@ -50,9 +50,9 @@ class FirstScreenHandlerImpl @Inject constructor(
 
     private suspend fun handleFirstScreen(isFreshLaunch: Boolean) {
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
-            val timeoutMs = getTimeoutMs()
+            val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            logcat { "FirstScreen: timeout is $timeoutMs and lastBackgrounded is $lastBackgrounded" }
+            logcat { "FirstScreen: timeout is $timeoutMs ms and lastBackgrounded is $lastBackgrounded" }
             val elapsed = System.currentTimeMillis() - lastBackgrounded
             logcat { "FirstScreen: time elapsed $elapsed" }
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
@@ -71,15 +71,26 @@ class FirstScreenHandlerImpl @Inject constructor(
         settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
     }
 
-    private fun getTimeoutMs(): Long {
-        val settings = androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings()
-            ?: return DEFAULT_TIMEOUT_MS
-        return runCatching {
-            JSONObject(settings).getLong("defaultIdleThresholdSeconds") * 1000
-        }.getOrDefault(DEFAULT_TIMEOUT_MS)
+    private fun getTimeoutSeconds(): Long {
+        val userPref = settingsDataStore.userSelectedIdleThresholdSeconds
+        if (userPref != null) return userPref
+
+        return parseDefaultIdleThresholdSeconds(androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings())
+            ?: DEFAULT_IDLE_THRESHOLD_SECONDS
     }
 
     companion object {
-        private const val DEFAULT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+        const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
+        val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 1800L, 3600L, 43200L, 86400L)
+
+        fun parseDefaultIdleThresholdSeconds(settingsJson: String?): Long? {
+            if (settingsJson == null) return null
+            return try {
+                val json = JSONObject(settingsJson)
+                if (json.has("defaultIdleThresholdSeconds")) json.getLong("defaultIdleThresholdSeconds") else null
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 }

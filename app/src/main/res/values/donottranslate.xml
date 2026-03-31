@@ -65,6 +65,11 @@
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
 
+    <!-- Duck.ai header tier -->
+    <string name="duckAiHeaderFreePlan">Free Plan</string>
+    <string name="duckAiHeaderUpgrade">Upgrade</string>
+    <string name="duckAiHeaderPaidTitle">Duck.ai</string>
+
     <!-- ADS -->
     <string name="ads_demo_activity_title" translatable="false">Android Design System Demo</string>
 
@@ -87,7 +92,14 @@
 
     <!-- Inactivity timeout -->
     <string name="afterInactivityOptionTitle">After Inactivity</string>
+    <string name="afterInactivityTimeoutRowTitle">Choose an inactivity timer</string>
+    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return after inactivity</string>
     <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
+    <string name="afterInactivityTimeoutAlways" translatable="false">Always</string>
+    <string name="afterInactivityTimeout1Minute" translatable="false">1 minute</string>
+    <string name="afterInactivityTimeoutXMinutes" translatable="false">%1$d minutes</string>
+    <string name="afterInactivityTimeout1Hour" translatable="false">1 hour</string>
+    <string name="afterInactivityTimeoutXHours" translatable="false">%1$d hours</string>
 
     <!--Onboarding Rebrand Design Update-->
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
