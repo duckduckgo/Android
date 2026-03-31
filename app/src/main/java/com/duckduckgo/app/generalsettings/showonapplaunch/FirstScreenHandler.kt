@@ -81,7 +81,7 @@ class FirstScreenHandlerImpl @Inject constructor(
 
     companion object {
         const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
-        val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 3600L, 43200L, 86400L)
+        val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 1800L, 3600L, 43200L, 86400L)
 
         fun parseDefaultIdleThresholdSeconds(settingsJson: String?): Long? {
             if (settingsJson == null) return null
