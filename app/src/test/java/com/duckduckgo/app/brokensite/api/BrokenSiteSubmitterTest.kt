@@ -43,6 +43,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
@@ -108,6 +109,8 @@ class BrokenSiteSubmitterTest {
 
     private val ampLinks: AmpLinks = mock()
 
+    private val sitePermissionsRepository: SitePermissionsRepository = mock()
+
     private lateinit var testBlockListFeature: TestBlockListFeature
     private lateinit var inventory: FeatureTogglesInventory
 
@@ -126,6 +129,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
         runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+        runBlocking { whenever(sitePermissionsRepository.isDrmEnabledForSite(url = any())).thenReturn(true) }
 
         testBlockListFeature = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -163,6 +167,7 @@ class BrokenSiteSubmitterTest {
             webViewVersionProvider,
             ampLinks,
             inventory,
+            sitePermissionsRepository,
         )
     }
 
@@ -603,6 +608,30 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.lastValue
         assertEquals(brokenSite.siteUrl, params["siteUrl"])
         assertFalse(params.containsKey("protectionsState"))
+    }
+
+    @Test
+    fun whenDrmIsEnabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(true)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("true", paramsCaptor.lastValue["drmEnabled"])
+    }
+
+    @Test
+    fun whenDrmIsDisabledForReportedSiteThenIncludeDrmEnabledParam() = runTest {
+        whenever(sitePermissionsRepository.isDrmEnabledForSite("https://example.com")).thenReturn(false)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite(), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+
+        assertEquals("false", paramsCaptor.lastValue["drmEnabled"])
     }
 
     @Test

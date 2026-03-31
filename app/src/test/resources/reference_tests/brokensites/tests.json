@@ -231,6 +231,7 @@
                 "model": "305 RAMAC",
                 "os": "12",
                 "gpcEnabled": true,
+                "drmEnabled": true,
                 "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
@@ -244,12 +245,43 @@
                     {"name": "model", "value": "305 RAMAC"},
                     {"name": "os", "value": "12"},
                     {"name": "gpc", "value": "true"},
+                    {"name": "drmEnabled", "value": "true"},
                     {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "web-extension",
                     "safari-extension",
                     "macos-browser",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Android-specific DRM disabled field",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test"],
+                "surrogates": [],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "drmEnabled": false,
+                "protectionsEnabled": true,
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test"},
+                    {"name": "surrogates", "value": ""},
+                    {"name": "drmEnabled", "value": "false"},
+                    {"name": "protectionsState", "value": "true"}
+                ],
+                "exceptPlatforms": [
+                    "web-extension",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
                     "windows-browser"
                 ]
             },
