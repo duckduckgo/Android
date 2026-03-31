@@ -464,7 +464,7 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenGetCardItemImageFilePathReturnNullWhenStoryReturnsNull() = runTest {
+    fun whenGetCardItemImageFilePathReturnNullWhenStoreReturnsNull() = runTest {
         whenever(remoteMessageImageStore.getCardItemImageFilePath("item1")).thenReturn(null)
 
         val result = testee.getCardItemImageFilePath("item1")

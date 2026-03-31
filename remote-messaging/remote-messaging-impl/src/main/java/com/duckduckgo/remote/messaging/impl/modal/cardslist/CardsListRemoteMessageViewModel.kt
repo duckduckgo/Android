@@ -135,7 +135,7 @@ class CardsListRemoteMessageViewModel @Inject constructor(
 
         items.addAll(
             cardsList.listItems.map { cardItem ->
-                val itemImagePath = if (cardItem is CardItem.ListItem && cardItem.imageUrl != null) {
+                val itemImagePath = if (cardItem is CardItem.ListItem && !cardItem.imageUrl.isNullOrEmpty()) {
                     remoteMessagingRepository.getCardItemImageFilePath(cardItem.id)
                 } else {
                     null

@@ -237,6 +237,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                     .transition(withCrossFade())
                     .into(imageView)
             } else {
+                Glide.with(imageView).clear(imageView)
                 imageView.setImageResource(placeholder.drawable(true))
             }
         }
