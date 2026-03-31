@@ -92,6 +92,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             HttpErrorPixelName.WEBVIEW_RECEIVED_HTTP_ERROR_5XX_DAILY.pixelName to PixelParameter.removeAtb(),
             SitePermissionsPixelName.PERMISSION_DIALOG_CLICK.pixelName to PixelParameter.removeAtb(),
             SitePermissionsPixelName.PERMISSION_DIALOG_IMPRESSION.pixelName to PixelParameter.removeAtb(),
+            SitePermissionsPixelName.PERMISSION_PROMPT_SHOWN.pixelName to PixelParameter.removeAtb(),
             SITE_NOT_WORKING_SHOWN.pixelName to PixelParameter.removeAtb(),
             SITE_NOT_WORKING_WEBSITE_BROKEN.pixelName to PixelParameter.removeAtb(),
             AppPixelName.APP_VERSION_AT_SEARCH_TIME.pixelName to PixelParameter.removeAll(),

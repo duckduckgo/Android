@@ -5327,7 +5327,7 @@ class BrowserTabFragment :
         }
 
         activity?.let {
-            sitePermissionsDialogLauncher.askForSitePermission(it, request.origin.toString(), tabId, permissionsToRequest, request, this)
+            sitePermissionsDialogLauncher.askForSitePermission(it, request.origin.toString(), tabId, permissionsToRequest, request, this, viewModel.url)
         }
     }
 

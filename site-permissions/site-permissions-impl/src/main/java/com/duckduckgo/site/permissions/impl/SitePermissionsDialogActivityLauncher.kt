@@ -34,8 +34,8 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -74,6 +74,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var permissionsHandledAutomatically: List<String>
     private var siteURL: String = ""
     private var tabId: String = ""
+    private var pageUrl: String? = null
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -90,6 +91,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         permissionsRequested: SitePermissions,
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
+        pageUrl: String?,
     ) {
         logcat { "Permissions: permission askForSitePermission $permissionsRequested" }
         sitePermissionRequest = request
@@ -97,6 +99,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.tabId = tabId
         this.activity = activity
         this.permissionsGrantedListener = permissionsGrantedListener
+        this.pageUrl = pageUrl
         permissionsHandledByUser = permissionsRequested.userHandled
         permissionsHandledAutomatically = permissionsRequested.autoAccept
 
@@ -338,6 +341,24 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             SitePermissionsPixelName.PERMISSION_DIALOG_IMPRESSION,
             mapOf(SitePermissionsPixelParameters.PERMISSION_TYPE to type),
         )
+        sendPermissionPromptShownPixel(type)
+    }
+
+    private fun sendPermissionPromptShownPixel(type: String) {
+        val isThirdParty = isPermissionRequestThirdParty()
+        pixel.fire(
+            SitePermissionsPixelName.PERMISSION_PROMPT_SHOWN,
+            mapOf(
+                SitePermissionsPixelParameters.PERMISSION_TYPE to type,
+                SitePermissionsPixelParameters.IS_THIRD_PARTY to isThirdParty.toString(),
+            ),
+        )
+    }
+
+    private fun isPermissionRequestThirdParty(): Boolean {
+        val requestOriginDomain = siteURL.extractDomain() ?: return false
+        val pageDomain = pageUrl?.extractDomain() ?: return false
+        return !requestOriginDomain.equals(pageDomain, ignoreCase = true)
     }
 
     private fun sendNegativeDialogClickPixel(

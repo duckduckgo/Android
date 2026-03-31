@@ -26,6 +26,7 @@ interface SitePermissionsDialogLauncher {
      * @param permissionsRequested maps of permissions where keys are the type [PermissionsKey] and have a list of [String] as values.
      * @param request from onPermissionRequest callback in BrowserChromeClient. It is needed to grant site permissions.
      * @param permissionsGrantedListener interface that fragment or activity needs to implement to handle special cases when granting permissions
+     * @param pageUrl the top-level page URL, used to determine first vs third party context
      */
     fun askForSitePermission(
         activity: Activity,
@@ -34,5 +35,6 @@ interface SitePermissionsDialogLauncher {
         permissionsRequested: SitePermissions,
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
+        pageUrl: String? = null,
     )
 }

@@ -21,11 +21,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 enum class SitePermissionsPixelName(override val pixelName: String) : Pixel.PixelName {
     PERMISSION_DIALOG_IMPRESSION("m_site_permissions_dialog_impresssion"),
     PERMISSION_DIALOG_CLICK("m_site_permissions_dialog_click"),
+    PERMISSION_PROMPT_SHOWN("m_site_permissions_prompt_shown"),
 }
 
 object SitePermissionsPixelParameters {
     const val PERMISSION_TYPE = "type"
     const val PERMISSION_SELECTION = "selection"
+    const val IS_THIRD_PARTY = "isThirdParty"
 }
 
 object SitePermissionsPixelValues {

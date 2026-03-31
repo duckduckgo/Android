@@ -1,0 +1,22 @@
+{
+    "m_site_permissions_prompt_shown": {
+        "description": "Fired when a website permission prompt (camera, mic, location, DRM) is shown to the user.",
+        "owners": ["AnyBooker"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            {
+                "key": "type",
+                "description": "The permission type requested by the website",
+                "type": "string",
+                "enum": ["camera", "microphone", "camera_and_microphone", "drm", "location"]
+            },
+            {
+                "key": "isThirdParty",
+                "description": "Whether the permission request originated from a third-party context (different domain than the top-level page)",
+                "type": "boolean"
+            }
+        ],
+        "expires": "2026-09-30"
+    }
+}
