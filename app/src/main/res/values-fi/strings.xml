@@ -825,7 +825,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hei!<br/><br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Hei!<br/><br/>Oletko valmis nopeampaan selaimeen, joka suojaa sinua ja antaa sinun päättää, milloin ja miten käytät tekoälyä?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Hei!</string>
+    <string name="preOnboardingDaxDialog1Text">Oletko valmis nopeampaan selaimeen, joka suojaa sinua ja antaa sinun päättää, milloin ja miten käytät tekoälyä?</string>
     <string name="preOnboardingDaxDialog1Button">Aloitetaan!</string>
     <string name="preOnboardingDaxDialog1Button_2">Aloitetaan!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>

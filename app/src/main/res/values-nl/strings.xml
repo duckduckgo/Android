@@ -825,7 +825,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een snellere browser die je beschermt?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Hallo.<br/><br/>Klaar voor een snellere browser die je beschermt en je zelf laat bepalen wanneer en hoe je AI gebruikt?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Hoi.</string>
+    <string name="preOnboardingDaxDialog1Text">Klaar voor een snellere browser die je beschermt en je zelf laat bepalen wanneer en hoe je AI gebruikt?</string>
     <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
     <string name="preOnboardingDaxDialog1Button_2">Laten we beginnen!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Overslaan</string>

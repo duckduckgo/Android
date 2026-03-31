@@ -825,7 +825,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Merhaba.<br/><br/>Sizi koruyan ve yapay zekâyı ne zaman ve nasıl kullanacağınıza karar vermenizi sağlayan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Merhaba.</string>
+    <string name="preOnboardingDaxDialog1Text">Sizi koruyan ve yapay zekâyı ne zaman ve nasıl kullanacağınıza karar vermenizi sağlayan daha hızlı bir tarayıcıya hazır mısınız?</string>
     <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
     <string name="preOnboardingDaxDialog1Button_2">Başlayalım!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
