@@ -373,14 +373,15 @@ open class InputModeWidget @JvmOverloads constructor(
                 )
                 minLines = 1
                 maxLines = if (canExpand) MAX_LINES else 1
+                setHorizontallyScrolling(!canExpand)
             } else {
                 hint = context.getString(R.string.input_screen_chat_hint)
+                setHorizontallyScrolling(!canExpand)
                 applyChatInputType()
                 val chatMin = if (bottomButtonsMode) 1 else CHAT_MIN_LINES
                 minLines = chatMin
                 maxLines = if (canExpand) MAX_LINES else chatMin
             }
-            setHorizontallyScrolling(!canExpand)
             post {
                 requestLayout()
             }

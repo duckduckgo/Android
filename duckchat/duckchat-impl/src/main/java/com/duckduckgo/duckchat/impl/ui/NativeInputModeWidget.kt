@@ -124,6 +124,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
+    private var isStreaming: Boolean = false
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
     private var onShowSuggestions: ((ChatSuggestionsAdapter) -> Unit)? = null
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
@@ -204,7 +205,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         prepareSubmitButtons()
         configureMainButtonsVisibility()
         inputField.doOnTextChanged { text, _, _, _ ->
-            if (isChatTabSelected()) {
+            if (isChatTabSelected() && !isStreaming) {
                 submitButtons?.setSendButtonEnabled(!text.isNullOrBlank())
             }
         }
@@ -451,6 +452,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun setChatStreaming(streaming: Boolean) {
+        isStreaming = streaming
         ensureSubmitButtons()
         if (streaming) {
             submitButtons?.setStopButton()
@@ -467,7 +469,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         if (isChatTab) {
             submitButtons?.setSendButtonIcon(R.drawable.ic_arrow_up_24)
             submitButtons?.setSendButtonVisible(true)
-            submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
+            if (!isStreaming) {
+                submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
+            }
             inputField.minLines = 1
             inputField.maxLines = MAX_LINES
         } else {
