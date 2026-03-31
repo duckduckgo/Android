@@ -1,9 +1,8 @@
 ---
 description: |
-  This workflow creates daily repo status reports. It gathers recent repository
-  activity (issues, PRs, discussions, releases, code changes) and generates
-  engaging GitHub issues with productivity insights, community highlights,
-  and project recommendations.
+  This workflow runs the Android Maintenance Worker agent. It picks one maintenance
+  task from the Android Agentic Maintenance Backlog in Asana, implements it on a
+  feature branch, and opens a draft PR targeting develop.
 
 on:
   workflow_dispatch:
@@ -141,7 +140,7 @@ Body (follow the template exactly — replace the placeholder sections):
     | No UI changes | No UI changes |
 
 After opening the PR:
-- Move the Asana task to "In Review"
+- Move the Asana task to "In Review" (section GID: `1213746476312674`) via the Asana API
 - Leave a comment on the Asana task with the PR link
 - Update memory: in_progress_pr → PR number and branch
 
