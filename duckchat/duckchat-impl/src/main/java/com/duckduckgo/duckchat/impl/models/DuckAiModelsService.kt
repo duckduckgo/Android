@@ -25,4 +25,10 @@ import retrofit2.http.Url
 interface DuckAiModelsService {
     @GET
     suspend fun getModels(@Url url: String): AIChatModelsResponse
+
+    companion object {
+        private const val MODELS_PATH = "/duckchat/v1/models"
+
+        fun modelsUrl(host: String): String = "https://$host$MODELS_PATH"
+    }
 }

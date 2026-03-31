@@ -34,6 +34,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -223,7 +224,7 @@ class ModelPickerView @JvmOverloads constructor(
     }
 
     private fun LinearLayout.addDivider() {
-        addView(LayoutInflater.from(context).inflate(R.layout.view_model_picker_divider, this, false))
+        addView(HorizontalDivider(context))
     }
 
     companion object {

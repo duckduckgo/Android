@@ -108,7 +108,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun fetchRemoteModels(userTier: UserTier): List<AIChatModel> {
-        val url = "https://${duckAiHostProvider.getHost()}/duckchat/v1/models"
+        val url = DuckAiModelsService.modelsUrl(duckAiHostProvider.getHost())
         return modelsService.getModels(url).models.map { resolveModel(it, userTier) }
     }
 
