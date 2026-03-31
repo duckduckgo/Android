@@ -434,12 +434,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun observeTier() {
         tierJob?.cancel()
-        tierJob = subscriptions.getEntitlementStatus()
-            .onEach { entitlements ->
-                val hasDuckAiPlus = entitlements.any { it == Product.DuckAiPlus }
-                onPaidTierChanged?.invoke(hasDuckAiPlus)
-            }
-            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+        val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
+        tierJob = scope.launch {
+            if (!subscriptions.isEligible()) return@launch
+            subscriptions.getEntitlementStatus()
+                .onEach { entitlements ->
+                    val hasDuckAiPlus = entitlements.any { it == Product.DuckAiPlus }
+                    onPaidTierChanged?.invoke(hasDuckAiPlus)
+                }
+                .launchIn(this)
+        }
     }
 
     private fun fetchChatSuggestions(
