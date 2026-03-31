@@ -99,6 +99,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
     private var skipOnboardingFadeOutAnimatorSet: AnimatorSet? = null
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
+    private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
     private var textIntroScale = 1f
     private var isAnimating = false
@@ -407,6 +408,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         skipOnboardingFadeOutAnimatorSet = null
         skipOnboardingFadeInAnimatorSet?.cancel()
         skipOnboardingFadeInAnimatorSet = null
+        arrowSlideAnimator?.cancel()
+        arrowSlideAnimator = null
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         backgroundAnimator?.cancel()
         backgroundAnimator = null
@@ -592,7 +595,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     val cardView = binding.daxDialogCta.cardView
                     cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
-                    android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+                    arrowSlideAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
                         duration = DIALOG_TRANSITION_DURATION
                         interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator()
                         addUpdateListener {
