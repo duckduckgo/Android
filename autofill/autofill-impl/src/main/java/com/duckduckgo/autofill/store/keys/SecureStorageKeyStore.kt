@@ -243,25 +243,27 @@ class RealSecureStorageKeyStore(
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName, harmonyFlags)) {
-                pixel.fire(
-                    AUTOFILL_STORE_KEY_ALREADY_EXISTS,
-                    getPixelParams(
-                        keyName = keyValue.first,
-                        useHarmony = harmonyFlags.useHarmony,
-                        readFromHarmony = harmonyFlags.readFromHarmony,
-                    ),
-                    type = Daily(),
-                )
-                throw SecureStorageException.KeyAlreadyExistsException("Trying to overwrite already existing key")
+            keyValues.forEach { keyValue ->
+                if (keyAlreadyExists(legacyPrefs, harmonyPrefs, keyValue.first, harmonyFlags)) {
+                    pixel.fire(
+                        AUTOFILL_STORE_KEY_ALREADY_EXISTS,
+                        getPixelParams(
+                            keyName = keyValue.first,
+                            useHarmony = harmonyFlags.useHarmony,
+                            readFromHarmony = harmonyFlags.readFromHarmony,
+                        ),
+                        type = Daily(),
+                    )
+                    throw SecureStorageException.KeyAlreadyExistsException("Trying to overwrite already existing key")
+                }
             }
 
             if (legacyPrefs != null) {
                 // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
                 val (legacyCommitted, error) = runCatching {
-                    logcat(TAG) { "Writing $keyName to legacy" }
                     val editor = legacyPrefs.edit()
                     keyValues.forEach { keyValue ->
+                        logcat(TAG) { "Writing ${keyValue.first} to legacy" }
                         editor.putString(keyValue.first, keyValue.second.toByteString().base64())
                     }
                     editor.commit() to null
@@ -286,9 +288,9 @@ class RealSecureStorageKeyStore(
 
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
                 val (harmonyCommitted, error) = runCatching {
-                    logcat(TAG) { "Writing $keyName to harmony" }
                     val editor = harmonyPrefs.edit()
                     keyValues.forEach { keyValue ->
+                        logcat(TAG) { "Writing ${keyValue.first} to harmony" }
                         editor.putString(keyValue.first, keyValue.second.toByteString().base64())
                     }
                     editor.commit() to null

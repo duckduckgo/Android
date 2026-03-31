@@ -792,7 +792,7 @@ class RealSecureStorageKeyStoreTest {
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Write should succeed — legacy stale cache doesn't block
         verify(harmonyEditor).putString(eq(KEY_NAME), any())
@@ -808,7 +808,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
@@ -871,7 +871,7 @@ class RealSecureStorageKeyStoreTest {
         configureMultiProcessMode()
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
         createTestee()
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Verify key was written to legacy (for rollback support)
         verify(legacyEditor).putString(eq(KEY_NAME), eq(TEST_VALUE.toByteString().base64()))
@@ -931,7 +931,7 @@ class RealSecureStorageKeyStoreTest {
         createTestee()
 
         // First operation latches multiProcess=true
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Disable the flag mid-session
         autofillServiceFeature.self().setRawStoredState(State(enable = false))
@@ -942,7 +942,7 @@ class RealSecureStorageKeyStoreTest {
         // Try to write again - should be blocked because latched multiProcess still checks Harmony
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, DIFFERENT_VALUE)
+            testee.updateKey(Pair(KEY_NAME, DIFFERENT_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
