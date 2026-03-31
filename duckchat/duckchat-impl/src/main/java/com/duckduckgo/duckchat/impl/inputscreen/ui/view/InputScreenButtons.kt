@@ -42,7 +42,7 @@ class InputScreenButtons @JvmOverloads constructor(
     var onSendClick: (() -> Unit)? = null
         set(value) {
             field = value
-            binding.actionSend.setOnClickListener { value?.invoke() }
+            binding.actionSend.setOnClickListener { if (it.isEnabled) value?.invoke() }
         }
 
     var onStopClick: (() -> Unit)? = null
@@ -74,6 +74,7 @@ class InputScreenButtons @JvmOverloads constructor(
     }
 
     fun setStopButton() {
+        binding.actionSend.isEnabled = true
         binding.actionSend.setImageResource(R.drawable.ic_stop_16)
         binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonDestructiveContainer)
         binding.actionSend.setOnClickListener { onStopClick?.invoke() }
@@ -82,7 +83,7 @@ class InputScreenButtons @JvmOverloads constructor(
     fun clearStopButton(iconResId: Int) {
         binding.actionSend.setImageResource(iconResId)
         binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonPrimaryContainer)
-        binding.actionSend.setOnClickListener { onSendClick?.invoke() }
+        binding.actionSend.setOnClickListener { if (it.isEnabled) onSendClick?.invoke() }
     }
 
     private fun resolveThemeColorStateList(attr: Int): android.content.res.ColorStateList? {
@@ -90,6 +91,13 @@ class InputScreenButtons @JvmOverloads constructor(
         val colorStateList = attributes.getColorStateList(0)
         attributes.recycle()
         return colorStateList
+    }
+
+    fun setSendButtonEnabled(enabled: Boolean) {
+        binding.actionSend.isEnabled = enabled
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
+            if (enabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
+        )
     }
 
     fun setSendButtonVisible(visible: Boolean) {

@@ -17,9 +17,11 @@
 package com.duckduckgo.app.browser.nativeinput
 
 import android.app.Activity
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
@@ -78,6 +80,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
     private var isExiting: Boolean = false
+    private var floatingSubmitContainer: View? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -179,6 +182,10 @@ class RealNativeInputManager @Inject constructor(
         if (isExiting) return
         val widget = widgetFrom(rootView) ?: return
         val widgetRoot = widget.asView().parent?.parent as? View
+
+        if (omnibarController.isDuckAiMode()) {
+            widget.setToggleVisible(isVisible)
+        }
 
         if (isVisible) {
             onKeyboardShown(widgetRoot)
@@ -307,7 +314,9 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         attachWidget(widgetView)
-        if (!omnibarController.isDuckAiMode()) {
+        if (omnibarController.isDuckAiMode()) {
+            widgetFrom(widgetView)?.setToggleVisible(false)
+        } else {
             showNtp()
         }
     }
@@ -377,6 +386,10 @@ class RealNativeInputManager @Inject constructor(
             rootView.removeView(it)
             removed = true
         }
+        floatingSubmitContainer?.let {
+            (it.parent as? ViewGroup)?.removeView(it)
+            floatingSubmitContainer = null
+        }
         return removed
     }
 
@@ -405,6 +418,9 @@ class RealNativeInputManager @Inject constructor(
                 onVoiceClick = { callbacks.onVoiceSearchPressed(isChatTabSelected()) }
             }
             onImageClick = { callbacks.onImageButtonPressed() }
+            if (!layoutCoordinator.isWidgetBottom()) {
+                setFloatingSubmitContainer(createFloatingSubmitContainer())
+            }
         }
         bindSearchCallbacks(widgetView, callbacks)
         bindAutocompleteVisibility(widgetView)
@@ -476,7 +492,7 @@ class RealNativeInputManager @Inject constructor(
                 }
             }
         } else {
-            animator.applyLayoutTransitions(widgetView)
+            animator.applyLayoutTransitions(widgetView, layoutCoordinator.isWidgetBottom())
             if (!omnibarController.isDuckAiMode()) {
                 omnibarController.hide()
                 widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)
@@ -498,7 +514,10 @@ class RealNativeInputManager @Inject constructor(
         var adapter: RecyclerView.Adapter<*>? = null
         widget.bindChatSuggestions(
             lifecycleOwner = lifecycleOwner,
-            onChatSuggestionSelected = onChatSuggestionSelected,
+            onChatSuggestionSelected = { query ->
+                hideNativeInput()
+                onChatSuggestionSelected(query)
+            },
             onShowSuggestions = { chatAdapter ->
                 adapter = adapter ?: autoCompleteList.adapter
                 autoCompleteList.adapter = chatAdapter
@@ -518,6 +537,25 @@ class RealNativeInputManager @Inject constructor(
                 }
             },
         )
+    }
+
+    private fun createFloatingSubmitContainer(): ViewGroup {
+        val activity = rootView.context as? Activity ?: return FrameLayout(rootView.context)
+        val contentView = activity.findViewById<FrameLayout>(android.R.id.content)
+        return FrameLayout(rootView.context).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            ).apply {
+                gravity = Gravity.BOTTOM or Gravity.END
+                marginEnd = 6f.toPx(rootView.context).toInt()
+                bottomMargin = 4f.toPx(rootView.context).toInt()
+            }
+            elevation = WIDGET_ELEVATION_DP.toPx()
+        }.also {
+            contentView.addView(it)
+            floatingSubmitContainer = it
+        }
     }
 
     companion object {
