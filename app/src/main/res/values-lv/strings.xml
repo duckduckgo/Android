@@ -843,7 +843,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Sveiks.<br/><br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā un ļauj tev izlemt, kad un kā izmantot mākslīgo intelektu?]]></string>
     <string name="preOnboardingDaxDialog1Button">Aiziet!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Sāksim!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Es jau esmu bijis/-usi šeit agrāk</string>
     <string name="preOnboardingDaxDialog2Title">Aizsardzība ir aktivizēta!</string>
     <string name="preOnboardingDaxDialog2Button">Izvēlies pārlūku</string>
@@ -855,6 +857,7 @@
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
     <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
+    <string name="preOnboardingComparisonChartDuckAi">Izmanto ChatGPT privāti ar iebūvēto Duck.ai</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="preOnboardingAddressBarTitle">Kur novietot adreses joslu?</string>
     <string name="preOnboardingAddressBarOkButton">Nākamais</string>
@@ -909,6 +912,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vēlies ērtu piekļuvi privātai MI tērzēšanai?</string>
+    <string name="preOnboardingInputScreenTitle_2">Vai vēlies ērti piekļūt privātai mākslīgā intelekta tērzēšanai adreses joslā?</string>
     <string name="preOnboardingInputScreenButton">Nākamais</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[MI funkcijas ir privātas un nav obligātas. Tu vari veikt izmaiņas sadaļā <b>Iestatījumi > MI funkcijas</b>.]]></string>
 
