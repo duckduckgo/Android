@@ -137,11 +137,6 @@ class FakeSettingsDataStore :
         set(value) {
             store["lastSessionBackgroundTimestamp"] = value
         }
-    override var userSelectedIdleThresholdSeconds: Long?
-        get() = store["userSelectedIdleThresholdSeconds"] as Long? ?: 0L
-        set(value) {
-            store["userSelectedIdleThresholdSeconds"] = value
-        }
 
     override var appNotificationsEnabled: Boolean
         get() = store["appNotificationsEnabled"] as Boolean? ?: true

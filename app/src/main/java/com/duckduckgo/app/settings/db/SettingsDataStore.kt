@@ -82,7 +82,6 @@ interface SettingsDataStore {
     var automaticallyClearWhenOption: ClearWhenOption
     var appBackgroundedTimestamp: Long
     var lastSessionBackgroundTimestamp: Long
-    var userSelectedIdleThresholdSeconds: Long?
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
@@ -228,19 +227,6 @@ class SettingsSharedPreferences @Inject constructor(
     override var lastSessionBackgroundTimestamp: Long
         get() = preferences.getLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, 0)
         set(value) = preferences.edit(commit = true) { putLong(KEY_LAST_SESSION_BACKGROUND_TIMESTAMP, value) }
-
-    override var userSelectedIdleThresholdSeconds: Long?
-        get() {
-            val value = preferences.getLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, -1L)
-            return if (value == -1L) null else value
-        }
-        set(value) = preferences.edit {
-            if (value == null) {
-                remove(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS)
-            } else {
-                putLong(KEY_USER_SELECTED_IDLE_THRESHOLD_SECONDS, value)
-            }
-        }
 
     override var appNotificationsEnabled: Boolean
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
