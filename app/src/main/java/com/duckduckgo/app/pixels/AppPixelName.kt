@@ -179,6 +179,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON("ms_clear_duck_ai_data_toggled_on"),
     SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF("ms_clear_duck_ai_data_toggled_off"),
     SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
+    SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED("m_settings_after_inactivity_timeout_changed"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
