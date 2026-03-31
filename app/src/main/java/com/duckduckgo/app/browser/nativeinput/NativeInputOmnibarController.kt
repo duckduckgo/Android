@@ -200,11 +200,7 @@ class RealNativeInputOmnibarController(
                 aiTitle.movementMethod = LinkMovementMethod.getInstance()
                 aiTitle.highlightColor = Color.TRANSPARENT
             }
-            is DuckAiTier.Paid -> {
-                aiTitle.text = aiTitle.context.getString(R.string.duckAiHeaderPaidTitle)
-                aiTitle.movementMethod = null
-            }
-            is DuckAiTier.Unknown -> {
+            is DuckAiTier.Paid, is DuckAiTier.Unknown -> {
                 aiTitle.text = aiTitle.context.getString(R.string.duckAiHeaderPaidTitle)
                 aiTitle.movementMethod = null
             }
