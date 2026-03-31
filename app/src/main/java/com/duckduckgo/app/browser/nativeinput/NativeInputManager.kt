@@ -77,7 +77,6 @@ class RealNativeInputManager @Inject constructor(
     private val animator: NativeInputAnimator,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val pendingNativePromptStore: PendingNativePromptStore,
 ) : NativeInputManager {
     private lateinit var omnibarController: NativeInputOmnibarController
     private lateinit var rootView: ViewGroup
