@@ -121,7 +121,7 @@ class ModelPickerView @JvmOverloads constructor(
         val imm = context.getSystemService<InputMethodManager>()
         if (imm?.isAcceptingText == true) {
             imm.hideSoftInputFromWindow(windowToken, 0)
-            postDelayed(KEYBOARD_DELAY) { showPopupWindow(state) }
+            postDelayed(KEYBOARD_DELAY) { if (isAttachedToWindow) showPopupWindow(state) }
         } else {
             showPopupWindow(state)
         }
@@ -177,6 +177,16 @@ class ModelPickerView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         stateJob?.cancel()
         stateJob = null
+        dismissPopup()
+    }
+
+    private fun dismissPopup() {
+        popupWindow?.let {
+            it.setOnDismissListener(null)
+            if (it.isShowing) it.dismiss()
+        }
+        popupWindow = null
+        viewModel.menuShowing = false
     }
 
     private fun LinearLayout.populateMenu(state: ModelState, popup: PopupWindow) {
