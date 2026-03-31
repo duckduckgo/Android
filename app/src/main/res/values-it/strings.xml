@@ -825,7 +825,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Ciao.<br/><br/>Vuoi un browser più veloce che ti garantisca protezione?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Ciao.<br/><br/>Vuoi un browser più veloce che protegge e permette di decidere quando e come usare l\'AI?]]></string>
     <string name="preOnboardingDaxDialog1Button">Facciamolo!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Iniziamo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Sono già stato qui prima</string>
     <string name="preOnboardingDaxDialog2Title">Protezioni attivate!</string>
     <string name="preOnboardingDaxDialog2Button">Scegli il tuo browser</string>
@@ -837,6 +839,7 @@
     <string name="preOnboardingComparisonChartItem3">Blocca i popup dei cookie</string>
     <string name="preOnboardingComparisonChartItem4">Blocca gli annunci mirati</string>
     <string name="preOnboardingComparisonChartItem5">Cancella i dati di navigazione con un solo pulsante</string>
+    <string name="preOnboardingComparisonChartDuckAi">Utilizza ChatGPT in privato con Duck.ai integrato</string>
     <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>
     <string name="preOnboardingAddressBarTitle">Dove devo mettere la barra degli indirizzi?</string>
     <string name="preOnboardingAddressBarOkButton">Successivo</string>
@@ -889,6 +892,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Vuoi un accesso facile alla chat AI privata?</string>
+    <string name="preOnboardingInputScreenTitle_2">Vuoi un accesso facile alla chat AI privata nella barra degli indirizzi?</string>
     <string name="preOnboardingInputScreenButton">Successivo</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[Le funzionalità AI sono private e opzionali. Puoi effettuare modifiche in <b>Impostazioni > Funzionalità AI</b>.]]></string>
 
