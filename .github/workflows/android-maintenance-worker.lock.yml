@@ -659,6 +659,7 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           MCP_TIMEOUT: 120000
           MCP_TOOL_TIMEOUT: 60000
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       - name: Configure Git credentials
         env:
           REPO_NAME: ${{ github.repository }}

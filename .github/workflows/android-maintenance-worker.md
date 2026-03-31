@@ -164,5 +164,5 @@ verification fails in a way you cannot resolve):
 - No breaking changes: if a change could break existing behavior, stop and comment instead
 - Format before committing: always run spotlessApply before committing
 - One task per run: never pick up a second task even if the first completes quickly
-- Asana API: use bash with curl and the ASANA_PAT secret for all Asana operations
+- Asana API: use bash with curl and the ASANA_ACCESS_TOKEN secret for all Asana operations
 - AI transparency: every PR description and Asana comment must include the 🤖 Android Maintenance Worker disclosure
