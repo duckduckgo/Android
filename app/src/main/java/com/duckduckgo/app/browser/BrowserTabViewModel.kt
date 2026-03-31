@@ -4274,11 +4274,6 @@ class BrowserTabViewModel @Inject constructor(
                             _subscriptionEventDataChannel.send(event)
                         }
                     }
-                    duckChatJSHelper.consumeNativePromptOnHandoff(method)?.let { event ->
-                        withContext(dispatchers.main()) {
-                            _subscriptionEventDataChannel.send(event)
-                        }
-                    }
                 }
             }
 

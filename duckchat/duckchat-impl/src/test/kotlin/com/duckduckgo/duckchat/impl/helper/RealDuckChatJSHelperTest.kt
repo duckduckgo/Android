@@ -1536,51 +1536,6 @@ class RealDuckChatJSHelperTest {
     // endregion
 
     @Test
-    fun whenConsumeNativePromptOnHandoffWithHandoffMethodAndPromptStoredThenReturnsEvent() {
-        val pending = PendingNativePrompt("hello world", "model")
-        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
-
-        val result = testee.consumeNativePromptOnHandoff("getAIChatNativeHandoffData")
-        assertNotNull(result)
-        assertEquals(DUCK_CHAT_FEATURE_NAME, result!!.featureName)
-        assertEquals("submitAIChatNativePrompt", result.subscriptionName)
-        assertEquals("android", result.params.getString("platform"))
-        assertEquals("query", result.params.getString("tool"))
-
-        val query = result.params.getJSONObject("query")
-        assertEquals("hello world", query.getString("prompt"))
-        assertTrue(query.getBoolean("autoSubmit"))
-        assertEquals("model", query.getString("modelId"))
-    }
-
-    @Test
-    fun whenConsumeNativePromptOnHandoffWithPromptButNoModelIdThenModelIdOmitted() {
-        val pending = PendingNativePrompt("hello", null)
-        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
-
-        val result = testee.consumeNativePromptOnHandoff("getAIChatNativeHandoffData")
-        assertNotNull(result)
-
-        val query = result!!.params.getJSONObject("query")
-        assertEquals("hello", query.getString("prompt"))
-        assertFalse(query.has("modelId"))
-    }
-
-    @Test
-    fun whenConsumeNativePromptOnHandoffWithOtherMethodThenReturnsNull() {
-        val result = testee.consumeNativePromptOnHandoff("getAIChatNativeConfigValues")
-        assertNull(result)
-        verify(mockPendingNativePromptStore, never()).consume()
-    }
-
-    @Test
-    fun whenConsumeNativePromptOnHandoffWithNothingStoredThenReturnsNull() {
-        whenever(mockPendingNativePromptStore.consume()).thenReturn(null)
-        val result = testee.consumeNativePromptOnHandoff("getAIChatNativeHandoffData")
-        assertNull(result)
-    }
-
-    @Test
     fun whenGetAIChatNativePromptWithPendingPromptThenReturnsPromptData() = runTest {
         val pending = PendingNativePrompt("test prompt", "model")
         whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)

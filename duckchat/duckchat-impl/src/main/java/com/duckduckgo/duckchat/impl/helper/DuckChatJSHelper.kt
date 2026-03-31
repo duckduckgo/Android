@@ -64,8 +64,6 @@ interface DuckChatJSHelper {
     fun clearTabContextPromptEvent()
 
     fun consumeTabContextPromptOnHandoff(method: String): SubscriptionEventData?
-
-    fun consumeNativePromptOnHandoff(method: String): SubscriptionEventData?
 }
 
 enum class Mode {
@@ -291,32 +289,6 @@ class RealDuckChatJSHelper @Inject constructor(
             //     },
             // )
             pending.pageContexts.firstOrNull()?.let { put("pageContext", it) }
-        }
-
-        return SubscriptionEventData(
-            featureName = DUCK_CHAT_FEATURE_NAME,
-            subscriptionName = SUBSCRIPTION_SUBMIT_NATIVE_PROMPT,
-            params = params,
-        )
-    }
-
-    override fun consumeNativePromptOnHandoff(method: String): SubscriptionEventData? {
-        if (method != METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA) return null
-        val pending = pendingNativePromptStore.consume() ?: return null
-
-        val params = JSONObject().apply {
-            put(PLATFORM, ANDROID)
-            put("tool", "query")
-            put(
-                "query",
-                JSONObject().apply {
-                    put("prompt", pending.prompt)
-                    put("autoSubmit", true)
-                    if (pending.modelId != null) {
-                        put("modelId", pending.modelId)
-                    }
-                },
-            )
         }
 
         return SubscriptionEventData(
