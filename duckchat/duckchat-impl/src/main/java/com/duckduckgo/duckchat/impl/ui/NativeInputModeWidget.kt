@@ -48,6 +48,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestionsAd
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputScreenButtons
+import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Job
@@ -66,6 +68,7 @@ interface NativeInputWidget {
     var onStopTapped: (() -> Unit)?
     var onVoiceClick: (() -> Unit)?
     var onImageClick: (() -> Unit)?
+    var onPaidTierChanged: ((Boolean) -> Unit)?
 
     fun focusInput(activity: Activity?)
     fun hasInputFocus(): Boolean
@@ -116,6 +119,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     @Inject
     lateinit var chatSuggestionsReader: ChatSuggestionsReader
 
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
     private var tabCountLiveData: LiveData<Int>? = null
     private var tabCountObserver: Observer<Int>? = null
     private var submitButtons: InputScreenButtons? = null
@@ -123,6 +129,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var chatStateJob: Job? = null
     private var chatSuggestionsSettingJob: Job? = null
     private var chatSuggestionsJob: Job? = null
+    private var tierJob: Job? = null
     private var chatSuggestionsUserEnabled: Boolean = true
     private var isStreaming: Boolean = false
     private var chatSuggestionsAdapter: ChatSuggestionsAdapter? = null
@@ -130,6 +137,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var onClearSuggestions: ((Boolean) -> Unit)? = null
     override var onStopTapped: (() -> Unit)? = null
     override var onImageClick: (() -> Unit)? = null
+    override var onPaidTierChanged: ((Boolean) -> Unit)? = null
+        set(value) {
+            field = value
+            if (value != null && isAttachedToWindow) observeTier()
+        }
 
     private val imageButton: ImageView by lazy { findViewById(R.id.inputFieldImageButton) }
 
@@ -139,6 +151,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         applyNativeStyling()
         observeChatState()
         observeChatSuggestionsEnabled()
+        if (onPaidTierChanged != null) observeTier()
     }
 
     override fun onDetachedFromWindow() {
@@ -147,6 +160,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatStateJob = null
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = null
+        tierJob?.cancel()
+        tierJob = null
         tearDownChatSuggestions()
     }
 
@@ -414,6 +429,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
         chatSuggestionsSettingJob?.cancel()
         chatSuggestionsSettingJob = duckChatInternal.observeChatSuggestionsUserSettingEnabled()
             .onEach { enabled -> chatSuggestionsUserEnabled = enabled }
+            .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
+    }
+
+    private fun observeTier() {
+        tierJob?.cancel()
+        tierJob = subscriptions.getEntitlementStatus()
+            .onEach { entitlements ->
+                val hasDuckAiPlus = entitlements.any { it == Product.DuckAiPlus }
+                onPaidTierChanged?.invoke(hasDuckAiPlus)
+            }
             .launchIn(findViewTreeLifecycleOwner()?.lifecycleScope ?: return)
     }
 
