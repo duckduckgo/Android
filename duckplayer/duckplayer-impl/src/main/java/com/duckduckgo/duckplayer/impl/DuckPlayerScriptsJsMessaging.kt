@@ -64,7 +64,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             }
             jsMessage?.let {
                 logcat { jsMessage.toString() }
-                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(allowedDomains, url)) {
+                if (this.secret == secret && context == jsMessage.context) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName && isUrlAllowed(it.allowedDomains, url)
                     }?.process(jsMessage, this, jsMessageCallback)
