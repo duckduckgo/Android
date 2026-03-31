@@ -247,6 +247,7 @@ class RealSecureStorageKeyStore(
             if (legacyPrefs != null) {
                 // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
                 val (legacyCommitted, error) = runCatching {
+                    logcat(TAG) { "Writing $keyName to legacy" }
                     val editor = legacyPrefs.edit()
                     editor.putString(keyName, keyValue.toByteString().base64())
                     editor.commit() to null
@@ -271,6 +272,7 @@ class RealSecureStorageKeyStore(
 
             if (harmonyPrefs != null && harmonyFlags.useHarmony) {
                 val (harmonyCommitted, error) = runCatching {
+                    logcat(TAG) { "Writing $keyName to harmony" }
                     val editor = harmonyPrefs.edit()
                     editor.putString(keyName, keyValue.toByteString().base64())
                     editor.commit() to null
