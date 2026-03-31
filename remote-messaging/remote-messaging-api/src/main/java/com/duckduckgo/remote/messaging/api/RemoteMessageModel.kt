@@ -22,7 +22,7 @@ interface RemoteMessageModel {
 
     fun getActiveMessage(): RemoteMessage?
 
-    fun getActiveMessages(): Flow<RemoteMessage?>
+    fun observeActiveMessages(): Flow<RemoteMessage?>
 
     suspend fun onMessageShown(remoteMessage: RemoteMessage)
 

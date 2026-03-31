@@ -36,7 +36,7 @@ class RealRemoteMessageModel @Inject constructor(
 ) : RemoteMessageModel {
 
     override fun getActiveMessage(): RemoteMessage? = remoteMessagingRepository.message()
-    override fun getActiveMessages() = remoteMessagingRepository.messageFlow()
+    override fun observeActiveMessages() = remoteMessagingRepository.messageFlow()
 
     override suspend fun onMessageShown(remoteMessage: RemoteMessage) {
         withContext(dispatchers.io()) {

@@ -47,7 +47,6 @@ import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.Command.SubmitUrl
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.NewTabPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabPageViewModel.ViewState
-import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -67,6 +66,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
