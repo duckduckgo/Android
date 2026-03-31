@@ -300,7 +300,13 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "is_enabled",
+                "description": "whether automatic page context collection is enabled or not"
+            }
+        ]
     },
     "m_aichat_settings_chat_suggestions_turned_on_count": {
         "description": "User enabled the Chat Suggestions toggle in General Settings",
