@@ -117,5 +117,4 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
         }
     }
-
 }
