@@ -36,12 +36,13 @@ import com.duckduckgo.mobile.android.R as CommonR
  * 4dp edge-to-edge gap between adjacent dots. Dot positions shift during transitions
  * to maintain the 4dp gap as dots grow and shrink.
  *
- * The active dot is drawn at full size in [CommonR.attr.onboardingAccentPrimary].
- * Inactive dots are drawn smaller in [CommonR.attr.onboardingAccentAltPrimary].
+ * The current and completed dots are drawn in [CommonR.attr.onboardingAccentPrimary].
+ * The current dot is drawn at full size; completed dots are drawn at the smaller inactive size.
+ * Future (not-yet-reached) dots are drawn smaller in [CommonR.attr.onboardingAccentAltPrimary].
  *
- * When transitioning, both size and colour are animated simultaneously:
- * the current active dot shrinks and fades to the inactive colour while
- * the next dot grows and fades to the active colour.
+ * When transitioning, the departing dot shrinks to inactive size (keeping the active colour,
+ * since it becomes a completed step) while the next dot grows and fades from the inactive
+ * colour to the active colour.
  */
 internal class StepIndicatorDotsView @JvmOverloads constructor(
     context: Context,

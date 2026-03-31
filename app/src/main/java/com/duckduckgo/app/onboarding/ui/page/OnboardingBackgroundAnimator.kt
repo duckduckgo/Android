@@ -140,27 +140,29 @@ class OnboardingBackgroundAnimator(
     fun snapTo(step: OnboardingBackgroundStep) {
         cancel()
 
-        val density = backgroundSecondary.resources.displayMetrics.density
+        val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
+        val outView = activeView
+        val density = inView.resources.displayMetrics.density
 
-        with(backgroundSecondary) {
+        with(inView) {
             setImageResource(step.backgroundRes)
             updateLayoutParams<ConstraintLayout.LayoutParams> {
                 constrainedHeight = true
                 matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
                 verticalBias = 1f
-                val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
-                dimensionRatio = if (usesFitCenter) imageDimensionRatio(backgroundSecondary) else null
+                val usesFitCenter = scaleType == ImageView.ScaleType.FIT_CENTER
+                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
             }
             translationX = 0f
             alpha = 1f
             isVisible = true
         }
 
-        backgroundPrimary.alpha = 0f
-        backgroundPrimary.translationX = 0f
-        backgroundPrimary.isVisible = false
+        outView.alpha = 0f
+        outView.translationX = 0f
+        outView.isVisible = false
 
-        activeView = backgroundSecondary
+        activeView = inView
     }
 
     fun cancel() {
