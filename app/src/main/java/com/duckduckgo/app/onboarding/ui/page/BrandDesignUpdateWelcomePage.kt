@@ -749,6 +749,18 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 ADDRESS_BAR_POSITION -> {
                     dismissBottomWingAnimation()
+                    val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+                    (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                        if (isTablet) {
+                            verticalBias = 0.5f
+                            bottomToTop = binding.bobbingDaxAnimation.id
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                        } else {
+                            verticalBias = 0f
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                    }
                     backgroundAnimator?.transitionTo(
                         step = OnboardingBackgroundStep.AddressBar,
                     )
@@ -981,10 +993,17 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.AddressBar)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
+                val isTablet = resources.configuration.smallestScreenWidthDp >= 600
                 (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                    verticalBias = 0f
-                    bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    if (isTablet) {
+                        verticalBias = 0.5f
+                        bottomToTop = binding.bobbingDaxAnimation.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                    } else {
+                        verticalBias = 0f
+                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
                 }
                 val cardView = binding.daxDialogCta.cardView
                 cardView.setArrowAnimationTarget(ARROW_TARGET_OFFSET_END_DP.toPx().toFloat())
