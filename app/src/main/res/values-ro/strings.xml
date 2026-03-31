@@ -843,7 +843,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Salut!<br/><br/>Ești gata pentru un browser mai rapid, care te protejează și îți permite să decizi când și cum să folosești inteligența artificială?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Salut!</string>
+    <string name="preOnboardingDaxDialog1Text">Ești gata pentru un browser mai rapid, care te protejează și îți permite să decizi când și cum să folosești inteligența artificială?</string>
     <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
     <string name="preOnboardingDaxDialog1Button_2">Să începem!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Am mai fost aici</string>

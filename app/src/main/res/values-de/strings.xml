@@ -825,7 +825,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich auch noch schützt?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Hallo.<br/><br/>Bereit für einen schnelleren Browser, der dich schützt und dir die Entscheidung überlässt, wann und wie du KI einsetzt?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Hallo.</string>
+    <string name="preOnboardingDaxDialog1Text">Bereit für einen schnelleren Browser, der dich schützt und dir die Entscheidung überlässt, wann und wie du KI einsetzt?</string>
     <string name="preOnboardingDaxDialog1Button">Machen wir das!</string>
     <string name="preOnboardingDaxDialog1Button_2">Los geht\'s!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>

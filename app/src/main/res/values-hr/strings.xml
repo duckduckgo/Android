@@ -861,7 +861,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za brži preglednik koji te štiti?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Pozdrav!<br/><br/>Jesi li spreman za brži preglednik koji te štiti i omogućuje ti da odlučiš kada i kako koristiti AI?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Bok!</string>
+    <string name="preOnboardingDaxDialog1Text">Jesi li spreman za brži preglednik koji te štiti i omogućuje ti da odlučiš kada i kako koristiti AI?</string>
     <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
     <string name="preOnboardingDaxDialog1Button_2">Započnimo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>

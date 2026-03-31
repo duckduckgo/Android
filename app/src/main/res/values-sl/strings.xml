@@ -861,7 +861,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas zaščiti?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na hitrejši brskalnik, ki vas ščiti in vam omogoča, da se odločite, kdaj in kako boste uporabljali umetno inteligenco?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Pozdravljeni.</string>
+    <string name="preOnboardingDaxDialog1Text">Ste pripravljeni na hitrejši brskalnik, ki vas ščiti in vam omogoča, da se odločite, kdaj in kako boste uporabljali umetno inteligenco?</string>
     <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
     <string name="preOnboardingDaxDialog1Button_2">Začnimo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Tukaj sem že bil/-a</string>

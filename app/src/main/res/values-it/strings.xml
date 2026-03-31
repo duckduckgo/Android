@@ -825,7 +825,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Ciao.<br/><br/>Vuoi un browser più veloce che ti garantisca protezione?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Ciao.<br/><br/>Vuoi un browser più veloce che protegge e permette di decidere quando e come usare l\'AI?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Ciao.</string>
+    <string name="preOnboardingDaxDialog1Text">Vuoi un browser più veloce che protegge e permette di decidere quando e come usare l\'AI?</string>
     <string name="preOnboardingDaxDialog1Button">Facciamolo!</string>
     <string name="preOnboardingDaxDialog1Button_2">Iniziamo!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Sono già stato qui prima</string>

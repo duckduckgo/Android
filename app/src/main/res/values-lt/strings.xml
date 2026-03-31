@@ -861,7 +861,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Sveiki.<br/><br/>Ar nori greitesnės naršyklės, kuri saugo tave ir leidžia nuspręsti, kada ir kaip naudoti dirbtinį intelektą?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Sveiki.</string>
+    <string name="preOnboardingDaxDialog1Text">Ar nori greitesnės naršyklės, kuri saugo tave ir leidžia nuspręsti, kada ir kaip naudoti dirbtinį intelektą?</string>
     <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
     <string name="preOnboardingDaxDialog1Button_2">Pradėkime!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>

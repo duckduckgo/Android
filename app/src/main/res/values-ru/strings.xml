@@ -861,7 +861,8 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Быстрый и надежный браузер заказывали?]]></string>
-    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Привет!<br/><br/>Как насчет быстрого браузера, который защищает ваши данные и дает вам право решать, когда использовать ИИ?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2">Привет!</string>
+    <string name="preOnboardingDaxDialog1Text">Как насчет быстрого браузера, который защищает ваши данные и дает вам право решать, когда использовать ИИ?</string>
     <string name="preOnboardingDaxDialog1Button">Поехали!</string>
     <string name="preOnboardingDaxDialog1Button_2">Итак, начнем!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Мы уже это проходили</string>
