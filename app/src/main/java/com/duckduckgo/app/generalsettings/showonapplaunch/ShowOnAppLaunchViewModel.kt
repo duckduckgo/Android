@@ -52,8 +52,8 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         val selectedOption: ShowOnAppLaunchOption,
         val specificPageUrl: String,
         val showNTPAfterIdleReturn: Boolean = false,
-        val selectedIdleThresholdSeconds: Long = DEFAULT_IDLE_THRESHOLD_SECONDS,
-        val idleThresholdOptions: List<Long> = DEFAULT_IDLE_THRESHOLD_OPTIONS,
+        val selectedIdleThresholdSeconds: Long = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
+        val idleThresholdOptions: List<Long> = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
     )
 
     sealed class Command {
@@ -79,16 +79,12 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             androidBrowserConfigFeature.showNTPAfterIdleReturn().enabled(),
             userSelectedThreshold,
         ) { option, specificPageUrl, showNTPAfterIdleReturn, userThreshold ->
-            val settings = parseIdleThresholdSettings(
-                androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
-            )
-            val options = settings?.idleThresholdOptions ?: DEFAULT_IDLE_THRESHOLD_OPTIONS
             _viewState.value = ViewState(
                 selectedOption = option,
                 specificPageUrl = specificPageUrl,
                 showNTPAfterIdleReturn = showNTPAfterIdleReturn,
-                selectedIdleThresholdSeconds = resolveSelectedThreshold(userThreshold, settings),
-                idleThresholdOptions = options,
+                selectedIdleThresholdSeconds = userThreshold ?: FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_SECONDS,
+                idleThresholdOptions = FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS,
             )
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
@@ -122,10 +118,4 @@ class ShowOnAppLaunchViewModel @Inject constructor(
         }
     }
 
-    private fun resolveSelectedThreshold(userSelected: Long?, settings: IdleThresholdSettings?): Long {
-        if (userSelected != null) return userSelected
-        val default = settings?.defaultIdleThresholdSeconds ?: DEFAULT_IDLE_THRESHOLD_SECONDS
-        val options = settings?.idleThresholdOptions ?: DEFAULT_IDLE_THRESHOLD_OPTIONS
-        return if (options.isEmpty() || default in options) default else DEFAULT_IDLE_THRESHOLD_SECONDS
-    }
 }

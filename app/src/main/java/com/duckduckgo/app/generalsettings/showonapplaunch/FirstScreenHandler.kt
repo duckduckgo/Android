@@ -71,17 +71,11 @@ class FirstScreenHandlerImpl @Inject constructor(
     }
 
     private fun getTimeoutSeconds(): Long {
-        val userSelected = settingsDataStore.userSelectedIdleThresholdSeconds
-        if (userSelected != null) return userSelected
+        return settingsDataStore.userSelectedIdleThresholdSeconds ?: DEFAULT_IDLE_THRESHOLD_SECONDS
+    }
 
-        val settings = parseIdleThresholdSettings(
-            androidBrowserConfigFeature.showNTPAfterIdleReturn().getSettings(),
-        ) ?: return DEFAULT_IDLE_THRESHOLD_SECONDS
-
-        return if (settings.idleThresholdOptions.isEmpty() || settings.defaultIdleThresholdSeconds in settings.idleThresholdOptions) {
-            settings.defaultIdleThresholdSeconds
-        } else {
-            DEFAULT_IDLE_THRESHOLD_SECONDS
-        }
+    companion object {
+        const val DEFAULT_IDLE_THRESHOLD_SECONDS = 300L
+        val DEFAULT_IDLE_THRESHOLD_OPTIONS = listOf(1L, 60L, 300L, 600L, 3600L, 43200L, 86400L)
     }
 }

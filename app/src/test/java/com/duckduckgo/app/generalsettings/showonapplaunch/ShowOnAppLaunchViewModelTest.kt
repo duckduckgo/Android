@@ -220,7 +220,7 @@ class ShowOnAppLaunchViewModelTest {
 
         testee.viewState.test {
             val state = awaitItem()
-            assertEquals(DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
         }
     }
 
@@ -236,7 +236,7 @@ class ShowOnAppLaunchViewModelTest {
         testee.viewState.test {
             val state = awaitItem()
             assertEquals(300L, state.selectedIdleThresholdSeconds)
-            assertEquals(DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
+            assertEquals(FirstScreenHandlerImpl.DEFAULT_IDLE_THRESHOLD_OPTIONS, state.idleThresholdOptions)
         }
     }
 
