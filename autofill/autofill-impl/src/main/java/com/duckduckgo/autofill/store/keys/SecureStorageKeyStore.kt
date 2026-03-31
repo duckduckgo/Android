@@ -90,6 +90,7 @@ class RealSecureStorageKeyStore(
     private val harmonyMutex: Mutex = Mutex()
 
     private var initialUseHarmonyValue: Boolean? = null
+    private var initialMultiProcessValue: Boolean? = null
 
     /**
      * Evaluates all three harmony-related flags in a single consistent snapshot.
@@ -97,6 +98,11 @@ class RealSecureStorageKeyStore(
      * Harmony is the only multi-process-safe store, so it is treated as implicitly active regardless
      * of the remote-config flag state. All three values are derived from one check of each flag,
      * guaranteeing they can never be mutually inconsistent.
+     *
+     * The [multiProcess] flag is latched: once true, it stays true for the lifetime of this instance.
+     * This prevents mid-execution flag changes from causing data corruption — if we ever operated in
+     * multi-process mode, we must continue checking Harmony for key existence to avoid overwriting
+     * keys that may only exist there.
      */
     private data class HarmonyFlags(
         val useHarmony: Boolean,
@@ -108,10 +114,18 @@ class RealSecureStorageKeyStore(
         return withContext(dispatcherProvider.io()) {
             val autofillServiceFlag = autofillServiceFeature.self().isEnabled()
             val useHarmonyFlag = autofillFeature.useHarmony().isEnabled()
+
+            // Latch: once multiProcess is true, it stays true for this session to prevent
+            // mid-execution flag changes from causing us to miss keys that exist only in Harmony.
+            if (initialMultiProcessValue == null) {
+                initialMultiProcessValue = autofillServiceFlag
+            }
+            val effectiveMultiProcess = initialMultiProcessValue == true || autofillServiceFlag
+
             HarmonyFlags(
-                useHarmony = useHarmonyFlag || autofillServiceFlag,
-                readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()) || autofillServiceFlag,
-                multiProcess = autofillServiceFlag,
+                useHarmony = useHarmonyFlag || effectiveMultiProcess,
+                readFromHarmony = (useHarmonyFlag && autofillFeature.readFromHarmony().isEnabled()) || effectiveMultiProcess,
+                multiProcess = effectiveMultiProcess,
             )
         }
     }
@@ -188,20 +202,17 @@ class RealSecureStorageKeyStore(
         withContext(dispatcherProvider.io()) {
             val harmonyFlags = harmonyFlags()
 
-            // In multi-process mode, skip legacy entirely — EncryptedSharedPreferences writes do not
-            // propagate between processes, so writing from two processes would produce divergent state.
-            val legacyPrefs: SharedPreferences? = if (harmonyFlags.multiProcess) {
-                null
-            } else {
-                getEncryptedPreferences().also {
-                    if (it == null) {
-                        pixel.fire(
-                            AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
-                            getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
-                            type = Daily(),
-                        )
-                        throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
-                    }
+            // Always write to legacy for rollback support. In multi-process mode, keyAlreadyExists()
+            // uses Harmony as the source of truth (not legacy) to avoid stale cache issues. The
+            // KeyAlreadyExistsException guard prevents divergent writes across processes.
+            val legacyPrefs = getEncryptedPreferences().also {
+                if (it == null) {
+                    pixel.fire(
+                        AUTOFILL_PREFERENCES_UPDATE_KEY_NULL_FILE,
+                        getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
+                        type = Daily(),
+                    )
+                    throw SecureStorageException.InternalSecureStorageException("Legacy Preferences file is null on write")
                 }
             }
 
@@ -224,7 +235,7 @@ class RealSecureStorageKeyStore(
             // for a key that already exists in either store, something upstream read null
             // incorrectly and is about to overwrite a valid key — block the write to prevent
             // irreversible corruption.
-            if (keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName, harmonyFlags.useHarmony)) {
+            if (keyAlreadyExists(legacyPrefs, harmonyPrefs, keyName, harmonyFlags)) {
                 pixel.fire(
                     AUTOFILL_STORE_KEY_ALREADY_EXISTS,
                     getPixelParams(keyName = keyName, useHarmony = harmonyFlags.useHarmony, readFromHarmony = harmonyFlags.readFromHarmony),
@@ -233,7 +244,7 @@ class RealSecureStorageKeyStore(
                 throw SecureStorageException.KeyAlreadyExistsException("Trying to overwrite already existing key")
             }
 
-            if (legacyPrefs != null && !harmonyFlags.multiProcess) {
+            if (legacyPrefs != null) {
                 // Use the editor directly (not the KTX edit(commit=true) extension) so we can capture commit()'s boolean return value
                 val (legacyCommitted, error) = runCatching {
                     val editor = legacyPrefs.edit()
@@ -279,8 +290,7 @@ class RealSecureStorageKeyStore(
                         type = Daily(),
                     )
                     // Rollback legacy write so we don't cause a corrupted state with out-of-sync files.
-                    // In multi-process mode legacy was never written to, so no rollback is needed.
-                    if (legacyPrefs != null && !harmonyFlags.multiProcess) {
+                    if (legacyPrefs != null) {
                         runCatching {
                             val editor = legacyPrefs.edit()
                             editor.remove(keyName)
@@ -326,17 +336,21 @@ class RealSecureStorageKeyStore(
         legacyPrefs: SharedPreferences?,
         harmonyPrefs: SharedPreferences?,
         keyName: String,
-        useHarmony: Boolean,
+        harmonyFlags: HarmonyFlags,
     ): Boolean {
         val legacyExists = try {
-            legacyPrefs?.getString(keyName, null) != null
+            if (harmonyFlags.multiProcess) {
+                false
+            } else {
+                legacyPrefs?.getString(keyName, null) != null
+            }
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             false
         }
         if (legacyExists) return true
 
-        if (useHarmony) {
+        if (harmonyFlags.useHarmony) {
             val harmonyExists = try {
                 harmonyPrefs?.getString(keyName, null) != null
             } catch (e: Exception) {
