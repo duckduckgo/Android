@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver")
@@ -105,7 +106,9 @@ class CardsListRemoteMessageViewModel @Inject constructor(
             val customParams = mapOf(
                 PARAM_NAME_DISMISS_TYPE to PARAM_VALUE_CLOSE_BUTTON,
             )
-            cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
+            withContext(dispatchers.io()) {
+                cardsListPixelHelper.dismissCardsListMessage(message.id, customParams)
+            }
         }
     }
 

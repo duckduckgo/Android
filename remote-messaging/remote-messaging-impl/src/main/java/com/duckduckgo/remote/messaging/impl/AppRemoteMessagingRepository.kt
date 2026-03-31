@@ -49,7 +49,6 @@ interface RemoteMessagingRepository {
 class AppRemoteMessagingRepository(
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagesDao: RemoteMessagesDao,
-    private val dispatchers: DispatcherProvider,
     private val messageMapper: MessageMapper,
     private val remoteMessageImageStore: RemoteMessageImageStore,
 ) : RemoteMessagingRepository {
@@ -107,10 +106,8 @@ class AppRemoteMessagingRepository(
     }
 
     override suspend fun dismissMessage(id: String) {
-        withContext(dispatchers.io()) {
-            remoteMessagesDao.updateState(id, Status.DISMISSED)
-            remoteMessagingConfigRepository.invalidate()
-        }
+        remoteMessagesDao.updateState(id, Status.DISMISSED)
+        remoteMessagingConfigRepository.invalidate()
     }
 
     override fun dismissedMessages(): List<String> {

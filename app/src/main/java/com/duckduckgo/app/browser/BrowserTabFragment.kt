@@ -21,7 +21,6 @@ import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -155,7 +154,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.remote.messaging.api.SharePromoLinkIntentFactory
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -658,6 +657,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var systemAutofillEngagement: SystemAutofillEngagement
+
+    @Inject
+    lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
     private var isActiveTab: Boolean = false
 
@@ -4472,13 +4474,7 @@ class BrowserTabFragment :
                 type = "text/plain"
             }
 
-        val pi =
-            PendingIntent.getBroadcast(
-                requireContext(),
-                0,
-                Intent(requireContext(), SharePromoLinkRMFBroadCastReceiver::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-            )
+        val pi = sharePromoLinkIntentFactory.pendingIntent(requireContext())
         try {
             startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {

@@ -143,7 +143,7 @@ class RealNewAddressBarOptionManager @Inject constructor(
             logcat(DEBUG) { "NewAddressBarOptionManager: $it isBottomAddressBarDisabled" }
         }
 
-    private fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
+    private suspend fun hasNotInteractedWithSearchAndDuckAiRMF(): Boolean =
         (!remoteMessageModel.isMessageDismissed("search_duck_ai_announcement")).also {
             logcat(DEBUG) { "NewAddressBarOptionManager: $it hasNotInteractedWithSearchAndDuckAiRMF" }
         }

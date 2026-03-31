@@ -87,14 +87,8 @@ class RealRemoteMessageModel @Inject constructor(
         remoteMessagingRepository.clearMessageImage(surface)
     }
 
-    override fun isMessageDismissed(id: String): Boolean {
-        return remoteMessagingRepository.dismissedMessages().contains(id)
-    }
-
-    override suspend fun dismissMessage(id: String) {
-        withContext(dispatchers.io()) {
-            remoteMessagingRepository.dismissMessage(id)
-        }
+    override suspend fun isMessageDismissed(id: String): Boolean = withContext(dispatchers.io()) {
+        remoteMessagingRepository.dismissedMessages().contains(id)
     }
 
     private fun Content.getPrimaryAction(): Action? {

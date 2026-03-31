@@ -38,7 +38,5 @@ interface RemoteMessageModel {
 
     suspend fun clearMessageImage(surface: Surface)
 
-    fun isMessageDismissed(id: String): Boolean
-
-    suspend fun dismissMessage(id: String)
+    suspend fun isMessageDismissed(id: String): Boolean
 }

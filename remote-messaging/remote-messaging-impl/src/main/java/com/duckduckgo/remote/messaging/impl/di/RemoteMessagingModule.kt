@@ -100,14 +100,12 @@ object DataSourceModule {
     fun providesRemoteMessagingRepository(
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
-        dispatchers: DispatcherProvider,
         messageMapper: MessageMapper,
         remoteMessageImageStore: RemoteMessageImageStore,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
             remoteMessagesDao,
-            dispatchers,
             messageMapper,
             remoteMessageImageStore,
         )
