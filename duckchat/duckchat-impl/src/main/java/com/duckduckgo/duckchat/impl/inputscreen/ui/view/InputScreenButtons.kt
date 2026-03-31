@@ -82,7 +82,9 @@ class InputScreenButtons @JvmOverloads constructor(
 
     fun showSendButton() {
         binding.actionSend.setImageResource(R.drawable.ic_arrow_up_24)
-        binding.actionSend.backgroundTintList = resolveThemeColorStateList(CommonR.attr.daxColorButtonPrimaryContainer)
+        binding.actionSend.backgroundTintList = resolveThemeColorStateList(
+            if (binding.actionSend.isEnabled) CommonR.attr.daxColorButtonPrimaryContainer else CommonR.attr.daxColorContainerDisabled,
+        )
         binding.actionSend.setOnClickListener { sendIfEnabled() }
     }
 

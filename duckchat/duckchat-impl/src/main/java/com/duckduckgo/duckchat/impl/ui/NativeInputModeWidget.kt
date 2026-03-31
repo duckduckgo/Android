@@ -221,7 +221,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     }
 
     private fun prepareSubmitButtons() {
-        ensureSubmitButtons()
+        configureSubmitButtons()
         submitButtons?.setSendButtonVisible(false)
         findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer)?.visibility = VISIBLE
     }
@@ -453,7 +453,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     private fun setChatStreaming(streaming: Boolean) {
         isStreaming = streaming
-        ensureSubmitButtons()
+        configureSubmitButtons()
         if (streaming) {
             submitButtons?.showStopButton()
         } else {
@@ -488,31 +488,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
         floatingSubmitContainer = container
     }
 
-    private fun ensureSubmitButtons() {
+    private fun configureSubmitButtons() {
         if (submitButtons != null) return
         val floating = floatingSubmitContainer
-        if (floating != null) {
-            val buttons = InputScreenButtons(context, useTopBar = true).apply {
-                onSendClick = { submitMessage() }
-                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                setSendButtonVisible(false)
-                setNewLineButtonVisible(false)
-                setVoiceButtonVisible(false)
-            }
-            floating.addView(buttons)
-            submitButtons = buttons
+        val (container, useTopBar) = if (floating != null) {
+            floating to true
         } else {
-            val container = findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return
-            val buttons = InputScreenButtons(context, useTopBar = false).apply {
-                onSendClick = { submitMessage() }
-                onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
-                setSendButtonVisible(false)
-                setNewLineButtonVisible(false)
-                setVoiceButtonVisible(false)
-            }
-            container.addView(buttons)
-            submitButtons = buttons
+            (findViewById<FrameLayout?>(R.id.inputScreenButtonsContainer) ?: return) to false
         }
+        val buttons = InputScreenButtons(context, useTopBar = useTopBar).apply {
+            onSendClick = { submitMessage() }
+            onStopClick = { this@NativeInputModeWidget.onStopTapped?.invoke() }
+            setSendButtonVisible(false)
+            setNewLineButtonVisible(false)
+            setVoiceButtonVisible(false)
+        }
+        container.addView(buttons)
+        submitButtons = buttons
     }
 
     companion object {
