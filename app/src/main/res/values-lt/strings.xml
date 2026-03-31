@@ -861,7 +861,9 @@
 
     <!-- Extended Onboarding-->
     <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+    <string name="preOnboardingDaxDialog1Title_2"><![CDATA[Sveiki.<br/><br/>Ar nori greitesnės naršyklės, kuri saugo tave ir leidžia nuspręsti, kada ir kaip naudoti dirbtinį intelektą?]]></string>
     <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
+    <string name="preOnboardingDaxDialog1Button_2">Pradėkime!</string>
     <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
     <string name="preOnboardingDaxDialog2Title">Apsaugos priemonės įjungtos!</string>
     <string name="preOnboardingDaxDialog2Button">Pasirinkite naršyklę</string>
@@ -873,6 +875,7 @@
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
     <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
+    <string name="preOnboardingComparisonChartDuckAi">Naudok „ChatGPT“ privačiai su integruotu „Duck.ai“.</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="preOnboardingAddressBarTitle">Kur turėčiau nustatyti jūsų adreso juostą?</string>
     <string name="preOnboardingAddressBarOkButton">Kitas</string>
@@ -929,6 +932,7 @@
 
     <!-- Input Screen Onboarding step -->
     <string name="preOnboardingInputScreenTitle">Norite lengvos prieigos prie privačių DI pokalbių?</string>
+    <string name="preOnboardingInputScreenTitle_2">Ar nori lengvai pasiekti privatų DI pokalbį adreso juostoje?</string>
     <string name="preOnboardingInputScreenButton">Kitas</string>
     <string name="preOnboardingInputScreenDescription"><![CDATA[DI funkcijos yra privačios ir neprivalomos. Galite atlikti pakeitimus <b>Nustatymai > DI funkcijos</b>.]]></string>
 
