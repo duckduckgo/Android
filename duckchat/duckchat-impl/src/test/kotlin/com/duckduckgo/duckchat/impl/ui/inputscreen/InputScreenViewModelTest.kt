@@ -2988,4 +2988,49 @@ class InputScreenViewModelTest {
         }
 
     // endregion
+
+    // region mode switched pixel
+
+    @Test
+    fun `mode switched pixel includes default_position when feature flag is on`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.DUCK_AI))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onChatSelected()
+
+            verify(pixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+                parameters = mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "false",
+                    DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION to "duckAI",
+                ),
+            )
+        }
+
+    @Test
+    fun `mode switched pixel excludes default_position when feature flag is off`() =
+        runTest {
+            @Suppress("DenyListedApi")
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+
+            val viewModel = createViewModel()
+            viewModel.onSearchSelected()
+            viewModel.onChatSelected()
+
+            verify(pixel).fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED,
+                parameters = mapOf(
+                    "direction" to "to_duckai",
+                    "had_text" to "false",
+                ),
+            )
+        }
+
+    // endregion
 }

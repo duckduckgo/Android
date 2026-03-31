@@ -747,16 +747,16 @@ class InputScreenViewModel @AssistedInject constructor(
             } else {
                 searchInputTextState.value.isNotBlank()
             }
-        val params =
-            mapOf(
-                "direction" to
-                    if (directionToSearch) {
-                        "to_search"
-                    } else {
-                        "to_duckai"
-                    },
-                "had_text" to hadText.toString(),
+        val params = buildMap {
+            put(
+                "direction",
+                if (directionToSearch) "to_search" else "to_duckai",
             )
+            put("had_text", hadText.toString())
+            if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+                put(DuckChatPixelParameters.DEFAULT_TOGGLE_POSITION, defaultTogglePosition.value.pixelValue)
+            }
+        }
         pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, parameters = params)
     }
 
