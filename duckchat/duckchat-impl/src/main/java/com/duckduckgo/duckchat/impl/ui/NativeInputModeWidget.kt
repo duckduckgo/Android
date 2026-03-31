@@ -455,9 +455,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
         isStreaming = streaming
         ensureSubmitButtons()
         if (streaming) {
-            submitButtons?.setStopButton()
+            submitButtons?.showStopButton()
         } else {
-            submitButtons?.clearStopButton(R.drawable.ic_arrow_up_24)
+            submitButtons?.showSendButton()
             submitButtons?.setSendButtonEnabled(inputField.text.isNotBlank())
         }
     }
