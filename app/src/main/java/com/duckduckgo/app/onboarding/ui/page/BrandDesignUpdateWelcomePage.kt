@@ -580,6 +580,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     )
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
+                                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                             playCheckIconAnimation()
                                         }
                                     })
@@ -621,7 +622,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                     binding.daxDialogCta.primaryCta.alpha = 0f
                 }
 
