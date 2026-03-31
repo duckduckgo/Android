@@ -69,6 +69,40 @@ class OnboardingBackgroundAnimator(
     private var activeView: ImageView = backgroundPrimary
 
     /**
+     * Whether the current layout uses fitCenter scaling for backgrounds.
+     *
+     * Determined from [backgroundSecondary]'s XML scaleType, which is the reliable reference:
+     * - Phone portrait: centerCrop
+     * - Phone landscape: fitCenter
+     * - Tablet: fitCenter
+     *
+     * [backgroundPrimary] is a LottieAnimationView that always starts as centerCrop in XML,
+     * so it cannot be used as the reference. When this is true, [backgroundPrimary]'s scaleType
+     * is overridden to fitCenter before use, and layout params include a dimensionRatio to
+     * eliminate fitCenter gaps.
+     */
+    private val usesFitCenter: Boolean
+        get() = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
+
+    /**
+     * Ensures [view] has the correct scaleType for the current layout and updates its
+     * layout params for the given [step].
+     */
+    private fun configureBackgroundView(view: ImageView, step: OnboardingBackgroundStep) {
+        if (usesFitCenter && view == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
+            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+        val density = view.resources.displayMetrics.density
+        view.setImageResource(step.backgroundRes)
+        view.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            constrainedHeight = true
+            matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+            verticalBias = 1f
+            dimensionRatio = if (usesFitCenter) imageDimensionRatio(view) else null
+        }
+    }
+
+    /**
      * Transitions the background to the given [step].
      *
      * Must be called after the view hierarchy has been laid out (e.g., inside [View.doOnLayout]).
@@ -94,24 +128,11 @@ class OnboardingBackgroundAnimator(
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
 
-        // Layouts that use fitCenter (tablet, landscape) need dimensionRatio to eliminate gaps
-        val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
-        if (usesFitCenter && inView == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
-            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
-        }
+        configureBackgroundView(inView, step)
 
-        val density = inView.resources.displayMetrics.density
         val screenWidth = inView.rootView.width.toFloat()
 
         with(inView) {
-            setImageResource(step.backgroundRes)
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                constrainedHeight = true
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-                verticalBias = 1f
-                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
-            }
-
             val startX = enterStartX ?: (screenWidth + centerCropOverflow(inView, screenWidth))
             translationX = startX
             alpha = 0f
@@ -146,21 +167,12 @@ class OnboardingBackgroundAnimator(
 
         val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
         val outView = activeView
-        val density = inView.resources.displayMetrics.density
 
-        with(inView) {
-            setImageResource(step.backgroundRes)
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                constrainedHeight = true
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-                verticalBias = 1f
-                val usesFitCenter = scaleType == ImageView.ScaleType.FIT_CENTER
-                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
-            }
-            translationX = 0f
-            alpha = 1f
-            isVisible = true
-        }
+        configureBackgroundView(inView, step)
+
+        inView.translationX = 0f
+        inView.alpha = 1f
+        inView.isVisible = true
 
         outView.alpha = 0f
         outView.translationX = 0f
