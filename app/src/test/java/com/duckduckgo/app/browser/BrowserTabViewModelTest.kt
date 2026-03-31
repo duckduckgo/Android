@@ -97,6 +97,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
@@ -645,6 +646,7 @@ class BrowserTabViewModelTest {
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
+    private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
@@ -935,6 +937,7 @@ class BrowserTabViewModelTest {
                 queryUrlPredictor = mockQueryUrlPredictor,
                 browserUiLockFeature = fakeBrowserUiLockFeature,
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
+                faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -3891,6 +3894,98 @@ class BrowserTabViewModelTest {
             testee.iconReceived("https://notexample.com", "https://example.com/favicon.png")
 
             verify(mockFaviconManager, never()).storeFavicon(any(), any())
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledTwiceForSameDomainThenFaviconFetchedOnce() =
+        runTest {
+            val url = "https://www.example.com/"
+            givenCurrentSite(url)
+
+            testee.prefetchFavicon(url)
+            testee.prefetchFavicon(url)
+
+            verify(mockFaviconManager, times(1)).tryFetchFaviconForUrl("TAB_ID", url)
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledForDifferentDomainsThenFaviconFetchedForEach() =
+        runTest {
+            val url1 = "https://www.example.com/"
+            val url2 = "https://www.other.com/"
+            givenCurrentSite(url1)
+            testee.prefetchFavicon(url1)
+            givenCurrentSite(url2)
+            testee.prefetchFavicon(url2)
+
+            verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url1)
+            verify(mockFaviconManager).tryFetchFaviconForUrl("TAB_ID", url2)
+        }
+
+    @Test
+    fun whenPrefetchFaviconCalledTwiceForSameDomainAndFixDisabledThenFaviconFetchedTwice() =
+        runTest {
+            fakeFaviconFetchingFixFeature.self().setRawStoredState(Toggle.State(enable = false))
+            val url = "https://www.example.com/"
+            givenCurrentSite(url)
+
+            testee.prefetchFavicon(url)
+            testee.prefetchFavicon(url)
+
+            verify(mockFaviconManager, times(2)).tryFetchFaviconForUrl(any(), any())
+        }
+
+    @Test
+    fun whenIconReceivedAndNoExistingFaviconThenStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(null)
+
+            testee.iconReceived("https://example.com", bitmap)
+
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(bitmap, "https://example.com"))
+        }
+
+    @Test
+    fun whenIconReceivedAndExistingFaviconHasBetterQualityThenSkipStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager, never()).storeFavicon(any(), any())
+        }
+
+    @Test
+    fun whenIconReceivedAndNewFaviconHasBetterQualityThenStoreFavicon() =
+        runTest {
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(newBitmap, "https://example.com"))
+        }
+
+    @Test
+    fun whenIconReceivedAndFixDisabledThenSkipQualityCheckAndStoreFavicon() =
+        runTest {
+            fakeFaviconFetchingFixFeature.self().setRawStoredState(Toggle.State(enable = false))
+            givenOneActiveTabSelected()
+            val existingBitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.RGB_565)
+            val newBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
+            whenever(mockFaviconManager.loadFromDisk(any(), any())).thenReturn(existingBitmap)
+
+            testee.iconReceived("https://example.com", newBitmap)
+
+            verify(mockFaviconManager, never()).loadFromDisk(any(), any())
+            verify(mockFaviconManager).storeFavicon("TAB_ID", FaviconSource.ImageFavicon(newBitmap, "https://example.com"))
         }
 
     @Test

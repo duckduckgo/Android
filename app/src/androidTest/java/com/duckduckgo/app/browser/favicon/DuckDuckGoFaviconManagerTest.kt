@@ -130,26 +130,6 @@ class DuckDuckGoFaviconManagerTest {
     }
 
     @Test
-    fun whenTryFetchFaviconForUrlCalledTwiceForSameDomainThenOnlyFetchesOnce() = runTest {
-        val url = "https://example.com"
-
-        testee.tryFetchFaviconForUrl("tab1", url)
-        testee.tryFetchFaviconForUrl("tab1", url)
-
-        // Only 2 network calls total (touch icon + favicon.ico) on the first invocation, 0 on the second
-        verify(mockFaviconDownloader, times(2)).getFaviconFromUrl(any())
-    }
-
-    @Test
-    fun whenTryFetchFaviconForUrlCalledForDifferentDomainsThenFetchesForBothDomains() = runTest {
-        testee.tryFetchFaviconForUrl("tab1", "https://example.com")
-        testee.tryFetchFaviconForUrl("tab1", "https://other.com")
-
-        // 4 calls total: 2 per domain (touch icon + favicon.ico), because domain changed
-        verify(mockFaviconDownloader, times(4)).getFaviconFromUrl(any())
-    }
-
-    @Test
     fun whenStoreFaviconIfFaviconHasBetterQualityThenReplacePersistedFavicons() = runTest {
         val bitmap = asBitmap()
         givenFaviconShouldBePersisted()
