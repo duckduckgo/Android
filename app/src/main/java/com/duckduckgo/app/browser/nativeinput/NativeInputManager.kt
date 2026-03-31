@@ -343,9 +343,9 @@ class RealNativeInputManager @Inject constructor(
             },
         )
         val previousOnChatSelected = widget.onChatSelected
-        widget.onChatSelected = {
+        widget.onChatSelected = { animate ->
             callbacks.onClearAutocomplete()
-            previousOnChatSelected?.invoke()
+            previousOnChatSelected?.invoke(animate)
         }
         widget.onClearTextTapped = {
             if (!widget.isChatTabSelected()) {
@@ -420,11 +420,11 @@ class RealNativeInputManager @Inject constructor(
     ) {
         val widget = widgetFrom(widgetView) ?: return
         val previousOnSearchSelected = widget.onSearchSelected
-        widget.onSearchSelected = {
+        widget.onSearchSelected = { animate ->
             if (widget.text.isBlank()) {
                 onClearAutocomplete()
             }
-            previousOnSearchSelected?.invoke()
+            previousOnSearchSelected?.invoke(animate)
         }
     }
 
@@ -440,8 +440,8 @@ class RealNativeInputManager @Inject constructor(
             rootView.findViewById<RecyclerView?>(R.id.autoCompleteSuggestionsList) ?: return
         val focusedView = rootView.findViewById<View?>(R.id.focusedView)
         val previousOnChatSelected = widget.onChatSelected
-        widget.onChatSelected = {
-            previousOnChatSelected?.invoke()
+        widget.onChatSelected = { animate ->
+            previousOnChatSelected?.invoke(animate)
             autoCompleteList.gone()
             focusedView?.gone()
         }

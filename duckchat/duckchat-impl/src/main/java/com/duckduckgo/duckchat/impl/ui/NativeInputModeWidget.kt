@@ -56,8 +56,8 @@ import javax.inject.Inject
 interface NativeInputWidget {
 
     var text: String
-    var onSearchSelected: (() -> Unit)?
-    var onChatSelected: (() -> Unit)?
+    var onSearchSelected: ((animate: Boolean) -> Unit)?
+    var onChatSelected: ((animate: Boolean) -> Unit)?
     var onClearTextTapped: (() -> Unit)?
     var onStopTapped: (() -> Unit)?
     var onVoiceClick: (() -> Unit)?
@@ -297,7 +297,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChatSubmitted: (String) -> Unit,
     ) {
         this.onSearchTextChanged = onSearchTextChanged
-        this.onSearchSelected = {
+        this.onSearchSelected = { _ ->
             onSearchTextChanged(text)
         }
         this.onSearchSent = onSearchSubmitted
@@ -342,14 +342,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         }
 
         val previousOnSearchSelected = this.onSearchSelected
-        this.onSearchSelected = {
+        this.onSearchSelected = { animate ->
             hideChatSuggestions(hideList = false)
-            previousOnSearchSelected?.invoke()
+            previousOnSearchSelected?.invoke(animate)
         }
 
         val previousOnChatSelected = this.onChatSelected
-        this.onChatSelected = {
-            previousOnChatSelected?.invoke()
+        this.onChatSelected = { animate ->
+            previousOnChatSelected?.invoke(animate)
             showSuggestions(text)
         }
 
