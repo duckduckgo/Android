@@ -3243,7 +3243,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchPrivacyPro> {
-            assertEquals("funnel_reinstallmodal_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_skippedonboarding_android", uri.getQueryParameter("origin"))
         }
     }
 
