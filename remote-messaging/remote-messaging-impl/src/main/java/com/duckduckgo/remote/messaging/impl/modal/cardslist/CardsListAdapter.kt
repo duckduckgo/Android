@@ -20,6 +20,7 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -33,6 +34,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.remote.messaging.api.CardItem
 import com.duckduckgo.remote.messaging.api.CardItemType
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageCardItemBinding
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageFeaturedListItemBinding
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageHeaderBinding
@@ -96,11 +98,13 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
             }
 
             is RemoteMessageItemHolder.CardItemViewHolder -> {
-                holder.bind((getItem(position) as ModalListItem.CardListItem).cardItem as CardItem.ListItem)
+                val cardListItem = getItem(position) as ModalListItem.CardListItem
+                holder.bind(cardListItem.cardItem as CardItem.ListItem, cardListItem.imageFilePath)
             }
 
             is RemoteMessageItemHolder.FeaturedItemHolder -> {
-                holder.bind((getItem(position) as ModalListItem.CardListItem).cardItem as CardItem.ListItem)
+                val cardListItem = getItem(position) as ModalListItem.CardListItem
+                holder.bind(cardListItem.cardItem as CardItem.ListItem, cardListItem.imageFilePath)
             }
 
             is RemoteMessageItemHolder.SectionTitleHolder -> {
@@ -129,19 +133,15 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 binding.headerTitle.text = header.titleText
 
                 if (!header.imageUrl.isNullOrEmpty()) {
-                    val imageSource: Any = header.imageFilePath?.let { File(it) } ?: header.imageUrl
-
-                    Glide.with(binding.remoteImage)
-                        .load(imageSource)
-                        .error(header.placeholder.drawable(true))
-                        .addListener(object : RequestListener<Drawable> {
+                    val imageLoadListener = listener?.let {
+                        object : RequestListener<Drawable> {
                             override fun onLoadFailed(
                                 e: GlideException?,
                                 model: Any?,
                                 target: Target<Drawable>,
                                 isFirstResource: Boolean,
                             ): Boolean {
-                                listener?.onImageLoadFailed()
+                                it.onImageLoadFailed()
                                 return false
                             }
 
@@ -152,13 +152,18 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                                 dataSource: DataSource,
                                 isFirstResource: Boolean,
                             ): Boolean {
-                                listener?.onImageLoadSuccess()
+                                it.onImageLoadSuccess()
                                 return false
                             }
-                        })
-                        .centerCrop()
-                        .transition(withCrossFade())
-                        .into(binding.remoteImage)
+                        }
+                    }
+                    loadRemoteImage(
+                        imageView = binding.remoteImage,
+                        imageUrl = header.imageUrl,
+                        imageFilePath = header.imageFilePath,
+                        placeholder = header.placeholder,
+                        listener = imageLoadListener,
+                    )
                     binding.headerImage.gone()
                     binding.remoteImage.show()
                 } else {
@@ -174,10 +179,13 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
             private val listener: CardItemClickListener,
         ) : RemoteMessageItemHolder(binding.root) {
 
-            fun bind(item: CardItem.ListItem) {
+            fun bind(
+                item: CardItem.ListItem,
+                imageFilePath: String?,
+            ) {
                 binding.title.text = item.titleText
                 binding.description.text = item.descriptionText
-                binding.startImage.setImageResource(item.placeholder.drawable(true))
+                loadRemoteImage(binding.startImage, item.imageUrl, imageFilePath, item.placeholder)
                 binding.listItemContainer.setOnClickListener {
                     listener.onItemClicked(item)
                 }
@@ -198,14 +206,39 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
             private val listener: CardItemClickListener,
         ) : RemoteMessageItemHolder(binding.root) {
 
-            fun bind(item: CardItem.ListItem) {
+            fun bind(
+                item: CardItem.ListItem,
+                imageFilePath: String?,
+            ) {
                 binding.title.text = item.titleText
                 binding.description.text = item.descriptionText
-                binding.image.setImageResource(item.placeholder.drawable(true))
                 binding.action.text = item.primaryActionText
+                loadRemoteImage(binding.image, item.imageUrl, imageFilePath, item.placeholder)
                 binding.action.setOnClickListener {
                     listener.onItemClicked(item)
                 }
+            }
+        }
+
+        fun loadRemoteImage(
+            imageView: ImageView,
+            imageUrl: String?,
+            imageFilePath: String?,
+            placeholder: Content.Placeholder,
+            listener: RequestListener<Drawable>? = null,
+        ) {
+            if (!imageUrl.isNullOrEmpty()) {
+                val imageSource: Any = imageFilePath?.let { File(it) } ?: imageUrl
+                Glide.with(imageView)
+                    .load(imageSource)
+                    .centerCrop()
+                    .error(placeholder.drawable(true))
+                    .apply { if (listener != null) addListener(listener) }
+                    .transition(withCrossFade())
+                    .into(imageView)
+            } else {
+                Glide.with(imageView).clear(imageView)
+                imageView.setImageResource(placeholder.drawable(true))
             }
         }
     }
