@@ -788,10 +788,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     }
 
-                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
-                    binding.daxDialogCta.addressBarContent.root.isVisible = true
-                    binding.daxDialogCta.addressBarContent.root.alpha = 0f
-
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
                     val transition = androidx.transition.ChangeBounds().apply {
@@ -816,8 +812,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     })
 
-                    val cardView = binding.daxDialogCta.cardView
-                    TransitionManager.beginDelayedTransition(cardView as ViewGroup, transition)
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
+
+                    binding.daxDialogCta.comparisonChartContent.root.isVisible = false
+                    binding.daxDialogCta.addressBarContent.root.isVisible = true
+                    binding.daxDialogCta.addressBarContent.root.alpha = 0f
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
