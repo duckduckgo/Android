@@ -292,6 +292,7 @@
                         android:layout_height="wrap_content"
                         app:textType="secondary"
                         android:text="@string/duckAIContextualAttachPageContent"
+                        android:paddingStart="0dp"
                         android:paddingEnd="@dimen/keyline_2"
                         android:layout_marginStart="@dimen/keyline_2"
                         app:typography="body2_bold"

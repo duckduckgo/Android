@@ -20,6 +20,7 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false"
     android:paddingTop="@dimen/keyline_5"
+    android:paddingStart="0dp"
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_5">
 
