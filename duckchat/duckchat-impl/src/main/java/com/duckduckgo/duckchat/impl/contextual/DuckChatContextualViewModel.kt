@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -58,6 +59,7 @@ class DuckChatContextualViewModel @Inject constructor(
     private val timeProvider: DuckChatContextualTimeProvider,
     private val duckChatPixels: DuckChatPixels,
     private val duckChatFeature: DuckChatFeature,
+    private val featureTogglesInventory: FeatureTogglesInventory,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -99,10 +101,22 @@ class DuckChatContextualViewModel @Inject constructor(
                 contextTitle = "",
                 tabId = "",
                 prompt = "",
-                isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled(),
+                isFireButtonEnabled = false,
             ),
         )
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            val isSingleTabFireEnabled = featureTogglesInventory
+                .getAllTogglesForParent("androidBrowserConfig")
+                .find { it.featureName().name == "singleTabFireDialog" }
+                ?.isEnabled() == true
+            _viewState.update {
+                it.copy(isFireButtonEnabled = duckChatFeature.contextualFireButton().isEnabled() && isSingleTabFireEnabled)
+            }
+        }
+    }
 
     data class ViewState(
         val sheetMode: SheetMode = SheetMode.INPUT,
