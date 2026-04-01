@@ -16,22 +16,25 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -64,9 +67,22 @@ class DuckChatContextualViewModelTest {
     private val timeProvider = FakeDuckChatContextualTimeProvider()
     private val sessionTimeoutProvider = FakeDuckChatContextualSessionTimeoutProvider()
     private val duckChatPixels: DuckChatPixels = mock()
+    private val duckChatFeature: DuckChatFeature = mock()
+    private val contextualFireButtonToggle: Toggle = mock()
+    private val featureTogglesInventory: FeatureTogglesInventory = mock()
+    private val singleTabFireDialogToggle: Toggle = mock()
+    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
+        parentName = "androidBrowserConfig",
+        name = "singleTabFireDialog",
+    )
 
     @Before
     fun setup() {
+        whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(singleTabFireDialogToggle.featureName()).thenReturn(singleTabFireDialogFeatureName)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
+        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(listOf(singleTabFireDialogToggle))
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
         whenever(
             duckChatJSHelper.onNativeAction(NativeAction.NEW_CHAT),
@@ -87,6 +103,8 @@ class DuckChatContextualViewModelTest {
             sessionTimeoutProvider = sessionTimeoutProvider,
             timeProvider = timeProvider,
             duckChatPixels = duckChatPixels,
+            duckChatFeature = duckChatFeature,
+            featureTogglesInventory = featureTogglesInventory,
         )
     }
 
@@ -314,6 +332,8 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
                 )
 
             val tabId = "tab-1"
@@ -679,6 +699,8 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
                 )
 
             val serializedPageData =
@@ -713,6 +735,8 @@ class DuckChatContextualViewModelTest {
                     sessionTimeoutProvider = sessionTimeoutProvider,
                     timeProvider = timeProvider,
                     duckChatPixels = duckChatPixels,
+                    duckChatFeature = duckChatFeature,
+                    featureTogglesInventory = featureTogglesInventory,
                 )
 
             val serializedPageData =
@@ -1299,6 +1323,86 @@ class DuckChatContextualViewModelTest {
 
         assertFalse(testee.isPageContextRequested)
     }
+
+    @Test
+    fun `when both fire flags enabled then isFireButtonEnabled is true`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertTrue(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when contextual fire button flag disabled then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(true)
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when singleTabFireDialog flag disabled then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        whenever(singleTabFireDialogToggle.isEnabled()).thenReturn(false)
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when singleTabFireDialog toggle does not exist then isFireButtonEnabled is false`() = runTest {
+        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(true)
+        runBlocking { whenever(featureTogglesInventory.getAllTogglesForParent("androidBrowserConfig")) }.thenReturn(emptyList())
+        val testee = buildViewModel()
+
+        assertFalse(testee.viewState.value.isFireButtonEnabled)
+    }
+
+    @Test
+    fun `when fire button clicked then tapped pixel is fired`() = runTest {
+        testee.onFireButtonClicked()
+        verify(duckChatPixels).reportContextualFireButtonTapped()
+    }
+
+    @Test
+    fun `when fire confirmed then confirmed pixel is fired`() = runTest {
+        testee.onContextualFireConfirmed()
+        verify(duckChatPixels).reportContextualFireButtonConfirmed()
+    }
+
+    @Test
+    fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
+        testee.onContextualFireConfirmed()
+        verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
+    }
+
+    @Test
+    fun `when fire confirmed then sheet is hidden`() = runTest {
+        testee.commands.test {
+            testee.onSheetOpened("tab-1")
+            expectMostRecentItem() // drain onSheetOpened commands
+
+            testee.onContextualFireConfirmed()
+            val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
+            assertEquals(BottomSheetBehavior.STATE_HIDDEN, command.newState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun buildViewModel() = DuckChatContextualViewModel(
+        dispatchers = coroutineRule.testDispatcherProvider,
+        duckChat = duckChat,
+        duckChatInternal = duckChatInternal,
+        duckChatJSHelper = duckChatJSHelper,
+        contextualDataStore = contextualDataStore,
+        sessionTimeoutProvider = sessionTimeoutProvider,
+        timeProvider = timeProvider,
+        duckChatPixels = duckChatPixels,
+        duckChatFeature = duckChatFeature,
+        featureTogglesInventory = featureTogglesInventory,
+    )
 
     private class FakeDuckChat : com.duckduckgo.duckchat.api.DuckChat {
         var nextUrl: String = ""

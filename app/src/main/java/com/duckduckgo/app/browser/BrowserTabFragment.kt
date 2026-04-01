@@ -5577,6 +5577,10 @@ class BrowserTabFragment :
         }
     }
 
+    fun onContextualSheetFireComplete() {
+        sharedContextualViewModel.onContextualFireConfirmed()
+    }
+
     private fun createBreakageReportingEventData(): SubscriptionEventData =
         SubscriptionEventData(
             featureName = "breakageReporting",
