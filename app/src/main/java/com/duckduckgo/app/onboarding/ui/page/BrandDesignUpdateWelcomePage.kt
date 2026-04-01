@@ -66,6 +66,7 @@ import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.flow.launchIn
@@ -81,6 +82,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var deviceInfo: DeviceInfo
 
     @Inject
     lateinit var appTheme: AppTheme
@@ -335,6 +339,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         super.onViewCreated(view, savedInstanceState)
 
         ViewGroupCompat.installCompatInsetsDispatch(binding.root)
+        if (deviceInfo.formFactor() == DeviceInfo.FormFactor.TABLET) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+                val tappableInsets = windowInsets.getInsets(WindowInsetsCompat.Type.tappableElement())
+                v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, tappableInsets.bottom)
+                windowInsets
+            }
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, windowInsets ->
             val insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
