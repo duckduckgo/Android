@@ -90,18 +90,6 @@
     <string name="syncRestoreDialogPrimaryCta">Restore My Stuff</string>
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
-    <!-- Inactivity timeout -->
-    <string name="afterInactivityDialogTitle">After Inactivity</string>
-    <string name="afterInactivityOptionTitle">Opening Screen</string>
-    <string name="afterInactivityTimeoutRowTitle">Choose an inactivity timer</string>
-    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return to DuckDuckGo</string>
-    <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
-    <string name="afterInactivityTimeoutAlways" translatable="false">None</string>
-    <string name="afterInactivityTimeout1Minute" translatable="false">1 minute</string>
-    <string name="afterInactivityTimeoutXMinutes" translatable="false">%1$d minutes</string>
-    <string name="afterInactivityTimeout1Hour" translatable="false">1 hour</string>
-    <string name="afterInactivityTimeoutXHours" translatable="false">%1$d hours</string>
-
     <!--Onboarding Rebrand Design Update-->
     <string name="preOnboardingWelcomeDialogTitle">Hi there!</string>
     <string name="preOnboardingWelcomeDialogBody">Ready for a faster browser that keeps you protected?</string>
