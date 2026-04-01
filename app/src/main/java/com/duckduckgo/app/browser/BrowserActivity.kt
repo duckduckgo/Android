@@ -455,7 +455,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         resources.getQuantityString(R.plurals.tabsClearedSnackbarMessage, 1, 1)
                     }
                     showSnackbar(message)
-                    currentTab?.hideContextualSheet()
+                    if (isDuckAiContextual) currentTab?.onContextualSheetFireComplete()
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)

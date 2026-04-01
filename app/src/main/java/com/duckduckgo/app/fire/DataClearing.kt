@@ -111,9 +111,6 @@ class DataClearing @Inject constructor(
 
         logcat { "Performing contextual sheet clear for tab: $tabId" }
 
-        val tabUrl = tabRepository.getTab(tabId)?.url
-
-        clearDuckAiChatIfNeeded(tabUrl)
         deleteContextualChat(tabId)
 
         logcat { "Contextual sheet clear completed for tab: $tabId" }

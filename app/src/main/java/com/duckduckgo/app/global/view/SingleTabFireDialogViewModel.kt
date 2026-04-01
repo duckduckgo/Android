@@ -281,7 +281,7 @@ class SingleTabFireDialogViewModel @Inject constructor(
                 get() = (stateData.isSingleTabEnabled && origin == BROWSER) || origin == DUCK_AI_CONTEXTUAL_CHAT
 
             val isDeleteAllButtonVisible: Boolean
-                get() = !(isDuckAiTabInBrowser && (stateData.isSingleTabEnabled || origin == DUCK_AI_CONTEXTUAL_CHAT))
+                get() = origin != DUCK_AI_CONTEXTUAL_CHAT && !(isDuckAiTabInBrowser && stateData.isSingleTabEnabled)
 
             val isSiteDataSubtitleVisible: Boolean
                 get() = stateData.isSiteDataSubtitleEligible && !isDuckAiTabInBrowser

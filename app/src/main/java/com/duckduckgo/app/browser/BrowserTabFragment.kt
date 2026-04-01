@@ -5577,7 +5577,7 @@ class BrowserTabFragment :
         }
     }
 
-    fun hideContextualSheet() {
+    fun onContextualSheetFireComplete() {
         sharedContextualViewModel.onContextualFireConfirmed()
     }
 

@@ -1375,6 +1375,21 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
+    fun `when delete this tab clicked with duck ai contextual chat origin then clearTabContextualChat is called`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
+        testee = createViewModel()
+        testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
+
+        testee.onDeleteThisTabClicked()
+
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockDataClearing).clearTabContextualChat("tab1")
+    }
+
+    @Test
     fun `when delete this tab clicked with duck ai contextual chat origin then single tab pixels are fired`() = runTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)

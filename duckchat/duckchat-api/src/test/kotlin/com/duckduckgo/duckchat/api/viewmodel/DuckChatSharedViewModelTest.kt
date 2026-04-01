@@ -89,5 +89,4 @@ class DuckChatSharedViewModelTest {
                 assertEquals(DuckChatSharedViewModel.Command.LaunchContextualChatFire, awaitItem())
             }
         }
-
 }
