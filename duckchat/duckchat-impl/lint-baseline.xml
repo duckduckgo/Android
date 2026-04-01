@@ -442,28 +442,6 @@
     </issue>
 
     <issue
-        id="ClickableViewAccessibility"
-        message="Custom view ``WebView`` has `setOnTouchListener` called on it but does not override `performClick`"
-        errorLine1="            it.setOnTouchListener { v, event ->"
-        errorLine2="            ^">
-        <location
-            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="292"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="ClickableViewAccessibility"
-        message="`onTouch` lambda should call `View#performClick` when a click is detected"
-        errorLine1="            it.setOnTouchListener { v, event ->"
-        errorLine2="                                  ^">
-        <location
-            file="src/main/java/com/duckduckgo/duckchat/impl/contextual/DuckChatContextualFragment.kt"
-            line="292"
-            column="35"/>
-    </issue>
-
-    <issue
         id="RtlSymmetry"
         message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
         errorLine1="                        android:paddingEnd=&quot;@dimen/keyline_2&quot;"
@@ -474,11 +452,5 @@
             column="25"/>
     </issue>
 
-    <issue
-        id="RtlEnabled"
-        message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
-        <location
-            file="src/main/AndroidManifest.xml"/>
-    </issue>
 
 </issues>
