@@ -43,11 +43,11 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf

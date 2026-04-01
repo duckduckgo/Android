@@ -54,7 +54,6 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
@@ -89,6 +88,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
