@@ -1321,7 +1321,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun initializeTabs(savedInstanceState: Bundle?) {
         if (swipingTabsFeature.isEnabled) {
             tabManager.registerCallbacks(
-                onTabsUpdated = ::onTabsUpdated,
+                onTabsUpdated = {
+                    onTabsUpdated(it, savedInstanceState)
+                },
             )
 
             tabPager.adapter = tabPagerAdapter
@@ -1330,9 +1332,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
             configureViewPagerForSystemAutofill(tabPager)
 
-            savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
-                tabPagerAdapter.restore(it)
-            }
+            // savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
+            //     tabPagerAdapter.restore(it)
+            // }
         }
 
         binding.fragmentContainer.isVisible = !swipingTabsFeature.isEnabled
@@ -1483,8 +1485,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun onTabsUpdated(updatedTabIds: List<TabModel>) {
+    private fun onTabsUpdated(updatedTabIds: List<TabModel>, savedInstanceState: Bundle?) {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
+        savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
+            tabPagerAdapter.restore(it)
+        }
+        savedInstanceState?.remove(KEY_TAB_PAGER_STATE)
     }
 
     fun launchNewTab(
