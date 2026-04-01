@@ -772,7 +772,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 autoCompleteTargetVisibility = false
                 hideOverlayImmediately(binding.autoCompleteOverlay, ::invalidateAutoCompleteBlurView)
             }
-            updateChatSuggestionsVisibility(viewModel.chatSuggestions.value.isNotEmpty())
+            updateChatSuggestionsVisibility(
+                viewModel.chatSuggestions.value.isNotEmpty() || viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty(),
+            )
         }
     }
 

@@ -105,6 +105,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -277,6 +278,38 @@ class InputScreenViewModel @AssistedInject constructor(
             .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val chatUrlSuggestions: StateFlow<AutoCompleteResult> =
+        if (duckChatFeature.rememberTogglePosition().isEnabled()) {
+            combine(
+                chatInputTextState.debounceExceptFirst(timeoutMillis = 100),
+                _chatSuggestions,
+                autoCompleteSuggestionsEnabled,
+            ) { chatInput, chatSuggestions, autoCompleteEnabled ->
+                if (autoCompleteEnabled && chatInput.isNotEmpty() && chatSuggestions.isEmpty()) chatInput else null
+            }.distinctUntilChanged()
+                .flatMapLatest { query ->
+                    if (query != null) {
+                        autoComplete.autoComplete(query).map { result ->
+                            result.copy(
+                                suggestions = result.suggestions.filter {
+                                    it is AutoCompleteBookmarkSuggestion ||
+                                        it is AutoCompleteSwitchToTabSuggestion ||
+                                        it is AutoCompleteHistorySuggestion ||
+                                        (it is AutoCompleteSearchSuggestion && it.isUrl)
+                                },
+                            )
+                        }
+                    } else {
+                        flowOf(AutoCompleteResult("", emptyList()))
+                    }
+                }.flowOn(dispatchers.io())
+                .catch { t -> logcat(WARN) { "Failed to get chat URL suggestions: ${t.asLog()}" } }
+                .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+        } else {
+            MutableStateFlow(AutoCompleteResult("", emptyList()))
+        }
+
     private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
     val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
 
@@ -338,10 +371,13 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        _chatSuggestions.onEach { suggestions ->
-            val hasChatSuggestions = suggestions.isNotEmpty()
+        combine(_chatSuggestions, chatUrlSuggestions) { chatSuggestions, urlSuggestions ->
+            Pair(chatSuggestions, urlSuggestions)
+        }.onEach { (chatSuggestions, urlSuggestions) ->
+            val hasChatSuggestions = chatSuggestions.isNotEmpty()
+            val hasUrlSuggestions = urlSuggestions.suggestions.isNotEmpty()
             _visibilityState.update {
-                it.copy(showChatLogo = !hasChatSuggestions, chatSuggestionsVisible = hasChatSuggestions)
+                it.copy(showChatLogo = !hasChatSuggestions && !hasUrlSuggestions, chatSuggestionsVisible = hasChatSuggestions || hasUrlSuggestions)
             }
         }.launchIn(viewModelScope)
 
@@ -374,9 +410,14 @@ class InputScreenViewModel @AssistedInject constructor(
         voiceServiceAvailable.value = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
-    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
+    fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion, fromChatUrlSuggestions: Boolean = false) {
         appCoroutineScope.launch(dispatchers.io()) {
-            autoComplete.fireAutocompletePixel(autoCompleteSuggestionResults.value.suggestions, suggestion, true)
+            val suggestions = if (duckChatFeature.rememberTogglePosition().isEnabled() && fromChatUrlSuggestions) {
+                chatUrlSuggestions.value.suggestions
+            } else {
+                autoCompleteSuggestionResults.value.suggestions
+            }
+            autoComplete.fireAutocompletePixel(suggestions, suggestion, true)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase)
