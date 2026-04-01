@@ -106,6 +106,7 @@ class SingleTabFireDialogViewModelTest {
             whenever(mockWebViewCapabilityChecker.isSupported(DeleteBrowsingData)).thenReturn(false)
             whenever(mockDownloadsRepository.getDownloads()).thenReturn(emptyList())
             whenever(mockDataClearing.clearSingleTabData(any())).thenReturn(ClearDataResult.Success)
+            whenever(mockDataClearing.clearTabContextualChat(any())).thenReturn(ClearDataResult.Success)
         }
     }
 
@@ -1343,6 +1344,9 @@ class SingleTabFireDialogViewModelTest {
 
     @Test
     fun `when delete this tab clicked with duck ai contextual chat origin then OnSingleTabClearComplete is sent`() = runTest {
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(
+            TabEntity(tabId = "tab1", url = "https://duck.ai/chat", title = "Duck AI"),
+        )
         testee = createViewModel()
 
         testee.commands().test {
@@ -1371,7 +1375,7 @@ class SingleTabFireDialogViewModelTest {
     }
 
     @Test
-    fun `when delete this tab clicked with duck ai contextual chat origin then single tab pixels are not fired`() = runTest {
+    fun `when delete this tab clicked with duck ai contextual chat origin then single tab pixels are fired`() = runTest {
         testee = createViewModel()
         testee.setOrigin(FireDialogOrigin.DUCK_AI_CONTEXTUAL_CHAT)
 
@@ -1379,8 +1383,8 @@ class SingleTabFireDialogViewModelTest {
 
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
-        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
-        verify(mockPixel, never()).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
+        verify(mockPixel).enqueueFire(FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
     }
 
     @Test

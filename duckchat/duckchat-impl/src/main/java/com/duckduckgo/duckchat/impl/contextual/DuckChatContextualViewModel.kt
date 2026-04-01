@@ -608,14 +608,8 @@ class DuckChatContextualViewModel @Inject constructor(
         }
     }
 
-    fun onFireConfirmed() {
+    fun onContextualFireConfirmed() {
         duckChatPixels.reportContextualFireButtonConfirmed()
-        val url = fullModeUrl
-        viewModelScope.launch(dispatchers.io()) {
-            if (url.isNotBlank()) {
-                duckChat.deleteChat(url)
-            }
-        }
         renderNewChatState(sheetState = BottomSheetBehavior.STATE_HIDDEN)
     }
 

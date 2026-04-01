@@ -90,37 +90,4 @@ class DuckChatSharedViewModelTest {
             }
         }
 
-    @Test
-    fun `when onSingleTabFireCompleted after contextual fire then emit ClearContextualChat`() =
-        runTest {
-            testee.onContextualFireButtonClicked()
-            testee.command.test { awaitItem() } // consume LaunchContextualChatFire
-
-            testee.onSingleTabFireCompleted()
-            testee.contextualCommand.test {
-                assertEquals(DuckChatSharedViewModel.ContextualCommand.ClearContextualChat, awaitItem())
-            }
-        }
-
-    @Test
-    fun `when onSingleTabFireCompleted without contextual fire pending then no contextual command emitted`() =
-        runTest {
-            testee.onSingleTabFireCompleted()
-            testee.contextualCommand.test {
-                expectNoEvents()
-            }
-        }
-
-    @Test
-    fun `when onFireCanceled after contextual fire then onSingleTabFireCompleted emits nothing`() =
-        runTest {
-            testee.onContextualFireButtonClicked()
-            testee.command.test { awaitItem() } // consume LaunchContextualChatFire
-
-            testee.onFireCanceled()
-            testee.onSingleTabFireCompleted()
-            testee.contextualCommand.test {
-                expectNoEvents()
-            }
-        }
 }

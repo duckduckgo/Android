@@ -438,7 +438,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     pixel.fire(FIRE_DIALOG_CANCEL)
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                     externalIntentProcessingState.onPendingSnackbarDisplayed()
-                    duckChatViewModel.onFireCanceled()
                 }
                 FireDialog.EVENT_ON_CLEAR_STARTED -> {
                     isDataClearingInProgress = true
@@ -449,15 +448,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     currentTab?.onFireDialogVisibilityChanged(isVisible = false)
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_COMPLETE -> {
-                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) ==
-                        DUCK_AI_CONTEXTUAL_CHAT.name
+                    val isDuckAiContextual = bundle.getString(FireDialog.RESULT_KEY_ORIGIN) == DUCK_AI_CONTEXTUAL_CHAT.name
                     val message = if (isDuckAiContextual) {
                         getString(R.string.duckAiChatDeletedSnackbar)
                     } else {
                         resources.getQuantityString(R.plurals.tabsClearedSnackbarMessage, 1, 1)
                     }
                     showSnackbar(message)
-                    duckChatViewModel.onSingleTabFireCompleted()
+                    currentTab?.hideContextualSheet()
                 }
                 FireDialog.EVENT_ON_SINGLE_TAB_CLEAR_FEATURE_NOT_SUPPORTED -> {
                     showSnackbar(R.string.singleTabFireDialogClearNotSupportedSnackbar)

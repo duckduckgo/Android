@@ -164,28 +164,6 @@ class SingleTabFireDialogViewModel @Inject constructor(
         viewModelScope.launch {
             shouldRestartAfterClearing = false
 
-            if (origin.value == DUCK_AI_CONTEXTUAL_CHAT) {
-                command.send(Command.OnClearStarted)
-
-                val (selectedFireAnimation, fireAnimationEnabled) = withContext(dispatcherProvider.io()) {
-                    settingsDataStore.selectedFireAnimation to settingsDataStore.fireAnimationEnabled
-                }
-
-                pixel.enqueueFire(
-                    pixel = FIRE_DIALOG_ANIMATION,
-                    parameters = mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()),
-                )
-
-                if (fireAnimationEnabled) {
-                    command.send(Command.PlayAnimation)
-                }
-
-                // Chat deletion is handled by DuckChatContextualFragment via the shared ViewModel
-                // round-trip: OnSingleTabClearComplete → onSingleTabFireCompleted → ClearContextualChat → duckChat.deleteChat()
-                command.send(Command.OnSingleTabClearComplete)
-                return@launch
-            }
-
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED)
             pixel.enqueueFire(AppPixelName.FIRE_DIALOG_CLEAR_SINGLE_TAB_PRESSED_DAILY, type = Daily())
 
@@ -210,7 +188,11 @@ class SingleTabFireDialogViewModel @Inject constructor(
 
             val result = withContext(dispatcherProvider.io()) {
                 if (originalTabId != null) {
-                    dataClearing.clearSingleTabData(originalTabId)
+                    if (origin.value == DUCK_AI_CONTEXTUAL_CHAT) {
+                        dataClearing.clearTabContextualChat(originalTabId)
+                    } else {
+                        dataClearing.clearSingleTabData(originalTabId)
+                    }
                 } else {
                     null
                 }
@@ -219,7 +201,10 @@ class SingleTabFireDialogViewModel @Inject constructor(
             when (result) {
                 is ClearDataResult.FeatureNotSupported -> command.send(Command.OnSingleTabClearFeatureNotSupported)
                 is ClearDataResult.Success -> {
-                    waitForTabsToUpdate(originalTabId)
+                    if (origin.value != DUCK_AI_CONTEXTUAL_CHAT) {
+                        // in case of contextual chat the origin tab is never closed, don't need this
+                        waitForTabsToUpdate(originalTabId)
+                    }
                     command.send(Command.OnSingleTabClearComplete)
                 }
                 else -> command.send(Command.OnSingleTabClearError)

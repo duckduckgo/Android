@@ -612,14 +612,11 @@ class DuckChatContextualFragment :
                         viewModel.onSheetReopened()
                     }
 
-                    else -> {}
-                }
-            }.launchIn(lifecycleScope)
+                    is DuckChatContextualSharedViewModel.Command.OnContextualFireConfirmed -> {
+                        viewModel.onContextualFireConfirmed()
+                    }
 
-        duckChatSharedViewModel.contextualCommand
-            .onEach { command ->
-                when (command) {
-                    DuckChatSharedViewModel.ContextualCommand.ClearContextualChat -> viewModel.onFireConfirmed()
+                    else -> {}
                 }
             }.launchIn(lifecycleScope)
 

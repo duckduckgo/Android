@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
-import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -33,9 +32,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -72,7 +71,10 @@ class DuckChatContextualViewModelTest {
     private val contextualFireButtonToggle: Toggle = mock()
     private val featureTogglesInventory: FeatureTogglesInventory = mock()
     private val singleTabFireDialogToggle: Toggle = mock()
-    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(parentName = "androidBrowserConfig", name = "singleTabFireDialog")
+    private val singleTabFireDialogFeatureName: Toggle.FeatureName = Toggle.FeatureName(
+        parentName = "androidBrowserConfig",
+        name = "singleTabFireDialog",
+    )
 
     @Before
     fun setup() {
@@ -1366,13 +1368,13 @@ class DuckChatContextualViewModelTest {
 
     @Test
     fun `when fire confirmed then confirmed pixel is fired`() = runTest {
-        testee.onFireConfirmed()
+        testee.onContextualFireConfirmed()
         verify(duckChatPixels).reportContextualFireButtonConfirmed()
     }
 
     @Test
     fun `when fire confirmed then placeholder shown pixel is not fired`() = runTest {
-        testee.onFireConfirmed()
+        testee.onContextualFireConfirmed()
         verify(duckChatPixels, never()).reportContextualPlaceholderContextShown()
     }
 
@@ -1382,7 +1384,7 @@ class DuckChatContextualViewModelTest {
             testee.onSheetOpened("tab-1")
             expectMostRecentItem() // drain onSheetOpened commands
 
-            testee.onFireConfirmed()
+            testee.onContextualFireConfirmed()
             val command = awaitItem() as DuckChatContextualViewModel.Command.ChangeSheetState
             assertEquals(BottomSheetBehavior.STATE_HIDDEN, command.newState)
             cancelAndIgnoreRemainingEvents()

@@ -27,11 +27,6 @@ class DuckChatSharedViewModel() : ViewModel() {
     private val _command = Channel<Command>()
     val command = _command.receiveAsFlow() // Activity will collect this
 
-    private val _contextualCommand = Channel<ContextualCommand>()
-    val contextualCommand = _contextualCommand.receiveAsFlow() // Contextual fragment will collect this
-
-    private var isPendingContextualClear = false
-
     fun onFireButtonClicked() {
         viewModelScope.launch {
             _command.send(Command.LaunchFire)
@@ -39,23 +34,9 @@ class DuckChatSharedViewModel() : ViewModel() {
     }
 
     fun onContextualFireButtonClicked() {
-        isPendingContextualClear = true
         viewModelScope.launch {
             _command.send(Command.LaunchContextualChatFire)
         }
-    }
-
-    fun onSingleTabFireCompleted() {
-        if (isPendingContextualClear) {
-            isPendingContextualClear = false
-            viewModelScope.launch {
-                _contextualCommand.send(ContextualCommand.ClearContextualChat)
-            }
-        }
-    }
-
-    fun onFireCanceled() {
-        isPendingContextualClear = false
     }
 
     fun onTabSwitcherClicked() {
@@ -82,9 +63,5 @@ class DuckChatSharedViewModel() : ViewModel() {
         object LaunchTabSwitcher : Command()
         data class SearchRequested(val query: String) : Command()
         data class OpenTab(val tabId: String) : Command()
-    }
-
-    sealed class ContextualCommand {
-        object ClearContextualChat : ContextualCommand()
     }
 }

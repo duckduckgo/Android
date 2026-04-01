@@ -74,6 +74,18 @@ class DataClearing @Inject constructor(
 ) : ManualDataClearing, AutomaticDataClearing {
 
     override suspend fun clearSingleTabData(tabId: String): ClearDataResult {
+        suspend fun clearContextualChatDataIfNeeded(tabId: String) {
+            val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
+                .contains(FireClearOption.DUCKAI_CHATS)
+
+            if (isDuckAiChatHistoryClearingEnabled) {
+                val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+                clearDuckAiChatIfNeeded(contextualTabChatUrl)
+
+                contextualDataStore.clearTabChatUrl(tabId)
+            }
+        }
+
         logcat { "Performing single tab clear for tab: $tabId" }
 
         val visitedSites = tabVisitedSitesRepository.getVisitedSites(tabId)
@@ -91,6 +103,23 @@ class DataClearing @Inject constructor(
         return clearDataResult
     }
 
+    override suspend fun clearTabContextualChat(tabId: String): ClearDataResult {
+        suspend fun deleteContextualChat(tabId: String) {
+            val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
+            clearDuckAiChatIfNeeded(contextualTabChatUrl)
+        }
+
+        logcat { "Performing contextual sheet clear for tab: $tabId" }
+
+        val tabUrl = tabRepository.getTab(tabId)?.url
+
+        clearDuckAiChatIfNeeded(tabUrl)
+        deleteContextualChat(tabId)
+
+        logcat { "Contextual sheet clear completed for tab: $tabId" }
+        return ClearDataResult.Success
+    }
+
     private suspend fun getNewTabUrl(tabUrl: String?): String? {
         val option = showOnAppLaunchOptionDataStore.optionFlow.firstOrNull()
         val isDuckChat = tabUrl?.toUri()?.let { duckChat.isDuckChatUrl(it) } == true
@@ -98,18 +127,6 @@ class DataClearing @Inject constructor(
             isDuckChat -> duckChat.getDuckChatUrl("", autoPrompt = false)
             option is ShowOnAppLaunchOption.SpecificPage -> option.url
             else -> null
-        }
-    }
-
-    private suspend fun clearContextualChatDataIfNeeded(tabId: String) {
-        val isDuckAiChatHistoryClearingEnabled = fireDataStore.getManualClearOptions()
-            .contains(FireClearOption.DUCKAI_CHATS)
-
-        if (isDuckAiChatHistoryClearingEnabled) {
-            val contextualTabChatUrl = contextualDataStore.getTabChatUrl(tabId)
-            clearDuckAiChatIfNeeded(contextualTabChatUrl)
-
-            contextualDataStore.clearTabChatUrl(tabId)
         }
     }
 
