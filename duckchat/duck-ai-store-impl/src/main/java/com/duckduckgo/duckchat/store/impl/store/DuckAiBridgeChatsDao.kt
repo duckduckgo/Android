@@ -32,6 +32,9 @@ interface DuckAiBridgeChatsDao {
     @Query("SELECT * FROM duck_ai_chats")
     fun getAll(): List<DuckAiBridgeChatEntity>
 
+    @Query("SELECT * FROM duck_ai_chats WHERE chatId = :chatId")
+    fun getById(chatId: String): DuckAiBridgeChatEntity?
+
     @Query("DELETE FROM duck_ai_chats WHERE chatId = :chatId")
     fun delete(chatId: String)
 
