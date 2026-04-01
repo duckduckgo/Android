@@ -22,6 +22,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -57,6 +58,7 @@ class RealSecureStorageKeyStoreTest {
 
     private val pixel: Pixel = mock()
     private lateinit var autofillFeature: AutofillFeature
+    private lateinit var autofillServiceFeature: AutofillServiceFeature
     private lateinit var sharedPreferencesProvider: SharedPreferencesProvider
 
     private lateinit var legacyPrefs: SharedPreferences
@@ -70,6 +72,7 @@ class RealSecureStorageKeyStoreTest {
     @Before
     fun setup() {
         autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+        autofillServiceFeature = FakeFeatureToggleFactory.create(AutofillServiceFeature::class.java)
         sharedPreferencesProvider = mock()
 
         legacyEditor = mock {
@@ -99,6 +102,7 @@ class RealSecureStorageKeyStoreTest {
             coroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillFeature = autofillFeature,
+            autofillServiceFeature = autofillServiceFeature,
             sharedPreferencesProvider = sharedPreferencesProvider,
             pixel = pixel,
             encryptedPreferencesFactory = encryptedPreferencesFactory,
@@ -216,7 +220,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
             assertEquals("Trying to overwrite already existing key", e.message)
         }
@@ -235,7 +239,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 
@@ -252,7 +256,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 
@@ -633,7 +637,7 @@ class RealSecureStorageKeyStoreTest {
         var exceptionThrown = false
         try {
             testee.updateKey(KEY_NAME, TEST_VALUE)
-        } catch (e: SecureStorageException.InternalSecureStorageException) {
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
 
@@ -724,6 +728,7 @@ class RealSecureStorageKeyStoreTest {
             coroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillFeature = mockAutofillFeature,
+            autofillServiceFeature = autofillServiceFeature,
             sharedPreferencesProvider = sharedPreferencesProvider,
             pixel = pixel,
             encryptedPreferencesFactory = encryptedPreferencesFactory,
@@ -736,16 +741,168 @@ class RealSecureStorageKeyStoreTest {
 
     // endregion
 
+    // region Multi-process mode (autofill service enabled)
+
+    @Test
+    fun whenMultiProcessModeEnabledThenGetKeyReadsOnlyFromHarmony() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        createTestee()
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertArrayEquals(TEST_VALUE, result)
+        // Legacy must never be touched
+        verify(legacyPrefs, never()).getString(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndKeyAbsentInHarmonyThenGetKeyReturnsNull() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        val result = testee.getKey(KEY_NAME)
+
+        assertNull(result)
+        verify(legacyPrefs, never()).getString(any(), anyOrNull())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledThenUpdateKeyWritesToBothForRollbackSupport() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        val expectedBase64 = TEST_VALUE.toByteString().base64()
+        // Both stores should be written to: Harmony for runtime, legacy for rollback
+        verify(harmonyEditor).putString(eq(KEY_NAME), eq(expectedBase64))
+        verify(harmonyEditor).commit()
+        verify(legacyEditor).putString(eq(KEY_NAME), eq(expectedBase64))
+        verify(legacyEditor).commit()
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndKeyExistsInLegacyOnlyThenWriteIsNotBlocked() = runTest {
+        // Key exists in legacy (stale cache) but not in harmony — write should proceed
+        // because keyAlreadyExists skips legacy read in multi-process mode
+        configureMultiProcessMode()
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        // Write should succeed — legacy stale cache doesn't block
+        verify(harmonyEditor).putString(eq(KEY_NAME), any())
+        verify(legacyEditor).putString(eq(KEY_NAME), any())
+        verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndKeyExistsInHarmonyThenWriteIsBlocked() = runTest {
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(EXISTING_VALUE.toByteString().base64())
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndHarmonyNullOnGetKeyThenThrows() = runTest {
+        configureMultiProcessMode(harmonyPrefsReturnsNull = true)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.getKey(KEY_NAME)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_GET_KEY_NULL_FILE), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeEnabledAndHarmonyNullOnUpdateKeyThenThrows() = runTest {
+        configureMultiProcessMode(harmonyPrefsReturnsNull = true)
+        createTestee()
+
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, TEST_VALUE)
+        } catch (e: SecureStorageException.InternalSecureStorageException) {
+            exceptionThrown = true
+        }
+
+        assertTrue(exceptionThrown)
+        verify(pixel).fire(eq(AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_UPDATE_KEY_NULL_FILE), any(), any(), any())
+    }
+
+    @Test
+    fun whenMultiProcessModeDisabledThenLegacyIsStillUsed() = runTest {
+        configureHarmonyDisabled()
+        createTestee()
+
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        verify(legacyEditor).putString(eq(KEY_NAME), any())
+        verify(legacyEditor).commit()
+    }
+
+    @Test
+    fun whenKeyWrittenInMultiProcessModeThenReadableAfterFeatureDisabled() = runTest {
+        // Simulate rollback scenario:
+        // 1. Key written while multi-process enabled (writes to both harmony and legacy)
+        // 2. Feature disabled, new instance created
+        // 3. Key should be readable from legacy
+
+        // Step 1: Write key in multi-process mode
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        // Verify key was written to legacy (for rollback support)
+        verify(legacyEditor).putString(eq(KEY_NAME), eq(TEST_VALUE.toByteString().base64()))
+
+        // Step 2: Disable feature and create new instance
+        // Simulate legacy now has the key (written in step 1)
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        configureHarmonyDisabled()
+        createTestee()
+
+        // Step 3: Read key - should come from legacy
+        val result = testee.getKey(KEY_NAME)
+
+        assertArrayEquals(TEST_VALUE, result)
+    }
+
+    // endregion
+
     // region Helper methods
 
     private fun configureHarmonyDisabled() {
         autofillFeature.useHarmony().setRawStoredState(State(enable = false))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = false))
+        autofillServiceFeature.self().setRawStoredState(State(enable = false))
     }
 
     private fun configureHarmonyEnabled(harmonyPrefsReturnsNull: Boolean = false) {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = false))
+        autofillServiceFeature.self().setRawStoredState(State(enable = false))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
@@ -754,9 +911,69 @@ class RealSecureStorageKeyStoreTest {
     private fun configureReadFromHarmonyEnabled(harmonyPrefsReturnsNull: Boolean = false) {
         autofillFeature.useHarmony().setRawStoredState(State(enable = true))
         autofillFeature.readFromHarmony().setRawStoredState(State(enable = true))
+        autofillServiceFeature.self().setRawStoredState(State(enable = false))
         sharedPreferencesProvider.stub {
             onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
         }
+    }
+
+    private fun configureMultiProcessMode(harmonyPrefsReturnsNull: Boolean = false) {
+        autofillServiceFeature.self().setRawStoredState(State(enable = true))
+        sharedPreferencesProvider.stub {
+            onBlocking { getMigratedEncryptedSharedPreferences(any(), any()) } doReturn if (harmonyPrefsReturnsNull) null else harmonyPrefs
+        }
+    }
+
+    @Test
+    fun whenMultiProcessLatchedAndFlagDisabledMidSessionThenKeyExistsCheckStillUsesHarmony() = runTest {
+        // Start in multi-process mode
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+        createTestee()
+
+        // First operation latches multiProcess=true
+        testee.updateKey(KEY_NAME, TEST_VALUE)
+
+        // Disable the flag mid-session
+        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+
+        // Key now exists in harmony
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+
+        // Try to write again - should be blocked because latched multiProcess still checks Harmony
+        var exceptionThrown = false
+        try {
+            testee.updateKey(KEY_NAME, DIFFERENT_VALUE)
+        } catch (e: SecureStorageException.KeyAlreadyExistsException) {
+            exceptionThrown = true
+        }
+
+        assertTrue("Write should be blocked because latched multiProcess still checks Harmony", exceptionThrown)
+    }
+
+    @Test
+    fun whenMultiProcessLatchedAndFlagDisabledMidSessionThenGetKeyStillReadsFromHarmony() = runTest {
+        // Start in multi-process mode
+        configureMultiProcessMode()
+        whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(TEST_VALUE.toByteString().base64())
+        createTestee()
+
+        // First operation latches multiProcess=true
+        val firstRead = testee.getKey(KEY_NAME)
+        assertArrayEquals(TEST_VALUE, firstRead)
+
+        // Disable the flag mid-session
+        autofillServiceFeature.self().setRawStoredState(State(enable = false))
+
+        // Legacy has different/no value (simulating stale cache from another process writing)
+        whenever(legacyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
+
+        // Read again - should still read from Harmony because multiProcess is latched
+        val secondRead = testee.getKey(KEY_NAME)
+
+        assertArrayEquals("Should still read from Harmony due to latched multiProcess", TEST_VALUE, secondRead)
+        // Verify we never touched legacy
+        verify(legacyPrefs, never()).getString(any(), anyOrNull())
     }
 
     // endregion
