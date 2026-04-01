@@ -58,7 +58,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.newtabpage.api.NtpAfterIdleRepository
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_USER_INITIATED
@@ -120,7 +120,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    private val ntpAfterIdleRepository: NtpAfterIdleRepository,
+    private val ntpAfterIdleRepository: NtpAfterIdleManager,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT

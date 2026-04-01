@@ -17,13 +17,16 @@
 package com.duckduckgo.newtabpage.api
 
 /**
- * Tracks whether the most recent NTP display was triggered by an idle timeout or by the user.
- * Used to correctly attribute downstream events (hatch tap, search bar used) to the right context.
+ * Tracks whether the most recent NTP display was triggered by an idle timeout or by the user,
+ * and fires the appropriate pixels for downstream hatch interactions.
  */
-interface NtpAfterIdleRepository {
+interface NtpAfterIdleManager {
     /** Sets whether the last NTP was shown because the idle threshold was met. */
     fun setAfterIdle(isAfterIdle: Boolean)
 
     /** Returns true if the last NTP was shown because the idle threshold was met. */
     fun wasAfterIdle(): Boolean
+
+    /** Fires the return-to-page-tapped pixel using the correct after-idle / user-initiated context. */
+    fun fireReturnToPageTapped()
 }

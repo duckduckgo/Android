@@ -24,7 +24,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.NtpAfterIdleRepository
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_AFTER_IDLE
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_AFTER_IDLE_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED
@@ -47,7 +47,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val ntpAfterIdleRepository: NtpAfterIdleRepository,
+    private val ntpAfterIdleRepository: NtpAfterIdleManager,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {

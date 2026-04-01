@@ -17,7 +17,8 @@
 package com.duckduckgo.newtabpage.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.NtpAfterIdleRepository
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.newtabpage.impl.pixels.HatchPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicBoolean
@@ -25,7 +26,9 @@ import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class NtpAfterIdleRepositoryImpl @Inject constructor() : NtpAfterIdleRepository {
+class NtpAfterIdleManagerImpl @Inject constructor(
+    private val hatchPixels: HatchPixels,
+) : NtpAfterIdleManager {
 
     private val afterIdle = AtomicBoolean(false)
 
@@ -34,4 +37,8 @@ class NtpAfterIdleRepositoryImpl @Inject constructor() : NtpAfterIdleRepository 
     }
 
     override fun wasAfterIdle(): Boolean = afterIdle.get()
+
+    override fun fireReturnToPageTapped() {
+        hatchPixels.fireReturnToPageTapped(wasAfterIdle())
+    }
 }

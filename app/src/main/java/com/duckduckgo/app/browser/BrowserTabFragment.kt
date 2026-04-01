@@ -323,11 +323,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
-import com.duckduckgo.newtabpage.api.NtpAfterIdleRepository
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_AFTER_IDLE
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_AFTER_IDLE_DAILY
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED_DAILY
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -433,7 +429,7 @@ class BrowserTabFragment :
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var ntpAfterIdleRepository: NtpAfterIdleRepository
+    lateinit var ntpAfterIdleManager: NtpAfterIdleManager
 
     @Inject
     lateinit var vpnMenuStore: VpnMenuStore
@@ -3509,13 +3505,7 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
-                    if (ntpAfterIdleRepository.wasAfterIdle()) {
-                        pixel.fire(RETURN_TO_PAGE_TAPPED_AFTER_IDLE, type = Count)
-                        pixel.fire(RETURN_TO_PAGE_TAPPED_AFTER_IDLE_DAILY, type = Daily())
-                    } else {
-                        pixel.fire(RETURN_TO_PAGE_TAPPED_USER_INITIATED, type = Count)
-                        pixel.fire(RETURN_TO_PAGE_TAPPED_USER_INITIATED_DAILY, type = Daily())
-                    }
+                    ntpAfterIdleManager.fireReturnToPageTapped()
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
 
