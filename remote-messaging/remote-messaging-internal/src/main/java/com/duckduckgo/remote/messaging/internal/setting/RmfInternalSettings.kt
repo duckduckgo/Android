@@ -30,5 +30,6 @@ interface RmfInternalSettings {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun useStatingEndpoint(): Toggle
 }

@@ -32,6 +32,7 @@ interface SettingsPageFeature {
     fun embeddedSettingsWebView(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.InternalAlwaysEnabled
     fun whatsNewEnabled(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
