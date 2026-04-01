@@ -32,6 +32,15 @@ safe-outputs:
     base-branch: develop
     draft: true
     github-token: ${{ secrets.GT_DAXMOBILE }}
+mcp-servers:
+  asana:
+    command: npx
+    args: ["-y", "@anthropic/asana-mcp-server"]
+    env:
+      ASANA_ACCESS_TOKEN: "${{ secrets.ASANA_ACCESS_TOKEN }}"
+imports:
+  apm-packages:
+    - duckduckgo/ddg-ai-config
 engine: claude
 ---
 
@@ -167,5 +176,5 @@ verification fails in a way you cannot resolve):
 - No breaking changes: if a change could break existing behavior, stop and comment instead
 - Format before committing: always run spotlessApply before committing
 - One task per run: never pick up a second task even if the first completes quickly
-- Asana API: use bash with curl and the ASANA_ACCESS_TOKEN secret for all Asana operations
+- Asana API: use the Asana MCP server tools (mcp__asana__*) for all Asana operations
 - AI transparency: every PR description and Asana comment must include the 🤖 Android Maintenance Worker disclosure
