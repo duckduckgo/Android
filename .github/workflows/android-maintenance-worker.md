@@ -102,12 +102,22 @@ PR against live data before acting on memory.
 
 ### Step 1: Check for in-progress work
 
-1. Read memory for any task marked in_progress
-2. If found, fetch the current state of that task and its PR from live data
-3. If the PR has CI failures caused by your changes → fix them, push an update, and stop
-4. If the PR has merge conflicts → resolve them, push an update, and stop
-5. If the PR is in "In Review" with no issues → nothing to do, stop
-6. If no in-progress task exists → proceed to Step 2
+**Before doing anything else, check live state — do not rely on memory alone.**
+
+1. Use the `asana_get_section_tasks` tool to list tasks in the "In Progress" section
+   (section GID: `1213746476312672`).
+2. List open GitHub PRs whose title starts with `[Android Maintenance]`
+   (use the GitHub MCP tool `list_pull_requests` with state `open`).
+3. If EITHER check returns results → in-progress work exists. Go to step 5.
+4. If BOTH checks are empty → no in-progress work. Proceed to Step 2.
+5. Inspect the in-progress work:
+   - If the PR has CI failures caused by your changes → fix them, push an update, and **stop**.
+   - If the PR has merge conflicts → resolve them, push an update, and **stop**.
+   - Otherwise (PR is open and healthy, or no PR exists yet) → **stop**. Do not start a new task.
+
+**Never proceed to Step 2 when step 3 applies.**
+Use memory (`in_progress_task`, `in_progress_pr`) only as a hint to locate the task and PR
+faster — it is not the source of truth.
 
 ### Step 2: Select a task
 
