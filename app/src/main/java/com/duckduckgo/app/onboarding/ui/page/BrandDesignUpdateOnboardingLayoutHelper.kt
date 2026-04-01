@@ -19,17 +19,20 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 
 object BrandDesignUpdateOnboardingLayoutHelper {
 
     /**
-     * Returns whether there is enough vertical screen space to display both
-     * the [dialogView] and the [decorationView] without overlapping the system bars.
+     * Returns whether there is enough vertical space within [rootView] to display both
+     * the [dialogView] and the [decorationView] without overlap.
      *
-     * @param rootView the root view used to determine available height and insets
+     * With edge-to-edge enabled, the root view spans the full screen including system
+     * bar areas. Both the dialog margins (from parent top) and the decoration margins
+     * (from parent bottom) are defined relative to the parent edges, so the check
+     * compares against [rootView.height] directly — no inset subtraction is needed.
+     *
+     * @param rootView the root view used to determine available height
      * @param dialogView the dialog whose measured height is checked
      * @param decorationView the optional decoration (e.g. walking Dax animation)
      */
@@ -41,11 +44,6 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         if (rootView.height == 0) return false
         if (isInScrollableContainer(dialogView, rootView)) return true
 
-        val insets = ViewCompat.getRootWindowInsets(rootView)
-        val topInset = insets?.getInsets(WindowInsetsCompat.Type.statusBars())?.top ?: 0
-        val bottomInset = insets?.getInsets(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
-        val availableHeight = rootView.height - topInset - bottomInset
-
         val dialogWidthSpec = View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
         val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         dialogView.measure(dialogWidthSpec, dialogHeightSpec)
@@ -56,7 +54,7 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         val decorationParams = decorationView.layoutParams as ViewGroup.MarginLayoutParams
         val decorationSpace = decorationView.layoutParams.height + decorationParams.bottomMargin
 
-        return availableHeight >= dialogSpace + decorationSpace
+        return rootView.height >= dialogSpace + decorationSpace
     }
 
     private fun isInScrollableContainer(view: View, stopAt: View): Boolean {
