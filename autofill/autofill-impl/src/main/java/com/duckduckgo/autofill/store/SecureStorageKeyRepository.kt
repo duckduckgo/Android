@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.store
 
+import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.store.keys.SecureStorageKeyStore
 
 interface SecureStorageKeyRepository {
@@ -55,6 +56,12 @@ interface SecureStorageKeyRepository {
      * @return `true` if keystore encryption is supported and `false` otherwise
      */
     suspend fun canUseEncryption(): Boolean
+
+    /**
+     * Encrypted key that can be decrypted to be used for L2 encryption
+     * and Iv to be used for L2 key decryption
+     */
+    suspend fun setEncryptedL2Key(value: EncryptionHelper.EncryptedBytes)
 }
 
 class RealSecureStorageKeyRepository constructor(
@@ -62,27 +69,34 @@ class RealSecureStorageKeyRepository constructor(
 ) : SecureStorageKeyRepository {
     override suspend fun getPassword(): ByteArray? = keyStore.getKey(KEY_GENERATED_PASSWORD)
     override suspend fun setPassword(value: ByteArray) {
-        keyStore.updateKey(KEY_GENERATED_PASSWORD, value)
+        keyStore.updateKey(Pair(KEY_GENERATED_PASSWORD, value))
     }
 
     override suspend fun getL1Key(): ByteArray? = keyStore.getKey(KEY_L1KEY)
     override suspend fun setL1Key(value: ByteArray) {
-        keyStore.updateKey(KEY_L1KEY, value)
+        keyStore.updateKey(Pair(KEY_L1KEY, value))
     }
 
     override suspend fun getPasswordSalt(): ByteArray? = keyStore.getKey(KEY_PASSWORD_SALT)
     override suspend fun setPasswordSalt(value: ByteArray) {
-        keyStore.updateKey(KEY_PASSWORD_SALT, value)
+        keyStore.updateKey(Pair(KEY_PASSWORD_SALT, value))
     }
 
     override suspend fun getEncryptedL2Key(): ByteArray? = keyStore.getKey(KEY_ENCRYPTED_L2KEY)
     override suspend fun setEncryptedL2Key(value: ByteArray) {
-        keyStore.updateKey(KEY_ENCRYPTED_L2KEY, value)
+        keyStore.updateKey(Pair(KEY_ENCRYPTED_L2KEY, value))
     }
 
     override suspend fun getEncryptedL2KeyIV(): ByteArray? = keyStore.getKey(KEY_ENCRYPTED_L2KEY_IV)
     override suspend fun setEncryptedL2KeyIV(value: ByteArray) {
-        keyStore.updateKey(KEY_ENCRYPTED_L2KEY_IV, value)
+        keyStore.updateKey(Pair(KEY_ENCRYPTED_L2KEY_IV, value))
+    }
+
+    override suspend fun setEncryptedL2Key(value: EncryptionHelper.EncryptedBytes) {
+        keyStore.updateKey(
+            Pair(KEY_ENCRYPTED_L2KEY, value.data),
+            Pair(KEY_ENCRYPTED_L2KEY_IV, value.iv),
+        )
     }
 
     override suspend fun canUseEncryption(): Boolean = keyStore.canUseEncryption()

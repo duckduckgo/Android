@@ -46,7 +46,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -116,7 +115,7 @@ class RealSecureStorageKeyStoreTest {
         configureHarmonyDisabled()
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         verify(legacyEditor).putString(eq(KEY_NAME), eq(TEST_VALUE.toByteString().base64()))
         verify(legacyEditor).commit()
@@ -200,7 +199,7 @@ class RealSecureStorageKeyStoreTest {
         configureHarmonyEnabled()
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         val expectedBase64 = TEST_VALUE.toByteString().base64()
         verify(legacyEditor).putString(eq(KEY_NAME), eq(expectedBase64))
@@ -219,7 +218,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
             assertEquals("Trying to overwrite already existing key", e.message)
@@ -238,7 +237,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
@@ -255,7 +254,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
@@ -291,7 +290,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
             assertEquals("Legacy Preferences file is null on write", e.message)
@@ -308,7 +307,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
             assertEquals("Harmony Preferences file is null on write", e.message)
@@ -326,7 +325,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
             assertEquals("Legacy Preferences file is null on write", e.message)
@@ -546,7 +545,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: Exception) {
             exceptionThrown = true
         }
@@ -570,7 +569,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
         }
@@ -598,7 +597,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
         }
@@ -636,7 +635,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
@@ -655,7 +654,7 @@ class RealSecureStorageKeyStoreTest {
 
         // Legacy exception in keyAlreadyExists() returns false (structural failure, not transient Keystore issue)
         // so the write should proceed without triggering the write guard
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         verify(pixel, never()).fire(eq(AutofillPixelNames.AUTOFILL_STORE_KEY_ALREADY_EXISTS), any(), any(), any())
         verify(legacyEditor).putString(eq(KEY_NAME), any())
@@ -774,7 +773,7 @@ class RealSecureStorageKeyStoreTest {
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         val expectedBase64 = TEST_VALUE.toByteString().base64()
         // Both stores should be written to: Harmony for runtime, legacy for rollback
@@ -793,7 +792,7 @@ class RealSecureStorageKeyStoreTest {
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Write should succeed — legacy stale cache doesn't block
         verify(harmonyEditor).putString(eq(KEY_NAME), any())
@@ -809,7 +808,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
@@ -841,7 +840,7 @@ class RealSecureStorageKeyStoreTest {
 
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, TEST_VALUE)
+            testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
         } catch (e: SecureStorageException.InternalSecureStorageException) {
             exceptionThrown = true
         }
@@ -855,7 +854,7 @@ class RealSecureStorageKeyStoreTest {
         configureHarmonyDisabled()
         createTestee()
 
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         verify(legacyEditor).putString(eq(KEY_NAME), any())
         verify(legacyEditor).commit()
@@ -872,7 +871,7 @@ class RealSecureStorageKeyStoreTest {
         configureMultiProcessMode()
         whenever(harmonyPrefs.getString(eq(KEY_NAME), anyOrNull())).thenReturn(null)
         createTestee()
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Verify key was written to legacy (for rollback support)
         verify(legacyEditor).putString(eq(KEY_NAME), eq(TEST_VALUE.toByteString().base64()))
@@ -932,7 +931,7 @@ class RealSecureStorageKeyStoreTest {
         createTestee()
 
         // First operation latches multiProcess=true
-        testee.updateKey(KEY_NAME, TEST_VALUE)
+        testee.updateKey(Pair(KEY_NAME, TEST_VALUE))
 
         // Disable the flag mid-session
         autofillServiceFeature.self().setRawStoredState(State(enable = false))
@@ -943,7 +942,7 @@ class RealSecureStorageKeyStoreTest {
         // Try to write again - should be blocked because latched multiProcess still checks Harmony
         var exceptionThrown = false
         try {
-            testee.updateKey(KEY_NAME, DIFFERENT_VALUE)
+            testee.updateKey(Pair(KEY_NAME, DIFFERENT_VALUE))
         } catch (e: SecureStorageException.KeyAlreadyExistsException) {
             exceptionThrown = true
         }
