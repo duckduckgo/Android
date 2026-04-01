@@ -45,7 +45,14 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.ui.newtab.hatch.NewTabReturnHatchView
+import com.duckduckgo.newtabpage.api.NtpAfterIdleRepository
+import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_AFTER_IDLE
+import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_AFTER_IDLE_DAILY
+import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED
+import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.RETURN_TO_PAGE_TAPPED_USER_INITIATED_DAILY
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.toPx
@@ -113,6 +120,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ntpAfterIdleRepository: NtpAfterIdleRepository
 
     @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
@@ -563,6 +573,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    if (ntpAfterIdleRepository.wasAfterIdle()) {
+                        pixel.fire(RETURN_TO_PAGE_TAPPED_AFTER_IDLE, type = Count)
+                        pixel.fire(RETURN_TO_PAGE_TAPPED_AFTER_IDLE_DAILY, type = Daily())
+                    } else {
+                        pixel.fire(RETURN_TO_PAGE_TAPPED_USER_INITIATED, type = Count)
+                        pixel.fire(RETURN_TO_PAGE_TAPPED_USER_INITIATED_DAILY, type = Daily())
+                    }
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
