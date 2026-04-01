@@ -18,12 +18,17 @@ package com.duckduckgo.app.browser.progressbar
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.Choreographer
 import android.view.View
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.core.view.isVisible
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 
 class PageLoadProgressBar @JvmOverloads constructor(
@@ -39,14 +44,26 @@ class PageLoadProgressBar @JvmOverloads constructor(
     }
 
     private val engine = ProgressPhaseEngine(config, timeProvider)
-    private val shimmerRenderer = ShimmerRenderer(config, resources.displayMetrics.density)
+
+    private val barColor = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+
+    private val shimmerRenderer = ShimmerRenderer(
+        config = config,
+        density = resources.displayMetrics.density,
+        shimmerColor = lighten(barColor, shimmerLightenFraction(config)),
+    )
 
     private val progressPaint = Paint().apply {
-        color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorAccentBlue)
+        color = barColor
         style = Paint.Style.FILL
     }
 
     private val barHeightPx = 1.5f * resources.displayMetrics.density
+
+    private fun shimmerLightenFraction(config: ProgressBarConfig): Float {
+        val isDark = (context as? DuckDuckGoActivity)?.isDarkThemeEnabled() ?: false
+        return if (isDark) config.shimmerLightenFractionDark else config.shimmerLightenFractionLight
+    }
 
     private var lastFrameTimeNanos = 0L
     private var _isStarted = false
@@ -170,5 +187,14 @@ class PageLoadProgressBar @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         reset()
+    }
+
+    companion object {
+        /** Blend [color] toward white by [fraction] (0 = original, 1 = white). */
+        private fun lighten(color: Int, fraction: Float): Int = Color.rgb(
+            (color.red + (255 - color.red) * fraction).toInt(),
+            (color.green + (255 - color.green) * fraction).toInt(),
+            (color.blue + (255 - color.blue) * fraction).toInt(),
+        )
     }
 }

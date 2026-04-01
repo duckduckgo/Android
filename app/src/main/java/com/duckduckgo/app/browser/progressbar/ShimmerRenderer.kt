@@ -28,6 +28,7 @@ import kotlin.math.roundToInt
 class ShimmerRenderer(
     private val config: ProgressBarConfig,
     private val density: Float,
+    private val shimmerColor: Int = Color.WHITE,
 ) {
 
     private val bandStartWidthPx = config.shimmerBandStartWidthDp * density
@@ -94,15 +95,18 @@ class ShimmerRenderer(
 
     private fun ensureGradientCached() {
         if (cachedGradients != null) return
+        val r = Color.red(shimmerColor)
+        val g = Color.green(shimmerColor)
+        val b = Color.blue(shimmerColor)
         cachedGradients = Array(bandCount) {
             LinearGradient(
                 0f, 0f, bandStartWidthPx, 0f,
                 intArrayOf(
-                    Color.argb(0, 255, 255, 255),
-                    Color.argb(204, 255, 255, 255), // 80%
-                    Color.argb(255, 255, 255, 255), // 100%
-                    Color.argb(204, 255, 255, 255), // 80%
-                    Color.argb(0, 255, 255, 255),
+                    Color.argb(0, r, g, b),
+                    Color.argb(204, r, g, b), // 80%
+                    Color.argb(255, r, g, b), // 100%
+                    Color.argb(204, r, g, b), // 80%
+                    Color.argb(0, r, g, b),
                 ),
                 floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f),
                 Shader.TileMode.CLAMP,
