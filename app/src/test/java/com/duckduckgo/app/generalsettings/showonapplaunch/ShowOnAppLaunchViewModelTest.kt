@@ -29,6 +29,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,6 +52,7 @@ class ShowOnAppLaunchViewModelTest {
     private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val settingsDataStore: SettingsDataStore = mock()
     private val pixel: Pixel = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
 
     @Before
     fun setup() {
@@ -63,6 +65,7 @@ class ShowOnAppLaunchViewModelTest {
             fakeBrowserConfigFeature,
             settingsDataStore,
             pixel,
+            ntpAfterIdleManager,
         )
     }
 
@@ -109,7 +112,7 @@ class ShowOnAppLaunchViewModelTest {
     fun whenShowNTPAfterIdleReturnDisabledThenViewStateFalse() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(false))
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -122,7 +125,7 @@ class ShowOnAppLaunchViewModelTest {
     fun whenShowNTPAfterIdleReturnEnabledThenViewStateTrue() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -137,7 +140,7 @@ class ShowOnAppLaunchViewModelTest {
     fun whenNoSettingsAndNoUserPrefThenSelectedIsDefaultFiveMinutes() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -152,7 +155,7 @@ class ShowOnAppLaunchViewModelTest {
             Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":60}"""),
         )
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -168,7 +171,7 @@ class ShowOnAppLaunchViewModelTest {
             Toggle.State(true, settings = """{"defaultIdleThresholdSeconds":300}"""),
         )
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -183,7 +186,7 @@ class ShowOnAppLaunchViewModelTest {
             Toggle.State(true, settings = """invalid"""),
         )
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -220,7 +223,7 @@ class ShowOnAppLaunchViewModelTest {
     fun whenViewStateCreatedThenDefaultOptionsExposed() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.viewState.test {
@@ -235,7 +238,7 @@ class ShowOnAppLaunchViewModelTest {
     fun whenTimeoutRowClickedThenEmitsShowTimeoutDialogCommand() = runTest {
         fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(true))
         testee = ShowOnAppLaunchViewModel(
-            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel,
+            dispatcherProvider, fakeDataStore, FakeUrlConverter(), fakeBrowserConfigFeature, settingsDataStore, pixel, ntpAfterIdleManager,
         )
 
         testee.commands.test {

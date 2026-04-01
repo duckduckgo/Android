@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +47,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
 ) : ViewModel() {
 
     data class ViewState(
@@ -119,6 +121,7 @@ class ShowOnAppLaunchViewModel @Inject constructor(
             settingsDataStore.userSelectedIdleThresholdSeconds = seconds
             userSelectedThreshold.value = seconds
             pixel.fire(SETTINGS_AFTER_INACTIVITY_TIMEOUT_CHANGED, mapOf("selectedSeconds" to seconds.toString()))
+            ntpAfterIdleManager.fireTimeoutSelected(seconds)
         }
     }
 }

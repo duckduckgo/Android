@@ -24,6 +24,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -48,6 +50,7 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
     private val duckChat: DuckChat = mock()
     private val tabRepository: TabRepository = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val testScope = coroutineTestRule.testScope
@@ -69,6 +72,7 @@ class FirstScreenHandlerImplTest {
             duckChat = duckChat,
             tabRepository = tabRepository,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            ntpAfterIdleManager = ntpAfterIdleManager,
             appCoroutineScope = testScope,
         )
     }
