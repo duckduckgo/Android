@@ -201,5 +201,5 @@
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
-    },
+    }
 }
