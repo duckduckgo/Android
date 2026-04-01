@@ -48,6 +48,5 @@ interface RemoteMessagingFeatureToggles {
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    @Toggle.InternalAlwaysEnabled
     fun remoteMessageModalSurface(): Toggle
 }
