@@ -31,4 +31,6 @@ data class ProgressBarConfig(
     val shimmerBandEndWidthDp: Float = 20f,
     val shimmerBandStartOpacity: Float = 0.4f,
     val shimmerBandEndOpacity: Float = 0.55f,
+    val shimmerLightenFractionLight: Float = 0.9f,
+    val shimmerLightenFractionDark: Float = 0.5f,
 )
