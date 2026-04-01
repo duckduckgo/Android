@@ -43,7 +43,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
+import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -68,6 +68,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
@@ -105,7 +106,7 @@ class TabDataRepositoryTest {
 
     private val mockFaviconManager: FaviconManager = mock()
 
-    private val mockDuckChatContextualDataStore: DuckChatContextualDataStore = mock()
+    private val mockDataClearingTrigger: DataClearingTrigger = mock()
 
     private val mockTabVisitedSitesRepository: TabVisitedSitesRepository = mock()
 
@@ -216,19 +217,6 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun whenTabDeletedThenTabAndDataCleared() = runTest {
-        val testee = tabDataRepository()
-        val addedTabId = testee.add()
-        val siteData = testee.retrieveSiteData(addedTabId)
-
-        testee.delete(TabEntity(addedTabId, position = 0))
-
-        verify(mockDao).deleteTabAndUpdateSelection(any())
-        assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
-        verify(mockTabVisitedSitesRepository).clearTab(addedTabId)
-    }
-
-    @Test
     fun whenAllDeletedThenTabAndDataCleared() = runTest {
         val testee = tabDataRepository(
             webViewPreviewPersister = mockWebViewPreviewPersister,
@@ -244,7 +232,7 @@ class TabDataRepositoryTest {
         verify(mockFaviconManager).deleteAllTemp()
         verify(mockAdClickManager).clearAll()
         verify(mockWebViewSessionStorage).deleteAllSessions()
-        verify(mockDuckChatContextualDataStore).clearAll()
+        verify(mockDataClearingTrigger).clearData(any())
         verify(mockTabVisitedSitesRepository).clearAll()
         assertNotSame(siteData, testee.retrieveSiteData(addedTabId))
     }
@@ -645,9 +633,9 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
+        verify(mockDataClearingTrigger, times(tabIds.size)).clearData(any())
     }
 
     @Test
@@ -663,9 +651,9 @@ class TabDataRepositoryTest {
             assertNull(testee.retrieveSiteData(tabId).value)
             verify(mockWebViewSessionStorage).deleteSession(tabId)
             verify(mockAdClickManager).clearTabId(tabId)
-            verify(mockDuckChatContextualDataStore).clearTabChatUrl(tabId)
             verify(mockTabVisitedSitesRepository).clearTab(tabId)
         }
+        verify(mockDataClearingTrigger, times(tabIds.size)).clearData(any())
     }
 
     @Test
@@ -769,7 +757,7 @@ class TabDataRepositoryTest {
         tabSwitcherDataStore: TabSwitcherDataStore = mock(),
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock(),
         timeProvider: CurrentTimeProvider = FakeTimeProvider(),
-        contextualDataStore: DuckChatContextualDataStore = mockDuckChatContextualDataStore,
+        dataClearingTrigger: DataClearingTrigger = mockDataClearingTrigger,
         tabVisitedSitesRepository: TabVisitedSitesRepository = mockTabVisitedSitesRepository,
     ): TabDataRepository {
         return TabDataRepository(
@@ -794,7 +782,7 @@ class TabDataRepositoryTest {
             mockAdClickManager,
             mockWebViewSessionStorage,
             tabManagerFeatureFlags,
-            contextualDataStore,
+            dataClearingTrigger,
             tabVisitedSitesRepository,
         )
     }

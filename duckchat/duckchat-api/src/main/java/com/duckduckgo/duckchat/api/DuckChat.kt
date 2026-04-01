@@ -38,14 +38,6 @@ interface DuckChat {
     fun openDuckChat()
 
     /**
-     * Deletes the local storage data for a specific chat conversation.
-     *
-     * @param url the URL associated with the chat to delete
-     * @return true if the chat was successfully deleted from all domains, false otherwise
-     */
-    suspend fun deleteChat(url: String): Boolean
-
-    /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
     fun openDuckChatWithAutoPrompt(query: String)

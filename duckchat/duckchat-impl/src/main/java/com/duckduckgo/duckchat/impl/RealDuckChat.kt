@@ -78,6 +78,14 @@ import javax.inject.Inject
 
 interface DuckChatInternal : DuckChat {
     /**
+     * Deletes the local storage data for a specific chat conversation and syncs the deletion.
+     *
+     * @param url the URL associated with the chat to delete
+     * @return true if the chat was successfully deleted from all domains, false otherwise
+     */
+    suspend fun deleteChat(url: String): Boolean
+
+    /**
      * Set user setting to determine whether DuckChat should be enabled or disabled.
      */
     suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
