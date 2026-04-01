@@ -824,6 +824,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         }
                     })
 
+                    binding.daxDialogCta.root.translationZ = 1f.toPx()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.root as ViewGroup, transition)
 
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
