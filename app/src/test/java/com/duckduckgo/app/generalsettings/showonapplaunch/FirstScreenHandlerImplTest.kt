@@ -19,6 +19,7 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,6 +36,7 @@ class FirstScreenHandlerImplTest {
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature = mock()
     private val settingsDataStore: SettingsDataStore = mock()
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
     private val idleReturnToggle: Toggle = mock()
     private val showOnAppLaunchToggle: Toggle = mock()
     private val testScope = TestScope()
@@ -52,6 +54,7 @@ class FirstScreenHandlerImplTest {
             showOnAppLaunchFeature = showOnAppLaunchFeature,
             settingsDataStore = settingsDataStore,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
+            ntpAfterIdleManager = ntpAfterIdleManager,
             appCoroutineScope = testScope,
         )
     }

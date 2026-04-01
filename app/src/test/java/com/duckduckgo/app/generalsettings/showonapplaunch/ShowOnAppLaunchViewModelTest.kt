@@ -26,6 +26,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -51,6 +52,7 @@ class ShowOnAppLaunchViewModelTest {
     private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val settingsDataStore: SettingsDataStore = mock()
     private val pixel: Pixel = mock()
+    private val ntpAfterIdleManager: NtpAfterIdleManager = mock()
 
     @Before
     fun setup() {
@@ -63,6 +65,7 @@ class ShowOnAppLaunchViewModelTest {
             fakeBrowserConfigFeature,
             settingsDataStore,
             pixel,
+            ntpAfterIdleManager,
         )
     }
 

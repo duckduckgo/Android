@@ -55,14 +55,8 @@ import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_AFTER_IDLE_DAILY
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_USER_INITIATED
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.BAR_USED_FROM_NTP_USER_INITIATED_DAILY
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -972,13 +966,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
         )
         if (_viewState.value.url.isEmpty()) {
-            if (ntpAfterIdleRepository.wasAfterIdle()) {
-                pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE, type = Count)
-                pixel.fire(BAR_USED_FROM_NTP_AFTER_IDLE_DAILY, type = Daily())
-            } else {
-                pixel.fire(BAR_USED_FROM_NTP_USER_INITIATED, type = Count)
-                pixel.fire(BAR_USED_FROM_NTP_USER_INITIATED_DAILY, type = Daily())
-            }
+            ntpAfterIdleRepository.fireBarUsedFromNtp()
         }
     }
 

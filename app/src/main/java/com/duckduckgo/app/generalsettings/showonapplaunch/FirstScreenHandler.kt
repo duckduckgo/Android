@@ -19,16 +19,9 @@ package com.duckduckgo.app.generalsettings.showonapplaunch
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_AFTER_IDLE
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_AFTER_IDLE_DAILY
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED
-import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED_DAILY
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -47,8 +40,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val ntpAfterIdleRepository: NtpAfterIdleManager,
-    private val pixel: Pixel,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -67,18 +59,14 @@ class FirstScreenHandlerImpl @Inject constructor(
             logcat { "FirstScreen: time elapsed $elapsed" }
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
                 logcat { "FirstScreen: handleAppLaunchOption (after idle)" }
-                ntpAfterIdleRepository.setAfterIdle(true)
-                pixel.fire(NTP_SHOWN_AFTER_IDLE, type = Count)
-                pixel.fire(NTP_SHOWN_AFTER_IDLE_DAILY, type = Daily())
+                ntpAfterIdleManager.onNtpShownAfterIdle()
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
             return
         }
 
         if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
-            ntpAfterIdleRepository.setAfterIdle(false)
-            pixel.fire(NTP_SHOWN_USER_INITIATED, type = Count)
-            pixel.fire(NTP_SHOWN_USER_INITIATED_DAILY, type = Daily())
+            ntpAfterIdleManager.onNtpShownUserInitiated()
             showOnAppLaunchOptionHandler.handleAppLaunchOption()
         }
     }
