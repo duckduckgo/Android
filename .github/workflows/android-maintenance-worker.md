@@ -29,6 +29,7 @@ safe-outputs:
   allowed-github-references: []
   create-pull-request:
     title-prefix: "[Android Maintenance] "
+    labels: [agentic-maintenance]
     base-branch: develop
     draft: true
     github-token: ${{ secrets.GT_DAXMOBILE }}
