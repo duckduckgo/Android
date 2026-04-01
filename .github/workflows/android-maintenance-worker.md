@@ -40,7 +40,13 @@ mcp-servers:
       ASANA_ACCESS_TOKEN: "${{ secrets.ASANA_ACCESS_TOKEN }}"
 imports:
   apm-packages:
-    - duckduckgo/ddg-ai-config
+    github-app:
+      app-id: ${{ vars.GH_AW_APP_ID }}
+      private-key: ${{ secrets.GH_AW_APP_PRIVATE_KEY }}
+      repositories:
+        - ddg-ai-config
+    packages:
+      - duckduckgo/ddg-ai-config
 engine: claude
 ---
 
