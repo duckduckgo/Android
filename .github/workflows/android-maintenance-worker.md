@@ -38,15 +38,6 @@ mcp-servers:
     args: ["-y", "@anthropic/asana-mcp-server"]
     env:
       ASANA_ACCESS_TOKEN: "${{ secrets.ASANA_ACCESS_TOKEN }}"
-imports:
-  apm-packages:
-    github-app:
-      app-id: ${{ vars.GH_AW_APP_ID }}
-      private-key: ${{ secrets.GH_AW_APP_PRIVATE_KEY }}
-      repositories:
-        - ddg-ai-config
-    packages:
-      - duckduckgo/ddg-ai-config
 engine: claude
 ---
 
