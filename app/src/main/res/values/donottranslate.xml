@@ -91,11 +91,12 @@
     <string name="syncRestoreDialogSecondaryCta">Skip</string>
 
     <!-- Inactivity timeout -->
-    <string name="afterInactivityOptionTitle">After Inactivity</string>
+    <string name="afterInactivityDialogTitle">After Inactivity</string>
+    <string name="afterInactivityOptionTitle">Opening Screen</string>
     <string name="afterInactivityTimeoutRowTitle">Choose an inactivity timer</string>
-    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return after inactivity</string>
+    <string name="afterInactivityScreenSectionHeader">Choose what you see when you return to DuckDuckGo</string>
     <string name="afterInactivityOptionMessage" translatable="false">Choose what you see when you return after %1$s minutes of inactivity.</string>
-    <string name="afterInactivityTimeoutAlways" translatable="false">Always</string>
+    <string name="afterInactivityTimeoutAlways" translatable="false">None</string>
     <string name="afterInactivityTimeout1Minute" translatable="false">1 minute</string>
     <string name="afterInactivityTimeoutXMinutes" translatable="false">%1$d minutes</string>
     <string name="afterInactivityTimeout1Hour" translatable="false">1 hour</string>
