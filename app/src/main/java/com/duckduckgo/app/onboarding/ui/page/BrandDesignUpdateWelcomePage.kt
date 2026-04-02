@@ -1194,6 +1194,22 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             INPUT_SCREEN -> {
                 binding.bottomWingAnimation.isVisible = false
 
+                val leftWingView = binding.leftWingAnimation
+                val showLeftWing = if (leftWingView != null) {
+                    BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                        rootView = binding.root,
+                        dialogView = binding.daxDialogCta.root,
+                        decorationView = leftWingView,
+                    )
+                } else {
+                    false
+                }
+                binding.leftWingAnimation?.apply {
+                    isVisible = showLeftWing
+                    alpha = 1f
+                    progress = WING_STOP_PROGRESS
+                }
+
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
