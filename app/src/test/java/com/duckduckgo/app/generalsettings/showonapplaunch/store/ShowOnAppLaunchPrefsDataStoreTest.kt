@@ -27,14 +27,13 @@ import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,10 +54,8 @@ class ShowOnAppLaunchPrefsDataStoreTest {
             produceFile = { dataStoreFile },
         )
 
-    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
-
-    private val testee: ShowOnAppLaunchOptionDataStore =
-        ShowOnAppLaunchOptionPrefsDataStore(testDataStore, fakeBrowserConfigFeature)
+    private val testee: ShowOnAppLaunchOptionPrefsDataStore =
+        ShowOnAppLaunchOptionPrefsDataStore(testDataStore, coroutineRule.testDispatcherProvider)
 
     @After
     fun after() {
@@ -66,14 +63,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
     }
 
     @Test
-    fun whenOptionIsNullAndFeatureEnabledThenShouldReturnNewTabPage() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
-        assertEquals(NewTabPage, testee.optionFlow.first())
-    }
-
-    @Test
-    fun whenOptionIsNullAndFeatureDisabledThenShouldReturnLastOpenedTab() = runTest {
-        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
+    fun whenOptionIsNullThenShouldReturnLastOpenedTab() = runTest {
         assertEquals(LastOpenedTab, testee.optionFlow.first())
     }
 
@@ -113,7 +103,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
         testee.optionFlow.test {
             val defaultOption = awaitItem()
 
-            assertEquals(NewTabPage, defaultOption)
+            assertEquals(LastOpenedTab, defaultOption)
 
             testee.setShowOnAppLaunchOption(LastOpenedTab)
 
@@ -123,5 +113,27 @@ class ShowOnAppLaunchPrefsDataStoreTest {
 
             assertEquals(SpecificPage("example.com"), awaitItem())
         }
+    }
+
+    @Test
+    fun whenNoOptionSelectedThenHasOptionSelectedReturnsFalse() = runTest {
+        assertFalse(testee.hasOptionSelected())
+    }
+
+    @Test
+    fun whenOptionSelectedThenHasOptionSelectedReturnsTrue() = runTest {
+        testee.setShowOnAppLaunchOption(NewTabPage)
+        assertTrue(testee.hasOptionSelected())
+    }
+
+    @Test
+    fun whenResolvedPageUrlIsSetThenSpecificPageIncludesResolvedUrl() = runTest {
+        testee.setShowOnAppLaunchOption(SpecificPage("example.com"))
+        testee.setResolvedPageUrl("https://www.example.com/")
+
+        val option = testee.optionFlow.first()
+        assertTrue(option is SpecificPage)
+        assertEquals("example.com", (option as SpecificPage).url)
+        assertEquals("https://www.example.com/", option.resolvedUrl)
     }
 }

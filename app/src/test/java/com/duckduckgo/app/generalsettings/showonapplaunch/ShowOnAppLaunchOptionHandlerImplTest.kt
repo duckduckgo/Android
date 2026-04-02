@@ -24,12 +24,12 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.FakeShowOnAppLaunchOptionDataStore
-import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.flow.Flow
@@ -37,11 +37,15 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ShowOnAppLaunchOptionHandlerImplTest {
@@ -50,16 +54,18 @@ class ShowOnAppLaunchOptionHandlerImplTest {
     val coroutineTestRule = CoroutineTestRule()
     private val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
 
-    private lateinit var fakeDataStore: ShowOnAppLaunchOptionDataStore
+    private lateinit var fakeDataStore: FakeShowOnAppLaunchOptionDataStore
     private lateinit var fakeTabRepository: TabRepository
+    private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var testee: ShowOnAppLaunchOptionHandler
 
     @Before
     fun setup() {
         fakeDataStore = FakeShowOnAppLaunchOptionDataStore()
         fakeTabRepository = FakeTabRepository()
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
         testee =
-            ShowOnAppLaunchOptionHandlerImpl(dispatcherProvider, fakeDataStore, fakeTabRepository)
+            ShowOnAppLaunchOptionHandlerImpl(dispatcherProvider, fakeDataStore, fakeTabRepository, appBuildConfig)
     }
 
     @Test
@@ -722,6 +728,139 @@ class ShowOnAppLaunchOptionHandlerImplTest {
             assertTrue(tabs.size == 1)
             assertTrue(tabs.last().url == url)
         }
+    }
+
+    // handleAfterInactivityOption tests
+
+    @Test
+    fun whenNewInstallAndNoOptionSelectedThenSetsNewTabPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // NewTabPage was set, then handleAppLaunchOption added a tab
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+    }
+
+    @Test
+    fun whenNewInstallAndOptionAlreadySelectedThenDoesNotOverrideOption() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        fakeDataStore.setShowOnAppLaunchOption(LastOpenedTab)
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // LastOpenedTab was preserved, no tab added
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNotNewInstallThenDoesNotSetNewTabPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // No option was set, default is LastOpenedTab → no tab added
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNotNewInstallWithExistingOptionThenHandlesExistingOption() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(NewTabPage)
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "")
+        }
+    }
+
+    // handleResolvedUrlStorage tests
+
+    @Test
+    fun whenConditionsMatchThenResolvedUrlIsStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = true,
+            tabId = tabId,
+        )
+
+        assertEquals("https://www.example.com/", fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenCurrentUrlIsNullThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = null,
+            isRootOfTab = true,
+            tabId = tabId,
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenNotRootOfTabThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        val tabId = fakeDataStore.showOnAppLaunchTabId!!
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = false,
+            tabId = tabId,
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
+    }
+
+    @Test
+    fun whenTabIdDoesNotMatchThenResolvedUrlIsNotStored() = runTest {
+        val url = "https://example.com/"
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage(url))
+        testee.handleAppLaunchOption()
+
+        testee.handleResolvedUrlStorage(
+            currentUrl = "https://www.example.com/",
+            isRootOfTab = true,
+            tabId = "wrong-tab-id",
+        )
+
+        assertNull(fakeDataStore.resolvedPageUrl)
     }
 
     private class FakeTabRepository : TabRepository {

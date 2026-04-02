@@ -27,12 +27,14 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore.Companion.DEFAULT_SPECIFIC_PAGE_URL
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionDataStore {
@@ -40,6 +42,7 @@ interface ShowOnAppLaunchOptionDataStore {
     val specificPageUrlFlow: Flow<String>
     val showOnAppLaunchTabId: String?
 
+    fun hasOptionSelected(): Boolean
     fun setShowOnAppLaunchTabId(tabId: String)
     suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption)
     suspend fun setSpecificPageUrl(url: String)
@@ -54,18 +57,17 @@ interface ShowOnAppLaunchOptionDataStore {
 @SingleInstanceIn(AppScope::class)
 class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
     @ShowOnAppLaunch private val store: DataStore<Preferences>,
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ShowOnAppLaunchOptionDataStore {
 
     override var showOnAppLaunchTabId: String? = null
         private set
 
+    override fun hasOptionSelected(): Boolean = runBlocking(dispatcherProvider.io()) {
+        store.data.first()[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)] != null
+    }
+
     override val optionFlow: Flow<ShowOnAppLaunchOption> = store.data.map { preferences ->
-        val defaultValue = if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()){
-            NewTabPage
-        } else {
-            LastOpenedTab
-        }
         preferences[intPreferencesKey(KEY_SHOW_ON_APP_LAUNCH_OPTION)]?.let { optionId ->
             when (val option = ShowOnAppLaunchOption.mapToOption(optionId)) {
                 LastOpenedTab,
@@ -77,7 +79,7 @@ class ShowOnAppLaunchOptionPrefsDataStore @Inject constructor(
                     SpecificPage(url, resolvedUrl)
                 }
             }
-        } ?: defaultValue
+        } ?: LastOpenedTab
     }
 
     override val specificPageUrlFlow: Flow<String> = store.data.map { preferences ->
