@@ -945,8 +945,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Показывать при запуске приложения</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Последняя открытая вкладка</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Страница новой вкладки</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Последняя использованная вкладка</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Новая вкладка</string>
     <string name="showOnAppLaunchOptionSpecificPage">Конкретная страница</string>
 
     <!-- Privacy Dashboard -->
@@ -1016,4 +1016,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Конфиденциальный поиск с DuckDuckGo или вопросы для Duck.ai. Голосовой поиск и Duck.ai можно включить по желанию.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Поиск или посещение любимых сайтов в приватном режиме одним касанием. По желанию можно включить голосовой поиск и Duck.ai.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">После бездействия</string>
+    <string name="afterInactivityOptionTitle">Начальный экран</string>
+    <string name="afterInactivityTimeoutRowTitle">Выберите таймер бездействия</string>
+    <string name="afterInactivityScreenSectionHeader">Что показывать при возвращении в DuckDuckGo</string>
+    <string name="afterInactivityTimeoutAlways">Ничего</string>
+    <string name="afterInactivityTimeout1Minute">1 мин.</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d минут</string>
+    <string name="afterInactivityTimeout1Hour">1 ч.</string>
+    <string name="afterInactivityTimeoutXHours">%1$d ч.</string>
+
 </resources>
