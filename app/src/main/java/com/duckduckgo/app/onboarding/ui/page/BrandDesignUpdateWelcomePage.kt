@@ -794,36 +794,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         step = OnboardingBackgroundStep.AddressBar,
                     )
 
-                    bobbingDaxAnimator?.cancel()
-                    val screenWidth = binding.root.rootView.width.toFloat()
-                    binding.bobbingDaxAnimation.also { bobbingDax ->
-                        bobbingDax.isVisible = true
-                        bobbingDax.alpha = 0f
-                        bobbingDax.translationX = screenWidth
-                        bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-                            duration = OnboardingBackgroundAnimator.ENTER_DURATION
-                            interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
-                            addUpdateListener { animator ->
-                                val progress = animator.animatedValue as Float
-                                bobbingDax.translationX = screenWidth * (1f - progress)
-                                bobbingDax.alpha = OnboardingBackgroundAnimator.enterAlpha(progress)
-                            }
-                            addListener(object : AnimatorListenerAdapter() {
-                                private var cancelled = false
-
-                                override fun onAnimationCancel(animation: Animator) {
-                                    cancelled = true
-                                }
-
-                                override fun onAnimationEnd(animation: Animator) {
-                                    if (!cancelled) {
-                                        bobbingDax.playAnimation()
-                                    }
-                                }
-                            })
-                            start()
-                        }
-                    }
+                    animateBobbingDaxIn()
 
                     binding.daxDialogCta.stepIndicator.animateToNextStep()
 
@@ -878,35 +849,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                         step = OnboardingBackgroundStep.InputType,
                     )
 
-                    bobbingDaxAnimator?.cancel()
-                    val screenWidth = binding.root.rootView.width.toFloat()
-                    binding.bobbingDaxAnimation.also { bobbingDax ->
-                        bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-                            duration = OnboardingBackgroundAnimator.EXIT_DURATION
-                            interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
-                            addUpdateListener { animator ->
-                                val progress = animator.animatedValue as Float
-                                bobbingDax.translationX = -screenWidth * progress
-                                bobbingDax.alpha = OnboardingBackgroundAnimator.exitAlpha(progress)
-                            }
-                            addListener(object : AnimatorListenerAdapter() {
-                                private var cancelled = false
-
-                                override fun onAnimationCancel(animation: Animator) {
-                                    cancelled = true
-                                }
-
-                                override fun onAnimationEnd(animation: Animator) {
-                                    if (!cancelled) {
-                                        bobbingDax.isVisible = false
-                                        bobbingDax.cancelAnimation()
-                                        bobbingDax.translationX = 0f
-                                    }
-                                }
-                            })
-                            start()
-                        }
-                    }
+                    animateBobbingDaxOut()
 
                     val transition = AutoTransition().apply {
                         duration = DIALOG_TRANSITION_DURATION
@@ -1283,6 +1226,71 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 start()
             }
             binding.welcomeScreenWalkingDax.playAnimation()
+        }
+    }
+
+    private fun animateBobbingDaxIn() {
+        bobbingDaxAnimator?.cancel()
+        val screenWidth = binding.root.rootView.width.toFloat()
+        binding.bobbingDaxAnimation?.also { bobbingDax ->
+            bobbingDax.isVisible = true
+            bobbingDax.alpha = 0f
+            bobbingDax.translationX = screenWidth
+            bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = OnboardingBackgroundAnimator.ENTER_DURATION
+                interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
+                addUpdateListener { animator ->
+                    val progress = animator.animatedValue as Float
+                    bobbingDax.translationX = screenWidth * (1f - progress)
+                    bobbingDax.alpha = OnboardingBackgroundAnimator.enterAlpha(progress)
+                }
+                addListener(object : AnimatorListenerAdapter() {
+                    private var cancelled = false
+
+                    override fun onAnimationCancel(animation: Animator) {
+                        cancelled = true
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (!cancelled) {
+                            bobbingDax.playAnimation()
+                        }
+                    }
+                })
+                start()
+            }
+        }
+    }
+
+    private fun animateBobbingDaxOut() {
+        bobbingDaxAnimator?.cancel()
+        val screenWidth = binding.root.rootView.width.toFloat()
+        binding.bobbingDaxAnimation?.also { bobbingDax ->
+            bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = OnboardingBackgroundAnimator.EXIT_DURATION
+                interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
+                addUpdateListener { animator ->
+                    val progress = animator.animatedValue as Float
+                    bobbingDax.translationX = -screenWidth * progress
+                    bobbingDax.alpha = OnboardingBackgroundAnimator.exitAlpha(progress)
+                }
+                addListener(object : AnimatorListenerAdapter() {
+                    private var cancelled = false
+
+                    override fun onAnimationCancel(animation: Animator) {
+                        cancelled = true
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        if (!cancelled) {
+                            bobbingDax.isVisible = false
+                            bobbingDax.cancelAnimation()
+                            bobbingDax.translationX = 0f
+                        }
+                    }
+                })
+                start()
+            }
         }
     }
 
