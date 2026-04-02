@@ -83,7 +83,6 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.Mode
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
-import com.duckduckgo.duckchat.impl.ui.SubscriptionsHandler
 import com.duckduckgo.duckchat.impl.ui.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.camera.CameraHardwareChecker
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -92,6 +91,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -136,7 +136,7 @@ class DuckChatContextualFragment :
     lateinit var duckChatJSHelper: DuckChatJSHelper
 
     @Inject
-    lateinit var subscriptionsHandler: SubscriptionsHandler
+    lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
 
     @Inject
     @AppCoroutineScope
@@ -377,15 +377,20 @@ class DuckChatContextualFragment :
                             }
 
                             SUBSCRIPTIONS_FEATURE_NAME -> {
-                                subscriptionsHandler.handleSubscriptionsFeature(
-                                    featureName,
-                                    method,
-                                    id,
-                                    data,
-                                    requireActivity(),
-                                    appCoroutineScope,
-                                    contentScopeScripts,
-                                )
+                                val activity = requireActivity()
+                                appCoroutineScope.launch(dispatcherProvider.io()) {
+                                    subscriptionsJSHelper.processJsCallbackMessage(
+                                        featureName,
+                                        method,
+                                        id,
+                                        data,
+                                        activity,
+                                    )?.let { response ->
+                                        withContext(dispatcherProvider.main()) {
+                                            contentScopeScripts.onResponse(response)
+                                        }
+                                    }
+                                }
                             }
 
                             else -> {}
