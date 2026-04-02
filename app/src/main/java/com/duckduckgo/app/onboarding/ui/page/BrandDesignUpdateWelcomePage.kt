@@ -887,6 +887,22 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     animateBobbingDaxOut()
 
+                    val leftWingView = binding.leftWingAnimation
+                    val showLeftWingAnimation = if (leftWingView != null) {
+                        BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
+                            rootView = binding.root,
+                            dialogView = binding.daxDialogCta.root,
+                            decorationView = leftWingView,
+                        )
+                    } else {
+                        false
+                    }
+                    if (!showLeftWingAnimation) {
+                        binding.leftWingAnimation?.isVisible = false
+                    } else {
+                        playLeftWingAnimation()
+                    }
+
                     val transition = AutoTransition().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
