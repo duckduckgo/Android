@@ -183,5 +183,43 @@
                 "type": "string"
             }
         ]
+    },
+    "m_remote_message_card_image_load_success": {
+        "description": "Triggered when a card item image is successfully loaded within a card-style remote message",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "card",
+                "description": "The identifier for the card item whose image was loaded",
+                "type": "string"
+            }
+        ]
+    },
+    "m_remote_message_card_image_load_failed": {
+        "description": "Triggered when a card item image fails to load within a card-style remote message",
+        "owners": ["catalinradoiu"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "message",
+                "description": "The identifier for the message, sourced from the remote message configuration",
+                "type": "string"
+            },
+            {
+                "key": "card",
+                "description": "The identifier for the card item whose image failed to load",
+                "type": "string"
+            }
+        ]
     }
 }
