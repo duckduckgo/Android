@@ -16,9 +16,14 @@
 
 package com.duckduckgo.app.browser.menu
 
+import android.content.Context
+import android.view.View
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.browser.api.ui.BrowserMenuPlugin
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -36,22 +41,27 @@ class RealBrowserMenuHighlightStateTest {
 
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
-    private val downloadMenuStateProvider: DownloadMenuStateProvider = mock()
-
     private val highlightPopupMenuFlow = MutableStateFlow(false)
 
-    private val hasNewDownloadFlow = MutableStateFlow(false)
+    private val pluginHighlightFlow = MutableStateFlow(false)
 
     private lateinit var testee: RealBrowserMenuHighlightState
 
     @Before
     fun setUp() {
         whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(highlightPopupMenuFlow)
-        whenever(downloadMenuStateProvider.hasNewDownloadFlow).thenReturn(hasNewDownloadFlow)
+
+        val fakePlugin = object : BrowserMenuPlugin {
+            override fun getMenuItemView(context: Context): View? = null
+            override val menuHighlightFlow: Flow<Boolean> = pluginHighlightFlow
+        }
+        val pluginPoint = object : PluginPoint<BrowserMenuPlugin> {
+            override fun getPlugins(): Collection<BrowserMenuPlugin> = listOf(fakePlugin)
+        }
 
         testee = RealBrowserMenuHighlightState(
             additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
-            downloadMenuStateProvider = downloadMenuStateProvider,
+            browserMenuPlugins = pluginPoint,
             appCoroutineScope = coroutineTestRule.testScope,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
@@ -78,11 +88,11 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when new download is true then shouldHighlight is true`() = runTest {
+    fun `when plugin highlight is true then shouldHighlight is true`() = runTest {
         testee.shouldHighlight.test {
             assertFalse(awaitItem())
 
-            hasNewDownloadFlow.value = true
+            pluginHighlightFlow.value = true
             assertTrue(awaitItem())
 
             cancelAndIgnoreRemainingEvents()
@@ -97,7 +107,7 @@ class RealBrowserMenuHighlightStateTest {
             highlightPopupMenuFlow.value = true
             assertTrue(awaitItem())
 
-            hasNewDownloadFlow.value = true
+            pluginHighlightFlow.value = true
             // still true, no new emission expected (same value)
 
             cancelAndIgnoreRemainingEvents()
@@ -105,16 +115,16 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when default browser clears but download is still active then shouldHighlight remains true`() = runTest {
+    fun `when default browser clears but plugin highlight is still active then shouldHighlight remains true`() = runTest {
         testee.shouldHighlight.test {
             assertFalse(awaitItem())
 
             highlightPopupMenuFlow.value = true
-            hasNewDownloadFlow.value = true
+            pluginHighlightFlow.value = true
             assertTrue(awaitItem())
 
             highlightPopupMenuFlow.value = false
-            // still true because hasNewDownload is true
+            // still true because pluginHighlight is true
             expectNoEvents()
 
             cancelAndIgnoreRemainingEvents()
@@ -122,15 +132,15 @@ class RealBrowserMenuHighlightStateTest {
     }
 
     @Test
-    fun `when download clears but default browser is still active then shouldHighlight remains true`() = runTest {
+    fun `when plugin highlight clears but default browser is still active then shouldHighlight remains true`() = runTest {
         testee.shouldHighlight.test {
             assertFalse(awaitItem())
 
             highlightPopupMenuFlow.value = true
-            hasNewDownloadFlow.value = true
+            pluginHighlightFlow.value = true
             assertTrue(awaitItem())
 
-            hasNewDownloadFlow.value = false
+            pluginHighlightFlow.value = false
             // still true because highlightPopupMenu is true
             expectNoEvents()
 
@@ -144,11 +154,11 @@ class RealBrowserMenuHighlightStateTest {
             assertFalse(awaitItem())
 
             highlightPopupMenuFlow.value = true
-            hasNewDownloadFlow.value = true
+            pluginHighlightFlow.value = true
             assertTrue(awaitItem())
 
             highlightPopupMenuFlow.value = false
-            hasNewDownloadFlow.value = false
+            pluginHighlightFlow.value = false
             assertFalse(awaitItem())
 
             cancelAndIgnoreRemainingEvents()

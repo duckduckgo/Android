@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads
+package com.duckduckgo.downloads.impl
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -29,12 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
-import com.duckduckgo.app.downloads.DownloadsScreens.DownloadsScreenNoParams
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
-import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone
@@ -44,7 +36,9 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
+import com.duckduckgo.downloads.api.DownloadsScreens.DownloadsScreenNoParams
 import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.impl.databinding.ActivityDownloadsBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
@@ -124,17 +118,17 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommands(command: Command) {
+    private fun processCommands(command: DownloadsViewModel.Command) {
         when (command) {
-            is OpenFile -> showOpen(command)
-            is ShareFile -> showShare(command)
-            is DisplayMessage -> showSnackbar(command.messageId, command.arg)
-            is DisplayUndoMessage -> showUndo(command)
-            is CancelDownload -> cancelDownload(command)
+            is DownloadsViewModel.Command.OpenFile -> showOpen(command)
+            is DownloadsViewModel.Command.ShareFile -> showShare(command)
+            is DownloadsViewModel.Command.DisplayMessage -> showSnackbar(command.messageId, command.arg)
+            is DownloadsViewModel.Command.DisplayUndoMessage -> showUndo(command)
+            is DownloadsViewModel.Command.CancelDownload -> cancelDownload(command)
         }
     }
 
-    private fun showOpen(command: OpenFile) {
+    private fun showOpen(command: DownloadsViewModel.Command.OpenFile) {
         val file = File(command.item.filePath)
         if (file.exists()) {
             val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
@@ -146,11 +140,11 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showShare(command: ShareFile) {
+    private fun showShare(command: DownloadsViewModel.Command.ShareFile) {
         downloadsFileActions.shareFile(this@DownloadsActivity, File(command.item.filePath))
     }
 
-    private fun showUndo(command: DisplayUndoMessage) {
+    private fun showUndo(command: DownloadsViewModel.Command.DisplayUndoMessage) {
         Snackbar.make(
             binding.root,
             getString(command.messageId, command.arg),
@@ -181,7 +175,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         viewModel.removeFromDiskAndFromDownloadManager(items)
     }
 
-    private fun cancelDownload(command: CancelDownload) {
+    private fun cancelDownload(command: DownloadsViewModel.Command.CancelDownload) {
         viewModel.removeFromDownloadManager(command.item.downloadId)
     }
 
@@ -189,12 +183,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
         Snackbar.make(binding.root, getString(messageId, arg), Snackbar.LENGTH_LONG).show()
     }
 
-    private fun render(viewState: ViewState) {
+    private fun render(viewState: DownloadsViewModel.ViewState) {
         downloadsAdapter.updateData(viewState.filteredItems)
         searchMenuItem?.isVisible = itemsAvailable(viewState)
     }
 
-    private fun itemsAvailable(viewState: ViewState): Boolean {
+    private fun itemsAvailable(viewState: DownloadsViewModel.ViewState): Boolean {
         // The empty view is part of the list.
         return viewState.filteredItems.size > 1
     }
@@ -229,9 +223,5 @@ class DownloadsActivity : DuckDuckGoActivity() {
         toolbar.show()
         searchBar.handle(SearchBar.Event.DismissSearchBar)
         searchBar.hideKeyboard()
-    }
-
-    companion object {
-        fun intent(context: Context): Intent = Intent(context, DownloadsActivity::class.java)
     }
 }

@@ -14,57 +14,68 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.menu
+package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.settings.db.SettingsDataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.di.DownloadMenu
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface DownloadMenuStateProvider {
-    /**
-     * Reactive flow indicating whether there is a new download that has not been viewed by the user yet.
-     */
     val hasNewDownloadFlow: Flow<Boolean>
-
-    /**
-     * Indicates whether there is a new download that has not been viewed by the user yet.
-     */
     fun hasNewDownload(): Boolean
-
-    /**
-     * Indicates that a new download has completed, and the user should be notified about it until they view the downloads screen.
-     */
     fun onDownloadComplete()
-
-    /**
-     * Indicates that the user has viewed the downloads screen, and any new download notifications can be cleared.
-     */
     fun onDownloadsScreenViewed()
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDownloadMenuStateProvider @Inject constructor(
-    private val settingsDataStore: SettingsDataStore,
+    @DownloadMenu private val store: DataStore<Preferences>,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : DownloadMenuStateProvider {
 
-    private val _hasNewDownloadFlow = MutableStateFlow(settingsDataStore.hasNewDownload)
+    private object Keys {
+        val HAS_NEW_DOWNLOAD = booleanPreferencesKey("has_new_download")
+    }
+
+    private val _hasNewDownloadFlow = MutableStateFlow(false)
     override val hasNewDownloadFlow: Flow<Boolean> = _hasNewDownloadFlow.asStateFlow()
 
-    override fun hasNewDownload(): Boolean = settingsDataStore.hasNewDownload
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            store.data.collect { prefs ->
+                _hasNewDownloadFlow.value = prefs[Keys.HAS_NEW_DOWNLOAD] ?: false
+            }
+        }
+    }
+
+    override fun hasNewDownload(): Boolean = _hasNewDownloadFlow.value
 
     override fun onDownloadComplete() {
-        settingsDataStore.hasNewDownload = true
         _hasNewDownloadFlow.value = true
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            store.edit { prefs -> prefs[Keys.HAS_NEW_DOWNLOAD] = true }
+        }
     }
 
     override fun onDownloadsScreenViewed() {
-        settingsDataStore.hasNewDownload = false
         _hasNewDownloadFlow.value = false
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            store.edit { prefs -> prefs[Keys.HAS_NEW_DOWNLOAD] = false }
+        }
     }
 }
