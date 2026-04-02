@@ -1475,6 +1475,37 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         }
     }
 
+    private fun playLeftWingAnimation() {
+        binding.leftWingAnimation?.apply {
+            isVisible = true
+            alpha = 0f
+            setMaxProgress(WING_STOP_PROGRESS)
+            leftWingDelayedRunnable = postDelayed(WING_START_DELAY) {
+                animate()
+                    .alpha(1f)
+                    .setDuration(WING_FADE_IN_DURATION)
+                    .start()
+                playAnimation()
+            }
+        }
+    }
+
+    private fun dismissLeftWingAnimation() {
+        binding.leftWingAnimation?.apply {
+            if (!isVisible) return
+            setMinProgress(WING_STOP_PROGRESS)
+            setMaxProgress(1f)
+            speed = 1f
+            addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isGone = true
+                    removeAnimatorListener(this)
+                }
+            })
+            playAnimation()
+        }
+    }
+
     private fun showDefaultBrowserDialog(intent: Intent) {
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
