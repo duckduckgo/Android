@@ -55,7 +55,7 @@ class RxBasedPixel @Inject constructor(
             .sendPixel(pixelName, parameters, encodedParameters, type)
             .subscribeOn(Schedulers.io())
             .subscribe(
-                { result ->
+                { result: PixelSender.SendPixelResult ->
                     when (result) {
                         PIXEL_SENT -> logcat(VERBOSE) { "Pixel sent: $pixelName with params: $parameters $encodedParameters" }
                         PIXEL_IGNORED -> logcat(VERBOSE) { "Pixel ignored: $pixelName with params: $parameters $encodedParameters" }
@@ -93,7 +93,7 @@ class RxBasedPixel @Inject constructor(
             .enqueuePixel(pixelName, parameters, encodedParameters, type)
             .subscribeOn(Schedulers.io())
             .subscribe(
-                { result ->
+                { result: EnqueuePixelResult ->
                     when (result) {
                         EnqueuePixelResult.PIXEL_ENQUEUED -> logcat(VERBOSE) {
                             "Pixel enqueued: $pixelName with params: $parameters $encodedParameters"

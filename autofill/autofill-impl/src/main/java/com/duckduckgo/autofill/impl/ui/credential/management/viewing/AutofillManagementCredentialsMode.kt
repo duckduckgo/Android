@@ -491,16 +491,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun processCommand(command: CredentialModeCommand) {
-        var processed = true
         when (command) {
             is ShowEditCredentialMode -> showEditMode()
             is ShowManualCredentialMode -> showEditMode()
-            else -> processed = false
         }
-        if (processed) {
-            logcat(VERBOSE) { "Processed command $command" }
-            viewModel.commandProcessed(command)
-        }
+        logcat(VERBOSE) { "Processed command $command" }
+        viewModel.commandProcessed(command)
     }
 
     private fun disableSystemAutofillServiceOnPasswordField() {
