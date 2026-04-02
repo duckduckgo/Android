@@ -22,7 +22,9 @@ import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,6 +99,92 @@ class BrandDesignUpdateOnboardingLayoutHelperTest {
         (decoration.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 150
 
         assertFalse(BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(root, dialog, decoration))
+    }
+
+    // calculateWalkingDaxHeight tests
+
+    @Test
+    fun whenRootHeightIsZeroThenCalculateWalkingDaxHeightReturnsNull() {
+        val root = createViewWithSize(width = 1080, height = 0)
+        val dialog = createViewWithSize(width = 1080, height = 400)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        root.addView(dialog)
+        root.addView(dax)
+
+        assertNull(BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+    }
+
+    @Test
+    fun whenDialogIsInsideScrollViewThenCalculateWalkingDaxHeightReturnsMax() {
+        val root = createViewWithSize(width = 1080, height = 800)
+        val scrollView = ScrollView(context)
+        val dialog = createViewWithSize(width = 1080, height = 600)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        scrollView.addView(dialog)
+        root.addView(scrollView)
+        root.addView(dax)
+
+        assertEquals(274, BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+    }
+
+    @Test
+    fun whenEnoughSpaceForMaxDaxHeightThenReturnMaxHeight() {
+        // root=1000, dialog=400 → available=600 ≥ max=274 → returns 274
+        val root = createViewWithSize(width = 1080, height = 1000)
+        val dialog = createViewWithSize(width = 1080, height = 400)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        root.addView(dialog)
+        root.addView(dax)
+
+        assertEquals(274, BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+    }
+
+    @Test
+    fun whenSpaceBetweenMinAndMaxThenReturnAvailableHeight() {
+        // root=800, dialog=400, daxMargin=200 → available=200 (between 174 and 274) → returns 200
+        val root = createViewWithSize(width = 1080, height = 800)
+        val dialog = createViewWithSize(width = 1080, height = 400)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        root.addView(dialog)
+        root.addView(dax)
+        // Set margin after addView to avoid FrameLayout replacing the LayoutParams
+        (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 200
+
+        assertEquals(200, BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+    }
+
+    @Test
+    fun whenAvailableSpaceBelowMinHeightThenReturnNull() {
+        // root=600, dialog=400, daxMargin=100 → available=100 < min=174 → null
+        val root = createViewWithSize(width = 1080, height = 600)
+        val dialog = createViewWithSize(width = 1080, height = 400)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        root.addView(dialog)
+        root.addView(dax)
+        // Set margin after addView to avoid FrameLayout replacing the LayoutParams
+        (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 100
+
+        assertNull(BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
+    }
+
+    @Test
+    fun whenAvailableSpaceExactlyAtMinHeightThenReturnMinHeight() {
+        // root=750, dialog=400, daxMargin=176 → available=174 == min=174 → returns 174
+        val root = createViewWithSize(width = 1080, height = 750)
+        val dialog = createViewWithSize(width = 1080, height = 400)
+        val dax = createViewWithSize(width = 200, height = 274)
+
+        root.addView(dialog)
+        root.addView(dax)
+        // Set margin after addView to avoid FrameLayout replacing the LayoutParams
+        (dax.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = 176
+
+        assertEquals(174, BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(root, dialog, dax, maxHeightPx = 274, minHeightPx = 174))
     }
 
     private fun createViewWithSize(

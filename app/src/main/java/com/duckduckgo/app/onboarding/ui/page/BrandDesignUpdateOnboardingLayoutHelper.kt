@@ -57,6 +57,44 @@ object BrandDesignUpdateOnboardingLayoutHelper {
         return rootView.height >= dialogSpace + decorationSpace
     }
 
+    /**
+     * Calculates the height to use for the walking Dax animation based on available space.
+     *
+     * Returns the height in pixels to apply (clamped between [minHeightPx] and [maxHeightPx]),
+     * or null if Dax should be hidden because there is not enough room even at the minimum height.
+     *
+     * @param rootView the root view used to determine available height
+     * @param dialogView the dialog whose measured height is checked
+     * @param daxView the walking Dax animation view
+     * @param maxHeightPx the maximum allowed height for Dax in pixels
+     * @param minHeightPx the minimum required height for Dax in pixels; below this Dax is hidden
+     */
+    fun calculateWalkingDaxHeight(
+        rootView: View,
+        dialogView: View,
+        daxView: View,
+        maxHeightPx: Int,
+        minHeightPx: Int,
+    ): Int? {
+        if (rootView.height == 0) return null
+        if (isInScrollableContainer(dialogView, rootView)) return maxHeightPx
+
+        val dialogWidthSpec = View.MeasureSpec.makeMeasureSpec(rootView.width, View.MeasureSpec.AT_MOST)
+        val dialogHeightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        dialogView.measure(dialogWidthSpec, dialogHeightSpec)
+
+        val dialogParams = dialogView.layoutParams as ViewGroup.MarginLayoutParams
+        val dialogSpace = dialogView.measuredHeight + dialogParams.topMargin + dialogParams.bottomMargin
+
+        val daxParams = daxView.layoutParams as ViewGroup.MarginLayoutParams
+        val availableForDax = rootView.height - dialogSpace - daxParams.bottomMargin
+
+        return when {
+            availableForDax < minHeightPx -> null
+            else -> availableForDax.coerceAtMost(maxHeightPx)
+        }
+    }
+
     private fun isInScrollableContainer(view: View, stopAt: View): Boolean {
         var parent = view.parent
         while (parent != null && parent != stopAt) {

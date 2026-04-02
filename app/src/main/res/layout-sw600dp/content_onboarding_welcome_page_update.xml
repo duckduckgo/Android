@@ -126,11 +126,12 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/welcomeScreenWalkingDax"
-        android:layout_width="217dp"
-        android:layout_height="275dp"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_height="274dp"
         android:layout_marginBottom="104dp"
         android:alpha="0"
-        android:translationX="-48dp"
+        android:translationX="-24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/daxDialogCta"
         app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"
@@ -157,6 +158,6 @@
         app:lottie_rawRes="@raw/onboarding_wing_bottom"
         tools:alpha="1"
         tools:lottie_progress="0.5"
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
