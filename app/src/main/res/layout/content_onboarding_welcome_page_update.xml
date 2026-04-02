@@ -125,11 +125,12 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/welcomeScreenWalkingDax"
-        android:layout_width="217dp"
-        android:layout_height="275dp"
-        android:layout_marginBottom="112dp"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_height="274dp"
+        android:layout_marginBottom="104dp"
         android:alpha="0"
-        android:translationX="-48dp"
+        android:translationX="-16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:lottie_rawRes="@raw/onboarding_welcome_screen_dax_walking"

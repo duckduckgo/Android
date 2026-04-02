@@ -488,19 +488,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
-                    val showWalkingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                        rootView = binding.root,
-                        dialogView = binding.daxDialogCta.root,
-                        decorationView = binding.welcomeScreenWalkingDax,
-                    )
-                    if (!showWalkingDax) {
-                        binding.welcomeScreenWalkingDax.isVisible = false
-                        (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                            verticalBias = 0f
-                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                        }
-                    }
+                    val showWalkingDax = applyWalkingDaxLayout()
 
                     playOutroAnimation(
                         nextStep = OnboardingBackgroundStep.Welcome,
@@ -720,24 +708,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
 
-                val showWalkingDax = BrandDesignUpdateOnboardingLayoutHelper.hasSpaceForAnimation(
-                    rootView = binding.root,
-                    dialogView = binding.daxDialogCta.root,
-                    decorationView = binding.welcomeScreenWalkingDax,
-                )
+                val showWalkingDax = applyWalkingDaxLayout()
                 if (showWalkingDax) {
                     with(binding.welcomeScreenWalkingDax) {
                         cancelAnimation()
                         progress = 1f
                         alpha = 1f
                         translationX = -WALKING_DAX_FINAL_X_DP.toPx().toFloat()
-                    }
-                } else {
-                    binding.welcomeScreenWalkingDax.isVisible = false
-                    (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
-                        verticalBias = 0f
-                        bottomToTop = ConstraintLayout.LayoutParams.UNSET
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                     }
                 }
 
@@ -871,6 +848,31 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 // TODO
             }
         }
+    }
+
+    /**
+     * Calculates the walking Dax height and applies the result to the layout.
+     * Returns true if Dax is visible, false if hidden due to insufficient space.
+     */
+    private fun applyWalkingDaxLayout(): Boolean {
+        val walkingDaxHeight = BrandDesignUpdateOnboardingLayoutHelper.calculateWalkingDaxHeight(
+            rootView = binding.root,
+            dialogView = binding.daxDialogCta.root,
+            daxView = binding.welcomeScreenWalkingDax,
+            maxHeightPx = WALKING_DAX_MAX_HEIGHT_DP.toPx(),
+            minHeightPx = WALKING_DAX_MIN_HEIGHT_DP.toPx(),
+        )
+        if (walkingDaxHeight != null) {
+            binding.welcomeScreenWalkingDax.updateLayoutParams { height = walkingDaxHeight }
+        } else {
+            binding.welcomeScreenWalkingDax.isVisible = false
+            (binding.daxDialogCta.root.layoutParams as ConstraintLayout.LayoutParams).apply {
+                verticalBias = 0f
+                bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+            }
+        }
+        return walkingDaxHeight != null
     }
 
     private fun playWalkingDaxAnimation() {
@@ -1104,6 +1106,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         private const val WALKING_DAX_SLIDE_DURATION = 600L
         private const val WALKING_DAX_START_X_DP = 48
         private const val WALKING_DAX_FINAL_X_DP = 22
+        private const val WALKING_DAX_MAX_HEIGHT_DP = 274
+        private const val WALKING_DAX_MIN_HEIGHT_DP = 174
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
 
