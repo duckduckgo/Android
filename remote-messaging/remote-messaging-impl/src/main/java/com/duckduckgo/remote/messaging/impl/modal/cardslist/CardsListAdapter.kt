@@ -46,7 +46,7 @@ import javax.inject.Inject
 class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsListAdapter.RemoteMessageItemHolder>(ModalSurfaceDiffCallback()) {
 
     private lateinit var cardItemClickListener: CardItemClickListener
-    var headerImageLoadListener: HeaderImageLoadListener? = null
+    var imageLoadListener: ImageLoadListener? = null
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -58,7 +58,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 parent,
                 false,
             ),
-            headerImageLoadListener,
+            imageLoadListener,
         )
 
         ITEM_TYPE_LIST_SECTION_TITLE -> RemoteMessageItemHolder.SectionTitleHolder(
@@ -76,6 +76,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 false,
             ),
             cardItemClickListener,
+            imageLoadListener,
         )
 
         else -> RemoteMessageItemHolder.CardItemViewHolder(
@@ -85,6 +86,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 false,
             ),
             cardItemClickListener,
+            imageLoadListener,
         )
     }
 
@@ -126,43 +128,19 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
 
         class HeaderViewHolder(
             private val binding: ViewRemoteMessageHeaderBinding,
-            private val listener: HeaderImageLoadListener?,
+            private val listener: ImageLoadListener?,
         ) : RemoteMessageItemHolder(binding.root) {
 
             fun bind(header: ModalListItem.Header) {
                 binding.headerTitle.text = header.titleText
 
                 if (!header.imageUrl.isNullOrEmpty()) {
-                    val imageLoadListener = listener?.let {
-                        object : RequestListener<Drawable> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>,
-                                isFirstResource: Boolean,
-                            ): Boolean {
-                                it.onImageLoadFailed()
-                                return false
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                model: Any,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource,
-                                isFirstResource: Boolean,
-                            ): Boolean {
-                                it.onImageLoadSuccess()
-                                return false
-                            }
-                        }
-                    }
                     loadRemoteImage(
                         imageView = binding.remoteImage,
                         imageUrl = header.imageUrl,
                         imageFilePath = header.imageFilePath,
                         placeholder = header.placeholder,
-                        listener = imageLoadListener,
+                        listener = createGlideListener(listener, ImageLoadSource.Header),
                     )
                     binding.headerImage.gone()
                     binding.remoteImage.show()
@@ -177,6 +155,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
         class CardItemViewHolder(
             private val binding: ViewRemoteMessageCardItemBinding,
             private val listener: CardItemClickListener,
+            private val imageLoadListener: ImageLoadListener?,
         ) : RemoteMessageItemHolder(binding.root) {
 
             fun bind(
@@ -185,7 +164,13 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
             ) {
                 binding.title.text = item.titleText
                 binding.description.text = item.descriptionText
-                loadRemoteImage(binding.startImage, item.imageUrl, imageFilePath, item.placeholder)
+                loadRemoteImage(
+                    binding.startImage,
+                    item.imageUrl,
+                    imageFilePath,
+                    item.placeholder,
+                    createGlideListener(imageLoadListener, ImageLoadSource.CardItem(item.id)),
+                )
                 binding.listItemContainer.setOnClickListener {
                     listener.onItemClicked(item)
                 }
@@ -204,6 +189,7 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
         class FeaturedItemHolder(
             private val binding: ViewRemoteMessageFeaturedListItemBinding,
             private val listener: CardItemClickListener,
+            private val imageLoadListener: ImageLoadListener?,
         ) : RemoteMessageItemHolder(binding.root) {
 
             fun bind(
@@ -213,9 +199,43 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
                 binding.title.text = item.titleText
                 binding.description.text = item.descriptionText
                 binding.action.text = item.primaryActionText
-                loadRemoteImage(binding.image, item.imageUrl, imageFilePath, item.placeholder)
+                loadRemoteImage(
+                    binding.image,
+                    item.imageUrl,
+                    imageFilePath,
+                    item.placeholder,
+                    createGlideListener(imageLoadListener, ImageLoadSource.CardItem(item.id)),
+                )
                 binding.action.setOnClickListener {
                     listener.onItemClicked(item)
+                }
+            }
+        }
+
+        fun createGlideListener(
+            listener: ImageLoadListener?,
+            source: ImageLoadSource,
+        ): RequestListener<Drawable>? = listener?.let {
+            object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    it.onImageLoadFailed(source)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable,
+                    model: Any,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean,
+                ): Boolean {
+                    it.onImageLoadSuccess(source)
+                    return false
                 }
             }
         }
@@ -247,9 +267,9 @@ class CardsListAdapter @Inject constructor() : ListAdapter<ModalListItem, CardsL
         this.cardItemClickListener = listener
     }
 
-    interface HeaderImageLoadListener {
-        fun onImageLoadSuccess()
-        fun onImageLoadFailed()
+    interface ImageLoadListener {
+        fun onImageLoadSuccess(source: ImageLoadSource)
+        fun onImageLoadFailed(source: ImageLoadSource)
     }
 
     private class ModalSurfaceDiffCallback : DiffUtil.ItemCallback<ModalListItem>() {
