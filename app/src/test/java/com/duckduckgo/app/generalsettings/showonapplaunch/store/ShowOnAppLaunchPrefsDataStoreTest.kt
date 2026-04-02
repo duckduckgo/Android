@@ -27,7 +27,10 @@ import app.cash.turbine.test
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.NewTabPage
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.SpecificPage
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -52,8 +55,10 @@ class ShowOnAppLaunchPrefsDataStoreTest {
             produceFile = { dataStoreFile },
         )
 
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     private val testee: ShowOnAppLaunchOptionDataStore =
-        ShowOnAppLaunchOptionPrefsDataStore(testDataStore)
+        ShowOnAppLaunchOptionPrefsDataStore(testDataStore, fakeBrowserConfigFeature)
 
     @After
     fun after() {
@@ -61,8 +66,15 @@ class ShowOnAppLaunchPrefsDataStoreTest {
     }
 
     @Test
-    fun whenOptionIsNullThenShouldReturnNewTabPage() = runTest {
+    fun whenOptionIsNullAndFeatureEnabledThenShouldReturnNewTabPage() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = true))
         assertEquals(NewTabPage, testee.optionFlow.first())
+    }
+
+    @Test
+    fun whenOptionIsNullAndFeatureDisabledThenShouldReturnLastOpenedTab() = runTest {
+        fakeBrowserConfigFeature.showNTPAfterIdleReturn().setRawStoredState(Toggle.State(enable = false))
+        assertEquals(LastOpenedTab, testee.optionFlow.first())
     }
 
     @Test
