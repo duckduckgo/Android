@@ -18,12 +18,29 @@ Use the imperative mood in the subject line (e.g. "Add feature X", not "Added fe
 
 ## PR body
 
-PRs use `.github/PULL_REQUEST_TEMPLATE.md`, which has four sections:
+Read `.github/PULL_REQUEST_TEMPLATE.md` and use it as the PR body exactly — do not skip or reorder sections, do not add content above the first line of the template.
 
-**Task/Issue URL** — Link to the Asana task for this change.
+Fill in the template sections as follows:
+- **Task/Issue URL**: the Asana task URL
+- **Description**: summarise what was changed and why
+- **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
+- **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
-**Description** — A short summary of what changed and why.
+Use `gh api repos/duckduckgo/Android/pulls --method POST` to open PRs — do not use `gh pr create`, which fails with a Projects Classic deprecation warning.
 
-**Steps to test this PR** — Numbered or bulleted steps a reviewer can follow to verify the feature or fix. List each distinct scenario as its own feature block. Be specific enough that someone unfamiliar with the code can follow them.
+## Stacked PRs (Graphite)
 
-**UI changes** — Before/After screenshots or recordings. Include this section whenever the change affects any visible UI. Omit it only for pure logic/backend changes with no visual impact.
+We use Graphite for stacked pull requests. When asked to build a complete feature, plan a stack of PRs following the ordering below before writing any code. For any other task, follow the engineer's instructions on how to structure the work. Each PR in the stack must build and pass `./gradlew jvm_checks` independently.
+
+### Stack ordering
+
+Structure the stack around the evolution of the work, not the module layout:
+
+1. **Feature flag** (if needed) — remote feature toggle gating the new behaviour
+2. **Implementation** (one or more PRs) — the feature itself, including UI, logic, and unit tests; split into multiple PRs if the feature is large enough to benefit from independent review
+3. **Pixels** — analytics events for the feature
+4. **Translations** — any new strings added for the feature
+
+### Creating stacked PRs
+
+If the GT MCP is available, use it to create and submit stacked PRs. Otherwise, create branches and PRs manually using `gh`. In both cases, each PR body must follow the template in the **PR body** section above.
