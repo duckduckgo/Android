@@ -17,7 +17,9 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,11 +39,12 @@ class DelegatingDuckChatDeleterTest {
     private val nativeDeleter: NativeDuckChatDeleter = mock()
     private val webViewDeleter: RealDuckChatDeleter = mock()
     private val store: DuckAiChatStore = mock()
+    private val pixels: DuckChatPixels = mock()
     private lateinit var deleter: DelegatingDuckChatDeleter
 
     @Before
     fun setup() {
-        deleter = DelegatingDuckChatDeleter(nativeDeleter, webViewDeleter, store)
+        deleter = DelegatingDuckChatDeleter(nativeDeleter, webViewDeleter, store, Lazy { pixels })
     }
 
     @Test

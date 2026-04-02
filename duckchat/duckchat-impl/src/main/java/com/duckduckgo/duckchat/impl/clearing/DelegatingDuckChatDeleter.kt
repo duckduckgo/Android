@@ -17,8 +17,10 @@
 package com.duckduckgo.duckchat.impl.clearing
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.api.DuckAiChatStore
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import logcat.logcat
 import javax.inject.Inject
@@ -31,11 +33,15 @@ class DelegatingDuckChatDeleter @Inject constructor(
     // from treating this field as a competing binding for the DuckChatDeleter interface.
     private val webViewDeleter: RealDuckChatDeleter,
     private val store: DuckAiChatStore,
+    // Lazy to break the DI cycle: RealDuckChat → DuckChatDeleter → DuckChatPixels
+    //   → DuckChatTermsOfServiceHandler → DuckChatInternal (RealDuckChat)
+    private val pixels: Lazy<DuckChatPixels>,
 ) : DuckChatDeleter {
 
     override suspend fun deleteChat(chatId: String): Boolean {
         val deleter = if (store.hasMigrated()) nativeDeleter else webViewDeleter
         logcat { "DuckAI chat deletion: using ${if (deleter === nativeDeleter) "native store" else "WebView"} deleter" }
+        pixels.get().reportNativeStorageDeletionUsed(native = deleter === nativeDeleter)
         return deleter.deleteChat(chatId)
     }
 }

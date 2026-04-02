@@ -418,5 +418,33 @@
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_reader_native_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the native store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_reader_webview_daily": {
+        "description": "Duck.ai chat suggestions were loaded from the WebView store (daily)",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_deletion_native_count": {
+        "description": "A Duck.ai chat was deleted via the native store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_native_storage_deletion_webview_count": {
+        "description": "A Duck.ai chat was deleted via the WebView store path",
+        "owners": ["aitorvs"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }

@@ -21,7 +21,9 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.ChatSuggestionsNativeReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.DelegatingChatSuggestionsReader
 import com.duckduckgo.duckchat.impl.inputscreen.ui.suggestions.reader.RealChatSuggestionsReader
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.api.DuckAiChatStore
+import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -41,13 +43,14 @@ class DelegatingChatSuggestionsReaderTest {
     private val nativeReader: ChatSuggestionsNativeReader = mock()
     private val webViewReader: RealChatSuggestionsReader = mock()
     private val store: DuckAiChatStore = mock()
+    private val pixels: DuckChatPixels = mock()
     private lateinit var reader: DelegatingChatSuggestionsReader
 
     private val fakeSuggestion = ChatSuggestion("id", "Title", LocalDateTime.now(), false)
 
     @Before
     fun setup() {
-        reader = DelegatingChatSuggestionsReader(nativeReader, webViewReader, store)
+        reader = DelegatingChatSuggestionsReader(nativeReader, webViewReader, store, Lazy { pixels })
     }
 
     @Test
