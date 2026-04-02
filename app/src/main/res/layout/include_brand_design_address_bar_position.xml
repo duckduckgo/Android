@@ -71,14 +71,29 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="160dp">
 
-            <ImageView
-                android:id="@+id/topOmnibarToggleImage"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/preOnboardingAddressBarPositionTop"
-                android:foreground="@drawable/selectable_rounded_ripple"
-                android:scaleType="fitCenter"
-                tools:src="@drawable/mobile_toolbar_top_selected_light" />
+                android:foreground="@drawable/selectable_rounded_ripple">
+
+                <ImageView
+                    android:id="@+id/topOmnibarToggleImageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter" />
+
+                <ImageView
+                    android:id="@+id/topOmnibarToggleImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/preOnboardingAddressBarPositionTop"
+                    android:scaleType="fitCenter"
+                    tools:src="@drawable/mobile_toolbar_top_selected_light" />
+
+            </FrameLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"
@@ -126,14 +141,29 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="160dp">
 
-            <ImageView
-                android:id="@+id/bottomOmnibarToggleImage"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/preOnboardingAddressBarPositionBottom"
-                android:foreground="@drawable/selectable_rounded_ripple"
-                android:scaleType="fitCenter"
-                tools:src="@drawable/mobile_toolbar_bottom_unselected_light" />
+                android:foreground="@drawable/selectable_rounded_ripple">
+
+                <ImageView
+                    android:id="@+id/bottomOmnibarToggleImageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter" />
+
+                <ImageView
+                    android:id="@+id/bottomOmnibarToggleImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/preOnboardingAddressBarPositionBottom"
+                    android:scaleType="fitCenter"
+                    tools:src="@drawable/mobile_toolbar_bottom_unselected_light" />
+
+            </FrameLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"
@@ -181,14 +211,29 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="160dp">
 
-            <ImageView
-                android:id="@+id/splitOmnibarToggleImage"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/preOnboardingAddressBarPositionSplit"
-                android:foreground="@drawable/selectable_rounded_ripple"
-                android:scaleType="fitCenter"
-                tools:src="@drawable/mobile_toolbar_split_unselected_light" />
+                android:foreground="@drawable/selectable_rounded_ripple">
+
+                <ImageView
+                    android:id="@+id/splitOmnibarToggleImageBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter" />
+
+                <ImageView
+                    android:id="@+id/splitOmnibarToggleImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/preOnboardingAddressBarPositionSplit"
+                    android:scaleType="fitCenter"
+                    tools:src="@drawable/mobile_toolbar_split_unselected_light" />
+
+            </FrameLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="wrap_content"

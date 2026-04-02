@@ -146,15 +146,26 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         return inflater.cloneInContext(contextThemeWrapper)
     }
 
-    private fun setAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false) {
+    private fun setAddressBarPositionOptions(selectedOption: OmnibarType, showSplitOption: Boolean = false, animate: Boolean = true) {
         val isLightMode = appTheme.isLightModeEnabled()
 
         with(binding.daxDialogCta.addressBarContent) {
-            topOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SINGLE_TOP, selectedOption, isLightMode))
+            val topRes = omnibarToggleImageRes(OmnibarType.SINGLE_TOP, selectedOption, isLightMode)
+            val bottomRes = omnibarToggleImageRes(OmnibarType.SINGLE_BOTTOM, selectedOption, isLightMode)
+            val splitRes = omnibarToggleImageRes(OmnibarType.SPLIT, selectedOption, isLightMode)
+
+            if (animate) {
+                crossfadeImage(topOmnibarToggleImage, topOmnibarToggleImageBack, topRes)
+                crossfadeImage(bottomOmnibarToggleImage, bottomOmnibarToggleImageBack, bottomRes)
+                crossfadeImage(splitOmnibarToggleImage, splitOmnibarToggleImageBack, splitRes)
+            } else {
+                topOmnibarToggleImage.setImageResource(topRes)
+                bottomOmnibarToggleImage.setImageResource(bottomRes)
+                splitOmnibarToggleImage.setImageResource(splitRes)
+            }
+
             topOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_TOP
-            bottomOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SINGLE_BOTTOM, selectedOption, isLightMode))
             bottomOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SINGLE_BOTTOM
-            splitOmnibarToggleImage.setImageResource(omnibarToggleImageRes(OmnibarType.SPLIT, selectedOption, isLightMode))
             splitOmnibarToggleCheck.isChecked = selectedOption == OmnibarType.SPLIT
 
             splitOmnibarContainer.isVisible = showSplitOption
