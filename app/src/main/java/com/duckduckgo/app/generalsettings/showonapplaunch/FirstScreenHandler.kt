@@ -58,9 +58,7 @@ class FirstScreenHandlerImpl @Inject constructor(
                 showOnAppLaunchOptionHandler.handleAfterInactivityOption()
                 return
             }
-        }
-
-        if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
+        } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             showOnAppLaunchOptionHandler.handleAppLaunchOption()
         }
     }
