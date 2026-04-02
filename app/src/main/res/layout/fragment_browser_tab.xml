@@ -120,6 +120,12 @@
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     tools:background="#4F00" />
 
+                <com.duckduckgo.app.browser.pdf.SwipeBlockingFrameLayout
+                    android:id="@+id/pdfViewerContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
                 <include
                     android:id="@+id/includeErrorView"
                     layout="@layout/include_error_view"

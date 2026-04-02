@@ -515,4 +515,11 @@ sealed class Command {
         val tabId: String,
         val pageContext: String,
     ) : Command()
+
+    data class ShowPdfInTab(
+        val url: String,
+        val cachedFileUri: Uri,
+    ) : Command()
+
+    data object ExpandOmnibar : Command()
 }

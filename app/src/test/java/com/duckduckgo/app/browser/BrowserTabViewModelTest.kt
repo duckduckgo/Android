@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -642,6 +643,7 @@ class BrowserTabViewModelTest {
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
     private var fakeFaviconFetchingFixFeature = FakeFeatureToggleFactory.create(FaviconFetchingFixFeature::class.java)
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
+    private val mockInlinePdfHandler: InlinePdfHandler = mock()
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -937,6 +939,7 @@ class BrowserTabViewModelTest {
                 progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
                 faviconFetchingFixFeature = fakeFaviconFetchingFixFeature,
                 ntpAfterIdleManager = mockNtpAfterIdleManager,
+                inlinePdfHandler = mockInlinePdfHandler,
             )
 
         testee.loadData("abc", null, false, false)
@@ -10065,4 +10068,145 @@ class BrowserTabViewModelTest {
         // Manager is NOT called at exactly FIXED_PROGRESS (50) - only when progress > 50
         verify(mockPageLoadWideEvent, never()).onProgressChanged(any(), any())
     }
+
+    // region PDF viewer tests
+
+    @Test
+    fun whenShouldNotRenderPdfInlineThenDownloadFile() {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(false)
+        val webView: WebView = mock()
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+        assertCommandIssued<Command.RequestFileDownload>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfEnabledAndApi31ThenDownloadToCacheAndEmitShowPdfCommand() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(testUri)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        assertCommandIssued<Command.ShowPdfInTab> {
+            assertEquals("https://example.com/doc.pdf", this.url)
+            assertEquals(testUri, this.cachedFileUri)
+        }
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfDownloadToCacheFailsThenFallbackToStandardDownload() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(null)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        assertCommandIssued<Command.RequestFileDownload>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfInlineThenExpandOmnibarCommandIsEmitted() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(testUri)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        assertCommandIssued<Command.ExpandOmnibar>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfDownloadStartsThenLoadingStateShowsProgress() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(testUri)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        assertFalse(loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfDownloadFailsThenLoadingStateIsReset() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(null)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        assertFalse(loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenShouldNotRenderPdfInlineThenExpandOmnibarNotEmitted() {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(false)
+        val webView: WebView = mock()
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+        assertCommandNotIssued<Command.ExpandOmnibar>()
+    }
+
+    @Test
+    fun whenBlobUrlThenPdfHandlerNotCalled() {
+        val webView: WebView = mock()
+        testee.requestFileDownload(webView, "blob:https://example.com/abc", null, "application/pdf", true, false)
+        verify(mockInlinePdfHandler, never()).shouldRenderPdfInline(any(), anyOrNull(), any())
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfWithContentDispositionInlineThenShowPdf() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        val testUri = Uri.parse("file:///cache/test.pdf")
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenReturn(testUri)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", "inline", "application/pdf", true, false)
+
+        assertCommandIssued<Command.ShowPdfInTab>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfNotInlineThenFallbackToDownloadWhenContentDispositionIsAttachment() {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(false)
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", "attachment", "application/pdf", true, false)
+
+        assertCommandIssued<Command.RequestFileDownload>()
+        assertCommandNotIssued<Command.ExpandOmnibar>()
+    }
+
+    @Test
+    @Config(sdk = [31])
+    fun whenPdfDownloadInProgressAndUserNavigatesAwayThenShowPdfNotEmitted() = runTest {
+        whenever(mockInlinePdfHandler.shouldRenderPdfInline(any(), anyOrNull(), any())).thenReturn(true)
+        // Return COROUTINE_SUSPENDED to simulate a long-running download that never completes
+        whenever(mockInlinePdfHandler.downloadToCache("https://example.com/doc.pdf")).thenAnswer {
+            kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+        }
+        val webView: WebView = mock()
+
+        testee.requestFileDownload(webView, "https://example.com/doc.pdf", null, "application/pdf", true, false)
+
+        // Simulate user navigating away before download completes
+        setBrowserShowing(true)
+        testee.navigationStateChanged(buildWebNavigation(currentUrl = "https://other.com"))
+
+        advanceUntilIdle()
+
+        assertCommandNotIssued<Command.ShowPdfInTab>()
+    }
+
+    // endregion
 }

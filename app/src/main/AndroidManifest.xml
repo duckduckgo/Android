@@ -24,6 +24,12 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
+    <!--
+    androidx.pdf library is defining a min version to 31, but our app supports 21 and above.
+    This allows us to use the library while still supporting older versions of Android
+    -->
+    <uses-sdk tools:overrideLibrary="androidx.pdf,androidx.pdf.document.service,androidx.pdf.viewer.fragment" />
+
     <queries>
         <intent>
             <action android:name="android.speech.RecognitionService" />
@@ -593,6 +599,14 @@
             </intent-filter>
         </receiver>
 
+        <!-- Override the AndroidX PDF service to disable isolatedProcess.
+             The isolated process triggers DuckDuckGoApplication init which calls
+             bindService (forbidden in isolated processes). Disabling it is safe
+             because we already render the same URLs in WebView with full app permissions. -->
+        <service
+            android:name="androidx.pdf.service.PdfDocumentServiceImpl"
+            android:isolatedProcess="false"
+            tools:replace="android:isolatedProcess" />
     </application>
 
 </manifest>

@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowFireproofWebSiteConfirmat
 import com.duckduckgo.app.browser.commands.Command.ShowFullScreen
 import com.duckduckgo.app.browser.commands.Command.ShowImageCamera
 import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
+import com.duckduckgo.app.browser.commands.Command.ShowPdfInTab
 import com.duckduckgo.app.browser.commands.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.app.browser.commands.Command.ShowSSLError
 import com.duckduckgo.app.browser.commands.Command.ShowSavedSiteAddedConfirmation
@@ -202,6 +203,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -522,6 +524,7 @@ class BrowserTabViewModel @Inject constructor(
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
     private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
     private val ntpAfterIdleManager: NtpAfterIdleManager,
+    private val inlinePdfHandler: InlinePdfHandler,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -607,6 +610,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var autoCompleteJob = ConflatedJob()
     private var serpLogoJob = ConflatedJob()
+    private var pdfDownloadJob = ConflatedJob()
 
     private var site: Site? = null
         set(value) {
@@ -1709,6 +1713,7 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab && hasSourceTab && !isCustomTab && site?.url.isNullOrEmpty()
 
     private fun navigateHome() {
+        pdfDownloadJob.cancel()
         site = null
         onSiteChanged()
         webNavigationState = null
@@ -1755,6 +1760,7 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
         val stateChange = newWebNavigationState.compare(webNavigationState)
+        pdfDownloadJob.cancel()
 
         viewModelScope.launch {
             showOnAppLaunchOptionHandler.handleResolvedUrlStorage(
@@ -3655,8 +3661,28 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 command.value = ConvertBlobToDataUri(url, mimeType)
             }
+        } else if (inlinePdfHandler.shouldRenderPdfInline(url, contentDisposition, mimeType)) {
+            handlePdfUrl(url, contentDisposition, mimeType, requestUserConfirmation)
         } else {
             sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
+    }
+
+    private fun handlePdfUrl(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        command.value = Command.ExpandOmnibar
+        loadingViewState.value = currentLoadingViewState().copy(isLoading = true, progress = FIXED_PROGRESS)
+        pdfDownloadJob += viewModelScope.launch(dispatchers.io()) {
+            val cachedUri = inlinePdfHandler.downloadToCache(url)
+            withContext(dispatchers.main()) {
+                loadingViewState.value = currentLoadingViewState().copy(isLoading = false, progress = 100)
+                if (cachedUri != null) {
+                    val pdfTitle = inlinePdfHandler.extractFileName(url)
+                    buildSiteFactory(url, title = pdfTitle)
+                    command.value = ShowPdfInTab(url, cachedUri)
+                } else {
+                    sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+                }
+            }
         }
     }
 

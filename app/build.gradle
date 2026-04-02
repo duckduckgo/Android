@@ -602,6 +602,9 @@ dependencies {
     // Browser
     implementation "androidx.browser:browser:_"
 
+    // PDF Viewer
+    implementation "androidx.pdf:pdf-viewer-fragment:_"
+
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
@@ -610,6 +613,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
+    testImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
     androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit

@@ -157,6 +157,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.*
 import com.duckduckgo.app.browser.omnibar.OmnibarType
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.pdf.DdgPdfViewerFragment
+import com.duckduckgo.app.browser.pdf.PdfPreviewGenerator
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -442,6 +444,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewGenerator: WebViewPreviewGenerator
+
+    @Inject
+    lateinit var pdfPreviewGenerator: PdfPreviewGenerator
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
@@ -2041,6 +2046,7 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        hidePdf()
         contextualSheetLayoutChangeListener?.let { binding.rootView.removeOnLayoutChangeListener(it) }
         contextualSheetLayoutChangeListener = null
         contextualSheetBottomSheetCallback?.let {
@@ -2249,8 +2255,46 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         maliciousWarningView.gone()
+        hidePdf()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun showPdf(url: String, cachedFileUri: Uri) {
+        newBrowserTab.newTabLayout.gone()
+        newBrowserTab.newTabRootLayout.gone()
+        binding.browserLayout.show()
+        webViewContainer.gone()
+        webView?.onPause()
+        webView?.hide()
+        errorView.errorLayout.gone()
+        sslErrorView.gone()
+        maliciousWarningView.gone()
+
+        binding.pdfViewerContainer.show()
+        val pdfFragment = DdgPdfViewerFragment()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.pdfViewerContainer, pdfFragment, PDF_VIEWER_FRAGMENT_TAG)
+            .commitNowAllowingStateLoss()
+        pdfFragment.documentUri(cachedFileUri)
+
+        binding.swipeRefreshContainer.isEnabled = false
+        omnibar.setViewMode(ViewMode.Pdf(url))
+        browserNavigationBarIntegration.configureBrowserViewMode()
+    }
+
+    private fun hidePdf() {
+        childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG)?.let {
+            childFragmentManager.beginTransaction()
+                .remove(it)
+                .commitAllowingStateLoss()
+        }
+        binding.pdfViewerContainer.gone()
+        binding.swipeRefreshContainer.isEnabled = true
+    }
+
+    private fun isPdfVisible(): Boolean {
+        return childFragmentManager.findFragmentByTag(PDF_VIEWER_FRAGMENT_TAG) != null
     }
 
     private fun showError(
@@ -2599,6 +2643,7 @@ class BrowserTabFragment :
 
             is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
+                if (isPdfVisible()) showBrowser()
                 navigate(it.url, it.headers)
             }
 
@@ -2906,6 +2951,14 @@ class BrowserTabFragment :
             is Command.PageContextReceived -> {
                 sharedContextualViewModel.onPageContextReceived(it.tabId, it.pageContext, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
+
+            is Command.ShowPdfInTab -> {
+                showPdf(it.url, it.cachedFileUri)
+            }
+
+            is Command.ExpandOmnibar -> {
+                omnibar.setExpanded(true)
+            }
         }
     }
 
@@ -3182,21 +3235,30 @@ class BrowserTabFragment :
     }
 
     private fun generateWebViewPreviewImage() {
-        webView?.let { webView ->
+        val viewToCapture: android.view.View? = if (isPdfVisible()) {
+            binding.pdfViewerContainer
+        } else {
+            webView
+        }
 
+        viewToCapture?.let { view ->
             // if there's an existing job for generating a preview, cancel that in favor of the new request
             bitmapGeneratorJob?.cancel()
 
             bitmapGeneratorJob =
                 launch {
-                    logcat { "Generating WebView preview" }
+                    logcat { "Generating preview (pdf=${isPdfVisible()})" }
                     try {
-                        val preview = previewGenerator.generatePreview(webView)
+                        val preview = if (view is android.webkit.WebView) {
+                            previewGenerator.generatePreview(view)
+                        } else {
+                            pdfPreviewGenerator.generatePreview(view)
+                        }
                         val fileName = previewPersister.save(preview, tabId)
                         viewModel.updateTabPreview(tabId, fileName)
                         logcat { "Saved and updated tab preview" }
                     } catch (e: Exception) {
-                        logcat { "Failed to generate WebView preview: ${e.asLog()}" }
+                        logcat { "Failed to generate preview: ${e.asLog()}" }
                     }
                 }
         }
@@ -4706,6 +4768,17 @@ class BrowserTabFragment :
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
         if (nativeInputManager.hideNativeInput()) return true
+        if (isPdfVisible()) {
+            hidePdf()
+            val currentUrl = webView?.url
+            // WebView lost its content after process death
+            if (currentUrl.isNullOrBlank() || currentUrl == "about:blank") {
+                viewModel.onUserPressedBack(isCustomTab)
+            } else {
+                showBrowser()
+            }
+            return true
+        }
         return viewModel.onUserPressedBack(isCustomTab)
     }
 
@@ -4999,6 +5072,7 @@ class BrowserTabFragment :
         private const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
+        private const val PDF_VIEWER_FRAGMENT_TAG = "PDF_VIEWER"
         const val KEYBOARD_DELAY = 200L
         private const val NAVIGATION_DELAY = 100L
         private const val POPUP_MENU_DELAY = 200L

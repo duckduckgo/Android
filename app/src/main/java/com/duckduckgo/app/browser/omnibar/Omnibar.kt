@@ -153,6 +153,8 @@ class Omnibar(
         ) : ViewMode()
 
         data object DuckAI : ViewMode()
+
+        data class Pdf(val url: String?) : ViewMode()
     }
 
     val omnibarView: OmnibarView by lazy {
