@@ -101,6 +101,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var skipOnboardingFadeInAnimatorSet: AnimatorSet? = null
     private var arrowSlideAnimator: android.animation.ValueAnimator? = null
     private var backgroundAnimator: OnboardingBackgroundAnimator? = null
+    private var changeBoundsTransition: androidx.transition.Transition? = null
+    private var changeBoundsTransitionListener: TransitionListenerAdapter? = null
     private var textIntroScale = 1f
     private var isAnimating = false
 
@@ -410,6 +412,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         skipOnboardingFadeInAnimatorSet = null
         arrowSlideAnimator?.cancel()
         arrowSlideAnimator = null
+        changeBoundsTransitionListener?.let { listener ->
+            changeBoundsTransition?.removeListener(listener)
+        }
+        changeBoundsTransitionListener = null
+        changeBoundsTransition = null
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
         backgroundAnimator?.cancel()
         backgroundAnimator = null
@@ -563,8 +570,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     val transition = androidx.transition.ChangeBounds().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
-                    transition.addListener(object : TransitionListenerAdapter() {
+                    changeBoundsTransition = transition
+                    val listener = object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
+                            if (!isAdded) return
                             binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.startOnboardingTypingAnimation(
                                 getString(R.string.preOnboardingDaxDialog2Title),
                             ) {
@@ -588,7 +597,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 }
                             }
                         }
-                    })
+                    }
+                    changeBoundsTransitionListener = listener
+                    transition.addListener(listener)
                     binding.daxDialogCta.stepIndicator.setSteps(viewModel.getMaxPageCount(), 1)
                     binding.daxDialogCta.stepIndicator.isVisible = true
                     binding.daxDialogCta.stepIndicator.alpha = 0f
