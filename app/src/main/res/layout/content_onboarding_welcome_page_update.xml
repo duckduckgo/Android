@@ -164,8 +164,24 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:lottie_rawRes="@raw/onboarding_address_bar_bobbing_dax"
         app:lottie_loop="true"
+        app:lottie_rawRes="@raw/onboarding_address_bar_bobbing_dax"
+        tools:alpha="1"
+        tools:lottie_progress="0.5"
+        tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/leftWingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="196dp"
+        android:layout_marginBottom="52dp"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:lottie_rawRes="@raw/onboarding_wing_left"
         tools:alpha="1"
         tools:lottie_progress="0.5"
         tools:visibility="visible" />
