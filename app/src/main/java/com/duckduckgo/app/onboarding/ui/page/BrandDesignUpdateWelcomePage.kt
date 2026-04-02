@@ -105,6 +105,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
     private var bottomWingDelayedRunnable: Runnable? = null
+    private var leftWingDelayedRunnable: Runnable? = null
     private var welcomeFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
@@ -492,6 +493,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxDelayedRunnable = null
         bottomWingDelayedRunnable?.let { binding.bottomWingAnimation.removeCallbacks(it) }
         bottomWingDelayedRunnable = null
+        leftWingDelayedRunnable?.let { binding.leftWingAnimation?.removeCallbacks(it) }
+        leftWingDelayedRunnable = null
         welcomeFadeInAnimatorSet?.cancel()
         welcomeFadeInAnimatorSet = null
         comparisonChartFadeInAnimatorSet?.cancel()
@@ -534,6 +537,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding.backgroundPrimary.cancelAnimation()
         binding.welcomeScreenWalkingDax.cancelAnimation()
         binding.bottomWingAnimation.cancelAnimation()
+        binding.leftWingAnimation?.cancelAnimation()
     }
 
     override fun onActivityResult(
