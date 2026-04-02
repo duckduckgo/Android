@@ -18,6 +18,8 @@ package com.duckduckgo.networkprotection.impl.pixels
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_EXCELLENT_LATENCY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_GOOD_LATENCY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REPORT_MODERATE_LATENCY
@@ -47,7 +49,11 @@ class VpnLatencyPixelInterceptorTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = VpnLatencyPixelInterceptor(netPGeoswitchingRepository, appBuildConfig)
+        testee = VpnLatencyPixelInterceptor(
+            netPGeoswitchingRepository,
+            appBuildConfig,
+            FakeFeatureToggleFactory.create(OkHttpInterceptorRefactorFeature::class.java),
+        )
     }
 
     @Test

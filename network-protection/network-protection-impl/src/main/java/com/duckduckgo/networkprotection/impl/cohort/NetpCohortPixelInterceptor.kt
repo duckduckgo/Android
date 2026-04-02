@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.common.utils.featureflags.OkHttpInterceptorRefactorFeature
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
@@ -34,8 +35,26 @@ import javax.inject.Inject
 )
 class NetpCohortPixelInterceptor @Inject constructor(
     private val cohortStore: NetpCohortStore,
+    private val okHttpInterceptorRefactorFeature: OkHttpInterceptorRefactorFeature,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
+        if (!okHttpInterceptorRefactorFeature.self().isEnabled()) {
+            return interceptLegacy(chain)
+        }
+        val originalRequest = chain.request()
+        val pixel = originalRequest.url.pathSegments.last()
+
+        if (pixel.startsWith(PIXEL_PREFIX) && !EXCEPTIONS.any { exception -> pixel.startsWith(exception) }) {
+            // IF there is no cohort for NetP we just drop the pixel request
+            if (cohortStore.cohortLocalDate == null) {
+                return dummyResponse(chain)
+            }
+        }
+
+        return chain.proceed(originalRequest)
+    }
+
+    private fun interceptLegacy(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
 

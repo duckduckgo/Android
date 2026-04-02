@@ -23,6 +23,10 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+anvil {
+    generateDaggerFactories = true // default is false
+}
+
 android {
     lintOptions {
         baseline file("lint-baseline.xml")
