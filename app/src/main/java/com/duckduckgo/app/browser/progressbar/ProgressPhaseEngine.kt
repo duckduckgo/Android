@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser.progressbar
 
-import kotlin.math.abs
-
 enum class Phase {
     IDLE, FAST_START, TRACKING, COMPLETING, DONE
 }
@@ -45,6 +43,7 @@ class ProgressPhaseEngine(
     private var realProgress: Float = 0f
     private var velocity: Float = 0f
     private var phaseStartTime: Long = 0L
+    private var creepProgress: Float = 0f
 
     private var completionFrom: Float = 0f
 
@@ -60,6 +59,7 @@ class ProgressPhaseEngine(
         displayProgress = 0f
         realProgress = 0f
         velocity = 0f
+        creepProgress = 0f
 
         phaseStartTime = timeProvider.elapsedRealtime()
     }
@@ -83,6 +83,7 @@ class ProgressPhaseEngine(
         displayProgress = 0f
         realProgress = 0f
         velocity = 0f
+        creepProgress = 0f
     }
 
     fun tick(dtSeconds: Float): FrameState {
@@ -109,13 +110,20 @@ class ProgressPhaseEngine(
             displayProgress = config.fastStartTarget
             phase = Phase.TRACKING
             velocity = 0f
+            creepProgress = config.fastStartTarget
         }
     }
 
     private fun tickTracking(dt: Float) {
         val floor = config.fastStartTarget
+
+        // Perpetual creep accumulates independently
+        if (config.creepVelocity > 0f) {
+            creepProgress = (creepProgress + config.creepVelocity * dt * 100f).coerceAtMost(95f)
+        }
+
         val target = realProgress.coerceAtMost(95f)
-        val effectiveTarget = maxOf(target, floor)
+        val effectiveTarget = maxOf(target, floor, creepProgress)
 
         // Spring dynamics (semi-implicit Euler)
         val displacement = effectiveTarget - displayProgress
@@ -127,11 +135,6 @@ class ProgressPhaseEngine(
         if (displayProgress > effectiveTarget) {
             displayProgress = effectiveTarget
             velocity = 0f
-        }
-
-        // Perpetual creep
-        if (displayProgress < 95f && abs(velocity) < 0.5f && config.creepVelocity > 0f) {
-            displayProgress += config.creepVelocity * dt * 100f
         }
 
         displayProgress = displayProgress.coerceIn(floor, 95f)
