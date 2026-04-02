@@ -1,0 +1,38 @@
+{
+    "m_pdf_viewer_opened": {
+        "description": "Fired when a PDF is successfully rendered inline in a browser tab",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_pdf_render_failure": {
+        "description": "Fired when a PDF fails to render inline (malformed file, unsupported format, or other error)",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "error_type",
+                "type": "string",
+                "description": "The category of error that caused the render failure",
+                "enum": ["io_error", "security_error", "unknown"]
+            }
+        ]
+    },
+    "m_nav_pdf_download_menu_item_pressed": {
+        "description": "Fired when the user taps the Download PDF item in the browser menu",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_pdf_fallback": {
+        "description": "Fired when inline PDF rendering is not available (unsupported device, API < 31) and the standard download flow is used instead",
+        "owners": ["GerardPaligot"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}
