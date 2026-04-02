@@ -33,5 +33,5 @@ interface ProductSurfaceTelemetryFeature {
 
     @DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
-    fun feature(): Toggle
+    fun enableTelemetry(): Toggle
 }

@@ -39,7 +39,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelMatchesThenPixelIsDropped() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -57,7 +57,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelMatchesThenPixelProceeds() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -73,7 +73,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelDoesNotMatchThenPixelProceeds() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -89,7 +89,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelDoesNotMatchThenPixelProceeds() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -105,7 +105,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenNoPluginsRegisteredThenPixelAlwaysProceeds() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = false))
 
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
@@ -115,7 +115,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenPixelStartsWithRegisteredNameThenItMatches() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -132,7 +132,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenPixelNameIsExactMatchThenItMatches() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_dau",
@@ -147,7 +147,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelHasQueryParamsThenPixelIsDropped() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -163,7 +163,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelHasQueryParamsThenPixelProceeds() {
-        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.enableTelemetry().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_website",
