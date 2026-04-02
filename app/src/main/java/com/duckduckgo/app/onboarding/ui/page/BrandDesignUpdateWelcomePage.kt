@@ -480,6 +480,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         changeBoundsTransitionListener = null
         changeBoundsTransition = null
         binding.daxDialogCta.comparisonChartContent.comparisonChartTitle.cancelAnimation()
+        binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
         addressBarFadeInAnimatorSet?.cancel()
         addressBarFadeInAnimatorSet = null
         bobbingDaxAnimator?.cancel()
@@ -807,19 +808,27 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     transition.addListener(object : TransitionListenerAdapter() {
                         override fun onTransitionEnd(transition: androidx.transition.Transition) {
-                            addressBarFadeInAnimatorSet = AnimatorSet().apply {
-                                playTogether(
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.addressBarContent.root, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                    ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
-                                        .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
-                                )
-                                addListener(object : AnimatorListenerAdapter() {
-                                    override fun onAnimationEnd(animation: Animator) {
-                                        isAnimating = false
-                                    }
-                                })
-                                start()
+                            if (!isAdded) return
+                            binding.daxDialogCta.addressBarContent.addressBarTitle.startOnboardingTypingAnimation(
+                                getString(R.string.preOnboardingAddressBarTitle),
+                            ) {
+                                addressBarFadeInAnimatorSet = AnimatorSet().apply {
+                                    playTogether(
+                                        ObjectAnimator.ofFloat(
+                                            binding.daxDialogCta.addressBarContent.addressBarPositionContainer,
+                                            View.ALPHA,
+                                            1f,
+                                        ).setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                        ObjectAnimator.ofFloat(binding.daxDialogCta.primaryCta, View.ALPHA, 1f)
+                                            .setDuration(DIALOG_CONTENT_FADE_IN_DURATION),
+                                    )
+                                    addListener(object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
+                                        }
+                                    })
+                                    start()
+                                }
                             }
                         }
                     })
@@ -829,7 +838,6 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.comparisonChartContent.root.isVisible = false
                     binding.daxDialogCta.addressBarContent.root.isVisible = true
-                    binding.daxDialogCta.addressBarContent.root.alpha = 0f
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
@@ -1033,6 +1041,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                 binding.daxDialogCta.addressBarContent.root.isVisible = true
                 binding.daxDialogCta.addressBarContent.root.alpha = 1f
+                binding.daxDialogCta.addressBarContent.addressBarTitle.cancelAnimation()
+                binding.daxDialogCta.addressBarContent.addressBarTitle.text =
+                    getString(R.string.preOnboardingAddressBarTitle)
+                binding.daxDialogCta.addressBarContent.addressBarPositionContainer.alpha = 1f
 
                 binding.daxDialogCta.stepIndicator.isVisible = true
                 binding.daxDialogCta.stepIndicator.alpha = 1f
