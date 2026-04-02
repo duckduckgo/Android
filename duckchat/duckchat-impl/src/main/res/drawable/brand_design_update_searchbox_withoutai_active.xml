@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="128dp"
+    android:height="72dp"
+    android:viewportWidth="128"
+    android:viewportHeight="72">
+    <path
+        android:fillColor="?attr/onboardingAccentAltGlowSecondary"
+        tools:fillColor="#14A1CFF7"
+        android:pathData="M0 19.64C0 8.79 8.6 0 19.2 0h89.6C119.4 0 128 8.79 128 19.64v32.72C128 63.21 119.4 72 108.8 72H19.2C8.6 72 0 63.21 0 52.36V19.64z" />
+    <path
+        android:pathData="M19.2 0.5h89.6c10.32 0 18.7 8.56 18.7 19.14v32.72c0 10.58-8.38 19.14-18.7 19.14H19.2c-10.32 0-18.7-8.56-18.7-19.14V19.64C0.5 9.06 8.88 0.5 19.2 0.5z"
+        android:strokeWidth="1"
+        android:strokeColor="?attr/onboardingAccentPrimary"
+        tools:strokeColor="#2F95EE" />
+    <path
+        android:fillColor="?attr/onboardingSurfaceTertiary"
+        android:pathData="M94.4 14.73c10.6 0 19.2 8.79 19.2 19.63v37.02c-1.53 0.4-3.14 0.62-4.8 0.62H19.2c-1.66 0-3.27-0.22-4.8-0.62V34.36c0-10.84 8.6-19.63 19.2-19.63h60.8z"
+        tools:fillColor="#ffffff" />
+    <path
+        android:fillColor="?attr/onboardingAccentGlowPrimary"
+        tools:fillColor="#332F95EE"
+        android:pathData="M94.4 13.09c11.49 0 20.8 9.53 20.8 21.27v36.52c-2 0.72-4.16 1.12-6.4 1.12H19.2c-2.24 0-4.4-0.4-6.4-1.12V34.36c0-11.74 9.31-21.27 20.8-21.27h60.8zM25.6 36.82c-3.53 0-6.4 2.93-6.4 6.54v4.91c0 3.62 2.87 6.55 6.4 6.55h76.8c3.53 0 6.4-2.93 6.4-6.55v-4.91c0-3.61-2.87-6.54-6.4-6.54H25.6z" />
+    <path
+        android:fillColor="?attr/onboardingAccentPrimary"
+        tools:fillColor="#2F95EE"
+        android:pathData="M94.4 13.09c11.49 0 20.8 9.53 20.8 21.27v36.52c-1.03 0.37-2.1 0.66-3.2 0.85V34.36c0-9.94-7.88-18-17.6-18H33.6c-9.72 0-17.6 8.06-17.6 18v37.37c-1.1-0.19-2.17-0.48-3.2-0.85V34.36c0-11.74 9.31-21.27 20.8-21.27h60.8z" />
+    <path
+        android:fillColor="?attr/onboardingAccentPrimary"
+        tools:fillColor="#2F95EE"
+        android:pathData="M28.2 40.91c2.32 0 4.2 1.92 4.2 4.29 0 1.04-0.36 2-0.96 2.74l2.04 2.09 0.05 0.06c0.11 0.16 0.09 0.38-0.05 0.52-0.13 0.14-0.35 0.15-0.5 0.05l-0.06-0.05-2.05-2.09c-0.72 0.61-1.65 0.98-2.67 0.98-2.32 0-4.2-1.92-4.2-4.3 0-2.37 1.88-4.29 4.2-4.29zm0 0.82c-1.88 0-3.4 1.55-3.4 3.47 0 1.93 1.52 3.48 3.4 3.48s3.4-1.55 3.4-3.48c0-1.92-1.52-3.47-3.4-3.47z" />
+</vector>

@@ -21,13 +21,18 @@
     <attr name="onboardingSurfaceBackdrop" format="color" />
     <attr name="onboardingSurfaceTertiary" format="color" />
     <attr name="onboardingSurfaceDecorationPrimary" format="color" />
+    <attr name="onboardingSurfaceDecorationTertiary" format="color" />
     <attr name="onboardingAccentAltPrimary" format="color" />
     <attr name="onboardingAccentAltGlowPrimary" format="color" />
+    <attr name="onboardingAccentAltGlowSecondary" format="color" />
     <attr name="onboardingAccentBrand" format="color" />
     <attr name="onboardingAccentContentPrimary" format="color" />
     <attr name="onboardingAccentPrimary" format="color" />
     <attr name="onboardingAccentSecondary" format="color" />
+    <attr name="onboardingAccentGlowPrimary" format="color" />
+    <attr name="onboardingIconsSecondary" format="color" />
     <attr name="onboardingIconsTertiary" format="color" />
+    <attr name="onboardingControlFillTertiary" format="color" />
     <color name="onboardingBubbleShadowColor">#08000000</color>
 
     <style name="Theme.DuckDuckGo.Light.Onboarding" parent="Theme.DuckDuckGo.Light">
@@ -38,12 +43,17 @@
         <item name="onboardingSurfaceBackdrop">@color/white</item>
         <item name="onboardingSurfaceTertiary">@color/white</item>
         <item name="onboardingSurfaceDecorationPrimary">#17242323</item> <!--9% Alpha-->
+        <item name="onboardingSurfaceDecorationTertiary">#3D242323</item> <!--24% Alpha-->
         <item name="onboardingAccentAltPrimary">@color/pondwater20</item>
         <item name="onboardingAccentAltGlowPrimary">#29A1CFF7</item> <!--16% Alpha-->
+        <item name="onboardingAccentAltGlowSecondary">#14A1CFF7</item> <!--8% Alpha-->
         <item name="onboardingAccentBrand">@color/mandarin50</item>
         <item name="onboardingAccentContentPrimary">@color/white</item>
         <item name="onboardingAccentPrimary">@color/pondwater50</item>
         <item name="onboardingAccentSecondary">@color/mandarin60</item>
+        <item name="onboardingAccentGlowPrimary">#332F95EE</item> <!--20% Alpha-->
+        <item name="onboardingControlFillTertiary">@color/black12</item>
+        <item name="onboardingIconsSecondary">#99383838</item> <!--60% Alpha-->
         <item name="onboardingIconsTertiary">#66242323</item> <!--40% Alpha-->
 
         <!--Surface-->
@@ -89,12 +99,17 @@
         <item name="onboardingSurfaceBackdrop">#133E7C</item>
         <item name="onboardingSurfaceTertiary">#011D34</item>
         <item name="onboardingSurfaceDecorationPrimary">#0FFFFFFF</item> <!--6% Alpha-->
+        <item name="onboardingSurfaceDecorationTertiary">@color/white20</item>
         <item name="onboardingAccentAltPrimary">#133E7C</item>
         <item name="onboardingAccentAltGlowPrimary">#1FA1CFF7</item> <!--12% Alpha-->
+        <item name="onboardingAccentAltGlowSecondary">#14A1CFF7</item> <!--8% Alpha-->
         <item name="onboardingAccentBrand">@color/pollen30</item>
         <item name="onboardingAccentContentPrimary">@color/pollen100</item>
         <item name="onboardingAccentPrimary">@color/pondwater40</item>
         <item name="onboardingAccentSecondary">@color/pollen40</item>
+        <item name="onboardingAccentGlowPrimary">#2975B6EB</item> <!--16% Alpha-->
+        <item name="onboardingControlFillTertiary">@color/white24</item>
+        <item name="onboardingIconsSecondary">#7AFBFAF9</item> <!--48% Alpha-->
         <item name="onboardingIconsTertiary">#7AFBFAF9</item> <!--48% Alpha-->
 
         <!--Surface-->
