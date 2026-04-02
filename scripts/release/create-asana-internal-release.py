@@ -98,7 +98,8 @@ def main():
     parser = argparse.ArgumentParser(description='Create an Asana task with links to tasks from git commits')
     parser.add_argument('--tag', required=True, help='Tag to use as end commit') # Example: v0.44.0
     parser.add_argument('--android-repo-path', default='.', help='Path to Android git repository (default: current directory)')
-    parser.add_argument('--trigger-phrase', required=True, help='Prefix for Asana task URLs in commit messages')
+    parser.add_argument('--trigger-phrase', required=True, action='append', dest='trigger_phrases',
+                        help='Prefix for Asana task URLs in commit messages (can be specified multiple times)')
     parser.add_argument('--asana-project-id', required=True, help='Asana project ID')
     parser.add_argument('--asana-section-id', required=True, help='Asana section ID to place the task in')
     parser.add_argument('--asana-workspace-id', required=True, help='Asana workspace ID')
@@ -135,7 +136,7 @@ def main():
         
         log(f"Extracting task links from {len(commits)} commits")
         # Extract Asana task links from commit messages
-        task_links = extract_asana_task_links(commits, args.trigger_phrase)
+        task_links = extract_asana_task_links(commits, args.trigger_phrases)
 
         # Create the Asana task with the tag name
         task_id = create_asana_task(client, args.asana_workspace_id, args.tag, task_links, args.asana_section_id)
