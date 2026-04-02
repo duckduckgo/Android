@@ -945,8 +945,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Prikaži pri pokretanju aplikacije</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Posljednja otvorena kartica</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Nova stranica kartice</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Posljednja korištena kartica</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nova kartica</string>
     <string name="showOnAppLaunchOptionSpecificPage">Specifična stranica</string>
 
     <!-- Privacy Dashboard -->
@@ -1016,4 +1016,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Pretražuj privatno s DuckDuckGo-om ili pitaj Duck.ai. Glasovno pretraživanje i Duck.ai dostupni su ako su omogućeni.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Pretraži ili posjeti svoje omiljene mrežne lokacije privatno jednim dodirom. Glasovno pretraživanje i Duck.ai dostupni su ako su omogućeni.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Nakon neaktivnosti</string>
+    <string name="afterInactivityOptionTitle">Početni zaslon</string>
+    <string name="afterInactivityTimeoutRowTitle">Odaberi mjerač vremena neaktivnosti</string>
+    <string name="afterInactivityScreenSectionHeader">Odaberi što ćeš vidjeti kada se vratiš na DuckDuckGo</string>
+    <string name="afterInactivityTimeoutAlways">Nijedno</string>
+    <string name="afterInactivityTimeout1Minute">1 minutu</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d minuta</string>
+    <string name="afterInactivityTimeout1Hour">1 sat</string>
+    <string name="afterInactivityTimeoutXHours">%1$d sati</string>
+
 </resources>
