@@ -17,7 +17,6 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
-import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -28,6 +27,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.concurrent.TimeUnit
 
 class PaywallMetricsManagerTest {
 

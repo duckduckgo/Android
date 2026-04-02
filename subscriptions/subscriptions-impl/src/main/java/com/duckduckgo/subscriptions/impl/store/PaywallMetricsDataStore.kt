@@ -30,7 +30,7 @@ class PaywallMetricsDataStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
     private val preferences: SharedPreferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = false, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME)
     }
 
     var paywallEverSeen: Boolean

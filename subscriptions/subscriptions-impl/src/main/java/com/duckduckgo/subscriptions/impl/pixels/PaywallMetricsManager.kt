@@ -25,30 +25,30 @@ import javax.inject.Inject
 /**
  * Owns all business logic related to paywall visibility metrics.
  * [com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore] is the dumb storage layer; this class is the single entry
- * point for the ViewModel, the scheduler, and the workers.
+ * point for the PixelSender, the scheduler, and the workers.
  */
 @SingleInstanceIn(AppScope::class)
 class PaywallMetricsManager @Inject constructor(
-    private val store: PaywallMetricsDataStore,
+    private val paywallMetricsStore: PaywallMetricsDataStore,
 ) {
-    val paywallEverSeen: Boolean get() = store.paywallEverSeen
+    val paywallEverSeen: Boolean get() = paywallMetricsStore.paywallEverSeen
 
     fun recordFirstPaywallSeen(): String? {
-        if (store.paywallEverSeen) return null
-        store.paywallEverSeen = true
-        return getDayBucket(store.firstInstallTimestamp)
+        if (paywallMetricsStore.paywallEverSeen) return null
+        paywallMetricsStore.paywallEverSeen = true
+        return getDayBucket(paywallMetricsStore.firstInstallTimestamp)
     }
 
-    fun isNotSeenDayFired(dayBucket: String): Boolean = store.isNotSeenDayFired(dayBucket)
+    fun isNotSeenDayFired(dayBucket: String): Boolean = paywallMetricsStore.isNotSeenDayFired(dayBucket)
 
-    fun markNotSeenDayFired(dayBucket: String) = store.markNotSeenDayFired(dayBucket)
+    fun markNotSeenDayFired(dayBucket: String) = paywallMetricsStore.markNotSeenDayFired(dayBucket)
 
     /**
      * Returns the delay in milliseconds until [checkAfterDays] have elapsed since install.
      * Returns 0 if that point is already in the past.
      */
     fun delayUntilMilestone(checkAfterDays: Long): Long {
-        val checkAtMillis = store.firstInstallTimestamp + TimeUnit.DAYS.toMillis(checkAfterDays)
+        val checkAtMillis = paywallMetricsStore.firstInstallTimestamp + TimeUnit.DAYS.toMillis(checkAfterDays)
         return maxOf(0L, checkAtMillis - System.currentTimeMillis())
     }
 
