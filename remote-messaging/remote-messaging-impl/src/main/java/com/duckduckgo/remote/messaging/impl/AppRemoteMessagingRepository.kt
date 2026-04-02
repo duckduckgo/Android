@@ -16,9 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.api.Surface
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.impl.store.RemoteMessageImageStore
@@ -30,12 +28,27 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
+
+interface RemoteMessagingRepository {
+    fun getMessageById(id: String): RemoteMessage?
+    fun activeMessage(message: RemoteMessage?)
+    fun message(): RemoteMessage?
+    fun messageFlow(): Flow<RemoteMessage?>
+    suspend fun dismissMessage(id: String)
+    fun dismissedMessages(): List<String>
+    fun didShow(id: String): Boolean
+    fun markAsShown(remoteMessage: RemoteMessage)
+
+    suspend fun getRemoteMessageImageFile(surface: Surface): String?
+
+    suspend fun clearMessageImage(surface: Surface)
+
+    suspend fun getCardItemImageFilePath(itemId: String): String?
+}
 
 class AppRemoteMessagingRepository(
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagesDao: RemoteMessagesDao,
-    private val dispatchers: DispatcherProvider,
     private val messageMapper: MessageMapper,
     private val remoteMessageImageStore: RemoteMessageImageStore,
 ) : RemoteMessagingRepository {
@@ -93,10 +106,8 @@ class AppRemoteMessagingRepository(
     }
 
     override suspend fun dismissMessage(id: String) {
-        withContext(dispatchers.io()) {
-            remoteMessagesDao.updateState(id, Status.DISMISSED)
-            remoteMessagingConfigRepository.invalidate()
-        }
+        remoteMessagesDao.updateState(id, Status.DISMISSED)
+        remoteMessagingConfigRepository.invalidate()
     }
 
     override fun dismissedMessages(): List<String> {

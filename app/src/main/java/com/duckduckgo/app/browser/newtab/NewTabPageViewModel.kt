@@ -133,7 +133,7 @@ class NewTabPageViewModel @AssistedInject constructor(
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
                 .combine(
-                    remoteMessagingModel.getActiveMessages()
+                    remoteMessagingModel.observeActiveMessages()
                         .map { message ->
                             if (message?.surfaces?.contains(Surface.NEW_TAB_PAGE) == true) message else null
                         },

@@ -70,7 +70,6 @@ class AppRemoteMessagingRepositoryTest {
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
-        coroutineRule.testDispatcherProvider,
         getMessageMapper(),
         remoteMessageImageStore,
     )

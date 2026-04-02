@@ -71,7 +71,7 @@ class RemoteMessageViewModelTest {
 
     @Test
     fun whenViewModelInitialisedWithoutMessageThenViewStateEmitInitState() = runTest {
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(null))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(null))
         testee.onStart(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -83,7 +83,7 @@ class RemoteMessageViewModelTest {
     @Test
     fun whenViewModelInitialisedWithMessageAndModalSurfaceThenViewStateEmitInitStateWithNoMessageToShow() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.MODAL))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         testee.onStart(mockLifecycleOwner)
         testee.viewState.test {
             expectMostRecentItem().also {
@@ -123,7 +123,7 @@ class RemoteMessageViewModelTest {
     @Test
     fun whenMessageShownThenRemoteMessagingModelUpdated() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         testee.onStart(mockLifecycleOwner)
 
         testee.onMessageShown()
@@ -142,7 +142,7 @@ class RemoteMessageViewModelTest {
     @Test
     fun whenMessagePrimaryButtonCLickedThenRemoteMessagingModelDismissed() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
 
@@ -158,7 +158,7 @@ class RemoteMessageViewModelTest {
     @Test
     fun whenMessageSecondaryButtonCLickedThenRemoteMessagingModelDismissed() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onSecondaryActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
 
@@ -174,7 +174,7 @@ class RemoteMessageViewModelTest {
     @Test
     fun whenMessageActionCLickedThenRemoteMessagingModelDismissed() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onActionClicked(remoteMessage)).thenReturn(DefaultBrowser)
         testee.onStart(mockLifecycleOwner)
 
@@ -191,7 +191,7 @@ class RemoteMessageViewModelTest {
     fun whenMessageActionClickedIsShareThenImageNotCleared() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         val shareAction = Action.Share("https://example.com", mapOf("title" to "Share Title"))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onActionClicked(remoteMessage)).thenReturn(shareAction)
         testee.onStart(mockLifecycleOwner)
 
@@ -208,7 +208,7 @@ class RemoteMessageViewModelTest {
     fun whenMessageActionClickedIsSurveyThenSubmitUrlCommandSent() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         whenever(surveyParameterManager.buildSurveyUrl("https://example.com", listOf("atb"))).thenReturn("https://example.com?atb")
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.onPrimaryActionClicked(remoteMessage)).thenReturn(
             Survey("https://example.com", mapOf("queryParams" to "atb")),
         )
@@ -257,7 +257,7 @@ class RemoteMessageViewModelTest {
 
     private suspend fun whenRemoteMessageAvailable(imageFilePath: String? = null): RemoteMessage {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
-        whenever(remoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
+        whenever(remoteMessageModel.observeActiveMessages()).thenReturn(flowOf(remoteMessage))
         whenever(remoteMessageModel.getRemoteMessageImageFile(Surface.NEW_TAB_PAGE)).thenReturn(imageFilePath)
         testee.onStart(mockLifecycleOwner)
         return remoteMessage

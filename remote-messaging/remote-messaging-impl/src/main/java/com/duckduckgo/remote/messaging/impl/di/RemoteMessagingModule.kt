@@ -27,8 +27,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
@@ -100,14 +100,12 @@ object DataSourceModule {
     fun providesRemoteMessagingRepository(
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
-        dispatchers: DispatcherProvider,
         messageMapper: MessageMapper,
         remoteMessageImageStore: RemoteMessageImageStore,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
             remoteMessagesDao,
-            dispatchers,
             messageMapper,
             remoteMessageImageStore,
         )
