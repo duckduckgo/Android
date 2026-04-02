@@ -133,17 +133,6 @@ interface SubscriptionPixelSender {
     fun reportFreeTrialStart()
     fun reportFreeTrialVpnActivation(activationDay: String, platform: String)
     fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String)
-
-    /**
-     * Fired once (Unique) the first time the user opens the paywall, tagged with the install-day cohort.
-     * @param daysSinceInstall one of: "d0", "d1_to_d3", "d4_to_d7", "d8_to_d14", "d15_to_d30", "d30_plus"
-     */
-    fun reportOfferScreenShownFirstTime(daysSinceInstall: String)
-
-    /**
-     * Fired at each day milestone if the user has not yet opened the paywall.
-     * @param dayBucket one of: "d0", "d3", "d7", "d14", "d30"
-     */
     fun reportPaywallNotSeen(dayBucket: String)
 }
 
@@ -151,6 +140,7 @@ interface SubscriptionPixelSender {
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
+    private val paywallMetricsManager: PaywallMetricsManager,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -162,8 +152,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
             ),
         )
 
-    override fun reportOfferScreenShown() =
+    override fun reportOfferScreenShown() {
+        paywallMetricsManager.recordFirstPaywallSeen()?.let { dayBucket ->
+            fire(OFFER_SCREEN_SHOWN_FIRST_TIME, mapOf(DAYS_SINCE_INSTALL to dayBucket))
+        }
         fire(OFFER_SCREEN_SHOWN)
+    }
 
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
@@ -330,10 +324,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportFreeTrialDuckAiPaidUsed(activationDay: String, platform: String) {
         fire(FREE_TRIAL_DUCK_AI_PAID_USED, mapOf(ACTIVATION_DAY to activationDay, ACTIVATION_PLATFORM to platform))
-    }
-
-    override fun reportOfferScreenShownFirstTime(daysSinceInstall: String) {
-        fire(OFFER_SCREEN_SHOWN_FIRST_TIME, mapOf(DAYS_SINCE_INSTALL to daysSinceInstall))
     }
 
     override fun reportPaywallNotSeen(dayBucket: String) {

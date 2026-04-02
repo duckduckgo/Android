@@ -17,17 +17,30 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import logcat.logcat
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesWorker(AppScope::class)
 class PaywallNotSeenWorker(
     context: Context,
-    params: WorkerParameters,
-) : CoroutineWorker(context, params) {
+    workerParameters: WorkerParameters,
+) : CoroutineWorker(context, workerParameters) {
 
     @Inject
     lateinit var pixelSender: SubscriptionPixelSender
@@ -49,5 +62,73 @@ class PaywallNotSeenWorker(
 
     companion object {
         const val KEY_DAY_BUCKET = "KEY_DAY_BUCKET"
+    }
+}
+
+/**
+ * Schedules one-shot WorkManager jobs at each milestone to fire a "paywall not seen" pixel
+ * if the user has not yet visited the paywall by that day.
+ *
+ * Milestones (check fires at day+1 relative to the milestone):
+ *   d0  → fires after day 1
+ *   d3  → fires after day 4
+ *   d7  → fires after day 8
+ *   d14 → fires after day 15
+ *   d30 → fires after day 31
+ *
+ * Uses [ExistingWorkPolicy.KEEP] so re-scheduling on subsequent app starts is a no-op while
+ * the work is still pending. The worker itself guards against double-firing via [PaywallMetricsDataStore].
+ */
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
+class PaywallNotSeenScheduler @Inject constructor(
+    private val workManager: WorkManager,
+    private val paywallMetricsManager: PaywallMetricsManager,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : MainProcessLifecycleObserver {
+
+    override fun onStart(owner: LifecycleOwner) {
+        if (paywallMetricsManager.paywallEverSeen) return
+
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            scheduleMilestones()
+        }
+    }
+
+    private fun scheduleMilestones() {
+        MILESTONES.forEach { (dayBucket, checkAfterDays) ->
+            if (paywallMetricsManager.isNotSeenDayFired(dayBucket)) return@forEach
+
+            val request = OneTimeWorkRequestBuilder<PaywallNotSeenWorker>()
+                .setInputData(workDataOf(PaywallNotSeenWorker.KEY_DAY_BUCKET to dayBucket))
+                .setInitialDelay(paywallMetricsManager.delayUntilMilestone(checkAfterDays), TimeUnit.MILLISECONDS)
+                .addTag(workTag(dayBucket))
+                .build()
+
+            workManager.enqueueUniqueWork(workName(dayBucket), ExistingWorkPolicy.KEEP, request)
+
+            logcat {
+                "NOELIA scheduling pixel paywall not seen for $dayBucket - delayMilis: ${paywallMetricsManager.delayUntilMilestone(
+                    checkAfterDays,
+                )}"
+            }
+        }
+    }
+
+    companion object {
+        /** Maps day-bucket label to the number of days after install at which the check runs. */
+        val MILESTONES = linkedMapOf(
+            "d0" to 1L,
+            "d3" to 4L,
+            "d7" to 8L,
+            "d14" to 15L,
+            "d30" to 31L,
+        )
+
+        fun workName(dayBucket: String) = "paywall_not_seen_$dayBucket"
+        fun workTag(dayBucket: String) = "paywall_not_seen_tag_$dayBucket"
     }
 }

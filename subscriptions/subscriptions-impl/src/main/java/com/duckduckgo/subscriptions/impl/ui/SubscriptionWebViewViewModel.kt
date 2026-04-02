@@ -66,7 +66,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PRO_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.SubscriptionReplacementMode
-import com.duckduckgo.subscriptions.impl.pixels.PaywallMetricsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
@@ -103,7 +102,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
     private val pirFeature: PirFeature,
-    private val paywallMetricsManager: PaywallMetricsManager,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -654,9 +652,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     fun paywallShown() {
         pixelSender.reportOfferScreenShown()
-        paywallMetricsManager.recordFirstPaywallSeen()?.let { dayBucket ->
-            pixelSender.reportOfferScreenShownFirstTime(dayBucket)
-        }
     }
 
     data class SubscriptionOptionsJson(
