@@ -21,7 +21,7 @@ data class ProgressBarConfig(
     val fastStartDuration: Long = 600L,
     val springStiffness: Float = 2.0f,
     val dampingRatio: Float = 8.5f,
-    val creepVelocity: Float = 0.004f,
+    val creepVelocity: Float = 0.04f,
     val endDuration: Long = 300L,
     val fadeInDuration: Long = 100L,
     val fadeOutDuration: Long = 100L,

@@ -2163,9 +2163,10 @@ class BrowserTabViewModel @Inject constructor(
             if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
         }
 
-        // Track the first time we escape from fixed progress for Wide Events
+        // Track the first time we escape from max progress threshold for Wide Events
         val currentUrl = webViewNavigationState.currentUrl
-        if (!hasExitedFixedProgress && currentUrl != null && newProgress > FIXED_PROGRESS) {
+        val progressThreshold = if (progressBarUpgradeFeature.self().isEnabled()) UPGRADED_PROGRESS_THRESHOLD else FIXED_PROGRESS
+        if (!hasExitedFixedProgress && currentUrl != null && newProgress > progressThreshold) {
             hasExitedFixedProgress = true
             pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
         }
@@ -4955,6 +4956,7 @@ class BrowserTabViewModel @Inject constructor(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        private const val UPGRADED_PROGRESS_THRESHOLD = 95
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

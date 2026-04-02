@@ -46,7 +46,7 @@ import kotlin.time.toJavaDuration
 
 /**
  * Tracks page load events as Wide Event flows with multi-phase tracking.
- * Manages flow lifecycle: page_start → page_visible → page_escaped_fixed_progress → page_finish
+ * Manages flow lifecycle: page_start → page_visible → page_escaped_max_progress → page_finish
  */
 interface PageLoadWideEvent {
     /**
@@ -65,7 +65,7 @@ interface PageLoadWideEvent {
     fun onPageVisible(tabId: String, url: String, progress: Int)
 
     /**
-     * Called when page progress changes and escapes the fixed progress state.
+     * Called when page progress changes and escapes the max progress threshold state.
      * @param tabId The unique identifier for the tab
      * @param url The URL of the page being loaded
      */
@@ -191,7 +191,7 @@ class RealPageLoadWideEvent @Inject constructor(
                 wideEventId = flowId,
                 stepName = STEP_PAGE_ESCAPED_FIXED_PROGRESS,
             )
-            logcat { "Exited fixed progress: flowId=$flowId" }
+            logcat { "Exited max progress threshold: flowId=$flowId" }
         }
     }
 
