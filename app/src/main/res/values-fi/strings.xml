@@ -905,8 +905,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Näytä sovelluksen käynnistyksen yhteydessä</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Viimeksi avattu -välilehti</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti -sivu</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Viimeksi käytetty välilehti</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Uusi välilehti</string>
     <string name="showOnAppLaunchOptionSpecificPage">Tietty sivu</string>
 
     <!-- Privacy Dashboard -->
@@ -976,4 +976,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Tee yksityisiä hakuja DuckDuckGo:n avulla tai kysy Duck.ai:lta. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Tee hakuja ja käy lempisivustoillasi yhdellä napautuksella. Äänihaku ja Duck.ai ovat käytettävissä, jos ne on aktivoitu.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Toimettomuuden jälkeen</string>
+    <string name="afterInactivityOptionTitle">Aloitusnäyttö</string>
+    <string name="afterInactivityTimeoutRowTitle">Valitse passiivisuusajastin</string>
+    <string name="afterInactivityScreenSectionHeader">Valitse, mitä näet palatessasi DuckDuckGo-palveluun</string>
+    <string name="afterInactivityTimeoutAlways">Ei mitään</string>
+    <string name="afterInactivityTimeout1Minute">1 minuutti</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d minuuttia</string>
+    <string name="afterInactivityTimeout1Hour">1 tunti</string>
+    <string name="afterInactivityTimeoutXHours">%1$d tuntia</string>
+
 </resources>
