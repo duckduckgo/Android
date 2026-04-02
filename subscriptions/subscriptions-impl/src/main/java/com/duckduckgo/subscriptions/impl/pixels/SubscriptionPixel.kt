@@ -274,6 +274,40 @@ enum class SubscriptionPixel(
         includedParameters = setOf(APP_VERSION),
         enqueue = true,
     ),
+
+    // Fires once (Unique) with the day-cohort bucket when the user first opens the paywall.
+    OFFER_SCREEN_SHOWN_FIRST_TIME(
+        baseName = "m_privacy-pro_offer_screen_impression",
+        type = Unique(),
+        includedParameters = setOf(ATB, APP_VERSION),
+    ),
+
+    // Fired at day+1 for each milestone if the user has not yet visited the paywall.
+    PAYWALL_NOT_SEEN_D0(
+        baseName = "m_privacy-pro_offer_not_seen_d0",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    PAYWALL_NOT_SEEN_D3(
+        baseName = "m_privacy-pro_offer_not_seen_d3",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    PAYWALL_NOT_SEEN_D7(
+        baseName = "m_privacy-pro_offer_not_seen_d7",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    PAYWALL_NOT_SEEN_D14(
+        baseName = "m_privacy-pro_offer_not_seen_d14",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
+    PAYWALL_NOT_SEEN_D30(
+        baseName = "m_privacy-pro_offer_not_seen_d30",
+        type = Count,
+        includedParameters = setOf(APP_VERSION),
+    ),
     ;
 
     constructor(
@@ -295,6 +329,7 @@ object SubscriptionPixelParameter {
     const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
+    const val DAYS_SINCE_INSTALL = "days_since_install"
 }
 
 internal val PixelType.pixelNameSuffix: String

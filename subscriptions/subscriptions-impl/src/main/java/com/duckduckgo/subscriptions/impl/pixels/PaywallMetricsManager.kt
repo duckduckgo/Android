@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.subscriptions.impl.pixels
+
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
+import dagger.SingleInstanceIn
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+
+/**
+ * Owns all business logic related to paywall visibility metrics.
+ * [com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore] is the dumb storage layer; this class is the single entry
+ * point for the ViewModel, the scheduler, and the workers.
+ */
+@SingleInstanceIn(AppScope::class)
+class PaywallMetricsManager @Inject constructor(
+    private val store: PaywallMetricsDataStore,
+) {
+    val paywallEverSeen: Boolean get() = store.paywallEverSeen
+
+    fun recordFirstPaywallSeen(): String? {
+        if (store.paywallEverSeen) return null
+        store.paywallEverSeen = true
+        return getDayBucket(store.firstInstallTimestamp)
+    }
+
+    fun isNotSeenDayFired(dayBucket: String): Boolean = store.isNotSeenDayFired(dayBucket)
+
+    fun markNotSeenDayFired(dayBucket: String) = store.markNotSeenDayFired(dayBucket)
+
+    /**
+     * Returns the delay in milliseconds until [checkAfterDays] have elapsed since install.
+     * Returns 0 if that point is already in the past.
+     */
+    fun delayUntilMilestone(checkAfterDays: Long): Long {
+        val checkAtMillis = store.firstInstallTimestamp + TimeUnit.DAYS.toMillis(checkAfterDays)
+        return maxOf(0L, checkAtMillis - System.currentTimeMillis())
+    }
+
+    private fun getDayBucket(firstInstallTimestamp: Long): String {
+        val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - firstInstallTimestamp)
+        return when {
+            days == 0L -> "d0"
+            days <= 3L -> "d1_to_d3"
+            days <= 7L -> "d4_to_d7"
+            days <= 14L -> "d8_to_d14"
+            days <= 30L -> "d15_to_d30"
+            else -> "d30_plus"
+        }
+    }
+}
