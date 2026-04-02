@@ -576,6 +576,116 @@ class CardsListRemoteMessageViewModelTest {
     }
 
     @Test
+    fun whenInitCalledWithCardItemsWithoutImageUrlThenNoImagePathResolution() = runTest {
+        val messageId = "message-123"
+        val cardItem = CardItem.ListItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Placeholder.CRITICAL_UPDATE,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+        )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+
+        viewModel.viewState.test {
+            assertNull(awaitItem()) // Initial state
+
+            viewModel.init(messageId)
+
+            val viewState = awaitItem()
+            assertNotNull(viewState)
+
+            val cardItems = viewState?.modalListItems?.filterIsInstance<ModalListItem.CardListItem>()
+            assertEquals(1, cardItems?.size)
+            assertNull(cardItems?.get(0)?.imageFilePath)
+
+            // Verify getCardItemImageFilePath was never called since imageUrl is null
+            verify(remoteMessagingRepository, never()).getCardItemImageFilePath(any())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInitCalledWithCardItemImagesThenViewStateIncludesImagePaths() = runTest {
+        val messageId = "message-123"
+        val cardItem1 = CardItem.ListItem(
+            id = "item1",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Placeholder.IMAGE_AI,
+            titleText = "Card 1",
+            descriptionText = "Description 1",
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            imageUrl = "https://example.com/image1.png",
+        )
+        val cardItem2 = CardItem.ListItem(
+            id = "item2",
+            type = CardItemType.TWO_LINE_LIST_ITEM,
+            placeholder = Placeholder.RADAR,
+            titleText = "Card 2",
+            descriptionText = "Description 2",
+            primaryAction = Action.Dismiss,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            imageUrl = "https://example.com/image2.png",
+        )
+        val cardsList = Content.CardsList(
+            titleText = "Test Cards",
+            descriptionText = "Description",
+            placeholder = Placeholder.DDG_ANNOUNCE,
+            listItems = listOf(cardItem1, cardItem2),
+            primaryActionText = "Dismiss",
+            primaryAction = Action.Dismiss,
+        )
+        val message = RemoteMessage(
+            id = messageId,
+            content = cardsList,
+            matchingRules = emptyList(),
+            exclusionRules = emptyList(),
+            surfaces = listOf(Surface.MODAL),
+        )
+        whenever(remoteMessagingRepository.getMessageById(eq(messageId))).thenReturn(message)
+        whenever(remoteMessagingRepository.getCardItemImageFilePath(eq("item1"))).thenReturn("/path/to/item1.png")
+        whenever(remoteMessagingRepository.getCardItemImageFilePath(eq("item2"))).thenReturn(null)
+
+        viewModel.viewState.test {
+            assertNull(awaitItem()) // Initial state
+
+            viewModel.init(messageId)
+
+            val viewState = awaitItem()
+            assertNotNull(viewState)
+
+            val cardItems = viewState?.modalListItems?.filterIsInstance<ModalListItem.CardListItem>()
+            assertEquals(2, cardItems?.size)
+            assertEquals("/path/to/item1.png", cardItems?.get(0)?.imageFilePath)
+            assertNull(cardItems?.get(1)?.imageFilePath)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRemoteImageLoadSuccessThenPixelFired() = runTest {
         val messageId = "message-123"
         val cardsList = Content.CardsList(

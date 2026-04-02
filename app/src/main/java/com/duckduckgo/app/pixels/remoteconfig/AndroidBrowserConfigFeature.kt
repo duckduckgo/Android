@@ -138,6 +138,9 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun atomicFaviconWrites(): Toggle
+
     /**
      * @return `true` when the remote config has the global "checkMaliciousAfterHttpsUpgrade" androidBrowserConfig
      * sub-feature flag enabled

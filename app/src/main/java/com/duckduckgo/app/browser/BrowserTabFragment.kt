@@ -1261,7 +1261,7 @@ class BrowserTabFragment :
                     binding.focusedView.gone()
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query ->
+                onDuckAiChatSubmitted = { query, modelId ->
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
                             featureName = "aiChat",
@@ -1273,6 +1273,10 @@ class BrowserTabFragment :
                                     JSONObject().apply {
                                         put("prompt", query)
                                         put("autoSubmit", true)
+                                        // TODO: This currently causes a new chat to be sent if set
+                                        // if (modelId != null) {
+                                        //     put("modelId", modelId)
+                                        // }
                                     },
                                 )
                             },
@@ -1697,6 +1701,9 @@ class BrowserTabFragment :
         bottomSheetMenu?.apply {
             onMenuItemClicked(backMenuItem) {
                 onBackArrowClicked()
+            }
+            onMenuItemLongClicked(backMenuItem) {
+                onBackArrowLongClicked()
             }
             onMenuItemClicked(forwardMenuItem) {
                 onForwardArrowClicked()
@@ -3459,6 +3466,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter =
             BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener = {
+                    nativeInputManager.hideNativeInput(animate = false)
                     viewModel.userSelectedAutocomplete(it)
                 },
                 editableSearchClickListener = {
@@ -5567,6 +5575,10 @@ class BrowserTabFragment :
         } else {
             viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
         }
+    }
+
+    fun onContextualSheetFireComplete() {
+        sharedContextualViewModel.onContextualFireConfirmed()
     }
 
     private fun createBreakageReportingEventData(): SubscriptionEventData =

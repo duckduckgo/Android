@@ -105,6 +105,15 @@
                                 tools:progress="50"
                                 tools:visibility="visible" />
 
+                            <com.duckduckgo.app.browser.progressbar.PageLoadProgressBar
+                                android:id="@+id/pageLoadProgressBar"
+                                android:layout_width="match_parent"
+                                android:layout_height="2dp"
+                                android:visibility="invisible"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent" />
+
                             <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/trackersAnimation"
                                 android:layout_width="wrap_content"

@@ -46,6 +46,7 @@ interface FireDialogProvider {
         BROWSER,
         SETTINGS,
         TAB_SWITCHER,
+        DUCK_AI_CONTEXTUAL_CHAT,
     }
 }
 

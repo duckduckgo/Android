@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.DerivedKeySecretFactory
 import com.duckduckgo.autofill.impl.securestorage.RealDerivedKeySecretFactory
+import com.duckduckgo.autofill.impl.service.AutofillServiceFeature
 import com.duckduckgo.autofill.store.RealSecureStorageKeyRepository
 import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import com.duckduckgo.autofill.store.keys.EncryptedPreferencesFactory
@@ -45,6 +46,7 @@ object SecureStorageModule {
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         autofillFeature: AutofillFeature,
+        autofillServiceFeature: AutofillServiceFeature,
         sharedPreferencesProvider: SharedPreferencesProvider,
         pixel: Pixel,
         encryptedPreferencesFactory: EncryptedPreferencesFactory,
@@ -54,6 +56,7 @@ object SecureStorageModule {
                 coroutineScope,
                 dispatcherProvider,
                 autofillFeature,
+                autofillServiceFeature,
                 sharedPreferencesProvider,
                 pixel,
                 encryptedPreferencesFactory,

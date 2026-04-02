@@ -40,7 +40,9 @@ import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemDuckAiTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
@@ -58,11 +60,16 @@ import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.GRID
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType.LIST
 import com.duckduckgo.app.tabs.model.isAboutBlank
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_GRID
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.DUCK_AI_LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.GRID_TAB
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.LIST_TAB
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_GRID
+import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.SELECTABLE_DUCK_AI_LIST
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.Companion.TRACKER_ANIMATION_TILE_INFO_PANEL
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabSwitcherViewHolder.TabViewHolder
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.DuckAiTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_DEFAULT_ALPHA
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
@@ -80,6 +87,7 @@ import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.io.File
 import java.security.MessageDigest
+import com.duckduckgo.browser.ui.R as BrowserUiR
 import com.duckduckgo.mobile.android.R as AndroidR
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -90,10 +98,14 @@ class TabSwitcherAdapter(
     private val faviconManager: FaviconManager,
     private val dispatchers: DispatcherProvider,
     private val trackerCountAnimator: TrackerCountAnimator,
+    private val addressDisplayFormatter: AddressDisplayFormatter,
 ) : Adapter<ViewHolder>() {
 
     @Volatile
     private var isDragging: Boolean = false
+
+    @Volatile
+    var isFullUrlEnabled: Boolean = true
     private var layoutType: LayoutType = GRID
     private var onAnimationTileCloseClickListener: (() -> Unit)? = null
 
@@ -120,6 +132,16 @@ class TabSwitcherAdapter(
                 addExtraCloseButtonTouchArea(binding.close)
                 TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
+            DUCK_AI_GRID, SELECTABLE_DUCK_AI_GRID -> {
+                val binding = ItemDuckAiTabGridBinding.inflate(inflater, parent, false)
+                addExtraCloseButtonTouchArea(binding.close)
+                TabSwitcherViewHolder.DuckAiTabGridViewHolder(binding)
+            }
+            DUCK_AI_LIST, SELECTABLE_DUCK_AI_LIST -> {
+                val binding = ItemTabListBinding.inflate(inflater, parent, false)
+                addExtraCloseButtonTouchArea(binding.close)
+                TabSwitcherViewHolder.DuckAiTabListViewHolder(binding)
+            }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder(binding)
@@ -129,12 +151,20 @@ class TabSwitcherAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-        when (differ.currentList[position]) {
-            is Tab -> {
-                when (layoutType) {
-                    GRID -> GRID_TAB
-                    LIST -> LIST_TAB
-                }
+        when (val item = differ.currentList[position]) {
+            is DuckAiTab -> when (layoutType) {
+                GRID -> DUCK_AI_GRID
+                LIST -> DUCK_AI_LIST
+            }
+            is SelectableTab -> when {
+                item.isDuckAi && layoutType == GRID -> SELECTABLE_DUCK_AI_GRID
+                item.isDuckAi && layoutType == LIST -> SELECTABLE_DUCK_AI_LIST
+                layoutType == GRID -> GRID_TAB
+                else -> LIST_TAB
+            }
+            is Tab -> when (layoutType) {
+                GRID -> GRID_TAB
+                LIST -> LIST_TAB
             }
             is TabSwitcherItem.TrackersAnimationInfoPanel -> TRACKER_ANIMATION_TILE_INFO_PANEL
         }
@@ -148,6 +178,12 @@ class TabSwitcherAdapter(
             }
             is TabSwitcherViewHolder.ListTabViewHolder -> {
                 bindListTab(holder, differ.currentList[position] as Tab)
+            }
+            is TabSwitcherViewHolder.DuckAiTabGridViewHolder -> {
+                bindDuckAiGridTab(holder, differ.currentList[position] as Tab)
+            }
+            is TabSwitcherViewHolder.DuckAiTabListViewHolder -> {
+                bindDuckAiListTab(holder, differ.currentList[position] as Tab)
             }
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackersAnimationInfoPanel = differ.currentList[position] as TabSwitcherItem.TrackersAnimationInfoPanel
@@ -190,7 +226,7 @@ class TabSwitcherAdapter(
         val context = holder.rootView.context
         val glide = Glide.with(context)
         holder.title.text = extractTabTitle(tab.tabEntity, context)
-        holder.url.text = tab.tabEntity.url ?: ""
+        holder.url.text = formatUrl(tab.tabEntity.url)
         holder.url.visibility = if (tab.tabEntity.url.isNullOrEmpty()) View.GONE else View.VISIBLE
         updateUnreadIndicator(holder, tab.tabEntity)
         loadFavicon(tab.tabEntity, glide, holder.favicon, holder)
@@ -210,6 +246,38 @@ class TabSwitcherAdapter(
         updateUnreadIndicator(holder, tab.tabEntity)
         loadFavicon(tab.tabEntity, glide, holder.favicon, holder)
         loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
+        loadSelectionState(holder, tab)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tabId = tab.id,
+        )
+    }
+
+    private fun bindDuckAiGridTab(holder: TabSwitcherViewHolder.DuckAiTabGridViewHolder, tab: Tab) {
+        holder.cancelLoadJobs()
+        val context = holder.rootView.context
+        val glide = Glide.with(context)
+        holder.title.text = extractTabTitle(tab.tabEntity, context)
+        holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
+        updateUnreadIndicator(holder, tab.tabEntity)
+        loadTabPreviewImage(tab.tabEntity, glide, holder.tabPreview, holder)
+        loadSelectionState(holder, tab)
+        attachTabClickListeners(
+            tabViewHolder = holder,
+            bindingAdapterPosition = { holder.bindingAdapterPosition },
+            tabId = tab.id,
+        )
+    }
+
+    private fun bindDuckAiListTab(holder: TabSwitcherViewHolder.DuckAiTabListViewHolder, tab: Tab) {
+        holder.cancelLoadJobs()
+        val context = holder.rootView.context
+        holder.title.text = context.getString(BrowserUiR.string.duck_ai_tab_label)
+        holder.url.text = tab.tabEntity.title ?: ""
+        holder.url.visibility = View.VISIBLE
+        holder.favicon.setImageResource(CommonR.drawable.ic_duck_ai_color_24)
+        updateUnreadIndicator(holder, tab.tabEntity)
         loadSelectionState(holder, tab)
         attachTabClickListeners(
             tabViewHolder = holder,
@@ -265,6 +333,11 @@ class TabSwitcherAdapter(
         return title
     }
 
+    private fun formatUrl(url: String?): String {
+        if (url.isNullOrEmpty()) return ""
+        return if (isFullUrlEnabled) url else addressDisplayFormatter.getShortUrl(url)
+    }
+
     private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
         holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
     }
@@ -283,6 +356,16 @@ class TabSwitcherAdapter(
             )
             LIST_TAB -> handlePayloadsForListTab(
                 viewHolder = holder as TabSwitcherViewHolder.ListTabViewHolder,
+                tab = differ.currentList[position] as Tab,
+                payloads = payloads,
+            )
+            DUCK_AI_GRID, SELECTABLE_DUCK_AI_GRID -> handlePayloadsForDuckAiGridTab(
+                viewHolder = holder as TabSwitcherViewHolder.DuckAiTabGridViewHolder,
+                tab = differ.currentList[position] as Tab,
+                payloads = payloads,
+            )
+            DUCK_AI_LIST, SELECTABLE_DUCK_AI_LIST -> handlePayloadsForDuckAiListTab(
+                viewHolder = holder as TabSwitcherViewHolder.DuckAiTabListViewHolder,
                 tab = differ.currentList[position] as Tab,
                 payloads = payloads,
             )
@@ -341,7 +424,7 @@ class TabSwitcherAdapter(
 
             bundle.getString(DIFF_KEY_URL)?.let {
                 viewHolder.url.show()
-                viewHolder.url.text = it
+                viewHolder.url.text = formatUrl(it)
                 loadFavicon(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.favicon, viewHolder)
             }
 
@@ -353,6 +436,53 @@ class TabSwitcherAdapter(
                 loadSelectionState(viewHolder, tab)
             }
 
+            if (bundle.containsKey(DIFF_KEY_VIEWED)) {
+                updateUnreadIndicator(viewHolder, tab.tabEntity)
+            }
+        }
+    }
+
+    private fun handlePayloadsForDuckAiGridTab(
+        viewHolder: TabSwitcherViewHolder.DuckAiTabGridViewHolder,
+        tab: Tab,
+        payloads: MutableList<Any>,
+    ) {
+        for (payload in payloads) {
+            val bundle = payload as Bundle
+            for (key in bundle.keySet()) {
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
+            }
+            if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
+                loadTabPreviewImage(tab.tabEntity, Glide.with(viewHolder.rootView), viewHolder.tabPreview, viewHolder)
+            }
+            bundle.getString(DIFF_KEY_TITLE)?.let {
+                viewHolder.title.text = it
+            }
+            if (bundle.containsKey(DIFF_KEY_SELECTION)) {
+                loadSelectionState(viewHolder, tab)
+            }
+            if (bundle.containsKey(DIFF_KEY_VIEWED)) {
+                updateUnreadIndicator(viewHolder, tab.tabEntity)
+            }
+        }
+    }
+
+    private fun handlePayloadsForDuckAiListTab(
+        viewHolder: TabSwitcherViewHolder.DuckAiTabListViewHolder,
+        tab: Tab,
+        payloads: MutableList<Any>,
+    ) {
+        for (payload in payloads) {
+            val bundle = payload as Bundle
+            for (key in bundle.keySet()) {
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
+            }
+            bundle.getString(DIFF_KEY_TITLE)?.let {
+                viewHolder.url.text = it
+            }
+            if (bundle.containsKey(DIFF_KEY_SELECTION)) {
+                loadSelectionState(viewHolder, tab)
+            }
             if (bundle.containsKey(DIFF_KEY_VIEWED)) {
                 updateUnreadIndicator(viewHolder, tab.tabEntity)
             }
@@ -452,6 +582,12 @@ class TabSwitcherAdapter(
             is TabSwitcherViewHolder.ListTabViewHolder -> {
                 glide.clear(holder.favicon)
             }
+            is TabSwitcherViewHolder.DuckAiTabGridViewHolder -> {
+                glide.clear(holder.tabPreview)
+            }
+            is TabSwitcherViewHolder.DuckAiTabListViewHolder -> {
+                // favicon is a static drawable; no need to clear
+            }
         }
     }
 
@@ -523,6 +659,10 @@ class TabSwitcherAdapter(
             const val GRID_TAB = 0
             const val LIST_TAB = 1
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
+            const val DUCK_AI_GRID = 3
+            const val DUCK_AI_LIST = 4
+            const val SELECTABLE_DUCK_AI_GRID = 5
+            const val SELECTABLE_DUCK_AI_LIST = 6
 
             const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
 
@@ -560,6 +700,48 @@ class TabSwitcherAdapter(
         }
 
         data class ListTabViewHolder(
+            override val rootView: View,
+            override val favicon: ImageView,
+            override val title: TextView,
+            override val close: ImageView,
+            override val tabUnread: ImageView,
+            override val selectionIndicator: ImageView,
+            val url: TextView,
+        ) : TabSwitcherViewHolder(rootView), TabViewHolder {
+
+            constructor(binding: ItemTabListBinding) : this(
+                rootView = binding.root,
+                favicon = binding.favicon,
+                title = binding.title,
+                close = binding.close,
+                tabUnread = binding.tabUnread,
+                selectionIndicator = binding.selectionIndicator,
+                url = binding.url,
+            )
+        }
+
+        data class DuckAiTabGridViewHolder(
+            override val rootView: View,
+            override val favicon: ImageView,
+            override val title: TextView,
+            override val close: ImageView,
+            override val tabUnread: ImageView,
+            override val selectionIndicator: ImageView,
+            val tabPreview: ImageView,
+        ) : TabSwitcherViewHolder(rootView), TabViewHolder {
+
+            constructor(binding: ItemDuckAiTabGridBinding) : this(
+                rootView = binding.root,
+                favicon = binding.favicon,
+                title = binding.title,
+                close = binding.close,
+                tabUnread = binding.tabUnread,
+                selectionIndicator = binding.selectionIndicator,
+                tabPreview = binding.tabPreview,
+            )
+        }
+
+        data class DuckAiTabListViewHolder(
             override val rootView: View,
             override val favicon: ImageView,
             override val title: TextView,

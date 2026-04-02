@@ -104,7 +104,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 onSearchSubmitted(query)
             },
             onChatSubmitted = { prompt ->
-                sendPrompt(prompt)
+                sendPrompt(prompt, widget.getSelectedModelId())
                 widget.text = ""
             },
         )
@@ -116,7 +116,7 @@ class RealContextualNativeInputManager @Inject constructor(
             .launchIn(lifecycleOwner.lifecycleScope)
     }
 
-    private fun sendPrompt(prompt: String) {
+    private fun sendPrompt(prompt: String, modelId: String? = null) {
         val params = JSONObject().apply {
             put("platform", "android")
             put("tool", "query")
@@ -125,6 +125,9 @@ class RealContextualNativeInputManager @Inject constructor(
                 JSONObject().apply {
                     put("prompt", prompt)
                     put("autoSubmit", true)
+                    if (modelId != null) {
+                        put("modelId", modelId)
+                    }
                 },
             )
         }

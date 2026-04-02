@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.omnibar.StandardizedLeadingIconFeatureToggle
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
@@ -644,6 +645,7 @@ class BrowserTabViewModelTest {
     private lateinit var fakeContentScopeScriptsSubscriptionEventPluginPoint: FakeContentScopeScriptsSubscriptionEventPluginPoint
     private var serpSettingsFeature = FakeFeatureToggleFactory.create(SerpSettingsFeature::class.java)
     private var fakeBrowserUiLockFeature = FakeFeatureToggleFactory.create(BrowserUiLockFeature::class.java)
+    private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val mockSerpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
     private val mockSetFavouriteToggle: Toggle = mock()
     private val mockSerpLogos: SerpLogos = mock()
@@ -932,6 +934,7 @@ class BrowserTabViewModelTest {
                 pageLoadWideEvent = mockPageLoadWideEvent,
                 queryUrlPredictor = mockQueryUrlPredictor,
                 browserUiLockFeature = fakeBrowserUiLockFeature,
+                progressBarUpgradeFeature = fakeProgressBarUpgradeFeature,
             )
 
         testee.loadData("abc", null, false, false)
@@ -1663,6 +1666,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
 
         testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
@@ -1676,6 +1680,64 @@ class BrowserTabViewModelTest {
         testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
         assertEquals(0, loadingViewState().progress)
         assertEquals(false, loadingViewState().isLoading)
+    }
+
+    // --- hasCompletedPageLoad tests ---
+
+    @Test
+    fun whenProgressReaches100ThenSubsequentProgressEventsAreIgnored() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        assertEquals(true, loadingViewState().isLoading)
+
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // Simulate iframe progress after main page completed — should be ignored
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        assertEquals(false, loadingViewState().isLoading)
+        assertEquals(100, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenPageStartedAfterCompletionThenProgressEventsFlowAgain() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+        testee.progressChanged(50, WebViewNavigationState(mockStack, 50))
+        testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // Verify iframe progress is blocked
+        testee.progressChanged(30, WebViewNavigationState(mockStack, 30))
+        assertEquals(false, loadingViewState().isLoading)
+
+        // New navigation starts — resets hasCompletedPageLoad
+        testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
+
+        // Progress events should now be accepted
+        testee.progressChanged(10, WebViewNavigationState(mockStack, 10))
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenProgressBarUpgradeEnabledThenRawProgressPassedThrough() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = true))
+        setBrowserShowing(true)
+
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
+        assertEquals(15, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenProgressBarUpgradeDisabledThenProgressFlooredAtFixedProgress() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
+        setBrowserShowing(true)
+
+        testee.progressChanged(15, WebViewNavigationState(mockStack, 15))
+        assertEquals(50, loadingViewState().progress)
+        assertEquals(true, loadingViewState().isLoading)
     }
 
     @Test
@@ -1724,6 +1786,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
+        fakeProgressBarUpgradeFeature.self().setRawStoredState(State(enable = false))
         setBrowserShowing(true)
         testee.startProcessingTrackingLink()
         testee.progressChanged(100, WebViewNavigationState(mockStack, 100))
@@ -3180,7 +3243,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<LaunchPrivacyPro> {
-            assertEquals("funnel_reinstallmodal_android", uri.getQueryParameter("origin"))
+            assertEquals("funnel_skippedonboarding_android", uri.getQueryParameter("origin"))
         }
     }
 

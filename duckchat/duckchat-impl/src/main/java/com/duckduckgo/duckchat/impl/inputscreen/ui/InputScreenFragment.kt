@@ -290,9 +290,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             params?.launchOnChat ?: false
         }
         if (launchOnChat) {
-            inputModeWidget.initOnChat()
+            inputModeWidget.initOnChat(animate = false)
         } else {
-            inputModeWidget.initOnSearch()
+            inputModeWidget.initOnSearch(animate = false)
         }
         updateMenuIconButton(params?.useBottomSheetMenu ?: false)
 
@@ -464,13 +464,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             onBack = {
                 requireActivity().onBackPressed()
             }
-            onSearchSelected = {
-                binding.viewPager.setCurrentItem(0, true)
+            onSearchSelected = { animate ->
+                binding.viewPager.setCurrentItem(0, animate)
                 viewModel.onSearchSelected()
                 viewModel.onSearchInputTextChanged(inputModeWidget.text)
             }
-            onChatSelected = {
-                binding.viewPager.setCurrentItem(1, true)
+            onChatSelected = { animate ->
+                binding.viewPager.setCurrentItem(1, animate)
                 viewModel.onChatSelected()
                 viewModel.onChatInputTextChanged(inputModeWidget.text)
                 if (!useTopBar) {

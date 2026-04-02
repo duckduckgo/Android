@@ -80,4 +80,13 @@ class DuckChatSharedViewModelTest {
                 assertEquals(DuckChatSharedViewModel.Command.OpenTab(tabId), awaitItem())
             }
         }
+
+    @Test
+    fun `when onContextualFireButtonClicked then emit LaunchContextualChatFire Command`() =
+        runTest {
+            testee.onContextualFireButtonClicked()
+            testee.command.test {
+                assertEquals(DuckChatSharedViewModel.Command.LaunchContextualChatFire, awaitItem())
+            }
+        }
 }

@@ -201,6 +201,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.browser.pageload.PageLoadWideEvent
+import com.duckduckgo.app.browser.progressbar.ProgressBarUpgradeFeature
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -515,6 +516,7 @@ class BrowserTabViewModel @Inject constructor(
     private val pageLoadWideEvent: PageLoadWideEvent,
     private val queryUrlPredictor: QueryUrlPredictor,
     private val browserUiLockFeature: BrowserUiLockFeature,
+    private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -623,6 +625,8 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var hasExitedFixedProgress = false
+    private var hasCompletedPageLoad = false
+
     private var allowlistRefreshTriggerJob: Job? = null
     private var isCustomTabScreen: Boolean = false
     private var alreadyShownKeyboard: Boolean = false
@@ -1786,6 +1790,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onPageContentStart(url: String) {
+        hasCompletedPageLoad = false
         showWebContent()
     }
 
@@ -1897,6 +1902,7 @@ class BrowserTabViewModel @Inject constructor(
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
         hasExitedFixedProgress = false
+        hasCompletedPageLoad = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
@@ -2137,22 +2143,25 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
+        if (!currentBrowserViewState().browserShowing) return
+
+        // Once a page load completes, ignore subsequent progress events (iframes, subresources)
+        // until a new navigation starts (pageStarted/onPageContentStart resets hasCompletedPageLoad)
+        if (progressBarUpgradeFeature.self().isEnabled() && hasCompletedPageLoad) return
+
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
         }
-
-        if (!currentBrowserViewState().browserShowing) return
 
         val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
 
-        val visualProgress =
-            if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
-                FIXED_PROGRESS
-            } else {
-                newProgress
-            }
+        val reportedProgress = if (progressBarUpgradeFeature.self().isEnabled()) {
+            newProgress
+        } else {
+            if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) FIXED_PROGRESS else newProgress
+        }
 
         // Track the first time we escape from fixed progress for Wide Events
         val currentUrl = webViewNavigationState.currentUrl
@@ -2161,9 +2170,10 @@ class BrowserTabViewModel @Inject constructor(
             pageLoadWideEvent.onProgressChanged(tabId, currentUrl)
         }
 
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress, url = site?.url ?: "")
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = reportedProgress, url = site?.url ?: "")
 
         if (newProgress == 100) {
+            hasCompletedPageLoad = true
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -2246,6 +2256,14 @@ class BrowserTabViewModel @Inject constructor(
                 maliciousSiteBlocked = false,
             )
         navigationStateChanged(webViewNavigationState)
+        hasCompletedPageLoad = false
+
+        // Reset progress so stale progress=100 from the previous page doesn't
+        // trigger tracker animations before the new page's progress events arrive
+        val progress = currentLoadingViewState()
+        if (progressBarUpgradeFeature.self().isEnabled() && progress.progress == 100) {
+            loadingViewState.value = progress.copy(progress = 0)
+        }
 
         command.value = Command.PageStarted
     }
@@ -3257,8 +3275,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 is SubscriptionPromoModalCta -> {
                     viewModelScope.launch {
-                        ctaViewModel.onUserDismissedCta(cta)
-                        val origin = "funnel_reinstallmodal_android"
+                        val origin = "funnel_skippedonboarding_android"
                         command.value = LaunchPrivacyPro("https://duckduckgo.com/pro?origin=$origin".toUri())
                     }
                     null

@@ -48,6 +48,7 @@ interface NativeInputAnimator {
     fun animateCardWidth(card: View, widgetView: View, target: CardWidthTarget, onComplete: () -> Unit = {})
     fun cancelAnimation()
     fun applyLayoutTransitions(widgetView: View)
+    fun applyLayoutTransitions(widgetView: View, isBottom: Boolean)
     fun clearLayoutTransitions(widgetView: View)
 }
 
@@ -281,6 +282,10 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
     }
 
     override fun applyLayoutTransitions(widgetView: View) {
+        applyLayoutTransitions(widgetView, isBottomCard)
+    }
+
+    override fun applyLayoutTransitions(widgetView: View, isBottom: Boolean) {
         val changingTransition = {
             LayoutTransition().apply {
                 enableTransitionType(LayoutTransition.CHANGING)
@@ -289,7 +294,7 @@ class RealNativeInputAnimator @Inject constructor() : NativeInputAnimator {
         }
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidgetCard)?.layoutTransition = changingTransition()
         widgetView.findViewById<ViewGroup?>(R.id.inputModeWidget)?.layoutTransition = changingTransition()
-        if (isBottomCard) {
+        if (isBottom) {
             (widgetView as? ViewGroup)?.layoutTransition = changingTransition()
         }
     }

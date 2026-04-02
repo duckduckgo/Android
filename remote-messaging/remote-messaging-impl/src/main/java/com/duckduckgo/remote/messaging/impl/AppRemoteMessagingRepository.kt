@@ -110,4 +110,8 @@ class AppRemoteMessagingRepository(
     override suspend fun clearMessageImage(surface: Surface) {
         remoteMessageImageStore.clearStoredImageFile(surface)
     }
+
+    override suspend fun getCardItemImageFilePath(itemId: String): String? {
+        return remoteMessageImageStore.getCardItemImageFilePath(itemId)
+    }
 }

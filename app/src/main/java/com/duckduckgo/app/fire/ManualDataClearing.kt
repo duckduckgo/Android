@@ -37,4 +37,5 @@ interface ManualDataClearing {
      * @return [ClearDataResult] indicating whether the operation succeeded or the feature is not supported
      */
     suspend fun clearSingleTabData(tabId: String): ClearDataResult
+    suspend fun clearTabContextualChat(tabId: String): ClearDataResult
 }
