@@ -945,8 +945,8 @@
 
     <!-- Show on App Launch Option -->
     <string name="showOnAppLaunchOptionTitle">Zobrazit při spuštění aplikace</string>
-    <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy otevřená karta</string>
-    <string name="showOnAppLaunchOptionNewTabPage">Stránka Nová karta</string>
+    <string name="showOnAppLaunchOptionLastOpenedTab">Naposledy použitá karta</string>
+    <string name="showOnAppLaunchOptionNewTabPage">Nová karta</string>
     <string name="showOnAppLaunchOptionSpecificPage">Konkrétní stránka</string>
 
     <!-- Privacy Dashboard -->
@@ -1016,4 +1016,16 @@
     <string name="searchWidgetDescription" instruction="Description for the search widget, which may include Duck.ai and voice search">Vyhledávej soukromě pomocí DuckDuckGo nebo se zeptej Duck.ai. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
     <string name="searchAndFavoritesWidgetDescription" instruction="Description for the search and favorites widget">Vyhledávej nebo navštěvuj své oblíbené weby soukromě jediným klepnutím. Stačí povolit hlasové vyhledávání a Duck.ai.</string>
     <string name="duckAiOnlyPinShortcutLabel" instruction="Label for the Duck.ai pinned shortcut. Should be Duck.ai in all languages">Duck.ai</string>
+
+    <!-- Inactivity timeout -->
+    <string name="afterInactivityDialogTitle">Po nečinnosti</string>
+    <string name="afterInactivityOptionTitle">Úvodní obrazovka</string>
+    <string name="afterInactivityTimeoutRowTitle">Vyber časovač nečinnosti</string>
+    <string name="afterInactivityScreenSectionHeader">Vyber si, co uvidíš po návratu na DuckDuckGo</string>
+    <string name="afterInactivityTimeoutAlways">Žádný</string>
+    <string name="afterInactivityTimeout1Minute">1 minuta</string>
+    <string name="afterInactivityTimeoutXMinutes">%1$d minut(y)</string>
+    <string name="afterInactivityTimeout1Hour">1 hodina</string>
+    <string name="afterInactivityTimeoutXHours">%1$d hodin(y)</string>
+
 </resources>
