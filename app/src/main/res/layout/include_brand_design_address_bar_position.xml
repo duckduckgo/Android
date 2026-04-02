@@ -19,26 +19,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:alpha="0"
-    android:orientation="vertical"
-    tools:alpha="1">
+    android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/addressBarTitle"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:gravity="center"
-        android:paddingHorizontal="12dp"
-        android:text="@string/preOnboardingAddressBarTitle"
-        app:typography="onboarding_title" />
+        android:paddingHorizontal="12dp">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/addressBarTitleHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/preOnboardingAddressBarTitle"
+            android:visibility="invisible"
+            app:typography="onboarding_title" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/addressBarTitle"
+            style="@style/Typography.DuckDuckGo.Onboarding.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="?attr/daxColorPrimaryText" />
+
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/addressBarPositionContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_2">
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:alpha="0"
+        tools:alpha="1">
 
         <LinearLayout
             android:id="@+id/topOmnibarContainer"
