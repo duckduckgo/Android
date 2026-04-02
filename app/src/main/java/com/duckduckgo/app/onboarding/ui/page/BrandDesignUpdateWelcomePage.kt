@@ -767,7 +767,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     bobbingDaxAnimator?.cancel()
                     val screenWidth = binding.root.rootView.width.toFloat()
-                    binding.bobbingDaxAnimation?.also { bobbingDax ->
+                    binding.bobbingDaxAnimation.also { bobbingDax ->
                         bobbingDax.isVisible = true
                         bobbingDax.alpha = 0f
                         bobbingDax.translationX = screenWidth
