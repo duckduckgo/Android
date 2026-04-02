@@ -17,25 +17,30 @@
 package com.duckduckgo.app.generalsettings.showonapplaunch.store
 
 import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption
+import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchOption.LastOpenedTab
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 
 class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? = null) : ShowOnAppLaunchOptionDataStore {
 
     override var showOnAppLaunchTabId: String? = null
         private set
 
-    private var currentOptionStateFlow = MutableStateFlow(defaultOption)
+    private var optionSelected = defaultOption != null
+
+    private var currentOptionStateFlow = MutableStateFlow(defaultOption ?: LastOpenedTab)
 
     private var currentSpecificPageUrl = MutableStateFlow("https://duckduckgo.com")
 
-    override val optionFlow: Flow<ShowOnAppLaunchOption> = currentOptionStateFlow.asStateFlow().filterNotNull()
+    override val optionFlow: Flow<ShowOnAppLaunchOption> = currentOptionStateFlow.asStateFlow()
 
     override val specificPageUrlFlow: Flow<String> = currentSpecificPageUrl.asStateFlow()
 
+    override fun hasOptionSelected(): Boolean = optionSelected
+
     override suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption) {
+        optionSelected = true
         currentOptionStateFlow.value = showOnAppLaunchOption
     }
 
@@ -43,8 +48,11 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
         currentSpecificPageUrl.value = url
     }
 
+    var resolvedPageUrl: String? = null
+        private set
+
     override suspend fun setResolvedPageUrl(url: String) {
-        TODO("Not yet implemented")
+        resolvedPageUrl = url
     }
 
     override fun setShowOnAppLaunchTabId(tabId: String) {
