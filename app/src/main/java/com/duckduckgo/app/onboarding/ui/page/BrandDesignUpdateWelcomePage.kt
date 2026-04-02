@@ -31,9 +31,9 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.view.animation.OvershootInterpolator
 import android.view.animation.PathInterpolator
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -874,6 +874,40 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 }
 
                 INPUT_SCREEN -> {
+                    backgroundAnimator?.transitionTo(
+                        step = OnboardingBackgroundStep.InputType,
+                    )
+
+                    bobbingDaxAnimator?.cancel()
+                    val screenWidth = binding.root.rootView.width.toFloat()
+                    binding.bobbingDaxAnimation.also { bobbingDax ->
+                        bobbingDaxAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+                            duration = OnboardingBackgroundAnimator.EXIT_DURATION
+                            interpolator = OnboardingBackgroundAnimator.EASE_IN_OUT
+                            addUpdateListener { animator ->
+                                val progress = animator.animatedValue as Float
+                                bobbingDax.translationX = -screenWidth * progress
+                                bobbingDax.alpha = OnboardingBackgroundAnimator.exitAlpha(progress)
+                            }
+                            addListener(object : AnimatorListenerAdapter() {
+                                private var cancelled = false
+
+                                override fun onAnimationCancel(animation: Animator) {
+                                    cancelled = true
+                                }
+
+                                override fun onAnimationEnd(animation: Animator) {
+                                    if (!cancelled) {
+                                        bobbingDax.isVisible = false
+                                        bobbingDax.cancelAnimation()
+                                        bobbingDax.translationX = 0f
+                                    }
+                                }
+                            })
+                            start()
+                        }
+                    }
+
                     val transition = AutoTransition().apply {
                         duration = DIALOG_TRANSITION_DURATION
                     }
@@ -1160,7 +1194,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                 binding.logoAnimation.alpha = 0f
                 binding.welcomeTitle.alpha = 0f
 
-                backgroundAnimator?.snapTo(OnboardingBackgroundStep.Welcome)
+                backgroundAnimator?.snapTo(OnboardingBackgroundStep.InputType)
 
                 binding.welcomeScreenWalkingDax.isVisible = false
                 val isTablet = resources.configuration.smallestScreenWidthDp >= 600
@@ -1358,12 +1392,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         binding: ContentOnboardingWelcomePageUpdateBinding,
         withAi: Boolean,
     ) {
-        val withoutAiImageRes = if(!withAi) {
+        val withoutAiImageRes = if (!withAi) {
             com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_active
         } else {
             com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withoutai_inactive
         }
-        val withAiImageRes = if(withAi) {
+        val withAiImageRes = if (withAi) {
             com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_active
         } else {
             com.duckduckgo.duckchat.impl.R.drawable.brand_design_update_searchbox_withai_inactive
