@@ -45,7 +45,7 @@ class MobileBrowserSurfacePixelInterceptor @Inject constructor(
         }
 
         if (shouldCheckFeatureFlag) {
-            if (!productSurfaceTelemetryFeature.self().isEnabled()) {
+            if (!productSurfaceTelemetryFeature.feature().isEnabled()) {
                 logcat { "Mobile surfaces pixel dropped: $pixelName (feature disabled)" }
                 return dummyResponse(chain)
             } else {
@@ -58,7 +58,7 @@ class MobileBrowserSurfacePixelInterceptor @Inject constructor(
 
     private fun dummyResponse(chain: Chain): Response {
         return Response.Builder()
-            .code(500)
+            .code(200)
             .protocol(Protocol.HTTP_2)
             .body("Mobile surfaces pixel dropped".toResponseBody())
             .message("Dropped mobile surfaces pixel")

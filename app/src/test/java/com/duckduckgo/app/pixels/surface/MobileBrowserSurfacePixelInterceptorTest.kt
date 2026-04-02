@@ -39,7 +39,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelMatchesThenPixelIsDropped() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -50,14 +50,14 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(500, response.code)
+        assertEquals(200, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
         assertEquals("Mobile surfaces pixel dropped", response.body?.string())
     }
 
     @Test
     fun whenFeatureIsEnabledAndPixelMatchesThenPixelProceeds() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -73,7 +73,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsEnabledAndPixelDoesNotMatchThenPixelProceeds() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -89,7 +89,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelDoesNotMatchThenPixelProceeds() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -105,7 +105,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenNoPluginsRegisteredThenPixelAlwaysProceeds() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
 
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
@@ -115,7 +115,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenPixelStartsWithRegisteredNameThenItMatches() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -126,13 +126,13 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(500, response.code)
+        assertEquals(200, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
     }
 
     @Test
     fun whenPixelNameIsExactMatchThenItMatches() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_dau",
@@ -147,7 +147,7 @@ class MobileBrowserSurfacePixelInterceptorTest {
 
     @Test
     fun whenFeatureIsDisabledAndPixelHasQueryParamsThenPixelIsDropped() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = false))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = false))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_serp",
@@ -157,13 +157,13 @@ class MobileBrowserSurfacePixelInterceptorTest {
         val startUrl = "$URL_PIXEL_BASE/m_product_telemetry_surface_usage_serp_phone?appVersion=5.123.0"
         val response = interceptor.intercept(FakeChain(startUrl))
 
-        assertEquals(500, response.code)
+        assertEquals(200, response.code)
         assertEquals("Dropped mobile surfaces pixel", response.message)
     }
 
     @Test
     fun whenFeatureIsEnabledAndPixelHasQueryParamsThenPixelProceeds() {
-        productSurfaceTelemetryFeature.self().setRawStoredState(Toggle.State(enable = true))
+        productSurfaceTelemetryFeature.feature().setRawStoredState(Toggle.State(enable = true))
         whenever(surfacePixelPlugin.names()).thenReturn(
             listOf(
                 "m_product_telemetry_surface_usage_website",
