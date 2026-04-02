@@ -17,7 +17,7 @@
 <resources>
     <string name="duckAiNativeInputFieldTitle">Native Input Field</string>
     <string name="duckAiNativeInputFieldMessage">Use the native input field for Duck.ai</string>
-    <string name="duckAiDefaultTogglePositionTitle">Default Toggle Position</string>
+    <string name="duckAiDefaultTogglePositionTitle">New tab toggle position</string>
     <string name="duckAiDefaultTogglePositionSearch">Search</string>
     <string name="duckAiDefaultTogglePositionDuckAi">Duck.ai</string>
     <string name="duckAiDefaultTogglePositionLastUsed">Last Used</string>
