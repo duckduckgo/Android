@@ -95,6 +95,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var backgroundIntroAnimatorSet: AnimatorSet? = null
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
+    private var bottomWingDelayedRunnable: Runnable? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
     private var skipOnboardingFadeOutAnimatorSet: AnimatorSet? = null
@@ -402,6 +403,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxAnimatorSet = null
         walkingDaxDelayedRunnable?.let { binding.welcomeScreenWalkingDax.removeCallbacks(it) }
         walkingDaxDelayedRunnable = null
+        bottomWingDelayedRunnable?.let { binding.bottomWingAnimation.removeCallbacks(it) }
+        bottomWingDelayedRunnable = null
         comparisonChartFadeInAnimatorSet?.cancel()
         comparisonChartFadeInAnimatorSet = null
         comparisonChartDetailAnimatorSet?.cancel()
@@ -662,9 +665,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                 binding.daxDialogCta.welcomeContent.titleText.alpha = 1f
 
                                 binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog3Button)
-                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                 binding.daxDialogCta.secondaryCta.text = getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
 
                                 binding.daxDialogCta.welcomeContent.titleText.startOnboardingTypingAnimation(
                                     getString(R.string.preOnboardingDaxDialog3Title),
@@ -680,6 +681,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         )
                                         addListener(object : AnimatorListenerAdapter() {
                                             override fun onAnimationEnd(animation: Animator) {
+                                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                                                 isAnimating = false
                                             }
                                         })
@@ -967,7 +970,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             isVisible = true
             alpha = 0f
             setMaxProgress(WING_STOP_PROGRESS)
-            postDelayed(WING_START_DELAY) {
+            bottomWingDelayedRunnable = postDelayed(WING_START_DELAY) {
                 animate()
                     .alpha(1f)
                     .setDuration(WING_FADE_IN_DURATION)
