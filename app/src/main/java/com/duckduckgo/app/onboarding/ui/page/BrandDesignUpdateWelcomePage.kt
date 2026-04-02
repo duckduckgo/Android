@@ -105,6 +105,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
     private var walkingDaxAnimatorSet: AnimatorSet? = null
     private var walkingDaxDelayedRunnable: Runnable? = null
     private var bottomWingDelayedRunnable: Runnable? = null
+    private var welcomeFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartFadeInAnimatorSet: AnimatorSet? = null
     private var comparisonChartDetailAnimatorSet: AnimatorSet? = null
     private var skipOnboardingFadeOutAnimatorSet: AnimatorSet? = null
@@ -431,6 +432,10 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
             backgroundSecondary = binding.backgroundSecondary,
         )
 
+        binding.daxDialogCta.cardContainer.setOnClickListener {
+            viewModel.onDialogTapped()
+        }
+
         viewModel.viewState
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { state ->
@@ -469,6 +474,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     is BrandDesignUpdatePageViewModel.Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(command.intent)
                     is BrandDesignUpdatePageViewModel.Command.Finish -> onContinuePressed()
                     is BrandDesignUpdatePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
+                    BrandDesignUpdatePageViewModel.Command.SkipDialogAnimation -> skipCurrentDialogAnimation()
                 }
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
@@ -486,6 +492,8 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         walkingDaxDelayedRunnable = null
         bottomWingDelayedRunnable?.let { binding.bottomWingAnimation.removeCallbacks(it) }
         bottomWingDelayedRunnable = null
+        welcomeFadeInAnimatorSet?.cancel()
+        welcomeFadeInAnimatorSet = null
         comparisonChartFadeInAnimatorSet?.cancel()
         comparisonChartFadeInAnimatorSet = null
         comparisonChartDetailAnimatorSet?.cancel()
@@ -579,6 +587,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     }
                     binding.daxDialogCta.secondaryCta.visibility = if (showSecondaryCta) View.INVISIBLE else View.GONE
 
+                    binding.daxDialogCta.primaryCta.isClickable = false
+                    if (showSecondaryCta) {
+                        binding.daxDialogCta.secondaryCta.isClickable = false
+                    }
+
                     val showWalkingDax = applyWalkingDaxLayout()
 
                     playOutroAnimation(
@@ -602,13 +615,15 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         animators += ObjectAnimator.ofFloat(binding.daxDialogCta.secondaryCta, View.ALPHA, 1f)
                                             .setDuration(DIALOG_CONTENT_FADE_IN_DURATION)
                                     }
-                                    AnimatorSet().apply {
+                                    welcomeFadeInAnimatorSet = AnimatorSet().apply {
                                         playTogether(animators)
                                         addListener(object : AnimatorListenerAdapter() {
                                             override fun onAnimationEnd(animation: Animator) {
                                                 isAnimating = false
+                                                binding.daxDialogCta.primaryCta.isClickable = true
                                                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                                 if (showSecondaryCta) {
+                                                    binding.daxDialogCta.secondaryCta.isClickable = true
                                                     binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                                                 }
                                             }
@@ -675,6 +690,7 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
+                                            binding.daxDialogCta.primaryCta.isClickable = true
                                             binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
                                             playCheckIconAnimation()
                                         }
@@ -719,9 +735,13 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
 
                     binding.daxDialogCta.primaryCta.text = getString(R.string.preOnboardingDaxDialog2Button)
                     binding.daxDialogCta.primaryCta.alpha = 0f
+                    binding.daxDialogCta.primaryCta.isClickable = false
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
+                    binding.daxDialogCta.primaryCta.isClickable = false
+                    binding.daxDialogCta.secondaryCta.isClickable = false
+
                     val fadeOutAnimators = listOf<Animator>(
                         ObjectAnimator.ofFloat(binding.daxDialogCta.welcomeContent.titleText, View.ALPHA, 0f)
                             .setDuration(OUTRO_FADE_DURATION),
@@ -763,7 +783,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                         )
                                         addListener(object : AnimatorListenerAdapter() {
                                             override fun onAnimationEnd(animation: Animator) {
+                                                binding.daxDialogCta.primaryCta.isClickable = true
                                                 binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                                binding.daxDialogCta.secondaryCta.isClickable = true
                                                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked() }
                                                 isAnimating = false
                                             }
@@ -821,7 +843,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
+                                            binding.daxDialogCta.primaryCta.isClickable = true
                                             binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
+                                            binding.daxDialogCta.addressBarContent.topOmnibarContainer.isClickable = true
+                                            binding.daxDialogCta.addressBarContent.bottomOmnibarContainer.isClickable = true
+                                            binding.daxDialogCta.addressBarContent.splitOmnibarContainer.isClickable = true
                                         }
                                     })
                                     start()
@@ -842,6 +868,12 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
                     setAddressBarPositionOptions(selectedAddressBarPosition, showSplitOption)
+
+                    // Disable clickability on invisible children so taps reach cardContainer for skip
+                    binding.daxDialogCta.primaryCta.isClickable = false
+                    binding.daxDialogCta.addressBarContent.topOmnibarContainer.isClickable = false
+                    binding.daxDialogCta.addressBarContent.bottomOmnibarContainer.isClickable = false
+                    binding.daxDialogCta.addressBarContent.splitOmnibarContainer.isClickable = false
                 }
 
                 INPUT_SCREEN -> {
@@ -878,6 +910,9 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                                     addListener(object : AnimatorListenerAdapter() {
                                         override fun onAnimationEnd(animation: Animator) {
                                             isAnimating = false
+                                            binding.daxDialogCta.primaryCta.isClickable = true
+                                            binding.daxDialogCta.inputScreenContent.inputScreenSearchOnlyContainer.isClickable = true
+                                            binding.daxDialogCta.inputScreenContent.inputScreenWithAiContainer.isClickable = true
                                         }
                                     })
                                     start()
@@ -917,6 +952,11 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
                     binding.daxDialogCta.primaryCta.alpha = 0f
 
                     updateAiChatToggleState(binding, withAi = true)
+
+                    // Disable clickability on invisible children so taps reach cardContainer for skip
+                    binding.daxDialogCta.primaryCta.isClickable = false
+                    binding.daxDialogCta.inputScreenContent.inputScreenSearchOnlyContainer.isClickable = false
+                    binding.daxDialogCta.inputScreenContent.inputScreenWithAiContainer.isClickable = false
                 }
             }
         }
@@ -1313,6 +1353,45 @@ class BrandDesignUpdateWelcomePage : OnboardingPageFragment(R.layout.content_onb
         typingDelayInMs = TYPING_DELAY_MS
         delayAfterAnimationInMs = TYPING_POST_DELAY_MS
         startTypingAnimation(text, isCancellable = true, afterAnimation = afterAnimation)
+    }
+
+    private fun skipCurrentDialogAnimation() {
+        if (!isAnimating) return
+
+        // End the skip-onboarding fade-out first — its end listener starts the typing animation
+        skipOnboardingFadeOutAnimatorSet?.end()
+
+        // Complete any active typing animation (triggers afterAnimation callback which starts fade-in)
+        with(binding.daxDialogCta) {
+            listOf(
+                welcomeContent.titleText,
+                comparisonChartContent.comparisonChartTitle,
+                addressBarContent.addressBarTitle,
+                inputScreenContent.inputScreenTitle,
+            ).filter { it.hasAnimationStarted() }.forEach { it.performClick() }
+        }
+
+        // End any running content fade-in animations (end() snaps to final values and triggers end listeners)
+        welcomeFadeInAnimatorSet?.end()
+        comparisonChartFadeInAnimatorSet?.end()
+        comparisonChartDetailAnimatorSet?.end()
+        skipOnboardingFadeInAnimatorSet?.end()
+        addressBarFadeInAnimatorSet?.end()
+        inputScreenFadeInAnimatorSet?.end()
+
+        // Snap check icons to final state — the postDelayed AVD runnables would otherwise animate them in one by one
+        snapCheckIconsToFinalState()
+    }
+
+    private fun snapCheckIconsToFinalState() {
+        with(binding.daxDialogCta.comparisonChartContent) {
+            listOf(check1, check2, check3, check4, check5).forEach { checkView ->
+                checkView.alpha = 1f
+                checkView.scaleX = 1f
+                checkView.scaleY = 1f
+                checkView.setImageResource(CommonR.drawable.ic_check_green_24)
+            }
+        }
     }
 
     private fun playCheckIconAnimation() {

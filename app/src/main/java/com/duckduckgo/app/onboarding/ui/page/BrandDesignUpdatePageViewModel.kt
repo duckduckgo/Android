@@ -121,6 +121,13 @@ class BrandDesignUpdatePageViewModel @Inject constructor(
         data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
+        data object SkipDialogAnimation : Command
+    }
+
+    fun onDialogTapped() {
+        viewModelScope.launch {
+            _commands.send(Command.SkipDialogAnimation)
+        }
     }
 
     fun onDialogAnimationStarted() {
