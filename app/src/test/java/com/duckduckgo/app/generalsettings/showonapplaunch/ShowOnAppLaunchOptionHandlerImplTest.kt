@@ -795,6 +795,76 @@ class ShowOnAppLaunchOptionHandlerImplTest {
         }
     }
 
+    @Test
+    fun whenNotNewInstallWithSpecificPageOptionThenNavigatesToSpecificPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://example.com/")
+        }
+    }
+
+    @Test
+    fun whenNewInstallWithSpecificPageAlreadySelectedThenPreservesSpecificPage() = runTest {
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        fakeDataStore.setShowOnAppLaunchOption(SpecificPage("https://example.com/"))
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.size == 1)
+            assertTrue(tabs.last().url == "https://example.com/")
+        }
+    }
+
+    @Test
+    fun whenUpdatedFromNewInstallBeforeFirstInactivityFiredThenGetsLastOpenedTab() = runTest {
+        // Simulates a user who installed fresh but updated the app before the inactivity
+        // timeout ever fired. isNewInstall() returns false post-update so the NTP default
+        // is not applied — this is an accepted trade-off. Without the isNewInstall() guard,
+        // existing users who never explicitly set a preference would incorrectly get NTP.
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            assertTrue(tabs.isEmpty())
+        }
+    }
+
+    @Test
+    fun whenNtpSetOnFirstInactivityThenSubsequentInactivityAfterUpdateStillShowsNtp() = runTest {
+        // First inactivity on new install: NTP is persisted in the store
+        whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        testee.handleAfterInactivityOption()
+
+        // After an app update isNewInstall() returns false, but the stored NTP option is preserved
+        whenever(appBuildConfig.isNewInstall()).thenReturn(false)
+        testee.handleAfterInactivityOption()
+
+        fakeTabRepository.flowTabs.test {
+            val tabs = awaitItem()
+            awaitComplete()
+
+            // Both inactivity returns opened NTP
+            assertTrue(tabs.size == 2)
+            assertTrue(tabs.all { it.url == "" })
+        }
+    }
+
     // handleResolvedUrlStorage tests
 
     @Test
