@@ -114,5 +114,6 @@
     <string name="preOnboardingInputModeDemoChatHint">Ask privately</string>
     <string name="preOnboardingInputModeDemoChatSuggestion1">how to say \"duck\" in 10 languages</string>
     <string name="preOnboardingInputModeDemoChatSuggestion2">all mighty ducks movies</string>
+    <string name="preOnboardingInputModeDemoChatSuggestion3" translatable="false">what are some fascinating facts?</string>
 
 </resources>
