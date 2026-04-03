@@ -24,15 +24,18 @@ import com.duckduckgo.app.generalsettings.showonapplaunch.model.ShowOnAppLaunchO
 import com.duckduckgo.app.generalsettings.showonapplaunch.store.ShowOnAppLaunchOptionDataStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttpOrHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import javax.inject.Inject
 
 interface ShowOnAppLaunchOptionHandler {
+    suspend fun handleAfterInactivityOption()
     suspend fun handleAppLaunchOption()
     suspend fun handleResolvedUrlStorage(
         currentUrl: String?,
@@ -46,10 +49,24 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val showOnAppLaunchOptionDataStore: ShowOnAppLaunchOptionDataStore,
     private val tabRepository: TabRepository,
+    private val appBuildConfig: AppBuildConfig,
 ) : ShowOnAppLaunchOptionHandler {
 
+    override suspend fun handleAfterInactivityOption() {
+        // new users see New Tab
+        logcat { "FirstScreen: Inactivity Timer passed" }
+        if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
+            logcat { "FirstScreen: setting New Tab for new users" }
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
+        }
+        // existing users see whatever they had selected
+        handleAppLaunchOption()
+    }
+
     override suspend fun handleAppLaunchOption() {
-        when (val option = showOnAppLaunchOptionDataStore.optionFlow.first()) {
+        val option = showOnAppLaunchOptionDataStore.optionFlow.first()
+        logcat { "FirstScreen: showing $option on app launch" }
+        when (option) {
             LastOpenedTab -> Unit
             NewTabPage -> tabRepository.add()
             is SpecificPage -> handleSpecificPageOption(option)

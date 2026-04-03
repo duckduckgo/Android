@@ -20,12 +20,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -39,6 +39,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -52,23 +53,20 @@ class FirstScreenHandlerImpl @Inject constructor(
         if (androidBrowserConfigFeature.showNTPAfterIdleReturn().isEnabled()) {
             val timeoutMs = getTimeoutSeconds() * 1000
             val lastBackgrounded = settingsDataStore.lastSessionBackgroundTimestamp
-            logcat { "FirstScreen: timeout is $timeoutMs ms and lastBackgrounded is $lastBackgrounded" }
             val elapsed = System.currentTimeMillis() - lastBackgrounded
-            logcat { "FirstScreen: time elapsed $elapsed" }
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
-                logcat { "FirstScreen: handleAppLaunchOption" }
-                showOnAppLaunchOptionHandler.handleAppLaunchOption()
+                showOnAppLaunchOptionHandler.handleAfterInactivityOption()
+                return
             }
-            return
-        }
-
-        if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
+        } else if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
             showOnAppLaunchOptionHandler.handleAppLaunchOption()
         }
     }
 
     override fun onClose() {
-        settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.lastSessionBackgroundTimestamp = System.currentTimeMillis()
+        }
     }
 
     private fun getTimeoutSeconds(): Long {

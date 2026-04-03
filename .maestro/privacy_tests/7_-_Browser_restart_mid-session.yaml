@@ -93,6 +93,11 @@ tags:
             - killApp
             - launchApp:
                 clearState: false
+            - runFlow:
+                when:
+                  visible: "Return to"
+                commands:
+                  - tapOn: "Return to"
             - assertVisible:
                 text: "Pay"
             - assertVisible:
