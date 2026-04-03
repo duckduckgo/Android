@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl.pixels
 
+import android.annotation.SuppressLint
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -35,6 +36,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class PaywallNotSeenSchedulerTest {
 
     @get:Rule
