@@ -37,13 +37,18 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardOpenedPlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.BROKEN_SITE_ALLOWLIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.REPORT_BROKEN_SITE_SENT
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.GoBack
 import com.nhaarman.mockitokotlin2.mock
 import com.squareup.moshi.Moshi
@@ -90,6 +95,7 @@ class PrivacyDashboardHybridViewModelTest {
     private val brokenSiteSender: BrokenSiteSender = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val pluginPoint = FakePluginPoint(protectionTogglePlugin)
+    private val dashboardOpenedPluginPoint = FakeDashboardOpenedPluginPoint()
 
     private val toggleReports: ToggleReports = mock {
         runBlocking { whenever(mock.shouldPrompt()).thenReturn(false) }
@@ -108,6 +114,7 @@ class PrivacyDashboardHybridViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             brokenSiteSender = brokenSiteSender,
             privacyProtectionTogglePlugin = pluginPoint,
+            privacyDashboardOpenedPlugin = dashboardOpenedPluginPoint,
             toggleReports = toggleReports,
             moshi = Moshi.Builder().build(),
         )
@@ -562,6 +569,10 @@ private class FakeUserAllowListRepository : UserAllowListRepository {
     override suspend fun addDomainToUserAllowList(domain: String) = domains.update { it + domain }
 
     override suspend fun removeDomainFromUserAllowList(domain: String) = domains.update { it - domain }
+}
+
+class FakeDashboardOpenedPluginPoint : PluginPoint<PrivacyDashboardOpenedPlugin> {
+    override fun getPlugins(): Collection<PrivacyDashboardOpenedPlugin> = emptyList()
 }
 
 class FakePluginPoint(val plugin: FakePrivacyProtectionTogglePlugin) : PluginPoint<PrivacyProtectionTogglePlugin> {
