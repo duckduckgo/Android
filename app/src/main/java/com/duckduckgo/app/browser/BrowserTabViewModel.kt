@@ -4996,6 +4996,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.StartAddressBarTrackersAnimation(trackerEvents)
     }
 
+    fun dismissDuckAiFireOnboardingCta() {
+        ctaViewState.value?.cta
+            ?.let { it as? OnboardingDaxDialogCta.DaxDuckAiFireButtonCta }
+            ?.let { duckAiFireCta ->
+                viewModelScope.launch { ctaViewModel.onUserDismissedCta(cta = duckAiFireCta) }
+            }
+    }
+
     private fun trackersCount(): String =
         siteLiveData.value?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
 
