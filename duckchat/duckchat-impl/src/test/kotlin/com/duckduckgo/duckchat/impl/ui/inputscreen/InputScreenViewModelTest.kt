@@ -3033,4 +3033,144 @@ class InputScreenViewModelTest {
         }
 
     // endregion
+
+    // region chat URL suggestions
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty and autocomplete not called when feature flag is off`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = false))
+
+            val viewModel = createViewModel()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+            verify(autoComplete, never()).autoComplete(any())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions filters out non-URL suggestions when feature flag is on`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val bookmarkSuggestion = AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion(
+                phrase = "example.com",
+                title = "Example",
+                url = "https://example.com",
+            )
+            val searchSuggestion = AutoCompleteSearchSuggestion(
+                phrase = "example",
+                isUrl = false,
+                isAllowedInTopHits = false,
+            )
+            val urlSearchSuggestion = AutoCompleteSearchSuggestion(
+                phrase = "example.com",
+                isUrl = true,
+                isAllowedInTopHits = false,
+            )
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(AutoCompleteResult("example", listOf(searchSuggestion, bookmarkSuggestion, urlSearchSuggestion))),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            val result = viewModel.chatUrlSuggestions.value
+            assertEquals(2, result.suggestions.size)
+            assertTrue(result.suggestions[0] is AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion)
+            assertTrue(result.suggestions[1] is AutoCompleteSearchSuggestion)
+            assertTrue((result.suggestions[1] as AutoCompleteSearchSuggestion).isUrl)
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when chat input is empty`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+            verify(autoComplete, never()).autoComplete("")
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when chat suggestions exist`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(duckChat.observeDefaultTogglePosition()).thenReturn(flowOf(DefaultTogglePosition.SEARCH))
+            whenever(duckChat.observeLastUsedTogglePosition()).thenReturn(flowOf(null))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(
+                listOf(ChatSuggestion(chatId = "1", title = "Test Chat", lastEdit = LocalDateTime.now(), pinned = false)),
+            )
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(AutoCompleteResult("test", listOf(AutoCompleteSearchSuggestion("test.com", isUrl = true, isAllowedInTopHits = false)))),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("test")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatUrlSuggestions is empty when autocomplete suggestions disabled`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            whenever(autoCompleteSettings.autoCompleteSuggestionsEnabled).thenReturn(false)
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isEmpty())
+        }
+
+    @Suppress("DenyListedApi")
+    @Test
+    fun `chatSuggestionsVisible is true when only URL suggestions exist`() =
+        runTest {
+            duckChatFeature.rememberTogglePosition().setRawStoredState(State(enable = true))
+            duckChatFeature.aiChatSuggestions().setRawStoredState(State(enable = true))
+            whenever(chatSuggestionsReader.fetchSuggestions(any())).thenReturn(emptyList())
+            whenever(autoComplete.autoComplete(any())).thenReturn(
+                flowOf(
+                    AutoCompleteResult(
+                        "example",
+                        listOf(AutoCompleteSearchSuggestion("example.com", isUrl = true, isAllowedInTopHits = false)),
+                    ),
+                ),
+            )
+
+            val viewModel = createViewModel()
+            viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged("example")
+            advanceUntilIdle()
+
+            assertTrue(viewModel.chatUrlSuggestions.value.suggestions.isNotEmpty())
+            assertTrue(viewModel.visibilityState.value.chatSuggestionsVisible)
+            assertFalse(viewModel.visibilityState.value.showChatLogo)
+        }
+
+    // endregion
 }
