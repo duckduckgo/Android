@@ -108,4 +108,8 @@
     <!--Duck.ai contextual fire-->
     <string name="duckAiChatDeletedSnackbar">Chat deleted</string>
 
+    <!-- Default browser changed survey -->
+    <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
+    <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
+
 </resources>

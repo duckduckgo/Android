@@ -17,16 +17,27 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
 import androidx.lifecycle.LifecycleOwner
+import androidx.work.WorkManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class DefaultBrowserObserver(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
+    private val defaultBrowserChangedSurveyManager: DefaultBrowserChangedSurveyManager,
+    private val notificationSender: NotificationSender,
+    private val defaultBrowserChangedSurveyNotification: DefaultBrowserChangedSurveyNotification,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val workManager: WorkManager,
 ) : MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -40,7 +51,17 @@ class DefaultBrowserObserver(
                     )
                     pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
                 }
-                else -> pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                else -> {
+                    pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                    defaultBrowserChangedSurveyManager.markSurveyPending()
+                    if (defaultBrowserChangedSurveyManager.shouldTriggerSurvey()) {
+                        defaultBrowserChangedSurveyManager.recordNotificationSentThisSession()
+                        DefaultBrowserChangedSurveyWorker.schedule(workManager)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            notificationSender.sendNotification(defaultBrowserChangedSurveyNotification)
+                        }
+                    }
+                }
             }
         }
     }
