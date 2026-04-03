@@ -18,76 +18,89 @@ package com.duckduckgo.app.browser.defaultbrowsing
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultBrowserObserverTest {
 
-    private lateinit var testee: DefaultBrowserObserver
-
-    @Mock
-    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
-
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
-
-    @Mock
-    private lateinit var mockPixel: Pixel
-
-    private val mockOwner: LifecycleOwner = mock()
+    private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val appInstallStore: AppInstallStore = mock()
+    private val pixel: Pixel = mock()
+    private val surveyManager: DefaultBrowserChangedSurveyManager = mock()
+    private val notificationSender: NotificationSender = mock()
+    private val surveyNotification: DefaultBrowserChangedSurveyNotification = mock()
+    private val dispatcherProvider: DispatcherProvider = mock()
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
+    private val lifecycleOwner: LifecycleOwner = mock()
+    private lateinit var observer: DefaultBrowserObserver
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel)
-    }
-
-    @Test
-    fun whenDDGIsDefaultBrowserIfItWasNotBeforeThenFireSetPixel() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+        whenever(dispatcherProvider.io()).thenReturn(testDispatcher)
+        observer = DefaultBrowserObserver(
+            defaultBrowserDetector = defaultBrowserDetector,
+            appInstallStore = appInstallStore,
+            pixel = pixel,
+            defaultBrowserChangedSurveyManager = surveyManager,
+            notificationSender = notificationSender,
+            defaultBrowserChangedSurveyNotification = surveyNotification,
+            appCoroutineScope = testScope,
+            dispatcherProvider = dispatcherProvider,
         )
-
-        testee.onResume(mockOwner)
-
-        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
-    fun whenDDGIsNotDefaultBrowserIfItWasNotBeforeThenDoNotFireSetPixel() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
-
-        testee.onResume(mockOwner)
-
-        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(Count))
+    fun whenBecomeDefaultBrowserThenRecordDefaultSet() {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(appInstallStore.defaultBrowser).thenReturn(false)
+        observer.onResume(lifecycleOwner)
+        verify(surveyManager).recordDefaultSet()
     }
 
     @Test
-    fun whenDDGIsDefaultBrowserIfItWasBeforeThenDoNotFireSetPixel() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(true)
-
-        testee.onResume(mockOwner)
-
-        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(Count))
+    fun whenNoLongerDefaultBrowserThenDoNotRecordDefaultSet() {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(appInstallStore.defaultBrowser).thenReturn(true)
+        observer.onResume(lifecycleOwner)
+        verify(surveyManager, never()).recordDefaultSet()
     }
 
     @Test
-    fun whenDDGIsNotDefaultBrowserIfItWasBeforeThenFireUnsetPixel() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(true)
+    fun whenAlreadyDefaultBrowserThenStillRecordDefaultSet() {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(appInstallStore.defaultBrowser).thenReturn(true)
+        observer.onResume(lifecycleOwner)
+        verify(surveyManager).recordDefaultSet()
+    }
 
-        testee.onResume(mockOwner)
+    @Test
+    fun whenNoLongerDefaultAndShouldTriggerSurveyThenSendNotification() = runTest {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(appInstallStore.defaultBrowser).thenReturn(true)
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(true)
+        observer.onResume(lifecycleOwner)
+        verify(notificationSender).sendNotification(surveyNotification)
+    }
 
-        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+    @Test
+    fun whenNoLongerDefaultButSurveySuppressedThenDoNotSendNotification() = runTest {
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(appInstallStore.defaultBrowser).thenReturn(true)
+        whenever(surveyManager.shouldTriggerSurvey()).thenReturn(false)
+        observer.onResume(lifecycleOwner)
+        verify(notificationSender, never()).sendNotification(surveyNotification)
     }
 }

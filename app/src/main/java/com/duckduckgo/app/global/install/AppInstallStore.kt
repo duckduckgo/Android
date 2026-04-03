@@ -39,6 +39,9 @@ interface AppInstallStore : MainProcessLifecycleObserver {
 
     var defaultBrowser: Boolean
 
+    var wasEverDefault: Boolean
+    var defaultBrowserChangedSurveyShown: Boolean
+
     var newDefaultBrowserDialogCount: Int
 
     fun hasInstallTimestampRecorded(): Boolean
@@ -65,6 +68,14 @@ class AppInstallSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
         set(defaultBrowser) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser) }
 
+    override var wasEverDefault: Boolean
+        get() = preferences.getBoolean(KEY_WAS_EVER_DEFAULT, false)
+        set(value) = preferences.edit { putBoolean(KEY_WAS_EVER_DEFAULT, value) }
+
+    override var defaultBrowserChangedSurveyShown: Boolean
+        get() = preferences.getBoolean(KEY_DEFAULT_BROWSER_CHANGED_SURVEY_SHOWN, false)
+        set(value) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER_CHANGED_SURVEY_SHOWN, value) }
+
     override var newDefaultBrowserDialogCount: Int
         get() = preferences.getInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, 0)
         set(defaultBrowser) = preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
@@ -89,6 +100,8 @@ class AppInstallSharedPreferences @Inject constructor(
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
         const val KEY_WIDGET_INSTALLED = "KEY_WIDGET_INSTALLED"
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"
+        const val KEY_WAS_EVER_DEFAULT = "KEY_WAS_EVER_DEFAULT"
+        const val KEY_DEFAULT_BROWSER_CHANGED_SURVEY_SHOWN = "KEY_DEFAULT_BROWSER_CHANGED_SURVEY_SHOWN"
         private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
     }
 }
