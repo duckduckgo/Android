@@ -52,8 +52,13 @@ class PaywallNotSeenWorker(
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
     override suspend fun doWork(): Result {
         val dayBucket = inputData.getString(KEY_DAY_BUCKET) ?: return Result.failure()
+
+        if (!subscriptions.isEligible()) return Result.success()
 
         if (paywallMetricsManager.paywallEverSeen || paywallMetricsManager.isNotSeenDayFired(dayBucket)) {
             return Result.success()
@@ -92,7 +97,6 @@ class PaywallNotSeenWorker(
 class PaywallNotSeenScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val paywallMetricsManager: PaywallMetricsManager,
-    private val subscriptions: Subscriptions,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -101,7 +105,6 @@ class PaywallNotSeenScheduler @Inject constructor(
         if (paywallMetricsManager.paywallEverSeen) return
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (!subscriptions.isEligible()) return@launch
             scheduleMilestones()
         }
     }
