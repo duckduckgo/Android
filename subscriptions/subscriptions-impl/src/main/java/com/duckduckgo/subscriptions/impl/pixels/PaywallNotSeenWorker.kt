@@ -31,6 +31,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -97,11 +98,13 @@ class PaywallNotSeenWorker(
 class PaywallNotSeenScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val paywallMetricsManager: PaywallMetricsManager,
+    private val privacyProFeature: PrivacyProFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
+        if (!privacyProFeature.schedulePaywallNotSeenPixels().isEnabled()) return
         if (paywallMetricsManager.paywallEverSeen) return
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
