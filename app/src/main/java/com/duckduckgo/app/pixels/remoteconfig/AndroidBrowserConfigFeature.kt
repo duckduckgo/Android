@@ -132,7 +132,7 @@ interface AndroidBrowserConfigFeature {
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun showNTPAfterIdleReturn(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
