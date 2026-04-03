@@ -1479,7 +1479,8 @@ class BrowserTabFragment :
 
     private fun onFireButtonPressed() {
         val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
-        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
+        val isDuckAiOnboarding = viewModel.ctaViewState.value?.cta is OnboardingDaxDialogCta.DaxDuckAiFireButtonCta
+        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp, isDuckAiOnboarding = isDuckAiOnboarding)
         viewModel.onFireMenuSelected(omnibar.viewMode)
     }
 
@@ -6195,6 +6196,10 @@ class BrowserTabFragment :
         browserLayout.post {
             updateContainerHeight(browserLayout.height)
         }
+    }
+
+    fun dismissDuckAiFireOnboardingCta() {
+        viewModel.dismissDuckAiFireOnboardingCta()
     }
 }
 
