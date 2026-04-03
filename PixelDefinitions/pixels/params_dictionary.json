@@ -101,5 +101,15 @@
         "type": "string",
         "description": "VPN menu item state when the menu was opened or when the VPN item was tapped",
         "enum": ["pill", "no_pill", "subscribed", "hidden"]
+    },
+    "returningUser": {
+        "key": "returning_user",
+        "type": "boolean",
+        "description": "Whether the app is a reinstall or a fresh install"
+    },
+    "privacyDashboardOpened": {
+        "key": "privacy_dashboard_opened",
+        "type": "boolean",
+        "description": "Whether the user has ever opened the Privacy Dashboard"
     }
 }
