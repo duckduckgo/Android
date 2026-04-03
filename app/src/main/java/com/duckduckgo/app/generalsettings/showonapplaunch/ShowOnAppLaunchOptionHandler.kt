@@ -55,13 +55,9 @@ class ShowOnAppLaunchOptionHandlerImpl @Inject constructor(
     override suspend fun handleAfterInactivityOption() {
         // new users see New Tab
         logcat { "FirstScreen: Inactivity Timer passed" }
-        if (appBuildConfig.isNewInstall()) {
-            withContext(dispatchers.io()) {
-                if (!showOnAppLaunchOptionDataStore.hasOptionSelected()) {
-                    logcat { "FirstScreen: setting New Tab for new users" }
-                    showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
-                }
-            }
+        if (appBuildConfig.isNewInstall() && !showOnAppLaunchOptionDataStore.hasOptionSelected()) {
+            logcat { "FirstScreen: setting New Tab for new users" }
+            showOnAppLaunchOptionDataStore.setShowOnAppLaunchOption(NewTabPage)
         }
         // existing users see whatever they had selected
         handleAppLaunchOption()
