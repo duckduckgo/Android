@@ -304,6 +304,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun fetchProTierEntitlements(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun schedulePaywallNotSeenPixels(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
