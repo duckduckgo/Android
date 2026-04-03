@@ -274,6 +274,43 @@ enum class SubscriptionPixel(
         includedParameters = setOf(APP_VERSION),
         enqueue = true,
     ),
+
+    PAYWALL_SHOWN_FIRST_TIME(
+        baseName = "m_subscription_paywall_impression",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+    ),
+
+    PAYWALL_NOT_SEEN_D0(
+        baseName = "m_subscription_paywall_not_seen_d0",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D3(
+        baseName = "m_subscription_paywall_not_seen_d3",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D7(
+        baseName = "m_subscription_paywall_not_seen_d7",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D14(
+        baseName = "m_subscription_paywall_not_seen_d14",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
+    PAYWALL_NOT_SEEN_D30(
+        baseName = "m_subscription_paywall_not_seen_d30",
+        type = Unique(),
+        includedParameters = setOf(APP_VERSION),
+        enqueue = true,
+    ),
     ;
 
     constructor(
@@ -295,6 +332,9 @@ object SubscriptionPixelParameter {
     const val PETAL = "petal"
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
+    const val DAYS_SINCE_INSTALL = "days_since_install"
+    const val RETURNING_USER = "returning_user"
+    const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
 }
 
 internal val PixelType.pixelNameSuffix: String
