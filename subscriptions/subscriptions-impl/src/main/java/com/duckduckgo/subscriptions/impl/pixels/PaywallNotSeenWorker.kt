@@ -27,12 +27,13 @@ import androidx.work.workDataOf
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -48,6 +49,9 @@ class PaywallNotSeenWorker(
     @Inject
     lateinit var paywallMetricsManager: PaywallMetricsManager
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     override suspend fun doWork(): Result {
         val dayBucket = inputData.getString(KEY_DAY_BUCKET) ?: return Result.failure()
 
@@ -55,7 +59,8 @@ class PaywallNotSeenWorker(
             return Result.success()
         }
 
-        pixelSender.reportPaywallNotSeen(dayBucket)
+        val returningUser = appBuildConfig.isAppReinstall()
+        pixelSender.reportPaywallNotSeen(dayBucket, returningUser)
         paywallMetricsManager.markNotSeenDayFired(dayBucket)
         return Result.success()
     }
@@ -86,6 +91,7 @@ class PaywallNotSeenWorker(
 class PaywallNotSeenScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val paywallMetricsManager: PaywallMetricsManager,
+    private val subscriptions: Subscriptions,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
@@ -94,6 +100,7 @@ class PaywallNotSeenScheduler @Inject constructor(
         if (paywallMetricsManager.paywallEverSeen) return
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!subscriptions.isEligible()) return@launch
             scheduleMilestones()
         }
     }
@@ -109,17 +116,10 @@ class PaywallNotSeenScheduler @Inject constructor(
                 .build()
 
             workManager.enqueueUniqueWork(workName(dayBucket), ExistingWorkPolicy.KEEP, request)
-
-            logcat {
-                "NOELIA scheduling pixel paywall not seen for $dayBucket - delayMilis: ${paywallMetricsManager.delayUntilMilestone(
-                    checkAfterDays,
-                )}"
-            }
         }
     }
 
     companion object {
-        /** Maps day-bucket label to the number of days after install at which the check runs. */
         val MILESTONES = linkedMapOf(
             "d0" to 1L,
             "d3" to 4L,

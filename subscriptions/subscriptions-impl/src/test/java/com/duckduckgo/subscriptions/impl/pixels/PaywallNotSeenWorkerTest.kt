@@ -20,12 +20,14 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestWorkerBuilder
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -39,6 +41,7 @@ class PaywallNotSeenWorkerTest {
 
     private val pixelSender: SubscriptionPixelSender = mock()
     private val paywallMetricsManager: PaywallMetricsManager = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private fun buildWorker(dayBucket: String?): PaywallNotSeenWorker {
         val inputData = dayBucket?.let {
@@ -52,6 +55,7 @@ class PaywallNotSeenWorkerTest {
             .also { worker ->
                 worker.pixelSender = pixelSender
                 worker.paywallMetricsManager = paywallMetricsManager
+                worker.appBuildConfig = appBuildConfig
             }
     }
 
@@ -68,7 +72,7 @@ class PaywallNotSeenWorkerTest {
         val result = buildWorker("d0").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender, never()).reportPaywallNotSeen("d0")
+        verify(pixelSender, never()).reportPaywallNotSeen(any(), any())
     }
 
     @Test
@@ -79,18 +83,41 @@ class PaywallNotSeenWorkerTest {
         val result = buildWorker("d3").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender, never()).reportPaywallNotSeen("d3")
+        verify(pixelSender, never()).reportPaywallNotSeen(any(), any())
     }
 
     @Test
     fun `when paywall not seen and pixel not fired then fires pixel and marks day as fired`() = runTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d7")).thenReturn(false)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
 
         val result = buildWorker("d7").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender).reportPaywallNotSeen("d7")
+        verify(pixelSender).reportPaywallNotSeen("d7", false)
         verify(paywallMetricsManager).markNotSeenDayFired("d7")
+    }
+
+    @Test
+    fun `when app is a reinstall then returning_user is true`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+
+        buildWorker("d0").doWork()
+
+        verify(pixelSender).reportPaywallNotSeen("d0", true)
+    }
+
+    @Test
+    fun `when app is a fresh install then returning_user is false`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+
+        buildWorker("d0").doWork()
+
+        verify(pixelSender).reportPaywallNotSeen("d0", false)
     }
 }

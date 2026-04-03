@@ -20,6 +20,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -39,22 +40,40 @@ class PaywallNotSeenSchedulerTest {
 
     private val workManager: WorkManager = mock()
     private val paywallMetricsManager: PaywallMetricsManager = mock()
+    private val subscriptions: Subscriptions = mock()
     private lateinit var scheduler: PaywallNotSeenScheduler
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         scheduler = PaywallNotSeenScheduler(
             workManager = workManager,
             paywallMetricsManager = paywallMetricsManager,
+            subscriptions = subscriptions,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         whenever(paywallMetricsManager.delayUntilMilestone(any())).thenReturn(0L)
+        whenever(subscriptions.isEligible()).thenReturn(true)
     }
 
     @Test
     fun `when paywall already seen then no workers are scheduled`() = runTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(true)
+
+        scheduler.onStart(mock())
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(workManager, never()).enqueueUniqueWork(
+            any<String>(),
+            any<ExistingWorkPolicy>(),
+            any<OneTimeWorkRequest>(),
+        )
+    }
+
+    @Test
+    fun `when user is not eligible then no workers are scheduled`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(subscriptions.isEligible()).thenReturn(false)
 
         scheduler.onStart(mock())
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
