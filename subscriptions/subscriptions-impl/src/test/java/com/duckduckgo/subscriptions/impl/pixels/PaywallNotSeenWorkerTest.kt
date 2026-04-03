@@ -22,6 +22,7 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestWorkerBuilder
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -42,6 +43,7 @@ class PaywallNotSeenWorkerTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val paywallMetricsManager: PaywallMetricsManager = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val subscriptions: Subscriptions = mock()
 
     private fun buildWorker(dayBucket: String?): PaywallNotSeenWorker {
         val inputData = dayBucket?.let {
@@ -56,6 +58,7 @@ class PaywallNotSeenWorkerTest {
                 worker.pixelSender = pixelSender
                 worker.paywallMetricsManager = paywallMetricsManager
                 worker.appBuildConfig = appBuildConfig
+                worker.subscriptions = subscriptions
             }
     }
 
@@ -66,7 +69,18 @@ class PaywallNotSeenWorkerTest {
     }
 
     @Test
+    fun `when user is not eligible then pixel is not fired`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(false)
+
+        val result = buildWorker("d0").doWork()
+
+        assertEquals(Result.success(), result)
+        verify(pixelSender, never()).reportPaywallNotSeen(any(), any(), any())
+    }
+
+    @Test
     fun `when paywall was already seen then pixel is not fired`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(true)
 
         val result = buildWorker("d0").doWork()
@@ -77,6 +91,7 @@ class PaywallNotSeenWorkerTest {
 
     @Test
     fun `when pixel was already fired for this day then pixel is not fired again`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d3")).thenReturn(true)
 
@@ -88,6 +103,7 @@ class PaywallNotSeenWorkerTest {
 
     @Test
     fun `when paywall not seen and pixel not fired then fires pixel and marks day as fired`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d7")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
@@ -102,6 +118,7 @@ class PaywallNotSeenWorkerTest {
 
     @Test
     fun `when app is a reinstall then returning_user is true`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
@@ -114,6 +131,7 @@ class PaywallNotSeenWorkerTest {
 
     @Test
     fun `when app is a fresh install then returning_user is false`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
@@ -126,6 +144,7 @@ class PaywallNotSeenWorkerTest {
 
     @Test
     fun `when privacy dashboard was opened then privacy_dashboard_ever_opened is true`() = runTest {
+        whenever(subscriptions.isEligible()).thenReturn(true)
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
