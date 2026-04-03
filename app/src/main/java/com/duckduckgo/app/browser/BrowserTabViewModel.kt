@@ -173,6 +173,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.favicon.FaviconFetchingFixFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -517,6 +518,7 @@ class BrowserTabViewModel @Inject constructor(
     private val queryUrlPredictor: QueryUrlPredictor,
     private val browserUiLockFeature: BrowserUiLockFeature,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val faviconFetchingFixFeature: FaviconFetchingFixFeature,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -620,6 +622,7 @@ class BrowserTabViewModel @Inject constructor(
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
+    private var faviconRequestedForDomain: String? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
@@ -1431,6 +1434,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun prefetchFavicon(url: String) {
+        if (faviconFetchingFixFeature.self().isEnabled()) {
+            val domain = url.toUri().baseHost ?: return
+            if (faviconRequestedForDomain == domain) return
+            faviconRequestedForDomain = domain
+        }
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob =
             viewModelScope.launch {
@@ -1452,6 +1460,10 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(dispatchers.io()) {
+            if (faviconFetchingFixFeature.self().isEnabled()) {
+                val existing = faviconManager.loadFromDisk(currentTab.tabId, url)
+                if (existing != null && existing.width >= icon.width) return@launch
+            }
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, ImageFavicon(icon, url))
             faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
