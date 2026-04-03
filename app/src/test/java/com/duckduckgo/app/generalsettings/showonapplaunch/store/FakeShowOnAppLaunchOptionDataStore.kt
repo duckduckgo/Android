@@ -37,7 +37,7 @@ class FakeShowOnAppLaunchOptionDataStore(defaultOption: ShowOnAppLaunchOption? =
 
     override val specificPageUrlFlow: Flow<String> = currentSpecificPageUrl.asStateFlow()
 
-    override fun hasOptionSelected(): Boolean = optionSelected
+    override suspend fun hasOptionSelected(): Boolean = optionSelected
 
     override suspend fun setShowOnAppLaunchOption(showOnAppLaunchOption: ShowOnAppLaunchOption) {
         optionSelected = true

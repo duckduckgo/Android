@@ -55,7 +55,7 @@ class ShowOnAppLaunchPrefsDataStoreTest {
         )
 
     private val testee: ShowOnAppLaunchOptionPrefsDataStore =
-        ShowOnAppLaunchOptionPrefsDataStore(testDataStore, coroutineRule.testDispatcherProvider)
+        ShowOnAppLaunchOptionPrefsDataStore(testDataStore)
 
     @After
     fun after() {
