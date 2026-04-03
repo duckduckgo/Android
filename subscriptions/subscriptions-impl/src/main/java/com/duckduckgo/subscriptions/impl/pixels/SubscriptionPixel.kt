@@ -275,38 +275,41 @@ enum class SubscriptionPixel(
         enqueue = true,
     ),
 
-    // Fires once (Unique) with the day-cohort bucket when the user first opens the paywall.
-    OFFER_SCREEN_SHOWN_FIRST_TIME(
-        baseName = "m_privacy-pro_offer_screen_impression",
+    PAYWALL_SHOWN_FIRST_TIME(
+        baseName = "m_subscription_paywall_impression",
         type = Unique(),
-        includedParameters = setOf(ATB, APP_VERSION),
+        includedParameters = setOf(APP_VERSION),
     ),
 
-    // Fired at day+1 for each milestone if the user has not yet visited the paywall.
     PAYWALL_NOT_SEEN_D0(
-        baseName = "m_privacy-pro_offer_not_seen_d0",
-        type = Count,
+        baseName = "m_subscription_paywall_not_seen_d0",
+        type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     PAYWALL_NOT_SEEN_D3(
-        baseName = "m_privacy-pro_offer_not_seen_d3",
-        type = Count,
+        baseName = "m_subscription_paywall_not_seen_d3",
+        type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     PAYWALL_NOT_SEEN_D7(
-        baseName = "m_privacy-pro_offer_not_seen_d7",
-        type = Count,
+        baseName = "m_subscription_paywall_not_seen_d7",
+        type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     PAYWALL_NOT_SEEN_D14(
-        baseName = "m_privacy-pro_offer_not_seen_d14",
-        type = Count,
+        baseName = "m_subscription_paywall_not_seen_d14",
+        type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     PAYWALL_NOT_SEEN_D30(
-        baseName = "m_privacy-pro_offer_not_seen_d30",
-        type = Count,
+        baseName = "m_subscription_paywall_not_seen_d30",
+        type = Unique(),
         includedParameters = setOf(APP_VERSION),
+        enqueue = true,
     ),
     ;
 
@@ -331,6 +334,7 @@ object SubscriptionPixelParameter {
     const val ACTIVATION_PLATFORM = "activation_platform"
     const val DAYS_SINCE_INSTALL = "days_since_install"
     const val RETURNING_USER = "returning_user"
+    const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
 }
 
 internal val PixelType.pixelNameSuffix: String

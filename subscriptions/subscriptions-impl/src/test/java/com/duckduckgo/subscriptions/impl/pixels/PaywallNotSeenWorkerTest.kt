@@ -72,7 +72,7 @@ class PaywallNotSeenWorkerTest {
         val result = buildWorker("d0").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender, never()).reportPaywallNotSeen(any(), any())
+        verify(pixelSender, never()).reportPaywallNotSeen(any(), any(), any())
     }
 
     @Test
@@ -83,7 +83,7 @@ class PaywallNotSeenWorkerTest {
         val result = buildWorker("d3").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender, never()).reportPaywallNotSeen(any(), any())
+        verify(pixelSender, never()).reportPaywallNotSeen(any(), any(), any())
     }
 
     @Test
@@ -91,11 +91,12 @@ class PaywallNotSeenWorkerTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d7")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(paywallMetricsManager.privacyDashboardEverOpened).thenReturn(false)
 
         val result = buildWorker("d7").doWork()
 
         assertEquals(Result.success(), result)
-        verify(pixelSender).reportPaywallNotSeen("d7", false)
+        verify(pixelSender).reportPaywallNotSeen("d7", false, false)
         verify(paywallMetricsManager).markNotSeenDayFired("d7")
     }
 
@@ -104,10 +105,11 @@ class PaywallNotSeenWorkerTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        whenever(paywallMetricsManager.privacyDashboardEverOpened).thenReturn(false)
 
         buildWorker("d0").doWork()
 
-        verify(pixelSender).reportPaywallNotSeen("d0", true)
+        verify(pixelSender).reportPaywallNotSeen("d0", true, false)
     }
 
     @Test
@@ -115,9 +117,22 @@ class PaywallNotSeenWorkerTest {
         whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
         whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(paywallMetricsManager.privacyDashboardEverOpened).thenReturn(false)
 
         buildWorker("d0").doWork()
 
-        verify(pixelSender).reportPaywallNotSeen("d0", false)
+        verify(pixelSender).reportPaywallNotSeen("d0", false, false)
+    }
+
+    @Test
+    fun `when privacy dashboard was opened then privacy_dashboard_ever_opened is true`() = runTest {
+        whenever(paywallMetricsManager.paywallEverSeen).thenReturn(false)
+        whenever(paywallMetricsManager.isNotSeenDayFired("d0")).thenReturn(false)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
+        whenever(paywallMetricsManager.privacyDashboardEverOpened).thenReturn(true)
+
+        buildWorker("d0").doWork()
+
+        verify(pixelSender).reportPaywallNotSeen("d0", false, true)
     }
 }

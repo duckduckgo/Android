@@ -17,7 +17,9 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardOpenedPlugin
 import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -28,10 +30,20 @@ import javax.inject.Inject
  * point for the PixelSender, the scheduler, and the workers.
  */
 @SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(
+    AppScope::class,
+    boundType = PrivacyDashboardOpenedPlugin::class,
+)
 class PaywallMetricsManager @Inject constructor(
     private val paywallMetricsStore: PaywallMetricsDataStore,
-) {
+) : PrivacyDashboardOpenedPlugin {
     val paywallEverSeen: Boolean get() = paywallMetricsStore.paywallEverSeen
+
+    val privacyDashboardEverOpened: Boolean get() = paywallMetricsStore.privacyDashboardEverOpened
+
+    override suspend fun onPrivacyDashboardOpened() {
+        paywallMetricsStore.privacyDashboardEverOpened = true
+    }
 
     fun recordFirstPaywallSeen(): String? {
         if (paywallMetricsStore.paywallEverSeen) return null
