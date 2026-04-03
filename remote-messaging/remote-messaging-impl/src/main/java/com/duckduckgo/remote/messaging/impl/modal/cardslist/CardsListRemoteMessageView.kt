@@ -130,13 +130,13 @@ class CardsListRemoteMessageView @JvmOverloads constructor(
 
     private fun setupUi() {
         cardsListAdapter.setListener(viewModel)
-        cardsListAdapter.headerImageLoadListener = object : CardsListAdapter.HeaderImageLoadListener {
-            override fun onImageLoadSuccess() {
-                viewModel.onRemoteImageLoadSuccess()
+        cardsListAdapter.imageLoadListener = object : CardsListAdapter.ImageLoadListener {
+            override fun onImageLoadSuccess(source: ImageLoadSource) {
+                viewModel.onImageLoadSuccess(source)
             }
 
-            override fun onImageLoadFailed() {
-                viewModel.onRemoteImageLoadFailed()
+            override fun onImageLoadFailed(source: ImageLoadSource) {
+                viewModel.onImageLoadFailed(source)
             }
         }
         binding.cardItemsRecyclerView.adapter = cardsListAdapter

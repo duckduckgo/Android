@@ -189,6 +189,8 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.DATA_CLEARING_AUTOMATIC_OPTIONS_UPDATED.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
             RemoteMessagingPixelName.REMOTE_MESSAGE_IMAGE_LOAD_FAILED.pixelName to PixelParameter.removeAtb(),
+            RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            RemoteMessagingPixelName.REMOTE_MESSAGE_CARD_IMAGE_LOAD_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_HARMONY_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_RETRIEVAL_FAILED.pixelName to PixelParameter.removeAtb(),
             AutofillPixelNames.AUTOFILL_PREFERENCES_GET_KEY_FAILED.pixelName to PixelParameter.removeAtb(),
