@@ -330,6 +330,7 @@ object SubscriptionPixelParameter {
     const val ACTIVATION_DAY = "activation_day"
     const val ACTIVATION_PLATFORM = "activation_platform"
     const val DAYS_SINCE_INSTALL = "days_since_install"
+    const val RETURNING_USER = "returning_user"
 }
 
 internal val PixelType.pixelNameSuffix: String
