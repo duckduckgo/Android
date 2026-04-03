@@ -37,6 +37,10 @@ class PaywallMetricsDataStore @Inject constructor(
         get() = preferences.getBoolean(KEY_PAYWALL_EVER_SEEN, false)
         set(value) { preferences.edit { putBoolean(KEY_PAYWALL_EVER_SEEN, value) } }
 
+    var privacyDashboardEverOpened: Boolean
+        get() = preferences.getBoolean(KEY_PRIVACY_DASHBOARD_EVER_OPENED, false)
+        set(value) { preferences.edit { putBoolean(KEY_PRIVACY_DASHBOARD_EVER_OPENED, value) } }
+
     val firstInstallTimestamp: Long by lazy {
         context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
     }
@@ -54,5 +58,6 @@ class PaywallMetricsDataStore @Inject constructor(
         const val FILENAME = "com.duckduckgo.subscriptions.paywall.metrics"
         const val KEY_PAYWALL_EVER_SEEN = "KEY_PAYWALL_EVER_SEEN"
         const val KEY_NOT_SEEN_FIRED_DAYS = "KEY_NOT_SEEN_FIRED_DAYS"
+        const val KEY_PRIVACY_DASHBOARD_EVER_OPENED = "KEY_PRIVACY_DASHBOARD_EVER_OPENED"
     }
 }

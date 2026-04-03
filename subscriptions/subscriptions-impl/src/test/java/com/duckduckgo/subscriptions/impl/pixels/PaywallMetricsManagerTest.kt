@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.subscriptions.impl.store.PaywallMetricsDataStore
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -141,5 +142,20 @@ class PaywallMetricsManagerTest {
         whenever(store.firstInstallTimestamp).thenReturn(System.currentTimeMillis())
 
         assertTrue(manager.delayUntilMilestone(checkAfterDays = 4) > 0)
+    }
+
+    @Test
+    fun `privacyDashboardEverOpened delegates to store`() {
+        whenever(store.privacyDashboardEverOpened).thenReturn(true)
+        assertTrue(manager.privacyDashboardEverOpened)
+
+        whenever(store.privacyDashboardEverOpened).thenReturn(false)
+        assertFalse(manager.privacyDashboardEverOpened)
+    }
+
+    @Test
+    fun `onPrivacyDashboardOpened sets flag in store`() = runTest {
+        manager.onPrivacyDashboardOpened()
+        verify(store).privacyDashboardEverOpened = true
     }
 }

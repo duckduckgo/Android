@@ -60,7 +60,8 @@ class PaywallNotSeenWorker(
         }
 
         val returningUser = appBuildConfig.isAppReinstall()
-        pixelSender.reportPaywallNotSeen(dayBucket, returningUser)
+        val privacyDashboardEverOpened = paywallMetricsManager.privacyDashboardEverOpened
+        pixelSender.reportPaywallNotSeen(dayBucket, returningUser, privacyDashboardEverOpened)
         paywallMetricsManager.markNotSeenDayFired(dayBucket)
         return Result.success()
     }
