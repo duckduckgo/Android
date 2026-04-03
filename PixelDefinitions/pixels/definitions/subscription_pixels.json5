@@ -63,6 +63,56 @@
             }
         ]
     },
+    "m_subscription_paywall_impression_u": {
+        "description": "Fired once (unique) the first time a user opens the Privacy Pro paywall. Includes the day-since-install cohort bucket to understand when users first encounter the paywall.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "days_since_install",
+                "description": "Day-cohort bucket indicating how many days after install the user first saw the paywall",
+                "type": "string",
+                "enum": ["d0", "d1_to_d3", "d4_to_d7", "d8_to_d14", "d15_to_d30", "d30_plus"]
+            }
+        ]
+    },
+    "m_subscription_paywall_not_seen_d0_u": {
+        "description": "Fired once (unique) on day 1 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+    },
+    "m_subscription_paywall_not_seen_d3_u": {
+        "description": "Fired once (unique) on day 4 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+    },
+    "m_subscription_paywall_not_seen_d7_u": {
+        "description": "Fired once (unique) on day 8 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+    },
+    "m_subscription_paywall_not_seen_d14_u": {
+        "description": "Fired once (unique) on day 15 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+    },
+    "m_subscription_paywall_not_seen_d30_u": {
+        "description": "Fired once (unique) on day 31 if the user has not yet opened the Privacy Pro paywall since install.",
+        "owners": ["nalcalag"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion", "returningUser", "privacyDashboardOpened"]
+    },
     "m_privacy-pro_app_subscription_active_d": {
         "description": "Fired once daily on app start for an active subscription",
         "owners": ["lmac012"],
