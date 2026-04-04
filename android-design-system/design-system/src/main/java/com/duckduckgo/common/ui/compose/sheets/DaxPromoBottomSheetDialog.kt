@@ -36,8 +36,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.buttons.SmallGhostButton
-import com.duckduckgo.common.ui.compose.buttons.SmallPrimaryButton
+import com.duckduckgo.common.ui.compose.button.DaxGhostButton
+import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.R
@@ -127,7 +127,7 @@ fun DaxPromoBottomSheetDialog(
     )
 }
 
-object DaxPromoBottomSheetDefaults {
+private object DaxPromoBottomSheetDefaults {
     internal val sheetPadding = 24.dp
     internal val sheetVerticalGap = 16.dp
     internal val sheetHorizontalGap = 16.dp
@@ -151,8 +151,8 @@ private fun DaxPromoBottomSheetDialogPreview() {
                 description = "Add our search widget to your home screen for quick access.",
                 promoIcon = painterResource(R.drawable.ic_announce),
                 buttons = {
-                    SmallGhostButton(text = "Button", onClick = {})
-                    SmallPrimaryButton(text = "Button", onClick = {})
+                    DaxGhostButton(text = "Button", onClick = {})
+                    DaxPrimaryButton(text = "Button", onClick = {})
                 },
                 onDismissRequest = {},
             )
@@ -175,8 +175,8 @@ private fun DaxPromoBottomSheetDialogNoImagePreview() {
                 description = "Add our search widget to your home screen for quick access.",
                 promoIcon = null,
                 buttons = {
-                    SmallGhostButton(text = "Button", onClick = {})
-                    SmallPrimaryButton(text = "Button", onClick = {})
+                    DaxGhostButton(text = "Button", onClick = {})
+                    DaxPrimaryButton(text = "Button", onClick = {})
                 },
                 onDismissRequest = {},
             )
@@ -199,8 +199,8 @@ private fun DaxPromoBottomSheetDialogNoImageAndTitlePreview() {
                 description = "Add our search widget to your home screen for quick access.",
                 promoIcon = null,
                 buttons = {
-                    SmallGhostButton(text = "Button", onClick = {})
-                    SmallPrimaryButton(text = "Button", onClick = {})
+                    DaxGhostButton(text = "Button", onClick = {})
+                    DaxPrimaryButton(text = "Button", onClick = {})
                 },
                 onDismissRequest = {},
             )
