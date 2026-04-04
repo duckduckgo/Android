@@ -273,6 +273,8 @@ class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override val rootView = this
+
     override val findInPage: IncludeFindInPageBinding by lazy {
         IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
     }
@@ -824,7 +826,9 @@ class OmnibarLayout @JvmOverloads constructor(
                 showDuckSidebar = viewState.showDuckAISidebar,
             )
 
-        if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null &&
+        val isRestoringButtonsOnBottomOmnibar = omnibarType == OmnibarType.SINGLE_BOTTOM &&
+            !viewState.hasFocus && previousTransitionState?.showFireIcon == false && newTransitionState.showFireIcon
+        if (omnibarAnimationManager.isFeatureEnabled() && previousTransitionState != null && !isRestoringButtonsOnBottomOmnibar &&
             (
                 newTransitionState.showFireIcon != previousTransitionState?.showFireIcon ||
                     newTransitionState.showTabsMenu != previousTransitionState?.showTabsMenu ||

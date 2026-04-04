@@ -290,6 +290,7 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -1123,6 +1124,17 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+
+        val view = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) {
+            omnibar.omnibarView.rootView
+        } else {
+            null
+        }
+
+        if (view != null) {
+            val insetsWithKeyboardAnimationCallback = InsetsWithKeyboardAnimationCallback(view)
+            ViewCompat.setWindowInsetsAnimationCallback(view, insetsWithKeyboardAnimationCallback)
+        }
     }
 
     private fun disableViewStateSaving() {

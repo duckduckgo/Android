@@ -32,6 +32,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -53,6 +54,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
+import com.duckduckgo.common.utils.ui.InsetsWithKeyboardAnimationCallback
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
@@ -260,6 +262,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             inputModeWidget.setInputScreenBottomButtons(inputScreenButtons)
             binding.inputModeWidgetContainerBottom.addView(inputModeWidget)
             binding.inputModeWidgetContainerBottom.addView(contentSeparator)
+
+            val insetsWithKeyboardAnimationCallback = InsetsWithKeyboardAnimationCallback(binding.inputModeWidgetContainerBottom)
+            ViewCompat.setWindowInsetsAnimationCallback(binding.inputModeWidgetContainerBottom, insetsWithKeyboardAnimationCallback)
         }
 
         configureViewPager()

@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import kotlinx.coroutines.flow.Flow
 
 interface OmnibarView {
+    val rootView: View
     val omnibarType: OmnibarType
     var isScrollingEnabled: Boolean
     var isUiLocked: Boolean
