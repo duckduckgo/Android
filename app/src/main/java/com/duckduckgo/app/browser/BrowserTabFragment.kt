@@ -323,6 +323,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -426,6 +427,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ntpAfterIdleManager: NtpAfterIdleManager
 
     @Inject
     lateinit var vpnMenuStore: VpnMenuStore
@@ -3501,6 +3505,7 @@ class BrowserTabFragment :
         newTabReturnHatchView.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    ntpAfterIdleManager.fireReturnToPageTapped()
                     browserActivity?.openExistingTab(newTabReturnHatchView.tabId)
                 }
 

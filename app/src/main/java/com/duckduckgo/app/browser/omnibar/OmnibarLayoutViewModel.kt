@@ -67,6 +67,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
 import com.duckduckgo.serp.logos.api.SerpLogo
@@ -113,6 +114,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val addressBarTrackersAnimationManager: AddressBarTrackersAnimationManager,
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
+    private val ntpAfterIdleRepository: NtpAfterIdleManager,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
@@ -963,6 +965,9 @@ class OmnibarLayoutViewModel @Inject constructor(
             AppPixelName.KEYBOARD_GO_SERP_CLICKED,
             AppPixelName.KEYBOARD_GO_WEBSITE_CLICKED,
         )
+        if (_viewState.value.url.isEmpty()) {
+            ntpAfterIdleRepository.fireBarUsedFromNtp()
+        }
     }
 
     fun onAnimationStarted(decoration: Decoration) {

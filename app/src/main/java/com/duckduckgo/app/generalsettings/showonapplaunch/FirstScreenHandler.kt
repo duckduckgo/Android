@@ -21,6 +21,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,7 @@ class FirstScreenHandlerImpl @Inject constructor(
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val settingsDataStore: SettingsDataStore,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
+    private val ntpAfterIdleManager: NtpAfterIdleManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : BrowserLifecycleObserver {
 
@@ -56,13 +58,15 @@ class FirstScreenHandlerImpl @Inject constructor(
             val elapsed = System.currentTimeMillis() - lastBackgrounded
             logcat { "FirstScreen: time elapsed $elapsed" }
             if (lastBackgrounded == 0L || elapsed >= timeoutMs) {
-                logcat { "FirstScreen: handleAppLaunchOption" }
+                logcat { "FirstScreen: handleAppLaunchOption (after idle)" }
+                ntpAfterIdleManager.onNtpShownAfterIdle()
                 showOnAppLaunchOptionHandler.handleAppLaunchOption()
             }
             return
         }
 
         if (isFreshLaunch && showOnAppLaunchFeature.self().isEnabled()) {
+            ntpAfterIdleManager.onNtpShownUserInitiated()
             showOnAppLaunchOptionHandler.handleAppLaunchOption()
         }
     }

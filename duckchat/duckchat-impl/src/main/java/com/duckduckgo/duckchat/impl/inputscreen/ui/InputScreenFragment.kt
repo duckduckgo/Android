@@ -88,6 +88,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.store.DefaultTogglePosition
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
@@ -113,6 +114,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ntpAfterIdleManager: NtpAfterIdleManager
 
     @Inject
     lateinit var viewModelFactory: InputScreenViewModelFactory
@@ -563,6 +567,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.inputScreenHatch.setHatchListener(
             object : NewTabReturnHatchView.HatchListener {
                 override fun onHatchPressed() {
+                    ntpAfterIdleManager.fireReturnToPageTapped()
                     val tabId = binding.inputScreenHatch.tabId
                     val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, tabId)
                     requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
