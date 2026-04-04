@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">Dette oppretter en kryptert sikkerhetskopi av bokmerkene, passordene og Duck.ai-chattene dine på DuckDuckGos sikre server, som kan synkroniseres med dine andre enheter. \n\n Krypteringsnøkkelen lagres bare på enheten din. DuckDuckGo har ikke tilgang til den.</string>
     <string name="sync_intro_enable_footer">Du kan synkronisere med de andre enhetene dine senere.</string>
     <string name="sync_intro_enable_cta">Slå på Synkronisering og sikkerhetskopiering</string>
-    <string name="sync_intro_recover_title">Gjenopprett synkroniserte data</string>
-    <string name="sync_intro_recover_content">For å gjenopprette synkroniserte data trenger du gjenopprettingskoden du lagret, da du først satte opp synkronisering. Denne koden kan ha blitt lagret som en PDF-fil på enheten du opprinnelig brukte til å sette opp synkronisering.</string>
-    <string name="sync_intro_recover_cta">Kom i gang</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Gjenopprett synkroniserte data</string>
+    <string name="sync_recover_synced_data_content">Du trenger gjenopprettingskoden du fikk, da du konfigurerte Sync &amp; Backup. Du kan ha lagret den som en PDF på enheten du brukte.</string>
+    <string name="sync_recover_synced_data_cta">Gjenopprett synkroniserte data</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skann QR-kode</string>

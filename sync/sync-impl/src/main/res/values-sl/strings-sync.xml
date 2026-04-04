@@ -56,9 +56,10 @@
     <string name="sync_intro_enable_content_with_ai_chat">S tem ustvarite šifrirano varnostno kopijo zaznamkov, gesel in klepetov Duck.ai v varnem strežniku DuckDuckGo, ki jo lahko sinhronizirate z drugimi napravami. \n\n Šifrirni ključ je shranjen samo v vaši napravi, DuckDuckGo ne more dostopati do njega.</string>
     <string name="sync_intro_enable_footer">Pozneje lahko sinhronizirate z drugimi napravami.</string>
     <string name="sync_intro_enable_cta">Vklopite sinhronizacijo in varnostno kopiranje</string>
-    <string name="sync_intro_recover_title">Obnovitev sinhroniziranih podatkov</string>
-    <string name="sync_intro_recover_content">Za obnovitev sinhroniziranih podatkov potrebujete kodo za obnovitev, ki ste jo shranili ob prvi nastavitvi sinhronizacije. Ta koda je bila morda shranjena kot PDF v napravi, ki ste jo prvotno uporabili za nastavitev sinhronizacije.</string>
-    <string name="sync_intro_recover_cta">Začni</string>
+    <!-- Recover Synced Data Intro Screen -->
+    <string name="sync_recover_synced_data_title">Obnovi sinhronizirane podatke</string>
+    <string name="sync_recover_synced_data_content">Potrebovali boste obnovitveno kodo, ki ste jo prejeli ob nastavitvi funkcije Sync &amp; Backup. To kodo ste morda shranili kot PDF v napravi, ki ste jo takrat uporabili.</string>
+    <string name="sync_recover_synced_data_cta">Obnovitev sinhroniziranih podatkov</string>
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniranje kode QR</string>
