@@ -21,6 +21,7 @@ import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.isEmpty
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -94,6 +95,16 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         conflatedJob.cancel()
         super.onDetachedFromWindow()
+    }
+
+    // When this view is re-attached while its parent is GONE (e.g. during tab switching),
+    // the RecyclerView misses its initial layout pass after submitList(). Force a layout
+    // when the view becomes visible so the adapter data is actually rendered.
+    override fun onVisibilityAggregated(isVisible: Boolean) {
+        super.onVisibilityAggregated(isVisible)
+        if (isVisible && binding.quickAccessRecyclerView.isEmpty() && (binding.quickAccessRecyclerView.adapter?.itemCount ?: 0) > 0) {
+            binding.quickAccessRecyclerView.requestLayout()
+        }
     }
 
     private fun render(viewState: ViewState) {
