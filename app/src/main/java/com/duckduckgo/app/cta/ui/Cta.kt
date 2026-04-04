@@ -148,7 +148,7 @@ sealed class OnboardingDaxDialogCta(
         onPrimaryCtaClicked: () -> Unit,
         onSecondaryCtaClicked: () -> Unit,
         onTypingAnimationFinished: () -> Unit = {},
-        onDismissCtaClicked: () -> Unit,
+        onDismissCtaClicked: (() -> Unit)?,
     ) {
         val daxDialog = binding.includeOnboardingInContextDaxDialog
 
@@ -174,6 +174,7 @@ sealed class OnboardingDaxDialogCta(
         daxDialog.onboardingDialogSuggestionsContent.gone()
         daxDialog.onboardingDialogContent.show()
         daxDialog.root.alpha = MAX_ALPHA
+        daxDialog.daxDialogDismissButton.isVisible = onDismissCtaClicked != null
         TransitionManager.beginDelayedTransition(daxDialog.cardView, AutoTransition())
         val afterAnimation = {
             daxDialog.dialogTextCta.finishAnimation()
@@ -191,7 +192,7 @@ sealed class OnboardingDaxDialogCta(
             }
             binding.includeOnboardingInContextDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             binding.includeOnboardingInContextDaxDialog.secondaryCta.setOnClickListener { onSecondaryCtaClicked.invoke() }
-            binding.includeOnboardingInContextDaxDialog.daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+            daxDialog.daxDialogDismissButton.setOnClickListener(onDismissCtaClicked?.let { { it() } })
             onTypingAnimationFinished.invoke()
         }
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
@@ -570,7 +571,7 @@ sealed class OnboardingDaxDialogCta(
                 onPrimaryCtaClicked = onPrimaryCtaClicked,
                 onSecondaryCtaClicked = onSecondaryCtaClicked,
                 onTypingAnimationFinished = onTypingAnimationFinished,
-                onDismissCtaClicked = onDismissCtaClicked,
+                onDismissCtaClicked = null, // no dismiss button
             )
         }
     }
