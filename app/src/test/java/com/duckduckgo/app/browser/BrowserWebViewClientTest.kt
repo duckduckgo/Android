@@ -969,7 +969,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(BAD_URL, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(BAD_URL), eq(""), anyString())
     }
 
     @Test
@@ -981,7 +981,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(CONNECTION, "")
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(CONNECTION), eq(""), anyString())
     }
 
     @Test
@@ -993,7 +993,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1005,7 +1005,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1017,7 +1017,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString())
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any(), anyString(), anyString())
     }
 
     @Test
@@ -1031,7 +1031,7 @@ class BrowserWebViewClientTest {
 
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
 
-        verify(testee.webViewClientListener)!!.onReceivedError(SSL_PROTOCOL_ERROR, requestUrl)
+        verify(testee.webViewClientListener)!!.onReceivedError(eq(SSL_PROTOCOL_ERROR), eq(requestUrl), anyString())
     }
 
     @Test

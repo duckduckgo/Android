@@ -3836,6 +3836,7 @@ class BrowserTabViewModel @Inject constructor(
     override fun onReceivedError(
         errorType: WebViewErrorResponse,
         url: String,
+        rawErrorCode: String,
     ) {
         browserViewState.value =
             currentBrowserViewState().copy(
@@ -3844,6 +3845,9 @@ class BrowserTabViewModel @Inject constructor(
             )
         if (androidBrowserConfig.errorPagePixel().isEnabled()) {
             pixel.enqueueFire(AppPixelName.ERROR_PAGE_SHOWN)
+        }
+        if (androidBrowserConfig.errorCodePixel().isEnabled()) {
+            pixel.enqueueFire(AppPixelName.ERROR_CODE_PIXEL, mapOf("error_code" to rawErrorCode))
         }
         command.value = WebViewError(errorType, url)
     }
