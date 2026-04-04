@@ -157,6 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="56dp"
+                android:paddingEnd="0dp"
                 android:visibility="gone"
                 app:primaryText="@string/atp_ManageRecentAppsProtectionShowAll"/>
 

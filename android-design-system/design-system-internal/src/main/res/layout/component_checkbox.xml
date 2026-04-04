@@ -22,6 +22,7 @@
   android:clipToPadding="false"
   android:paddingTop="@dimen/keyline_5"
   android:paddingBottom="@dimen/keyline_5"
+  android:paddingStart="@dimen/keyline_4"
   android:paddingEnd="@dimen/keyline_4">
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

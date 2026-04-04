@@ -1967,39 +1967,6 @@
     </issue>
 
     <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                android:paddingStart=&quot;56dp&quot;"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/activity_manage_recent_apps_protection.xml"
-            line="159"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="    android:paddingEnd=&quot;16dp&quot; />"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/menu_item_device_tracker_switch.xml"
-            line="22"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="        android:paddingEnd=&quot;@dimen/keyline_4&quot;"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_device_shield_report_app_breakage_entry.xml"
-            line="24"
-            column="9"/>
-    </issue>
-
-    <issue
         id="RtlEnabled"
         message="The project references RTL attributes, but does not explicitly enable or disable RTL support with `android:supportsRtl` in the manifest">
         <location
