@@ -1011,6 +1011,8 @@ class BrowserTabFragment :
         }
         viewModel.handleExternalLaunch(isLaunchedFromExternalApp)
 
+        viewModel.observeSelectedTab(savedInstanceState != null)
+
         observeSubscriptionEventDataChannel()
     }
 
