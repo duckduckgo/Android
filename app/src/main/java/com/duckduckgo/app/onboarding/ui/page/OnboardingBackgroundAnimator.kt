@@ -44,6 +44,10 @@ sealed class OnboardingBackgroundStep(
         backgroundRes = R.drawable.onboarding_welcome_screen_background,
         maxHeightDp = 404,
     )
+    data object ComparisonChart : OnboardingBackgroundStep(
+        backgroundRes = R.drawable.onboarding_browser_comparison_background,
+        maxHeightDp = 216,
+    )
 }
 
 /**
@@ -86,14 +90,23 @@ class OnboardingBackgroundAnimator(
 
         cancel()
 
+        // Layouts that use fitCenter (tablet, landscape) need dimensionRatio to eliminate gaps
+        val usesFitCenter = backgroundSecondary.scaleType == ImageView.ScaleType.FIT_CENTER
+        if (usesFitCenter && inView == backgroundPrimary && backgroundPrimary.scaleType != ImageView.ScaleType.FIT_CENTER) {
+            backgroundPrimary.scaleType = ImageView.ScaleType.FIT_CENTER
+        }
+
         val density = inView.resources.displayMetrics.density
         val screenWidth = inView.rootView.width.toFloat()
 
         with(inView) {
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-            }
             setImageResource(step.backgroundRes)
+            updateLayoutParams<ConstraintLayout.LayoutParams> {
+                constrainedHeight = true
+                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+                verticalBias = 1f
+                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
+            }
 
             val startX = enterStartX ?: (screenWidth + centerCropOverflow(inView, screenWidth))
             translationX = startX
@@ -125,18 +138,21 @@ class OnboardingBackgroundAnimator(
      * Used to restore the correct background state after configuration changes (e.g., rotation).
      */
     fun snapTo(step: OnboardingBackgroundStep) {
-        val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
-        val outView = activeView
-
         cancel()
 
+        val inView = if (activeView == backgroundPrimary) backgroundSecondary else backgroundPrimary
+        val outView = activeView
         val density = inView.resources.displayMetrics.density
 
         with(inView) {
-            updateLayoutParams<ConstraintLayout.LayoutParams> {
-                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
-            }
             setImageResource(step.backgroundRes)
+            updateLayoutParams<ConstraintLayout.LayoutParams> {
+                constrainedHeight = true
+                matchConstraintMaxHeight = (step.maxHeightDp * density).roundToInt()
+                verticalBias = 1f
+                val usesFitCenter = scaleType == ImageView.ScaleType.FIT_CENTER
+                dimensionRatio = if (usesFitCenter) imageDimensionRatio(inView) else null
+            }
             translationX = 0f
             alpha = 1f
             isVisible = true
@@ -198,6 +214,19 @@ class OnboardingBackgroundAnimator(
         val scale = maxOf(viewWidth / intrinsicW, viewHeight / intrinsicH)
         val scaledWidth = intrinsicW * scale
         return maxOf(0f, (scaledWidth - viewWidth) / 2f)
+    }
+
+    /**
+     * Returns a ConstraintLayout dimension ratio string derived from the view's current
+     * drawable, so the view's height is computed from its width to match the image's
+     * aspect ratio. This eliminates fitCenter gaps by making the view exactly the
+     * height the fitted image needs. Returns null when dimensions are unavailable.
+     */
+    private fun imageDimensionRatio(view: ImageView): String? {
+        val d = view.drawable ?: return null
+        val w = d.intrinsicWidth.takeIf { it > 0 } ?: return null
+        val h = d.intrinsicHeight.takeIf { it > 0 } ?: return null
+        return "H,$w:$h"
     }
 
     companion object {

@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/daxCtaContainer"
@@ -22,7 +22,6 @@
     android:alpha="0"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="vertical"
     android:visibility="invisible"
     tools:alpha="1"
     tools:visibility="visible">
@@ -36,44 +35,76 @@
         android:layout_marginBottom="16dp"
         app:arrowOffsetStart="96dp">
 
-        <LinearLayout
-            android:id="@+id/cardContainer"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="32dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="20dp">
+            android:fadeScrollbars="false">
 
-            <include
-                android:id="@+id/welcomeContent"
-                layout="@layout/include_brand_design_dialog_welcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/primaryCta"
+            <LinearLayout
+                android:id="@+id/cardContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:alpha="0"
-                android:paddingHorizontal="24dp"
-                android:text="@string/preOnboardingDaxDialog1Button"
-                tools:alpha="1"
-                tools:ignore="DeprecatedWidgetInXml" />
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="32dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="20dp">
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/secondaryCta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:alpha="0"
-                android:text="@string/preOnboardingDaxDialog1SecondaryButton"
-                android:visibility="gone"
-                tools:alpha="1"
-                tools:ignore="DeprecatedWidgetInXml"
-                tools:visibility="visible" />
-        </LinearLayout>
+                <include
+                    android:id="@+id/welcomeContent"
+                    layout="@layout/include_brand_design_dialog_welcome"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include
+                    android:id="@+id/comparisonChartContent"
+                    layout="@layout/include_brand_design_comparison_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:alpha="0"
+                    android:paddingHorizontal="24dp"
+                    android:text="@string/preOnboardingDaxDialog1Button"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/secondaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0"
+                    android:text="@string/preOnboardingDaxDialog1SecondaryButton"
+                    android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Button"
+                    android:visibility="gone"
+                    tools:alpha="1"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidDaxButtonProperty"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
     </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleBrandDesignUpdateCardView>
 
-</LinearLayout>
+    <com.duckduckgo.app.onboarding.ui.view.OnboardingStepIndicatorView
+        android:id="@+id/stepIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="58dp"
+        android:alpha="0"
+        android:translationZ="8dp"
+        android:visibility="gone"
+        tools:alpha="1"
+        tools:visibility="visible" />
+
+</FrameLayout>
