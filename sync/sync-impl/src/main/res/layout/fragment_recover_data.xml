@@ -63,6 +63,7 @@
             android:paddingStart="@dimen/keyline_5"
             android:paddingEnd="@dimen/keyline_5"
             android:paddingTop="20dp"
+            android:paddingBottom="@dimen/keyline_5"
             android:clipToPadding="false">
 
             <ImageView
